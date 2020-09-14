@@ -238,7 +238,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->expectsGetExtendConfig([
-            'owner' => ExtendScope::ORIGIN_CUSTOM,
+            'owner' => ExtendScope::OWNER_CUSTOM,
         ]);
 
         $this->expectsGetEntityConfig(self::$entityConfig);
@@ -286,7 +286,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'boolean' => [
                 'fieldType' => 'boolean',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                 ],
                 'expectedOptions' => [
                     'label' => self::SOME_LABEL,
@@ -302,7 +302,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'string' => [
                 'fieldType' => 'string',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                     'length' => 17
                 ],
                 'expectedOptions' => [
@@ -317,7 +317,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'decimal' => [
                 'fieldType' => 'decimal',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                     'precision' => 8,
                     'scale' => 2
                 ],
@@ -334,7 +334,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'float' => [
                 'fieldType' => 'float',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                 ],
                 'expectedOptions' => [
                     'label' => self::SOME_LABEL,
@@ -379,7 +379,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $relationOptions = [
             'fieldType' => RelationType::MANY_TO_ONE,
             'extendConfig' => [
-                'owner' => ExtendScope::ORIGIN_CUSTOM,
+                'owner' => ExtendScope::OWNER_CUSTOM,
                 'target_entity' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
                 'target_field' => 'SomeTargetField'
             ],
@@ -408,7 +408,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'many_to_one' => [
                 'fieldType' => RelationType::MANY_TO_ONE,
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                     'target_entity' => 'Oro\Bundle\SomeBundle\Entity\SomeTargetEntity',
                     'target_field' => 'SomeTargetField'
                 ],
@@ -471,7 +471,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'enum' => [
                 'fieldType' => 'enum',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                 ],
                 'enumConfig' => [
                     'enum_code' => 'SomeEnumCode'
@@ -486,7 +486,7 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
             'multiEnum' => [
                 'fieldType' => 'multiEnum',
                 'extendConfig' => [
-                    'owner' => ExtendScope::ORIGIN_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM,
                 ],
                 'enumConfig' => [
                     'enum_code' => 'SomeEnumCode'

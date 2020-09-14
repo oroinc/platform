@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
@@ -9,25 +10,23 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var ConfigProvider */
-    private $configurationProvider;
-
-    /** @var string */
-    private $cacheFile;
+    private ConfigProvider $configurationProvider;
+    private array $expectedDashboardConfigs;
+    private array $expectedWidgetConfigs;
 
     protected function setUp(): void
     {
-        $this->cacheFile = $this->getTempFile('DachboardConfigurationProvider');
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $cacheFile = $this->getTempFile('DashboardConfigurationProvider');
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->configurationProvider = new ConfigProvider($this->cacheFile, false, $this->eventDispatcher);
+        $this->configurationProvider = new ConfigProvider($cacheFile, false, $eventDispatcher);
 
         $bundle1 = new FirstTestBundle();
         $bundle2 = new SecondTestBundle();
@@ -37,119 +36,112 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
                 $bundle1->getName() => get_class($bundle1),
                 $bundle2->getName() => get_class($bundle2)
             ]);
-    }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testConfiguration()
-    {
-        $expectedConfiguration = [
-            'widgets'    => [
-                'quick_launchpad'        => [
-                    'route'                        => 'alternative_quick_lanchpad_route',
-                    'route_parameters'             => [
-                        'bundle' => 'TestBundle',
-                        'name'   => 'quickLaunchpad',
-                        'widget' => 'quick_launchpad'
-                    ],
-                    'items'                        => [
-                        'test1'  => [
-                            'label'            => 'Test1',
-                            'route'            => 'test1',
-                            'route_parameters' => [],
-                            'enabled'          => true
-                        ],
-                        'index'  => [
-                            'label'            => 'List',
-                            'route'            => 'oro_sales_opportunity_index',
-                            'acl'              => 'oro_sales_opportunity_view',
-                            'route_parameters' => [],
-                            'enabled'          => true
-                        ],
-                        'create' => [
-                            'label'            => 'Create opportunity',
-                            'route'            => 'oro_sales_opportunity_create',
-                            'acl'              => 'oro_sales_opportunity_create',
-                            'route_parameters' => [],
-                            'enabled'          => true
-                        ],
-                        'test2'  => [
-                            'label'            => 'Test2',
-                            'route'            => 'test2',
-                            'route_parameters' => [],
-                            'enabled'          => true
-                        ]
-                    ],
-                    'enabled'                      => true,
-                    'isNew'                        => false,
-                    'configuration_dialog_options' => ['resizable' => false],
-                    'configuration'                => [],
-                    'data_items'                   => [],
-                ],
-                'second_quick_launchpad' => [
-                    'route'                        => 'second_quick_launchpad_test_route',
-                    'route_parameters'             => [
-                        'bundle' => 'SecondTestBundle',
-                        'name'   => 'secondQuickLaunchpad',
-                        'widget' => 'second_quick_launchpad'
-                    ],
-                    'isNew'                        => true,
-                    'enabled'                      => true,
-                    'configuration_dialog_options' => ['resizable' => false],
-                    'configuration'                => [],
-                    'data_items'                   => [],
-                ]
-            ],
-            'dashboards' => [
-                'main'                  => [
-                    'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                ],
-                'alternative_dashboard' => [
-                    'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                ],
-                'empty_board'           => [
-                    'twig' => 'OroDashboardBundle:Index:default.html.twig'
-                ]
-            ]
+        $this->expectedDashboardConfigs = [
+            'main'                  => ['twig' => 'OroDashboardBundle:Index:default.html.twig'],
+            'alternative_dashboard' => ['twig' => 'OroDashboardBundle:Index:default.html.twig'],
+            'empty_board'           => ['twig' => 'OroDashboardBundle:Index:default.html.twig']
         ];
 
-        self::assertEquals(
-            $expectedConfiguration['widgets'],
-            $this->configurationProvider->getWidgetConfigs()
-        );
-        foreach ($expectedConfiguration['widgets'] as $name => $config) {
-            self::assertTrue(
-                $this->configurationProvider->hasWidgetConfig($name),
-                $name
-            );
-            self::assertEquals(
-                $config,
-                $this->configurationProvider->getWidgetConfig($name),
-                $name
-            );
-        }
+        $this->expectedWidgetConfigs = [
+            'quick_launchpad'        => [
+                'route'                        => 'alternative_quick_lanchpad_route',
+                'route_parameters'             => [
+                    'bundle' => 'TestBundle',
+                    'name'   => 'quickLaunchpad',
+                    'widget' => 'quick_launchpad'
+                ],
+                'items'                        => [
+                    'test1'  => [
+                        'label'            => 'Test1',
+                        'route'            => 'test1',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'index'  => [
+                        'label'            => 'List',
+                        'route'            => 'oro_sales_opportunity_index',
+                        'acl'              => 'oro_sales_opportunity_view',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'create' => [
+                        'label'            => 'Create opportunity',
+                        'route'            => 'oro_sales_opportunity_create',
+                        'acl'              => 'oro_sales_opportunity_create',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ],
+                    'test2'  => [
+                        'label'            => 'Test2',
+                        'route'            => 'test2',
+                        'route_parameters' => [],
+                        'enabled'          => true
+                    ]
+                ],
+                'enabled'                      => true,
+                'isNew'                        => false,
+                'configuration_dialog_options' => ['resizable' => false],
+                'configuration'                => [],
+                'data_items'                   => [],
+            ],
+            'second_quick_launchpad' => [
+                'route'                        => 'second_quick_launchpad_test_route',
+                'route_parameters'             => [
+                    'bundle' => 'SecondTestBundle',
+                    'name'   => 'secondQuickLaunchpad',
+                    'widget' => 'second_quick_launchpad'
+                ],
+                'isNew'                        => true,
+                'enabled'                      => true,
+                'configuration_dialog_options' => ['resizable' => false],
+                'configuration'                => [],
+                'data_items'                   => [],
+            ]
+        ];
+    }
 
-        self::assertEquals(
-            $expectedConfiguration['dashboards'],
-            $this->configurationProvider->getDashboardConfigs()
-        );
-        foreach ($expectedConfiguration['dashboards'] as $name => $config) {
-            self::assertTrue(
-                $this->configurationProvider->hasDashboardConfig($name),
-                $name
-            );
-            self::assertEquals(
-                $config,
-                $this->configurationProvider->getDashboardConfig($name),
-                $name
-            );
+    public function testGetDashboardConfigs()
+    {
+        self::assertEquals($this->expectedDashboardConfigs, $this->configurationProvider->getDashboardConfigs());
+    }
+
+    public function testHasDashboardConfig()
+    {
+        foreach (\array_keys($this->expectedDashboardConfigs) as $name) {
+            self::assertTrue($this->configurationProvider->hasDashboardConfig($name), $name);
         }
     }
 
-    public function testHasDashboardConfigForUnknownDashboard()
+    public function testGetDashboardConfig()
     {
-        $this->assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
+        foreach ($this->expectedDashboardConfigs as $name => $config) {
+            self::assertEquals($config, $this->configurationProvider->getDashboardConfig($name), $name);
+        }
+    }
+
+    public function testGetWidgetConfigs()
+    {
+        self::assertEquals($this->expectedWidgetConfigs, $this->configurationProvider->getWidgetConfigs());
+    }
+
+    public function testHasWidgetConfig()
+    {
+        foreach (\array_keys($this->expectedWidgetConfigs) as $name) {
+            self::assertTrue($this->configurationProvider->hasWidgetConfig($name), $name);
+        }
+    }
+
+    public function testGetWidgetConfig()
+    {
+        foreach ($this->expectedWidgetConfigs as $name => $config) {
+            self::assertEquals($config, $this->configurationProvider->getWidgetConfig($name), $name);
+        }
+    }
+
+    public function testHasWidgetConfigForUnknownWidget()
+    {
+        static::assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
     }
 
     public function testGetWidgetConfigForUnknownWidget()
@@ -160,9 +152,14 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider->getWidgetConfig('unknown');
     }
 
-    public function testHasWidgetConfigForUnknownWidget()
+    public function testGetWidgetConfigForUnknownWidgetIfExceptioNotAllowed()
     {
-        $this->assertFalse($this->configurationProvider->hasWidgetConfig('unknown'));
+        static::assertNull($this->configurationProvider->getWidgetConfig('unknown', false));
+    }
+
+    public function testHasDashboardConfigForUnknownDashboard()
+    {
+        static::assertFalse($this->configurationProvider->hasDashboardConfig('unknown'));
     }
 
     public function testGetDashboardConfigForUnknownDashboard()

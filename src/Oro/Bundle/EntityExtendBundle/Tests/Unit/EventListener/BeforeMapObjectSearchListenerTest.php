@@ -103,7 +103,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $customEntityConfig      = new Config($customEntityConfigId);
         $customEntityConfig->set('is_extend', true);
         $customEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
-        $customEntityConfig->set('owner', ExtendScope::ORIGIN_CUSTOM);
+        $customEntityConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $customEntityConfig->set('label', 'custom');
         $customEntityConfig->set('schema', [
             'doctrine' => ['Oro\TestBundle\Entity\Custom' => ['table' => 'testTable']]

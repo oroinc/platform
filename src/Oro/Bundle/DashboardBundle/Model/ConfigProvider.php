@@ -108,23 +108,22 @@ class ConfigProvider extends PhpArrayConfigProvider
     }
 
     /**
-     * @param string $widgetName
-     *
-     * @return array
-     *
-     * @throws InvalidConfigurationException
+     * @throws InvalidConfigurationException if the widget config was not found and $throwExceptionIfMissing = true
      */
-    public function getWidgetConfig(string $widgetName): array
+    public function getWidgetConfig(string $widgetName, bool $throwExceptionIfMissing = true): ?array
     {
         $configs = $this->doGetConfig();
         if (!isset($configs[self::WIDGETS][$widgetName])) {
-            throw new InvalidConfigurationException($widgetName);
+            if ($throwExceptionIfMissing) {
+                throw new InvalidConfigurationException($widgetName);
+            }
+            return null;
         }
 
         $widgetConfig = $configs[self::WIDGETS][$widgetName];
         if ($this->eventDispatcher->hasListeners(WidgetConfigurationLoadEvent::EVENT_NAME)) {
             $event = new WidgetConfigurationLoadEvent($widgetConfig);
-            $this->eventDispatcher->dispatch(WidgetConfigurationLoadEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, WidgetConfigurationLoadEvent::EVENT_NAME);
             $widgetConfig = $event->getConfiguration();
         }
 
