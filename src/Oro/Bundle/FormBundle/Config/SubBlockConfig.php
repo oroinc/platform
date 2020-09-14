@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Config;
 
+/**
+ * Sub block configuration class. This class stores data from system configuration files,
+ * later this data used to build form of configuration on UI
+ */
 class SubBlockConfig implements FormConfigInterface
 {
     /**
@@ -13,6 +17,11 @@ class SubBlockConfig implements FormConfigInterface
      * @var string
      */
     protected $description;
+
+    /**
+     * @var string
+     */
+    protected $descriptionStyle;
 
     /**
      * @var string
@@ -80,6 +89,26 @@ class SubBlockConfig implements FormConfigInterface
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescriptionStyle(): ?string
+    {
+        return $this->descriptionStyle;
+    }
+
+    /**
+     * @param string $descriptionStyle
+     *
+     * @return $this
+     */
+    public function setDescriptionStyle(?string $descriptionStyle): self
+    {
+        $this->descriptionStyle = $descriptionStyle;
+
+        return $this;
     }
 
     /**
@@ -194,6 +223,7 @@ class SubBlockConfig implements FormConfigInterface
             'code'        => $this->code,
             'title'       => $this->title,
             'description' => $this->description,
+            'descriptionStyle' => $this->descriptionStyle,
             'tooltip'     => $this->tooltip,
             'data'        => $this->data,
             'useSpan'     => $this->useSpan !== null ? $this->useSpan : true

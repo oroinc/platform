@@ -217,7 +217,11 @@
 
         {% if block.description is defined and block.description != '' %}
             <div class="container-fluid">
-                <p>{{ block.description|trans }}</p>
+                {% if block.descriptionStyle is defined and block.descriptionStyle != '' %}
+                    <p class="{{ block.descriptionStyle }}">{{ block.description|trans|oro_html_sanitize }}</p>
+                {% else %}
+                    <p>{{ block.description|trans|oro_html_sanitize }}</p>
+                {% endif %}
             </div>
         {% endif %}
 

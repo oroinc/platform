@@ -198,6 +198,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
             'code'        => $code,
             'title'       => null,
             'description' => null,
+            'descriptionStyle' => null,
             'data'        => $this->getData($itemNames),
             'useSpan'     => true,
             'tooltip'     => null
