@@ -16,7 +16,7 @@ class OroAttachmentExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $config        = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -28,8 +28,11 @@ class OroAttachmentExtension extends Extension
         $container->setParameter('oro_attachment.debug_images', $config['debug_images']);
         $container->setParameter('oro_attachment.upload_file_mime_types', $config['upload_file_mime_types']);
         $container->setParameter('oro_attachment.upload_image_mime_types', $config['upload_image_mime_types']);
+        $container->setParameter('oro_attachment.processors_allowed', $config['processors_allowed']);
+        $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
+        $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);
 
-        $yaml  = new Parser();
+        $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));
         $container->setParameter('oro_attachment.files', $value['file-icons']);
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
@@ -28,14 +29,17 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     private $filterAwareGenerator;
 
+    /** @var AttachmentHashProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentHashProvider;
+
     protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $this->filterConfiguration = $this->createMock(FilterConfiguration::class);
+        $this->attachmentHashProvider = $this->createMock(AttachmentHashProvider::class);
 
         $this->filterAwareGenerator = new AttachmentFilterAwareUrlGenerator(
             $this->urlGenerator,
-            $this->filterConfiguration
+            $this->attachmentHashProvider
         );
 
         $this->setUpLoggerMock($this->filterAwareGenerator);
@@ -67,7 +71,8 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $route = 'test';
         $parameters = ['id' => 1];
 
-        $this->filterConfiguration->expects($this->never())
+        $this->attachmentHashProvider
+            ->expects($this->never())
             ->method($this->anything());
 
         $this->urlGenerator->expects($this->once())
@@ -82,16 +87,16 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $route = 'test';
         $parameters = ['id' => 1, 'filter' => 'test_filter'];
 
-        $filterConfig = ['size' => ['height' => 'auto']];
-        $this->filterConfiguration->expects($this->once())
-            ->method('get')
-            ->with('test_filter')
-            ->willReturn($filterConfig);
-        $filterMd5 = md5(json_encode($filterConfig));
+        $filterHash = md5(json_encode(['size' => ['height' => 'auto']]));
+
+        $this->attachmentHashProvider
+            ->expects($this->once())
+            ->method('getFilterConfigHash')
+            ->willReturn($filterHash);
 
         $this->urlGenerator->expects($this->once())
             ->method('generate')
-            ->with($route, ['id' => 1, 'filter' => 'test_filter', 'filterMd5' => $filterMd5])
+            ->with($route, ['id' => 1, 'filter' => 'test_filter', 'filterMd5' => $filterHash])
             ->willReturn('/test/1');
         $this->assertSame('/test/1', $this->filterAwareGenerator->generate($route, $parameters));
     }
@@ -101,7 +106,8 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $route = 'test';
         $parameters = ['id' => 1];
 
-        $this->filterConfiguration->expects($this->never())
+        $this->attachmentHashProvider
+            ->expects($this->never())
             ->method($this->anything());
 
         $this->urlGenerator->expects($this->once())
@@ -119,7 +125,8 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $route = 'test';
         $parameters = ['id' => 1];
 
-        $this->filterConfiguration->expects($this->never())
+        $this->attachmentHashProvider
+            ->expects($this->never())
             ->method($this->anything());
 
         $this->urlGenerator->expects($this->once())
@@ -132,17 +139,16 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $this->filterAwareGenerator->generate($route, $parameters));
     }
 
-    public function testGetFilterHash()
+    public function testGetFilterHash(): void
     {
         $filterName = 'filterName';
-        $filterConfig = ['filterConfig'];
-        $this->filterConfiguration->expects($this->once())
-            ->method('get')
+        $filterConfig = md5(json_encode(['filterConfig']));
+        $this->attachmentHashProvider
+            ->expects($this->once())
+            ->method('getFilterConfigHash')
             ->with($filterName)
             ->willReturn($filterConfig);
 
-        $expected = md5(json_encode($filterConfig));
-
-        $this->assertEquals($expected, $this->filterAwareGenerator->getFilterHash($filterName));
+        $this->assertEquals($filterConfig, $this->filterAwareGenerator->getFilterHash($filterName));
     }
 }

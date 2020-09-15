@@ -52,6 +52,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                     'title'       => null,
                     'data'        => ['text_3' => ''],
                     'description' => null,
+                    'descriptionStyle' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
                 ],
@@ -67,6 +68,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                     'title'       => null,
                     'data'        => ['text_2' => ''],
                     'description' => null,
+                    'descriptionStyle' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
                 ],
@@ -75,6 +77,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                     'title'       => 'Second SubBlock',
                     'data'        => ['text_1' => ''],
                     'description' => null,
+                    'descriptionStyle' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
                 ],
@@ -90,6 +93,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                     'title'       => null,
                     'data'        => ['text_4' => ''],
                     'description' => null,
+                    'descriptionStyle' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
                 ],
@@ -98,6 +102,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                     'title'       => null,
                     'data'        => ['text_5' => ''],
                     'description' => null,
+                    'descriptionStyle' => null,
                     'useSpan'     => true,
                     'tooltip'     => null
                 ],
@@ -138,7 +143,8 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
                                 'title' => 'Second SubBlock'
                             ],
                         ],
-                        'description' => 'some desc'
+                        'description' => 'some desc',
+                        'descriptionStyle' => 'some desc style'
                     ],
                     'second' => [
                         'priority' => 2,

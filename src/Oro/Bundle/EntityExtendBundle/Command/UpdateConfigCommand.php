@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByInitialStateFilter;
-use Oro\Bundle\EntityExtendBundle\Tools\ConfigFilter\ByOriginFilter;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,9 +16,7 @@ class UpdateConfigCommand extends Command
 {
     protected static $defaultName = 'oro:entity-extend:update-config';
 
-    /**
-     * @var ExtendConfigDumper
-     */
+    /** @var ExtendConfigDumper */
     private $extendConfigDumper;
 
     /**
@@ -28,7 +25,6 @@ class UpdateConfigCommand extends Command
     public function __construct(ExtendConfigDumper $extendConfigDumper)
     {
         $this->extendConfigDumper = $extendConfigDumper;
-
         parent::__construct();
     }
 
@@ -44,12 +40,6 @@ class UpdateConfigCommand extends Command
                 null,
                 InputOption::VALUE_NONE,
                 'Applies user changes that require schema update if specified'
-            )
-            ->addOption(
-                'skip-origin',
-                null,
-                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Origin names which will be skipped during configuration update'
             )
             ->addOption(
                 'initial-state-path',
@@ -83,11 +73,6 @@ class UpdateConfigCommand extends Command
             $initialStates = unserialize(file_get_contents($initialStatePath));
             if (!empty($initialStates)) {
                 $filter = new ByInitialStateFilter($initialStates);
-            }
-        } else {
-            $skippedOrigins = (array)$input->getOption('skip-origin');
-            if (!empty($skippedOrigins)) {
-                $filter = new ByOriginFilter($skippedOrigins);
             }
         }
 

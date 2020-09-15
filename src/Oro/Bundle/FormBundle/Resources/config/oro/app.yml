@@ -11,7 +11,9 @@ oro_form:
 
             allowed_iframe_domains:
                 - 'youtube.com/embed/'
+                - 'www.youtube.com/embed/'
                 - 'youtube-nocookie.com/embed/'
+                - 'www.youtube-nocookie.com/embed/'
                 - 'player.vimeo.com/video/'
                 - 'maps.google.com/maps'
             allowed_html_elements:

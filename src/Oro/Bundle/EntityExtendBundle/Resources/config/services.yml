@@ -255,6 +255,13 @@ services:
         arguments:
             - '@oro_entity_extend.configuration_provider'
 
+    oro_entity_extend.extend_entity_platform_update_checker:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityPlatformUpdateChecker
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro.installer.platform_update_checker }
+
     oro_entity_extend.configuration_provider:
         class: Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider
         public: false
