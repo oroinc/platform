@@ -359,7 +359,7 @@ abstract class AbstractScopeManager
             return $this->getScopeEntityIdValue($entity);
         }
 
-        return null;
+        return $this->getScopeId();
     }
 
     /**
