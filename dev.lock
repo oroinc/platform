@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b7442f5047ff0f3e9ba39c44e7b6092",
+    "content-hash": "cf3b168d46c0058726f2b4f02742da40",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -8961,16 +8961,16 @@
         },
         {
             "name": "tinymce/tinymce",
-            "version": "4.6.7",
+            "version": "4.9.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tinymce/tinymce-dist.git",
-                "reference": "9f9cf10d009892009a296dff48970b079ec78c7a"
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/9f9cf10d009892009a296dff48970b079ec78c7a",
-                "reference": "9f9cf10d009892009a296dff48970b079ec78c7a",
+                "url": "https://api.github.com/repos/tinymce/tinymce-dist/zipball/3a68b67d1120ab89c6760afeb787291703c9a7d5",
+                "reference": "3a68b67d1120ab89c6760afeb787291703c9a7d5",
                 "shasum": ""
             },
             "type": "component",
@@ -8991,7 +8991,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-2.1"
+                "LGPL-2.1-only"
             ],
             "description": "Web based JavaScript HTML WYSIWYG editor control.",
             "homepage": "http://www.tinymce.com",
@@ -9003,7 +9003,7 @@
                 "tinymce",
                 "wysiwyg"
             ],
-            "time": "2017-09-18T11:31:55+00:00"
+            "time": "2020-07-13T05:29:19+00:00"
         },
         {
             "name": "true/punycode",
