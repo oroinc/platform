@@ -12,10 +12,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FieldConfigModelRepositoryTest extends WebTestCase
 {
-    /**
-     * @var FieldConfigModelRepository
-     */
-    protected $repository;
+    /** @var FieldConfigModelRepository */
+    private $repository;
 
     protected function setUp()
     {
@@ -101,8 +99,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
             LoadAttributeData::SYSTEM_ATTRIBUTE_1,
             LoadAttributeData::SYSTEM_ATTRIBUTE_2,
             LoadAttributeData::REGULAR_ATTRIBUTE_1,
-            LoadAttributeData::REGULAR_ATTRIBUTE_2,
-            LoadAttributeData::NOT_USED_ATTRIBUTE
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
         ];
         foreach ($attributes as $attribute) {
             self::assertInstanceOf(FieldConfigModel::class, $attribute);
@@ -174,8 +171,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
         // check only attributes added by this bundle because other bundles may add own attributes
         $expectedAttributes = [
             LoadAttributeData::REGULAR_ATTRIBUTE_1,
-            LoadAttributeData::REGULAR_ATTRIBUTE_2,
-            LoadAttributeData::NOT_USED_ATTRIBUTE,
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
         ];
         foreach ($attributes as $attribute) {
             self::assertInstanceOf(FieldConfigModel::class, $attribute);
@@ -195,8 +191,7 @@ class FieldConfigModelRepositoryTest extends WebTestCase
             LoadAttributeData::SYSTEM_ATTRIBUTE_1,
             LoadAttributeData::SYSTEM_ATTRIBUTE_2,
             LoadAttributeData::REGULAR_ATTRIBUTE_1,
-            LoadAttributeData::REGULAR_ATTRIBUTE_2,
-            LoadAttributeData::NOT_USED_ATTRIBUTE
+            LoadAttributeData::REGULAR_ATTRIBUTE_2
         ];
         $attributes = $this->repository->getAllAttributes();
 

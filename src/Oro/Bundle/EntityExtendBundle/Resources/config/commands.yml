@@ -64,5 +64,7 @@ services:
     Oro\Bundle\EntityExtendBundle\Command\UpdateCommand:
         arguments:
             - '@oro_entity_extend.extend.update_processor'
+        calls:
+            - [setConfigManager, ['@oro_entity_config.config_manager']]
         tags:
             - { name: console.command }

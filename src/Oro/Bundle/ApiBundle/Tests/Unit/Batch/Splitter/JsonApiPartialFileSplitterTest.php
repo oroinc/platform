@@ -210,7 +210,7 @@ JSON;
             $state = $splitter->getState();
             $newSplitter = new JsonPartialFileSplitterStub(50);
             $newSplitter->setChunkSize(1);
-            $newSplitter->setTimeout(60);
+            $newSplitter->setTimeout(80);
             $newSplitter->setState($state);
 
             return $newSplitter;
@@ -221,7 +221,7 @@ JSON;
     {
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(60);
+        $splitter->setTimeout(80);
 
         $this->runTestSplitWhenTimeoutExceededAfterEachObject(function (JsonPartialFileSplitterStub $splitter) {
             return $splitter;
@@ -262,7 +262,7 @@ JSON;
         // first iteration
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(60);
+        $splitter->setTimeout(80);
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -408,7 +408,7 @@ JSON;
             $state = $splitter->getState();
             $newSplitter = new JsonPartialFileSplitterStub(50);
             $newSplitter->setChunkSize(1);
-            $newSplitter->setTimeout(110);
+            $newSplitter->setTimeout(140);
             $newSplitter->setState($state);
 
             return $newSplitter;
@@ -459,7 +459,7 @@ JSON;
         // first iteration
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -568,7 +568,7 @@ JSON;
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
         $splitter->setHeaderSectionName('jsonapi');
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
         $resultFileNames = [];
         $resultFileContents = [];
         $files = $this->splitFile($splitter, 'tmpFileName', $inputJson, $resultFileNames, $resultFileContents);
@@ -609,7 +609,7 @@ JSON;
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
         $splitter->setHeaderSectionName('jsonapi');
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
         $splitter->setState($state);
         $resultFileNames = [];
         $resultFileContents = [];
@@ -677,7 +677,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
 
         // first iteration
         $resultFileNames = [];
@@ -760,7 +760,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
 
         $this->splitWithException(
             $splitter,
@@ -782,7 +782,7 @@ JSON;
 
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
-        $splitter->setTimeout(110);
+        $splitter->setTimeout(140);
 
         // first iteration
         $resultFileNames = [];

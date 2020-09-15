@@ -15,6 +15,8 @@ use Psr\Log\LoggerInterface;
  * @see \Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\AddAttributesToTestActivityTargetMigration
  * @see \Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope::STATE_DELETE
  * @see \Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope::STATE_NEW
+ *
+ * @deprecated this class will be removed in v4.2. kept to avoid BC break
  */
 class UpdateAttributesForTestActivityTargetQuery implements MigrationQuery
 {
@@ -42,11 +44,13 @@ class UpdateAttributesForTestActivityTargetQuery implements MigrationQuery
      */
     public function execute(LoggerInterface $logger)
     {
-        $this->markAttributeAsToBeDeleted(AddAttributesToTestActivityTargetMigration::DELETED_SYSTEM_ATTRIBUTE);
-        $this->markAttributeAsToBeDeleted(AddAttributesToTestActivityTargetMigration::DELETED_REGULAR_ATTRIBUTE);
-        $this->addAttribute(UpdateAttributesForTestActivityTargetMigration::NOT_USED_ATTRIBUTE);
-
-        $this->configManager->flush();
+        /**
+         * @deprecated
+         */
+        //$this->markAttributeAsToBeDeleted(AddAttributesToTestActivityTargetMigration::DELETED_SYSTEM_ATTRIBUTE);
+        //$this->markAttributeAsToBeDeleted(AddAttributesToTestActivityTargetMigration::DELETED_REGULAR_ATTRIBUTE);
+        //$this->addAttribute(UpdateAttributesForTestActivityTargetMigration::NOT_USED_ATTRIBUTE);
+        //$this->configManager->flush();
     }
 
     /**

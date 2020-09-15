@@ -13,6 +13,8 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @see \Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\AddAttributesToTestActivityTargetMigration
  * @see \Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope::STATE_DELETE
  * @see \Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope::STATE_NEW
+ *
+ * @deprecated this class will be removed in v4.2. kept to avoid BC break
  */
 class UpdateAttributesForTestActivityTargetMigration implements Migration
 {

@@ -15,6 +15,12 @@ The current file describes significant changes in the code that may affect the u
 #### UIBundle
 * Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
 
+## 4.1.6
+### Changed
+
+#### ScopeBundle
+* TRIGGER database privilege became required
+
 ## 4.1.1 (2020-02-25)
 [Show detailed list of changes](incompatibilities-4-1-1.md)
 
