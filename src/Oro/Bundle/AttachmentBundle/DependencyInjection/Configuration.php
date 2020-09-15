@@ -17,6 +17,9 @@ class Configuration implements ConfigurationInterface
      */
     private const MAX_FILESIZE_MB = 10;
 
+    public const JPEG_QUALITY = 85;
+    public const PNG_QUALITY = 100;
+
     /**
      * Bytes in one MB. Used to calculate exact bytes in certain MB amount.
      */
@@ -46,6 +49,19 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->booleanNode('processors_allowed')
+                    ->defaultTrue()
+                ->end()
+                ->integerNode('png_quality')
+                    ->min(1)
+                    ->max(100)
+                    ->defaultValue(self::PNG_QUALITY)
+                ->end()
+                ->integerNode('jpeg_quality')
+                    ->min(30)
+                    ->max(100)
+                    ->defaultValue(self::JPEG_QUALITY)
+                ->end()
             ->end();
 
         SettingsBuilder::append(
@@ -53,7 +69,10 @@ class Configuration implements ConfigurationInterface
             [
                 'maxsize' => ['value' => self::MAX_FILESIZE_MB],
                 'upload_file_mime_types' => ['value' => null],
-                'upload_image_mime_types' => ['value' => null]
+                'upload_image_mime_types' => ['value' => null],
+                'processors_allowed' => ['value' => true],
+                'jpeg_quality' => ['value' => self::JPEG_QUALITY],
+                'png_quality' => ['value' => self::PNG_QUALITY],
             ]
         );
 

@@ -38,6 +38,16 @@ oro_behat_extension:
         type: 'xpath'
         locator: '//select[contains(@name, "oro_attachment___upload_image_mime_types")]'
 
+    JPEG resize quality (%):
+      selector:
+        type: 'xpath'
+        locator: '//input[contains(@name, "attachment_settings[oro_attachment___jpeg_quality][value]")]'
+
+    PNG resize quality (%):
+      selector:
+        type: 'xpath'
+        locator: '//select[contains(@name, "oro_attachment___png_quality")]'
+
     User Form With Multiple Files:
       selector: 'form[id^="oro_user_user"]'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

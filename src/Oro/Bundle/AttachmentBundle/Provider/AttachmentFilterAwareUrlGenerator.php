@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
-use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -23,18 +23,20 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     private $urlGenerator;
 
     /**
-     * @var FilterConfiguration
+     * @var AttachmentHashProvider
      */
-    private $filterConfiguration;
+    private $attachmentHashProvider;
 
     /**
      * @param UrlGeneratorInterface $urlGenerator
-     * @param FilterConfiguration $filterConfiguration
+     * @param AttachmentHashProvider $attachmentUrlProvider
      */
-    public function __construct(UrlGeneratorInterface $urlGenerator, FilterConfiguration $filterConfiguration)
-    {
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        AttachmentHashProvider $attachmentUrlProvider
+    ) {
         $this->urlGenerator = $urlGenerator;
-        $this->filterConfiguration = $filterConfiguration;
+        $this->attachmentHashProvider = $attachmentUrlProvider;
         $this->logger = new NullLogger();
     }
 
@@ -48,7 +50,7 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
         }
 
         try {
-            $url = (string) $this->urlGenerator->generate($name, $parameters, $referenceType);
+            $url = (string)$this->urlGenerator->generate($name, $parameters, $referenceType);
             // Catches only InvalidParameterException because it is the only one that can be caused during normal
             // runtime, other exceptions should lead to direct fix.
         } catch (InvalidParameterException $e) {
@@ -83,13 +85,25 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     }
 
     /**
+     * Important: To maintain backward compatibility, to build hash, do not use 'post_processors' parameter unless the
+     * system configuration has been changed.
+     *
+     * Default processors configuration (described in 'dimensions' or 'liip_imagine' configuration) have a higher
+     * priority than system configuration. To maintain backward compatibility with previous versions,
+     * need to check which processors configuration are used in filter and cover the following cases:
+     * - Processors configuration are exists, it is necessary use them and ignore system configuration.
+     * - Keep backward compatibility. If processor configuration does not exist, then not need
+     *   to update(add 'post_processors' configuration to filter) hash, provided that the new system configuration
+     *   has default value.
+     * - If the system configuration has changed and is not equivalent to the prevent(default) configuration,
+     *   then build a hash with the 'post_processors' parameter.
+     *
      * @param string $filterName
+     *
      * @return string
      */
     public function getFilterHash(string $filterName): string
     {
-        $filterConfig = $this->filterConfiguration->get($filterName);
-
-        return md5(json_encode($filterConfig));
+        return $this->attachmentHashProvider->getFilterConfigHash($filterName);
     }
 }

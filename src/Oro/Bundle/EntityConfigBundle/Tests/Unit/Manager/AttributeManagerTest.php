@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -178,6 +179,28 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         // call method after clearing the cache
         $this->manager->clearAttributesCache();
         $this->manager->getActiveAttributesByClass('className');
+    }
+
+    public function testGetActiveAttributesByClassForOrganization()
+    {
+        $organization = $this->createMock(OrganizationInterface::class);
+
+        $this->expectsDatabaseCheck(true, 2);
+
+        $repository = $this->expectsGetFieldConfigModelRepository(2);
+        $repository->expects($this->exactly(2))
+            ->method('getActiveAttributesByClass')
+            ->with('className')
+            ->willReturn([]);
+
+        $this->manager->getActiveAttributesByClassForOrganization('className', $organization);
+
+        // ensure that result is lazy loaded
+        $this->manager->getActiveAttributesByClassForOrganization('className', $organization);
+
+        // call method after clearing the cache
+        $this->manager->clearAttributesCache();
+        $this->manager->getActiveAttributesByClassForOrganization('className', $organization);
     }
 
     public function testGetActiveAttributesByClassWhenExceptionIsThrown()

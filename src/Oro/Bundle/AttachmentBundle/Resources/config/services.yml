@@ -322,7 +322,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator
         arguments:
             - '@router'
-            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.configurator.provider.attachment_hash_provider'
         calls:
             - [setLogger, ['@logger']]
 
@@ -533,6 +533,44 @@ services:
                 liip_imagine.filter.configuration: '@liip_imagine.filter.configuration'
                 oro_attachment.manager.image_removal_manager: '@oro_attachment.manager.image_removal_manager'
         tags: ['container.service_locator']
+
+    oro_attachment.configurator.attachment_filter_configuration:
+        class: Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration
+        decorates: liip_imagine.filter.configuration
+        # Any decorators cannot have a higher priority than specified, as this will violate backward compatibility.
+        decoration_priority: -255
+        arguments:
+            - '@oro_attachment.configurator.attachment_filter_configuration.inner'
+            - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
+
+    oro_attachment.configurator.provider.attachment_hash_provider:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider
+        arguments:
+            - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
+            - '@oro_attachment.configurator.attachment_filter_configuration'
+            - '@oro_attachment.configurator.attachment_filter_configuration.inner'
+
+    oro_attachment.configurator.provider.attachment_post_processors_provider:
+        class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: oro_featuretogle.feature, feature: post_processing_feature }
+
+    oro_attachment.checker.voter.post_processing_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessingVoter'
+        arguments:
+            - '@oro_config.global'
+        tags:
+            - { name: oro_featuretogle.voter, priority: 10 }
+
+    oro_attachment.checker.voter.post_processors_voter:
+        class: 'Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessorsVoter'
+        arguments:
+            - '%liip_imagine.jpegoptim.binary%'
+            - '%liip_imagine.pngquant.binary%'
+        tags:
+            - { name: oro_featuretogle.voter, priority: 10 }
 
     oro_attachment.importexport.event_listener.file_headers:
         class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileHeadersListener

@@ -6,6 +6,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ScopeBundle
+* TRIGGER database privilege became required
+
 #### DataGridBundle
 * The maximum number of items can be deleted at once during mass delete process was decreased to 100.
 
