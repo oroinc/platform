@@ -15,6 +15,8 @@ data parameter of next structure:
 Usage example:
 
 ``` html
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 <div>
     {{ oro_widget_render({
         'widgetType': 'block',
@@ -22,18 +24,27 @@ Usage example:
         'title': 'User Groups'|trans,
         'alias': 'user-groups-widget'
     }) }}
-
-    <script type="text/javascript">
-        loadModules(['oroui/js/widget-manager'],
-        function(widgetManager) {
-            widgetManager.getWidgetInstanceByAlias('user-groups-widget', function(widget) {
-                widget.on('grid-row-select', function(data) {
-                    console.log(data.datagrid);        // datagrid instance
-                    console.log(data.model);           // row data object
-                    console.log(data.model.get('id')); // row attribute
-                });
-            });
-        });
-    </script>
+    <div {{ UI.renderPageComponentAttributes({
+        'module': 'your/row-selection/handler',
+        'options': {
+            'alias': 'user-groups-widget'
+        }
+    })></div>
 </div>
+
+```
+Create js module with the handler definition `'your/row-selection/handler'` as shown in example below, don't forget to add this module to the list of `dynamic-imports` in `jsmodules.yml`  
+
+``` javascript
+import widgetManager from 'oroui/js/widget-manager';
+
+export default function(options) {
+    widgetManager.getWidgetInstanceByAlias(options.alias, function(widget) {
+        widget.on('grid-row-select', function(data) {
+            console.log(data.datagrid);        // datagrid instance
+            console.log(data.model);           // row data object
+            console.log(data.model.get('id')); // row attribute
+        });
+    });
+};
 ```
