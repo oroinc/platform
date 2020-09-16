@@ -23,12 +23,14 @@ your content will be tagged automatically, in cases when tags should be added dy
 
 **Example**
 ``` twig
-    <script type="text/javascript">
-        loadModules(['orosync/js/content-manager'],
-        function(contentManager) {
-            contentManager.tagContent(['users']);
-        });
-    </script>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    <div {{ UI.renderPageComponentAttributes({
+        module: 'orosync/js/app/components/tag-content',
+        options: {
+            tags: [/* list of tags*/]
+        }
+    }) }} ></div>
 ```
 In case when your template extends base template, but content depends on some additional objects you can use macros that defined in `SyncBundle/Resources/views/Include/contentTags.html.twig`
 

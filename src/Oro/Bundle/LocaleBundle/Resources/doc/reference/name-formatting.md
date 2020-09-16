@@ -127,16 +127,15 @@ Possible name object parameters are same to format placeholder keys.
 Usage example:
 
 ```javascript
-loadModules(['orolocale/js/formatter/name'],
-function(nameFormatter) {
-    var formattedName = nameFormatter.format({
+    import nameFormatter from 'orolocale/js/formatter/name';
+
+    const formattedName = nameFormatter.format({
         prefix: 'Mr.',
         first_name: 'First',
         middle_name: 'Middle',
         last_name: 'Last',
         suffix: 'Sn.'
     });
-});
 ```
 
 ### getNameFormat
