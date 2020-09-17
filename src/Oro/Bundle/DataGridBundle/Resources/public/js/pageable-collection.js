@@ -250,6 +250,7 @@ define([
          * @protected
          */
         onRemove: function(modelToRemove, collection, options = {}) {
+            this.trigger('beforeRemove', modelToRemove, collection, options);
             const {recountTotalRecords = true} = options;
 
             if (recountTotalRecords && this.state.totalRecords > 0) {
@@ -365,11 +366,13 @@ define([
             const responseModels = this._parseResponseModels(resp);
             const responseOptions = this._parseResponseOptions(resp);
             if (responseOptions) {
-                _.extend(options, responseOptions);
+                _.extend(options, responseOptions, {recountTotalRecords: false});
             }
-            this.state.totalRecords = options.totalRecords || 0;
-            this.state.hideToolbar = options.hideToolbar;
-            this.state = this._checkState(this.state);
+            const state = {
+                totalRecords: options.totalRecords || 0,
+                hideToolbar: options.hideToolbar
+            };
+            this.updateState(state);
 
             return responseModels;
         },
@@ -721,7 +724,8 @@ define([
 
             options = _.defaults(options || {}, {reset: true});
 
-            let state = this._checkState(this.state);
+            this.updateState({});
+            let state = this.state;
 
             const mode = this.mode;
 
