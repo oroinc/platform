@@ -8,6 +8,7 @@ const HtmlTemplateCell = StringCell.extend({
     getTemplateData: function() {
         return {
             ...this.model.toJSON(),
+            _cid: this.cid,
             _metadata: {
                 ...this.column.get('metadata')
             }

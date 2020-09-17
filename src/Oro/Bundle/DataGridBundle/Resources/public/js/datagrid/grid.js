@@ -1062,7 +1062,7 @@ define(function(require) {
             this.renderLoadingMask();
 
             this.delegateEvents();
-            this.listenTo(this.collection, 'reset remove', this.renderNoDataBlock);
+            this.listenTo(this.collection, 'reset remove sync', this.renderNoDataBlock);
 
             this._deferredRender();
             this.initLayout({
@@ -1340,9 +1340,10 @@ define(function(require) {
 
             if (collection) {
                 const fetchKeys = ['mode', 'parse', 'reset', 'wait', 'uniqueOnly',
-                    'add', 'remove', 'merge', 'toggleLoading', 'recountTotalRecords', 'alreadySynced'];
+                    'add', 'remove', 'merge', 'toggleLoading'];
                 let fetchOptions = {
-                    reset: true
+                    reset: true,
+                    alreadySynced: true // prevents recursion update
                 };
                 let params = _.pick(collection.options, fetchKeys);
 
@@ -1352,7 +1353,7 @@ define(function(require) {
 
                 fetchOptions = _.extend(fetchOptions, params, _.pick(options, fetchKeys));
 
-                if (!fetchOptions.alreadySynced) {
+                if (!options.alreadySynced) {
                     this.collection.fetch(fetchOptions);
                 }
             }
