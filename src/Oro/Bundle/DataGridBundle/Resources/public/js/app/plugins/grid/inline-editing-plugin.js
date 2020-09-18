@@ -21,6 +21,17 @@ define(function(require) {
         helpMessage: __('oro.form.inlineEditing.helpMessage'),
 
         /**
+         * Options for bootstrap modal
+         */
+        modalOptions: {
+            title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
+            content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
+            okText: __('Ok, got it'),
+            className: 'modal modal-primary',
+            cancelText: __('Cancel')
+        },
+
+        /**
          * Active editors set
          */
         activeEditorComponents: null,
@@ -98,13 +109,7 @@ define(function(require) {
         },
 
         confirmNavigation: function() {
-            const confirmModal = new Modal({
-                title: __('oro.datagrid.inline_editing.refresh_confirm_modal.title'),
-                content: __('oro.ui.leave_page_with_unsaved_data_confirm'),
-                okText: __('Ok, got it'),
-                className: 'modal modal-primary',
-                cancelText: __('Cancel')
-            });
+            const confirmModal = new Modal(this.modalOptions);
             const deferredConfirmation = $.Deferred();
 
             deferredConfirmation.always(_.bind(function() {
