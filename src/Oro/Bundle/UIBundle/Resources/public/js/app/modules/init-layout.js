@@ -45,9 +45,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         $(document).on('keydown click', 'textarea[data-autoresize]', e => {
             const el = e.target;
             setTimeout(() => {
-                el.style.cssText = 'height:auto; padding:0';
-                el.style.cssText = '-moz-box-sizing:content-box';
-                el.style.cssText = 'height:' + el.scrollHeight + 'px';
+                if (el.scrollHeight > el.offsetHeight) {
+                    el.style.cssText = 'height:auto; padding:0';
+                    el.style.cssText = '-moz-box-sizing:content-box';
+                    el.style.cssText = 'height:' + el.scrollHeight + 'px';
+                }
             }, 0);
         });
 
