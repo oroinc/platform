@@ -3,7 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Tools\NumberFormatterHelper;
 
 /**
  * Used to format numbers, currencies, percents etc according to locale and additional parameters
@@ -16,57 +18,60 @@ class NumberFormatter
     protected $localeSettings;
 
     /**
-     * array(
-     *      '<locale>' => array(
-     *          '<currencyCode>' => true|false|null,
-     *          ...
-     *      ),
-     *      ...
-     * )
+     * [
+     *     '<locale>_<currencyCode>' => true|false|null,
+     *     ...
+     * ]
      *
      * @var array
      */
-    protected $currencySymbolPrepend = array();
+    protected $currencySymbolPrepend = [];
+
+    /**
+     * @var IntlNumberFormatterFactory
+     */
+    private $numberFormatterFactory;
 
     /**
      * @param LocaleSettings $localeSettings
+     * @param IntlNumberFormatterFactory $intlNumberFormatterFactory
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(LocaleSettings $localeSettings, IntlNumberFormatterFactory $intlNumberFormatterFactory)
     {
         $this->localeSettings = $localeSettings;
+        $this->numberFormatterFactory = $intlNumberFormatterFactory;
     }
 
     /**
      * Format number
      *
      * @param int|float $value
-     * @param string|int $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param string|int $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      * @return string
      */
     public function format(
         $value,
         $style,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        return $this->getFormatter($locale, $this->parseConstantValue($style), $attributes, $textAttributes, $symbols)
-            ->format($value);
+        return $this->getFormatter($locale, $style, $attributes, $textAttributes, $symbols)->format($value);
     }
 
     /**
      * Format currency, replace INTL currency symbol with configuration currency symbol
      *
      * @param float $value
-     * @param string $currencyCode Currency code
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param string|null $currencyCode Currency code
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      *
      * @return string
@@ -89,14 +94,14 @@ class NumberFormatter
 
         $formatter = $this->getFormatter(
             $locale . '@currency=' . $currencyCode,
-            \NumberFormatter::CURRENCY,
+            IntlNumberFormatter::CURRENCY,
             $attributes,
             $textAttributes,
             $symbols
         );
 
         $formattedString = $formatter->formatCurrency($value, $currencyCode);
-        $fromCurrencySymbol = $formatter->getSymbol(\NumberFormatter::CURRENCY_SYMBOL);
+        $fromCurrencySymbol = $formatter->getSymbol(IntlNumberFormatter::CURRENCY_SYMBOL);
         $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode, $locale);
 
         if ($toCurrencySymbol === $currencyCode) {
@@ -119,79 +124,79 @@ class NumberFormatter
      * Format decimal
      *
      * @param float $value
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      * @return string
      */
     public function formatDecimal(
         $value,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        return $this->format($value, \NumberFormatter::DECIMAL, $attributes, $textAttributes, $symbols, $locale);
+        return $this->format($value, IntlNumberFormatter::DECIMAL, $attributes, $textAttributes, $symbols, $locale);
     }
 
     /**
      * Format percent
      *
      * @param float $value
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      * @return string
      */
     public function formatPercent(
         $value,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        return $this->format($value, \NumberFormatter::PERCENT, $attributes, $textAttributes, $symbols, $locale);
+        return $this->format($value, IntlNumberFormatter::PERCENT, $attributes, $textAttributes, $symbols, $locale);
     }
 
     /**
      * Format spellout
      *
      * @param float $value
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      * @return string
      */
     public function formatSpellout(
         $value,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        return $this->format($value, \NumberFormatter::SPELLOUT, $attributes, $textAttributes, $symbols, $locale);
+        return $this->format($value, IntlNumberFormatter::SPELLOUT, $attributes, $textAttributes, $symbols, $locale);
     }
 
     /**
      * Format duration
      *
-     * @param float|\DateTime $value          If value is a DateTime then it's timestamp will be used.
-     * @param array           $attributes     Set of attributes of \NumberFormatter
-     * @param array           $textAttributes Set of text attributes of \NumberFormatter
-     * @param array           $symbols        Set of symbols of \NumberFormatter
-     * @param string|null     $locale         Locale of formatting
-     * @param bool            $useDefaultFormat
+     * @param float|\DateTime $value If value is a DateTime then it's timestamp will be used.
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
+     * @param string|null $locale Locale of formatting
+     * @param bool $useDefaultFormat
      *
      * @return string
      */
     public function formatDuration(
         $value,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null,
         $useDefaultFormat = false
     ) {
@@ -205,7 +210,7 @@ class NumberFormatter
             return $this->formatDefaultDuration($value);
         }
 
-        $result = $this->format($value, \NumberFormatter::DURATION, $attributes, $textAttributes, $symbols, $locale);
+        $result = $this->format($value, IntlNumberFormatter::DURATION, $attributes, $textAttributes, $symbols, $locale);
 
         // In case if the result is not a valid duration string, do default format
         if (!$this->isDurationValid($result)) {
@@ -228,13 +233,14 @@ class NumberFormatter
      */
     protected function isDurationValid($value)
     {
-        $stripChars = array(
+        $stripChars = [
             ',',
             '.',
             ' ',
-            $this->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::DEFAULT_STYLE),
-            $this->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL, \NumberFormatter::DEFAULT_STYLE),
-        );
+            $this->getSymbol(IntlNumberFormatter::GROUPING_SEPARATOR_SYMBOL, IntlNumberFormatter::DEFAULT_STYLE),
+            $this->getSymbol(IntlNumberFormatter::DECIMAL_SEPARATOR_SYMBOL, IntlNumberFormatter::DEFAULT_STYLE),
+        ];
+
         return !is_numeric(str_replace($stripChars, '', $value));
     }
 
@@ -256,26 +262,26 @@ class NumberFormatter
      * Format ordinal
      *
      * @param float $value
-     * @param array $attributes Set of attributes of \NumberFormatter
-     * @param array $textAttributes Set of text attributes of \NumberFormatter
-     * @param array $symbols Set of symbols of \NumberFormatter
+     * @param array $attributes Set of attributes of IntlNumberFormatter
+     * @param array $textAttributes Set of text attributes of IntlNumberFormatter
+     * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
      * @return string
      */
     public function formatOrdinal(
         $value,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array(),
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = [],
         $locale = null
     ) {
-        return $this->format($value, \NumberFormatter::ORDINAL, $attributes, $textAttributes, $symbols, $locale);
+        return $this->format($value, IntlNumberFormatter::ORDINAL, $attributes, $textAttributes, $symbols, $locale);
     }
 
     /**
-     * Gets value of numeric attribute of \NumberFormatter
+     * Gets value of numeric attribute of IntlNumberFormatter
      *
-     * Supported numeric attribute constants of \NumberFormatter are:
+     * Supported numeric attribute constants of IntlNumberFormatter are:
      *  PARSE_INT_ONLY
      *  GROUPING_USED
      *  DECIMAL_ALWAYS_SHOWN
@@ -297,25 +303,22 @@ class NumberFormatter
      *  MAX_SIGNIFICANT_DIGITS
      *  LENIENT_PARSE
      *
-     * @param int|string $attribute Numeric attribute constant of \NumberFormatter or it's string name
-     * @param int|string $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
+     * @param int|string $attribute Numeric attribute constant of IntlNumberFormatter or it's string name
+     * @param int|string $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
      * @param string|null $locale
      * @param array $attributes
      * @return bool|int
      */
     public function getAttribute($attribute, $style = null, $locale = null, $attributes = [])
     {
-        return $this->getFormatter(
-            $locale,
-            $this->parseStyle($style),
-            $attributes
-        )->getAttribute($this->parseConstantValue($attribute));
+        return $this->getFormatter($locale, $style, $attributes)
+            ->getAttribute(NumberFormatterHelper::parseConstantValue($attribute));
     }
 
     /**
-     * Gets value of text attribute of \NumberFormatter
+     * Gets value of text attribute of IntlNumberFormatter
      *
-     * Supported text attribute constants of \NumberFormatter are:
+     * Supported text attribute constants of IntlNumberFormatter are:
      *  POSITIVE_PREFIX
      *  POSITIVE_SUFFIX
      *  NEGATIVE_PREFIX
@@ -325,23 +328,21 @@ class NumberFormatter
      *  DEFAULT_RULESET
      *  PUBLIC_RULESETS
      *
-     * @param int|string $attribute Text attribute constant of \NumberFormatter or it's string name
-     * @param int|string $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
+     * @param int|string $attribute Text attribute constant of IntlNumberFormatter or it's string name
+     * @param int|string $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
      * @param string|null $locale
      * @return bool|int
      */
     public function getTextAttribute($attribute, $style, $locale = null)
     {
-        return $this->getFormatter(
-            $locale,
-            $this->parseStyle($style)
-        )->getTextAttribute($this->parseConstantValue($attribute));
+        return $this->getFormatter($locale, $style)
+            ->getTextAttribute(NumberFormatterHelper::parseConstantValue($attribute));
     }
 
     /**
-     * Gets value of symbol associated with \NumberFormatter
+     * Gets value of symbol associated with IntlNumberFormatter
      *
-     * Supported symbol constants of \NumberFormatter are:
+     * Supported symbol constants of IntlNumberFormatter are:
      *  DECIMAL_SEPARATOR_SYMBOL
      *  GROUPING_SEPARATOR_SYMBOL
      *  PATTERN_SEPARATOR_SYMBOL
@@ -362,24 +363,21 @@ class NumberFormatter
      *  MONETARY_GROUPING_SEPARATOR_SYMBOL
      *
      *
-     * @param int|string $symbol Format symbol constant of \NumberFormatter or it's string name
-     * @param int|string $style Constant of \NumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
+     * @param int|string $symbol Format symbol constant of IntlNumberFormatter or it's string name
+     * @param int|string $style Constant of IntlNumberFormatter (DECIMAL, CURRENCY, PERCENT, etc) or string name
      * @param string|null $locale
      * @return bool|int
      */
     public function getSymbol($symbol, $style, $locale = null)
     {
-        return $this->getFormatter(
-            $locale,
-            $this->parseStyle($style)
-        )->getSymbol($this->parseConstantValue($symbol));
+        return $this->getFormatter($locale, $style)->getSymbol(NumberFormatterHelper::parseConstantValue($symbol));
     }
 
     /**
      * Creates instance of NumberFormatter class of intl extension
      *
-     * @param string $locale
-     * @param int $style
+     * @param string|null $locale
+     * @param int|string $style
      * @param array $attributes
      * @param array $textAttributes
      * @param array $symbols
@@ -389,140 +387,15 @@ class NumberFormatter
     protected function getFormatter(
         $locale,
         $style,
-        array $attributes = array(),
-        array $textAttributes = array(),
-        array $symbols = array()
-    ) {
-        $locale = $locale ? : $this->localeSettings->getLocale();
-        $style = $this->parseStyle($style);
-        $attributes = $this->parseAttributes($attributes);
-        $textAttributes = $this->parseAttributes($textAttributes);
-        $symbols = $this->parseAttributes($symbols);
-
-        $formatter = new IntlNumberFormatter($locale, $style);
-
-        foreach ($attributes as $attribute => $value) {
-            $formatter->setAttribute($attribute, $value);
-        }
-
-        foreach ($textAttributes as $attribute => $value) {
-            $formatter->setTextAttribute($attribute, $value);
-        }
-
-        foreach ($symbols as $symbol => $value) {
-            $formatter->setSymbol($symbol, $value);
-        }
-
-        $this->adjustFormatter($formatter, $locale, $style, $attributes);
-
-        return $formatter;
+        array $attributes = [],
+        array $textAttributes = [],
+        array $symbols = []
+    ): IntlNumberFormatter {
+        return $this->numberFormatterFactory->create((string)$locale, $style, $attributes, $textAttributes, $symbols);
     }
 
     /**
-     * @param IntlNumberFormatter $formatter
-     * @param string $locale
-     * @param int $style
-     * @param array $attributes
-     */
-    protected function adjustFormatter(
-        IntlNumberFormatter $formatter,
-        $locale,
-        $style,
-        array $attributes = array()
-    ) {
-        // need to manually set percent fraction same to decimal
-        if ($style === \NumberFormatter::PERCENT) {
-            $overriddenDecimalAttributes = array(
-                \NumberFormatter::FRACTION_DIGITS,
-                \NumberFormatter::MIN_FRACTION_DIGITS,
-                \NumberFormatter::MAX_FRACTION_DIGITS,
-            );
-
-            $decimalFormatter = $this->getFormatter($locale, \NumberFormatter::DECIMAL);
-
-            foreach ($overriddenDecimalAttributes as $decimalAttribute) {
-                if (!array_key_exists($decimalAttribute, $attributes)) {
-                    $formatter->setAttribute($decimalAttribute, $decimalFormatter->getAttribute($decimalAttribute));
-                }
-            }
-        }
-    }
-
-    /**
-     * Converts keys of attributes array to values of NumberFormatter constants
-     *
-     * @param array $attributes
-     * @return array
-     * @throws \InvalidArgumentException
-     */
-    protected function parseAttributes(array $attributes)
-    {
-        $result = array();
-        foreach ($attributes as $attribute => $value) {
-            $result[$this->parseConstantValue($attribute)] = $value;
-        }
-        return $result;
-    }
-
-    /**
-     * Pass value of NumberFormatter constant or it's string name and get value
-     *
-     * @param int|string $attribute
-     * @return mixed
-     * @throws \InvalidArgumentException
-     */
-    protected function parseConstantValue($attribute)
-    {
-        if (is_int($attribute)) {
-            return $attribute;
-        } else {
-            $attributeName = strtoupper($attribute);
-            $constantName = 'NumberFormatter::' . $attributeName;
-            if (!defined($constantName)) {
-                throw new \InvalidArgumentException("NumberFormatter has no constant '$attributeName'");
-            }
-            return constant($constantName);
-        }
-    }
-
-    /**
-     * Pass style of NumberFormatter
-     *
-     * @param int|string|null $style
-     * @return mixed
-     * @throws \InvalidArgumentException
-     */
-    protected function parseStyle($style)
-    {
-        $originalValue = $style;
-        if (null === $style) {
-            $style = \NumberFormatter::DEFAULT_STYLE;
-        }
-        $style = $this->parseConstantValue($style);
-
-        $styleConstants = array(
-            \NumberFormatter::PATTERN_DECIMAL,
-            \NumberFormatter::DECIMAL,
-            \NumberFormatter::CURRENCY,
-            \NumberFormatter::PERCENT,
-            \NumberFormatter::SCIENTIFIC,
-            \NumberFormatter::SPELLOUT,
-            \NumberFormatter::ORDINAL,
-            \NumberFormatter::DURATION,
-            \NumberFormatter::PATTERN_RULEBASED,
-            \NumberFormatter::IGNORE,
-            \NumberFormatter::DEFAULT_STYLE,
-        );
-
-        if (!in_array($style, $styleConstants)) {
-            throw new \InvalidArgumentException("NumberFormatter style '$originalValue' is invalid");
-        }
-
-        return $style;
-    }
-
-    /**
-     * @param string $currency
+     * @param string|null $currency
      * @param string|null $locale
      * @return bool|null Null means that there are no currency symbol in string
      */
@@ -536,10 +409,9 @@ class NumberFormatter
             $currency = $this->localeSettings->getCurrency();
         }
 
-        if (empty($this->currencySymbolPrepend[$locale])
-            || !array_key_exists($currency, $this->currencySymbolPrepend)
-        ) {
-            $formatter = $this->getFormatter($locale, \NumberFormatter::CURRENCY);
+        $key = $locale . '_' . $currency;
+        if (!array_key_exists($key, $this->currencySymbolPrepend)) {
+            $formatter = $this->getFormatter($locale, IntlNumberFormatter::CURRENCY);
             $pattern = $formatter->formatCurrency('123', $currency);
             preg_match(
                 '/^([^\s\xc2\xa0]*)[\s\xc2\xa0]*123(?:[,.]0+)?[\s\xc2\xa0]*([^\s\xc2\xa0]*)$/u',
@@ -548,14 +420,14 @@ class NumberFormatter
             );
 
             if (!empty($matches[1])) {
-                $this->currencySymbolPrepend[$locale][$currency] = true;
+                $this->currencySymbolPrepend[$key] = true;
             } elseif (!empty($matches[2])) {
-                $this->currencySymbolPrepend[$locale][$currency] = false;
+                $this->currencySymbolPrepend[$key] = false;
             } else {
-                $this->currencySymbolPrepend[$locale][$currency] = null;
+                $this->currencySymbolPrepend[$key] = null;
             }
         }
 
-        return $this->currencySymbolPrepend[$locale][$currency];
+        return $this->currencySymbolPrepend[$key];
     }
 }
