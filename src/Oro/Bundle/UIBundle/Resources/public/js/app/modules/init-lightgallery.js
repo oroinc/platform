@@ -1,4 +1,10 @@
-define(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function($, _) {
+define([
+    'jquery',
+    'underscore',
+    'oroui/js/tools',
+    'lightgallery',
+    'lightgallery.print'
+], function($, _, tools) {
     'use strict';
 
     /**
@@ -22,7 +28,13 @@ define(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function(
             let i = 0;
             $items.each(function() {
                 const $item = $(this);
-                const src = $item.attr('href');
+                let src = $item.attr('href');
+
+                // Hack for IE11
+                if (tools.isIE11() && $item.closest('[data-ie-preview]').length) {
+                    src = $item.closest('[data-ie-preview]').data('ie-preview');
+                }
+
                 if (_.indexOf(images, src) === -1) {
                     images.push(src);
                     const el = {};

@@ -180,6 +180,12 @@ services:
         public: true
         arguments:
             - '@oro_locale.settings'
+            - '@oro_locale.formatter.factory.intl_number_formatter'
+
+    oro_locale.formatter.factory.intl_number_formatter:
+        class: Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory
+        arguments:
+            - '@oro_locale.settings'
 
     # DQL formatter
     oro_locale.dql.formatter.name:
