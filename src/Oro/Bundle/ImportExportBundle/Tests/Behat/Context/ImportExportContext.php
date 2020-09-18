@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Tests\Behat\Services\PreExportMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
@@ -854,6 +855,18 @@ class ImportExportContext extends OroFeatureContext implements
             $validationMessage,
             implode('", "', $existedErrors)
         ));
+    }
+
+    /**
+     * @Given /^I change the export batch size to (?P<size>\d+)/
+     *
+     * @param int $size
+     */
+    public function changeExportBatchSize(int $size): void
+    {
+        // oro_importexport.test.cache service is defined in ImportExportBundle/Tests/Behat/parameters.yml
+        $cache = $this->getContainer()->get('oro_importexport.test.cache');
+        $cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
     }
 
     /**

@@ -24,6 +24,15 @@ services:
         class: Oro\Bundle\DataGridBundle\Event\EventDispatcher
         arguments: ['@event_dispatcher']
 
+    oro_datagrid.results.cache:
+        parent: oro.cache.provider.memory_cache
+
+    oro_datagrid.cache.serializer.normalizer:
+        class: Oro\Bundle\DataGridBundle\Serializer\ParameterBagNormalizer
+        parent: oro.cache.serializer.normalizer
+        tags:
+            - { name: 'oro_cache_generator_normalizer' }
+
     oro_datagrid.datagrid.builder:
         class: Oro\Bundle\DataGridBundle\Datagrid\Builder
         arguments:
@@ -32,6 +41,8 @@ services:
             - '@oro_datagrid.event.dispatcher'
             - ~ # service locator for data sources
             - [] # extensions
+        calls:
+            - ['setMemoryCacheProvider', ['@oro_datagrid.results.cache']]
         lazy: true
 
     oro_datagrid.datagrid.request_parameters_factory:
