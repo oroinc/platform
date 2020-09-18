@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareInterface;
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderAwareTrait;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -16,8 +18,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Provides a functionality to build datagrids.
  */
-class Builder
+class Builder implements MemoryCacheProviderAwareInterface
 {
+    use MemoryCacheProviderAwareTrait;
+
     /** @var string */
     private $baseDatagridClass;
 
@@ -84,6 +88,9 @@ class Builder
 
         /** @var DatagridInterface $datagrid */
         $datagrid = new $class($name, $config, $parameters);
+        if ($datagrid instanceof MemoryCacheProviderAwareInterface) {
+            $datagrid->setMemoryCacheProvider($this->getMemoryCacheProvider());
+        }
         $datagrid->setScope($config->offsetGetOr('scope'));
 
         $event = new BuildBefore($datagrid, $config);
