@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
@@ -28,8 +29,12 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
+    /** @var MemoryCacheProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $memoryCacheProvider;
+
     protected function setUp()
     {
+        $this->memoryCacheProvider = $this->createMock(MemoryCacheProviderInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
@@ -245,13 +250,17 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
             $dataSourceContainerBuilder->add($name, $dataSource);
         }
 
-        return new Builder(
+        $builder = new Builder(
             self::DEFAULT_DATAGRID_CLASS,
             self::DEFAULT_ACCEPTOR_CLASS,
             $this->eventDispatcher,
             $dataSourceContainerBuilder->getContainer($this),
             $extensions
         );
+
+        $builder->setMemoryCacheProvider($this->memoryCacheProvider);
+
+        return $builder;
     }
 
 
