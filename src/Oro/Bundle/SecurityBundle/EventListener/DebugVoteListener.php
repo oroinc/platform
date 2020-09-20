@@ -17,6 +17,9 @@ class DebugVoteListener extends VoteListener
     /** @var VoteListener */
     private $innerListener;
 
+    /** @var bool|null */
+    private $isEnabled;
+
     /**
      * @param ConfigManager $configManager
      * @param VoteListener $innerListener
@@ -32,7 +35,7 @@ class DebugVoteListener extends VoteListener
      */
     public function onVoterVote(VoteEvent $event): void
     {
-        if ($this->configManager->get('oro_security.symfony_profiler_collection_of_voter_decisions', true)) {
+        if ($this->isEnabled()) {
             $this->innerListener->onVoterVote($event);
         }
     }
@@ -43,5 +46,20 @@ class DebugVoteListener extends VoteListener
     public static function getSubscribedEvents(): array
     {
         return parent::getSubscribedEvents();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isEnabled(): bool
+    {
+        if ($this->isEnabled === null) {
+            $this->isEnabled = $this->configManager->get(
+                'oro_security.symfony_profiler_collection_of_voter_decisions',
+                true
+            );
+        }
+
+        return $this->isEnabled;
     }
 }
