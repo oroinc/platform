@@ -92,6 +92,25 @@ oro:
         config:
             file_size_settings.label: File Size Settings
             file_size.label:     File Size (MB)
+            feature:
+                attachment_processors_allowed:
+                    label: Enable Image Optimization
+                    tooltip: While additional image optimization may reduce the final image size it requires extra processing time and may increase the load on the system when uploading, importing or resizing many images at the same time.
+                    description: Disable or enable image optimization feature
+                attachment_processors:
+                    label: Attachment processors settings
+                    description: Attachment settings feature allow you to change the image quality from configuration
+                attachment_processing:
+                    label: Attachment processing
+                    description: Allows to enable or disable post processing
+            attachment_processors_settings:
+                label: Image Processing
+                description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
+            png_quality: PNG resize quality (%)
+            png_preserve_quality: Preserve quality
+            png_minimize_file_size: Minimize file size
+            jpeg_quality: JPEG resize quality (%)
+            quality_tooltip: Modification of the value may cause temporary storefront slow-down until all product images are resized.
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings

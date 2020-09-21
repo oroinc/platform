@@ -209,6 +209,7 @@ class ProcessorDecorator
                     ->scalarNode('title')->isRequired()->end()
                     ->scalarNode('icon')->end()
                     ->scalarNode('description')->end()
+                    ->scalarNode('description_style')->end()
                     ->arrayNode('configurator')
                         ->beforeNormalization()
                             ->ifString()
