@@ -63,7 +63,7 @@ class PreloadingManager
             return;
         }
 
-        $firstEntity = current($entities);
+        $firstEntity = reset($entities);
         $className = $this->doctrineHelper->getEntityClass($firstEntity);
 
         $this->preloadRecursively($className, $entities, $fieldsToPreload, $context);
