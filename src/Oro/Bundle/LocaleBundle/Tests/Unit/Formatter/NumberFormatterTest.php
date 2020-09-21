@@ -66,7 +66,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('format')
             ->with(self::UNFORMATTED_VALUE)
             ->willReturn(self::FORMATTED_VALUE);
@@ -86,14 +86,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
@@ -129,14 +129,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $fromSymbol = '$';
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($fromSymbol);
@@ -186,7 +186,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $formattedValue = '42$';
 
         $this->localeSettings
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getCurrency')
             ->willReturn(self::CURRENCY);
 
@@ -198,14 +198,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
@@ -229,7 +229,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $formattedValue = '42$';
 
         $this->localeSettings
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 
@@ -241,14 +241,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
@@ -374,12 +374,11 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $intlNumberFormatterDuration = $this->createMock(IntlNumberFormatter::class);
         $intlNumberFormatterDefault = $this->createMock(IntlNumberFormatter::class);
         $this->intlNumberFormatterFactory
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('create')
             ->willReturnMap(
                 [
                     [self::LOCALE, IntlNumberFormatter::DURATION, [], [], [], $intlNumberFormatterDuration],
-                    ['', IntlNumberFormatter::DEFAULT_STYLE, [], [], [], $intlNumberFormatterDefault],
                     ['', IntlNumberFormatter::DEFAULT_STYLE, [], [], [], $intlNumberFormatterDefault],
                 ]
             );
