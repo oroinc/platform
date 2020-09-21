@@ -69,6 +69,7 @@ Feature: User
     Given I login as "user1Name" user
     Then should see "Dashboard"
 
+  @skip
   Scenario: Create new user with birthday field formatted in the Portuguese locale
     Given I operate as the Admin
     And I go to System/Configuration
