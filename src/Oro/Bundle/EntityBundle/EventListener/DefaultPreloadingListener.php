@@ -3,13 +3,13 @@
 namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\Proxy;
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -126,7 +126,6 @@ class DefaultPreloadingListener
             return;
         }
 
-        /** @var EntityRepository $entityRepository */
         $entityRepository = $this->doctrineHelper->getEntityRepositoryForClass($entityClass);
         /** @var ClassMetadata $entityMetadata */
         $entityMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
@@ -216,11 +215,14 @@ class DefaultPreloadingListener
 
         if ($assocMapping['type'] & ClassMetadata::ONE_TO_MANY) {
             $mappedBy = $entityMetadata->getAssociationMappedByTargetField($targetField);
+            QueryBuilderUtil::checkParameter($mappedBy);
+            QueryBuilderUtil::checkParameter($entityIdField);
             $qbToMany
                 ->addSelect('collection_item_' . $mappedBy . '.' . $entityIdField)
                 ->innerJoin('collection_item.' . $mappedBy, 'collection_item_' . $mappedBy)
                 ->andWhere($qbToMany->expr()->in('collection_item_' . $mappedBy, ':entities'));
         } elseif ($assocMapping['type'] & ClassMetadata::MANY_TO_MANY) {
+            QueryBuilderUtil::checkParameter($entityClass);
             $qbToMany
                 ->addSelect('entity.' . $entityIdField)
                 ->innerJoin($entityClass, 'entity', Query\Expr\Join::WITH, $qbToMany->expr()->eq(1, 1))
@@ -231,6 +233,8 @@ class DefaultPreloadingListener
 
         if (!empty($assocMapping['orderBy'])) {
             foreach ($assocMapping['orderBy'] as $sort => $order) {
+                QueryBuilderUtil::checkParameter($sort);
+                QueryBuilderUtil::checkParameter($order);
                 $qbToMany->addOrderBy('collection_item.' . $sort, $order);
             }
         }
@@ -271,7 +275,7 @@ class DefaultPreloadingListener
     }
 
     /**
-     * @param object $entity
+     * @param object|null $entity
      * @return bool
      */
     private function isProxyAndNotInitialized(?object $entity): bool
@@ -280,7 +284,7 @@ class DefaultPreloadingListener
     }
 
     /**
-     * @param object $collection
+     * @param object|null $collection
      * @return bool
      */
     private function isCollectionAndNotInitialized(?object $collection): bool
