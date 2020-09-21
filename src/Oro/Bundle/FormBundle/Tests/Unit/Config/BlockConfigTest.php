@@ -47,6 +47,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
             'title'       => 'Common Setting',
             'priority'    => 3,
             'description' => 'some description',
+            'descriptionStyle' => 'some description style',
             'useSpan'     => true,
             'tooltip'     => 'some tooltip'
         ],
@@ -128,12 +129,14 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         $subblocks = array();
         foreach ($this->testSubBlocksConfig as $code => $data) {
             $blockDescription = !empty($data['description']) ? $data['description'] : null;
+            $blockDescriptionStyle = !empty($data['descriptionStyle']) ? $data['descriptionStyle'] : null;
             $tooltip = !empty($data['tooltip']) ? $data['tooltip'] : null;
             $subblocks[]      = array(
                 'code'        => $code,
                 'title'       => $data['title'],
                 'data'        => array('some_data'),
                 'description' => $blockDescription,
+                'descriptionStyle' => $blockDescriptionStyle,
                 'tooltip'     => $tooltip,
                 'useSpan'     => true
             );
@@ -160,6 +163,9 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
 
             $subBlock->setDescription($blockDescription);
             $this->assertEquals($blockDescription, $subBlock->getDescription());
+
+            $subBlock->setDescriptionStyle($blockDescriptionStyle);
+            $this->assertEquals($blockDescriptionStyle, $subBlock->getDescriptionStyle());
 
             /** test SubBlockConfig addSubBlock */
             $this->blockConfig->addSubBlock($subBlock);

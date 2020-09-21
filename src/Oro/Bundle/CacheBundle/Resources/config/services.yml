@@ -76,10 +76,9 @@ services:
             - '@oro.cache.serializer'
 
     oro.cache.serializer:
-        class: Symfony\Component\Serializer\Serializer
+        class: Oro\Bundle\CacheBundle\Serializer\Serializer
         arguments:
-            -
-                - '@oro.cache.serializer.normalizer'
+            - !tagged_iterator oro_cache_generator_normalizer
             -
                 json: '@serializer.encoder.json'
 
@@ -87,6 +86,8 @@ services:
         class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
         arguments:
             - '@oro.cache.serializer.mapping.factory.class_metadata' # Loaded by OroCacheExtension
+        tags:
+            - { name: 'oro_cache_generator_normalizer' }
 
     oro.cache.generator.universal_cache_key:
         class: Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator

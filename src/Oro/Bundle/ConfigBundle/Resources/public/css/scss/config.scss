@@ -119,6 +119,15 @@
             margin-top: $content-padding-small;
         }
     }
+
+    .warning {
+        position: relative;
+        padding: $content-padding-small;
+        margin: 0 0 $content-padding-medium;
+        border: 1px solid $primary-860;
+        background: $danger-lighten;
+        border-radius: 4px;
+    }
 }
 
 .system-configuration-content {
