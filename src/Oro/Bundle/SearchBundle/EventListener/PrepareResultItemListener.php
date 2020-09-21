@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,11 +38,11 @@ class PrepareResultItemListener
     /**
      * Constructor
      *
-     * @param Router $router
-     * @param ObjectMapper $mapper
-     * @param EntityManager $em
-     * @param EntityNameResolver $entityNameResolver
-     * @param ConfigManager $configManager
+     * @param Router              $router
+     * @param ObjectMapper        $mapper
+     * @param EntityManager       $em
+     * @param EntityNameResolver  $entityNameResolver
+     * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -88,8 +89,9 @@ class PrepareResultItemListener
     /**
      * Get url for entity
      *
-     * @param object $entity
-     * @param $item \Oro\Bundle\SearchBundle\Query\Result\Item
+     * @param object     $entity
+     * @param ResultItem $item
+     *
      * @return string
      */
     protected function getEntityUrl($entity, $item)
@@ -107,7 +109,7 @@ class PrepareResultItemListener
                 /**
                  * NOTE: possible to generate url without entity object if only identifier field needed
                  */
-                $idKey = array_search($identifierField, $routeParameters['parameters']);
+                $idKey = array_search($identifierField, $routeParameters['parameters'], true);
                 $needToHaveEntity = $idKey === false || count($routeParameters['parameters']) > 1;
 
                 if (!$entity && $needToHaveEntity) {
@@ -140,8 +142,8 @@ class PrepareResultItemListener
     /**
      * Get entity string
      *
-     * @param $entity object
-     * @param $item \Oro\Bundle\SearchBundle\Query\Result\Item
+     * @param object     $entity
+     * @param ResultItem $item
      *
      * @return string
      */
@@ -160,6 +162,7 @@ class PrepareResultItemListener
      * Check if route parameters defined and not empty
      *
      * @param array $data
+     *
      * @return bool
      */
     protected function isParametersDefined(array $data)
