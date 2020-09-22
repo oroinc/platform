@@ -101,3 +101,8 @@ services:
             # Listener priority should be lower than onProcessAfter in oro_attachment.import_export.file_strategy_event_listener
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 40 }
             - { name: doctrine.event_listener, event: preFlush, connection: 'default' }
+
+    oro_digital_asset.event_listener.digital_asset_preloading:
+        parent: oro_entity.event_listener.default_preloading
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.preload_entity.digitalasset, method: onPreload }
