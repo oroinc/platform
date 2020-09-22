@@ -76,17 +76,45 @@ services:
             - '@oro.cache.serializer'
 
     oro.cache.serializer:
-        class: Symfony\Component\Serializer\Serializer
+        class: Oro\Bundle\CacheBundle\Serializer\Serializer
         arguments:
-            -
-                - '@oro.cache.serializer.normalizer'
+            - !tagged_iterator oro_cache_generator_normalizer
             -
                 json: '@serializer.encoder.json'
+
+    oro.cache.serializer.mapping.cache_warmer:
+        class: Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer
+        arguments:
+            - [] # Loaders injected by the OroCacheExtension
+            - '%kernel.cache_dir%/oro/cache_serializers.php'
+        tags:
+            - kernel.cache_warmer
+
+    oro.cache.serializer_pool:
+        parent: cache.system
+        tags:
+            - cache.pool
+
+    oro.cache.serializer.mapping.cache:
+        class: Psr\Cache\CacheItemPoolInterface
+        factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
+        arguments:
+            - '%kernel.cache_dir%/oro/cache_serializers.php'
+            - "@oro.cache.serializer_pool"
+
+    oro.cache.serializer.mapping.factory.cache_class_metadata:
+        decorates: oro.cache.serializer.mapping.factory.class_metadata
+        class: Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory
+        arguments:
+            - "@oro.cache.serializer.mapping.factory.cache_class_metadata.inner"
+            - "@oro.cache.serializer.mapping.cache"
 
     oro.cache.serializer.normalizer:
         class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
         arguments:
             - '@oro.cache.serializer.mapping.factory.class_metadata' # Loaded by OroCacheExtension
+        tags:
+            - { name: 'oro_cache_generator_normalizer' }
 
     oro.cache.generator.universal_cache_key:
         class: Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator

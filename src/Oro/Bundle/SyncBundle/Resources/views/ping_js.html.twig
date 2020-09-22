@@ -1,6 +1,5 @@
-<script type="text/javascript">
-    loadModules(['orosync/js/sync'],
-    function(sync) {
-        sync.subscribe('oro/ping', function () {});
-    });
-</script>
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
+<div {{ UI.renderPageComponentAttributes({
+    module: 'orosync/js/app/components/ping-handler'
+}) }} ></div>

@@ -152,9 +152,10 @@ Possible address object parameters are:
 Example:
 
 ```javascript
-loadModules(['orolocale/js/formatter/address'],
-function(addressFormatter) {
-    var data = this.model.toJSON();
+    import addressFormatter from 'orolocale/js/formatter/address';
+
+    const data = addressModel.toJSON();
+
     data.formatted_address = addressFormatter.format({
         prefix: data.namePrefix,
         suffix: data.nameSuffix,
@@ -172,7 +173,6 @@ function(addressFormatter) {
         region: data.region,
         region_code: data.regionCode
     });
-});
 ```
 
 ### getAddressFormat

@@ -6,10 +6,14 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFamilyRepositoryTest extends WebTestCase
 {
+    use EntityTrait;
+
     /**
      * @var AttributeFamilyRepository
      */
@@ -84,8 +88,42 @@ class AttributeFamilyRepositoryTest extends WebTestCase
             $attributeId4 => [$family2->getId()],
         ];
 
-        $this->assertCount(count($expected), $result);
+        $this->assertFamilyIds($expected, $result);
+    }
 
+    public function testGetFamilyIdsForAttributesByOrganization()
+    {
+        /** @var AttributeFamily $family */
+        $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
+        $organization = $family->getOwner();
+        $attributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
+
+        $result = $this->repository->getFamilyIdsForAttributesByOrganization([$attributeId], $organization);
+
+        $expected = [
+            $attributeId => [$family->getId()],
+        ];
+
+        $this->assertFamilyIds($expected, $result);
+    }
+
+    public function testGetFamilyIdsForAttributesByAnotherOrganization()
+    {
+        $attributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
+
+        /** @var Organization $organization */
+        $organization = $this->getEntity(Organization::class, ['id' => 0]);
+
+        $this->assertEmpty($this->repository->getFamilyIdsForAttributesByOrganization([$attributeId], $organization));
+    }
+
+    /**
+     * @param array $expected
+     * @param array $result
+     */
+    private function assertFamilyIds(array $expected, array $result): void
+    {
+        $this->assertCount(count($expected), $result);
         foreach ($expected as $attributeId => $familyIds) {
             $this->assertArrayHasKey($attributeId, $result);
             $this->assertCount(count($familyIds), $result[$attributeId]);

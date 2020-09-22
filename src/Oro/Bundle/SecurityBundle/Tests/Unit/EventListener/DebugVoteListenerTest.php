@@ -44,10 +44,13 @@ class DebugVoteListenerTest extends \PHPUnit\Framework\TestCase
 
         $event = new VoteEvent($this->createMock(VoterInterface::class), new \stdClass, [], 0);
 
-        $this->innerListener->expects($this->once())
+        $this->innerListener->expects($this->exactly(2))
             ->method('onVoterVote')
             ->with($event);
 
+        $this->listener->onVoterVote($event);
+
+        // Checks local cache.
         $this->listener->onVoterVote($event);
     }
 
@@ -61,6 +64,9 @@ class DebugVoteListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects($this->never())
             ->method('onVoterVote');
 
+        $this->listener->onVoterVote(new VoteEvent($this->createMock(VoterInterface::class), new \stdClass, [], 0));
+
+        // Checks local cache.
         $this->listener->onVoterVote(new VoteEvent($this->createMock(VoterInterface::class), new \stdClass, [], 0));
     }
 }

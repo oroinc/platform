@@ -19,7 +19,7 @@ abstract class AbstractMapper
     protected $propertyAccessor;
 
     /**
-     * @param SearchMappingProvider $mappingProvider
+     * @param SearchMappingProvider     $mappingProvider
      * @param PropertyAccessorInterface $propertyAccessor
      */
     public function __construct(
@@ -89,9 +89,9 @@ abstract class AbstractMapper
      */
     public function getEntityModeConfig($entity)
     {
-        $config = $this->getEntityConfig($entity);
-        $value  = Mode::NORMAL;
+        $value = Mode::NORMAL;
 
+        $config = $this->getEntityConfig($entity);
         if ($config) {
             $value = $config['mode'];
         }
@@ -112,31 +112,27 @@ abstract class AbstractMapper
      */
     protected function setDataValue($alias, $objectData, $fieldConfig, $value, $isArray = false)
     {
-        if ($value) {
-            //check if field have target_fields parameter
-            $targetFields = isset($fieldConfig['target_fields'])
-                ? $fieldConfig['target_fields']
-                : [$fieldConfig['name']];
+        if (null === $value || '' === $value) {
+            return $objectData;
+        }
 
-            if ($fieldConfig['target_type'] != Query::TYPE_TEXT) {
-                foreach ($targetFields as $targetField) {
-                    if ($isArray) {
-                        $objectData[$fieldConfig['target_type']][$targetField][] = $value;
-                    } else {
-                        $objectData[$fieldConfig['target_type']][$targetField] = $value;
-                    }
+        $targetFields = $fieldConfig['target_fields'] ?? [$fieldConfig['name']];
+        if ($fieldConfig['target_type'] !== Query::TYPE_TEXT) {
+            foreach ($targetFields as $targetField) {
+                if ($isArray) {
+                    $objectData[$fieldConfig['target_type']][$targetField][] = $value;
+                } else {
+                    $objectData[$fieldConfig['target_type']][$targetField] = $value;
                 }
-            } else {
-                foreach ($targetFields as $targetField) {
-                    if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
-                        $objectData[$fieldConfig['target_type']][$targetField] = '';
-                    }
-
-                    $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
-                }
-
-                $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
             }
+        } else {
+            foreach ($targetFields as $targetField) {
+                if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
+                    $objectData[$fieldConfig['target_type']][$targetField] = '';
+                }
+                $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
+            }
+            $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
         }
 
         return $objectData;
@@ -144,7 +140,8 @@ abstract class AbstractMapper
 
     /**
      * @param string $fieldName
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return string
      */
     abstract protected function clearTextValue($fieldName, $value);
@@ -152,6 +149,7 @@ abstract class AbstractMapper
     /**
      * @param string $original
      * @param string $addition
+     *
      * @return string
      */
     public function buildAllDataField($original, $addition)
@@ -162,12 +160,7 @@ abstract class AbstractMapper
         $original .= sprintf(' %s %s ', $addition, $clearedAddition);
         $original = implode(
             Query::DELIMITER,
-            array_unique(
-                explode(
-                    Query::DELIMITER,
-                    $original
-                )
-            )
+            array_unique(explode(Query::DELIMITER, $original))
         );
 
         return trim($original);

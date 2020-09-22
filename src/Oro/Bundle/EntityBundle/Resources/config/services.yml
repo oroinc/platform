@@ -675,3 +675,21 @@ services:
         tags:
             - { name: doctrine.event_listener, event: preFlush, method: preFlush }
             - { name: doctrine.event_listener, event: postFlush, method: postFlush }
+
+    oro_entity.manager.preloading_manager:
+        class: Oro\Bundle\EntityBundle\Manager\PreloadingManager
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@event_dispatcher'
+            - '@oro_entity.entity_alias_resolver'
+            - '@property_accessor'
+
+    Oro\Bundle\EntityBundle\Manager\PreloadingManager:
+        alias: oro_entity.manager.preloading_manager
+
+    oro_entity.event_listener.default_preloading:
+        abstract: true
+        class: Oro\Bundle\EntityBundle\EventListener\DefaultPreloadingListener
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@property_accessor'
