@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Updates the database and all related caches to reflect changes made in extended entities.
+ * Updates the database schema and all related caches to reflect changes made in extended entities.
  *
  * @Route("/entity/extend")
  */

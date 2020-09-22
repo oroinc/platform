@@ -143,8 +143,8 @@ datagrids:
                     options:
                         field_options:
                             choices:
-                                oro.integration.integration_status.competed.label: 1
-                                oro.integration.integration_status.failed.label: 2
+                                oro.integration.integration_status.competed.label: "1"
+                                oro.integration.integration_status.failed.label: "2"
                 connector:
                     type:      choice
                     data_name: s.connector

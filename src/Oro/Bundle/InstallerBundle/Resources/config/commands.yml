@@ -27,6 +27,8 @@ services:
             - { name: console.command }
 
     Oro\Bundle\InstallerBundle\Command\PlatformUpdateCommand:
+        calls:
+            - [setPlatformUpdateChecker, ['@oro_installer.platform_update_checker']]
         tags:
             - { name: console.command }
 

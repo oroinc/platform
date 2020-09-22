@@ -21,12 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_COUNT = 10;
-    const TEST_PRICE = 150;
-
-    const ENTITY_MANUFACTURER = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer';
-    const ENTITY_PRODUCT      = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product';
-    const ENTITY_CATEGORY     = 'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category';
+    private const TEST_COUNT = 10;
+    private const TEST_PRICE = 150;
 
     /** @var ObjectMapper */
     protected $mapper;
@@ -50,12 +46,12 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     protected $htmlTagHelper;
 
     /** @var array */
-    protected $mappingConfig = [
-        self::ENTITY_MANUFACTURER => [
+    private $mappingConfig = [
+        Manufacturer::class => [
             'fields' => [
                 [
-                    'name' => 'name',
-                    'target_type' => 'text',
+                    'name'        => 'name',
+                    'target_type' => 'text'
                 ],
                 [
                     'name'            => 'products',
@@ -63,7 +59,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     'relation_fields' => [
                         [   // test that 'target_fields' is set to ['products']
                             'name'        => 'name',
-                            'target_type' => 'text',
+                            'target_type' => 'text'
                         ],
                         [
                             'name'            => 'categories',
@@ -71,7 +67,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                             'relation_fields' => [
                                 [   // test that 'target_fields' is set to ['categories']
                                     'name'        => 'name',
-                                    'target_type' => 'text',
+                                    'target_type' => 'text'
                                 ],
                                 [
                                     'name'          => 'name',
@@ -91,7 +87,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ],
-        self::ENTITY_PRODUCT      => [
+        Product::class      => [
             'alias'        => 'test_product',
             'label'        => 'test product',
             'title_fields' => ['name'],
@@ -119,7 +115,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 ],
                 [   // test that 'target_fields' is set to ['count']
                     'name'        => 'count',
-                    'target_type' => 'integer',
+                    'target_type' => 'integer'
                 ],
                 [
                     'name'            => 'manufacturer',
@@ -132,9 +128,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ]
-            ],
+            ]
         ],
-        self::ENTITY_CATEGORY     => [
+        Category::class     => [
             'fields' => [
                 [
                     'name'          => 'name',
@@ -147,7 +143,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     'relation_fields' => [
                         [   // test that 'target_fields' is set to ['products']
                             'name'        => 'name',
-                            'target_type' => 'text',
+                            'target_type' => 'text'
                         ],
                         [
                             'name'            => 'manufacturer',
@@ -163,11 +159,11 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ]
-        ],
+        ]
     ];
 
     /** @var array */
-    protected $categories = ['<p>men</p>', '<p>women</p>'];
+    private $categories = ['<p>men</p>', '<p>women</p>'];
 
     protected function setUp()
     {
@@ -203,7 +199,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $cache->expects($this->any())
             ->method('fetch')
             ->willReturn(false);
-        $this->mapperProvider  = new SearchMappingProvider($this->dispatcher, $configProvider, $cache);
+        $this->mapperProvider = new SearchMappingProvider($this->dispatcher, $configProvider, $cache);
 
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())
@@ -247,13 +243,13 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testMapObjectForProduct()
     {
-        $productName        = $this->product->getName();
+        $productName = $this->product->getName();
         $productDescription = $this->product->getDescription();
-        $manufacturerName   = $this->product->getManufacturer()->getName();
-        $allTextData        = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
+        $manufacturerName = $this->product->getManufacturer()->getName();
+        $allTextData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
 
         $expectedMapping = [
-            'text' => $this->clearTextData([
+            'text'    => $this->clearTextData([
                 'name'                       => $productName,
                 'description'                => $productDescription,
                 'manufacturer'               => $manufacturerName,
@@ -274,41 +270,97 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     public function testAllTextLimitation()
     {
         // create a product name exceeding the 256 length limitation
-        $productName        = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              ' ';
+        $productName = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . ' ';
         $expectedProductName = 'zUWidBOhT9IzqNyPhYvchY QJfPB2teh0ukQ';
         $productName .= $expectedProductName;
         $productDescription = 'description';
-        $manufacturerName   = $this->product->getManufacturer()->getName();
+        $manufacturerName = $this->product->getManufacturer()->getName();
 
         $allData = sprintf('%s %s %s', $productName, $productDescription, $manufacturerName);
         $allTextData = sprintf('%s %s %s', $expectedProductName, $productDescription, $manufacturerName);
 
         $expectedMapping = [
-            'text' => $this->clearTextData(
+            'text'    => $this->clearTextData(
                 [
-                   'name'                       => $productName,
-                   'description'                => $productDescription,
-                   'manufacturer'               => $manufacturerName,
-                   'all_data'                   => $allData,
-                   Indexer::TEXT_ALL_DATA_FIELD => $allTextData
+                    'name'                       => $productName,
+                    'description'                => $productDescription,
+                    'manufacturer'               => $manufacturerName,
+                    'all_data'                   => $allData,
+                    Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
             ),
             'decimal' => [
-                'price' => $this->product->getPrice(),
+                'price' => $this->product->getPrice()
             ],
             'integer' => [
-                'count' => $this->product->getCount(),
+                'count' => $this->product->getCount()
             ]
         ];
 
         $this->product
             ->setName($productName)
             ->setDescription($productDescription);
+
+        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+    }
+
+    public function testNullFieldValues()
+    {
+        $this->product->setCount(null);
+        $this->product->setPrice(null);
+        $this->product->setName(null);
+
+        $allTextData = sprintf(
+            '%s %s',
+            $this->product->getDescription(),
+            $this->product->getManufacturer()->getName()
+        );
+        $expectedMapping = [
+            'text' => $this->clearTextData(
+                [
+                    'description'                => $this->product->getDescription(),
+                    'manufacturer'               => $this->product->getManufacturer()->getName(),
+                    'all_data'                   => $allTextData,
+                    Indexer::TEXT_ALL_DATA_FIELD => $allTextData
+                ]
+            )
+        ];
+
+        $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
+    }
+
+    public function testZeroNumberAndEmptyStringFieldValues()
+    {
+        $this->product->setCount(0);
+        $this->product->setPrice(0.0);
+        $this->product->setName('');
+
+        $allTextData = sprintf(
+            '%s %s',
+            $this->product->getDescription(),
+            $this->product->getManufacturer()->getName()
+        );
+        $expectedMapping = [
+            'text'    => $this->clearTextData(
+                [
+                    'description'                => $this->product->getDescription(),
+                    'manufacturer'               => $this->product->getManufacturer()->getName(),
+                    'all_data'                   => $allTextData,
+                    Indexer::TEXT_ALL_DATA_FIELD => $allTextData
+                ]
+            ),
+            'decimal' => [
+                'price' => 0.0
+            ],
+            'integer' => [
+                'count' => 0
+            ]
+        ];
 
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
     }
@@ -350,8 +402,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
      */
     public function testMapObjectForCategory()
     {
-        $categoryName     = $this->category->getName();
-        $productName      = $this->product->getName();
+        $categoryName = $this->category->getName();
+        $productName = $this->product->getName();
         $manufacturerName = $this->manufacturer->getName();
 
         $expectedMapping = [
@@ -440,33 +492,31 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     {
         $data = $this->mapper->getEntitiesListAliases();
 
-        $this->assertEquals('test_product', $data[self::ENTITY_PRODUCT]);
+        $this->assertEquals('test_product', $data[Product::class]);
     }
 
     public function testGetMappingConfig()
     {
-        $mapping = $this->mappingConfig;
-
-        $this->assertEquals($mapping, $this->mapper->getMappingConfig());
+        $this->assertEquals($this->mappingConfig, $this->mapper->getMappingConfig());
     }
 
     public function testGetEntityMapParameter()
     {
         $this->assertEquals(
             'test_product',
-            $this->mapper->getEntityMapParameter(self::ENTITY_PRODUCT, 'alias')
+            $this->mapper->getEntityMapParameter(Product::class, 'alias')
         );
 
         $this->assertEquals(
             false,
-            $this->mapper->getEntityMapParameter(self::ENTITY_PRODUCT, 'non exists parameter')
+            $this->mapper->getEntityMapParameter(Product::class, 'non exists parameter')
         );
     }
 
     public function testGetEntities()
     {
         $entities = $this->mapper->getEntities();
-        $this->assertEquals(self::ENTITY_PRODUCT, $entities[1]);
+        $this->assertEquals(Product::class, $entities[1]);
     }
 
     public function testNonExistsConfig()
@@ -483,32 +533,32 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $query->expects($this->once())
             ->method('getSelectDataFields')
             ->willReturn([
-                'text.sku' => 'sku',
-                'text.defaultName' => 'defaultName',
+                'text.sku'             => 'sku',
+                'text.defaultName'     => 'defaultName',
                 'integer.integerField' => 'integerValue',
                 'decimal.decimalField' => 'decimalValue',
-                'notExistingField' => 'notExistingField'
+                'notExistingField'     => 'notExistingField'
             ]);
 
         $item = [
-            'item' => [
+            'item'         => [
                 'id'       => 50,
                 'recordId' => 29
             ],
-            'sku' => '2GH80',
-            'defaultName' => 'Example Headlamp',
+            'sku'          => '2GH80',
+            'defaultName'  => 'Example Headlamp',
             'integerField' => '42',
-            'decimalField' => '12.34',
+            'decimalField' => '12.34'
         ];
 
         $result = $this->mapper->mapSelectedData($query, $item);
 
         $this->assertSame(
             [
-                'sku' => '2GH80',
-                'defaultName' => 'Example Headlamp',
-                'integerValue' => 42,
-                'decimalValue' => 12.34,
+                'sku'              => '2GH80',
+                'defaultName'      => 'Example Headlamp',
+                'integerValue'     => 42,
+                'decimalValue'     => 12.34,
                 'notExistingField' => ''
             ],
             $result
@@ -528,6 +578,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param array $fields
+     *
      * @return array
      */
     protected function clearTextData(array $fields)

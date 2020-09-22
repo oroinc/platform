@@ -47,10 +47,6 @@ class OroEntityConfigExtension extends Extension
             'kernel.event_listener',
             ['event' => 'oro_migration.post_up', 'method' => 'onPostUp']
         );
-        $testMigrationListenerDef->addTag(
-            'kernel.event_listener',
-            ['event' => 'oro_migration.post_up', 'method' => 'updateAttributes', 'priority' => -260]
-        );
         $container->setDefinition('oro_entity_config.tests.migration_listener', $testMigrationListenerDef);
     }
 }

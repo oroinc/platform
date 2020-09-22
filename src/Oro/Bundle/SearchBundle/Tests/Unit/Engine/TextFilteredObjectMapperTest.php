@@ -26,22 +26,22 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
     public function testAllTextLimitation()
     {
         // create a product name exceeding the 256 length limitation
-        $productName        = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234' .
-                              ' ';
+        $productName = 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . 'QJfPB2teh0ukQN46FehTdiMRMMGGlaNvQvB4ymJq49zUWidBOhT9IzqNyPhYvchY1234'
+            . ' ';
         $expectedProductName = 'zUWidBOhT9IzqNyPhYvchY QJfPB2teh0ukQ';
         $productName .= $expectedProductName;
         $productDescription = 'description';
-        $manufacturerName   = $this->product->getManufacturer()->getName();
+        $manufacturerName = $this->product->getManufacturer()->getName();
 
         $allData = sprintf('%s %s %s', $expectedProductName, $productDescription, $manufacturerName);
         $allTextData = sprintf('%s %s %s', $expectedProductName, $productDescription, $manufacturerName);
 
         $expectedMapping = [
-            'text' => $this->clearTextData(
+            'text'    => $this->clearTextData(
                 [
                     'name'                       => $expectedProductName,
                     'description'                => $productDescription,
@@ -51,10 +51,10 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
                 ]
             ),
             'decimal' => [
-                'price' => $this->product->getPrice(),
+                'price' => $this->product->getPrice()
             ],
             'integer' => [
-                'count' => $this->product->getCount(),
+                'count' => $this->product->getCount()
             ]
         ];
 

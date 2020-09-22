@@ -23,14 +23,14 @@ class OroCacheExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $this->loadMetadataFactoryDefinition($container);
-
         $configuration = new Configuration();
         $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('commands.yml');
+
+        $this->loadMetadataFactoryDefinition($container);
     }
 
     /**
@@ -48,7 +48,12 @@ class OroCacheExtension extends Extension
             $serializerFileLoaders[] = new Definition(SerializerYamlFileLoader::class, [$resource->path]);
         }
         $loader = new Definition(LoaderChain::class, [$serializerFileLoaders]);
-        $definition = new Definition(ClassMetadataFactory::class, [$loader]);
+        $serializerLoaders = [$loader];
+        $definition = new Definition(ClassMetadataFactory::class, $serializerLoaders);
+        $container->getDefinition('oro.cache.serializer.mapping.cache_warmer')->replaceArgument(0, $serializerLoaders);
+        if ($container->getParameter('kernel.debug')) {
+            $container->removeDefinition('oro.cache.serializer.mapping.cache_warmer');
+        }
         $container->setDefinition('oro.cache.serializer.mapping.factory.class_metadata', $definition);
     }
 }

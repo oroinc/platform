@@ -300,6 +300,20 @@ class AcmeTestBundle implements Migration, ExtendExtensionAwareInterface
 }
 ```
 
+## Applying entity extend changes
+
+The following command updates the database schema and all related caches to reflect changes made in extended entities:
+
+```bash
+php bin/console oro:entity-extend:update
+```
+
+The `dry-run` can be used to show changes without applying them, e.g.:
+
+```bash
+php bin/console oro:entity-extend:update --dry-run
+```
+
 ## Preparing entity extend configuration
 
 The following command prepares extended entities configuration:

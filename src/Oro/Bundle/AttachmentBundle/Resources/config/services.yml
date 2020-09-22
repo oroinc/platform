@@ -565,3 +565,8 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_before, method: onProcessBefore }
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 50 }
             - { name: monolog.logger, channel: oro_attachment }
+
+    oro_attachment.event_listener.file_preloading:
+        parent: oro_entity.event_listener.default_preloading
+        tags:
+            - { name: kernel.event_listener, event: oro_entity.preload_entity.file, method: onPreload }

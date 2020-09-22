@@ -46,6 +46,17 @@ class HtmlTagProvider
     }
 
     /**
+     * Returns array of allowed iframe domains
+     *
+     * @param string $scope
+     * @return array
+     */
+    public function getAllowedIframeDomains(string $scope): array
+    {
+        return $this->getPurifierConfigByKey($scope, self::ALLOWED_IFRAME_DOMAINS);
+    }
+
+    /**
      * Returns string consisted from allowed tags
      *
      * @param string $scope

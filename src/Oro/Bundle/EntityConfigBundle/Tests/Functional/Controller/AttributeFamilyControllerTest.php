@@ -21,26 +21,6 @@ class AttributeFamilyControllerTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    public function testCreate()
-    {
-        $this->loadFixtures([LoadAttributeData::class]);
-        $crawler = $this->client->request(
-            'GET',
-            $this->getUrl('oro_attribute_family_create', ['alias' => $this->getTestEntityAlias()])
-        );
-        $saveButton = $crawler->selectButton('Save and Close');
-
-        $form = $saveButton->form();
-        $form['oro_attribute_family[code]'] = 'AttributeFamilyCode';
-        $form['oro_attribute_family[labels][values][default]'] = 'AttributeFamilyLabel';
-
-        $this->client->followRedirects(true);
-        $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertContains('Product Family was successfully saved', $crawler->html());
-    }
-
     public function testUpdate()
     {
         $this->loadFixtures([LoadAttributeFamilyData::class]);
@@ -61,6 +41,26 @@ class AttributeFamilyControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains('Successfully updated', $crawler->html());
+    }
+
+    public function testCreate()
+    {
+        $this->loadFixtures([LoadAttributeData::class]);
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_attribute_family_create', ['alias' => $this->getTestEntityAlias()])
+        );
+        $saveButton = $crawler->selectButton('Save and Close');
+
+        $form = $saveButton->form();
+        $form['oro_attribute_family[code]'] = 'AttributeFamilyCode';
+        $form['oro_attribute_family[labels][values][default]'] = 'AttributeFamilyLabel';
+
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains('Product Family was successfully saved', $crawler->html());
     }
 
     /**
