@@ -384,8 +384,18 @@ define(function(require) {
          * @param {string} styles
          */
         addCSSRule: function(selector, styles) {
-            const styleSheet = document.styleSheets[0];
-            styleSheet.insertRule(selector + '{' + styles + '}', styleSheet.cssRules.length);
+            const css = `${selector} { ${styles} }`;
+            const ID = '__runtime-styles';
+            const style = document.getElementById(ID) || (() => {
+                const head = document.head || document.getElementsByTagName('head')[0];
+                const style = document.createElement('style');
+                style.type = 'text/css';
+                style.id = ID;
+                head.appendChild(style);
+                return style;
+            })();
+
+            style.appendChild(document.createTextNode(css));
         },
 
         /**
