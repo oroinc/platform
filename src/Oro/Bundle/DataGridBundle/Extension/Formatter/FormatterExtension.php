@@ -87,10 +87,16 @@ class FormatterExtension extends AbstractExtension
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
         $toProcess  = array_merge($columns, $properties);
 
+        $objectsToProcess = [];
+        foreach ($toProcess as $name => $propertyConfig) {
+            $objectsToProcess[$name] = $this->getPropertyObject(
+                PropertyConfiguration::createNamed($name, $propertyConfig)
+            );
+        }
+
         foreach ($rows as $key => $row) {
             $currentRow = [];
-            foreach ($toProcess as $name => $propertyConfig) {
-                $property = $this->getPropertyObject(PropertyConfiguration::createNamed($name, $propertyConfig));
+            foreach ($objectsToProcess as $name => $property) {
                 $currentRow[$name] = $property->getValue($row);
             }
             $rows[$key] = $currentRow;
@@ -137,7 +143,7 @@ class FormatterExtension extends AbstractExtension
         }
 
         /** @var PropertyInterface $property */
-        $property = $this->propertyContainer->get($type);
+        $property = clone $this->propertyContainer->get($type);
         $property->init($config);
 
         return $property;
