@@ -57,8 +57,10 @@ class InlineEditColumnOptionsGuesser
 
             if (!empty($options)) {
                 if ($validatorMetadata->hasPropertyMetadata($columnName)) {
+                    $validationGroups = $column[Configuration::BASE_CONFIG_KEY]['validation_groups'] ?? [];
+
                     $options[Configuration::BASE_CONFIG_KEY]['validation_rules'] =
-                        $this->getValidationRules($validatorMetadata, $columnName);
+                        $this->getValidationRules($validatorMetadata, $columnName, $validationGroups);
                 }
 
                 return $options;
@@ -71,17 +73,25 @@ class InlineEditColumnOptionsGuesser
     /**
      * @param ClassMetadataInterface $validatorMetadata
      * @param string                 $columnName
+     * @param string[]               $validationGroups
      *
      * @return array
      */
-    private function getValidationRules($validatorMetadata, $columnName)
-    {
+    private function getValidationRules(
+        ClassMetadataInterface $validatorMetadata,
+        string $columnName,
+        array $validationGroups
+    ) {
         /** @var PropertyMetadataInterface $metadata */
         $metadata = $validatorMetadata->getPropertyMetadata($columnName);
         $metadata = is_array($metadata) && isset($metadata[0]) ? $metadata[0] : $metadata;
 
         $rules = [];
         foreach ($metadata->getConstraints() as $constraint) {
+            if ($validationGroups && !$this->isConstraintInGroups($constraint, $validationGroups)) {
+                continue;
+            }
+
             $reflectionClass = new \ReflectionClass($constraint);
             $ruleKey = $reflectionClass->getNamespaceName() === substr(AbstractLoader::DEFAULT_NAMESPACE, 1, -1)
                 ? $reflectionClass->getShortName()
@@ -97,14 +107,41 @@ class InlineEditColumnOptionsGuesser
     }
 
     /**
+     * @param Constraint|array  $constraint
+     * @param array             $expectedGroups
+     *
+     * @return bool
+     */
+    private function isConstraintInGroups($constraint, array $expectedGroups): bool
+    {
+        $groups = $this->getGroupsByConstraint($constraint);
+
+        return (bool)array_intersect($groups, $expectedGroups);
+    }
+
+    /**
      * @param Constraint|array $constraint
      *
      * @return bool
      */
-    private function isDefaultConstraint($constraint)
+    private function isDefaultConstraint($constraint): bool
     {
-        $groups = is_array($constraint) ? $constraint['groups'] : $constraint->groups;
+        $groups = $this->getGroupsByConstraint($constraint);
 
         return in_array(Constraint::DEFAULT_GROUP, $groups, true);
+    }
+
+    /**
+     * @param Constraint|array $constraint
+     *
+     * @return array
+     */
+    private function getGroupsByConstraint($constraint)
+    {
+        if (is_array($constraint)) {
+            return $constraint['groups'] ?? [];
+        }
+
+        return $constraint->groups;
     }
 }

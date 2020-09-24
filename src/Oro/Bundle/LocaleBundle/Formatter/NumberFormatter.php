@@ -158,6 +158,33 @@ class NumberFormatter
     }
 
     /**
+     * @param string $value
+     * @param array  $attributes
+     * @param array  $textAttributes
+     * @param array  $symbols
+     * @param null   $locale
+     *
+     * @return bool|float
+     */
+    public function parseFormattedDecimal(
+        $value,
+        array $attributes = array(),
+        array $textAttributes = array(),
+        array $symbols = array(),
+        $locale = null
+    ) {
+        $formatter = $this->getFormatter(
+            $locale,
+            $this->parseConstantValue(\NumberFormatter::DECIMAL),
+            $attributes,
+            $textAttributes,
+            $symbols
+        );
+
+        return $formatter->parse($value);
+    }
+
+    /**
      * Format percent
      *
      * @param float $value
