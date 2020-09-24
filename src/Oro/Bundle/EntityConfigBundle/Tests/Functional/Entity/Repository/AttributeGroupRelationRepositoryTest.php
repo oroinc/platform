@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Entity\Repository;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeGroupData;
+use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class AttributeGroupRelationRepositoryTest extends WebTestCase
@@ -48,6 +50,67 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
         ];
 
         $this->assertEquals($expectedFamilies, $families);
+    }
+
+    public function testGetAttributeFamiliesByAttributeIdsWithAcl()
+    {
+        $systemAttributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
+        $regularAttributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
+        $aclHelper = $this
+            ->getContainer()
+            ->get('oro_security.acl_helper');
+        $families = $this->repository->getFamiliesLabelsByAttributeIdsWithAcl(
+            [$systemAttributeId, $regularAttributeId],
+            $aclHelper
+        );
+
+        /** @var AttributeFamily $family1 */
+        $family1 = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
+        /** @var AttributeFamily $family2 */
+        $family2 = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
+
+        $expectedFamilies = [
+            $systemAttributeId => [
+                [
+                    'id' => $family1->getId(),
+                    'labels' => $family1->getLabels()
+                ],
+                [
+                    'id' => $family2->getId(),
+                    'labels' => $family2->getLabels()
+                ]
+            ],
+            $regularAttributeId => [
+                [
+                    'id' => $family1->getId(),
+                    'labels' => $family1->getLabels()
+                ]
+            ],
+        ];
+
+        $this->assertEquals(
+            $this->prepareFamilyForComparison($expectedFamilies),
+            $this->prepareFamilyForComparison($families)
+        );
+    }
+
+    /**
+     * @param array $families
+     * @return array
+     */
+    private function prepareFamilyForComparison(array $families): array
+    {
+        foreach ($families as $attributeId => $familyRows) {
+            $families[$attributeId] = array_map(static function (array $row) {
+                $row['labels'] = array_map(static function (LocalizedFallbackValue $value) {
+                    return $value->getString();
+                }, iterator_to_array($row['labels']));
+
+                return $row;
+            }, $familyRows);
+        }
+
+        return $families;
     }
 
     public function testGetAttributesMapByGroupIdsEmpty()
@@ -102,7 +165,7 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
 
         $attributeGroupRelations = $this->repository->getAttributeGroupRelationsByFamily($family);
 
-        $this->assertEquals(3, count($attributeGroupRelations));
+        $this->assertCount(3, $attributeGroupRelations);
 
         usort($attributeGroupRelations, function (AttributeGroupRelation $a, AttributeGroupRelation $b) {
             return $a->getEntityConfigFieldId() - $b->getEntityConfigFieldId();
