@@ -175,6 +175,10 @@ services:
         class: Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener
         arguments:
             - '@oro_entity.doctrine_helper'
+            - '@oro_locale.helper.localization'
+            - '@oro_security.acl_helper'
+            - '@security.authorization_checker'
+            - '@router'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after.attributes-grid, method: onResultAfter }
 
