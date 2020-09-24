@@ -1089,6 +1089,10 @@ i.mce-i-checkbox {
     white-space: normal
 }
 
+.mce-path.mce-flow-layout-item:after {
+    display: none;
+}
+
 .mce-path .mce-txt {
     display: inline-block;
     padding-right: 3px
@@ -1882,4 +1886,8 @@ i.mce-i-resize {
 i.mce-i-backcolor {
     text-shadow: none;
     background: #bbb
+}
+
+.mce-branding {
+    display: none;
 }

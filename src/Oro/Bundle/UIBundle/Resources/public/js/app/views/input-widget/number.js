@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
+    const NumberFormatter = require('orolocale/js/formatter/number');
     const localeSettings = require('orolocale/js/locale-settings');
     const _ = require('underscore');
     const $ = require('jquery');
@@ -39,7 +40,7 @@ define(function(require) {
         initializeWidget: function() {
             this._setPrecision();
             this._setAttr();
-            this.trigger('input');
+            this.$el.trigger('input');
         },
 
         disposeWidget: function() {
@@ -55,11 +56,33 @@ define(function(require) {
         _setAttr: function() {
             this._rememberAttr();
 
-            if (this.precision !== null) {
-                this.$el.attr({
-                    type: 'text',
-                    pattern: '[0-9]*'
-                });
+            /**
+             * Precision could be null in two cases:
+             * 1. Field is supposed t obe integer so we should not change number type to text in this case
+             * 2. Precision was not set, yet in this case we should not change input type before
+             * the correct precision will be set to not trigger: _normalizeNumberFieldValue
+             */
+            if (this.precision === null) {
+                return;
+            }
+
+            const oldType = this.$el.attr('type');
+
+            this.$el.attr('type', 'text')
+                .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
+
+            /**
+             * Value format is changed after type was changed in case if oldType was number
+             * It could be reproduced fo German locale.
+             * Example: value 1,23 will be transformed to valid float 1.23 but this float is not localized
+             * So the goal of the next code is to keep value localized to avoid further problems
+             */
+            if (oldType === 'number') {
+                const value = this.$el.val();
+                if (value !== '' && value !== null && value!==undefined) {
+                    const localizedFloat = NumberFormatter.formatDecimal(value);
+                    this.$el.val(localizedFloat);
+                }
             }
         },
 
@@ -69,7 +92,11 @@ define(function(require) {
         },
 
         _restoreAttr: function() {
-            this.$el.attr('type', this.type);
+            // Do not restore number type of input if it contains decimal
+            if (this.type !== 'number' || !this.isDecimalValue()) {
+                this.$el.attr('type', this.type);
+            }
+
             if (this.pattern) {
                 this.$el.attr('pattern', this.pattern);
             } else {
@@ -167,7 +194,14 @@ define(function(require) {
             const field = event.target;
             if (field.value !== value) {
                 $(field).trigger(event);
+                $(field).trigger('number-widget:' + event.type);
             }
+        },
+
+        isDecimalValue: function() {
+            const value = this.$el.val();
+
+            return (value !== undefined && value.indexOf(decimalSeparator) !== -1);
         }
     });
     return NumberInputWidgetView;
