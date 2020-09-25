@@ -135,7 +135,7 @@ define(function(require) {
             this.findElementHighlightClass = '.' + this.elementHighlightClass;
             this.findNotFoundClass = '.' + this.notFoundClass;
             this.findFoundClass = '.' + this.foundClass;
-            this.replaceBy = '<mark class="' + this.highlightClass + '">$&</mark>';
+            this.replaceBy = '<mark class="' + this.highlightClass + '">$1</mark>';
             this.combinedHighlightSelectors = this.highlightSelectors.join(', ');
 
             HighlightTextView.__super__.initialize.call(this, options);
@@ -380,7 +380,9 @@ define(function(require) {
                     let text = children.textContent;
                     if (this.textContainsSearchTerm(text)) {
                         result = true;
-                        text = text.replace(this.findText, this.replaceBy);
+                        text = _.escape(text.replace(this.findText, '[mark]$&[/mark]'))
+                            .replace(/\[mark\](.*?)\[\/mark\]/gi, this.replaceBy);
+
                         $children.replaceWith(text);
                     }
                 } else {
