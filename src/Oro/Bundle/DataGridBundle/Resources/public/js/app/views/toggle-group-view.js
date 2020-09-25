@@ -29,7 +29,10 @@ const TogglePaginationView = BaseView.extend({
 
     initialize(options) {
         _.extend(this, _.pick(options, ['translationPrefix']));
-
+        const {parameters = {}} = options.datagrid.collection.initialState;
+        if (parameters.hasOwnProperty('group')) {
+            this.defaultGroupState = parameters.group;
+        }
         this.grid = options.datagrid;
         this.listenTo(this.grid.collection, 'updateState sync', this.render);
         this.listenTo(this.grid, 'disable', this.disable);
@@ -86,11 +89,7 @@ const TogglePaginationView = BaseView.extend({
 
     togglePagination() {
         const {parameters = {}} = this.grid.collection.state;
-        if (this.getCurrentState() === this.defaultGroupState) {
-            parameters.group = !this.defaultGroupState;
-        } else {
-            delete parameters.group;
-        }
+        parameters.group = !this.getCurrentState();
         this.grid.collection.updateState({parameters});
         this.grid.collection.fetch({reset: true});
     }
