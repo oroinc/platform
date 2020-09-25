@@ -3,6 +3,7 @@ define(function(require) {
 
     const _ = require('underscore');
     const AbstractFormatter = require('orofilter/js/formatter/abstract-formatter');
+    const localeSettings = require('orolocale/js/locale-settings');
     const formatter = require('orolocale/js/formatter/number');
 
     /**
@@ -24,6 +25,9 @@ define(function(require) {
         if (this.decimals < 0 || this.decimals > 20) {
             throw new RangeError('decimals must be between 0 and 20');
         }
+
+        const numberFormats = localeSettings.getNumberFormats('decimal');
+        this.decimalSeparator = numberFormats.decimal_separator_symbol;
     };
 
     NumberFormatter.prototype = new AbstractFormatter();

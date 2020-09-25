@@ -1,3 +1,14 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{{ UI.entityViewLinks(record.getValue('attributeFamilies'), 'label', 'oro_attribute_family_view', 'oro_attribute_family_view') }}
+{# Template data provided by Oro\Bundle\EntityConfigBundle\EventListener\AttributesDatagridListener #}
+<ul class="extra-list">
+{% for attributeFamily in record.getValue('attributeFamiliesViewData') %}
+    <li class="extra-list-element">
+    {% if attributeFamily.viewLink %}
+        {{ UI.renderUrl(attributeFamily.viewLink, attributeFamily.label) }}
+    {% else %}
+        {{ attributeFamily.label }}
+    {% endif %}
+    </li>
+{% endfor %}
+</ul>
