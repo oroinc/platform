@@ -45,7 +45,6 @@ class DbPrivilegesProvider
             $pdo->exec('DROP TABLE oro_privileges_check');
             $granted[] = 'DROP';
         } catch (\Exception $e) {
-            return [];
         }
 
         return $granted;
@@ -63,7 +62,11 @@ class DbPrivilegesProvider
         foreach ($grantRows as $grantRow) {
             preg_match_all('/GRANT\s+(.+?)\s+ON\s+(.+?)\sTO/', $grantRow, $grants);
 
-            [$db, $host] = explode('.', $grants[2][0]);
+            $db = null;
+            $hostStr = $grants[2][0] ?? '';
+            if (strpos($hostStr, '.') !== false) {
+                [$db, $host] = explode('.', $grants[2][0]);
+            }
             $db = trim($db, '`');
 
             if ($db === $dbName || $db === '*') {
