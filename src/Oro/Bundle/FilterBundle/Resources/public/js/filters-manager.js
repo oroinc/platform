@@ -163,14 +163,15 @@ define(function(require, exports, module) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement'));
+            _.extend(this, _.pick(options, 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement',
+                'renderMode', 'hidePreviousOpenFilters'));
 
             this.template = this.getTemplateFunction();
             this.filters = _.extend({}, options.filters);
             this.storageKey = options.filtersStateStorageKey || config.filtersStateStorageKey || DEFAULT_STORAGE_KEY;
 
             if (options.forcedViewMode) {
-                this.viewMode = options.forceViewMode;
+                this.viewMode = options.forcedViewMode;
             } else if (this.renderMode === 'toggle-mode') {
                 this.viewMode = FiltersManager.STATE_VIEW_MODE;
             } else {
