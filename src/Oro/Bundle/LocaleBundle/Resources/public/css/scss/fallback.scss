@@ -69,7 +69,9 @@
     }
 
     .mce-tinymce {
-        width: $fallback-item-mce-tinymce-width;
+        &:not(.mce-fullscreen) {
+            width: $fallback-item-mce-tinymce-width;
+        }
     }
 }
 
