@@ -59,8 +59,8 @@ define(function(require, exports, module) {
             const options = _.extend(
                 methods.combineOptions.call(this),
                 _.pick(this, 'collection'),
-                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
-                    'useFiltersStateAnimationOnInit')
+                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'enableToggleFilters', 'renderMode',
+                    'hidePreviousOpenFilters', 'filtersStateStorageKey', 'useFiltersStateAnimationOnInit')
             );
 
             let filterContainer;
