@@ -70,12 +70,12 @@ class FormatterExtensionTest extends \PHPUnit\Framework\TestCase
                 'val8',
             );
 
-        $this->propertyContainer->expects($this->exactly(4))
+        $this->propertyContainer->expects($this->exactly(8))
             ->method('has')
             ->willReturn(true);
         $fieldType = 'field';
         $fieldProperty = new FieldProperty($this->translator);
-        $this->propertyContainer->expects($this->exactly(4))
+        $this->propertyContainer->expects($this->exactly(8))
             ->method('get')
             ->with($fieldType)
             ->willReturn($fieldProperty);
