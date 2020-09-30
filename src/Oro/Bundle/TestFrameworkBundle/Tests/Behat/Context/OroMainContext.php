@@ -2334,8 +2334,15 @@ JS;
     {
         foreach ($table->getRows() as $item) {
             $item = reset($item);
+            $page = $this->getPage();
+
+            $button = $page->findLink($item);
+            if (!$button) {
+                $button = $page->findButton($item);
+            }
+
             self::assertNotNull(
-                $this->getPage()->findLink($item),
+                $button,
                 "Button with name $item not found (link selector, actually)"
             );
         }
@@ -2350,8 +2357,15 @@ JS;
     {
         foreach ($table->getRows() as $item) {
             $item = reset($item);
+            $page = $this->getPage();
+
+            $button = $page->findLink($item);
+            if (!$button) {
+                $button = $page->findButton($item);
+            }
+
             self::assertNull(
-                $this->getPage()->findLink($item),
+                $button,
                 "Button with name $item still present on page (link selector, actually)"
             );
         }
