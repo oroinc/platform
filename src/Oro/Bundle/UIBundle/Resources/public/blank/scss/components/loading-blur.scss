@@ -1,5 +1,33 @@
 /* @theme: blank; */
 
+@mixin loading-blur {
+    filter: blur(2px);
+}
+
+@mixin loading-blur-overlay {
+    position: relative;
+
+    user-select: none;
+
+    @include loading-blur();
+
+    &:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        z-index: z('dropdown');
+
+        content: '';
+    }
+}
+
 .loading-blur {
-    filter: blur(3px);
+    @include loading-blur();
+}
+
+.loading-blur-overlay {
+    @include loading-blur-overlay();
 }
