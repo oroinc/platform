@@ -129,7 +129,7 @@
             "crypto-js": "3.1.7",
             "jquery-mousewheel": "3.1.13",
             "jquery-numeric": "1.5.0",
-            "timepicker": "1.13.*",
+            "timepicker": "1.13.14",
             "datepair.js": "0.4.*",
             "lightgallery": "1.7.3",
             "jquery-ui-multiselect-widget": "2.0.1",
