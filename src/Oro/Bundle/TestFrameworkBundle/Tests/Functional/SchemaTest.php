@@ -92,6 +92,7 @@ class SchemaTest extends WebTestCase
             DatabasePlatformInterface::DATABASE_POSTGRESQL => [
                 'ALTER TABLE oro_email_origin DROP ews_server',
                 'ALTER TABLE oro_email_origin DROP ews_user_email',
+                'ALTER TABLE oro_email_origin ALTER account_type DROP NOT NULL',
             ]
         ];
 

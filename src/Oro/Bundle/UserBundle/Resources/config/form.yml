@@ -177,6 +177,8 @@ services:
         arguments:
             - '@oro_config.user'
             - '@oro_user.imap_configuration.subscriber'
+        calls:
+            - [setOAuth2ManagerRegistry, ['@oro_imap.manager_registry.registry']]
         tags:
             - { name: form.type, alias: oro_user_emailsettings }
 

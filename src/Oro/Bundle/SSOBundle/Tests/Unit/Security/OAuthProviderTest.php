@@ -40,7 +40,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationGuesserInterface */
     private $organizationGuesser;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->userProvider = $this->createMock(OAuthAwareUserProviderInterface::class);
         $this->resourceOwnerMap = $this->createMock(ResourceOwnerMap::class);
@@ -57,7 +57,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsShouldReturnTrueForOAuthToken()
+    public function testSupportsShouldReturnTrueForGoogleOAuthToken()
     {
         $this->resourceOwnerMap->expects($this->once())
             ->method('hasResourceOwnerByName')
@@ -69,22 +69,32 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->oauthProvider->supports($token));
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Token Factory is not set in OAuthProvider.
-     */
+    public function testSupportsShouldReturnTrueForOffice365OAuthToken()
+    {
+        $this->resourceOwnerMap->expects($this->once())
+            ->method('hasResourceOwnerByName')
+            ->with($this->equalTo('office365'))
+            ->will($this->returnValue(true));
+
+        $token = new HWIOauthToken('token');
+        $token->setResourceOwnerName('office365');
+        $this->assertTrue($this->oauthProvider->supports($token));
+    }
+
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectExceptionMessage('Token Factory is not set in OAuthProvider.');
+
         $token = new OAuthToken('token');
         $this->oauthProvider->authenticate($token);
     }
 
-    /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
-     * @expectedExceptionMessage Organization Guesser is not set in OAuthProvider.
-     */
     public function testAuthenticateIfOrganizationGuesserIsNotSet()
     {
+        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectExceptionMessage('Organization Guesser is not set in OAuthProvider.');
+
         $this->oauthProvider->setTokenFactory($this->tokenFactory);
 
         $token = new OAuthToken('token');

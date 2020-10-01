@@ -6,6 +6,11 @@ hwi_oauth:
             client_id: changeMe
             client_secret: changeMe
             scope: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+        office365:
+            type: office365
+            client_id: changeMe
+            client_secret: changeMe
+            scope: "openid offline_access profile User.Read Mail.ReadWrite"
 
 security:
     firewalls:
@@ -13,6 +18,7 @@ security:
             oauth:
                 resource_owners:
                     google: /login/check-google
+                    office365: /login/check-office365
                 login_path: oro_user_security_login
                 failure_path: oro_user_security_login
                 check_path: oro_user_security_check
