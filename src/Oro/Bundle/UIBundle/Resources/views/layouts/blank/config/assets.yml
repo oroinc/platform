@@ -30,7 +30,6 @@ styles:
         - 'bundles/oroui/blank/scss/variables/highlight-text-config.scss'
         - 'bundles/oroui/blank/scss/components/highlight-text.scss'
         - 'bundles/oroui/blank/scss/reset.scss'
-        - 'bundles/oroui/blank/scss/components/loading-bar-lines.scss'
         - 'bundles/oroui/blank/scss/components/loading-blur.scss'
         - 'bundles/oroui/blank/scss/styles.scss'
     output: 'css/styles.css'
