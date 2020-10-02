@@ -25,6 +25,16 @@ class HtmlTagProvider
     }
 
     /**
+     * Returns the list of supported scopes.
+     *
+     * @return array
+     */
+    public function getScopes(): array
+    {
+        return array_keys($this->purifierConfig);
+    }
+
+    /**
      * Returns array of allowed elements
      *
      * @param string $scope

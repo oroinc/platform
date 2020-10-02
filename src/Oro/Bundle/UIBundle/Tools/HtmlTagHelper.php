@@ -55,6 +55,12 @@ class HtmlTagHelper implements TranslatorAwareInterface
     private $lastErrorCollector;
 
     /**
+     * @deprecated
+     * @var bool
+     */
+    private $collectErrors = true;
+
+    /**
      * @param HtmlTagProvider $htmlTagProvider
      * @param string|null $cacheDir
      */
@@ -105,9 +111,20 @@ class HtmlTagHelper implements TranslatorAwareInterface
     }
 
     /**
+     * @deprecated
+     * @param bool $collectErrors
+     */
+    public function setCollectErrors(bool $collectErrors = true)
+    {
+        $this->collectErrors = $collectErrors;
+    }
+
+    /**
      * @param string $value
      * @param string $scope
+     *
      * @return string
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sanitize($value, $scope = 'default')
     {
@@ -121,7 +138,7 @@ class HtmlTagHelper implements TranslatorAwareInterface
             $html5Config = \HTMLPurifier_HTML5Config::createDefault();
             $config = \HTMLPurifier_Config::create($html5Config);
 
-            $config->set('Core.CollectErrors', true);
+            $config->set('Core.CollectErrors', $this->collectErrors);
 
             $config->set('HTML.DefinitionID', __CLASS__);
             $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
@@ -177,7 +194,9 @@ class HtmlTagHelper implements TranslatorAwareInterface
         }
 
         $result = $this->htmlPurifiers[$scope]->purify($value);
-        $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector');
+        if ($this->collectErrors) {
+            $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector');
+        }
 
         return $result;
     }
