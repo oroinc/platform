@@ -12,7 +12,7 @@ class PlatformControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient(
-            array(),
+            [],
             $this->generateBasicAuthHeader()
         );
         $this->client->useHashNavigation(true);
@@ -28,6 +28,6 @@ class PlatformControllerTest extends WebTestCase
         static::assertStringContainsString('Deployment Type', $content);
         static::assertStringContainsString('Oro Packages', $content);
         static::assertStringContainsString('3rd Party Packages', $content);
-        static::assertStringContainsString('symfony/symfony', $content);
+        static::assertStringContainsString('doctrine/dbal', $content);
     }
 }
