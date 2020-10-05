@@ -70,6 +70,7 @@
 
     .mce-tinymce {
         width: $fallback-item-mce-tinymce-width;
+        max-width: $fallback-item-mce-tinymce-max-width;
     }
 }
 
