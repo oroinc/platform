@@ -867,7 +867,7 @@ class OroMainContext extends MinkContext implements
     {
         $page = $this->getSession()->getPage();
         $page->find('css', '.lg-image')->mouseOver();
-        $page->find('css', 'span.lg-close')->click();
+        $page->find('css', 'button.lg-close')->click();
     }
 
     /**
