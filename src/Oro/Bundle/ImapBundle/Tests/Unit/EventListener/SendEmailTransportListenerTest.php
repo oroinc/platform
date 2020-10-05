@@ -5,28 +5,23 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareTestCase;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
-class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
+class SendEmailTransportListenerTest extends OauthManagerRegistryAwareTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UserEmailOrigin */
-    protected $userEmailOrigin;
+    /** @var MockObject|OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
-
-    protected function setUp()
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp(): void
     {
-        $this->userEmailOrigin =
-            $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $managerClass = 'Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager';
-        $this->imapEmailGoogleOauth2Manager = $this->getMockBuilder($managerClass)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->oauthManagerRegistry = $this->getManagerRegistryMock();
     }
 
     /**
@@ -34,7 +29,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSendWithSmtpConfigured($host, $port, $username, $encryption, $authMode, $password)
     {
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_EsmtpTransport|MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
@@ -60,8 +55,11 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturnSelf();
 
         $encoder = $this->getEncoderMock($password);
+        /** @var Oauth2ManagerInterface|MockObject $manager */
+        $manager = $this->oauthManagerRegistry->getManager(self::MANAGER_TYPE_DEFAULT);
+        $userOriginMock = $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
         if ($authMode) {
-            $this->imapEmailGoogleOauth2Manager
+            $manager
                 ->expects($this->once())
                 ->method('getAccessTokenWithCheckingExpiration')
                 ->willReturn('test');
@@ -70,15 +68,17 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
                 ->with($authMode)
                 ->willReturnSelf();
         } else {
+            $userOriginMock->expects($this->once())
+                ->method('getPassword')
+                ->willReturn($password);
             $smtpTransportMock->expects($this->once())
                 ->method('setPassword')
                 ->with($password)
                 ->willReturnSelf();
         }
-        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->imapEmailGoogleOauth2Manager);
+        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->oauthManagerRegistry);
 
-        $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
-        $event = $this->prepareEventMock($smtpTransportMock);
+        $event = $this->prepareEventMock($smtpTransportMock, $userOriginMock);
 
         $sendEmailTransportListener->setSmtpTransport($event);
         $this->assertSame($streamOptions, $smtpTransportMock->getStreamOptions());
@@ -92,16 +92,16 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
         $username = 'test';
         $password = 'pass';
 
-        /** @var \Swift_Transport_AbstractSmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransportMock */
+        /** @var \Swift_Transport_AbstractSmtpTransport|MockObject $smtpTransportMock */
         $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
         $encoder = $this->getEncoderMock($password);
-        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->imapEmailGoogleOauth2Manager);
+        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->oauthManagerRegistry);
 
-        $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
+        $userEmailOrigin = $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
 
-        $event = new SendEmailTransport($this->userEmailOrigin, $smtpTransportMock);
+        $event = new SendEmailTransport($userEmailOrigin, $smtpTransportMock);
         $sendEmailTransportListener->setSmtpTransport($event);
 
         $transport = $event->getTransport();
@@ -115,7 +115,7 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param $password
-     * @return SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @return SymmetricCrypterInterface|MockObject
      */
     protected function getEncoderMock($password)
     {
@@ -128,32 +128,38 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $host
-     * @param $port
-     * @param $username
-     * @param $encryption
+     * @param string $host
+     * @param int $port
+     * @param string $username
+     * @param string $encryption
+     *
+     * @return MockObject|UserEmailOrigin
      */
     protected function prepareUserEmailOriginMock($host, $port, $username, $encryption)
     {
-        $this->userEmailOrigin->expects($this->once())
+        $emailOrigin = $this->getEmailOriginMock(self::MANAGER_TYPE_DEFAULT);
+        $emailOrigin->expects($this->once())
             ->method('getSmtpHost')
             ->will($this->returnValue($host));
-        $this->userEmailOrigin->expects($this->once())
+        $emailOrigin->expects($this->once())
             ->method('getSmtpPort')
             ->will($this->returnValue($port));
-        $this->userEmailOrigin->expects($this->once())
+        $emailOrigin->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue($username));
-        $this->userEmailOrigin->expects($this->once())
+        $emailOrigin->expects($this->once())
             ->method('getSmtpEncryption')
             ->will($this->returnValue($encryption));
+
+        return $emailOrigin;
     }
 
     /**
-     * @param $transport
+     * @param MockObject|\Swift_Transport_EsmtpTransport $transport
+     * @param MockObject|UserEmailOrigin
      * @return SendEmailTransport
      */
-    protected function prepareEventMock($transport)
+    protected function prepareEventMock($transport, $userOriginMock)
     {
         /** @var SendEmailTransport $event */
         $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\SendEmailTransport')
@@ -164,14 +170,14 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($transport);
         $event->expects($this->once())
             ->method('getEmailOrigin')
-            ->willReturn($this->userEmailOrigin);
+            ->willReturn($userOriginMock);
         $event->expects($this->once())
             ->method('setTransport');
 
         return $event;
     }
 
-    public static function transportDataProvider()
+    public static function transportDataProvider(): array
     {
         return [
             'imap' => [

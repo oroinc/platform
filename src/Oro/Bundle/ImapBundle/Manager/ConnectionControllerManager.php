@@ -9,8 +9,6 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
-use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Config\Definition\Exception\Exception;
@@ -19,7 +17,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * This class handle connection forms for Gmail and IMAP
+ * This class handle connection forms for IMAP
  */
 class ConnectionControllerManager
 {
@@ -29,7 +27,7 @@ class ConnectionControllerManager
     /** @var SymmetricCrypterInterface */
     protected $crypter;
 
-    /** @var ManagerRegistry */
+    /** @var OAuth2ManagerRegistry */
     protected $doctrine;
 
     /** @var ImapConnectorFactory */
@@ -47,15 +45,18 @@ class ConnectionControllerManager
     /** @var string */
     protected $emailMailboxFormType;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
+
+    /** @var string */
+    protected $type;
 
     /**
      * @param FormFactory $formFactory
      * @param SymmetricCrypterInterface $crypter
      * @param ManagerRegistry $doctrineHelper
      * @param ImapConnectorFactory $imapConnectorFactory
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      * @param string $userFormName
      * @param $userFormType
      * @param string $emailMailboxFormName
@@ -66,7 +67,7 @@ class ConnectionControllerManager
         SymmetricCrypterInterface $crypter,
         ManagerRegistry $doctrineHelper,
         ImapConnectorFactory $imapConnectorFactory,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
+        OAuth2ManagerRegistry $oauthManagerRegistry,
         $userFormName,
         $userFormType,
         $emailMailboxFormName,
@@ -76,7 +77,7 @@ class ConnectionControllerManager
         $this->crypter = $crypter;
         $this->doctrine = $doctrineHelper;
         $this->imapConnectorFactory = $imapConnectorFactory;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
         $this->userFormName = $userFormName;
         $this->userFormType = $userFormType;
         $this->emailMailboxFormName = $emailMailboxFormName;
@@ -84,20 +85,23 @@ class ConnectionControllerManager
     }
 
     /**
-     * @param Request $request
-     * @param string  $formParentName
+     * Returns check connection form instance
      *
+     * @param Request $request
+     * @param string $formParentName
      * @return FormInterface
      */
-    public function getCheckGmailConnectionForm($request, $formParentName)
+    public function getCheckConnectionForm(Request $request, string $formParentName): FormInterface
     {
-        $data = null;
         $id = $request->get('id', null);
-        if (!empty($id)) {
-            $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
-        }
+        /** @var UserEmailOrigin $data */
+        $data = $id ? $this->doctrine->getRepository(UserEmailOrigin::class)->find($id) : null;
 
-        $form = $this->formFactory->create(ConfigurationGmailType::class, null, ['csrf_protection' => false]);
+        $type = $data ? $data->getAccountType() : $request->get('type');
+        $oauthManager = $this->oauthManagerRegistry->getManager($type);
+
+        $typeClass = $oauthManager->getConnectionFormTypeClass();
+        $form = $this->formFactory->create($typeClass, null, ['csrf_protection' => false]);
         $form->setData($data);
         $form->handleRequest($request);
 
@@ -127,9 +131,22 @@ class ConnectionControllerManager
         $emailFolders = $manager->getFolders();
         $origin->setFolders($emailFolders);
 
-        $accountTypeModel = $this->createAccountModel(AccountTypeModel::ACCOUNT_TYPE_GMAIL, $origin);
+        $accountTypeModel = $this->createAccountModel($oauthManager->getType(), $origin);
 
         return $this->prepareForm($formParentName, $accountTypeModel);
+    }
+
+    /**
+     * @param Request $request
+     * @param string  $formParentName
+     *
+     * @return FormInterface
+     * @deprecated Pleas use \Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager::getCheckConnectionForm()
+     *              with certain type taken from request
+     */
+    public function getCheckGmailConnectionForm($request, $formParentName)
+    {
+        return $this->getCheckConnectionForm($request, $formParentName);
     }
 
     /**
@@ -144,9 +161,9 @@ class ConnectionControllerManager
         $oauthEmailOrigin = new UserEmailOrigin();
         $oauthEmailOrigin->setAccessToken($accessToken);
 
-        if ($type === AccountTypeModel::ACCOUNT_TYPE_GMAIL) {
-            $oauthEmailOrigin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);
-            $oauthEmailOrigin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
+        if ($type && ($type !== AccountTypeModel::ACCOUNT_TYPE_OTHER)) {
+            $oauthEmailOrigin->setAccountType($type);
+            $this->oauthManagerRegistry->getManager($type)->setOriginDefaults($oauthEmailOrigin);
         }
 
         $accountTypeModel = $this->createAccountModel($type, $oauthEmailOrigin);
@@ -157,24 +174,24 @@ class ConnectionControllerManager
     /**
      * Get oauth2 access token by security code
      *
-     * @param $code
-     *
+     * @param string $code
+     * @param string $type
      * @return array
      */
-    public function getAccessToken($code)
+    public function getAccessToken($code, $type)
     {
-        $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenByAuthCode($code);
-        $userInfo = $this->imapEmailGoogleOauth2Manager->getUserInfo($accessToken['access_token']);
-        $userInfoResponse = $userInfo->getResponse();
-        if (array_key_exists('error', $userInfoResponse)) {
-            $response = $userInfoResponse['error'];
-        } else {
+        $manager = $this->oauthManagerRegistry->getManager($type);
+        $accessTokenData = $manager->getAccessTokenDataByAuthCode($code);
+        try {
+            $userInfo = $manager->getUserInfo($accessTokenData);
             $response = [
-                'access_token' => $accessToken['access_token'],
-                'refresh_token' => $accessToken['refresh_token'],
-                'expires_in' => $accessToken['expires_in'],
+                'access_token' => $accessTokenData->getAccessToken(),
+                'refresh_token' => $accessTokenData->getRefreshToken(),
+                'expires_in' => $accessTokenData->getExpiresIn(),
                 'email_address' => $userInfo->getEmail()
             ];
+        } catch (\HWI\Bundle\OAuthBundle\OAuth\Exception\HttpTransportException $exc) {
+            $response = [ 'error' => $exc->getMessage() ];
         }
 
         return $response;

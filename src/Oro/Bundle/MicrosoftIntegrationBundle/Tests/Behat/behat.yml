@@ -1,0 +1,17 @@
+oro_behat_extension:
+    suites:
+        OroMicrosoftIntegrationBundle:
+            contexts:
+                - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+                - Oro\Bundle\ConfigBundle\Tests\Behat\Context\FeatureContext
+                - Oro\Bundle\NavigationBundle\Tests\Behat\Context\FeatureContext
+                - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
+            paths:
+                - '@OroMicrosoftIntegrationBundle/Tests/Behat/Features'
+    elements:
+        MS Client ID:
+            selector: 'input[id*="oro_microsoft_integration___client_id_value"]'
+        MS Client Secret:
+            selector: 'input[id*="oro_microsoft_integration___client_secret_value"]'
+        MS Tenant:
+            selector: 'input[id*="oro_microsoft_integration___tenant_value"]'

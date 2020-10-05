@@ -42,6 +42,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
             $mailbox->setOrigin(null);
             $this->assertEmpty($mailbox->getImapAccountType());
         } else {
+            $this->origin->expects($this->any())->method('getAccountType')->willReturn($accountType);
             $this->origin->expects($this->any())->method('getAccessToken')->willReturn($accessToken);
             $this->assertEquals($accountType, $mailbox->getImapAccountType()->getAccountType());
         }

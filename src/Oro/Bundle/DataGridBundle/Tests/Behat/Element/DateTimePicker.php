@@ -173,6 +173,6 @@ class DateTimePicker extends Element
 
     protected function closeCalendarWidget()
     {
-        $this->find('css', '.dropdown-menu-calendar')->click();
+        $this->getDatePicker()->click();
     }
 }
