@@ -23,6 +23,11 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $this->htmlTagProvider = new HtmlTagProvider($this->purifierConfig);
     }
 
+    public function testGetScopes()
+    {
+        self::assertEquals(['default', 'additional', 'extra'], $this->htmlTagProvider->getScopes());
+    }
+
     /**
      * @dataProvider allowedElementsDataProvider
      *

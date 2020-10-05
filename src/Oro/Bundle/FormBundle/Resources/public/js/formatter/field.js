@@ -3,6 +3,10 @@ define([
 ], function(_, __, numberFormatter, dateTimeFormatter) {
     'use strict';
 
+    function nl2br(val) {
+        return val.replace(/\n/g, '<br />\n');
+    }
+
     /**
      * @export  oroform/js/formatter/field
      * @name    oroform.formatter.field
@@ -29,7 +33,7 @@ define([
          * @returns {string}
          */
         text: function(val) {
-            return _.isNull(val) || _.isUndefined(val) ? __('N/A') : _.escape(val).replace(/\n/g, '<br />\n');
+            return _.isNull(val) || _.isUndefined(val) ? __('N/A') : nl2br(_.escape(val));
         },
 
         /**
@@ -37,7 +41,18 @@ define([
          * @returns {string}
          */
         html: function(val) {
-            return _.isNull(val) || _.isUndefined(val) ? __('N/A') : val.replace(/\n/g, '<br />\n');
+            if (_.isNull(val) || _.isUndefined(val)) {
+                return __('N/A');
+            } else {
+                const htmlWrapper = document.createElement('div');
+                htmlWrapper.innerHTML = val;
+
+                if (htmlWrapper.childElementCount > 0) {
+                    return val;
+                } else {
+                    return nl2br(val);
+                }
+            }
         },
 
         /**
