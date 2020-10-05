@@ -2,218 +2,94 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
-use Http\Client\Common\HttpMethodsClient;
-use HWI\Bundle\OAuthBundle\OAuth\Response\PathUserResponse;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
-use Psr\Http\Message\MessageInterface;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
+use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 
 /**
- * Manager to work with mailings via IMAP.
+ * Manager to work with Google OAuth 2 mailings via IMAP/SMTP.
  */
-class ImapEmailGoogleOauth2Manager
+class ImapEmailGoogleOauth2Manager extends AbstractOauth2Manager
 {
-    const OAUTH2_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
-    const OAUTH2_GMAIL_SCOPE = 'https://mail.google.com/';
-    const RETRY_TIMES = 3;
-    const RESOURCE_OWNER_GOOGLE = 'google';
+    public const OAUTH2_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token';
 
-    /** @var HttpMethodsClient */
-    protected $httpClient;
+    public const OAUTH2_GMAIL_SCOPE = 'https://mail.google.com/';
 
-    /** @var ResourceOwnerMap */
-    protected $resourceOwnerMap;
+    public const RESOURCE_OWNER_GOOGLE = 'google';
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var string[] */
+    protected $scopes = [
+        self::OAUTH2_GMAIL_SCOPE
+    ];
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    /** @var string */
+    protected $accessTokenUrl = self::OAUTH2_ACCESS_TOKEN_URL;
 
     /**
-     * @param HttpMethodsClient $httpClient
-     * @param ResourceOwnerMap $resourceOwnerMap
-     * @param ConfigManager $configManager
-     * @param ManagerRegistry $doctrine
+     * {@inheritDoc}
      */
-    public function __construct(
-        HttpMethodsClient $httpClient,
-        ResourceOwnerMap $resourceOwnerMap,
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine
-    ) {
-        $this->httpClient = $httpClient;
-        $this->resourceOwnerMap = $resourceOwnerMap;
-        $this->configManager = $configManager;
-        $this->doctrine = $doctrine;
+    public function getType(): string
+    {
+        return AccountTypeModel::ACCOUNT_TYPE_GMAIL;
     }
 
     /**
-     * @param string $code
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    public function getAccessTokenByAuthCode($code)
+    public function getConnectionFormTypeClass(): string
     {
-        $parameters = [
+        return ConfigurationGmailType::class;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function setOriginDefaults(UserEmailOrigin $origin): void
+    {
+        $origin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);
+        $origin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function buildParameters(string $code): array
+    {
+        return [
             'redirect_uri' => 'postmessage',
-            'scope' => self::OAUTH2_GMAIL_SCOPE,
+            'scope' => $this->getScope(),
             'code' => $code,
             'grant_type' => 'authorization_code'
         ];
-
-        $attemptNumber = 0;
-        do {
-            $attemptNumber++;
-            $response = $this->doHttpRequest($parameters);
-
-            $result = [
-                'access_token' => empty($response['access_token']) ? '' : $response['access_token'],
-                'refresh_token' => empty($response['refresh_token']) ? '' : $response['refresh_token'],
-                'expires_in' => empty($response['expires_in']) ? '' : $response['expires_in']
-            ];
-        } while ($attemptNumber <= self::RETRY_TIMES && empty($result['access_token']));
-
-        return $result;
     }
 
     /**
-     * @param string $accessToken
-     *
-     * @return PathUserResponse
+     * {@inheritDoc}
      */
-    public function getUserInfo($accessToken)
+    protected function getResourceOwnerName(): string
     {
-        $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName(self::RESOURCE_OWNER_GOOGLE);
-
-        return $resourceOwner->getUserInformation(['access_token' => $accessToken]);
+        return self::RESOURCE_OWNER_GOOGLE;
     }
 
     /**
-     * @param UserEmailOrigin $origin
-     *
-     * @return string
+     * {@inheritDoc}
      */
-    public function getAccessTokenWithCheckingExpiration(UserEmailOrigin $origin)
+    protected function getConfigParameters(): array
     {
-        $token = $origin->getAccessToken();
-
-        //if token had been expired, the new one must be generated and saved to DB
-        if ($this->isAccessTokenExpired($origin)
-            && $this->configManager->get('oro_imap.enable_google_imap')
-            && $origin->getRefreshToken()
-        ) {
-            $this->refreshAccessToken($origin);
-
-            /** @var EntityManager $em */
-            $em = $this->doctrine->getManagerForClass(ClassUtils::getClass($origin));
-            $em->persist($origin);
-            $em->flush($origin);
-
-            $token = $origin->getAccessToken();
-        }
-
-        return $token;
-    }
-
-    /**
-     * @param UserEmailOrigin $origin
-     *
-     * @return bool
-     */
-    public function isAccessTokenExpired(UserEmailOrigin $origin)
-    {
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        return $now > $origin->getAccessTokenExpiresAt();
-    }
-
-    /**
-     * @param UserEmailOrigin $origin
-     *
-     * @throws RefreshOAuthAccessTokenFailureException
-     */
-    public function refreshAccessToken(UserEmailOrigin $origin)
-    {
-        $refreshToken = $origin->getRefreshToken();
-        if (empty($refreshToken)) {
-            throw new RefreshOAuthAccessTokenFailureException('The RefreshToken is empty', $refreshToken);
-        }
-
-        $parameters = [
-            'refresh_token' => $refreshToken,
-            'grant_type'    => 'refresh_token'
-        ];
-
-        $response = [];
-        $attemptNumber = 0;
-        while ($attemptNumber <= self::RETRY_TIMES && empty($response['access_token'])) {
-            $response = $this->doHttpRequest($parameters);
-            $attemptNumber++;
-        }
-
-        if (empty($response['access_token'])) {
-            $failureReason = '';
-            if (!empty($response['error'])) {
-                $failureReason .= $response['error'];
-            }
-            if (!empty($response['error_description'])) {
-                $failureReason .= sprintf(' (%s)', $response['error_description']);
-            }
-
-            throw new RefreshOAuthAccessTokenFailureException($failureReason, $refreshToken);
-        }
-
-        $origin->setAccessToken($response['access_token']);
-        $origin->setAccessTokenExpiresAt(
-            new \DateTime('+' . ((int)$response['expires_in'] - 5) . ' seconds', new \DateTimeZone('UTC'))
-        );
-    }
-
-    /**
-     * @param array $parameters
-     *
-     * @return array
-     */
-    protected function doHttpRequest($parameters)
-    {
-        $contentParameters = [
+        $clientSecretEncrypted = $this->configManager->get('oro_google_integration.client_secret');
+        $clientSecretDecrypted = $this->crypter->decryptData($clientSecretEncrypted);
+        return [
             'client_id'     => $this->configManager->get('oro_google_integration.client_id'),
-            'client_secret' => $this->configManager->get('oro_google_integration.client_secret'),
+            'client_secret' => $clientSecretDecrypted,
         ];
-
-        $parameters = array_merge($contentParameters, $parameters);
-        $content = http_build_query($parameters, '', '&');
-        $headers = [
-            'Content-length: ' . strlen($content),
-            'content-type: application/x-www-form-urlencoded',
-            'user-agent: oro-oauth'
-        ];
-
-        $response = $this->httpClient->post(self::OAUTH2_ACCESS_TOKEN_URL, $headers, $content);
-
-        return $this->getResponseContent($response);
     }
 
     /**
-     * Get the 'parsed' content based on the response headers.
-     *
-     * @param MessageInterface $rawResponse
-     *
-     * @return array
+     * {@inheritDoc}
      */
-    protected function getResponseContent(MessageInterface $rawResponse)
+    public function isOAuthEnabled(): bool
     {
-        $content = $rawResponse->getBody();
-        if (!$content) {
-            return [];
-        }
-
-        return json_decode($content, true);
+        return $this->configManager->get('oro_imap.enable_google_imap');
     }
 }

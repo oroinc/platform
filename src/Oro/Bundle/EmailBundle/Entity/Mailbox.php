@@ -521,13 +521,9 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
             $accountTypeModel = null;
             if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                } else {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                }
+                $accountType = $userEmailOrigin->getAccountType();
+                $accountTypeModel->setAccountType($accountType);
+                $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
             }
 
             if ($accountTypeModel) {

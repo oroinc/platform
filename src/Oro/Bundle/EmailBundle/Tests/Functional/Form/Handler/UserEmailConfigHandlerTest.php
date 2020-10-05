@@ -22,6 +22,7 @@ class UserEmailConfigHandlerTest extends WebTestCase
     {
         $configuration = [
             'imapConfiguration' => [
+                'accountType' => 'other',
                 'useImap' => true,
                 'imapHost' => 'host',
                 'imapPort' => 1,
@@ -44,6 +45,7 @@ class UserEmailConfigHandlerTest extends WebTestCase
     {
         $configuration = [
             'imapConfiguration' => [
+                'accountType' => 'other',
                 'useImap' => true,
                 'imapHost' => 'host',
                 'imapPort' => 1,

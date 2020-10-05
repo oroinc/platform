@@ -137,11 +137,19 @@ services:
         arguments:
             - '@request_stack'
 
+    oro_ui.cache.purifier_config_warmer:
+        class: Oro\Bundle\UIBundle\Cache\HTMLPurifierConfigCacheWarmer
+        arguments:
+            - '@oro_ui.html_tag_helper'
+            - '@oro_form.provider.html_tag_provider'
+        tags:
+            - { name: kernel.cache_warmer }
+
     oro_ui.html_tag_helper:
         class: Oro\Bundle\UIBundle\Tools\HtmlTagHelper
         arguments:
             - '@oro_form.provider.html_tag_provider'
-            - '%kernel.cache_dir%/oro_data'
+            - '%kernel.cache_dir%/oro/html_purifier'
         calls:
             - ['setTranslator', ['@translator']]
             # Additional div attributes

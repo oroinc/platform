@@ -7,8 +7,10 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
@@ -37,8 +39,11 @@ class MailboxType extends AbstractType
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** ConfigManager */
+    /** @var ConfigManager */
     protected $userConfigManager;
+
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
 
     /**
      * @param MailboxProcessStorage $storage
@@ -53,6 +58,14 @@ class MailboxType extends AbstractType
         $this->storage = $storage;
         $this->encryptor = $encryptor;
         $this->userConfigManager = $userConfigManager;
+    }
+
+    /**
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     */
+    public function setOAuth2ManagerRegistry(OAuth2ManagerRegistry $oauthManagerRegistry)
+    {
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -83,9 +96,10 @@ class MailboxType extends AbstractType
             ],
         ]);
 
-        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
+        if ($this->oauthManagerRegistry->isOauthImapEnabled()) {
             $builder->add('imapAccountType', ChoiceAccountType::class, ['error_bubbling' => false]);
         } else {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, $this->getOriginListener());
             $builder->add('origin', ConfigurationType::class, ['error_bubbling' => false]);
         }
 
@@ -122,6 +136,49 @@ class MailboxType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SET_DATA, [$this, 'postSet']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
+    }
+
+    /**
+     * Returns callable for checking if exisitng origin method was disabled.
+     * Related form remains then, though with non-active CTAs
+     *
+     * @return callable
+     */
+    protected function getOriginListener(): callable
+    {
+        return function (FormEvent $event) {
+            $form = $event->getForm();
+            /** @var Mailbox $mailbox */
+            $mailbox = $event->getData();
+            if (null === $mailbox) {
+                return;
+            }
+
+            if ($this->isApplicableAccountType($mailbox)) {
+                $form->remove('origin');
+                if (!$form->has('imapAccountType')) {
+                    $form->add('imapAccountType', ChoiceAccountType::class, ['error_bubbling' => false]);
+                }
+            }
+        };
+    }
+
+    /**
+     * Provides dropdown for OAUth account types and
+     * cleanup calls - non-persisted mailbox
+     *
+     * @param Mailbox $mailbox
+     * @return bool
+     */
+    private function isApplicableAccountType(Mailbox $mailbox): bool
+    {
+        if (!$mailbox->getId()) {
+            $origin = $mailbox->getOrigin();
+            return !$origin || !$origin->getPassword();
+        }
+        $origin = $mailbox->getOrigin();
+
+        return (null !== $origin) && $origin->getAccountType() !== AccountTypeModel::ACCOUNT_TYPE_OTHER;
     }
 
     /**

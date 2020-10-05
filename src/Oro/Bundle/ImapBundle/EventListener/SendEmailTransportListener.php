@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -18,20 +18,20 @@ class SendEmailTransportListener
     protected $crypter;
     
     /**
-     * @var ImapEmailGoogleOauth2Manager
+     * @var OAuth2ManagerRegistry
      */
-    protected $imapEmailGoogleOauth2Manager;
+    protected $oauthManagerRegistry;
 
     /**
      * @param SymmetricCrypterInterface $crypter
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $crypter,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+        OAuth2ManagerRegistry $oauthManagerRegistry
     ) {
         $this->crypter = $crypter;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -59,10 +59,10 @@ class SendEmailTransportListener
             }
 
             $transport->setUsername($username);
-
-            $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($emailOrigin);
+            $manager = $this->oauthManagerRegistry->getManager($emailOrigin->getAccountType());
+            $accessToken = $manager->getAccessTokenWithCheckingExpiration($emailOrigin);
             if ($accessToken !== null) {
-                $transport->setAuthMode('XOAUTH2');
+                $transport->setAuthMode($manager->getAuthMode());
                 $transport->setPassword($accessToken);
             } else {
                 $transport->setPassword($password);

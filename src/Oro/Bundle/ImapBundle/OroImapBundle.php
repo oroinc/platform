@@ -4,10 +4,14 @@ namespace Oro\Bundle\ImapBundle;
 
 use Oro\Bundle\ImapBundle\Async\Topics;
 use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
+use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\Oauth2ManagerRegistryPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * OroImapBundle bundle class
+ */
 class OroImapBundle extends Bundle
 {
     /**
@@ -22,5 +26,6 @@ class OroImapBundle extends Bundle
         ;
         $container->addCompilerPass($addTopicPass);
         $container->addCompilerPass(new CredentialsNotificationSenderPass());
+        $container->addCompilerPass(new Oauth2ManagerRegistryPass());
     }
 }

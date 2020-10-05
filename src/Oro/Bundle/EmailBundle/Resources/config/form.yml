@@ -192,6 +192,8 @@ services:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.encoder.default'
             - '@oro_config.user'
+        calls:
+            - [setOAuth2ManagerRegistry, ['@oro_imap.manager_registry.registry']]
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 

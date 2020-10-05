@@ -402,6 +402,9 @@ class UserTest extends AbstractUserTest
         $origin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
             ->disableOriginalConstructor()
             ->getMock();
+        $origin->expects($this->any())
+            ->method('getAccountType')
+            ->willReturn($accountType);
 
         $user->addEmailOrigin($origin);
 
@@ -432,6 +435,11 @@ class UserTest extends AbstractUserTest
                 'skipOrigin' => false,
                 'accessToken' => '12345',
                 'accountType' => AccountTypeModel::ACCOUNT_TYPE_GMAIL
+            ],
+            'expect Microsoft account type' => [
+                'skipOrigin' => false,
+                'accessToken' => '12345',
+                'accountType' => AccountTypeModel::ACCOUNT_TYPE_MICROSOFT
             ],
             'expect Other account type' => [
                 'skipOrigin' => false,
