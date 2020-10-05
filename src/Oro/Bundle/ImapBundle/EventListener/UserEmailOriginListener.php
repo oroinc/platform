@@ -11,7 +11,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -36,26 +36,26 @@ class UserEmailOriginListener
     protected $doctrine;
 
     /**
-     * @var ImapEmailGoogleOauth2Manager
+     * @var OAuth2ManagerRegistry
      */
-    protected $imapEmailGoogleOauth2Manager;
+    protected $oauthManagerRegistry;
 
     /**
      * @param SymmetricCrypterInterface $crypter
      * @param ImapConnectorFactory $connectorFactory
      * @param Registry $doctrine
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $crypter,
         ImapConnectorFactory $connectorFactory,
         Registry $doctrine,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+        OAuth2ManagerRegistry $oauthManagerRegistry
     ) {
         $this->crypter = $crypter;
         $this->connectorFactory = $connectorFactory;
         $this->doctrine = $doctrine;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -106,13 +106,16 @@ class UserEmailOriginListener
      */
     protected function createManager(UserEmailOrigin $origin)
     {
+        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
+            : null;
         $config = new ImapConfig(
             $origin->getImapHost(),
             $origin->getImapPort(),
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->crypter->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
+            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
 
         $connector = $this->connectorFactory->createImapConnector($config);
