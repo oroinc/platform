@@ -61,6 +61,6 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
             $client->get('/baz'),
             'Default response should be returned'
         );
-        $this->assertEquals(302, $client->get('/baz')->getStatusCode());
+        $this->assertEquals(304, $client->get('/baz')->getStatusCode());
     }
 }

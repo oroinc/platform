@@ -2,10 +2,15 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\InvalidArgumentException;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Utils;
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
-use Symfony\Component\HttpFoundation\Response;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 
-class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
+class OroTranslationAdapterTest extends TestCase
 {
     /** @var OroTranslationAdapter */
     protected $adapter;
@@ -19,19 +24,12 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $response;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $query;
-
     protected function setUp(): void
     {
-        $this->client  = $this->createMock('Guzzle\Http\Client');
-        $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')
+        $this->client = $this->createMock(Client::class);
+        $this->response = $this->getMockBuilder(Response::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->response = $this->getMockBuilder('Guzzle\Http\Message\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->query = $this->createMock('Guzzle\Http\QueryString');
 
         $this->adapter = new OroTranslationAdapter($this->client);
         $this->adapter->setApiKey(uniqid());
@@ -45,14 +43,8 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
         $package  = 'en';
 
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->any())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
         $this->response->expects($this->once())
             ->method('getStatusCode')
             ->will($this->returnValue(200));
@@ -73,24 +65,22 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
     public function testFetchStatistic(
         $expectedResult,
         $fetchedData,
-        $code = Response::HTTP_OK,
+        $code = 200,
         $exceptionExpected = false
     ) {
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->any())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
         $this->response->expects($this->once())
             ->method('getStatusCode')
             ->will($this->returnValue(200));
+        $body = $this->createMock(StreamInterface::class);
+        $body->expects($this->once())
+            ->method('getContents')
+            ->willReturn($fetchedData);
         $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue($fetchedData));
+            ->method('getBody')
+            ->willReturn($body);
 
         if ($exceptionExpected) {
             $this->expectException($exceptionExpected);
@@ -105,37 +95,44 @@ class OroTranslationAdapterTest extends \PHPUnit\Framework\TestCase
      */
     public function statisticProvider()
     {
-        $correctStats = [
-            [
-                'code'              => 'en',
-                'translationStatus' => 50,
-                'lastBuildDate'     => '2014-04-01 12:00:00'
-            ]
-        ];
-
         return [
-            'should throw exception if code is not OK'   => [
-                [],
-                [],
-                400,
-                '\RuntimeException'
+            'should throw exception if code is not OK' => [
+                'expectedResult' => [],
+                'fetchedData' => Utils::jsonEncode([], true),
+                'code' => 400,
+                'exceptionExpected' => '\RuntimeException',
             ],
-            'if not json should throw exception'         => [
-                [],
-                'not JSON',
-                Response::HTTP_OK,
-                '\RuntimeException'
+            'if not json should throw exception' => [
+                'expectedResult' => [],
+                'fetchedData' => 'not JSON',
+                'code' => 200,
+                'exceptionExpected' => InvalidArgumentException::class,
             ],
-            'not full filled stat should be skipped'     => [
-                [],
-                [['code' => 'en']],
-                Response::HTTP_OK,
-                '\RuntimeException'
+            'not full filled stat should be skipped' => [
+                'expectedResult' => [],
+                'fetchedData' => Utils::jsonEncode([['code' => 'en']]),
+                'code' => 200,
+                'exceptionExpected' => '\RuntimeException',
             ],
             'correct statistic should be returned as is' => [
-                $correctStats,
-                $correctStats
-            ]
+                'expectedResult' => [
+                    [
+                        'code' => 'en',
+                        'translationStatus' => 50,
+                        'lastBuildDate' => '2014-04-01 12:00:00',
+                    ],
+                ],
+                'fetchedData' => Utils::jsonEncode(
+                    [
+                        [
+                            'code' => 'en',
+                            'translationStatus' => 50,
+                            'lastBuildDate' => '2014-04-01 12:00:00',
+                        ],
+                    ],
+                    true
+                ),
+            ],
         ];
     }
 }

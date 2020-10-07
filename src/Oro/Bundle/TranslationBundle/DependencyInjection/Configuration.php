@@ -9,8 +9,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     const DEFAULT_ADAPTER = 'crowdin';
-    const DEFAULT_CROWDIN_API_URL = 'https://api.crowdin.com/api';
-    const DEFAULT_PROXY_API_URL = 'http://translations.orocrm.com/api';
+    const DEFAULT_CROWDIN_API_URL = 'https://api.crowdin.com/api/';
+    const DEFAULT_PROXY_API_URL = 'http://translations.orocrm.com/api/';
 
     /**
      * {@inheritDoc}

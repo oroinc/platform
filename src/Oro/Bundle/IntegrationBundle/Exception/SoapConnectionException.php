@@ -4,29 +4,26 @@ namespace Oro\Bundle\IntegrationBundle\Exception;
 
 use Oro\Bundle\IntegrationBundle\Utils\SecureErrorMessageHelper;
 
+/**
+ * Exception that represents connection issues of the soap transport
+ */
 class SoapConnectionException extends TransportException
 {
     /**
-     * @param string     $response
-     * @param \Exception $exception
-     * @param string     $request
-     * @param string     $headers
-     *
+     * @param string          $response
+     * @param \Exception|null $exception
+     * @param string          $request
+     * @param int|string      $code
      * @return static
      */
-    public static function createFromResponse($response, \Exception $exception = null, $request = '', $headers = '')
+    public static function createFromResponse($response, \Exception $exception = null, $request = '', $code = 'unknown')
     {
         $exceptionMessage = '';
         $exceptionCode = 0;
-        $code = 'unknown';
 
         if (null !== $exception) {
             $exceptionMessage = $exception->getMessage();
             $exceptionCode = $exception->getCode();
-        }
-
-        if (!empty($headers['code'])) {
-            $code = $headers['code'];
         }
 
         $message = PHP_EOL;

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Symfony\Component\HttpFoundation\Response;
-
+/**
+ * Translation API adapter to download data from the Oro translation proxy server
+ */
 class OroTranslationAdapter extends AbstractAPIAdapter
 {
     const URL_STATS    = 'stats';
@@ -12,7 +13,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    public function download($path, array $projects = [], $package = null)
+    public function download($path, array $projects = [], string $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
         $result  = $this->request(
@@ -23,7 +24,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             ],
             'GET',
             [
-                'save_to'           => $path,
+                'sink'     => $path,
             ]
         );
 
@@ -62,8 +63,8 @@ class OroTranslationAdapter extends AbstractAPIAdapter
             ['packages' => implode(',', $packages)]
         );
 
-        if ($response->getStatusCode() === Response::HTTP_OK) {
-            $result = $response->json();
+        if ($response->getStatusCode() === 200) {
+            $result = $this->jsonDecode($response);
             $result = is_array($result) ? $result : [];
 
             $filtered = array_filter(
