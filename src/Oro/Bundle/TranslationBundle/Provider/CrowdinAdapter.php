@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+/**
+ * Translation API adapter to sync translations with crowdin.com
+ */
 class CrowdinAdapter extends AbstractAPIAdapter
 {
     const FILE_NOT_FOUND = 8;
@@ -17,10 +20,10 @@ class CrowdinAdapter extends AbstractAPIAdapter
      */
     public function addFile($remotePath, $file, $mode = 'add')
     {
-        $result = $this->request(
+        $response = $this->request(
             sprintf('project/%s/%s-file?json=1', $this->projectId, $mode),
             [
-                sprintf('files[%s]', $remotePath) => '@' . $file,
+                sprintf('files[%s]', $remotePath) => '@'.$file,
                 sprintf('export_patterns[%s]', $remotePath) => preg_replace(
                     '#\.[\w_]{2,5}\.(\w+)$#',
                     '.%locale_with_underscore%.$1',
@@ -30,7 +33,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
             'POST'
         );
 
-        return $result->json();
+        return $this->jsonDecode($response);
     }
 
     /**
@@ -50,7 +53,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
             'POST'
         );
 
-        return $response->json();
+        return $this->jsonDecode($response);
     }
 
     /**
@@ -166,7 +169,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
     /**
      * {@inheritdoc}
      */
-    public function download($path, array $projects = [], $package = null)
+    public function download($path, array $projects = [], string $package = null)
     {
         $package = is_null($package) ? 'all' : str_replace('_', '-', $package);
 
@@ -175,7 +178,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
             [],
             'GET',
             [
-                'save_to' => $path,
+                'sink' => $path,
             ]
         );
 

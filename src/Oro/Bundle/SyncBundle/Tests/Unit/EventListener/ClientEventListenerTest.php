@@ -11,17 +11,18 @@ use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
 use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
-use Guzzle\Http\Message\Response;
 use Oro\Bundle\SyncBundle\EventListener\ClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
-class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
+class ClientEventListenerTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
@@ -197,7 +198,7 @@ class ClientEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->connection
             ->expects(self::once())
             ->method('send')
-            ->with((string)$closingResponse);
+            ->with($closingResponse);
         $this->connection
             ->expects(self::once())
             ->method('close');

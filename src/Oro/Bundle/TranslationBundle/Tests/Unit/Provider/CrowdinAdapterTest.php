@@ -2,42 +2,36 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Response;
 use Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 
-class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
+class CrowdinAdapterTest extends TestCase
 {
     use TempDirExtension;
 
     /** @var CrowdinAdapter */
     protected $adapter;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject|LoggerInterface */
     protected $logger;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject|ClientInterface */
     protected $client;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject|Response */
     protected $response;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $query;
 
     protected function setUp(): void
     {
-        $this->logger = $this->createMock('Psr\Log\LoggerInterface');
-        $this->client = $this->createMock('Guzzle\Http\Client');
-        $this->request = $this->getMockBuilder('Guzzle\Http\Message\Request')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->response = $this->getMockBuilder('Guzzle\Http\Message\Response')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->query = $this->createMock('Guzzle\Http\QueryString');
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->client = $this->createMock(ClientInterface::class);
+        $this->response = $this->createMock(Response::class);
 
         $this->adapter = new CrowdinAdapter($this->client);
         $this->adapter->setApiKey('some-api-key');
@@ -62,20 +56,16 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
 
         $this->adapter->setProjectId(1);
 
-        $this->client->expects($this->exactly(4))
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-
+        $body = $this->createMock(StreamInterface::class);
+        $body->expects($this->atLeastOnce())
+            ->method('getContents')
+            ->willReturn('{"success": true}');
         $this->response->expects($this->any())
-            ->method('json')
-            ->willReturn(['success' => true]);
-        $this->request->expects($this->exactly(4))
+            ->method('getBody')
+            ->willReturn($body);
+        $this->client->expects($this->exactly(4))
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->exactly(4))
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
-
         $this->adapter->upload($files, $mode);
     }
 
@@ -90,15 +80,8 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         $this->adapter->setProjectId(1);
 
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->throwException(new \Exception('test')));
-        $this->request->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
-
         $this->adapter->upload($files, $mode);
     }
 
@@ -110,17 +93,15 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         $dirs = ['some/path'];
 
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
-        $this->response->expects($this->once())
-            ->method('json')
-            ->will($this->returnValue(['success' => true]));
+        $body = $this->createMock(StreamInterface::class);
+        $body->expects($this->atLeastOnce())
+            ->method('getContents')
+            ->willReturn('{"success": true}');
+        $this->response->expects($this->any())
+            ->method('getBody')
+            ->willReturn($body);
 
         $this->logger->expects($this->atLeastOnce())
             ->method('info');
@@ -138,15 +119,8 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->throwException(new \Exception('test')));
-        $this->request->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
-
         $this->logger->expects($this->once())
             ->method('error');
 
@@ -159,14 +133,8 @@ class CrowdinAdapterTest extends \PHPUnit\Framework\TestCase
         $path = $this->getTempDir('trans', false) . DIRECTORY_SEPARATOR . 'target.zip';
 
         $this->client->expects($this->once())
-            ->method('createRequest')
-            ->will($this->returnValue($this->request));
-        $this->request->expects($this->once())
             ->method('send')
             ->will($this->returnValue($this->response));
-        $this->request->expects($this->any())
-            ->method('getQuery')
-            ->will($this->returnValue($this->query));
         $this->response->expects($this->once())
             ->method('getStatusCode')
             ->will($this->returnValue(200));

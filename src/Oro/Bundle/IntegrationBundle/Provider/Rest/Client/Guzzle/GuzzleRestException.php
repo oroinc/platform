@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle;
 
-use Guzzle\Http\Exception\BadResponseException;
+use GuzzleHttp\Exception\BadResponseException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Exception\RestException as BaseException;
 
+/**
+ * Base wrapper for exceptions thrown by the Guzzle library
+ */
 class GuzzleRestException extends BaseException
 {
     /**
@@ -14,7 +17,7 @@ class GuzzleRestException extends BaseException
     public static function createFromException(\Exception $exception)
     {
         if ($exception instanceof BadResponseException && $exception->getResponse()) {
-            $url = $exception->getRequest() ? (string)$exception->getRequest()->getUrl() : null;
+            $url = $exception->getRequest() ? (string)$exception->getRequest()->getUri() : null;
             $result = GuzzleRestException::createFromResponse(
                 new GuzzleRestResponse($exception->getResponse(), $url),
                 null,
