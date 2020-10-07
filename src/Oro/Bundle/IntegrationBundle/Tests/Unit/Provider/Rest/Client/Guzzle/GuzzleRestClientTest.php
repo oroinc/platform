@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
-use Guzzle\Http\Client;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
 
-class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
+class GuzzleRestClientTest extends TestCase
 {
     /** @var Client|MockObject */
     protected $sourceClient;
@@ -19,7 +20,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
     protected $client;
 
     /** @var string */
-    protected $baseUrl = 'https://example.com/api';
+    protected $baseUrl = 'https://example.com/api/';
 
     /** @var array */
     protected $defaultOptions = ['default' => 'value'];
@@ -50,12 +51,6 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLastResponseWorks()
     {
-        $request = $this->createMock(RequestInterface::class);
-        $this->sourceClient->expects(static::once())->method('createRequest')->willReturn($request);
-
-        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
-        $request->expects(static::once())->method('send')->willReturn($response);
-
         $response = $this->client->get('users');
 
         static::assertEquals($response, $this->client->getLastResponse());
@@ -63,17 +58,14 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider performRequestDataProvider
+     * @param string $method
+     * @param array  $args
+     * @param array  $expected
      */
-    public function testPerformRequestWorks($method, $args, $expected)
+    public function testPerformRequestWorks(string $method, array $args, array $expected)
     {
-        $request = $this->createMock(RequestInterface::class);
-        $this->sourceClient->expects(static::once())
-            ->method('createRequest')
-            ->with($expected['method'], $expected['url'], $expected['headers'], $expected['data'], $expected['options'])
-            ->willReturn($request);
-
         $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
-        $request->expects(static::once())->method('send')->willReturn($response);
+        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
 
         $actual = call_user_func_array([$this->client, $method], $args);
 
@@ -175,15 +167,17 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
             'put force content type' => [
                 'method' => 'put',
                 'args' => [
-                    'resource' => 'user/1', 'data' => ['foo' => 'data'],
-                    'headers' => ['Content-Type' => 'text/html'], 'options' => [],
+                    'resource' => 'user/1',
+                    'data' => '{"foo":"data"}',
+                    'headers' => ['Content-Type' => 'text/html'],
+                    'options' => [],
                 ],
                 'expected' => [
                     'method' => 'put',
                     'url' => 'https://example.com/api/user/1',
                     'headers' => ['Content-Type' => 'text/html'],
-                    'data' => ['foo' => 'data'],
-                    'options' => ['default' => 'value']
+                    'data' => '{"foo":"data"}',
+                    'options' => ['default' => 'value'],
                 ]
             ],
             'delete' => [
@@ -208,95 +202,60 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $method = 'get';
         $url = 'https://google.com/api/v2';
 
-        $request = $this->createMock(RequestInterface::class);
-        $this->sourceClient->expects(static::once())->method('createRequest')->willReturn($request);
-
-        $request->expects(static::once())->method('send')->willThrowException(new \Exception('Exception message'));
+        $this->sourceClient->expects(static::once())->method('send')->willThrowException(
+            new \Exception('Exception message')
+        );
 
         $this->client->performRequest($method, $url);
     }
 
-    /**
-     * @dataProvider getFormattedResultDataProvider
-     */
-    public function testGetFormattedResult($format)
+    public function testGetFormattedResult()
     {
-        $url = 'https://example.com/api/v2/users.' . $format;
+        $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];
         $headers = ['foo' => 'header'];
         $options = ['foo' => 'option'];
         $expectedResult = ['foo' => 'data'];
-        $expectedUrl = $url . '?foo=param';
-        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
 
         $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
 
-        $request = $this->createMock(RequestInterface::class);
+        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
 
-        $this->sourceClient->expects(static::once())
-            ->method('createRequest')
-            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->willReturn($request);
+        $response->expects(static::any())->method('getStatusCode')->willReturn(200);
+        $response->expects(static::once())->method('getBody')->willReturn('{"foo":"data"}');
 
-        $request->expects(static::once())->method('send')->willReturn($response);
-
-        $response->expects(static::once())->method('isSuccessful')->willReturn(true);
-        $response->expects(static::once())->method($format)->willReturn($expectedResult);
-
-        $getter = 'get' . \strtoupper($format);
-
-        static::assertEquals($expectedResult, $this->client->$getter($url, $params, $headers, $options));
+        static::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
     }
 
-    /**
-     * @dataProvider getFormattedResultDataProvider
-     */
-    public function testGetFormattedResultThrowException($format)
+    public function testGetFormattedResultThrowException()
     {
-        $url = 'https://example.com/api/v2/users.' . $format;
+        $url = 'https://example.com/api/v2/users.json';
         $params = ['foo' => 'param'];
         $headers = ['foo' => 'header'];
         $options = ['foo' => 'option'];
-        $expectedUrl = $url . '?foo=param';
-        $expectedOptions = ['foo' => 'option', 'default' => 'value'];
         $statusCode = 403;
         $reasonPhrase = 'Forbidden';
 
         $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
 
-        $request = $this->createMock(RequestInterface::class);
+        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
 
-        $this->sourceClient->expects(static::once())
-            ->method('createRequest')
-            ->with('get', $expectedUrl, $headers, null, $expectedOptions)
-            ->willReturn($request);
-
-        $request->expects(static::once())->method('send')->willReturn($response);
-        $request->expects(static::atLeastOnce())->method('getUrl')->willReturn($url);
-
-        $response->expects(static::once())->method('isSuccessful')->willReturn(false);
         $response->expects(static::atLeastOnce())->method('getStatusCode')->willReturn($statusCode);
         $response->expects(static::atLeastOnce())->method('getReasonPhrase')->willReturn($reasonPhrase);
+        $body = $this->createMock(StreamInterface::class);
+        $body->expects($this->atLeastOnce())
+            ->method('isSeekable')
+            ->willReturn(false);
+        $response->expects(static::atLeastOnce())->method('getBody')->willReturn($body);
 
         $this->expectException(GuzzleRestException::class);
         $this->expectExceptionMessage(
-            "Unsuccessful response" . PHP_EOL .
-            "[status code] $statusCode" . PHP_EOL .
-            "[reason phrase] $reasonPhrase" . PHP_EOL .
+            "Client error response".PHP_EOL.
+            "[status code] $statusCode".PHP_EOL.
+            "[reason phrase] $reasonPhrase".PHP_EOL.
             "[url] $url"
         );
 
-        $getter = 'get' . \strtoupper($format);
-
-        $this->client->$getter($url, $params, $headers, $options);
-    }
-
-    public function getFormattedResultDataProvider()
-    {
-        return [
-            'json' => [
-                'format' => 'json',
-            ]
-        ];
+        $this->client->getJSON($url, $params, $headers, $options);
     }
 }
