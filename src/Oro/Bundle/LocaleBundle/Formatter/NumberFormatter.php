@@ -116,11 +116,14 @@ class NumberFormatter
 
             // 1) replaces currency symbol with one provided by LocaleSettings;
             // 2) excludes the case with space duplication when space is already there.
-            $formattedString = trim(str_replace(
-                [$fromCurrencySymbol, '  '],
-                [$toCurrencySymbol, ' '],
-                $formattedString
-            ), ' ');
+            $formattedString = trim(
+                str_replace(
+                    [$fromCurrencySymbol, '  '],
+                    [$toCurrencySymbol, ' '],
+                    $formattedString
+                ),
+                ' '
+            );
         }
 
         return $formattedString;
