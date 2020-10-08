@@ -119,6 +119,13 @@ define(function(require, exports, module) {
         dropdownContainer: 'body',
 
         /**
+         * Separate container selector where filter hint will placed
+         *
+         * @property {string}
+         */
+        outerHintContainer: void 0,
+
+        /**
          * Flag for close previous open filters
          *
          * @property
@@ -131,6 +138,12 @@ define(function(require, exports, module) {
          * @property
          */
         storageKey: null,
+
+        /**
+         * Show or hide Manage filters button
+         * @property {Boolean}
+         */
+        enableMultiselectWidget: false,
 
         /** @property */
         events: {
@@ -163,8 +176,10 @@ define(function(require, exports, module) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement',
-                'renderMode', 'hidePreviousOpenFilters'));
+            _.extend(this, _.pick(options,
+                'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
+                'hidePreviousOpenFilters', 'outerHintContainer', 'enableMultiselectWidget'
+            ));
 
             this.template = this.getTemplateFunction();
             this.filters = _.extend({}, options.filters);
@@ -426,7 +441,7 @@ define(function(require, exports, module) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
 
@@ -459,7 +474,7 @@ define(function(require, exports, module) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
             const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
@@ -499,7 +514,9 @@ define(function(require, exports, module) {
         getTemplateData: function() {
             return {
                 filters: this.filters,
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                outerHintContainer: this.outerHintContainer,
+                enableMultiselectWidget: this.enableMultiselectWidget
             };
         },
 
@@ -537,7 +554,7 @@ define(function(require, exports, module) {
 
             if (_.isEmpty(this.filters)) {
                 this.$el.hide();
-            } else {
+            } else if (this.enableMultiselectWidget) {
                 this._initializeSelectWidget();
             }
             const filtersStateView = this.subview('filters-state');
@@ -627,8 +644,21 @@ define(function(require, exports, module) {
             }, 0);
         },
 
+        /**
+         * @returns {jQuery.Element}
+         */
+        getHintContainer: function() {
+            let $container = this.dropdownContainer;
+
+            if (this.outerHintContainer) {
+                $container = $(this.outerHintContainer);
+            }
+
+            return $container.find('.filter-items-hint');
+        },
+
         _resetHintContainer: function() {
-            const $container = this.dropdownContainer.find('.filter-items-hint');
+            const $container = this.getHintContainer();
             let show = false;
             $container.children('span').each(function() {
                 if (this.style.display !== 'none') {
@@ -685,10 +715,6 @@ define(function(require, exports, module) {
                 this.multiselectParameters
             );
 
-            if (!this.$(this.filterSelector).length) {
-                return;
-            }
-
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: options
@@ -706,7 +732,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _refreshSelectWidget: function() {
-            if (!this.selectWidget) {
+            if (!this.selectWidget && !this.enableMultiselectWidget) {
                 return;
             }
             this.selectWidget.multiselect('refresh');
