@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 
     const template = require('tpl-loader!orofilter/templates/filter/filter-hint.html');
     const _ = require('underscore');
+    const $ = require('jquery');
     const BaseView = require('oroui/js/app/views/base/view');
     let config = require('module-config').default(module.id);
     const FilterTemplate = require('orofilter/js/filter-template');
@@ -14,7 +15,8 @@ define(function(require, exports, module) {
             itemHint: '.filter-item-hint',
             itemsHint: '.filter-items-hint',
             hint: '.filter-criteria-hint',
-            reset: '.reset-filter-button'
+            reset: '.reset-filter-button',
+            outerHintContainer: null
         }
     }, config);
 
@@ -67,9 +69,11 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         initialize: function(options) {
-            const opts = _.pick(options || {}, 'filter');
-            _.extend(this, opts);
-
+            if (!options.filter) {
+                throw new Error('Required option filter not found.');
+            }
+            this.filter = options.filter;
+            this.selectors = {...this.selectors, ...options.selectors};
             this.templateTheme = this.filter.templateTheme;
             this.label = this.filter.label;
             this.hint = this.filter._getCriteriaHint();
@@ -89,7 +93,9 @@ define(function(require, exports, module) {
                 this.filter.selectWidget.multiselect('getButton').hide();
             }
 
-            if (this.inline) {
+            if (this.selectors.outerHintContainer) {
+                $(this.selectors.outerHintContainer).find(this.selectors.itemsHint).prepend(this.$el);
+            } else if (this.inline) {
                 this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {
                 this.filter.$el.closest(this.selectors.filters).find(this.selectors.itemsHint)

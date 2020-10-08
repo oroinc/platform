@@ -115,6 +115,13 @@ define(function(require, exports, module) {
         renderMode: '',
 
         /**
+         * Separate container selector where filter hint will be placed
+         *
+         * @property {string}
+         */
+        outerHintContainer: void 0,
+
+        /**
          * @inheritDoc
          */
         constructor: function AbstractFilter(options) {
@@ -129,7 +136,7 @@ define(function(require, exports, module) {
          */
         initialize: function(options) {
             const opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
-                'templateSelector', 'templateTheme', 'template', 'renderMode');
+                'templateSelector', 'templateTheme', 'template', 'renderMode', 'outerHintContainer');
             _.extend(this, opts);
 
             this._defineTemplate();
@@ -148,7 +155,10 @@ define(function(require, exports, module) {
             AbstractFilter.__super__.initialize.call(this, options);
 
             const hintView = new FilterHint({
-                filter: this
+                filter: this,
+                selectors: {
+                    outerHintContainer: this.outerHintContainer
+                }
             });
 
             this.subview('hint', hintView);
