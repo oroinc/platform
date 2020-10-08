@@ -9,8 +9,7 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PH
- *     PMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 {
