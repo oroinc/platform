@@ -69,8 +69,10 @@
     }
 
     .mce-tinymce {
-        width: $fallback-item-mce-tinymce-width;
-        max-width: $fallback-item-mce-tinymce-max-width;
+        &:not(.mce-fullscreen) {
+            width: $fallback-item-mce-tinymce-width;
+            max-width: $fallback-item-mce-tinymce-max-width;
+        }
     }
 }
 
