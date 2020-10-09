@@ -7,6 +7,7 @@ use Gos\Bundle\WebSocketBundle\Client\ClientManipulatorInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
+use GuzzleHttp\Psr7\Uri;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\UserBundle\Security\UserProvider;
 use Psr\Http\Message\RequestInterface;
@@ -205,10 +206,9 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
      */
     private function getRequestWithNewTicket(RequestInterface $request, ?UserInterface $user = null): RequestInterface
     {
-        $requestUri = $request->getUri();
-        parse_str($requestUri->getQuery(), $query);
-        $query['ticket'] = base64_encode($this->ticketProvider->generateTicket($user));
+        $ticket = base64_encode($this->ticketProvider->generateTicket($user));
+        $requestUri = Uri::withQueryValue($request->getUri(), 'ticket', $ticket);
 
-        return $request->withUri($requestUri->withQuery(http_build_query($query)));
+        return $request->withUri($requestUri);
     }
 }

@@ -40,7 +40,7 @@
                 multiSelect: false
             }
         },
-        cssClass: is_image_type ? 'digital-asset-image-grid' : 'digital-asset-file-grid'
+        cssClass: 'inner-grid ' ~ (is_image_type ? 'digital-asset-image-grid' : 'digital-asset-file-grid')
     } %}
 
     <div class="widget-content">
@@ -101,8 +101,10 @@
                     {{ 'oro.digitalasset.dam.dialog.datagrid_title.files'|trans }}
                 {%- endif -%}
             </h4>
-
-            {{ dataGrid.renderGrid(grid_name, grid_params|default({}), grid_render_params) }}
+            <div class="scrollspy-nav-target" aria-hidden="true"></div>
+            <div class="section-content">
+                {{ dataGrid.renderGrid(grid_name, grid_params|default({}), grid_render_params) }}
+            </div>
         {% endblock %}
     </div>
 {% endif %}

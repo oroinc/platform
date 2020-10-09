@@ -2,12 +2,18 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Guzzle\Http\Client;
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Message\Request;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\Utils;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
+/**
+ * Abstract translation API adapter that simplifies sending REST requests
+ */
 abstract class AbstractAPIAdapter implements APIAdapterInterface
 {
     use LoggerAwareTrait;
@@ -18,10 +24,13 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     /** @var string */
     protected $projectId;
 
-    /** @var Client */
+    /** @var ClientInterface */
     protected $client;
 
-    public function __construct(Client $client)
+    /**
+     * @param ClientInterface $client
+     */
+    public function __construct(ClientInterface $client)
     {
         $this->client = $client;
         $this->setLogger(new NullLogger());
@@ -62,37 +71,40 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
     abstract public function upload($files, $mode = 'add');
 
     /**
-     * Allow adapter to modify request before sending,
+     * Allow adapter to replace the request before sending,
      * adding API key by default
      *
      * @param Request $request
+     * @return Request
      */
-    protected function preprocessRequest(Request $request)
+    protected function replaceRequest(Request $request): Request
     {
-        $request->getQuery()->add('key', $this->getApiKey());
+        $uriWithApiKey = Uri::withQueryValue($request->getUri(), 'key', $this->getApiKey());
+
+        return $request->withUri($uriWithApiKey);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function request($uri, $data = [], $method = 'GET', $options = [], $headers = [])
+    public function request($uri, $data = [], $method = 'GET', $options = [], $headers = []): ResponseInterface
     {
-        $request = $this->client->createRequest(
+        $request = new Request(
             $method,
             $uri,
             $headers,
-            $data,
-            $options
+            Utils::jsonEncode($data)
         );
 
         if (!in_array($method, ['POST', 'PUT'], true)) {
-            $request->getQuery()->merge($data);
+            $uri = Uri::withQueryValues($request->getUri(), $data);
+            $request = $request->withUri($uri);
         }
 
-        $this->preprocessRequest($request);
+        $request = $this->replaceRequest($request);
         try {
-            $response = $request->send();
-        } catch (BadResponseException $e) {
+            $response = $this->client->send($request, $options);
+        } catch (ClientExceptionInterface $e) {
             $response = $e->getResponse();
         }
 
@@ -125,5 +137,14 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
         }
 
         return array_unique($dirs);
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @return array|bool|float|int|object|string|null
+     */
+    protected function jsonDecode(ResponseInterface $response)
+    {
+        return Utils::jsonDecode($response->getBody()->getContents(), true);
     }
 }
