@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Gaufrette\Adapter\Cache;
+use Gaufrette\Adapter\GridFS;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream\InMemoryBuffer;
@@ -428,7 +428,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with($fileEntity->getFilename())
             ->willReturn($memoryBuffer);
 
-        $adapter = $this->createMock(Cache::class);
+        $adapter = $this->createMock(GridFS::class);
         $this->filesystem->expects($this->any())
             ->method('getAdapter')
             ->willReturn($adapter);
