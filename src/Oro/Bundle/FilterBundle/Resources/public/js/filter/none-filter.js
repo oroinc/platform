@@ -152,6 +152,9 @@ define(function(require) {
                 renderMode: this.renderMode
             }));
             this._wrap($filter);
+            if (this.initiallyOpened) {
+                this._showCriteria();
+            }
             return this;
         },
 

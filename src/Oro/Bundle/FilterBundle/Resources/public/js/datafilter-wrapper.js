@@ -33,22 +33,22 @@ define([
 
             this._appendFilter($filter);
 
-            const events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown'].map(function(eventName) {
-                return eventName + this._eventNamespace();
-            }.bind(this)).join(' ');
+            const events = ['click', 'multiselectbeforeopen', 'show.bs.dropdown']
+                .map(eventName => eventName + this._eventNamespace())
+                .join(' ');
 
-            $(document).on(events, _.bind(function(e) {
-                if (this.popupCriteriaShowed) {
+            $(document).on(events, e => {
+                if (this.popupCriteriaShowed && this.autoClose !== false) {
                     this._onClickOutsideCriteria(e);
                 }
-            }, this));
+            });
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', _.bind(function(e) {
+            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
                 if (e.keyCode === 27) {
                     this._hideCriteria();
                 }
-            }, this));
+            });
         },
 
         /**

@@ -110,6 +110,9 @@ define(function(require) {
             if (this.$el.html() === '') {
                 this._renderCriteria();
             }
+            if (this.initiallyOpened) {
+                this._showCriteria();
+            }
             return this;
         },
 
@@ -183,7 +186,7 @@ define(function(require) {
             const type = this.$(this.criteriaValueSelectors.type).val();
             const isEmptyType = this.isEmptyType(type);
             this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
-            if (!isEmptyType) {
+            if (!isEmptyType && this.autoClose !== false) {
                 this.$(this.criteriaValueSelectors.value).focus();
             }
         },
