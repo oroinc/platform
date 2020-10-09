@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
+use GuzzleHttp\Psr7\Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
+use PHPUnit\Framework\TestCase;
 
-class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
+class GuzzleRestResponseTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject|Response
      */
     protected $sourceResponse;
 
@@ -23,7 +25,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->sourceResponse = $this->getMockBuilder('Guzzle\Http\Message\Response')
+        $this->sourceResponse = $this->getMockBuilder(Response::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->response = new GuzzleRestResponse($this->sourceResponse, $this->requestUrl);
@@ -36,10 +38,14 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider methodDelegationDataProvider
+     * @param            $targetMethod
+     * @param array      $targetArgs
+     * @param null       $sourceMethod
+     * @param array|null $sourceArgs
      */
     public function testMethodDelegationWorks(
         $targetMethod,
-        array $targetArgs = array(),
+        array $targetArgs = [],
         $sourceMethod = null,
         array $sourceArgs = null
     ) {
@@ -54,7 +60,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
             ->method($sourceMethod);
 
         if ($sourceArgs) {
-            $stub = call_user_func_array(array($stub, 'with'), $sourceArgs);
+            $stub = call_user_func_array([$stub, 'with'], $sourceArgs);
         }
 
         $expected = 'test';
@@ -62,30 +68,24 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $expected,
-            call_user_func_array(array($this->response, $targetMethod), $targetArgs),
+            call_user_func_array([$this->response, $targetMethod], $targetArgs),
             $targetMethod
         );
     }
 
-    public function methodDelegationDataProvider()
+    /**
+     * @return array
+     */
+    public function methodDelegationDataProvider(): array
     {
-        return array(
-            array('__toString'),
-            array('getBodyAsString', array(), 'getBody', array(true)),
-            array('getStatusCode'),
-            array('getMessage'),
-            array('getHeader', array('Content-Type')),
-            array('getHeaders'),
-            array('hasHeader', array('Content-Type')),
-            array('getReasonPhrase'),
-            array('isClientError'),
-            array('isInformational'),
-            array('isRedirect'),
-            array('isError'),
-            array('isServerError'),
-            array('isSuccessful'),
-            array('json'),
-        );
+        return [
+            ['getBodyAsString', [], 'getBody'],
+            ['getStatusCode'],
+            ['getHeader', ['Content-Type']],
+            ['getHeaders'],
+            ['hasHeader', ['Content-Type']],
+            ['getReasonPhrase'],
+        ];
     }
 
     public function testGetSourceResponse()

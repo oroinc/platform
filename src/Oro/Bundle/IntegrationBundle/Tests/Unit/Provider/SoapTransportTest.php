@@ -3,10 +3,12 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
 use Oro\Bundle\IntegrationBundle\Provider\SOAPTransport;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SoapTransportTest extends \PHPUnit\Framework\TestCase
+class SoapTransportTest extends TestCase
 {
     /** @var SOAPTransport|\PHPUnit\Framework\MockObject\MockObject */
     protected $transport;
@@ -97,7 +99,7 @@ class SoapTransportTest extends \PHPUnit\Framework\TestCase
      */
     public function testMultipleAttemptException($header, $attempt, $code)
     {
-        $this->expectException(\Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException::class);
+        $this->expectException(SoapConnectionException::class);
         $this->soapClientMock->expects($this->any())
             ->method('__getLastResponseHeaders')
             ->will($this->returnValue($header));

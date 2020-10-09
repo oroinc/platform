@@ -41,16 +41,18 @@ services:
 
     # guzzle http client for crowdin
     oro_translation.guzzle_crowdin_client:
-        class: Guzzle\Http\Client
+        class: GuzzleHttp\Client
         arguments:
-            - '%oro_translation.api.crowdin.endpoint%'
+            -
+                base_uri: '%oro_translation.api.crowdin.endpoint%'
         lazy: true
 
     # guzzle http client for oro proxy
     oro_translation.guzzle_oro_client:
-        class: Guzzle\Http\Client
+        class: GuzzleHttp\Client
         arguments:
-            - '%oro_translation.api.oro_service.endpoint%'
+            -
+                base_uri: '%oro_translation.api.oro_service.endpoint%'
         lazy: true
 
     oro_translation.uploader.crowdin_adapter:
