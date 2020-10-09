@@ -130,7 +130,7 @@ define(function(require, exports, module) {
          *
          * @property
          */
-        hidePreviousOpenFilters: true,
+        autoClose: true,
 
         /**
          * Key that's used to fetch data about filters state view mode from persistent storage
@@ -178,7 +178,7 @@ define(function(require, exports, module) {
         initialize: function(options) {
             _.extend(this, _.pick(options,
                 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
-                'hidePreviousOpenFilters', 'outerHintContainer', 'enableMultiselectWidget'
+                'autoClose', 'outerHintContainer', 'enableMultiselectWidget'
             ));
 
             this.template = this.getTemplateFunction();
@@ -212,7 +212,10 @@ define(function(require, exports, module) {
 
             _.each(this.filters, function(filter) {
                 if (filter.wrappable) {
-                    _.extend(filter, filterWrapper);
+                    Object.assign(filter, filterWrapper);
+                }
+                if (this.autoClose === false) {
+                    Object.assign(filter, {autoClose: this.autoClose});
                 }
                 this.listenTo(filter, filterListeners);
                 filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
@@ -353,7 +356,7 @@ define(function(require, exports, module) {
         },
 
         _onFilterShowCriteria: function(shownFilter) {
-            if (this.hidePreviousOpenFilters) {
+            if (this.autoClose) {
                 _.each(this.filters, function(filter) {
                     if (filter !== shownFilter) {
                         _.result(filter, 'ensurePopupCriteriaClosed');

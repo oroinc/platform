@@ -59,10 +59,9 @@ define(function(require, exports, module) {
             const options = _.extend(
                 methods.combineOptions.call(this),
                 _.pick(this, 'collection'),
-                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'enableToggleFilters', 'renderMode',
-                    'hidePreviousOpenFilters', 'filtersStateStorageKey', 'useFiltersStateAnimationOnInit',
-                    'outerHintContainer', 'filtersContainerTemplate', 'enableMultiselectWidget'
-                )
+                _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
+                    'useFiltersStateAnimationOnInit'),
+                this.metadata.options.filtersManager
             );
 
             let filterContainer;
@@ -87,10 +86,6 @@ define(function(require, exports, module) {
 
                 options.filtersStateElement = $container.length
                     ? $container : $('<div/>').prependTo(filterContainer);
-            }
-
-            if (_.isFunction(options.filtersContainerTemplate)) {
-                options.template = options.filtersContainerTemplate;
             }
 
             const filtersList = new FiltersManager(options);
@@ -119,7 +114,6 @@ define(function(require, exports, module) {
             const filters = {};
             const modules = this.modules;
             const collection = this.collection;
-            const outerHintContainer = this.metadata.options.outerHintContainer;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
@@ -128,9 +122,6 @@ define(function(require, exports, module) {
                     }
                     if (options.lazy) {
                         options.loader = methods.createFilterLoader.call(this, options);
-                    }
-                    if (outerHintContainer) {
-                        options.outerHintContainer = outerHintContainer;
                     }
                     const Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();

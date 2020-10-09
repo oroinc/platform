@@ -253,7 +253,9 @@ define(function(require, exports, module) {
          * @protected
          */
         _applyValueAndHideCriteria: function() {
-            this._hideCriteria();
+            if (this.autoClose !== false) {
+                this._hideCriteria();
+            }
             if (this._isValid()) {
                 this.applyValue();
             }
@@ -305,7 +307,9 @@ define(function(require, exports, module) {
                 visibility: 'visible'
             }).removeAttr('aria-hidden');
             this._alignCriteria();
-            this._focusCriteria();
+            if (this.autoClose !== false) {
+                this._focusCriteria();
+            }
             this._setButtonPressed(this.$(this.criteriaSelector), true);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
