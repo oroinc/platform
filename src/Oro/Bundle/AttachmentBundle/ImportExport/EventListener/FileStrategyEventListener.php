@@ -89,29 +89,50 @@ class FileStrategyEventListener implements LoggerAwareInterface
     public function onProcessBefore(StrategyEvent $event): void
     {
         $entity = $event->getEntity();
-        $relations = $this->getRelations($entity);
         $itemData = (array)($event->getContext()->getValue('itemData') ?? []);
 
-        foreach ($relations as $relation) {
-            if (is_a($relation['related_entity_name'], File::class, true)) {
-                $this->beforeProcessFileField($entity, $relation['name'], $itemData);
-            }
+        $this->processRelations(
+            $entity,
+            $itemData,
+            function (object $entity, array $relation, array $itemData) {
+                if (is_a($relation['related_entity_name'], File::class, true)) {
+                    $this->beforeProcessFileField($entity, $relation['name'], $itemData);
+                }
 
-            if (is_a($relation['related_entity_name'], FileItem::class, true)) {
-                $this->beforeProcessMultiFileField($entity, $relation['name']);
+                if (is_a($relation['related_entity_name'], FileItem::class, true)) {
+                    $this->beforeProcessMultiFileField($entity, $relation['name']);
+                }
             }
-        }
+        );
     }
 
     /**
      * @param object $entity
+     * @param array $itemData
+     * @param callable $callback
+     */
+    private function processRelations(object $entity, array $itemData, callable $callback): void
+    {
+        $entityClass = $this->fileImportStrategyHelper->getClass($entity);
+        $relations = $this->getRelations($entityClass);
+        foreach ($relations as $relation) {
+            if ($this->fieldHelper->isFieldExcluded($entityClass, $relation['name'], $itemData)) {
+                continue;
+            }
+
+            $callback($entity, $relation, $itemData);
+        }
+    }
+
+    /**
+     * @param string $entityClass
      *
      * @return array
      */
-    private function getRelations(object $entity): array
+    private function getRelations(string $entityClass): array
     {
         return $this->fieldHelper->getRelations(
-            $this->fileImportStrategyHelper->getClass($entity),
+            $entityClass,
             false,
             true,
             false
@@ -239,18 +260,21 @@ class FileStrategyEventListener implements LoggerAwareInterface
     {
         $errors = [[]];
         $entity = $event->getEntity();
-        $relations = $this->getRelations($entity);
         $itemData = (array)($event->getContext()->getValue('itemData') ?? []);
 
-        foreach ($relations as $relation) {
-            if (is_a($relation['related_entity_name'], File::class, true)) {
-                $errors[] = $this->afterProcessFileField($entity, $relation['name'], $itemData);
-            }
+        $this->processRelations(
+            $entity,
+            $itemData,
+            function (object $entity, array $relation, array $itemData) use (&$errors) {
+                if (is_a($relation['related_entity_name'], File::class, true)) {
+                    $errors[] = $this->afterProcessFileField($entity, $relation['name'], $itemData);
+                }
 
-            if (is_a($relation['related_entity_name'], FileItem::class, true)) {
-                $errors[] = $this->afterProcessMultiFileField($entity, $relation['name'], $itemData);
+                if (is_a($relation['related_entity_name'], FileItem::class, true)) {
+                    $errors[] = $this->afterProcessMultiFileField($entity, $relation['name'], $itemData);
+                }
             }
-        }
+        );
 
         if ($errors = array_merge(...$errors)) {
             // File importing has failed, entity will be skipped from import.

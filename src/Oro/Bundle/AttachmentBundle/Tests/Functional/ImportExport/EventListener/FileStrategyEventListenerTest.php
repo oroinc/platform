@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\ImportExport\EventListener;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\ImportExport\EventListener;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
@@ -114,6 +115,30 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
+        $this->assertEmpty($context->getErrors());
+    }
+
+    public function testFileFieldWhenFieldExcluded(): void
+    {
+        $fieldName = 'avatar';
+        $context = $this->getContext([$fieldName => []]);
+        $existingUser = $this->getReference('user2');
+        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $event = $this->getEvent($context, $user);
+
+        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $fieldConfig = $entityConfigManager->getFieldConfig('importexport', User::class, 'avatar');
+        $fieldConfig->set('excluded', true);
+
+        $this->assertNotNull($existingUser->getAvatar());
+
+        $this->listener->onProcessBefore($event);
+
+        $event->setEntity($existingUser);
+
+        $this->listener->onProcessAfter($event);
+
+        $this->assertNotNull($existingUser->getAvatar());
         $this->assertEmpty($context->getErrors());
     }
 
