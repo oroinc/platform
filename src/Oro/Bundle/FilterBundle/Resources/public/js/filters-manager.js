@@ -268,24 +268,33 @@ define(function(require, exports, module) {
         },
 
         checkFiltersVisibility: function() {
+            _.each(this.filters, filter => {
+                if (filter.visible && filter.enabled) {
+                    this._renderFilter(filter).show();
+                } else if (!filter.visible) {
+                    filter.hide();
+                }
+            });
+
+            this.checkFiltersSelectVisibility();
+        },
+
+        checkFiltersSelectVisibility: function() {
             const filterSelector = this.$(this.filterSelector);
+
             if (!filterSelector.length) {
                 return;
             }
-            _.each(this.filters, function(filter) {
-                const option = filterSelector.find('option[value="' + filter.name + '"]');
+
+            _.each(this.filters, filter => {
+                const option = filterSelector.find(`option[value="${filter.name}"]`);
+
                 if (filter.visible && option.hasClass('hidden')) {
                     option.removeClass('hidden');
-
-                    if (filter.enabled) {
-                        this._renderFilter(filter).show();
-                    }
                 } else if (!filter.visible && !option.hasClass('hidden')) {
                     option.addClass('hidden');
-
-                    filter.hide();
                 }
-            }, this);
+            });
 
             this._refreshSelectWidget();
         },
