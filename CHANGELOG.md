@@ -726,7 +726,7 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 * Added `rest_api_prefix` and `rest_api_pattern` configuration options and `oro_api.rest.prefix` and `oro_api.rest.pattern` DIC parameters to be able to reconfigure REST API base path.
 * Added trigger `disposeLayout` on DOM element in `layout`
 #### DatagridBundle
-* Added [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md) functionality for flexible managing of filters and grid columns
+* Added [Datagrid Settings](../../documentation/backend/entities/customize-datagrids/frontend/datagrid_settings.md) functionality for flexible managing of filters and grid columns
 
 #### CacheBundle
 * Added `oro.cache.abstract.without_memory_cache` that is the same as `oro.cache.abstract` but without using additional in-memory caching, it can be used to avoid unnecessary memory usage and performance penalties if in-memory caching is not needed, e.g. you implemented some more efficient in-memory caching strategy around your cache service.
@@ -752,7 +752,7 @@ If you want to override some symbols, you can decorate `Oro\Bundle\LocaleBundle\
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionInterface`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage`, `Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage` and `Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionalFactorBuilder` classes because now ACL restrictions applies with Access Rules by `Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker`.
 * Removed `Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper::applyAclToCriteria` method. Please use `apply` method with Doctrine Query or Query builder instead.
 #### DatagridBundle
-* Removed all logic related with column manager. The logic of column manager was transformed and expanded in [Datagrid Settings](./src/Oro/Bundle/DataGridBundle/Resources/doc/frontend/datagrid_settings.md)
+* Removed all logic related with column manager. The logic of column manager was transformed and expanded in [Datagrid Settings](../../documentation/backend/entities/customize-datagrids/frontend/datagrid_settings.md)
 #### EntitySerializer Component
 * Removed `excluded_fields` deprecated configuration attribute for an entity. Use `exclude` attribute for a field instead.
 * Removed `result_name` deprecated configuration attribute for a field. Use `property_path` attribute instead.
