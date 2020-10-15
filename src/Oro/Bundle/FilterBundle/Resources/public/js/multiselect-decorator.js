@@ -182,9 +182,9 @@ define([
         },
 
         /**
-         * Get multiselect trigger
+         * Get a multiselect trigger element
          *
-         * @return {Object}
+         * @return {HTMLElement}
          */
         getWidgetTrigger: function() {
             return this.multiselect('instance').button;

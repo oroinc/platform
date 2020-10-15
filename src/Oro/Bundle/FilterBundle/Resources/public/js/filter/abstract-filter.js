@@ -173,6 +173,7 @@ define(function(require, exports, module) {
         rendered: function() {
             this._isRendered = true;
             this.subview('hint').render();
+            return this;
         },
 
         /**
