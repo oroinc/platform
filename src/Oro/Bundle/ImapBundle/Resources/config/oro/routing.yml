@@ -7,3 +7,8 @@ oro_imap_gmail_connection:
     resource:     "@OroImapBundle/Controller/GmailConnectionController.php"
     type:         annotation
     prefix:       /
+
+oro_imap_microsoft_connection:
+    resource:     "@OroImapBundle/Controller/MicrosoftConnectionController.php"
+    type:         annotation
+    prefix:       /

@@ -9,6 +9,7 @@ use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadEmailUserData;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadImapEmailData;
+use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadTypedUserEmailOriginData;
 use Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures\LoadUserEmailOriginData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -85,5 +86,59 @@ class UserEmailOriginRepositoryTest extends WebTestCase
         $repository = $this->getContainer()->get('doctrine')->getRepository($class);
 
         return count($repository->findAll());
+    }
+
+    /**
+     * @dataProvider getOriginsData
+     */
+    public function testGetOrigins(callable $qbCallback, int $expectedCount): void
+    {
+        $this->loadFixtures([LoadTypedUserEmailOriginData::class]);
+
+        /** @var UserEmailOriginRepository $repo */
+        $repo = $this->doctrineHeler->getEntityRepositoryForClass(UserEmailOrigin::class);
+        $qb = $qbCallback($repo);
+        $this->assertCount($expectedCount, $qb->getQuery()->execute());
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getOriginsData(): array
+    {
+        return [
+            [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithAccessTokens('gmail');
+                },
+                1
+            ], [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithAccessTokens('microsoft');
+                },
+                1
+            ], [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithAccessTokens();
+                },
+                2
+            ], [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithRefreshTokens('gmail');
+                },
+                1
+            ], [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithRefreshTokens('microsoft');
+                },
+                1
+            ],
+            [
+                function (UserEmailOriginRepository $repo) {
+                    return $repo->getAllOriginsWithRefreshTokens();
+                },
+                2
+            ]
+        ];
     }
 }

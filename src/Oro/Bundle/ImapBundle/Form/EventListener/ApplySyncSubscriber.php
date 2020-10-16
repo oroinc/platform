@@ -9,6 +9,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Applies sync information to origin related folders
+ */
 class ApplySyncSubscriber implements EventSubscriberInterface
 {
     /**
@@ -38,7 +41,6 @@ class ApplySyncSubscriber implements EventSubscriberInterface
             if ($origin !== null && $origin->getId() !== null) {
                 $this->applySyncEnabled($origin->getRootFolders(), $data['folders']);
 
-                $form->remove('folders');
                 unset($data['folders']);
             }
         } else {

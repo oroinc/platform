@@ -175,8 +175,8 @@ services:
     oro_user.form.type.user_emailsettings:
         class: Oro\Bundle\UserBundle\Form\Type\EmailSettingsType
         arguments:
-            - '@oro_config.user'
             - '@oro_user.imap_configuration.subscriber'
+            - '@oro_imap.manager_registry.registry'
         tags:
             - { name: form.type, alias: oro_user_emailsettings }
 

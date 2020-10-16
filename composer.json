@@ -262,6 +262,7 @@
             "Oro\\Bundle\\LocaleBundle\\": "src/Oro/Bundle/LocaleBundle",
             "Oro\\Bundle\\LoggerBundle\\": "src/Oro/Bundle/LoggerBundle",
             "Oro\\Bundle\\MessageQueueBundle\\": "src/Oro/Bundle/MessageQueueBundle",
+            "Oro\\Bundle\\MicrosoftIntegrationBundle\\": "src/Oro/Bundle/MicrosoftIntegrationBundle",
             "Oro\\Bundle\\MigrationBundle\\": "src/Oro/Bundle/MigrationBundle",
             "Oro\\Bundle\\NavigationBundle\\": "src/Oro/Bundle/NavigationBundle",
             "Oro\\Bundle\\NoteBundle\\": "src/Oro/Bundle/NoteBundle",

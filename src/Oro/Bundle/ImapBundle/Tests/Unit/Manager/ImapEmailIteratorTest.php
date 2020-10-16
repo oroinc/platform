@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
