@@ -70,3 +70,11 @@
         {% endif %}
     {% endspaceless %}
 {% endblock %}
+
+{% block oro_user_emailsettings_widget %}
+    <div {{ block('widget_container_attributes') }}>
+        {% for child in form %}
+            {{ form_widget(child) }}
+        {% endfor %}
+    </div>
+{% endblock %}

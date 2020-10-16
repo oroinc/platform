@@ -13,8 +13,8 @@ use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -30,8 +30,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
 
     /** @var ConfigManager */
     protected $configManager;
@@ -39,18 +39,18 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /**
      * @param ImapConnectorFactory $connectorFactory
      * @param SymmetricCrypterInterface $encryptor
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      * @param ConfigManager $configManager
      */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
+        OAuth2ManagerRegistry $oauthManagerRegistry,
         ConfigManager $configManager
     ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
         $this->configManager = $configManager;
     }
 
@@ -69,6 +69,9 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     {
         /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
+        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
+            : null;
 
         $config = new ImapConfig(
             $origin->getImapHost(),
@@ -76,7 +79,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
+            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
 
         $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));

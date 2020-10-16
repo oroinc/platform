@@ -1037,7 +1037,11 @@ class User extends ExtendUser implements
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {
-            $this->setImapConfiguration($accountTypeModel->getUserEmailOrigin());
+            /** @var UserEmailOrigin $emailOrigin */
+            if (($emailOrigin = $accountTypeModel->getUserEmailOrigin()) && $accountTypeModel->getAccountType()) {
+                $emailOrigin->setAccountType($accountTypeModel->getAccountType());
+            }
+            $this->setImapConfiguration($emailOrigin);
         }
     }
 
@@ -1052,13 +1056,12 @@ class User extends ExtendUser implements
             $accountTypeModel = null;
             if ($userEmailOrigin) {
                 $accountTypeModel = new AccountTypeModel();
-                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                } else {
-                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
-                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
-                }
+                $accountType = $userEmailOrigin->getAccountType();
+                // Setting up account type even or inactive OAuth accounts
+                // to keep the display of OAuth account with option to refresh
+                // If method still available
+                $accountTypeModel->setAccountType($accountType);
+                $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
             }
 
             if ($accountTypeModel) {

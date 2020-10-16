@@ -7,11 +7,14 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -42,19 +45,25 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
+
     /**
      * @param SymmetricCrypterInterface $encryptor
      * @param TokenAccessorInterface $tokenAccessor
-     * @param TranslatorInterface    $translator
+     * @param TranslatorInterface $translator
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $encryptor,
         TokenAccessorInterface $tokenAccessor,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        OAuth2ManagerRegistry $oauthManagerRegistry
     ) {
         $this->encryptor = $encryptor;
         $this->tokenAccessor = $tokenAccessor;
         $this->translator = $translator;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -98,6 +107,13 @@ class ConfigurationType extends AbstractType
                 'empty_data'  => null,
                 'placeholder' => '',
                 'required'    => false
+            ])
+            ->add('accountType', HiddenType::class, [
+                'required'  => true,
+                'data'      => AccountTypeModel::ACCOUNT_TYPE_OTHER,
+                'attr' => [
+                    'class' => 'check-connection',
+                ]
             ])
             ->add('useSmtp', CheckboxType::class, [
                 'label'    => 'oro.imap.configuration.use_smtp.label',
@@ -196,6 +212,7 @@ class ConfigurationType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = (array) $event->getData();
+                $data['accountType'] = AccountTypeModel::ACCOUNT_TYPE_OTHER;
                 /** @var UserEmailOrigin|null $entity */
                 $entity = $event->getForm()->getData();
                 $filtered = array_filter(
@@ -351,7 +368,7 @@ class ConfigurationType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class'        => 'Oro\\Bundle\\ImapBundle\\Entity\\UserEmailOrigin',
+            'data_class'        => UserEmailOrigin::class,
             'required'          => false,
             'constraints'       => new Valid(),
             'add_check_button'  => true,

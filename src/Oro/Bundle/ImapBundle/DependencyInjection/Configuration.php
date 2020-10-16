@@ -21,6 +21,10 @@ class Configuration implements ConfigurationInterface
                 'value' => false,
                 'type' => 'boolean',
             ],
+            'enable_microsoft_imap' => [
+                'value' => false,
+                'type' => 'boolean'
+            ]
         ]);
 
         return $treeBuilder;
