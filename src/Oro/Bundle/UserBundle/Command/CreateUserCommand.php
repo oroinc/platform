@@ -186,6 +186,7 @@ class CreateUserCommand extends Command
             $user
                 ->setOwner($businessUnit)
                 ->setOrganization($businessUnit->getOrganization())
+                ->addOrganization($businessUnit->getOrganization())                
                 ->addBusinessUnit($businessUnit);
         }
 
