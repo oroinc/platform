@@ -10,7 +10,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFlagManager;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -24,22 +24,22 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var ManagerRegistry */
+    protected $oauthManagerRegistry;
 
     /**
      * @param ImapConnectorFactory $connectorFactory
      * @param SymmetricCrypterInterface $encryptor
-     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+        OAuth2ManagerRegistry $oauthManagerRegistry
     ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -57,6 +57,9 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     {
         /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
+        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
+            : null;
 
         $config = new ImapConfig(
             $origin->getImapHost(),
@@ -64,7 +67,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
+            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
 
         return new ImapEmailFlagManager(

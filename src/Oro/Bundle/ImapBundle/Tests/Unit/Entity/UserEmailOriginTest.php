@@ -4,11 +4,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
+class UserEmailOriginTest extends TestCase
 {
     public function testGetId()
     {
@@ -119,6 +120,14 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $origin->setSmtpEncryption('');
 
         $this->assertFalse($origin->isSmtpConfigured());
+    }
+
+    public function testTypeGetterAndSetter(): void
+    {
+        $origin = new UserEmailOrigin();
+        $this->assertEquals('other', $origin->getAccountType());
+        $origin->setAccountType('test_type');
+        $this->assertEquals('test_type', $origin->getAccountType());
     }
 
     /**

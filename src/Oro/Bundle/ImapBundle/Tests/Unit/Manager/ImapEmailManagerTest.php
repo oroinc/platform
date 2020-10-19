@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use DateTime;
 use Laminas\Mail\Header\HeaderInterface;

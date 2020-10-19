@@ -57,7 +57,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsShouldReturnTrueForOAuthToken()
+    public function testSupportsShouldReturnTrueForGoogleOAuthToken()
     {
         $this->resourceOwnerMap->expects($this->once())
             ->method('hasResourceOwnerByName')
@@ -66,6 +66,18 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
 
         $token = new HWIOauthToken('token');
         $token->setResourceOwnerName('google');
+        $this->assertTrue($this->oauthProvider->supports($token));
+    }
+
+    public function testSupportsShouldReturnTrueForOffice365OAuthToken()
+    {
+        $this->resourceOwnerMap->expects($this->once())
+            ->method('hasResourceOwnerByName')
+            ->with($this->equalTo('office365'))
+            ->will($this->returnValue(true));
+
+        $token = new HWIOauthToken('token');
+        $token->setResourceOwnerName('office365');
         $this->assertTrue($this->oauthProvider->supports($token));
     }
 

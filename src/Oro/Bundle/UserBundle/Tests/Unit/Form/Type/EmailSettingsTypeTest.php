@@ -3,7 +3,10 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Type;
 
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraints\Valid;
 
 class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
@@ -13,10 +16,10 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected $type;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $userConfigManager;
+    /** @var MockObject|OAuth2ManagerRegistry */
+    protected $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MockObject|UserImapConfigSubscriber */
     protected $subscriber;
 
     /**
@@ -24,13 +27,16 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->userConfigManager   = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+        $this->createRegistryMock();
+        $this->subscriber = $this->getMockBuilder(UserImapConfigSubscriber::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscriber = $this->getMockBuilder('Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->type = new EmailSettingsType($this->userConfigManager, $this->subscriber);
+        $this->type = new EmailSettingsType($this->subscriber, $this->registry);
+    }
+
+    protected function createRegistryMock(): void
+    {
+        $this->registry = $this->getMockBuilder(OAuth2ManagerRegistry::class)->getMock();
     }
 
     public function testConfigureOptions()
@@ -50,8 +56,10 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildFormImapAccount()
     {
-        $this->userConfigManager->expects($this->once())->method('get')->with('oro_imap.enable_google_imap')
-            ->will($this->returnValue(true));
+        $this->registry->expects($this->once())
+            ->method('isOauthImapEnabled')
+            ->willReturn(true);
+
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->setMethods(['add', 'addEventSubscriber'])
@@ -71,11 +79,13 @@ class EmailSettingsTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildFormImapConfiguration()
     {
-        $this->userConfigManager->expects($this->once())->method('get')->with('oro_imap.enable_google_imap')
-            ->will($this->returnValue(false));
+        $this->registry->expects($this->once())
+            ->method('isOauthImapEnabled')
+            ->willReturn(false);
+
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
-            ->setMethods(['add', 'addEventSubscriber'])
+            ->setMethods(['add', 'addEventSubscriber', 'addEventListener'])
             ->getMock();
         $builder->expects($this->once())->method('add')->with(
             'imapConfiguration',

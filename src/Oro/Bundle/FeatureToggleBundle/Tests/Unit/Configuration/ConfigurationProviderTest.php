@@ -37,6 +37,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'workflows' => [],
                 'processes' => [],
                 'placeholder_items' => [],
+                'mq_topics' => []
             ],
             'feature2' => [
                 'label'         => 'Feature 2',
@@ -56,6 +57,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'workflows' => [],
                 'processes' => [],
                 'placeholder_items' => [],
+                'mq_topics' => []
             ],
             'feature3' => [
                 'label'         => 'Feature 3',
@@ -75,6 +77,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'workflows' => [],
                 'processes' => [],
                 'placeholder_items' => [],
+                'mq_topics' => []
             ]
         ],
         '__internal__' => [
