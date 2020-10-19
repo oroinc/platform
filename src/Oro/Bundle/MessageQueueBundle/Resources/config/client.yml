@@ -114,6 +114,8 @@ services:
         decoration_priority: -255 # the buffered producer should be at the top of the decoration chain
         arguments:
             - '@oro_message_queue.client.buffered_message_producer.inner'
+        calls:
+            - ['setFeatureChecker', ['@oro_featuretoggle.checker.feature_checker']]
 
     oro_message_queue.client.dbal_transaction_watcher:
         class: Oro\Bundle\MessageQueueBundle\Client\DbalTransactionWatcher
