@@ -104,6 +104,13 @@ services:
         tags:
             - { name: oro_navigation.menu_extension, priority: 90 }
 
+    oro_featuretoggle.async.message_filter:
+        class: Oro\Bundle\FeatureToggleBundle\Async\MessageFilter
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: oro_message_queue.message_filter }
+
     oro_featuretoggle.event_listener.cache_state:
         class:  Oro\Bundle\FeatureToggleBundle\EventListener\CacheStateChangeListener
         arguments:
