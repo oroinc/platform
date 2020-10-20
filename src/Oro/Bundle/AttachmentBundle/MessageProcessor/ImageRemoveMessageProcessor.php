@@ -11,6 +11,9 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface as OptionsResolverException;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Removes product image files and directories when removing product images
@@ -58,6 +61,17 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
         $images = JSON::decode($message->getBody());
         foreach ($images as $imageData) {
             try {
+                try {
+                    $imageData = $this->getOptionsResolver()->resolve($imageData);
+                } catch (OptionsResolverException $e) {
+                    $this->logger->warning(
+                        'Unable to remove image',
+                        ['exception' => $e, 'imageData' => json_encode($imageData)]
+                    );
+
+                    continue;
+                }
+
                 $fileId = $imageData['id'];
                 $fileName = $imageData['fileName'];
                 $originalFileName = $imageData['originalFileName'];
@@ -75,6 +89,29 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
         }
 
         return self::ACK;
+    }
+
+    /**
+     * @return OptionsResolver
+     */
+    protected function getOptionsResolver()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setRequired([
+            'id',
+            'fileName',
+            'originalFileName',
+            'parentEntityClass',
+        ]);
+        $resolver->setNormalizer('originalFileName', function (Options $options, $value) {
+            return $value ?: $options['fileName'];
+        });
+        $resolver->setAllowedTypes('id', ['int']);
+        $resolver->setAllowedTypes('fileName', ['string']);
+        $resolver->setAllowedTypes('originalFileName', ['string', 'null']);
+        $resolver->setAllowedTypes('parentEntityClass', ['string']);
+
+        return $resolver;
     }
 
     /**
