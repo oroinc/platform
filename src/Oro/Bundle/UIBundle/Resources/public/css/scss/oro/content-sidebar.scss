@@ -74,7 +74,8 @@
     }
 
     &--sidebar-content {
-        flex-shrink: 1;
+        min-height: $content-sidebar-sidebar-content-min-height;
+        flex-shrink: $content-sidebar-sidebar-content-flex-shrink;
     }
 
     &--header-content {
