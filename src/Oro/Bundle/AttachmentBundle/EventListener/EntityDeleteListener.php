@@ -27,16 +27,21 @@ class EntityDeleteListener
         $uow = $manager->getUnitOfWork();
         $repository = $manager->getRepository(File::class);
 
+        $idsByClassName = [];
         foreach ($uow->getScheduledEntityDeletions() as $entity) {
             $id = $this->doctrineHelper->getSingleEntityIdentifier($entity, false);
             if (!$id || !\is_numeric($id)) {
                 continue;
             }
 
+            $idsByClassName[$this->doctrineHelper->getEntityClass($entity)][] = $id;
+        }
+
+        foreach ($idsByClassName as $className => $ids) {
             $files = $repository->findBy(
                 [
-                    'parentEntityClass' => $this->doctrineHelper->getEntityClass($entity),
-                    'parentEntityId' => $id,
+                    'parentEntityClass' => $className,
+                    'parentEntityId' => $ids,
                 ]
             );
 
