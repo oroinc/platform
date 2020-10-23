@@ -152,21 +152,20 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
     protected function initializeRules()
     {
-        if ($this->headerConversionRules === null) {
-            $this->assertEntityName();
-            if ($this->translateUsingLocale) {
-                $this->fieldHelper->setLocale($this->localeSettings->getLanguage());
-            }
-
-            $headerConversionRules = $this->getEntityRules(
-                $this->entityName,
-                true,
-                self::DEFAULT_SINGLE_RELATION_LEVEL,
-                self::DEFAULT_MULTIPLE_RELATION_LEVEL
-            );
-
-            $this->headerConversionRules = $this->processCollectionRegexp($headerConversionRules);
+        // Do not cache header because it is dependent on the locale
+        $this->assertEntityName();
+        if ($this->translateUsingLocale) {
+            $this->fieldHelper->setLocale($this->localeSettings->getLanguage());
         }
+
+        $headerConversionRules = $this->getEntityRules(
+            $this->entityName,
+            true,
+            self::DEFAULT_SINGLE_RELATION_LEVEL,
+            self::DEFAULT_MULTIPLE_RELATION_LEVEL
+        );
+
+        $this->headerConversionRules = $this->processCollectionRegexp($headerConversionRules);
     }
 
     /**

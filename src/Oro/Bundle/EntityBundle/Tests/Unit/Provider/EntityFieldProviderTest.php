@@ -1107,4 +1107,12 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
             ]
         ];
     }
+
+    public function testGetLocale()
+    {
+        $this->assertNull($this->provider->getLocale());
+
+        $this->provider->setLocale('en-US');
+        $this->assertEquals('en-US', $this->provider->getLocale());
+    }
 }

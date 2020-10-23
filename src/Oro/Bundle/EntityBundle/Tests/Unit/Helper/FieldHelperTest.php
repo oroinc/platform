@@ -127,14 +127,36 @@ class FieldHelperTest extends \PHPUnit\Framework\TestCase
         $entityName = 'TestEntity';
         $withRelations = true;
         $expectedFields = [['name' => 'field']];
+        $expectedFieldsLocalized = [['nameLocalized' => 'fieldLocalized']];
 
-        $this->fieldProvider->expects($this->once())->method('getFields')->with($entityName, $withRelations)
-            ->will($this->returnValue($expectedFields));
+        $this->fieldProvider->expects($this->exactly(4))
+            ->method('getLocale')
+            ->willReturnOnConsecutiveCalls(
+                null,
+                null,
+                'de-DE',
+                'de-DE'
+            );
 
+        $this->fieldProvider->expects($this->exactly(2))
+            ->method('getFields')
+            ->with($entityName, $withRelations)
+            ->willReturnOnConsecutiveCalls(
+                $expectedFields,
+                $expectedFieldsLocalized
+            );
+
+        // first result without locale
         $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
 
-        // do not call twice
+        // cached result without locale
         $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
+
+        // first result with locale
+        $this->assertEquals($expectedFieldsLocalized, $this->helper->getFields($entityName, $withRelations));
+
+        // cached result with locale
+        $this->assertEquals($expectedFieldsLocalized, $this->helper->getFields($entityName, $withRelations));
     }
 
     /**
