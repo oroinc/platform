@@ -884,6 +884,14 @@ class EntityFieldProvider
     }
 
     /**
+     * @return string|null
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
      * Translates the given message according to the set or default locale
      *
      * @param string $messageId
