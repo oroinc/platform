@@ -15,6 +15,8 @@ const TogglePaginationView = BaseView.extend({
 
     maxPageSize: void 0,
 
+    className: 'datagrid-toggle-pagination',
+
     translationPrefix: 'oro.datagrid.btn',
 
     template,
