@@ -3,17 +3,21 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Form\EventListener\GmailOAuthSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\OAuthSubscriber;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GmailOAuthSubscriberTest extends \PHPUnit\Framework\TestCase
+class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  GmailOAuthSubscriber */
+    /** @var  OAuthSubscriber */
     protected $listener;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
 
     protected function setUp(): void
     {
@@ -21,7 +25,10 @@ class GmailOAuthSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->expects($this->any())
             ->method('trans');
 
-        $this->listener = new GmailOAuthSubscriber($this->translator);
+        $this->oauthManagerRegistry = $this->getMockBuilder(OAuth2ManagerRegistry::class)
+            ->getMock();
+
+        $this->listener = new OAuthSubscriber($this->translator, $this->oauthManagerRegistry);
     }
 
     public function testExtendForm()
@@ -31,9 +38,6 @@ class GmailOAuthSubscriberTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $form->expects($this->exactly(2))
             ->method('add')
-            ->will($this->returnSelf());
-        $form->expects($this->once())
-            ->method('remove')
             ->will($this->returnSelf());
 
         $userEmailOrigin = new UserEmailOrigin();
@@ -50,9 +54,6 @@ class GmailOAuthSubscriberTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $form->expects($this->never())
             ->method('add')
-            ->will($this->returnSelf());
-        $form->expects($this->never())
-            ->method('remove')
             ->will($this->returnSelf());
 
         //test without origin

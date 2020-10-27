@@ -23,6 +23,14 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
                 messageType = 'error';
             }
             messenger.notificationMessage(messageType, message);
+
+            if (data.messages) {
+                _.each(data.messages, function(messages, type) {
+                    _.each(messages, function(message) {
+                        messenger.notificationMessage(type, message);
+                    });
+                });
+            }
         },
 
         handleDataTemplateDownloadErrorMessage: function() {

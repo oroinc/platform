@@ -2,16 +2,18 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Gmail Connection Controller
+ * Provides check-connection and access token endpoints for OAuth
+ * authentication and related services. Integration for Google
+ * application to support OAuth for Gmail IMAP/SMTP.
+ *
  * @Route("/gmail")
  */
-class GmailConnectionController extends Controller
+class GmailConnectionController extends AbstractVendorConnectionController
 {
     /**
      * @Route("/connection/check", name="oro_imap_gmail_connection_check", methods={"POST"})
@@ -19,25 +21,7 @@ class GmailConnectionController extends Controller
      */
     public function checkAction()
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
-        $formParentName = $request->get('formParentName');
-
-        try {
-            $form = $connectionControllerManager->getCheckGmailConnectionForm($request, $formParentName);
-
-            $response = [
-                'html' => $this->renderView('OroImapBundle:Connection:checkGmail.html.twig', [
-                    'form' => $form->createView(),
-                ])
-            ];
-        } catch (\Exception $e) {
-            $response = [
-                'error' => $e->getMessage()
-            ];
-        }
-
-        return new JsonResponse($response);
+        return $this->check($this->getRequestStack()->getCurrentRequest());
     }
 
     /**
@@ -45,16 +29,9 @@ class GmailConnectionController extends Controller
      */
     public function accessTokenAction()
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
-        try {
-            $response = $connectionControllerManager->getAccessToken($request->get('code'));
-        } catch (\Exception $e) {
-            $response = [
-                'error' => $e->getMessage()
-            ];
-        }
-
-        return new JsonResponse($response);
+        return $this->handleAccessToken(
+            $this->getRequestStack()->getCurrentRequest(),
+            AccountTypeModel::ACCOUNT_TYPE_GMAIL
+        );
     }
 }

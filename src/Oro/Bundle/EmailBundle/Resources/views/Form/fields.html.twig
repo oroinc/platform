@@ -194,7 +194,9 @@
     } %}
     <div class="folder-tree-widget"
          data-page-component-module="oroemail/js/app/components/folder-tree-component"
-         data-page-component-options="{{ options|json_encode }}">
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate"
+    >
         <label class="folder-label">
             <input class="check-all" type="checkbox">
             {{ "oro.email.imap.folder.checkAll"|trans }}

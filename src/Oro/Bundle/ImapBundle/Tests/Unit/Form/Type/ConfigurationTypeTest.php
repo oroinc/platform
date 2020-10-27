@@ -15,7 +15,10 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareInterface;
+use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareTrait;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
@@ -28,6 +31,7 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -36,23 +40,28 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 {
     const TEST_PASSWORD = 'somePassword';
 
+    use OauthManagerRegistryAwareTrait;
+
     /** @var SymmetricCrypterInterface */
     private $encryptor;
 
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenAccessorInterface|MockObject */
     private $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|MockObject */
     private $translator;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $configProvider;
 
-    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ImapSettingsChecker|MockObject */
     private $imapSettingsChecker;
 
-    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var SmtpSettingsChecker|MockObject */
     private $smtpSettingsChecker;
+
+    /** @var OAuth2ManagerRegistry|MockObject */
+    private $oauthManagerRegistry;
 
     protected function setUp(): void
     {
@@ -84,16 +93,24 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->imapSettingsChecker = $this->createMock(ImapSettingsChecker::class);
         $this->smtpSettingsChecker = $this->createMock(SmtpSettingsChecker::class);
+        $this->oauthManagerRegistry = $this->getManagerRegistryMock();
 
         parent::setUp();
     }
 
+
+
     /**
-     * {@inheritdoc}
+     * @return array|\Symfony\Component\Form\FormExtensionInterface[]
      */
     protected function getExtensions()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
+        $type = new ConfigurationType(
+            $this->encryptor,
+            $this->tokenAccessor,
+            $this->translator,
+            $this->oauthManagerRegistry
+        );
 
         return array_merge(
             parent::getExtensions(),
@@ -125,7 +142,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         $this->imapSettingsChecker->expects($this->any())
             ->method('checkConnection')
             ->willReturn(true);
-        /** @var SmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject $smtpSettingsFactory */
+        /** @var SmtpSettingsFactory|MockObject $smtpSettingsFactory */
         $smtpSettingsFactory = $this->createMock(SmtpSettingsFactory::class);
         $smtpSettingsFactory->expects($this->any())
             ->method('create')
@@ -164,12 +181,17 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
+            'accountType' => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
             'password' => self::TEST_PASSWORD,
         ];
         $form = $this->factory->create(ConfigurationType::class);
         $form->submit($formData);
 
         static::assertEquals('someHost', $form->get('imapHost')->getData());
+        static::assertEquals(
+            OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+            $form->get('accountType')->getData()
+        );
         static::assertEquals('123', $form->get('imapPort')->getData());
         static::assertEquals('', $form->get('smtpHost')->getData());
         static::assertEquals('', $form->get('smtpPort')->getData());
@@ -177,9 +199,12 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         static::assertEquals('ssl', $form->get('smtpEncryption')->getData());
         static::assertEquals('someUser', $form->get('user')->getData());
 
+        /** @var UserEmailOrigin $entity */
         $entity = $form->getData();
+        static::assertInstanceOf(UserEmailOrigin::class, $entity);
 
         static::assertEquals('someHost', $entity->getImapHost());
+        static::assertEquals(OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT, $entity->getAccountType());
         static::assertEquals('123', $entity->getImapPort());
         static::assertEquals('', $entity->getSmtpHost());
         static::assertEquals('', $entity->getSmtpPort());
@@ -222,6 +247,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'imapPort' => '123',
             'smtpHost' => '',
             'smtpPort' => '',
+            'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
@@ -297,6 +323,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
+                'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -327,6 +354,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
+                'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -358,6 +386,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'useImap' => 0,
                 'useSmtp' => 0,
                 'imapHost' => 'someHost',
+                'accountType' => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
@@ -389,6 +418,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapHost' => '',
                 'imapPort' => '',
                 'smtpHost' => '',
+                'type'     => '',
                 'smtpPort' => '',
                 'imapEncryption' => '',
                 'smtpEncryption' => '',
@@ -435,6 +465,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'imapPort' => '123',
             'smtpHost' => 'someSmtpHost',
             'smtpPort' => '456',
+            'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
@@ -464,7 +495,12 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
     public function testGetName()
     {
-        $type = new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator);
+        $type = new ConfigurationType(
+            $this->encryptor,
+            $this->tokenAccessor,
+            $this->translator,
+            $this->oauthManagerRegistry
+        );
         $this->assertEquals(ConfigurationType::NAME, $type->getName());
     }
 }

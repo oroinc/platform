@@ -1,6 +1,6 @@
 <fieldset class="form-horizontal">
     {% if form.imapAccountType.userEmailOrigin is defined %}
-        <div {{ block('widget_container_attributes') }}>
+        <div>
             {%- if form.imapAccountType.userEmailOrigin.parent is empty -%}
                 {{ form_errors(form.imapAccountType.userEmailOrigin) }}
             {%- endif -%}

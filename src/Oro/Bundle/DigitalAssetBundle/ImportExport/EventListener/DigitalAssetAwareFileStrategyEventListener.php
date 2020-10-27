@@ -82,10 +82,15 @@ class DigitalAssetAwareFileStrategyEventListener
     {
         $errors = [[]];
         $entity = $event->getEntity();
-        $relations = $this->getRelations($entity);
+        $entityClass = $this->doctrineHelper->getClass($entity);
+        $relations = $this->getRelations($entityClass);
         $itemData = (array)($event->getContext()->getValue('itemData') ?? []);
 
         foreach ($relations as $relation) {
+            if ($this->fieldHelper->isFieldExcluded($entityClass, $relation['name'], $itemData)) {
+                continue;
+            }
+
             $relatedEntityName = $relation['related_entity_name'];
 
             if (is_a($relatedEntityName, File::class, true)) {
@@ -109,13 +114,18 @@ class DigitalAssetAwareFileStrategyEventListener
     }
 
     /**
-     * @param object $entity
+     * @param string $entityClass
      *
      * @return array
      */
-    private function getRelations(object $entity): array
+    private function getRelations(string $entityClass): array
     {
-        return $this->fieldHelper->getRelations($this->doctrineHelper->getClass($entity), false, true, false);
+        return $this->fieldHelper->getRelations(
+            $entityClass,
+            false,
+            true,
+            false
+        );
     }
 
     /**

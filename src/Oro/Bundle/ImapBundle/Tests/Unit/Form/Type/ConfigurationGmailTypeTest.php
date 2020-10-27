@@ -9,6 +9,7 @@ use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -17,6 +18,8 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ConfigurationGmailTypeTest extends FormIntegrationTestCase
 {
@@ -32,6 +35,12 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     /** @var ConfigManager|MockObject */
     protected $userConfigManager;
 
+    /** @var MockObject|RequestStack */
+    protected $requestStack;
+
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
+
     protected function setUp(): void
     {
         $user = $this->getMockBuilder(User::class)
@@ -43,8 +52,19 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         $this->tokenAccessor->method('getUser')->willReturn($user);
         $this->tokenAccessor->method('getOrganization')->willReturn($organization);
 
-        $this->translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
-        $this->userConfigManager = $this->getMockBuilder(ConfigManager::class)->disableOriginalConstructor()->getMock();
+        $this->translator = $this
+            ->getMockBuilder(Translator::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->userConfigManager = $this
+            ->getMockBuilder(ConfigManager::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->requestStack = $this->createRequestStack();
+
+        $this->oauthManagerRegistry = $this->getMockBuilder(OAuth2ManagerRegistry::class)
+            ->getMock();
 
         $this->configProvider = $this
             ->getMockBuilder(ConfigProvider::class)
@@ -55,9 +75,46 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * @return MockObject|RequestStack
+     */
+    protected function createRequestStack(): MockObject
     {
-        $type = new ConfigurationGmailType($this->translator, $this->userConfigManager, $this->tokenAccessor);
+        $requestStack = $this
+            ->getMockBuilder(RequestStack::class)
+            ->getMock();
+
+        $requestMock = $this
+            ->getMockBuilder(Request::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $requestMock->expects($this->any())
+            ->method('isXmlHttpRequest')
+            ->willReturn(false);
+        $requestMock->expects($this->any())
+            ->method('get')
+            ->willReturn('sample');
+
+        $requestStack
+            ->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($requestMock);
+
+        return $requestStack;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions(): array
+    {
+        $type = new ConfigurationGmailType(
+            $this->translator,
+            $this->userConfigManager,
+            $this->tokenAccessor,
+            $this->requestStack,
+            $this->oauthManagerRegistry
+        );
 
         return array_merge(
             parent::getExtensions(),

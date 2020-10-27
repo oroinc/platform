@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener;
+namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\ImportExport\EventListener;
 
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -85,6 +85,45 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
     public function testWhenDamNotEnabled(): void
     {
+        $this->toggleDam(false);
+
+        $fieldName = 'avatar';
+        $existingUser = $this->getReference('user1');
+        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+
+        $file = new File();
+        $symfonyFile = new SymfonyFile(
+            (string) $this->getContainer()->get('kernel')
+                ->locateResource('@OroUserBundle/Tests/Functional/DataFixtures/files/empty.jpg')
+        );
+        $file->setFile($symfonyFile);
+        $user->setAvatar($file);
+
+        $context = $this->getContext([$fieldName => []]);
+        $event = $this->getEvent($context, $user);
+
+        $this->fileStrategyListener->onProcessBefore($event);
+
+        $existingUser->setAvatar($file);
+        $event->setEntity($existingUser);
+
+        $this->fileStrategyListener->onProcessAfter($event);
+        $this->listener->onProcessAfter($event);
+
+        $this->assertEmpty($context->getErrors());
+        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
+        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        $this->assertEmpty($existingUser->getAvatar()->getDigitalAsset());
+    }
+
+    public function testWhenFieldExcluded(): void
+    {
+        $this->toggleDam(true);
+
+        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $fieldConfig = $entityConfigManager->getFieldConfig('importexport', User::class, 'avatar');
+        $fieldConfig->set('excluded', true);
+
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
         $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
