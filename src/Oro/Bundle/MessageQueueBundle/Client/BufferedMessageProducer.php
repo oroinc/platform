@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Client;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
@@ -19,6 +20,9 @@ class BufferedMessageProducer implements MessageProducerInterface
     /** @var array [[topic, message], ...] */
     private $buffer = [];
 
+    /** @var FeatureChecker */
+    private $featureChecker;
+
     /** @var bool */
     private $bufferEnabled = false;
 
@@ -31,10 +35,22 @@ class BufferedMessageProducer implements MessageProducerInterface
     }
 
     /**
+     * @param FeatureChecker $featureChecker
+     */
+    public function setFeatureChecker(FeatureChecker $featureChecker)
+    {
+        $this->featureChecker = $featureChecker;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function send($topic, $message)
     {
+        if ($this->featureChecker && !$this->featureChecker->isResourceEnabled($topic, 'mq_topics')) {
+            return;
+        }
+
         if ($this->bufferEnabled) {
             $this->buffer[] = [$topic, $message];
         } else {
