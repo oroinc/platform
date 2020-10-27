@@ -38,12 +38,14 @@ services:
             - { name: oro_entity.database_checker }
 
     oro_entity_config.config_model_manager:
-        public: false
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager
         arguments:
             - '@oro_entity_config.link.entity_manager'
             - '@oro_entity_config.config_model_lock_object'
             - '@oro_entity_config.database_checker'
+
+    Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager:
+        alias: oro_entity_config.config_model_manager
 
     oro_entity_config.attribute.config_model_manager:
         alias: oro_entity_config.config_model_manager
@@ -239,22 +241,26 @@ services:
 
     oro_entity_config.form.handler.create_update_config_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler
-        public: true
         arguments:
             - '@oro_entity_config.form.handler.config_helper_handler'
             - '@oro_entity_config.config_manager'
             - '@oro_entity_config.config.config_helper'
             - '@oro_entity_extend.form.util.field_session_storage'
 
+    Oro\Bundle\EntityConfigBundle\Form\Handler\CreateUpdateConfigFieldHandler:
+        alias: oro_entity_config.form.handler.create_update_config_field_handler
+
     oro_entity_config.form.handler.remove_restore_field_handler:
         class: Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler
-        public: true
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.extend.field_name_validation_helper'
             - '@oro_entity_config.config.config_helper'
             - '@session'
             - '@doctrine'
+
+    Oro\Bundle\EntityConfigBundle\Form\Handler\RemoveRestoreConfigFieldHandler:
+        alias: oro_entity_config.form.handler.remove_restore_field_handler
 
     oro_entity_config.config.config_helper:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigHelper

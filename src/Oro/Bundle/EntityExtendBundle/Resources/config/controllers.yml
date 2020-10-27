@@ -12,3 +12,9 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: 'oro_entity_config.provider.entity' }
+
+    Oro\Bundle\EntityExtendBundle\Controller\ConfigFieldGridController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
