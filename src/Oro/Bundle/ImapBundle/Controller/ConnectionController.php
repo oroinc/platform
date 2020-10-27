@@ -40,7 +40,7 @@ class ConnectionController extends Controller
         $data = null;
         $id = $request->get('id', false);
         if (false !== $id) {
-            $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
+            $data = $this->getDoctrine()->getRepository(UserEmailOrigin::class)->find($id);
         }
 
         $form = $this->createForm(
@@ -83,7 +83,7 @@ class ConnectionController extends Controller
         $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
 
         if ($token) {
-            $html = $this->renderView('OroImapBundle:Form:accountTypeGmail.html.twig', [
+            $html = $this->renderView('OroImapBundle:Form:accountTypeAuthorized.html.twig', [
                 'form' => $form->createView(),
             ]);
         } else {

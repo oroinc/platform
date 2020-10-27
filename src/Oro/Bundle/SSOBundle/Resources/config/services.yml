@@ -1,5 +1,6 @@
 parameters:
     hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
+    hwi_oauth.resource_owner.office365.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\Office365ResourceOwner
 
 services:
     oro_sso.oauth_provider:

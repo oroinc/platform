@@ -8,6 +8,17 @@ oro.imap:
         smtp:
             success: SMTP connection is established successfully
             error:   Could not establish the SMTP connection
+        microsoft.oauth:
+            popup.title: Authentication
+            error:
+                emptyClientId: Application (client) ID parameter value is empty in the Azure Active Directory Application Settings. Please, configure Microsoft settings in the application system configuration to proceed with Microsoft OAuth.
+                emptyTenant: Directory (tenant) ID value is empty in the Azure Active Directory Application Settings. Please, configure Microsoft settings in the application system configuration to proceed with Microsoft OAuth.
+                emptySecret: Client Secret value is empty in the Azure Active Directory Application Settings. Please, configure Microsoft settings in the application system configuration to proceed with Microsoft OAuth.
+                access_deny: Access deny
+                request: Something has gone wrong.
+                closed_auth: Something has gone wrong. Please address your administrator to check the API key settings.
+                blocked_popup: Something has gone wrong. Please make sure that pop-ups are enabled.
+                token: Invalid token data or no token data available.
         google.oauth:
             error:
                 emptyClientId: Client id parameter value is empty in the Google Integration Settings. Please, configure Google settings in the application system configuration to proceed with Google OAuth.

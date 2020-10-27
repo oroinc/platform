@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class HwiConfigurationPass implements CompilerPassInterface
 {
-    private const RESOURCE_OWNERS = ['google'];
+    private const RESOURCE_OWNERS = ['google', 'office365'];
 
     /**
      * {@inheritdoc}
@@ -22,8 +22,9 @@ class HwiConfigurationPass implements CompilerPassInterface
         foreach (self::RESOURCE_OWNERS as $owner) {
             $id = sprintf('hwi_oauth.resource_owner.%s', $owner);
             if ($container->hasDefinition($id)) {
-                $container->findDefinition($id)
-                    ->addMethodCall('configureCredentials', [new Reference('oro_config.global')]);
+                $definition = $container->findDefinition($id);
+                $definition->addMethodCall('setCrypter', [new Reference('oro_security.encoder.default')]);
+                $definition->addMethodCall('configureCredentials', [new Reference('oro_config.global')]);
             }
         }
 

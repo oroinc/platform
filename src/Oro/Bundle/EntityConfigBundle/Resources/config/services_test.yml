@@ -3,3 +3,11 @@ services:
         class: Oro\Bundle\EntityConfigBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
+
+    oro_entity_config.provider.export_query_tuple_length.test:
+        parent: oro_entity_config.provider.export_query_tuple_length
+        public: true
+
+    oro_importexport.reader.entity.test:
+        parent: oro_importexport.reader.entity
+        public: true

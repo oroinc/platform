@@ -117,6 +117,10 @@ class FeatureToggleConfiguration implements ConfigurationInterface
                 ->prototype('variable')
                 ->end()
             ->end()
+            ->arrayNode('mq_topics')
+                ->prototype('variable')
+                ->end()
+            ->end()
             ->scalarNode('strategy')
                 ->validate()
                     ->ifNotInArray(
