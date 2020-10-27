@@ -13,6 +13,8 @@ const TogglePaginationView = BaseView.extend({
 
     grid: null,
 
+    className: 'datagrid-toggle-group',
+
     defaultGroupState: false, // ungrouped by default
 
     translationPrefix: 'oro.datagrid.btn',
