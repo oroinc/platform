@@ -85,6 +85,12 @@ class FieldHelper
         $translate = true
     ) {
         $args = func_get_args();
+
+        $locale = $this->fieldProvider->getLocale();
+        if ($translate && null !== $locale) {
+            $args[] = $locale;
+        }
+
         $cacheKey = implode(':', $args);
         if (!array_key_exists($cacheKey, $this->fieldsCache)) {
             $this->fieldsCache[$cacheKey] = $this->fieldProvider->getFields(
@@ -168,7 +174,13 @@ class FieldHelper
      */
     protected function getCacheKey($entityName, $fieldName)
     {
-        return $entityName . ':' . $fieldName;
+        $args = [$entityName, $fieldName];
+
+        if (null !== $this->fieldProvider->getLocale()) {
+            $args[] = $this->fieldProvider->getLocale();
+        }
+
+        return implode(':', $args);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Client;
 
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -13,6 +14,9 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $inner;
 
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
+
     /** @var BufferedMessageProducer */
     private $producer;
 
@@ -22,6 +26,8 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->inner = $this->createMock(MessageProducerInterface::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->producer = new BufferedMessageProducer($this->inner);
     }
 
@@ -107,5 +113,43 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     {
         $this->producer->disableBuffering();
         $this->producer->clearBuffer();
+    }
+
+    public function testSendWithFeatureCheckerResourceEnabled()
+    {
+        $topic = 'topic1';
+        $message = 'message';
+
+        $this->producer->setFeatureChecker($this->featureChecker);
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($topic, 'mq_topics')
+            ->willReturn(true);
+
+        $this->inner->expects($this->once())
+            ->method('send')
+            ->with($topic, $message);
+
+        $this->producer->disableBuffering();
+        $this->producer->send($topic, $message);
+    }
+
+    public function testSendWithFeatureCheckerResourceDisabled()
+    {
+        $topic = 'topic1';
+        $message = 'message';
+
+        $this->producer->setFeatureChecker($this->featureChecker);
+        $this->featureChecker->expects($this->once())
+            ->method('isResourceEnabled')
+            ->with($topic, 'mq_topics')
+            ->willReturn(false);
+
+        $this->inner->expects($this->never())
+            ->method('send')
+            ->with($topic, $message);
+
+        $this->producer->disableBuffering();
+        $this->producer->send($topic, $message);
     }
 }

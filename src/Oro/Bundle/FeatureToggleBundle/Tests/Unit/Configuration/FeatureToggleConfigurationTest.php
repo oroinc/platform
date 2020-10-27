@@ -49,6 +49,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'workflows' => [],
                 'processes' => [],
                 'placeholder_items' => [],
+                'mq_topics' => []
             ]
         ];
 
@@ -78,6 +79,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'workflows' => ['workflow1', 'workflow2'],
                 'processes' => ['processe1', 'processe2'],
                 'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
+                'mq_topics' => ['mq.topic1', 'mq.topic2']
             ],
         ];
 
@@ -103,6 +105,7 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'workflows' => ['workflow1', 'workflow2'],
                 'processes' => ['processe1', 'processe2'],
                 'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
+                'mq_topics' => ['mq.topic1', 'mq.topic2']
             ]
         ];
 
