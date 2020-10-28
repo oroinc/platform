@@ -370,6 +370,17 @@ define(function(require, exports, module) {
         },
 
         /**
+         * Compare values
+         *
+         * @param {*} newValue
+         * @param {*} oldValue
+         * @returns {boolean}
+         */
+        isUpdatable(newValue, oldValue) {
+            return true;
+        },
+
+        /**
          * Compares current value with empty value
          *
          * @return {Boolean}

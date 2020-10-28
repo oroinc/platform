@@ -663,8 +663,15 @@ define(function(require, exports, module) {
         /**
          * @inheritDoc
          */
+        isUpdatable: function(newValue, oldValue) {
+            return !tools.isEqualsLoosely(newValue, oldValue);
+        },
+
+        /**
+         * @inheritDoc
+         */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+            if (this.isUpdatable(newValue, oldValue)) {
                 const start = this.subview('start');
                 const end = this.subview('end');
                 if (start && start.updateFront) {

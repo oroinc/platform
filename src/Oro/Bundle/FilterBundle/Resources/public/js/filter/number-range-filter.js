@@ -201,34 +201,10 @@ define(function(require) {
         _updateRangeFilter: function(value) {
             value = this._formatRawValue(value);
             const oldValue = tools.deepClone(value);
-            if (this.isApplicable(value.type)) {
-                if (value.value && value.value_end) {
-                    // if both values are filled
-                    // start/end values if end value is lower than start
-                    if (value.value_end < value.value) {
-                        const endValue = value.value_end;
-                        value.value_end = value.value;
-                        value.value = endValue;
-                    }
-                } else {
-                    if (value.value || value.value_end) {
-                        const type = parseInt(value.type);
-                        // if only one value is filled, replace filter type to less than or more than
-                        if (value.value_end) {
-                            value.type = type === this.typeValues.between
-                                ? this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
-                            value.value = value.value_end;
-                            value.value_end = '';
-                        } else {
-                            value.type = type === this.typeValues.between
-                                ? this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
-                        }
-                    }
-                }
-                if (!tools.isEqualsLoosely(value, oldValue)) {
-                    // apply new values and filter type
-                    this.setValue(value);
-                }
+            value = this.swapValues(value);
+            if (this.isApplicable(value.type) && !tools.isEqualsLoosely(value, oldValue)) {
+                // apply new values and filter type
+                this.setValue(value);
             }
         },
 
@@ -276,6 +252,34 @@ define(function(require) {
             const data = NumberRangeFilter.__super__._readDOMValue.call(this);
 
             data.value_end = this._getInputValue(this.criteriaValueSelectors.value_end);
+
+            return data;
+        },
+
+        swapValues(data) {
+            if (data.value && data.value_end) {
+                // if both values are filled
+                // start/end values if end value is lower than start
+                if (data.value_end < data.value) {
+                    const endValue = data.value_end;
+                    data.value_end = data.value;
+                    data.value = endValue;
+                }
+            } else {
+                if (data.value || data.value_end) {
+                    const type = parseInt(data.type);
+                    // if only one value is filled, replace filter type to less than or more than
+                    if (data.value_end) {
+                        data.type = type === this.typeValues.between
+                            ? this.fallbackTypeValues.lessThan : this.fallbackTypeValues.moreThan;
+                        data.value = data.value_end;
+                        data.value_end = '';
+                    } else {
+                        data.type = type === this.typeValues.between
+                            ? this.fallbackTypeValues.moreThan : this.fallbackTypeValues.lessThan;
+                    }
+                }
+            }
 
             return data;
         },

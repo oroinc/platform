@@ -182,6 +182,7 @@ define(function(require) {
          * @protected
          */
         _hideCriteria: function() {
+            this.trigger('hideCriteria', this);
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {

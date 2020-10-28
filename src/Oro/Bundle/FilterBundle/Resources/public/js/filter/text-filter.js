@@ -127,6 +127,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
+            this._onValueChanged();
+
             if (e.which !== 13) {
                 return;
             }
@@ -180,7 +182,6 @@ define(function(require, exports, module) {
         _isDOMValueChanged: function() {
             const thisDOMValue = this._readDOMValue();
             return (
-                !_.isEmpty(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.value) &&
                 !_.isNull(thisDOMValue.value) &&
                 !_.isEqual(this.value, thisDOMValue)
@@ -350,6 +351,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _hideCriteria: function() {
+            this.trigger('hideCriteria', this);
             this.$(this.criteriaSelector).css({
                 marginLeft: '-9999px',
                 visibility: 'hidden'
