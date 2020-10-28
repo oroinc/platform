@@ -1,0 +1,111 @@
+/* @theme: blank; */
+
+// Use: @include flexible-arrow();
+@mixin flexible-arrow(
+    $arrow-height: 10px,
+    $arrow-width: 11px,
+    $arrow-offset: -5px,
+    $arrow-placeholder: 8px,
+    $arrow-box-shadow: 0 0 0 1px $dropdown-border-color,
+    $arrow-transform: rotate(53deg) skewX(15deg),
+    $arrow-placement-end-transform: rotate(145deg) skewX(15deg),
+    $arrow-placement-start-transform: rotate(145deg) skewX(15deg),
+) {
+    &:before {
+        position: absolute;
+
+        height: $arrow-placeholder;
+        width: 100%;
+
+        content: '';
+    }
+
+    &:after {
+        position: absolute;
+        top: 0;
+        #{$end}: 0;
+        bottom: 0;
+        border: 0 none;
+        #{$start}: 0;
+        z-index: z('hidden');
+
+        background: inherit;
+        border-radius: inherit;
+
+        content: '';
+    }
+
+    .arrow {
+        position: absolute;
+        z-index: z('hidden');
+
+        width: $arrow-width;
+        height: $arrow-height;
+
+        border: 0 none;
+        background: inherit;
+        box-shadow: $arrow-box-shadow;
+
+        transform: $arrow-transform;
+    }
+
+    &[x-placement^="top"] {
+        margin-bottom: $arrow-placeholder;
+
+        &:before {
+            top: 100%;
+        }
+
+        .arrow {
+            bottom: $arrow-offset;
+        }
+    }
+
+    &[x-placement^="#{$end}"] {
+        margin-#{$start}: $arrow-placeholder;
+
+        &:before {
+            top: 0;
+            #{$end}: 100%;
+
+            height: 100%;
+            width: $arrow-placeholder;
+        }
+
+        .arrow {
+            #{$start}: $arrow-offset;
+
+            transform: $arrow-placement-end-transform;
+        }
+    }
+
+    &[x-placement^="bottom"] {
+        margin-top: $arrow-placeholder;
+
+        &:before {
+            bottom: 100%;
+        }
+
+        .arrow {
+            top: $arrow-offset;
+        }
+    }
+
+    &[x-placement^="#{$start}"] {
+        margin-right: $arrow-placeholder;
+
+        &:before {
+            top: 0;
+            #{$start}: 100%;
+
+            width: $arrow-placeholder;
+            height: 100%;
+        }
+
+        .arrow {
+            #{$end}: $arrow-offset;
+
+            transform: $arrow-placement-start-transform;
+        }
+    }
+}

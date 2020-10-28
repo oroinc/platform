@@ -307,6 +307,7 @@ define(function(require, exports, module) {
                         return this.closeAfterChose;
                     }, this),
                     close: _.bind(function() {
+                        this.trigger('hideCriteria', this);
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         if (!this.disposed) {
                             this.selectDropdownOpened = false;
@@ -434,6 +435,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _onSelectChange: function() {
+            this._onValueChanged();
             // set value
             this.applyValue();
             // update dropdown

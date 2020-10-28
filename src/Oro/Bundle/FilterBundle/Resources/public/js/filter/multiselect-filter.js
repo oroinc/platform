@@ -143,6 +143,15 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        _formatRawValue(value) {
+            const formatted = MultiSelectFilter.__super__._formatRawValue.call(this, value);
+
+            return this._normalizeValue(formatted);
+        },
+
+        /**
          * @param {Array} value
          * @param {Array} choices
          * @returns {Array}
