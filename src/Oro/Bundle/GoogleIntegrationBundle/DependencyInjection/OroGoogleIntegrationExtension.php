@@ -2,28 +2,22 @@
 
 namespace Oro\Bundle\GoogleIntegrationBundle\DependencyInjection;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroGoogleIntegrationExtension extends Extension
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $config = $this->processConfiguration(new Configuration(), $configs);
+        $serviceLoader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $serviceLoader->load('services.yml');
 
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
-    }
-
-    /**
-     * Get alias
-     *
-     * @return string
-     */
-    public function getAlias()
-    {
-        return 'oro_google_integration';
     }
 }

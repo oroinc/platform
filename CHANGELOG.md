@@ -9,6 +9,11 @@ The current file describes significant changes in the code that may affect the u
 #### ScopeBundle
 * TRIGGER database privilege became required
 
+#### SSOBundle
+* The configuration option `oro_sso.enable_google_sso` was renamed to `oro_google_integration.enable_sso`.
+* The configuration option `oro_sso.domains` was renamed to `oro_google_integration.sso_domains`.
+* The service `oro_sso.oauth_provider` was renamed to `oro_sso.oauth_user_provider`.
+
 #### DataGridBundle
 * The maximum number of items can be deleted at once during mass delete process was decreased to 100.
 

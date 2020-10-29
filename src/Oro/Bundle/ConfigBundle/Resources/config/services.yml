@@ -183,3 +183,9 @@ services:
             - '@oro_config.manager'
         tags:
             - { name: oro_config.configuration_search_provider, priority: -10 }
+
+    oro_config.placeholder.filter:
+        class: Oro\Bundle\ConfigBundle\Placeholder\PlaceholderFilter
+        public: true
+        arguments:
+            - "@oro_config.user"
