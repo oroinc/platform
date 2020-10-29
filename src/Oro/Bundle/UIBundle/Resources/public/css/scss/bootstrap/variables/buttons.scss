@@ -209,35 +209,3 @@ $btn-theme-square-keys: map-merge(
     ),
     $btn-theme-square-keys
 );
-
-$btn-brand-google-base-color: #dc4e41 !default;
-$btn-brand-google-padding-left: 40px !default;
-
-$btn-brand-google-before-content: '\f0d5' !default;
-$btn-brand-google-before-font-family: 'FontAwesome' !default;
-$btn-brand-google-before-font-size: 16px !default;
-$btn-brand-google-before-position: absolute !default;
-$btn-brand-google-before-top: 50% !default;
-$btn-brand-google-before-left: 16px !default;
-$btn-brand-google-before-transform: translate(0, -50%) !default;
-
-$btn-brand-google: (
-    'background': $btn-brand-google-base-color,
-    'border': $btn-brand-google-base-color,
-    'color': $primary-inverse,
-    'hover-background': darken($btn-brand-google-base-color, 5%),
-    'hover-border': darken($btn-brand-google-base-color, 5%),
-    'hover-color': $primary-inverse,
-    'active-background': lighten($btn-brand-google-base-color, 25%),
-    'active-border': darken($btn-brand-google-base-color, 5%),
-    'active-color': darken($btn-brand-google-base-color, 5%),
-    'active-box-shadow': none
-) !default;
-
-$btn-brand-keys: () !default;
-$btn-brand-keys: map-merge(
-    (
-        'google': $btn-brand-google
-    ),
-    $btn-brand-keys
-);
