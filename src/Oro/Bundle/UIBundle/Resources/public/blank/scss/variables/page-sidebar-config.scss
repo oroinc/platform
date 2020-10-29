@@ -3,6 +3,8 @@
 $page-sidebar-width: 255px !default;
 $page-sidebar-inner-offset: 0 $offset-x 0 0 !default;
 $page-sidebar-order: 1 !default;
+$page-sidebar-display: flex !default;
+$page-sidebar-flex-direction: column !default;
 $page-sidebar-flex: none !default;
 
 $page-sidebar-right-inner-offset: 0 0 0 $offset-x !default;

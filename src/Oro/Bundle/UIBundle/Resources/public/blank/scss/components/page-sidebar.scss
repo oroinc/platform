@@ -3,6 +3,8 @@
 .page-sidebar {
     width: $page-sidebar-width;
     padding: $page-sidebar-inner-offset;
+    display: $page-sidebar-display;
+    flex-direction: $page-sidebar-flex-direction;
 
     order: $page-sidebar-order;
     flex: $page-sidebar-flex;
