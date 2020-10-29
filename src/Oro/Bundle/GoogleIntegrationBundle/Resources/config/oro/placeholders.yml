@@ -1,0 +1,10 @@
+placeholders:
+    placeholders:
+        oro_user_login_form:
+            items:
+                google_oauth_login: ~
+
+    items:
+        google_oauth_login:
+            template: OroGoogleIntegrationBundle::oauthLogin.html.twig
+            applicable: "@oro_config.placeholder.filter->isEnabled(oro_google_integration.enable_sso)"

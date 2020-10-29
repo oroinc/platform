@@ -1,0 +1,18 @@
+/* @theme: admin.oro; */
+
+@import "oroui/css/scss/variables";
+
+$btn-brand-google-base-color: #dc4e41 !default;
+
+$btn-brand-google: (
+    'background': $btn-brand-google-base-color,
+    'border': $btn-brand-google-base-color,
+    'color': $primary-inverse,
+    'hover-background': darken($btn-brand-google-base-color, 5%),
+    'hover-border': darken($btn-brand-google-base-color, 5%),
+    'hover-color': $primary-inverse,
+    'active-background': lighten($btn-brand-google-base-color, 25%),
+    'active-border': darken($btn-brand-google-base-color, 5%),
+    'active-color': darken($btn-brand-google-base-color, 5%),
+    'active-box-shadow': none
+) !default;
