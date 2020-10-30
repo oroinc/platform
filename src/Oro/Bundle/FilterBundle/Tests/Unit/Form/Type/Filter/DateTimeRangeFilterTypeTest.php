@@ -63,6 +63,7 @@ class DateTimeRangeFilterTypeTest extends AbstractDateTypeTestCase
             [
                 'defaultOptions' => [
                     'field_type' => DateTimeRangeType::class,
+                    'time_zone' => 'UTC',
                     'widget_options' => [
                         'showDatevariables' => true,
                         'showTime'          => true,
