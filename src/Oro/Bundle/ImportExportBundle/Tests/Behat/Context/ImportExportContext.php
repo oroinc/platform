@@ -211,12 +211,12 @@ class ImportExportContext extends OroFeatureContext implements
         $this->template = $this->getTempFilePath('import_template_');
 
         $cookieJar = $this->getCookieJar($this->getSession());
-        $client = new Client([
+        $client = new Client();
+        $response = $client->request('GET', $url, [
             'allow_redirects' => true,
             'cookies' => $cookieJar,
-            'save_to' => $this->template
+            'sink' => $this->template
         ]);
-        $response = $client->get($url);
 
         self::assertEquals(200, $response->getStatusCode());
 
@@ -970,7 +970,7 @@ class ImportExportContext extends OroFeatureContext implements
         $client = new Client([
             'allow_redirects' => true,
             'cookies' => $cookieJar,
-            'save_to' => $filePath,
+            'sink' => $filePath
         ]);
 
         $this->spin(static function () use ($client, $exportFileUrl, &$response) {

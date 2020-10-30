@@ -87,14 +87,14 @@ class UserEmailOrigin extends EmailOrigin
     /**
      * @var string
      *
-     * @ORM\Column(name="access_token", type="string", length=255, nullable=true)
+     * @ORM\Column(name="access_token", type="string", length=2048, nullable=true)
      */
     protected $accessToken;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="refresh_token", type="string", length=255, nullable=true)
+     * @ORM\Column(name="refresh_token", type="string", length=2048, nullable=true)
      */
     protected $refreshToken;
 
@@ -107,8 +107,20 @@ class UserEmailOrigin extends EmailOrigin
 
     /**
      * @var string
+     *
+     * @ORM\Column(name="account_type", type="string", length=255, nullable=false, options={"default" = "other"})
+     */
+    protected $accountType = 'other';
+
+    /**
+     * @var string
      */
     protected $clientId;
+
+    /**
+     * @var string
+     */
+    protected $tenant;
 
     /**
      * Gets the host name of IMAP server
@@ -299,6 +311,28 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
+     * Returns type.
+     *
+     * @return string|null
+     */
+    public function getAccountType(): ?string
+    {
+        return $this->accountType;
+    }
+
+    /**
+     * Sets type
+     *
+     * @param string $accountType
+     * @return UserEmailOrigin
+     */
+    public function setAccountType(string $accountType): UserEmailOrigin
+    {
+        $this->accountType = $accountType;
+        return $this;
+    }
+
+    /**
      * Check is configured smtp.
      *
      * @return bool
@@ -366,7 +400,7 @@ class UserEmailOrigin extends EmailOrigin
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAccessToken()
     {
@@ -439,5 +473,26 @@ class UserEmailOrigin extends EmailOrigin
     public function getClientId()
     {
         return $this->clientId;
+    }
+
+    /**
+     * Sets tenant
+     *
+     * @param string $tenant
+     */
+    public function setTenant($tenant)
+    {
+        $this->tenant = $tenant;
+        return $this;
+    }
+
+    /**
+     * Returns tenant
+     *
+     * @return string
+     */
+    public function getTenant()
+    {
+        return $this->tenant;
     }
 }

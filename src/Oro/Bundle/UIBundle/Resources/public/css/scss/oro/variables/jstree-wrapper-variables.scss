@@ -5,6 +5,14 @@ $jstree-wrapper-min-height: 200px !default;
 $jstree-wrapper-inner-offset: 10px 0 !default;
 $jstree-wrapper-width: 100% !default;
 
+$jstree-wrapper-inner-height: 100% !default;
+$jstree-wrapper-inner-display: flex !default;
+$jstree-wrapper-inner-flex-direction: column !default;
+
+$jstree-wrapper-content-min-height: 0 !default;
+$jstree-wrapper-content-display: flex !default;
+$jstree-wrapper-content-flex-direction: column !default;
+
 $jstree-wrapper-title-display: flex !default;
 $jstree-wrapper-title-align-items: center !default;
 $jstree-wrapper-title-justify-content: space-between !default;
@@ -25,6 +33,7 @@ $jstree-wrapper-checkbox-display: none !default;
 $jstree-wrapper-jstree-offset: 8px 0 !default;
 $jstree-wrapper-jstree-outline: none !default;
 
+$content-with-sidebar-jstree-wrapper-height: 100% !default;
 $content-with-sidebar-jstree-wrapper-inner-offset: 0 $content-padding !default;
+$sidebar-container-content-with-sidebar-jstree-wrapper-min-height: 0 !default;
 $sidebar-container-content-with-sidebar-jstree-wrapper-overflow: auto !default;
-

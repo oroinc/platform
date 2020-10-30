@@ -11,7 +11,7 @@
 }) %}
 
 <div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
-    <div data-page-component-view="{{ data.treeOptions|json_encode }}">
+    <div class="jstree-wrapper__inner" data-page-component-view="{{ data.treeOptions|json_encode }}">
         <div class="jstree-wrapper__title">
             {% block header %}
                 {% block label %}
@@ -33,7 +33,7 @@
                 {% endblock actions %}
             {% endblock header %}
         </div>
-        <div data-collapse-container>
+        <div class="jstree-wrapper__content" data-collapse-container>
             {% block content %}
                 {% block search %}
                     {% if not data.disableSearch %}

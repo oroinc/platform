@@ -14,23 +14,35 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 class UserEmailOriginRepository extends EntityRepository
 {
     /**
+     * @param string $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithAccessTokens()
+    public function getAllOriginsWithAccessTokens(string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.accessToken'));
+        if (null !== $type) {
+            $queryBuilder
+                ->andWhere('user_email_origin.accountType = :typeName')
+                ->setParameter('typeName', $type);
+        }
 
         return $queryBuilder;
     }
 
     /**
+     * @param string $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithRefreshTokens()
+    public function getAllOriginsWithRefreshTokens(string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.refreshToken'));
+        if (null !== $type) {
+            $queryBuilder
+                ->andWhere('user_email_origin.accountType = :typeName')
+                ->setParameter('typeName', $type);
+        }
 
         return $queryBuilder;
     }

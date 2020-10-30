@@ -32,7 +32,7 @@ default: &default
                 handlers:
                     local:
                         directory: '%paths.base%/public/uploads/behat'
-                        base_url: '%mink.base_url%/uploads/behat'
+                        base_url: '%mink.base_url%/uploads/behat/'
                         auto_clear: false
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext

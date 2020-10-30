@@ -70,11 +70,11 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
     {
         $this->client->setResponseList([
             '/foo' => new Response(200),
-            '/bar' => new Response(302),
+            '/bar' => new Response(304),
         ]);
 
         $this->assertCorrectRestResponse(200, $this->client->get(self::FAKE_RESOURCE));
-        $this->assertCorrectRestResponse(302, $this->client->get('/bar'));
+        $this->assertCorrectRestResponse(304, $this->client->get('/bar'));
     }
 
     /**

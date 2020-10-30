@@ -2,33 +2,40 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
+/**
+ * Defines user email configuration/email settings form
+ */
 class EmailSettingsType extends AbstractType
 {
-    /** ConfigManager */
-    protected $userConfigManager;
-
     /** UserImapConfigSubscriber */
     protected $subscriber;
 
+    /** @var OAuth2ManagerRegistry */
+    protected $oauthManagerRegistry;
+
     /**
-     * @param ConfigManager $userConfigManager
      * @param UserImapConfigSubscriber $subscriber
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
-        ConfigManager            $userConfigManager,
-        UserImapConfigSubscriber $subscriber
+        UserImapConfigSubscriber $subscriber,
+        OAuth2ManagerRegistry    $oauthManagerRegistry
     ) {
-        $this->userConfigManager = $userConfigManager;
         $this->subscriber = $subscriber;
+        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**
@@ -50,7 +57,7 @@ class EmailSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->subscriber);
-        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
+        if ($this->oauthManagerRegistry->isOauthImapEnabled()) {
             $builder->add(
                 'imapAccountType',
                 ChoiceAccountType::class,
@@ -60,6 +67,7 @@ class EmailSettingsType extends AbstractType
                 ]
             );
         } else {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, $this->getUserOriginListener());
             $builder->add(
                 'imapConfiguration',
                 ConfigurationType::class,
@@ -69,6 +77,55 @@ class EmailSettingsType extends AbstractType
                 ]
             );
         }
+    }
+
+    /**
+     * Returns callable for checking if exisitng origin method was disabled.
+     * Related form remains then, though with non-active CTAs
+     *
+     * @return callable
+     */
+    protected function getUserOriginListener(): callable
+    {
+        return function (FormEvent $event) {
+            $form = $event->getForm();
+            /** @var User|null $user */
+            $user = $event->getData();
+            if (null === $user || !($user instanceof User)) {
+                return;
+            }
+            if ($this->isApplicableAccountType($user)) {
+                $form->remove('imapConfiguration');
+                if (!$form->has('imapAccountType')) {
+                    $form->add(
+                        'imapAccountType',
+                        ChoiceAccountType::class,
+                        [
+                            'label' => false,
+                            'constraints' => [new Valid()]
+                        ]
+                    );
+                }
+            }
+        };
+    }
+
+    /**
+     * Provides dropdown for OAUth account types and
+     * cleanup calls - non-persisted user
+     *
+     * @param User $user
+     * @return bool
+     */
+    private function isApplicableAccountType(User $user): bool
+    {
+        if (!$user->getId()) {
+            $origin = $user->getImapConfiguration();
+            return !$origin || !$origin->getPassword();
+        }
+        $origin = $user->getImapConfiguration();
+
+        return (null !== $origin) && $origin->getAccountType() !== AccountTypeModel::ACCOUNT_TYPE_OTHER;
     }
 
     /**
