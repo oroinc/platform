@@ -58,7 +58,7 @@ define(function(require) {
 
             /**
              * Precision could be null in two cases:
-             * 1. Field is supposed t obe integer so we should not change number type to text in this case
+             * 1. Field is supposed to be integer so we should not change number type to text in this case
              * 2. Precision was not set, yet in this case we should not change input type before
              * the correct precision will be set to not trigger: _normalizeNumberFieldValue
              */
@@ -79,8 +79,10 @@ define(function(require) {
              */
             if (oldType === 'number') {
                 const value = this.$el.val();
-                if (value !== '' && value !== null && value!==undefined) {
-                    const localizedFloat = NumberFormatter.formatDecimal(value);
+                if (value !== '' && value !== null && value !== void 0) {
+                    const localizedFloat = NumberFormatter.formatDecimal(value, {
+                        max_fraction_digits: this.precision
+                    });
                     this.$el.val(localizedFloat);
                 }
             }
