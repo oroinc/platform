@@ -19,6 +19,9 @@ class DateFilterModifier
     /** @var Compiler */
     protected $dateCompiler;
 
+    /** @var null|string  */
+    protected $timeZone = null;
+
     /** @var array */
     protected static $partFormatsMap = [
         DateModifierInterface::PART_MONTH => 'm',
@@ -113,7 +116,7 @@ class DateFilterModifier
             ? $data['value']['start']
             : $data['value']['end'];
         if ($date && !$date instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($date, true);
+            $result = $this->dateCompiler->compile($date, true, $this->getTimeZone());
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -192,7 +195,7 @@ class DateFilterModifier
     {
         $endDate = $data['value']['end'];
         if ($endDate && !$endDate instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($endDate, true);
+            $result = $this->dateCompiler->compile($endDate, true, $this->getTimeZone());
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -230,7 +233,7 @@ class DateFilterModifier
         if (isset($data['part'])) {
             foreach ($data['value'] as $field) {
                 if ($field && !$field instanceof \DateTime) {
-                    $result = $this->dateCompiler->compile($field, true);
+                    $result = $this->dateCompiler->compile($field, true, $this->getTimeZone());
 
                     switch ($result->getVariableType()) {
                         case DateModifierInterface::VAR_THIS_DAY_W_Y:
@@ -318,7 +321,7 @@ class DateFilterModifier
     protected function getCompileClosure()
     {
         return function ($data) {
-            return $this->dateCompiler->compile($data);
+            return $this->dateCompiler->compile($data, false, $this->getTimeZone());
         };
     }
 
@@ -360,5 +363,25 @@ class DateFilterModifier
 
             return $data;
         };
+    }
+
+    /**
+     * @param string|null $timeZone
+     *
+     * @return $this
+     */
+    public function setTimeZone(?string $timeZone = null): self
+    {
+        $this->timeZone = $timeZone;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTimeZone(): ?string
+    {
+        return $this->timeZone;
     }
 }
