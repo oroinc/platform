@@ -261,6 +261,10 @@ services:
             - ['setElement', ['style', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['map', 'Block', 'Flow', 'Common', true]]
             - ['setElement', ['area', 'Inline', 'Empty', 'Common', true]]
+            - ['setElement', ['figure', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['picture', 'Block', 'Flow', 'Common', true]]
+            - ['setElement', ['source', 'Inline', 'Empty', 'Common', true]]
+            - ['setElement', ['figcaption', 'Inline', 'Flow', 'Common', true]]
 
     oro_ui.flash_message_helper:
         class: Oro\Bundle\UIBundle\Tools\FlashMessageHelper

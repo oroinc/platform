@@ -152,6 +152,7 @@ oro:
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'
+        formatted_error_line: 'Line #{{ line }}: {{ message }}'
         messages:
             'HTMLPurifier': 'HTML Purifier'
             'LanguageFactoryTest: Pizza': 'Pizza'
