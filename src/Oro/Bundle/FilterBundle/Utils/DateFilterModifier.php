@@ -19,6 +19,9 @@ class DateFilterModifier
     /** @var Compiler */
     protected $dateCompiler;
 
+    /** @var null|string  */
+    protected $timeZone = null;
+
     /** @var array */
     protected static $partFormatsMap = [
         DateModifierInterface::PART_MONTH => 'm',
@@ -47,6 +50,39 @@ class DateFilterModifier
      * @return array
      */
     public function modify(array $data, array $valueKeys = ['start', 'end'], $compile = true)
+    {
+        return $this->doModify($data, $valueKeys, $compile);
+    }
+
+    /**
+     * Parses and modifies date filter data accordingly to part and value types with time zone.
+     *
+     * @param array $data
+     * @param array $valueKeys
+     * @param bool  $compile
+     * @param string|null $timeZone
+     *
+     * @return array
+     */
+    public function modifyWithTimeZone(
+        array $data,
+        array $valueKeys = ['start', 'end'],
+        $compile = true,
+        ?string $timeZone = null
+    ) {
+        $this->timeZone = $timeZone;
+
+        return $this->doModify($data, $valueKeys, $compile);
+    }
+
+    /**
+     * @param array $data
+     * @param string[] $valueKeys
+     * @param bool $compile
+     *
+     * @return array
+     */
+    private function doModify(array $data, array $valueKeys, bool $compile): array
     {
         if (isset($data['value'], $data['type'])) {
             if ($this->isEqualType($data)) {
@@ -113,7 +149,7 @@ class DateFilterModifier
             ? $data['value']['start']
             : $data['value']['end'];
         if ($date && !$date instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($date, true);
+            $result = $this->compile($date, true);
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -192,7 +228,7 @@ class DateFilterModifier
     {
         $endDate = $data['value']['end'];
         if ($endDate && !$endDate instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($endDate, true);
+            $result = $this->compile($endDate, true);
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -230,7 +266,7 @@ class DateFilterModifier
         if (isset($data['part'])) {
             foreach ($data['value'] as $field) {
                 if ($field && !$field instanceof \DateTime) {
-                    $result = $this->dateCompiler->compile($field, true);
+                    $result = $this->compile($field, true);
 
                     switch ($result->getVariableType()) {
                         case DateModifierInterface::VAR_THIS_DAY_W_Y:
@@ -318,7 +354,7 @@ class DateFilterModifier
     protected function getCompileClosure()
     {
         return function ($data) {
-            return $this->dateCompiler->compile($data);
+            return $this->compile($data, false);
         };
     }
 
@@ -360,5 +396,16 @@ class DateFilterModifier
 
             return $data;
         };
+    }
+
+    /**
+     * @param string $date
+     * @param bool $returnRawToken
+     *
+     * @return ExpressionResult
+     */
+    private function compile(string $date, bool $returnRawToken = false)
+    {
+        return $result = $this->dateCompiler->compileWithTimeZone($date, $returnRawToken, $this->timeZone);
     }
 }
