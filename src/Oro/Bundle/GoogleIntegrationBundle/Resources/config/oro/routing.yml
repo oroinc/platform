@@ -1,0 +1,2 @@
+oro_google_integration_sso_login_google:
+    path: /login/check-google
