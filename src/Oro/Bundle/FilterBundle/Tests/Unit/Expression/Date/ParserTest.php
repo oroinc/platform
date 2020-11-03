@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Carbon\Carbon;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,10 +14,11 @@ class ParserTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        $localeSettingsMock = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()->getMock();
-        $localeSettingsMock->expects($this->any())->method('getTimeZone')
-            ->will($this->returnValue('UTC'));
+        $localeSettingsMock = $this->createMock(LocaleSettings::class);
+        $localeSettingsMock
+            ->expects($this->any())
+            ->method('getTimeZone')
+            ->willReturn('UTC');
 
         $this->parser = new Parser($localeSettingsMock);
     }
@@ -29,8 +31,8 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseProvider
      *
-     * @param array       $tokens
-     * @param mixed       $expectedResult
+     * @param array $tokens
+     * @param mixed $expectedResult
      * @param null|string $expectedException
      */
     public function testParse($tokens, $expectedResult, $expectedException = null)
@@ -104,6 +106,44 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                 null,
                 'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
             ]
+        ];
+    }
+
+    /**
+     * @dataProvider parseWithTimeZoneProvider
+     *
+     * @param array $tokens
+     * @param string|null $timeZone
+     * @param mixed $expectedResult
+     */
+    public function testParseWithTimeZone(array $tokens, ?string $timeZone, Carbon $expectedResult): void
+    {
+        $result = $this->parser->parseWithTimeZone($tokens, false, $timeZone);
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function parseWithTimeZoneProvider(): array
+    {
+        return [
+            'Non system configuration time zone' => [
+                [
+                    new Token(Token::TYPE_DATE, '2001-01-01'),
+                    new Token(Token::TYPE_TIME, '23:00:00'),
+                ],
+                'time zone' => 'America/Jamaica',
+                Carbon::parse('2001-01-01 23:00:00', 'America/Jamaica')
+            ],
+            'System configuration time zone' => [
+                [
+                    new Token(Token::TYPE_DATE, '2001-01-01'),
+                    new Token(Token::TYPE_TIME, '23:00:00'),
+                ],
+                'time zone' => null,
+                Carbon::parse('2001-01-01 23:00:00', 'UTC')
+            ],
         ];
     }
 }

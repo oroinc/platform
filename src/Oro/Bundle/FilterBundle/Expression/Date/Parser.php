@@ -24,9 +24,33 @@ class Parser
     /**
      * @param array $tokens
      * @param bool $returnRawToken
+     * @param string|null $timeZone
+     *
+     * @return int|mixed|ExpressionResult|string
+     */
+    public function parseWithTimeZone(array $tokens, bool $returnRawToken = false, string $timeZone = null)
+    {
+        return $this->doParse($tokens, $returnRawToken, $timeZone);
+    }
+
+    /**
+     * @param array $tokens
+     * @param bool $returnRawToken
      * @return mixed
      */
     public function parse($tokens, $returnRawToken = false)
+    {
+        return $this->doParse($tokens, $returnRawToken);
+    }
+
+    /**
+     * @param array $tokens
+     * @param bool $returnRawToken
+     * @param string|null $timeZone
+     *
+     * @return int|mixed|ExpressionResult|string
+     */
+    private function doParse(array $tokens, bool $returnRawToken = false, string $timeZone = null)
     {
         $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
@@ -41,7 +65,7 @@ class Parser
                 $result = $a->{$method}($b);
                 array_push($stack, $result);
             } else {
-                $stack[] = new ExpressionResult($token, $this->localeSettings->getTimeZone());
+                $stack[] = new ExpressionResult($token, $timeZone ?? $this->localeSettings->getTimeZone());
             }
         }
 
