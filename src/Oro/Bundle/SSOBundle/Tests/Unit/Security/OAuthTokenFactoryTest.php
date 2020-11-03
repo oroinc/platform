@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
+namespace Oro\Bundle\SSOBundle\Tests\Unit\Security\Core;
 
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 

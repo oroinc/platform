@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Expression\Date;
 
+/**
+ * Responsible for compiling the datetime.
+ */
 class Compiler
 {
     /** @var Lexer */
@@ -19,10 +22,12 @@ class Compiler
     /**
      * @param string $string
      * @param bool $returnRawToken
+     * @param string|null $timeZone
+     *
      * @return ExpressionResult
      */
-    public function compile($string, $returnRawToken = false)
+    public function compile(string $string, $returnRawToken = false, ?string $timeZone = null)
     {
-        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken);
+        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken, $timeZone);
     }
 }
