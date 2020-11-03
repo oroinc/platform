@@ -170,13 +170,17 @@ class TagManager
      */
     public function deleteTagging($entity, $tags, User $owner = null)
     {
-        $tagIds     = $this->prepareTagIds($tags);
-        $repository = $this->getTagsRepository();
+        $tagIds          = $this->prepareTagIds($tags);
+        $repository      = $this->getTagsRepository();
+        $entityClassName = ClassUtils::getClass($entity);
+        $entityId        = TaggableHelper::getEntityId($entity);
+
+        unset($this->storage[$entityClassName][$entityId]);
 
         return $repository->deleteTaggingByParams(
             $tagIds,
-            ClassUtils::getClass($entity),
-            TaggableHelper::getEntityId($entity),
+            $entityClassName,
+            $entityId,
             $owner
         );
     }

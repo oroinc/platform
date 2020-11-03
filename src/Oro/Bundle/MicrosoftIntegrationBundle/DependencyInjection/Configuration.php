@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -17,18 +17,9 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         SettingsBuilder::append($rootNode, [
-            'client_id' => [
-                'value' => null,
-                'type' => 'text',
-            ],
-            'client_secret' => [
-                'value' => null,
-                'type'  => 'text',
-            ],
-            'tenant' => [
-                'value' => null,
-                'type' => 'text',
-            ]
+            'client_id'     => ['value' => null, 'type' => 'text'],
+            'client_secret' => ['value' => null, 'type' => 'text'],
+            'tenant'        => ['value' => null, 'type' => 'text']
         ]);
 
         return $treeBuilder;
