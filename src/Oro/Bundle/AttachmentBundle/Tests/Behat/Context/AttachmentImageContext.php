@@ -20,6 +20,10 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AttachmentImageContext extends AttachmentContext implements KernelAwareContext, OroPageObjectAware
 {
     use PageObjectDictionary;
@@ -415,5 +419,79 @@ JS;
 
         $this->assertArrayHasKey($name, $this->rememberedFilenames);
         $this->assertNotEquals($this->rememberedFilenames[$name], $matches['filename']);
+    }
+
+    /**
+     * Example: I remember filename of the image "cat1.jpg"
+     *
+     * @Then /^I remember filename of the image "(?P<image>(?:[^"]|\\")*)"$/
+     * @param string $image
+     */
+    public function iRememberFilenameOfImage(string $image): void
+    {
+        $image = $this->fixStepArgument($image);
+
+        $this->rememberedFilenames[$image] = $this->getImageFilename($image);
+    }
+
+    /**
+     * Example: filename of the image "cat1.jpg" is as remembered
+     *
+     * @Then /^filename of the image "(?P<image>(?:[^"]|\\")*)" is as remembered$/
+     * @param string $image
+     */
+    public function filenameOfImageIsAsRemembered(string $image): void
+    {
+        $image = $this->fixStepArgument($image);
+        $filename = $this->getImageFilename($image);
+
+        $this->assertEquals(
+            $this->rememberedFilenames[$image],
+            $filename,
+            sprintf(
+                'Filename of the image %s was expected to be equal to the previously remembered one',
+                $image
+            )
+        );
+    }
+
+    /**
+     * Example: filename of the image "cat1.jpg" is not as remembered
+     *
+     * @Then /^filename of the image "(?P<image>(?:[^"]|\\")*)" is not as remembered$/
+     * @param string $image
+     */
+    public function filenameOfImageIsNotAsRemembered(string $image): void
+    {
+        $image = $this->fixStepArgument($image);
+        $filename = $this->getImageFilename($image);
+
+        $this->assertNotEquals(
+            $this->rememberedFilenames[$image],
+            $filename,
+            sprintf(
+                'Filename of the image %s was not expected to be equal to the previously remembered one',
+                $image
+            )
+        );
+    }
+
+    /**
+     * @param string $imageName
+     * @return string
+     */
+    private function getImageFilename(string $imageName): string
+    {
+        $image = $this->createElement($imageName);
+        $this->assertTrue($image->isValid(), sprintf('Image %s was not found', $imageName));
+
+        preg_match(
+            '/\/media\/cache\/attachment\/.+\/(?P<filename>.+)$/',
+            $image->getAttribute('src'),
+            $matches
+        );
+        self::assertNotEmpty($matches['filename'], sprintf('Filename not found for image %s', $imageName));
+
+        return $matches['filename'];
     }
 }
