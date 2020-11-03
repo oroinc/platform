@@ -107,7 +107,7 @@ class TranslationPackDumper implements LoggerAwareInterface
                     $bundle->getName() . DIRECTORY_SEPARATOR . 'translations';
                 $this->filesystem->mkdir($translationsDir);
 
-                $this->writer->writeTranslations(
+                $this->writer->write(
                     $messageCatalogue,
                     $outputFormat,
                     ['path' => $translationsDir]
