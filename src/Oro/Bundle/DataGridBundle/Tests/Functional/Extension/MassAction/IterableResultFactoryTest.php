@@ -131,7 +131,7 @@ class IterableResultFactoryTest extends WebTestCase
         );
 
         $ids = array_map(
-            fn(string $name) => $this->getReference($name)->getId(),
+            fn (string $name) => $this->getReference($name)->getId(),
             [
                 LoadTestEntitiesData::FIRST_SIMPLE_USER_ENTITY,
                 LoadTestEntitiesData::SECOND_SIMPLE_USER_ENTITY,

@@ -6,6 +6,9 @@ use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldBlackList;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Describes the configuration tree for the inline datagrid editing feature.
+ */
 class Configuration implements ConfigurationInterface
 {
     const ENABLED_CONFIG_PATH           = '[inline_editing][enable]';
