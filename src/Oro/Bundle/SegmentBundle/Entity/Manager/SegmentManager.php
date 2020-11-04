@@ -81,7 +81,7 @@ class SegmentManager
     public function getSegmentTypeChoices()
     {
         $result = [];
-        $types = $this->em->getRepository('OroSegmentBundle:SegmentType')->findAll();
+        $types = $this->em->getRepository(SegmentType::class)->findAll();
         foreach ($types as $type) {
             $result[$type->getLabel()] = $type->getName();
         }
@@ -171,6 +171,7 @@ class SegmentManager
                 if ($this->logger) {
                     $this->logger->error($e->getMessage(), ['exception' => $e]);
                 }
+
                 return null;
             }
         }
@@ -205,22 +206,19 @@ class SegmentManager
         }
 
         $identifier = $this->getIdentifierFieldName($segment->getEntity());
+        $segmentQueryBuilder = $segmentQueryBuilder->select($segmentQueryBuilderRootAlias . '.' . $identifier);
+        $subQuery = $this->bindSegmentParametersToQueryBuilder(
+            $segmentQueryBuilder,
+            $segment,
+            $queryBuilder
+        );
+
         $queryBuilder->andWhere(
             $queryBuilder->expr()->in(
                 $queryBuilderRootAlias . '.' . $identifier,
-                $segmentQueryBuilder->select($segmentQueryBuilderRootAlias . '.' . $identifier)->getDQL()
+                $subQuery
             )
         );
-
-        $params = $segmentQueryBuilder->getParameters();
-
-        foreach ($params as $parameter) {
-            $queryBuilder->setParameter(
-                $parameter->getName(),
-                $parameter->getValue(),
-                $parameter->typeWasSpecified() ? $parameter->getType() : null
-            );
-        }
     }
 
     /**
@@ -317,23 +315,13 @@ class SegmentManager
                     $identifier
                 );
             }
-
-            $subQuery = $queryBuilder->getDQL();
-        } else {
-            $subQuery = $queryBuilder->getDQL();
         }
 
-        /** @var Parameter[] $params */
-        $params = $queryBuilder->getParameters();
-        foreach ($params as $parameter) {
-            $externalQueryBuilder->setParameter(
-                $parameter->getName(),
-                $parameter->getValue(),
-                $parameter->typeWasSpecified() ? $parameter->getType() : null
-            );
-        }
-
-        return $subQuery;
+        return $this->bindSegmentParametersToQueryBuilder(
+            $queryBuilder,
+            $segment,
+            $externalQueryBuilder
+        );
     }
 
     /**
@@ -345,7 +333,7 @@ class SegmentManager
     protected function getOffset($page)
     {
         if ($page > 1) {
-            return ($page - 1) * SegmentManager::PER_PAGE;
+            return ($page - 1) * self::PER_PAGE;
         }
 
         return 0;
@@ -394,5 +382,39 @@ class SegmentManager
         }
 
         return sprintf('%s:%s:%s', 'qb', $segment->getEntity(), $segment->getDefinition());
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param Segment $segment
+     * @param QueryBuilder $externalQueryBuilder
+     * @return string
+     */
+    private function bindSegmentParametersToQueryBuilder(
+        QueryBuilder $queryBuilder,
+        Segment $segment,
+        QueryBuilder $externalQueryBuilder
+    ): string {
+        $subQuery = $queryBuilder->getDQL();
+        /** @var Parameter[] $params */
+        $params = $queryBuilder->getParameters();
+        foreach ($params as $parameter) {
+            // Isolate parameter names for filter per segment, add "_s<segment.id>_" as additional prefix.
+            $parameterName = $parameter->getName();
+            $segmentParameterName = '_s' . $segment->getId() . '_' . $parameterName;
+            $subQuery = preg_replace(
+                '/(?<![\w\d])(' . $parameterName . ')(?![\w\d])/',
+                $segmentParameterName,
+                $subQuery
+            );
+
+            $externalQueryBuilder->setParameter(
+                $segmentParameterName,
+                $parameter->getValue(),
+                $parameter->typeWasSpecified() ? $parameter->getType() : null
+            );
+        }
+
+        return $subQuery;
     }
 }
