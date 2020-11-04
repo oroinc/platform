@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Handles update action of controller used to create or update entity on separate page or widget dialog.
+ */
 class UpdateHandlerFacade
 {
     /** @var UpdateFactory */
