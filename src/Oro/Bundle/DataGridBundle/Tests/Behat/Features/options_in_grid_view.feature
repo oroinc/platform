@@ -2,7 +2,9 @@
 @ticket-BAP-12348
 @automatically-ticket-tagged
 Feature: Options in Grid View
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+  As an Administrator
+  I want to be sure that 'Set As Default' value in 'Options' dropdown is displayed after the filter has been set as default
+  So I set filter as default
 
   Scenario: Create new not default grid view
     Given I login as administrator
