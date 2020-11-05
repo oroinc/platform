@@ -2,7 +2,10 @@
 @ticket-BAP-14097
 @automatically-ticket-tagged
 Feature: Mass reset translations
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+  In order to understand what I am doing with a translated string
+  As an Administrator
+  I want to have unambiguous icon and label for the button that resets translation to its default value.
+
   Scenario: Reset several translations
     Given I login as administrator
     When I go to System/Localization/Translations

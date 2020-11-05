@@ -1,7 +1,6 @@
 @regression
 @fixture-OroUserBundle:user.yml
 Feature: Actions applicability in grid
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: Administrator should see all actions except delete for system email templates
     Given I login as administrator
