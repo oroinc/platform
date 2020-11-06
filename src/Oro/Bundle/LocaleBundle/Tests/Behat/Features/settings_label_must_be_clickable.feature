@@ -1,5 +1,4 @@
 Feature: Settings label must be clickable
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: Click by settings label must change status of the appropriate checkbox
     Given I login as administrator
