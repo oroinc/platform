@@ -50,6 +50,11 @@ services:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
             - '@oro_config.config_definition_bag'
             - '@event_dispatcher'
+        calls:
+            - [setArrayCache, ['@oro_config.manager.array_cache']]
+
+    oro_config.manager.array_cache:
+        parent: doctrine_cache.abstract.array
 
     Oro\Bundle\ConfigBundle\Config\ConfigManager:
         alias: oro_config.manager
@@ -189,3 +194,10 @@ services:
         public: true
         arguments:
             - "@oro_config.user"
+
+    oro_config.event_listener.array_cache_clear_listener:
+        class: Oro\Bundle\ConfigBundle\EventListener\ConfigManagerArrayCacheClearListener
+        arguments:
+            - '@oro_config.manager.array_cache'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.config_manager_scope_id_change, method: onScopeIdChange }

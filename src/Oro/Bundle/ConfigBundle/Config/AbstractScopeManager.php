@@ -313,6 +313,9 @@ abstract class AbstractScopeManager
 
         $settings = $this->loadStoredSettings($entityId);
         $this->cache->save($cacheKey, $settings);
+
+        $event = new ConfigManagerScopeIdUpdateEvent();
+        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
     }
 
     /**

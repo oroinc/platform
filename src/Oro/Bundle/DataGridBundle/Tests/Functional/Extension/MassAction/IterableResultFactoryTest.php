@@ -28,6 +28,7 @@ class IterableResultFactoryTest extends WebTestCase
     use RolePermissionExtension;
 
     const GRID_NAME = 'test-entity-grid';
+    const GRID_ONLY_NAME = 'test-entity-name-grid';
 
     protected function setUp(): void
     {
@@ -113,6 +114,35 @@ class IterableResultFactoryTest extends WebTestCase
         ], $iterableResult);
     }
 
+    public function testCreateIterableResultWhenDataIdentifierNotInSelect(): void
+    {
+        $datagrid = $this->getDatagridManager()->getDatagrid(self::GRID_ONLY_NAME);
+
+        $selectedItems = SelectedItems::createFromParameters([
+            'values' => [],
+            'inset' => true
+        ]);
+
+        $iterableResult = $this->getFactory()->createIterableResult(
+            $datagrid->getAcceptedDatasource(),
+            ActionConfiguration::create(['data_identifier' => 'item.id']),
+            $datagrid->getConfig(),
+            $selectedItems
+        );
+
+        $ids = array_map(
+            fn (string $name) => $this->getReference($name)->getId(),
+            [
+                LoadTestEntitiesData::FIRST_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::SECOND_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::THIRD_SIMPLE_USER_ENTITY,
+                LoadTestEntitiesData::FIRST_NOT_SIMPLE_USER_ENTITY,
+            ]
+        );
+
+        $this->assertIterableResult($ids, 'id', $iterableResult);
+    }
+
     public function testCreateIterableResultWithObjectIdentifier()
     {
         /** @var TestEntity $secondTestEntity */
@@ -191,11 +221,25 @@ class IterableResultFactoryTest extends WebTestCase
      */
     private function assertNames(array $expectedNames, IterableResultInterface $iterableResult)
     {
-        $names = array_map(function (ResultRecord $record) {
-            return $record->getValue('name');
-        }, iterator_to_array($iterableResult));
+        $this->assertIterableResult($expectedNames, 'name', $iterableResult);
+    }
 
-        static::assertEquals($expectedNames, $names);
+    /**
+     * @param array $expected
+     * @param string $column
+     * @param IterableResultInterface $iterableResult
+     */
+    private function assertIterableResult(
+        array $expected,
+        string $column,
+        IterableResultInterface $iterableResult
+    ): void {
+        $values = array_map(
+            static fn (ResultRecord $record) => $record->getValue($column),
+            iterator_to_array($iterableResult)
+        );
+
+        static::assertEquals($expected, $values);
     }
 
     private function makeUserViewOnlyOwnEntities()

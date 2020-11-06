@@ -48,6 +48,21 @@ datagrids:
             default:
                 id: ASC
 
+    test-entity-name-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - item.name
+                from:
+                    - { table: Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership, alias: item }
+        columns:
+            name:
+                label: name
+        sorters:
+            default:
+                name: ASC
+
     test-search-grid:
         source:
             type: search

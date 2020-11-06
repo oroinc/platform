@@ -27,8 +27,6 @@ class OptionsHelper
     protected $htmlTagHelper;
 
     /**
-     * OptionsHelper constructor.
-     *
      * @param Router $router
      * @param TranslatorInterface $translator
      * @param FormProvider $formProvider
@@ -118,10 +116,6 @@ class OptionsHelper
             $options['message']['content'] = $message;
         }
 
-        if (isset($frontendOptions['confirmation']['message_parameters'])) {
-            $frontendOptions['confirmation']['message_parameters'] =
-                $this->prepareParameters($frontendOptions['confirmation']['message_parameters']);
-        }
         $this->addOption($options, $frontendOptions, 'confirmation');
 
         return $options;
@@ -135,12 +129,11 @@ class OptionsHelper
      */
     protected function getTitle(ButtonInterface $button, array $frontendOptions)
     {
-        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $button->getLabel();
-        $parameters = [];
-        if (isset($frontendOptions['title_parameters'])) {
-            $parameters = $this->prepareParameters($frontendOptions['title_parameters']);
-        }
-        return $this->translator->trans($title, $parameters, $button->getTranslationDomain());
+        return $this->translator->trans(
+            $frontendOptions['title'] ?? $button->getLabel(),
+            $frontendOptions['title_parameters'] ?? [],
+            $button->getTranslationDomain()
+        );
     }
 
     /**
@@ -154,10 +147,7 @@ class OptionsHelper
         $content = null;
         if (isset($frontendOptions['message']['content'])) {
             $message = $frontendOptions['message'];
-            $parameters = [];
-            if (isset($message['message_parameters'])) {
-                $parameters = $this->prepareParameters($message['message_parameters']);
-            }
+            $parameters = $message['message_parameters'] ?? [];
 
             $content = $this->translator->trans($message['content'], $parameters, $button->getTranslationDomain());
             $content = $content !== $message['content'] ? $content : null;
@@ -205,25 +195,5 @@ class OptionsHelper
             ],
             $data
         );
-    }
-
-    /**
-     * Recursive escape parameters
-     *
-     * @param $parameters
-     *
-     * @return mixed
-     */
-    private function prepareParameters($parameters)
-    {
-        foreach ($parameters as $key => &$value) {
-            if (\is_array($value)) {
-                $value = $this->prepareParameters($value);
-            } elseif (\is_string($value)) {
-                $value = $this->htmlTagHelper->escape($value);
-            }
-        }
-
-        return $parameters;
     }
 }
