@@ -38,19 +38,20 @@ define([
          * Execute delete model
          */
         execute: function() {
-            this.getConfirmDialog(_.bind(this.doDelete, this)).open();
+            this.getConfirmDialog(_.bind(function() {
+                this.doDelete(this.messages);
+            }, this)).open();
         },
 
         /**
          * Confirm delete item
          */
-        doDelete: function() {
+        doDelete: function(messages) {
             this.model.destroy({
                 url: this.getLink(),
                 wait: true,
                 success: function() {
-                    const messageText = __('Item deleted');
-                    messenger.notificationFlashMessage('success', messageText);
+                    messenger.notificationFlashMessage('success', __(messages.success));
                 }
             });
         }
