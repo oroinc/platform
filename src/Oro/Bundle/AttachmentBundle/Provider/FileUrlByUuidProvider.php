@@ -9,7 +9,7 @@ use Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Provide file urls by file UUID
+ * Provides file url by file UUID
  */
 class FileUrlByUuidProvider
 {
@@ -110,8 +110,6 @@ class FileUrlByUuidProvider
     }
 
     /**
-     * Find file by uuid with caching all files from entity related to that file
-     *
      * @param string $uuid
      *
      * @return File
@@ -120,22 +118,12 @@ class FileUrlByUuidProvider
      */
     private function findFileByUuid(string $uuid): File
     {
-        $file = $this->cache->fetch($uuid);
-        if ($file) {
-            return $file;
+        /** @var File $file */
+        $file = $this->registry->getRepository(File::class)->findOneByUuid($uuid);
+        if (!$file) {
+            throw new FileNotFoundException(sprintf('File with UUID "%s" not found', $uuid));
         }
 
-        $fileRepository = $this->registry->getRepository(File::class);
-
-        $files = $fileRepository->findAllForEntityByOneUuid($uuid);
-        if ($files) {
-            $this->cache->saveMultiple($files);
-
-            if (isset($files[$uuid])) {
-                return $files[$uuid];
-            }
-        }
-
-        throw new FileNotFoundException(sprintf('File with UUID "%s" not found', $uuid));
+        return $file;
     }
 }
