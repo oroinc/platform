@@ -73,7 +73,7 @@ Example:
 ```
 
 Use the **update** meta property to mark the records that should be updated.
-See [Creating and Updating Related Resources with Primary API Resource](https://doc.oroinc.com/api/create-update-related-resources/#creating-and-updating-related-resources-with-primary-api-resource)
+See [Creating and Updating Related Resources with Primary API Resource](https://doc.oroinc.com/api/create-update-related-resources/)
 for more details about this meta property.
 
 Example:
