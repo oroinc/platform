@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Filter\SpecialHandlingFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
@@ -78,7 +79,7 @@ class NormalizeFilterValues implements ProcessorInterface
         foreach ($filterValues as $filterKey => $filterValue) {
             if ($filters->has($filterKey)) {
                 $filter = $filters->get($filterKey);
-                if ($filter instanceof StandaloneFilter) {
+                if ($filter instanceof StandaloneFilter && !$filter instanceof SpecialHandlingFilterInterface) {
                     try {
                         $value = $this->normalizeFilterValue(
                             $requestType,

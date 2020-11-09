@@ -9,6 +9,6 @@ namespace Oro\Bundle\ApiBundle\Filter;
  * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleIncludeFilter
  * @see \Oro\Bundle\ApiBundle\Processor\GetConfig\ExpandRelatedEntities
  */
-class IncludeFilter extends StandaloneFilter
+class IncludeFilter extends StandaloneFilter implements SpecialHandlingFilterInterface
 {
 }

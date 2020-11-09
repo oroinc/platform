@@ -49,16 +49,16 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             ->getFilterNames($requestType)
             ->getMetaPropertyFilterName();
 
-        $filterValue = $context->getFilterValues()->get($filterName);
-        if (null === $filterValue) {
-            // meta properties were not requested
-            return;
-        }
-
         /** @var MetaPropertyFilter|null $filter */
         $filter = $context->getFilters()->get($filterName);
         if (null === $filter) {
-            // meta properties filter is not registered
+            // the "meta" filter is not supported
+            return;
+        }
+
+        $filterValue = $context->getFilterValues()->get($filterName);
+        if (null === $filterValue) {
+            // meta properties were not requested
             return;
         }
 
@@ -78,8 +78,8 @@ class HandleMetaPropertyFilter implements ProcessorInterface
             return;
         }
 
-        if (!$names) {
-            // meta properties were not requested
+        if ($context->hasErrors()) {
+            // detected errors in the filter value
             return;
         }
 

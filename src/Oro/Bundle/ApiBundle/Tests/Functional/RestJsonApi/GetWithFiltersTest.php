@@ -198,11 +198,48 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         );
     }
 
+    public function testMetaWithEmptyValue()
+    {
+        $response = $this->cget(
+            ['entity' => $this->getEntityType(TestEmployee::class)],
+            ['meta' => ''],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected string value. Given "".',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
+    public function testMetaTitlesWithStartingComma()
+    {
+        $response = $this->cget(
+            ['entity' => $this->getEntityType(TestEmployee::class)],
+            ['meta' => ',title'],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given ",title".',
+                'source' => ['parameter' => 'meta']
+            ],
+            $response
+        );
+    }
+
     public function testMetaTitlesWithEndingComma()
     {
-        $entityType = $this->getEntityType(TestEmployee::class);
         $response = $this->cget(
-            ['entity' => $entityType],
+            ['entity' => $this->getEntityType(TestEmployee::class)],
             ['meta' => 'title,'],
             [],
             false
