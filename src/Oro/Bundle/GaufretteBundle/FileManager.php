@@ -190,6 +190,19 @@ class FileManager
     }
 
     /**
+     * Deletes all files from the Gaufrette file system.
+     *
+     * @throws \RuntimeException if any file cannot be deleted
+     */
+    public function deleteAllFiles(): void
+    {
+        $fileNames = $this->findFiles();
+        foreach ($fileNames as $fileName) {
+            $this->filesystem->delete($fileName);
+        }
+    }
+
+    /**
      * Writes the specified data to the Gaufrette file system.
      *
      * @param string $content
