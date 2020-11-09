@@ -4,11 +4,13 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -58,19 +60,26 @@ class HandleFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $fields = [];
         $filterValues = $context->getFilterValues()->getGroup($filterGroupName);
+        if (!$filterValues) {
+            // filtering of fields was not requested
+            return;
+        }
+
+        $fields = [];
         foreach ($filterValues as $filterValue) {
-            try {
-                $normalizedValue = $this->valueNormalizer->normalizeValue(
-                    $filterValue->getValue(),
-                    DataType::STRING,
-                    $requestType,
-                    true
+            $path = $filterValue->getPath();
+            if (!$path || $path === $filterGroupName) {
+                $context->addError(
+                    Error::createValidationError(Constraint::FILTER)
+                        ->setDetail('An entity type is not specified.')
+                        ->setSource(ErrorSource::createByParameter($filterValue->getSourceKey()))
                 );
-                if ($normalizedValue) {
-                    $fields[$filterValue->getPath()] = (array)$normalizedValue;
-                }
+                break;
+            }
+
+            try {
+                $fields[$path] = $this->normalizeFilterValue($filterValue, $requestType);
             } catch (\Exception $e) {
                 $context->addError(
                     Error::createValidationError(Constraint::FILTER)
@@ -79,11 +88,27 @@ class HandleFieldsFilter implements ProcessorInterface
                 );
             }
         }
-        if (!$fields || $context->hasErrors()) {
-            // filtering of fields was not requested or detected errors in filter values
+        if ($context->hasErrors()) {
+            // detected errors in the filter value
             return;
         }
 
         $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
+    }
+
+    /**
+     * @param FilterValue $filterValue
+     * @param RequestType $requestType
+     *
+     * @return mixed
+     */
+    private function normalizeFilterValue(FilterValue $filterValue, RequestType $requestType)
+    {
+        $value = $filterValue->getValue();
+        if ('' === $value) {
+            return [];
+        }
+
+        return (array)$this->valueNormalizer->normalizeValue($value, DataType::STRING, $requestType, true);
     }
 }

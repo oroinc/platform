@@ -23,8 +23,8 @@ class HandleDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
         $this->context->setClassName('Test\Class');
         $this->processor->process($this->context);
 
-        $this->assertEquals(
-            new FilterFieldsConfigExtra([$this->context->getClassName() => ['id']]),
+        self::assertEquals(
+            new FilterFieldsConfigExtra([$this->context->getClassName() => []]),
             $this->context->getConfigExtra(FilterFieldsConfigExtra::NAME)
         );
     }
@@ -37,7 +37,7 @@ class HandleDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
         );
         $this->processor->process($this->context);
 
-        $this->assertEquals(
+        self::assertEquals(
             new FilterFieldsConfigExtra([$this->context->getClassName() => ['options']]),
             $this->context->getConfigExtra(FilterFieldsConfigExtra::NAME)
         );

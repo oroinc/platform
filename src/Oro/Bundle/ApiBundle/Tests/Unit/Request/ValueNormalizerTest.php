@@ -155,7 +155,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [ValueNormalizer::DEFAULT_REQUIREMENT, 'unknownType', [RequestType::REST]],
-            [ValueNormalizer::DEFAULT_REQUIREMENT, DataType::STRING, [RequestType::REST]],
+            [Processor\NormalizeString::REQUIREMENT, DataType::STRING, [RequestType::REST]],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, [RequestType::REST]],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::SMALLINT, [RequestType::REST]],
             [Processor\NormalizeInteger::REQUIREMENT, DataType::DURATION, [RequestType::REST]],
@@ -192,7 +192,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                Processor\NormalizeString::REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
@@ -297,7 +297,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                Processor\NormalizeString::REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
@@ -402,7 +402,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                ValueNormalizer::DEFAULT_REQUIREMENT,
+                Processor\NormalizeString::REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
@@ -544,6 +544,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [null, null, DataType::GUID, [RequestType::REST], true],
             [null, null, DataType::GUID, [RequestType::REST], false],
             [null, null, DataType::ORDER_BY, [RequestType::REST], true],
+            [' ', ' ', DataType::STRING, [RequestType::REST], true],
+            [' ', ' ', DataType::STRING, [RequestType::REST], false],
+            [',', ',', DataType::STRING, [RequestType::REST], false],
             ['test', 'test', DataType::STRING, [RequestType::REST], true],
             ['test', 'test', DataType::STRING, [RequestType::REST], false],
             [['test1', 'test2'], ['test1', 'test2'], DataType::STRING, [RequestType::REST], true],
@@ -594,7 +597,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             ['-123456789013245', '-123456789013245', DataType::BIGINT, [RequestType::REST], true],
             ['-123456789013245', '-123456789013245', DataType::BIGINT, [RequestType::REST], false],
             [
-                [123456789013245, -123456789013245],
+                ['123456789013245', '-123456789013245'],
                 '123456789013245,-123456789013245',
                 DataType::BIGINT,
                 [RequestType::REST],
@@ -684,7 +687,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [-123.0, '-123', DataType::FLOAT, [RequestType::REST], false],
             [-123.1, '-123.1', DataType::FLOAT, [RequestType::REST], true],
             [-123.1, '-123.1', DataType::FLOAT, [RequestType::REST], false],
-            [[123.1, -456], '123.1,-456', DataType::FLOAT, [RequestType::REST], true],
+            [[123.1, -456.0], '123.1,-456', DataType::FLOAT, [RequestType::REST], true],
             [123.1, 123.1, DataType::PERCENT, [RequestType::REST], true],
             [123.1, 123.1, DataType::PERCENT, [RequestType::REST], false],
             [[123.1, 456.1], [123.1, 456.1], DataType::PERCENT, [RequestType::REST], true],
@@ -703,7 +706,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [-123.0, '-123', DataType::PERCENT, [RequestType::REST], false],
             [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], true],
             [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], false],
-            [[123.1, -456], '123.1,-456', DataType::PERCENT, [RequestType::REST], true],
+            [[123.1, -456.0], '123.1,-456', DataType::PERCENT, [RequestType::REST], true],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
@@ -1001,6 +1004,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         return [
             [new Range('test1', 'test2'), new Range('test1', 'test2'), DataType::STRING],
             [new Range('test1', 'test2'), 'test1..test2', DataType::STRING],
+            [new Range(' ', ' '), ' .. ', DataType::STRING],
+            [new Range(' ', 'test2'), ' ..test2', DataType::STRING],
+            [new Range('test1', ' '), 'test1.. ', DataType::STRING],
             [new Range(123, 456), new Range(123, 456), DataType::INTEGER],
             [new Range(123, 456), '123..456', DataType::INTEGER],
             [new Range(-456, -123), '-456..-123', DataType::INTEGER],
@@ -1134,13 +1140,31 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'Expected integer value. Given "test"',
+                'Expected string value. Given "".',
+                '',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "".',
+                '',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of strings. Given ",".',
+                ',',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "test".',
                 'test',
                 DataType::INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "1a"',
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::INTEGER,
                 [RequestType::REST]
@@ -1152,13 +1176,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "test"',
+                'Expected integer value. Given "test".',
                 'test',
                 DataType::SMALLINT,
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "1a"',
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::SMALLINT,
                 [RequestType::REST]
@@ -1170,13 +1194,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected big integer value. Given "test"',
+                'Expected big integer value. Given "test".',
                 'test',
                 DataType::BIGINT,
                 [RequestType::REST]
             ],
             [
-                'Expected big integer value. Given "1a"',
+                'Expected big integer value. Given "1a".',
                 '1a',
                 DataType::BIGINT,
                 [RequestType::REST]
@@ -1188,43 +1212,43 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected unsigned integer value. Given "test"',
+                'Expected unsigned integer value. Given "test".',
                 'test',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected unsigned integer value. Given "1a"',
+                'Expected unsigned integer value. Given "1a".',
                 '1a',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of unsigned integers. Given "1,2a"',
+                'Expected an array of unsigned integers. Given "1,2a".',
                 '1,2a',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected unsigned integer value. Given "-1"',
+                'Expected unsigned integer value. Given "-1".',
                 '-1',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of unsigned integers. Given "1,-1"',
+                'Expected an array of unsigned integers. Given "1,-1".',
                 '1,-1',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "test"',
+                'Expected integer value. Given "test".',
                 'test',
                 DataType::DURATION,
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "1a"',
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::DURATION,
                 [RequestType::REST]
@@ -1236,37 +1260,37 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected boolean value. Given "test"',
+                'Expected boolean value. Given "test".',
                 'test',
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of booleans. Given "true,2"',
+                'Expected an array of booleans. Given "true,2".',
                 'true,2',
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "test"',
+                'Expected decimal value. Given "test".',
                 'test',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "1a"',
+                'Expected decimal value. Given "1a".',
                 '1a',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given ".0a"',
+                'Expected decimal value. Given ".0a".',
                 '.0a',
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "-.0a"',
+                'Expected decimal value. Given "-.0a".',
                 '-.0a',
                 DataType::DECIMAL,
                 [RequestType::REST]
@@ -1278,25 +1302,25 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "test"',
+                'Expected decimal value. Given "test".',
                 'test',
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "1a"',
+                'Expected decimal value. Given "1a".',
                 '1a',
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given ".0a"',
+                'Expected decimal value. Given ".0a".',
                 '.0a',
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "-.0a"',
+                'Expected decimal value. Given "-.0a".',
                 '-.0a',
                 DataType::MONEY,
                 [RequestType::REST]
@@ -1308,25 +1332,25 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "test"',
+                'Expected number value. Given "test".',
                 'test',
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "1a"',
+                'Expected number value. Given "1a".',
                 '1a',
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given ".0a"',
+                'Expected number value. Given ".0a".',
                 '.0a',
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "-.0a"',
+                'Expected number value. Given "-.0a".',
                 '-.0a',
                 DataType::FLOAT,
                 [RequestType::REST]
@@ -1338,25 +1362,25 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "test"',
+                'Expected number value. Given "test".',
                 'test',
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "1a"',
+                'Expected number value. Given "1a".',
                 '1a',
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given ".0a"',
+                'Expected number value. Given ".0a".',
                 '.0a',
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "-.0a"',
+                'Expected number value. Given "-.0a".',
                 '-.0a',
                 DataType::PERCENT,
                 [RequestType::REST]
@@ -1368,67 +1392,67 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected datetime value. Given "test"',
+                'Expected datetime value. Given "test".',
                 'test',
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of datetimes. Given "2010-01-28T15:00:00,test"',
+                'Expected an array of datetimes. Given "2010-01-28T15:00:00,test".',
                 '2010-01-28T15:00:00,test',
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                'Expected date value. Given "test"',
+                'Expected date value. Given "test".',
                 'test',
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                'Expected date value. Given "2010-01-28T15:00:00"',
+                'Expected date value. Given "2010-01-28T15:00:00".',
                 '2010-01-28T15:00:00',
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of dates. Given "2010-01-28,test"',
+                'Expected an array of dates. Given "2010-01-28,test".',
                 '2010-01-28,test',
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                'Expected time value. Given "test"',
+                'Expected time value. Given "test".',
                 'test',
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                'Expected time value. Given "2010-01-28T10:30:59"',
+                'Expected time value. Given "2010-01-28T10:30:59".',
                 '2010-01-28T10:30:59',
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                'Expected an array of times. Given "10:30:59,test"',
+                'Expected an array of times. Given "10:30:59,test".',
                 '10:30:59,test',
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                'Expected GUID value. Given "test"',
+                'Expected GUID value. Given "test".',
                 'test',
                 DataType::GUID,
                 [RequestType::REST]
             ],
             [
-                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0dh"',
+                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0dh".',
                 '7eab7435-44bb-493a-9bda-dea3fda3c0dh',
                 DataType::GUID,
                 [RequestType::REST]
             ],
             [
-                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0d91"',
+                'Expected GUID value. Given "7eab7435-44bb-493a-9bda-dea3fda3c0d91".',
                 '7eab7435-44bb-493a-9bda-dea3fda3c0d91',
                 DataType::GUID,
                 [RequestType::REST]
@@ -1462,7 +1486,43 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'Expected integer value. Given "1a"',
+                'Expected a pair of strings (string..string). Given "..".',
+                '..',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "..".',
+                '..',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of strings (string..string). Given "..test".',
+                '..test',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "..1".',
+                '..1',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of strings (string..string). Given "test..".',
+                'test..',
+                DataType::STRING,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of integers (integer..integer). Given "1..".',
+                '1..',
+                DataType::INTEGER,
+                [RequestType::REST]
+            ],
+            [
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::INTEGER,
                 [RequestType::REST]
@@ -1480,7 +1540,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "1a"',
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::SMALLINT,
                 [RequestType::REST]
@@ -1498,7 +1558,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected big integer value. Given "1a"',
+                'Expected big integer value. Given "1a".',
                 '1a',
                 DataType::BIGINT,
                 [RequestType::REST]
@@ -1516,7 +1576,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected unsigned integer value. Given "1a"',
+                'Expected unsigned integer value. Given "1a".',
                 '1a',
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
@@ -1546,7 +1606,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected integer value. Given "1a"',
+                'Expected integer value. Given "1a".',
                 '1a',
                 DataType::DURATION,
                 [RequestType::REST]
@@ -1564,7 +1624,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected boolean value. Given "test"',
+                'Expected boolean value. Given "test".',
                 'test',
                 DataType::BOOLEAN,
                 [RequestType::REST]
@@ -1582,7 +1642,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "test"',
+                'Expected decimal value. Given "test".',
                 'test',
                 DataType::DECIMAL,
                 [RequestType::REST]
@@ -1600,7 +1660,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected decimal value. Given "test"',
+                'Expected decimal value. Given "test".',
                 'test',
                 DataType::MONEY,
                 [RequestType::REST]
@@ -1618,7 +1678,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "test"',
+                'Expected number value. Given "test".',
                 'test',
                 DataType::FLOAT,
                 [RequestType::REST]
@@ -1636,7 +1696,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected number value. Given "test"',
+                'Expected number value. Given "test".',
                 'test',
                 DataType::PERCENT,
                 [RequestType::REST]
@@ -1654,7 +1714,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected datetime value. Given "test"',
+                'Expected datetime value. Given "test".',
                 'test',
                 DataType::DATETIME,
                 [RequestType::REST]
@@ -1672,7 +1732,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected date value. Given "test"',
+                'Expected date value. Given "test".',
                 'test',
                 DataType::DATE,
                 [RequestType::REST]
@@ -1690,7 +1750,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                'Expected time value. Given "test"',
+                'Expected time value. Given "test".',
                 'test',
                 DataType::TIME,
                 [RequestType::REST]
@@ -1754,6 +1814,9 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             }
         } elseif (is_array($expected)) {
             self::assertEquals($expected, $actual, $message);
+            foreach ($expected as $key => $expectedVal) {
+                self::assertNormalizedValue($expectedVal, $actual[$key], $message . sprintf(' (Key: %s)', $key));
+            }
         } else {
             self::assertSame($expected, $actual, $message);
         }

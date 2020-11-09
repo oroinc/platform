@@ -9,6 +9,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 {
@@ -170,7 +172,57 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $data = self::jsonToArray($response->getContent());
         self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
         self::assertCount(count($expectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
-        self::assertFalse(isset($data['data']['included']));
+        self::assertArrayNotHasKey('included', $data);
+    }
+
+    public function testFieldsFilterWithEmptyValue()
+    {
+        $response = $this->cget(
+            ['entity' => 'users'],
+            ['page' => ['size' => 1], 'fields' => ['users' => '']]
+        );
+        $this->assertResponseContains(['data' => [['type' => 'users', 'id' => '1']]], $response);
+
+        $data = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('attributes', $data['data'][0]);
+        self::assertArrayNotHasKey('relationships', $data['data'][0]);
+        self::assertArrayNotHasKey('included', $data);
+    }
+
+    public function testFieldsFilterWhenEntityTypeIsNotSpecified()
+    {
+        $response = $this->cget(
+            ['entity' => 'users'],
+            ['page' => ['size' => 1], 'fields' => 'username'],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'An entity type is not specified.',
+                'source' => ['parameter' => 'fields']
+            ],
+            $response
+        );
+    }
+
+    public function testFieldsFilterWhenEntityTypeIsEmpty()
+    {
+        $response = $this->cget(
+            ['entity' => 'users'],
+            ['page' => ['size' => 1], 'fields' => ['' => 'username']],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'An entity type is not specified.',
+                'source' => ['parameter' => 'fields[]']
+            ],
+            $response
+        );
     }
 
     public function testFieldsFilterWithWrongSeparators()
@@ -200,19 +252,61 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 
         $data = self::jsonToArray($response->getContent());
         self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
-        self::assertFalse(isset($data['data'][0]['relationships']));
-        self::assertFalse(isset($data['data']['included']));
+        self::assertArrayNotHasKey('relationships', $data['data'][0]);
+        self::assertArrayNotHasKey('included', $data);
     }
 
-    public function testFieldsFilterWithEndingComma()
+    public function testFieldsFilterWithStartingComma()
     {
-        $response = $this->cget(['entity' => 'users'], ['fields[users]' => 'phone,title,'], [], false);
+        $response = $this->cget(['entity' => 'users'], ['fields[users]' => ',firstName,lastName'], [], false);
 
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected an array of strings. Given "phone,title,".',
+                'detail' => 'Expected an array of strings. Given ",firstName,lastName".',
                 'source' => ['parameter' => 'fields[users]']
+            ],
+            $response
+        );
+    }
+
+    public function testFieldsFilterWithEndingComma()
+    {
+        $response = $this->cget(['entity' => 'users'], ['fields[users]' => 'firstName,lastName,'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given "firstName,lastName,".',
+                'source' => ['parameter' => 'fields[users]']
+            ],
+            $response
+        );
+    }
+
+    public function testIncludeFilterWithEmptyValue()
+    {
+        $response = $this->cget(['entity' => 'users'], ['include' => ''], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected string value. Given "".',
+                'source' => ['parameter' => 'include']
+            ],
+            $response
+        );
+    }
+
+    public function testIncludeFilterWithStartingComma()
+    {
+        $response = $this->cget(['entity' => 'users'], ['include' => ',owner,organization'], [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'Expected an array of strings. Given ",owner,organization".',
+                'source' => ['parameter' => 'include']
             ],
             $response
         );
@@ -264,7 +358,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $data = self::jsonToArray($response->getContent());
         self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
         self::assertCount(count($expectedResponse['data'][0]['relationships']), $data['data'][0]['relationships']);
-        self::assertFalse(isset($data['data']['included']));
+        self::assertArrayNotHasKey('included', $data);
     }
 
     public function testIncludeFilter()
@@ -468,8 +562,8 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
 
         $data = self::jsonToArray($response->getContent());
         self::assertCount(count($expectedResponse['data'][0]['attributes']), $data['data'][0]['attributes']);
-        self::assertFalse(isset($data['data'][0]['relationships']));
-        self::assertFalse(isset($data['data']['included']));
+        self::assertArrayNotHasKey('relationships', $data['data'][0]);
+        self::assertArrayNotHasKey('included', $data);
     }
 
     public function testIncludeFilterForSecondLevelRelatedEntity()
@@ -740,7 +834,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertFalse(isset($data['included']));
+        self::assertArrayNotHasKey('included', $data);
     }
 
     public function testIncludeFilterForSecondLevelRelatedEntityWhenSecondIncludeFieldsExistInFieldsFilter()
@@ -885,7 +979,7 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains($expectedResponse, $response);
 
         $data = self::jsonToArray($response->getContent());
-        self::assertFalse(isset($data['included']));
+        self::assertArrayNotHasKey('included', $data);
     }
 
     public function testIncludeFilterForFirstAndSecondLevelRelatedEntityWhenSecondIncludeFieldsExistInFieldsFilter()
