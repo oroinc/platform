@@ -203,7 +203,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         $entityClass,
         array $fieldFilters
     ) {
-        if (empty($fieldFilters[$entityClass])) {
+        if (!isset($fieldFilters[$entityClass])) {
             return;
         }
 
@@ -240,13 +240,13 @@ class FilterFieldsByExtra implements ProcessorInterface
     {
         $allowedFields = null;
         if ($metadata->isInheritanceTypeNone()) {
-            if (!empty($fieldFilters[$metadata->name])) {
+            if (isset($fieldFilters[$metadata->name])) {
                 $allowedFields = $fieldFilters[$metadata->name];
             }
         } else {
             $entityClasses = array_unique(array_merge([$metadata->name], $metadata->subClasses));
             foreach ($entityClasses as $entityClass) {
-                if (!empty($fieldFilters[$entityClass])) {
+                if (isset($fieldFilters[$entityClass])) {
                     if (null === $allowedFields) {
                         $allowedFields = $fieldFilters[$entityClass];
                     } else {

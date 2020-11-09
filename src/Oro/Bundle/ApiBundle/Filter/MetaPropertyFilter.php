@@ -11,7 +11,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
  * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleMetaPropertyFilter
  * @see \Oro\Bundle\ApiBundle\Processor\GetConfig\AddMetaProperties
  */
-class MetaPropertyFilter extends StandaloneFilter
+class MetaPropertyFilter extends StandaloneFilter implements SpecialHandlingFilterInterface
 {
     /** @var array [meta property name => data type or NULL, ...] */
     private $allowedMetaProperties = [];
