@@ -117,6 +117,29 @@ class AttributeFamilyRepositoryTest extends WebTestCase
         $this->assertEmpty($this->repository->getFamilyIdsForAttributesByOrganization([$attributeId], $organization));
     }
 
+    public function testGetFamilyByCode(): void
+    {
+        $family = $this->repository->getFamilyByCode(
+            LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1,
+            $this->getContainer()->get('oro_security.acl_helper')
+        );
+
+        $this->assertInstanceOf(AttributeFamily::class, $family);
+
+        $expectedFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
+        $this->assertEquals($expectedFamily->getId(), $family->getId());
+    }
+
+    public function testGetFamilyByCodeWithoutAclHelper(): void
+    {
+        $family = $this->repository->getFamilyByCode(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1, null);
+
+        $this->assertInstanceOf(AttributeFamily::class, $family);
+
+        $expectedFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
+        $this->assertEquals($expectedFamily->getId(), $family->getId());
+    }
+
     /**
      * @param array $expected
      * @param array $result

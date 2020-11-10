@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\FieldConfigModelRepository;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
@@ -82,13 +83,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByGroup($group);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByGroupWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getAttributesByGroup(new AttributeGroup());
     }
@@ -122,13 +122,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByFamily($family);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByFamilyWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getAttributesByFamily(new AttributeFamily());
     }
@@ -153,13 +152,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByClassWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getAttributesByClass('ClassName');
     }
@@ -206,13 +204,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getActiveAttributesByClassForOrganization('className', $organization);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetActiveAttributesByClassWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getActiveAttributesByClass('ClassName');
     }
@@ -237,13 +234,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getSystemAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetSystemAttributesByClassWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getSystemAttributesByClass('ClassName');
     }
@@ -268,13 +264,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getNonSystemAttributesByClass('className');
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetNonSystemAttributesByClassWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getNonSystemAttributesByClass('ClassName');
     }
@@ -353,87 +348,37 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectation, $this->manager->isSystem($attribute));
     }
 
-    public function testAttributeLabelWhenTranslationExists()
+    /**
+     * @param string $expectedTranslation
+     *
+     * @dataProvider getAttributeLabelDataProvider
+     */
+    public function testGetAttributeLabel(string $expectedTranslation): void
     {
-        $attributeLabel = 'oro.entity.attributeFieldName.label';
-        $config = $this->createMock(ConfigInterface::class);
-        $config
-            ->expects($this->once())
-            ->method('get')
-            ->with('label')
-            ->willReturn($attributeLabel);
-
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-        $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME)
-            ->willReturn($config);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('entity')
-            ->willReturn($entityConfigProvider);
+        $this->mockAttributeLabelTranslation(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME, $expectedTranslation);
 
         /** @var FieldConfigModel $attribute */
         $attribute = $this->getEntity(FieldConfigModel::class, [
             'fieldName' => self::ATTRIBUTE_FIELD_NAME,
             'entity' => $this->getEntity(EntityConfigModel::class, ['className' => self::ENTITY_CLASS_NAME])
         ]);
-
-        $expectedTranslation = 'attribute label';
-        $this->configTranslationHelper
-            ->expects($this->once())
-            ->method('translateWithFallback')
-            ->with($attributeLabel, self::ATTRIBUTE_FIELD_NAME)
-            ->willReturn($expectedTranslation);
 
         $this->assertEquals($expectedTranslation, $this->manager->getAttributeLabel($attribute));
     }
 
-    public function testAttributeLabelWhenTranslationNotExists()
+    /**
+     * @return array
+     */
+    public function getAttributeLabelDataProvider(): array
     {
-        $attributeLabel = 'oro.entity.attributeFieldName.label';
-        $config = $this->createMock(ConfigInterface::class);
-        $config
-            ->expects($this->once())
-            ->method('get')
-            ->with('label')
-            ->willReturn($attributeLabel);
-
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-        $entityConfigProvider = $this->getMockBuilder(ConfigProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::ENTITY_CLASS_NAME, self::ATTRIBUTE_FIELD_NAME)
-            ->willReturn($config);
-
-        $this->configManager
-            ->expects($this->once())
-            ->method('getProvider')
-            ->with('entity')
-            ->willReturn($entityConfigProvider);
-
-        /** @var FieldConfigModel $attribute */
-        $attribute = $this->getEntity(FieldConfigModel::class, [
-            'fieldName' => self::ATTRIBUTE_FIELD_NAME,
-            'entity' => $this->getEntity(EntityConfigModel::class, ['className' => self::ENTITY_CLASS_NAME])
-        ]);
-
-        $this->configTranslationHelper
-            ->expects($this->once())
-            ->method('translateWithFallback')
-            ->with($attributeLabel, self::ATTRIBUTE_FIELD_NAME)
-            ->willReturn(self::ATTRIBUTE_FIELD_NAME);
-
-        $this->assertEquals(self::ATTRIBUTE_FIELD_NAME, $this->manager->getAttributeLabel($attribute));
+        return [
+            'translation exists' => [
+                'expectedTranslation' => 'attribute label',
+            ],
+            'translation not exists' => [
+                'expectedTranslation' => self::ATTRIBUTE_FIELD_NAME,
+            ],
+        ];
     }
 
     public function testGetAttributesByIdsWithIndex()
@@ -449,13 +394,12 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesByIdsWithIndex([1, 2]);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\EntityConfigBundle\Exception\LogicException
-     * @expectedExceptionMessage Cannot use config database when a db schema is not synced.
-     */
     public function testGetAttributesByIdsWithIndexWhenExceptionIsThrown()
     {
         $this->expectsDatabaseCheck(false);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Cannot use config database when a db schema is not synced.');
 
         $this->manager->getAttributesByIdsWithIndex([1, 2]);
     }
@@ -619,6 +563,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param bool $isCheckSuccessful
+     * @param int $calls
      */
     private function expectsDatabaseCheck($isCheckSuccessful, $calls = 1)
     {
@@ -628,6 +573,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int $calls
      * @return FieldConfigModelRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetFieldConfigModelRepository($calls = 1)
@@ -645,6 +591,7 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @param int $calls
      * @return AttributeFamilyRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private function expectsGetAttributeFamilyRepository($calls = 1)
@@ -685,5 +632,41 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     private function createAttributeGroupRelation($attributeId)
     {
         return $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => $attributeId]);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param string $expectedTranslation
+     */
+    private function mockAttributeLabelTranslation(
+        string $className,
+        string $fieldName,
+        string $expectedTranslation
+    ): void {
+        $attributeLabel = 'oro.entity.attributeFieldName.label';
+        $config = $this->createMock(ConfigInterface::class);
+        $config->expects($this->once())
+            ->method('get')
+            ->with('label')
+            ->willReturn($attributeLabel);
+
+        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className, $fieldName)
+            ->willReturn($config);
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('entity')
+            ->willReturn($entityConfigProvider);
+
+        $this->configTranslationHelper
+            ->expects($this->once())
+            ->method('translateWithFallback')
+            ->with($attributeLabel, $fieldName)
+            ->willReturn($expectedTranslation);
     }
 }
