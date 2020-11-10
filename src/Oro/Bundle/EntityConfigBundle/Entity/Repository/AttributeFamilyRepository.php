@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
  * Doctrine repository for AttributeFamily entity
@@ -115,5 +116,20 @@ class AttributeFamilyRepository extends EntityRepository
         }
 
         return $attributeIds;
+    }
+
+    /**
+     * @param string $attributeFamilyCode
+     * @param AclHelper $aclHelper
+     * @return AttributeFamily|null
+     */
+    public function getFamilyByCode(string $attributeFamilyCode, AclHelper $aclHelper): ?AttributeFamily
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->andWhere($qb->expr()->eq('f.code', ':familyCode'))
+            ->setParameter('familyCode', $attributeFamilyCode)
+            ->setMaxResults(1);
+
+        return $aclHelper->apply($qb)->getOneOrNullResult();
     }
 }
