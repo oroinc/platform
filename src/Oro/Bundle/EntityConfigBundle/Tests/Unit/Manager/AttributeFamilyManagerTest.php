@@ -7,6 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeFamilyManager;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
@@ -54,7 +55,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
             ->with(AttributeFamily::class)
             ->willReturn($this->familyRepository);
 
-        $this->familyRepository->expects($this->once())
+        $this->familyRepository->expects($this->any())
             ->method('find')
             ->with(self::FAMILY_ID)
             ->willReturn($this->attributeFamily);
@@ -62,7 +63,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
         $this->familyManager = new AttributeFamilyManager($this->doctrineHelper);
     }
 
-    public function testFamilyIsLast()
+    public function testFamilyIsLast(): void
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
@@ -77,7 +78,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->familyManager->isAttributeFamilyDeletable(self::FAMILY_ID));
     }
 
-    public function testFamilyHasAssignedEntities()
+    public function testFamilyHasAssignedEntities(): void
     {
         $this->familyRepository->expects($this->once())
             ->method('countFamiliesByEntityClass')
@@ -97,7 +98,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->familyManager->isAttributeFamilyDeletable(self::FAMILY_ID));
     }
 
-    public function testFamilyIsDeletable()
+    public function testFamilyIsDeletable(): void
     {
         $this->familyRepository->expects($this->once())
             ->method('countFamiliesByEntityClass')
@@ -115,5 +116,22 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
 
         $this->assertTrue($this->familyManager->isAttributeFamilyDeletable(self::FAMILY_ID));
+    }
+
+    public function testGetAttributeFamilyByCode(): void
+    {
+        $aclHelper = $this->createMock(AclHelper::class);
+
+        $this->familyManager->setAclHelper($aclHelper);
+        
+        $this->familyRepository->expects($this->once())
+            ->method('getFamilyByCode')
+            ->with('test', $aclHelper)
+            ->willReturn($this->attributeFamily);
+
+        $this->assertSame($this->attributeFamily, $this->familyManager->getAttributeFamilyByCode('test'));
+
+        // check local cache
+        $this->assertSame($this->attributeFamily, $this->familyManager->getAttributeFamilyByCode('test'));
     }
 }
