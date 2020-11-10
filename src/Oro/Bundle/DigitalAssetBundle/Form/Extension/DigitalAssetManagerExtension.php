@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
-use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
+use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -36,7 +36,7 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
     /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
 
-    /** @var PreviewMetadataProvider */
+    /** @var PreviewMetadataProviderInterface */
     private $previewMetadataProvider;
 
     /** @var EntityToIdTransformer */
@@ -48,14 +48,14 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
     /**
      * @param AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
      * @param EntityClassNameHelper $entityClassNameHelper
-     * @param PreviewMetadataProvider $previewMetadataProvider
+     * @param PreviewMetadataProviderInterface $previewMetadataProvider
      * @param EntityToIdTransformer $digitalAssetToIdTransformer
      * @param FileReflector $fileReflector
      */
     public function __construct(
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
         EntityClassNameHelper $entityClassNameHelper,
-        PreviewMetadataProvider $previewMetadataProvider,
+        PreviewMetadataProviderInterface $previewMetadataProvider,
         EntityToIdTransformer $digitalAssetToIdTransformer,
         FileReflector $fileReflector
     ) {

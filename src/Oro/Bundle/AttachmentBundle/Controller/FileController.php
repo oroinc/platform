@@ -10,6 +10,7 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,15 +28,17 @@ class FileController extends AbstractController
      * @param int    $id
      * @param string $filename
      * @param string $action
+     * @param Request $request
      *
      * @return Response
      */
-    public function getFileAction(int $id, string $filename, string $action): Response
+    public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->closeSession($request);
 
         $response = new Response();
-        $response->headers->set('Cache-Control', 'public');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         if (FileUrlProviderInterface::FILE_ACTION_GET === $action) {
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
@@ -64,6 +67,7 @@ class FileController extends AbstractController
      * @param int    $width
      * @param int    $height
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
@@ -88,6 +92,7 @@ class FileController extends AbstractController
      * @param int    $id
      * @param string $filter
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
