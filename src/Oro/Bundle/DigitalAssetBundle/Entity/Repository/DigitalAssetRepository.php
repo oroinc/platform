@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Entity\Repository;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -36,12 +37,9 @@ class DigitalAssetRepository extends EntityRepository
      * Find source file by digital asset id
      *
      * @param int $id
-     * @return File
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @return File|null
      */
-    public function findSourceFile(int $id): File
+    public function findSourceFile(int $id): ?File
     {
         $qb = $this->getEntityManager()
             ->createQueryBuilder();
@@ -52,7 +50,7 @@ class DigitalAssetRepository extends EntityRepository
             ->where($qb->expr()->eq('digitalAsset.id', ':id'))
             ->setParameter('id', $id);
 
-        return $qb->getQuery()->getSingleResult();
+        return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -109,5 +107,30 @@ class DigitalAssetRepository extends EntityRepository
             ->setParameter(':ids', $ids);
 
         return $aclHelper->apply($qb)->getResult();
+    }
+
+    /**
+     * @param int $fileId
+     * @return array
+     */
+    public function getFileDataForTwigTag(int $fileId): array
+    {
+        $entityManager = $this->getEntityManager();
+        $expr = $entityManager->getExpressionBuilder();
+        $result = $entityManager->createQueryBuilder()
+            ->select(
+                [
+                    'file.uuid',
+                    'file.parentEntityClass',
+                    'file.parentEntityId',
+                    'IDENTITY(file.digitalAsset) as digitalAssetId',
+                ]
+            )
+            ->from(File::class, 'file')
+            ->where($expr->eq('file.id', ':fileId'))
+            ->getQuery()
+            ->execute(['fileId' => $fileId], AbstractQuery::HYDRATE_ARRAY);
+
+        return $result ? current($result) : [];
     }
 }

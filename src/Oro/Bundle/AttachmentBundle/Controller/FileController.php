@@ -10,6 +10,7 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,15 +28,17 @@ class FileController extends AbstractController
      * @param int $id
      * @param string $filename
      * @param string $action
+     * @param Request $request
      *
      * @return Response
      */
-    public function getFileAction(int $id, string $filename, string $action): Response
+    public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->closeSession($request);
 
         $response = new Response();
-        $response->headers->set('Cache-Control', 'public');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         if ($action === FileUrlProviderInterface::FILE_ACTION_GET) {
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
@@ -62,12 +65,14 @@ class FileController extends AbstractController
      * @param int $width
      * @param int $height
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
-    public function getResizedAttachmentImageAction($id, $width, $height, $filename)
+    public function getResizedAttachmentImageAction($id, $width, $height, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->closeSession($request);
 
         /** @var ImageResizeManagerInterface $resizeManager */
         $resizeManager = $this->get(ImageResizeManager::class);
@@ -87,12 +92,14 @@ class FileController extends AbstractController
      * @param int $id
      * @param string $filter
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
-    public function getFilteredImageAction($id, $filter, $filename)
+    public function getFilteredImageAction($id, $filter, $filename, Request $request)
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->closeSession($request);
 
         /** @var ImageResizeManagerInterface $resizeManager */
         $resizeManager = $this->get(ImageResizeManager::class);
@@ -102,6 +109,17 @@ class FileController extends AbstractController
         }
 
         return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function closeSession(Request $request): void
+    {
+        $session = $request->getSession();
+        if (null !== $session && $session->isStarted()) {
+            $session->save();
+        }
     }
 
     /**
