@@ -1,0 +1,3 @@
+css:
+    inputs:
+        - 'bundles/orogoogleintegration/css/main.scss'

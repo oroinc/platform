@@ -56,7 +56,18 @@ abstract class AbstractPagerExtension extends AbstractExtension
             $defaultPageSize = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH);
             $pageSizeItems = $config->offsetGetByPath(ToolbarExtension::PAGER_ITEMS_OPTION_PATH, []);
 
-            if (!in_array($currentPageSize, $pageSizeItems, false)) {
+            $exist = array_filter(
+                $pageSizeItems,
+                static function ($item) use ($currentPageSize) {
+                    if (isset($item['size'])) {
+                        return $currentPageSize == $item['size'];
+                    }
+
+                    return is_numeric($item) ? $currentPageSize == $item : false;
+                }
+            );
+
+            if (!$exist) {
                 $this->getParameters()
                     ->mergeKey(PagerInterface::PAGER_ROOT_PARAM, [PagerInterface::PER_PAGE_PARAM => $defaultPageSize]);
             }

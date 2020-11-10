@@ -30,6 +30,11 @@ class LazyServicesCompilerPass implements CompilerPassInterface
             foreach ($resource->data['lazy_services'] as $serviceId) {
                 if ($container->hasDefinition($serviceId)) {
                     $container->getDefinition($serviceId)->setLazy(true);
+                } else {
+                    $container->log(
+                        $this,
+                        sprintf('The service "%s" cannot be marked as lazy due to it does not exist.', $serviceId)
+                    );
                 }
             }
         }

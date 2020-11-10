@@ -261,9 +261,8 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     protected function receiveHeaderConversionRules()
     {
-        if (null === $this->headerConversionRules) {
-            $this->headerConversionRules = $this->getHeaderConversionRules();
-        }
+        // Do not cache header because it is dependent on the locale
+        $this->headerConversionRules = $this->getHeaderConversionRules();
 
         return $this->headerConversionRules;
     }

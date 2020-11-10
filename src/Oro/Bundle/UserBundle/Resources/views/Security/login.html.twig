@@ -74,11 +74,9 @@
                         <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                         <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
                     </div>
-                    {% if oro_config_value('oro_sso.enable_google_sso') %}
-                        <div class="form-signin__oauth">
-                            {% placeholder oro_user_login_form %}
-                        </div>
-                    {% endif %}
+                    <div class="form-signin__oauth">
+                        {% placeholder oro_user_login_form %}
+                    </div>
                 </fieldset>
                 <input type="hidden" name="_target_path" value="">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">

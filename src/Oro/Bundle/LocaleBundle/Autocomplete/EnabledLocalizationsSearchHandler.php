@@ -98,7 +98,7 @@ class EnabledLocalizationsSearchHandler extends SearchHandler
     {
         return (array) $this->configManager->get(
             Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
-            [],
+            false,
             false,
             $scope ? (int) $scope : null
         );

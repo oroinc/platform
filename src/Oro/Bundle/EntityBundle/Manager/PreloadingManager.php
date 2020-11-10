@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Manager;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -129,7 +130,7 @@ class PreloadingManager
 
         foreach ($entities as $entity) {
             $targetFieldValue = $this->propertyAccessor->getValue($entity, $targetField);
-            if ($targetFieldValue) {
+            if ($targetFieldValue && !$this->isCollectionNotInitialized($targetFieldValue)) {
                 $targetFieldEntities[] = $isToMany ? $targetFieldValue->toArray() : $targetFieldValue;
             }
         }
@@ -160,5 +161,14 @@ class PreloadingManager
                 )
             );
         }
+    }
+
+    /**
+     * @param object|null $collection
+     * @return bool
+     */
+    private function isCollectionNotInitialized(?object $collection): bool
+    {
+        return $collection instanceof AbstractLazyCollection && !$collection->isInitialized();
     }
 }

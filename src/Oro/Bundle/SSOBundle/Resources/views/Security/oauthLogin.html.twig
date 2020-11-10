@@ -1,7 +1,0 @@
-{% if oro_config_value('oro_sso.enable_google_sso') %}
-    {% for owner in hwi_oauth_resource_owners() %}
-        <a href="{{ hwi_oauth_authorization_url(owner) }}" class="btn btn-primary btn-large btn-uppercase btn-block btn-brand-{{ owner }}">
-            {{ 'oro.sso.login.alternative.label'|trans }} {{ owner|trans }}
-        </a>
-    {% endfor %}
-{% endif %}

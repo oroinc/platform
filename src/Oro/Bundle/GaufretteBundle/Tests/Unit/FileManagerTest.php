@@ -361,6 +361,26 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->deleteFile(null);
     }
 
+    public function testDeleteAllFiles()
+    {
+        $fileNames = ['text1.txt', 'text2.txt'];
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->willReturn([
+                'keys' => $fileNames,
+                'dirs' => ['dir1']
+            ]);
+        $this->filesystem->expects($this->exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$fileNames[0]],
+                [$fileNames[1]]
+            );
+
+        $this->fileManager->deleteAllFiles();
+    }
+
     public function testWriteToStorage()
     {
         $content = 'Test data';

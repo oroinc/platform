@@ -27,3 +27,7 @@ services:
     oro_layout.provider.image_placeholder.chain.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\ChainImagePlaceholderProvider'
         abstract: true
+
+    oro_layout.provider.image_placeholder.cache.abstract:
+        class: 'Oro\Bundle\LayoutBundle\Provider\Image\CacheImagePlaceholderProvider'
+        abstract: true

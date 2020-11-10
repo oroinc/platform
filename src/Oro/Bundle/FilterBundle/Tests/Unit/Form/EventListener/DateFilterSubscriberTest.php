@@ -11,8 +11,10 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -55,6 +57,40 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(FormEvents::PRE_SUBMIT, $eventNames[0]);
     }
 
+    public function testPreSubmitWithCustomFormTimeZoneConfig()
+    {
+        $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00']];
+        $form = $this->createMock(FormInterface::class);
+        $valueForm = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $event = new FormEvent($form, $data);
+
+        $form
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('value'))
+            ->willReturn($valueForm);
+        $form
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig
+            ->expects($this->once())
+            ->method('getOption')
+            ->willReturn('time_zone')
+            ->willReturn('UTC');
+        $valueForm
+            ->expects($this->any())
+            ->method('all')
+            ->willReturn(['start' => 'start subform']);
+        $this->subscriber->preSubmit($event);
+
+        self::assertEquals(
+            ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']],
+            $event->getData()
+        );
+    }
+
     /**
      * @dataProvider dataProvider
      *
@@ -65,13 +101,32 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = [])
     {
-        $form      = self::createMock('Symfony\Component\Form\Test\FormInterface');
-        $valueForm = self::createMock('Symfony\Component\Form\Test\FormInterface');
-        $event     = new FormEvent($form, $data);
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $valueForm = $this->createMock(FormInterface::class);
+        $event = new FormEvent($form, $data);
 
-        $form->expects(self::any())->method('get')->with(self::equalTo('value'))->will(self::returnValue($valueForm));
-        $valueForm->expects(self::any())->method('all')->will(self::returnValue($valueSubforms));
-        $valueForm->expects(self::exactly(count($shouldAddFields)))->method('add');
+        $form
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('value'))
+            ->willReturn($valueForm);
+        $form
+            ->expects($this->any())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig
+            ->expects($this->once())
+            ->method('getOption')
+            ->willReturn('time_zone')
+            ->willReturn(null);
+        $valueForm
+            ->expects($this->any())
+            ->method('all')
+            ->willReturn($valueSubforms);
+        $valueForm
+            ->expects($this->exactly(count($shouldAddFields)))
+            ->method('add');
 
         $this->subscriber->preSubmit($event);
         // should process only once, do not break expectation
@@ -94,6 +149,16 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $yearDateTime = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $yearNumber = $yearDateTime->format('Y');
         return [
+            'should process with custom time zone' => [
+                ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
+                [
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'value' => [
+                        'start' => $this->getUtcDate('2001-01-01')
+                    ]
+                ],
+                ['start' => 'start subform']
+            ],
             'should process date value'                                           => [
                 ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
                 [

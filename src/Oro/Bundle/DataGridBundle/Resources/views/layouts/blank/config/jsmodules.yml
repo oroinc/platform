@@ -24,6 +24,7 @@ aliases:
     oro/datagrid/cell/date-cell$: orodatagrid/js/datagrid/cell/date-cell
     oro/datagrid/cell/datetime-cell$: orodatagrid/js/datagrid/cell/datetime-cell
     oro/datagrid/cell/html-cell$: orodatagrid/js/datagrid/cell/html-cell
+    oro/datagrid/cell/html-template-cell$: orodatagrid/js/datagrid/cell/html-template-cell
     oro/datagrid/cell/multi-relation-cell$: orodatagrid/js/datagrid/cell/multi-relation-cell
     oro/datagrid/cell/multi-select-cell$: orodatagrid/js/datagrid/cell/multi-select-cell
     oro/datagrid/cell/number-cell$: orodatagrid/js/datagrid/cell/number-cell
@@ -48,6 +49,7 @@ configs:
     orodatagrid/js/grid-views-builder: {}
 dynamic-imports:
     orodatagrid:
+        - orodatagrid/js/app/views/toggle-group-view
         - oro/datagrid/action/abstract-action
         - oro/datagrid/action/ajax-action
         - oro/datagrid/action/ajaxdelete-action
@@ -71,6 +73,7 @@ dynamic-imports:
         - oro/datagrid/cell/date-cell
         - oro/datagrid/cell/datetime-cell
         - oro/datagrid/cell/html-cell
+        - oro/datagrid/cell/html-template-cell
         - oro/datagrid/cell/multi-relation-cell
         - oro/datagrid/cell/multi-select-cell
         - oro/datagrid/cell/number-cell
@@ -96,7 +99,9 @@ dynamic-imports:
         - orodatagrid/js/app/views/board/card-view
         - orodatagrid/js/app/views/board/column-header-view
         - orodatagrid/js/app/views/board/column-view
+        - orodatagrid/js/app/views/toggle-pagination-view
         - orodatagrid/js/appearance/builder
+        - orodatagrid/js/datagrid/builder/html-templates-preloader
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener
         - orodatagrid/js/datagrid/listener/change-editable-cell-listener
@@ -106,6 +111,10 @@ dynamic-imports:
         - orodatagrid/js/inline-editing/default-editors
         - orodatagrid/js/row-select-for-widget/builder
         - orodatagrid/js/totals-builder
+        - orodatagrid/js/app/components/cell-popup-editor-component
+        - oroform/js/app/views/editor/select-editor-view
+        - oroform/js/app/views/editor/related-id-relation-editor-view
+        - oroui/js/tools/search-api-accessor
     orodatagrid-scroll-plugin:
         - orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin
 map:
