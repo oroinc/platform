@@ -17,8 +17,6 @@ use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
-use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareInterface;
-use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareTrait;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
@@ -38,9 +36,9 @@ use Symfony\Component\Validator\ConstraintValidatorInterface;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
-    const TEST_PASSWORD = 'somePassword';
+    private const TEST_PASSWORD = 'somePassword';
 
-    use OauthManagerRegistryAwareTrait;
+    private const OAUTH_ACCOUNT_TYPE = 'oauth1';
 
     /** @var SymmetricCrypterInterface */
     private $encryptor;
@@ -93,7 +91,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
 
         $this->imapSettingsChecker = $this->createMock(ImapSettingsChecker::class);
         $this->smtpSettingsChecker = $this->createMock(SmtpSettingsChecker::class);
-        $this->oauthManagerRegistry = $this->getManagerRegistryMock();
+        $this->oauthManagerRegistry = $this->createMock(OAuth2ManagerRegistry::class);
 
         parent::setUp();
     }
@@ -181,17 +179,14 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
-                'accountType' => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'password' => self::TEST_PASSWORD,
             ];
         $form = $this->factory->create(ConfigurationType::class);
         $form->submit($formData);
 
         static::assertEquals('someHost', $form->get('imapHost')->getData());
-        static::assertEquals(
-            OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
-            $form->get('accountType')->getData()
-        );
+        static::assertEquals(self::OAUTH_ACCOUNT_TYPE, $form->get('accountType')->getData());
         static::assertEquals('123', $form->get('imapPort')->getData());
         static::assertEquals('', $form->get('smtpHost')->getData());
         static::assertEquals('', $form->get('smtpPort')->getData());
@@ -204,7 +199,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
         static::assertInstanceOf(UserEmailOrigin::class, $entity);
 
         static::assertEquals('someHost', $entity->getImapHost());
-        static::assertEquals(OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT, $entity->getAccountType());
+        static::assertEquals(self::OAUTH_ACCOUNT_TYPE, $entity->getAccountType());
         static::assertEquals('123', $entity->getImapPort());
         static::assertEquals('', $entity->getSmtpHost());
         static::assertEquals('', $entity->getSmtpPort());
@@ -247,7 +242,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'imapPort' => '123',
             'smtpHost' => '',
             'smtpPort' => '',
-            'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+            'accountType' => self::OAUTH_ACCOUNT_TYPE,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
@@ -323,7 +318,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
-                'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -354,7 +349,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
-                'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapEncryption' => 'ssl',
                 'smtpEncryption' => 'ssl',
                 'user' => 'someUser',
@@ -386,7 +381,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
                 'useImap' => 0,
                 'useSmtp' => 0,
                 'imapHost' => 'someHost',
-                'accountType' => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+                'accountType' => self::OAUTH_ACCOUNT_TYPE,
                 'imapPort' => '123',
                 'smtpHost' => '',
                 'smtpPort' => '',
@@ -465,7 +460,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             'imapPort' => '123',
             'smtpHost' => 'someSmtpHost',
             'smtpPort' => '456',
-            'accountType'   => OauthManagerRegistryAwareInterface::MANAGER_TYPE_DEFAULT,
+            'accountType' => self::OAUTH_ACCOUNT_TYPE,
             'imapEncryption' => 'ssl',
             'smtpEncryption' => 'ssl',
             'user' => 'someUser',
