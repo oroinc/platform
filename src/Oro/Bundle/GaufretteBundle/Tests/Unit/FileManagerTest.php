@@ -19,23 +19,19 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
-    const TEST_PROTOCOL         = 'testProtocol';
+    private const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
+    private const TEST_PROTOCOL         = 'testProtocol';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Filesystem */
-    protected $filesystem;
+    private $filesystem;
 
     /** @var FileManager */
-    protected $fileManager;
+    private $fileManager;
 
     protected function setUp(): void
     {
-        $this->filesystem = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $filesystemMap = $this->getMockBuilder(FilesystemMap::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->filesystem = $this->createMock(Filesystem::class);
+        $filesystemMap = $this->createMock(FilesystemMap::class);
         $filesystemMap->expects($this->once())
             ->method('get')
             ->with(self::TEST_FILE_SYSTEM_NAME)
@@ -155,9 +151,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $fileName = 'testFile.txt';
 
-        $file = $this->getMockBuilder(File::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = $this->createMock(File::class);
 
         $this->filesystem->expects($this->never())
             ->method('has');
@@ -187,9 +181,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $fileName = 'testFile.txt';
 
-        $file = $this->getMockBuilder(File::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = $this->createMock(File::class);
 
         $this->filesystem->expects($this->once())
             ->method('has')
@@ -237,10 +229,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetStreamWhenFileExistsAndRequestedIgnoreException()
     {
         $fileName = 'testFile.txt';
-
-        $file = tmpfile();
-        fwrite($file, 'file content ...');
-        fseek($file, 0);
+        $stream = new LocalStream('test');
 
         $this->filesystem->expects($this->once())
             ->method('has')
@@ -249,14 +238,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->filesystem->expects($this->once())
             ->method('createStream')
             ->with($fileName)
-            ->willReturn($file);
+            ->willReturn($stream);
 
-        $stream = $this->fileManager->getStream($fileName, false);
-
-        $this->assertIsResource($stream);
-        $this->assertSame($file, $stream);
-
-        fclose($file);
+        $this->assertSame($stream, $this->fileManager->getStream($fileName, false));
     }
 
     public function testGetFileContentByFileName()
@@ -264,9 +248,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
 
-        $file = $this->getMockBuilder(File::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = $this->createMock(File::class);
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
@@ -300,9 +282,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
 
-        $file = $this->getMockBuilder(File::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $file = $this->createMock(File::class);
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
@@ -355,7 +335,27 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->filesystem->expects($this->never())
             ->method('delete');
 
-        $this->fileManager->deleteFile(null);
+        $this->fileManager->deleteFile('');
+    }
+
+    public function testDeleteAllFiles()
+    {
+        $fileNames = ['text1.txt', 'text2.txt'];
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->willReturn([
+                'keys' => $fileNames,
+                'dirs' => ['dir1']
+            ]);
+        $this->filesystem->expects($this->exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$fileNames[0]],
+                [$fileNames[1]]
+            );
+
+        $this->fileManager->deleteAllFiles();
     }
 
     public function testWriteToStorage()
