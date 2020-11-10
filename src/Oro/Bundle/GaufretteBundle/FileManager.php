@@ -3,6 +3,7 @@
 namespace Oro\Bundle\GaufretteBundle;
 
 use Gaufrette\Exception;
+use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
@@ -17,6 +18,8 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 /**
  * This manager can be used to simplify retrieving and storing files
  * via Gaufrette filesystem abstraction layer.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FileManager
 {
@@ -35,7 +38,7 @@ class FileManager
     /**
      * @param string $filesystemName The name of Gaufrette filesystem this manager works with
      */
-    public function __construct($filesystemName)
+    public function __construct(string $filesystemName)
     {
         $this->filesystemName = $filesystemName;
     }
@@ -45,7 +48,7 @@ class FileManager
      *
      * @param FilesystemMap $filesystemMap
      */
-    public function setFilesystemMap(FilesystemMap $filesystemMap)
+    public function setFilesystemMap(FilesystemMap $filesystemMap): void
     {
         $this->filesystem = $filesystemMap->get($this->filesystemName);
     }
@@ -55,7 +58,7 @@ class FileManager
      *
      * @param string $protocol
      */
-    public function setProtocol($protocol)
+    public function setProtocol(string $protocol): void
     {
         $this->protocol = $protocol;
     }
@@ -65,7 +68,7 @@ class FileManager
      *
      * @return string
      */
-    public function getProtocol()
+    public function getProtocol(): string
     {
         return $this->protocol;
     }
@@ -80,7 +83,7 @@ class FileManager
      *
      * @throws ProtocolConfigurationException if the Gaufrette protocol is not configured
      */
-    public function getFilePath($fileName)
+    public function getFilePath(string $fileName): string
     {
         if (!$this->protocol) {
             throw new ProtocolConfigurationException();
@@ -96,10 +99,10 @@ class FileManager
      *
      * @return string[] The names of the found files
      */
-    public function findFiles($prefix = '')
+    public function findFiles(string $prefix = ''): array
     {
         $result = $this->filesystem->listKeys($prefix);
-        if (!empty($result) && array_key_exists('keys', $result)) {
+        if (!empty($result) && \array_key_exists('keys', $result)) {
             $result = $result['keys'];
         }
 
@@ -112,8 +115,10 @@ class FileManager
      * @param string $fileName
      *
      * @return bool
+     *
+     * @throws \InvalidArgumentException if the file name is empty string
      */
-    public function hasFile($fileName)
+    public function hasFile(string $fileName): bool
     {
         return $this->filesystem->has($fileName);
     }
@@ -126,8 +131,11 @@ class FileManager
      *                               in the Gaufrette file system
      *
      * @return File|null
+     *
+     * @throws FileNotFound if the file does not exist and throw exception is requested
+     * @throws \InvalidArgumentException if the file name is empty string
      */
-    public function getFile($fileName, $throwException = true)
+    public function getFile(string $fileName, bool $throwException = true): ?File
     {
         $file = null;
         if ($throwException || $this->filesystem->has($fileName)) {
@@ -144,8 +152,11 @@ class FileManager
      * @param bool   $throwException Whether to throw an exception in case the file does not exists
      *
      * @return Stream|null
+     *
+     * @throws FileNotFound if the file does not exist and throw exception is requested
+     * @throws \InvalidArgumentException if the file name is empty string
      */
-    public function getStream($fileName, $throwException = true)
+    public function getStream(string $fileName, bool $throwException = true): ?Stream
     {
         $hasFile = $this->filesystem->has($fileName);
         if (!$hasFile && $throwException) {
@@ -165,8 +176,12 @@ class FileManager
      *                               in the Gaufrette file system
      *
      * @return string|null
+     *
+     * @throws FileNotFound if the file does not exist and throw exception is requested
+     * @throws \RuntimeException if the file cannot be read
+     * @throws \InvalidArgumentException if the file name is empty string
      */
-    public function getFileContent($fileName, $throwException = true)
+    public function getFileContent(string $fileName, bool $throwException = true): ?string
     {
         $content = null;
         $file = $this->getFile($fileName, $throwException);
@@ -181,10 +196,25 @@ class FileManager
      * Checks whether the given file exists and, if so, deletes it from the Gaufrette file system.
      *
      * @param string $fileName
+     *
+     * @throws \RuntimeException if the file cannot be deleted
      */
-    public function deleteFile($fileName)
+    public function deleteFile(string $fileName): void
     {
         if ($fileName && $this->filesystem->has($fileName)) {
+            $this->filesystem->delete($fileName);
+        }
+    }
+
+    /**
+     * Deletes all files from the Gaufrette file system.
+     *
+     * @throws \RuntimeException if any file cannot be deleted
+     */
+    public function deleteAllFiles(): void
+    {
+        $fileNames = $this->findFiles();
+        foreach ($fileNames as $fileName) {
             $this->filesystem->delete($fileName);
         }
     }
@@ -196,8 +226,11 @@ class FileManager
      * @param string $fileName
      *
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
+     * @throws \RuntimeException if the destination stream cannot be opened
+     * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
+     * @throws \InvalidArgumentException if the file name is empty string
      */
-    public function writeToStorage($content, $fileName)
+    public function writeToStorage(string $content, string $fileName): void
     {
         $dstStream = $this->filesystem->createStream($fileName);
         $dstStream->open(new StreamMode('wb+'));
@@ -214,9 +247,17 @@ class FileManager
      *
      * @param string $localFilePath
      * @param string $fileName
+     *
+     * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
+     * @throws \RuntimeException if the destination stream cannot be opened
+     * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
+     * @throws \InvalidArgumentException if the local file path of the file name is empty string
      */
-    public function writeFileToStorage($localFilePath, $fileName)
+    public function writeFileToStorage(string $localFilePath, string $fileName): void
     {
+        if (empty($localFilePath)) {
+            throw new \InvalidArgumentException('Local path is empty.');
+        }
         $this->writeStreamToStorage(new LocalStream($localFilePath), $fileName);
     }
 
@@ -230,8 +271,11 @@ class FileManager
      * @return bool returns false in case if $avoidWriteEmptyStream = true and input stream is empty.
      *
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
+     * @throws \RuntimeException if the destination stream cannot be opened
+     * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
+     * @throws \InvalidArgumentException if the local file path of the file name is empty string
      */
-    public function writeStreamToStorage(Stream $srcStream, $fileName, $avoidWriteEmptyStream = false)
+    public function writeStreamToStorage(Stream $srcStream, string $fileName, bool $avoidWriteEmptyStream = false): bool
     {
         $srcStream->open(new StreamMode('rb'));
 
@@ -282,7 +326,7 @@ class FileManager
      *
      * @throws IOException if a temporary file cannot be created
      */
-    public function writeToTemporaryFile($content, $originalFileName = null)
+    public function writeToTemporaryFile(string $content, string $originalFileName = null): ComponentFile
     {
         $tmpFileName = $this->getTemporaryFileName($originalFileName);
         if (false === @file_put_contents($tmpFileName, $content)) {
@@ -301,8 +345,10 @@ class FileManager
      * @return ComponentFile The created temporary file
      *
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
+     * @throws \RuntimeException if the destination stream cannot be opened
+     * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
      */
-    public function writeStreamToTemporaryFile(Stream $srcStream, $originalFileName = null)
+    public function writeStreamToTemporaryFile(Stream $srcStream, string $originalFileName = null): ComponentFile
     {
         $tmpFileName = $this->getTemporaryFileName($originalFileName);
         $srcStream->open(new StreamMode('rb'));
@@ -330,14 +376,14 @@ class FileManager
      *
      * @return string The full path to a temporary file
      */
-    public function getTemporaryFileName($suggestedFileName = null)
+    public function getTemporaryFileName(string $suggestedFileName = null): string
     {
         $tmpDir = ini_get('upload_tmp_dir');
         if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
             $tmpDir = sys_get_temp_dir();
         }
         $tmpDir = realpath($tmpDir);
-        if (DIRECTORY_SEPARATOR !== substr($tmpDir, -strlen(DIRECTORY_SEPARATOR))) {
+        if (DIRECTORY_SEPARATOR !== substr($tmpDir, -\strlen(DIRECTORY_SEPARATOR))) {
             $tmpDir .= DIRECTORY_SEPARATOR;
         }
         $extension = null;
@@ -359,7 +405,7 @@ class FileManager
      *
      * @return string
      */
-    protected function generateFileName($extension = null)
+    protected function generateFileName(string $extension = null): string
     {
         $fileName = str_replace('.', '', uniqid('', true));
         if ($extension) {
