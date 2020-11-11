@@ -517,10 +517,14 @@ class OroMainContext extends MinkContext implements
      * Assert form error message
      * Example: Then I should see "At least one of the fields First name, Last name must be defined." error message
      *
-     * @Then /^(?:|I should )see "(?P<title>[^"]+)" error message$/
+     * @Then /^(?:|I should )see "(?P<title>(?:[^"]|\\")*)" error message$/
+     *
+     * @param string $title
      */
     public function iShouldSeeErrorMessage($title)
     {
+        $title = $this->fixStepArgument($title);
+
         $errorElement = $this->spin(function (MinkContext $context) {
             return $context->getSession()->getPage()->find('css', '.alert-error');
         });
@@ -2334,8 +2338,15 @@ JS;
     {
         foreach ($table->getRows() as $item) {
             $item = reset($item);
+            $page = $this->getPage();
+
+            $button = $page->findLink($item);
+            if (!$button) {
+                $button = $page->findButton($item);
+            }
+
             self::assertNotNull(
-                $this->getPage()->findLink($item),
+                $button,
                 "Button with name $item not found (link selector, actually)"
             );
         }
@@ -2350,8 +2361,15 @@ JS;
     {
         foreach ($table->getRows() as $item) {
             $item = reset($item);
+            $page = $this->getPage();
+
+            $button = $page->findLink($item);
+            if (!$button) {
+                $button = $page->findButton($item);
+            }
+
             self::assertNull(
-                $this->getPage()->findLink($item),
+                $button,
                 "Button with name $item still present on page (link selector, actually)"
             );
         }

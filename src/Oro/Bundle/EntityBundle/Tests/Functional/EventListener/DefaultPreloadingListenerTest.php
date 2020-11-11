@@ -26,6 +26,34 @@ class DefaultPreloadingListenerTest extends WebTestCase
         );
     }
 
+    public function testOnPreloadWhenNotExitingEntity(): void
+    {
+        $entityManager = $this->getContainer()->get('doctrine')->getManagerForClass(User::class);
+
+        // Ensure entity manager is cleared and will not use already loaded entities.
+        $entityManager->clear();
+
+        /** @var User $user */
+        $user = $entityManager->getReference(User::class, 999999);
+
+        $this->assertTrue($user instanceof Proxy && !$user->__isInitialized());
+
+        $event = new PreloadEntityEvent(
+            [$user],
+            [
+                'organizations' => [],
+                'emails' => [],
+                'owner' => [],
+            ],
+            []
+        );
+
+        $this->getContainer()->get('oro_entity.tests.event_listener.user_preloading')->onPreload($event);
+
+        // Entity must stay uninitialized because it does not exist.
+        $this->assertTrue($user instanceof Proxy && !$user->__isInitialized());
+    }
+
     public function testOnPreloadWhenIsNotInitialized(): void
     {
         // Ensure entity manager is cleared and will not use already loaded entities.

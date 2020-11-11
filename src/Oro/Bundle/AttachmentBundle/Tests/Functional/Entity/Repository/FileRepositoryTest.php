@@ -26,23 +26,6 @@ class FileRepositoryTest extends WebTestCase
         $this->repository = $container->get('doctrine')->getRepository(File::class);
     }
 
-    public function testFindAllForEntityByOneUuid(): void
-    {
-        /** @var File $fileA */
-        $fileA = $this->getReference(LoadFileData::FILE_1);
-
-        /** @var File $fileC */
-        $fileC = $this->getReference(LoadFileData::FILE_3);
-
-        $this->assertEquals(
-            [
-                $fileA->getUuid() => $fileA,
-                $fileC->getUuid() => $fileC,
-            ],
-            $this->repository->findAllForEntityByOneUuid($fileA->getUuid())
-        );
-    }
-
     public function testFindForEntityField(): void
     {
         $this->assertEquals(

@@ -115,6 +115,19 @@ oro:
             close_tooltip: "Close Column Manager"
             empty_list: "No columns found"
             close.label: "Close"
+        btn:
+            show_all:
+                aria_label: 'Show all added items on one page'
+                label: 'Show All'
+            show_less:
+                aria_label: 'Show all added items with pagination'
+                label: 'Show Less'
+            group_similar:
+                aria_label: 'Group similar items'
+                label: 'Group similar'
+            ungroup_similar:
+                aria_label: 'Show similar items separately'
+                label: 'Ungroup similar'
         not_number: Not a number
         inline_editing:
             message:
@@ -131,6 +144,7 @@ oro:
                 	<li><span style="font-family: monospace">Escape</span> - Quit</li>
                 </ul>
         action:
+            select_row: 'Select a row'
             default_postfix: "row action"
         mass_action:
             title: Mass Actions

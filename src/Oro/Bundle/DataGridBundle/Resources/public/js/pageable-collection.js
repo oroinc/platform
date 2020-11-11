@@ -249,8 +249,11 @@ define([
          *
          * @protected
          */
-        onRemove: function() {
-            if (this.state.totalRecords > 0) {
+        onRemove: function(modelToRemove, collection, options = {}) {
+            this.trigger('beforeRemove', modelToRemove, collection, options);
+            const {recountTotalRecords = true} = options;
+
+            if (recountTotalRecords && this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
         },
@@ -363,11 +366,13 @@ define([
             const responseModels = this._parseResponseModels(resp);
             const responseOptions = this._parseResponseOptions(resp);
             if (responseOptions) {
-                _.extend(options, responseOptions);
+                _.extend(options, responseOptions, {recountTotalRecords: false});
             }
-            this.state.totalRecords = options.totalRecords || 0;
-            this.state.hideToolbar = options.hideToolbar;
-            this.state = this._checkState(this.state);
+            const state = {
+                totalRecords: options.totalRecords || 0,
+                hideToolbar: options.hideToolbar
+            };
+            this.updateState(state);
 
             return responseModels;
         },
@@ -394,6 +399,10 @@ define([
          * @protected
          */
         _parseResponseModels: function(resp) {
+            if (this.options.parseResponseModels) {
+                return this.options.parseResponseModels(resp);
+            }
+
             if (_.has(resp, 'data')) {
                 return resp.data;
             }
@@ -406,6 +415,10 @@ define([
          * @protected
          */
         _parseResponseOptions: function(resp) {
+            if (this.options.parseResponseOptions) {
+                return this.options.parseResponseOptions(resp);
+            }
+
             if (_.has(resp, 'options')) {
                 return resp.options;
             }
@@ -711,7 +724,8 @@ define([
 
             options = _.defaults(options || {}, {reset: true});
 
-            let state = this._checkState(this.state);
+            this.updateState({});
+            let state = this.state;
 
             const mode = this.mode;
 
@@ -1050,9 +1064,8 @@ define([
          * @returns {string}
          * @protected
          */
-        _encodeStateData: function(state) {
-            let stateData = {urlParams: this.urlParams};
-            stateData = _.extend(stateData, state);
+        _encodeStateData: function(state= {}) {
+            const stateData = {...state, urlParams: {...this.urlParams, ...state.parameters}};
             this._packStateData(stateData);
             return PageableCollection.encodeStateData(stateData);
         },

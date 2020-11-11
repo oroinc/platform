@@ -288,13 +288,15 @@ define(function(require) {
             let options = {};
 
             if (!_.isEmpty(this.options.confirmation)) {
-                const placeholders = this.options.confirmation.message_parameters || {};
+                const placeholders = _.mapObject(this.options.confirmation.message_parameters || {}, function(item) {
+                    return _.isString(item) ? _.escape(item) : item;
+                });
 
                 options = _.defaults(_.omit(this.options.confirmation, 'component', 'message'), {
-                    title: this.messages.confirm_title,
+                    title: (this.options.confirmation.title || this.messages.confirm_title),
                     content: (this.options.confirmation.message || this.messages.confirm_content),
-                    okText: this.messages.confirm_ok,
-                    cancelText: this.messages.confirm_cancel
+                    okText: (this.options.confirmation.ok || this.messages.confirm_ok),
+                    cancelText: (this.options.confirmation.cancel || this.messages.confirm_cancel)
                 });
 
                 _.each(options, function(item, key, list) {

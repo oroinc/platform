@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SSOBundle\Tests\Unit\Security;
+namespace Oro\Bundle\SSOBundle\Tests\Unit\Security\Core;
 
 use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
@@ -57,28 +57,30 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsShouldReturnTrueForGoogleOAuthToken()
+    public function testSupportsShouldReturnTrueForKnownOAuthToken()
     {
+        $resourceOwnerName = 'test_resource_owner';
         $this->resourceOwnerMap->expects($this->once())
             ->method('hasResourceOwnerByName')
-            ->with($this->equalTo('google'))
-            ->will($this->returnValue(true));
+            ->with($resourceOwnerName)
+            ->willReturn(true);
 
         $token = new HWIOauthToken('token');
-        $token->setResourceOwnerName('google');
+        $token->setResourceOwnerName($resourceOwnerName);
         $this->assertTrue($this->oauthProvider->supports($token));
     }
 
-    public function testSupportsShouldReturnTrueForOffice365OAuthToken()
+    public function testSupportsShouldReturnTrueForUnknownOAuthToken()
     {
+        $resourceOwnerName = 'test_resource_owner';
         $this->resourceOwnerMap->expects($this->once())
             ->method('hasResourceOwnerByName')
-            ->with($this->equalTo('office365'))
-            ->will($this->returnValue(true));
+            ->with($resourceOwnerName)
+            ->willReturn(false);
 
         $token = new HWIOauthToken('token');
-        $token->setResourceOwnerName('office365');
-        $this->assertTrue($this->oauthProvider->supports($token));
+        $token->setResourceOwnerName($resourceOwnerName);
+        $this->assertFalse($this->oauthProvider->supports($token));
     }
 
     public function testAuthenticateIfTokenFactoryIsNotSet()
@@ -106,8 +108,9 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         $this->oauthProvider->setTokenFactory($this->tokenFactory);
         $this->oauthProvider->setOrganizationGuesser($this->organizationGuesser);
 
+        $resourceOwnerName = 'test_resource_owner';
         $token = new OAuthToken('token');
-        $token->setResourceOwnerName('google');
+        $token->setResourceOwnerName($resourceOwnerName);
         $organization = new Organization();
         $organization->setEnabled(true);
         $token->setOrganization($organization);
@@ -115,30 +118,30 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
         $userResponse = $this->createMock(UserResponseInterface::class);
 
         $resourceOwner = $this->createMock(ResourceOwnerInterface::class);
-        $resourceOwner->expects($this->any())
+        $resourceOwner->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('google'));
+            ->willReturn($resourceOwnerName);
 
-        $resourceOwner->expects($this->any())
+        $resourceOwner->expects($this->once())
             ->method('getUserInformation')
-            ->will($this->returnValue($userResponse));
+            ->willReturn($userResponse);
 
-        $this->resourceOwnerMap->expects($this->any())
+        $this->resourceOwnerMap->expects($this->once())
             ->method('getResourceOwnerByName')
-            ->will($this->returnValue($resourceOwner));
+            ->willReturn($resourceOwner);
 
         $user = new User();
         $user->addOrganization($organization);
 
-        $this->userProvider->expects($this->any())
+        $this->userProvider->expects($this->once())
             ->method('loadUserByOAuthUserResponse')
             ->with($userResponse)
-            ->will($this->returnValue($user));
+            ->willReturn($user);
 
         $resultToken = $this->oauthProvider->authenticate($token);
         $this->assertInstanceOf(OAuthToken::class, $resultToken);
         $this->assertSame($user, $resultToken->getUser());
-        $this->assertEquals('google', $resultToken->getResourceOwnerName());
+        $this->assertEquals($resourceOwnerName, $resultToken->getResourceOwnerName());
         $this->assertTrue($resultToken->isAuthenticated());
     }
 }

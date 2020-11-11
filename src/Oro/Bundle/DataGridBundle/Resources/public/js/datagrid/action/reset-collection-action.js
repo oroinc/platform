@@ -1,6 +1,7 @@
 define([
-    './abstract-action'
-], function(AbstractAction) {
+    './abstract-action',
+    'oroui/js/tools'
+], function(AbstractAction, tools) {
     'use strict';
 
     /**
@@ -43,7 +44,7 @@ define([
          * Execute reset collection
          */
         execute: function() {
-            this.collection.updateState(this.collection.initialState);
+            this.collection.updateState(tools.deepClone(this.collection.initialState));
             this.collection.fetch({reset: true});
         }
     });

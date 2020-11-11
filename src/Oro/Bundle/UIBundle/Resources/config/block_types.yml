@@ -24,7 +24,13 @@ services:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
             - [setName, ['layout_subtree_update']]
-            - [setOptionsConfig, [{reloadEvents: {required: true}, restoreFormState: {default: false}, showLoading: {default: true}}]]
+            - [setOptionsConfig, [{
+                  reloadEvents: {required: true},
+                  restoreFormState: {default: false},
+                  showLoading: {default: true},
+                  onLoadingCssClass: {default: ''},
+                  disableControls: {default: false}
+              }]]
         tags:
             - { name: layout.block_type, alias: layout_subtree_update }
 

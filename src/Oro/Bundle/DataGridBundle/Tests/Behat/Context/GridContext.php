@@ -248,9 +248,10 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $this->waitForAjax();
         $grid = $this->getGrid($gridName);
+        $hiddenRowsCount = 0;
 
         foreach ($table as $index => $row) {
-            $rowNumber = $index + 1;
+            $rowNumber = $index + $hiddenRowsCount + 1;
             foreach ($row as $columnTitle => $value) {
                 [$value, $cellValue, $columnTitle] = $this->normalizeValueByMetadata(
                     $value,
@@ -258,6 +259,12 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                     $rowNumber,
                     $columnTitle
                 );
+
+                if (!$grid->getRowByNumber($rowNumber)->isVisible()) {
+                    $hiddenRowsCount = $hiddenRowsCount + 1 ;
+                    $rowNumber = $rowNumber + 1;
+                    continue;
+                }
 
                 self::assertEquals(
                     $value,
@@ -1930,11 +1937,12 @@ TEXT;
     /**
      * Example: Then I reset "UsersGrid" grid
      *
+     * @Then /^(?:|I )reset grid$/
      * @Then /^(?:|I )reset "(?P<gridName>[^"]+)" grid$/
      *
      * @param string $gridName
      */
-    public function iResetGrid($gridName)
+    public function iResetGrid($gridName = null)
     {
         $grid = $this->getGrid($gridName);
         $refreshButton = $grid->getElement($grid->getMappedChildElementName('GridToolbarActionReset'));

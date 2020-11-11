@@ -326,3 +326,15 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: update, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
+
+    oro_api.tests.test_flash_bag_depended_service:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestFlashBagDependedService
+        arguments:
+            - '@session.flash_bag'
+
+    oro_api.tests.test_flash_bag_injection:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\TestFlashBagInjection
+        arguments:
+            - '@oro_api.tests.test_flash_bag_depended_service'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment }

@@ -1,0 +1,42 @@
+/* @theme: blank; */
+$arrow-height: 6px;
+$field-size: 40px;
+
+.floating-validation-message {
+    display: block;
+    position: absolute;
+    top: $floating-validation-message-top;
+    bottom: $floating-validation-message-bottom;
+    z-index: 2;
+    width: auto;
+    height: 0;
+    margin: 0;
+    white-space: nowrap;
+
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: $floating-validation-message-after-top;
+        left: $floating-validation-message-after-left;
+        margin-top: -6px;
+        border-style: solid;
+        border-color: get-color('ui', 'error') transparent;
+        border-width: 6px 4px 0;
+    }
+
+    > span {
+        position: absolute;
+        top: $floating-validation-message-label-top;
+        left: $floating-validation-message-label-left;
+        text-align: $floating-validation-message-label-text-align;
+        background-color: $floating-validation-message-label-background-color;
+        color: $floating-validation-message-label-color;
+        padding: $floating-validation-message-label-inner-offset;
+        border-radius: $floating-validation-message-label-border-radius;
+    }
+
+    &__icon {
+        display: $floating-validation-message-icon-display;
+    }
+}

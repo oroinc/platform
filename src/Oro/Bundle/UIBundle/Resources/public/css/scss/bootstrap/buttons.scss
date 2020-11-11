@@ -158,25 +158,6 @@ fieldset:disabled a.btn {
     }
 }
 
-.btn-brand {
-    &-google {
-        @include button-custom-variant($btn-brand-google...);
-
-        padding-#{$start}: $btn-brand-google-padding-left;
-        position: relative;
-
-        &:before {
-            content: $btn-brand-google-before-content;
-            font-family: $btn-brand-google-before-font-family;
-            font-size: $btn-brand-google-before-font-size;
-            position: $btn-brand-google-before-position;
-            top: $btn-brand-google-before-top;
-            #{$start}: $btn-brand-google-before-left;
-            transform: $btn-brand-google-before-transform;
-        }
-    }
-}
-
 //
 // Button Sizes
 //

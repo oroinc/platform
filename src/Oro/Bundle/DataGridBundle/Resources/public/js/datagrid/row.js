@@ -221,6 +221,14 @@ define([
             return classes.join(' ');
         },
 
+        attributes: function() {
+            const attributes = {};
+            if (this.model.get('row_attributes')) {
+                Object.assign(attributes, this.model.get('row_attributes'));
+            }
+            return attributes;
+        },
+
         /**
          * @inheritDoc
          */

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\Proxy;
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -41,62 +42,162 @@ class DefaultPreloadingListener
      */
     public function onPreload(PreloadEntityEvent $preloadEntityEvent): void
     {
-        $entities = $preloadEntityEvent->getEntities();
-        $firstEntity = current($entities);
+        $mainEntities = $preloadEntityEvent->getEntities();
+        $firstEntity = current($mainEntities);
         if (!$firstEntity) {
             return;
         }
 
-        // Base entity class.
-        $entityClass = $this->doctrineHelper->getEntityClass($firstEntity);
+        // Main entities class.
+        $mainEntityClass = $this->doctrineHelper->getEntityClass($firstEntity);
 
-        // Fields to preload from base entities.
-        $fieldsToPreload = $preloadEntityEvent->getFieldsToPreload();
+        $entityIdField = $this->getEntityIdField($mainEntityClass);
 
-        /** @var ClassMetadata $entityMetadata */
-        $entityMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $entityIdField = $this->getEntityIdField($entityClass);
+        // Contains uninitialized proxied main entities.
+        $mainEntitiesToLoad = [];
 
-        // Contains not initialized proxied base entities.
-        $entitiesToLoad = [];
-        // Contains base entities whose collections from TO_MANY associations should be preloaded.
-        $entitiesToLoadCollections = [];
-        // Contains not initialized proxied entities from TO_ONE associations of base entities.
-        $targetEntitiesByIds = [];
-
-        // Goes through base entities:
-        // 1) picks those to load from proxy and puts to $entitiesToLoad
-        // 2) picks those which have collections to preload and puts to $entitiesToLoadCollections
-        // 3) picks those which are already initialized, collects entities from their TO_ONE associations and puts
-        // to $targetEntitiesByIds
-        foreach ($entities as $entity) {
-            $entityId = $this->propertyAccessor->getValue($entity, $entityIdField);
-
-            if ($this->isProxyAndNotInitialized($entity)) {
-                $entitiesToLoad[$entityId] = $entity;
-                $entitiesToLoadCollections[$entityId] = $entity;
-            } else {
-                foreach ($fieldsToPreload as $targetField) {
-                    $targetFieldItem = $this->propertyAccessor->getValue($entity, $targetField);
-                    if ($this->isProxyAndNotInitialized($targetFieldItem)
-                        && !$preloadEntityEvent->hasSubFields($targetField)) {
-                        $targetEntityClass = $entityMetadata->getAssociationTargetClass($targetField);
-                        $targetEntityIdField = $this->getEntityIdField($targetEntityClass);
-                        $targetEntityId = $this->propertyAccessor->getValue($targetFieldItem, $targetEntityIdField);
-                        $targetEntitiesByIds[$targetEntityClass][$targetEntityId] = $targetFieldItem;
-                        continue;
-                    }
-
-                    if ($this->isCollectionAndNotInitialized($targetFieldItem)) {
-                        $entitiesToLoadCollections[$entityId] = $entity;
-                    }
-                }
+        // Collects uninitialized main entities.
+        foreach ($mainEntities as $mainEntity) {
+            if ($this->isProxyAndNotInitialized($mainEntity)) {
+                $entityId = $this->propertyAccessor->getValue($mainEntity, $entityIdField);
+                $mainEntitiesToLoad[$entityId] = $mainEntity;
             }
         }
 
-        $this->loadMain($entityClass, $entitiesToLoad, $fieldsToPreload);
-        $this->loadCollections($entityClass, $entitiesToLoadCollections, $fieldsToPreload);
-        $this->loadByIds($targetEntitiesByIds);
+        // Loads uninitialized main entities.
+        $this->loadMainEntities($mainEntityClass, $mainEntitiesToLoad, $preloadEntityEvent->getFieldsToPreload());
+
+        // Contains main entities whose collections from TO_MANY associations should be preloaded.
+        $mainEntitiesByFields = [];
+
+        // Contains not initialized proxied entities from TO_ONE associations of main entities.
+        $targetEntitiesByIds = [];
+
+        /** @var ClassMetadata $mainEntityMetadata */
+        $mainEntityMetadata = $this->doctrineHelper->getEntityMetadataForClass($mainEntityClass);
+
+        // Sorts out TO_ONE and TO_MANY relations to load from main entities.
+        foreach ($mainEntities as $mainEntity) {
+            if ($this->isProxyAndNotInitialized($mainEntity)) {
+                // Skips entities which failed to initialize - they might not exist.
+                continue;
+            }
+
+            $this->processRelations(
+                $preloadEntityEvent,
+                $mainEntityMetadata,
+                $mainEntity,
+                $targetEntitiesByIds,
+                $mainEntitiesByFields
+            );
+        }
+
+        $this->loadToManyRelations($mainEntityClass, $mainEntitiesByFields);
+        $this->loadToOneRelationsByIds($targetEntitiesByIds);
+    }
+
+    /**
+     * Sorts out entities to preload from TO_ONE and TO_MANY relations.
+     *
+     * @param PreloadEntityEvent $preloadEntityEvent
+     * @param ClassMetadata $mainEntityMetadata
+     * @param object $mainEntity
+     * @param array $targetEntitiesByIds
+     * @param array $entitiesToLoadCollections
+     */
+    private function processRelations(
+        PreloadEntityEvent $preloadEntityEvent,
+        ClassMetadata $mainEntityMetadata,
+        object $mainEntity,
+        array &$targetEntitiesByIds,
+        array &$entitiesToLoadCollections
+    ): void {
+        $entityIdField = $this->getEntityIdField($mainEntityMetadata->getName());
+        $entityId = $this->propertyAccessor->getValue($mainEntity, $entityIdField);
+
+        foreach ($preloadEntityEvent->getFieldsToPreload() as $targetField) {
+            $assocType = $mainEntityMetadata->getAssociationMapping($targetField)['type'];
+            $targetFieldValue = $this->propertyAccessor->getValue($mainEntity, $targetField);
+            if ($assocType & ClassMetadata::TO_ONE) {
+                $this->processToOneRelation(
+                    $preloadEntityEvent,
+                    $mainEntityMetadata,
+                    $mainEntity,
+                    $entityId,
+                    $targetField,
+                    $targetFieldValue,
+                    $targetEntitiesByIds
+                );
+                continue;
+            }
+
+            $this->processToManyRelation(
+                $preloadEntityEvent,
+                $mainEntityMetadata,
+                $mainEntity,
+                $entityId,
+                $targetField,
+                $targetFieldValue,
+                $entitiesToLoadCollections
+            );
+        }
+    }
+
+    /**
+     * Gets target entity from $fieldName of main entity and puts it to $targetEntitiesByIds if it is not initialized.
+     *
+     * @param PreloadEntityEvent $preloadEntityEvent
+     * @param ClassMetadata $mainEntityMetadata
+     * @param object $mainEntity
+     * @param $mainEntityId
+     * @param string $fieldName
+     * @param $fieldValue
+     * @param array $targetEntitiesByIds
+     */
+    private function processToOneRelation(
+        PreloadEntityEvent $preloadEntityEvent,
+        ClassMetadata $mainEntityMetadata,
+        object $mainEntity,
+        $mainEntityId,
+        string $fieldName,
+        $fieldValue,
+        array &$targetEntitiesByIds
+    ): void {
+        if (!$this->isProxyAndNotInitialized($fieldValue) || $preloadEntityEvent->hasSubFields($fieldName)) {
+            return;
+        }
+
+        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($fieldName);
+        $targetEntityIdField = $this->getEntityIdField($targetEntityClass);
+        $targetEntityId = $this->propertyAccessor->getValue($fieldValue, $targetEntityIdField);
+        $targetEntitiesByIds[$targetEntityClass][$targetEntityId] = $fieldValue;
+    }
+
+    /**
+     * Puts main entity to $mainEntitiesByFields if it has a collection to preload.
+     *
+     * @param PreloadEntityEvent $preloadEntityEvent
+     * @param ClassMetadata $mainEntityMetadata
+     * @param object $mainEntity
+     * @param $mainEntityId
+     * @param string $fieldName
+     * @param $fieldValue
+     * @param array $mainEntitiesByFields
+     */
+    private function processToManyRelation(
+        PreloadEntityEvent $preloadEntityEvent,
+        ClassMetadata $mainEntityMetadata,
+        object $mainEntity,
+        $mainEntityId,
+        string $fieldName,
+        $fieldValue,
+        array &$mainEntitiesByFields
+    ): void {
+        if (!$this->isCollectionAndNotInitialized($fieldValue)) {
+            return;
+        }
+
+        $mainEntitiesByFields[$fieldName][$mainEntityId] = $mainEntity;
     }
 
     /**
@@ -114,29 +215,30 @@ class DefaultPreloadingListener
     }
 
     /**
-     * Loads entities along with TO_ONE fields if any.
+     * Loads uninitialized main entities.
+     * Additonally loads TO_ONE relations if any.
      *
-     * @param string $entityClass
-     * @param array $entities
+     * @param string $mainEntityClass
+     * @param array $mainEntities
      * @param array $fieldsToPreload
      */
-    private function loadMain(string $entityClass, array $entities, array $fieldsToPreload): void
+    private function loadMainEntities(string $mainEntityClass, array $mainEntities, array $fieldsToPreload): void
     {
-        if (!$entities) {
+        if (!$mainEntities) {
             return;
         }
 
-        $entityRepository = $this->doctrineHelper->getEntityRepositoryForClass($entityClass);
-        /** @var ClassMetadata $entityMetadata */
-        $entityMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        $mainEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($mainEntityClass);
+        /** @var ClassMetadata $mainEntityMetadata */
+        $mainEntityMetadata = $this->doctrineHelper->getEntityMetadataForClass($mainEntityClass);
 
-        $qb = $entityRepository->createQueryBuilder('entity');
+        $qb = $mainEntityRepository->createQueryBuilder('entity');
         $qb
             ->where($qb->expr()->in('entity', ':entities'))
-            ->setParameter('entities', array_keys($entities));
+            ->setParameter('entities', array_keys($mainEntities));
 
         foreach ($fieldsToPreload as $targetField) {
-            $assocType = $entityMetadata->getAssociationMapping($targetField)['type'];
+            $assocType = $mainEntityMetadata->getAssociationMapping($targetField)['type'];
             if ($assocType & ClassMetadata::TO_ONE) {
                 $qb
                     ->addSelect('entity_' . $targetField)
@@ -148,34 +250,31 @@ class DefaultPreloadingListener
     }
 
     /**
-     * Loads TO_MANY fields for specified entities.
+     * Loads TO_MANY relations for specified entities.
      *
-     * @param string $entityClass
-     * @param array $entities
-     * @param array $fieldsToPreload
+     * @param string $mainEntityClass
+     * @param array $mainEntitiesByFields
      */
-    private function loadCollections(string $entityClass, array $entities, array $fieldsToPreload): void
+    private function loadToManyRelations(string $mainEntityClass, array $mainEntitiesByFields): void
     {
-        if (!$entities) {
+        if (!$mainEntitiesByFields) {
             return;
         }
 
-        /** @var ClassMetadata $entityMetadata */
-        $entityMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $toManyFields = [];
+        /** @var ClassMetadata $mainEntityMetadata */
+        $mainEntityMetadata = $this->doctrineHelper->getEntityMetadataForClass($mainEntityClass);
 
-        foreach ($fieldsToPreload as $targetField) {
-            $assocMapping = $entityMetadata->getAssociationMapping($targetField);
+        foreach ($mainEntitiesByFields as $targetField => $mainEntities) {
+            $assocMapping = $mainEntityMetadata->getAssociationMapping($targetField);
             if (!($assocMapping['type'] & ClassMetadata::TO_MANY)) {
                 continue;
             }
 
-            $toManyFields[] = $targetField;
-            $targetFieldItems = $this->getCollectionItems($entities, $entityMetadata, $targetField);
+            $targetFieldItems = $this->getCollectionItems($mainEntities, $mainEntityMetadata, $targetField);
             $indexBy = $assocMapping['indexBy'] ?? null;
 
             foreach ($targetFieldItems as $targetFieldItem) {
-                $collectionOwner = $entities[$targetFieldItem['id']];
+                $collectionOwner = $mainEntities[$targetFieldItem['id']];
                 /** @var PersistentCollection $collection */
                 $collection = $this->propertyAccessor->getValue($collectionOwner, $targetField);
                 if ($this->isCollectionAndNotInitialized($collection)) {
@@ -189,47 +288,61 @@ class DefaultPreloadingListener
                     }
                 }
             }
-        }
 
-        foreach ($entities as $entity) {
-            foreach ($toManyFields as $targetField) {
+            foreach ($mainEntities as $entity) {
                 $this->propertyAccessor->getValue($entity, $targetField)->setInitialized(true);
             }
         }
     }
 
     /**
-     * @param array $entities
-     * @param ClassMetadata $entityMetadata
+     * @param array $mainEntities
+     * @param ClassMetadata $mainEntityMetadata
      * @param string $targetField
      * @return array
      */
-    private function getCollectionItems(array $entities, ClassMetadata $entityMetadata, string $targetField): array
-    {
-        $entityClass = $entityMetadata->getName();
-        $entityIdField = $this->getEntityIdField($entityClass);
-        $assocMapping = $entityMetadata->getAssociationMapping($targetField);
-        $targetEntityClass = $entityMetadata->getAssociationTargetClass($targetField);
+    private function getCollectionItems(
+        array $mainEntities,
+        ClassMetadata $mainEntityMetadata,
+        string $targetField
+    ): array {
+        $assocMapping = $mainEntityMetadata->getAssociationMapping($targetField);
+        if ($assocMapping['type'] & ClassMetadata::ONE_TO_MANY) {
+            $qbToMany = $this->getOneToManyQueryBuilder($mainEntityMetadata, $mainEntities, $targetField);
+        } elseif ($assocMapping['type'] & ClassMetadata::MANY_TO_MANY) {
+            $qbToMany = $this->getManyToManyQueryBuilder($mainEntityMetadata, $mainEntities, $targetField);
+        } else {
+            throw new \LogicException(sprintf('Target field %s was expected to be a TO_MANY relation', $targetField));
+        }
+
+        return $qbToMany->getQuery()->execute();
+    }
+
+    /**
+     * @param ClassMetadata $mainEntityMetadata
+     * @param array $mainEntities
+     * @param string $fieldName
+     * @return QueryBuilder
+     */
+    private function getOneToManyQueryBuilder(
+        ClassMetadata $mainEntityMetadata,
+        array $mainEntities,
+        string $fieldName
+    ): QueryBuilder {
+        $mainEntityClass = $mainEntityMetadata->getName();
+        $mainEntityIdField = $this->getEntityIdField($mainEntityClass);
+        $assocMapping = $mainEntityMetadata->getAssociationMapping($fieldName);
+        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($fieldName);
         $targetEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($targetEntityClass);
         $qbToMany = $targetEntityRepository->createQueryBuilder('collection_item');
 
-        if ($assocMapping['type'] & ClassMetadata::ONE_TO_MANY) {
-            $mappedBy = $entityMetadata->getAssociationMappedByTargetField($targetField);
-            QueryBuilderUtil::checkParameter($mappedBy);
-            QueryBuilderUtil::checkParameter($entityIdField);
-            $qbToMany
-                ->addSelect('collection_item_' . $mappedBy . '.' . $entityIdField)
-                ->innerJoin('collection_item.' . $mappedBy, 'collection_item_' . $mappedBy)
-                ->andWhere($qbToMany->expr()->in('collection_item_' . $mappedBy, ':entities'));
-        } elseif ($assocMapping['type'] & ClassMetadata::MANY_TO_MANY) {
-            QueryBuilderUtil::checkParameter($entityClass);
-            $qbToMany
-                ->addSelect('entity.' . $entityIdField)
-                ->innerJoin($entityClass, 'entity', Query\Expr\Join::WITH, $qbToMany->expr()->eq(1, 1))
-                ->innerJoin('entity.' . $targetField, 'entity_' . $targetField)
-                ->andWhere($qbToMany->expr()->eq('entity_' . $targetField, 'collection_item'))
-                ->andWhere($qbToMany->expr()->in('entity', ':entities'));
-        }
+        $mappedBy = $mainEntityMetadata->getAssociationMappedByTargetField($fieldName);
+        QueryBuilderUtil::checkParameter($mappedBy);
+        QueryBuilderUtil::checkParameter($mainEntityIdField);
+        $qbToMany
+            ->addSelect('collection_item_' . $mappedBy . '.' . $mainEntityIdField)
+            ->innerJoin('collection_item.' . $mappedBy, 'collection_item_' . $mappedBy)
+            ->andWhere($qbToMany->expr()->in('collection_item_' . $mappedBy, ':entities'));
 
         if (!empty($assocMapping['orderBy'])) {
             foreach ($assocMapping['orderBy'] as $sort => $order) {
@@ -239,10 +352,50 @@ class DefaultPreloadingListener
             }
         }
 
-        return $qbToMany
-            ->setParameter(':entities', array_keys($entities))
-            ->getQuery()
-            ->execute();
+        $qbToMany->setParameter(':entities', array_keys($mainEntities));
+
+        return $qbToMany;
+    }
+
+    /**
+     * @param ClassMetadata $mainEntityMetadata
+     * @param array $mainEntities
+     * @param string $fieldName
+     * @return QueryBuilder
+     */
+    private function getManyToManyQueryBuilder(
+        ClassMetadata $mainEntityMetadata,
+        array $mainEntities,
+        string $fieldName
+    ): QueryBuilder {
+        $mainEntityClass = $mainEntityMetadata->getName();
+        $mainEntityIdField = $this->getEntityIdField($mainEntityClass);
+        $assocMapping = $mainEntityMetadata->getAssociationMapping($fieldName);
+        $targetEntityClass = $mainEntityMetadata->getAssociationTargetClass($fieldName);
+        $targetEntityRepository = $this->doctrineHelper->getEntityRepositoryForClass($targetEntityClass);
+        $qbToMany = $targetEntityRepository->createQueryBuilder('collection_item');
+
+        QueryBuilderUtil::checkParameter($mainEntityClass);
+        QueryBuilderUtil::checkParameter($mainEntityIdField);
+
+        $qbToMany
+            ->addSelect('entity.' . $mainEntityIdField)
+            ->innerJoin($mainEntityClass, 'entity', Query\Expr\Join::WITH, $qbToMany->expr()->eq(1, 1))
+            ->innerJoin('entity.' . $fieldName, 'entity_' . $fieldName)
+            ->andWhere($qbToMany->expr()->eq('entity_' . $fieldName, 'collection_item'))
+            ->andWhere($qbToMany->expr()->in('entity', ':entities'));
+
+        if (!empty($assocMapping['orderBy'])) {
+            foreach ($assocMapping['orderBy'] as $sort => $order) {
+                QueryBuilderUtil::checkParameter($sort);
+                QueryBuilderUtil::checkParameter($order);
+                $qbToMany->addOrderBy('collection_item.' . $sort, $order);
+            }
+        }
+
+        $qbToMany->setParameter(':entities', array_keys($mainEntities));
+
+        return $qbToMany;
     }
 
     /**
@@ -250,7 +403,7 @@ class DefaultPreloadingListener
      *
      * @param array $idsToLoadBy
      */
-    private function loadByIds(array $idsToLoadBy): void
+    private function loadToOneRelationsByIds(array $idsToLoadBy): void
     {
         if (!$idsToLoadBy) {
             return;
