@@ -39,7 +39,9 @@ class UniversalCacheKeyGenerator
      */
     public function generate($arguments): string
     {
-        return sha1($this->getCacheKey(func_get_args()));
+        $cacheKey = is_scalar($arguments) ? $arguments : $this->getCacheKey(func_get_args());
+
+        return sha1($cacheKey);
     }
 
     /**
@@ -56,7 +58,7 @@ class UniversalCacheKeyGenerator
                 $cacheKey[] = $this->objectCacheKeyGenerator->generate($argument, is_numeric($key) ? $scope : $key);
             } elseif (is_array($argument)) {
                 $cacheKey[] = $this->getCacheKey($argument, is_numeric($key) ? $scope : $key);
-            } elseif (is_resource($argument) || is_bool($argument)) {
+            } elseif (is_resource($argument)) {
                 $cacheKey[] = (int) $argument;
             } else {
                 $cacheKey[] = $argument;

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\Event\PreloadEntityEvent;
 use Oro\Bundle\EntityBundle\Manager\PreloadingManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -420,6 +422,74 @@ class PreloadingManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getValue')
             ->withConsecutive([$entities[0], $targetField])
             ->willReturn(new ArrayCollection());
+
+        $entityMetadata
+            ->expects($this->never())
+            ->method('getAssociationTargetClass');
+
+        $event1 = new PreloadEntityEvent($entities, $fieldsToPreload, $context);
+        $this->eventDispatcher
+            ->expects($this->once())
+            ->method('dispatch')
+            ->with($event1, $eventName1);
+
+        $this->manager->preloadInEntities($entities, $fieldsToPreload, $context);
+    }
+
+    public function testPreloadInEntitiesWhenToManyAndNotInitialized(): void
+    {
+        $entities = [new \stdClass()];
+        $targetField = 'sampleField';
+        $subField = 'sampleSubField';
+        $fieldsToPreload = [$targetField => [$subField => []]];
+        $context = [];
+        $eventName1 = 'oro_entity.preload_entity.stdclass';
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getEntityClass')
+            ->with($entities[0])
+            ->willReturn(\stdClass::class);
+
+        $this->entityAliasResolver
+            ->expects($this->atLeastOnce())
+            ->method('getAlias')
+            ->withConsecutive([\stdClass::class], [\stdClass::class])
+            ->willReturnOnConsecutiveCalls('stdclass', 'substdclass');
+
+        $entityMetadata = $this->createMock(ClassMetadata::class);
+        $this->doctrineHelper
+            ->expects($this->atLeastOnce())
+            ->method('getEntityMetadataForClass')
+            ->with(\stdClass::class)
+            ->willReturn($entityMetadata);
+
+        $entityMetadata
+            ->expects($this->once())
+            ->method('hasAssociation')
+            ->with($targetField)
+            ->willReturn(true);
+
+        $assocMapping = ['type' => ClassMetadata::ONE_TO_MANY];
+
+        $entityMetadata
+            ->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($targetField)
+            ->willReturn($assocMapping);
+
+        $collection = new PersistentCollection(
+            $this->createMock(EntityManagerInterface::class),
+            $this->createMock(ClassMetadata::class),
+            new ArrayCollection([new \stdClass()])
+        );
+        $collection->setInitialized(false);
+
+        $this->propertyAccessor
+            ->expects($this->once())
+            ->method('getValue')
+            ->withConsecutive([$entities[0], $targetField])
+            ->willReturn($collection);
 
         $entityMetadata
             ->expects($this->never())

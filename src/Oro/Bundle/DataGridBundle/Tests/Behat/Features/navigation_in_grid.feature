@@ -1,6 +1,5 @@
 @fixture-OroDataGridBundle:grid-navigation.yml
 Feature: Navigation in grid
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
 
   Scenario: User should see previous grid page, after deleting all records on current page
     Given I login as administrator

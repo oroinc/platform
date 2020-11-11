@@ -8,7 +8,7 @@ use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
 
 /**
- * Provides possibility to run unique or delayed jobs
+ * Provides possibility to run unique or delayed jobs.
  */
 class JobRunner
 {
@@ -24,7 +24,7 @@ class JobRunner
     /**
      * @param JobProcessor       $jobProcessor
      * @param ExtensionInterface $jobExtension
-     * @param Job                $rootJob
+     * @param Job|null           $rootJob
      */
     public function __construct(JobProcessor $jobProcessor, ExtensionInterface $jobExtension, Job $rootJob = null)
     {
@@ -34,11 +34,14 @@ class JobRunner
     }
 
     /**
-     * @param string $ownerId
-     * @param string $name
+     * Creates a root job and runs the $runCallback.
+     * It does not allow another job with the same name to run simultaneously.
+     *
+     * @param string   $ownerId
+     * @param string   $name
      * @param \Closure $runCallback
      *
-     * @return mixed
+     * @return mixed A value returned by the $runCallback or NULL if this closure cannot be run
      */
     public function runUnique($ownerId, $name, \Closure $runCallback)
     {
@@ -74,10 +77,17 @@ class JobRunner
     }
 
     /**
+     * Creates a delayed sub-job which runs asynchronously (sending its own message).
+     * It can only run inside another job.
+     *
+     * It is a common approach to create a delayed job simultaneously with a queue message that contains
+     * information about the job. In this case, after receiving the message, the subscribed message processor
+     * can run and perform a delayed job by running the {@see runDelayed()} method with the job data.
+     *
      * @param string   $name
      * @param \Closure $startCallback
      *
-     * @return mixed
+     * @return mixed A value returned by the $startCallback
      */
     public function createDelayed($name, \Closure $startCallback)
     {
@@ -105,12 +115,20 @@ class JobRunner
     }
 
     /**
+     * Runs a delayed sub-job.
+     * This method is used inside a processor for a message which was sent with {@see createDelayed()} method.
+     *
+     * The $runCallback closure usually returns true or false, the job status depends on the returned value.
+     * See {@link https://doc.oroinc.com/backend/mq/message-queue-jobs/#jobs-statuses} for the details.
+     *
+     * To reuse the existing processor logic in the scope of job, it may be decorated with
+     * {@see \Oro\Component\MessageQueue\Job\DelayedJobRunnerDecoratingProcessor} which will execute runDelayed(),
+     * pass the control to the given processor and then handle the result in the format applicable for runDelayed().
+     *
      * @param string   $jobId
      * @param \Closure $runCallback
      *
-     * @return mixed
-     *
-     * @throws \Exception
+     * @return mixed A value returned by the $runCallback
      */
     public function runDelayed($jobId, \Closure $runCallback)
     {
@@ -144,6 +162,8 @@ class JobRunner
     }
 
     /**
+     * Creates and return a new instance of JobRunner that can be used in sub-jobs.
+     *
      * @param Job $rootJob
      *
      * @return JobRunner
@@ -177,11 +197,9 @@ class JobRunner
     }
     /**
      * @param \Closure $runCallback
-     * @param Job $job
+     * @param Job      $job
      *
      * @return mixed
-     *
-     * @throws \Exception
      */
     private function callbackResult($runCallback, $job)
     {

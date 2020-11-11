@@ -10,6 +10,6 @@ namespace Oro\Bundle\ApiBundle\Filter;
  * @see \Oro\Bundle\ApiBundle\Processor\Shared\HandleFieldsFilter
  * @see \Oro\Bundle\ApiBundle\Processor\GetConfig\FilterFieldsByExtra
  */
-class FieldsFilter extends StandaloneFilterWithDefaultValue
+class FieldsFilter extends StandaloneFilterWithDefaultValue implements SpecialHandlingFilterInterface
 {
 }

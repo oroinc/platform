@@ -50,6 +50,7 @@ oro:
             download_error_log: "Error log"
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
+            warning:        "Warning in row #%number%."
             label:          "Import file"
             validation_label: "Validate"
             success:        "File was successfully imported."

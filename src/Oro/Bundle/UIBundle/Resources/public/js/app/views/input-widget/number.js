@@ -58,7 +58,7 @@ define(function(require) {
 
             /**
              * Precision could be null in two cases:
-             * 1. Field is supposed t obe integer so we should not change number type to text in this case
+             * 1. Field is supposed to be integer so we should not change number type to text in this case
              * 2. Precision was not set, yet in this case we should not change input type before
              * the correct precision will be set to not trigger: _normalizeNumberFieldValue
              */
@@ -72,17 +72,22 @@ define(function(require) {
                 .attr('pattern', this.precision === 0 ? '[0-9]*' : '');
 
             /**
-             * Value format is changed after type was changed in case if oldType was number
+             * Format value to localized value
              * It could be reproduced fo German locale.
              * Example: value 1,23 will be transformed to valid float 1.23 but this float is not localized
              * So the goal of the next code is to keep value localized to avoid further problems
              */
-            if (oldType === 'number') {
-                const value = this.$el.val();
-                if (value !== '' && value !== null && value!==undefined) {
-                    const localizedFloat = NumberFormatter.formatDecimal(value);
-                    this.$el.val(localizedFloat);
+            let value = this.$el.val();
+
+            if (value !== '') {
+                // Convert localized value to number
+                if (oldType === 'text') {
+                    value = NumberFormatter.unformatStrict(value);
                 }
+                const localizedFloat = NumberFormatter.formatDecimal(value, {
+                    max_fraction_digits: this.precision
+                });
+                this.$el.val(localizedFloat);
             }
         },
 

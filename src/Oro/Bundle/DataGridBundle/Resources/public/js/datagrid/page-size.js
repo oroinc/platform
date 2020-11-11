@@ -117,30 +117,16 @@ define([
 
         render: function() {
             this.$el.empty();
-
-            let currentSizeLabel = _.filter(
-                this.items,
-                _.bind(
-                    function(item) {
-                        return item.size === undefined
-                            ? this.collection.state.pageSize === item : this.collection.state.pageSize === item.size;
-                    },
-                    this
-                )
-            );
-
-            if (currentSizeLabel.length > 0) {
-                currentSizeLabel = _.isUndefined(currentSizeLabel[0].label)
-                    ? currentSizeLabel[0] : currentSizeLabel[0].label;
-            } else {
-                currentSizeLabel = this.items[0];
-            }
+            const {pageSize: currentPageSize} = this.collection.state;
+            const currentItem =
+                this.items.find(item => currentPageSize === (typeof item.size !== 'undefined' ? item.size : item));
 
             this.$el.append($(this.template({
                 disabled: !this.enabled || !this.collection.state.totalRecords,
                 collectionState: this.collection.state,
                 items: this.items,
-                currentSizeLabel: currentSizeLabel,
+                currentPageSize,
+                currentSizeLabel: typeof currentItem.label !== 'undefined' ? currentItem.label : currentItem,
                 showLabels: this.showLabels
             })));
 

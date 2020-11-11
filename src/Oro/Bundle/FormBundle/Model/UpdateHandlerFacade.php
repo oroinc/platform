@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Handles update action of controller used to create or update entity on separate page or widget dialog.
+ */
 class UpdateHandlerFacade
 {
     /** @var UpdateFactory */
@@ -109,7 +112,9 @@ class UpdateHandlerFacade
         $entity = $update->getFormData();
         if ($request->get('_wid')) {
             $result = $this->getResult($update, $request);
-            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            if ($this->doctrineHelper->isManageableEntity($entity)) {
+                $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            }
 
             return $result;
         } else {

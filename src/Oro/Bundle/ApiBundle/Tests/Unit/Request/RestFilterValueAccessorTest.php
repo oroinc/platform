@@ -350,6 +350,81 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testParseQueryStringWithEmptyValues()
+    {
+        $queryStringValues = [
+            'prm1='             => ['prm1', 'eq', '', 'prm1', 'prm1'],
+            'group1[key]='      => ['group1[key]', 'eq', '', 'key', 'group1[key]'],
+            'group2%5Bkey%5D='  => ['group2[key]', 'eq', '', 'key', 'group2[key]'],
+            'group3[key1]='     => ['group3[key1]', 'eq', '', 'key1', 'group3[key1]'],
+            'group3%5Bkey2%5D=' => ['group3[key2]', 'eq', '', 'key2', 'group3[key2]']
+        ];
+        $request = Request::create(
+            'http://test.com?' . implode('&', array_keys($queryStringValues))
+        );
+
+        $accessor = $this->getRestFilterValueAccessor($request);
+
+        $expectedQueryString =
+            'group1%5Bkey%5D='
+            . '&group2%5Bkey%5D='
+            . '&group3%5Bkey1%5D='
+            . '&group3%5Bkey2%5D='
+            . '&prm1=';
+        self::assertEquals(
+            $expectedQueryString,
+            $accessor->getQueryString()
+        );
+        // test that built query string can by parsed and stays the same after that
+        $anotherQueryString = $this
+            ->getRestFilterValueAccessor(Request::create('http://test.com?' . $expectedQueryString))
+            ->getQueryString();
+        $expectedQueryStringParts = explode('&', $expectedQueryString);
+        $anotherQueryStringParts = explode('&', $anotherQueryString);
+        sort($expectedQueryStringParts);
+        sort($anotherQueryStringParts);
+        $expectedQueryString = implode('&', $expectedQueryStringParts);
+        $anotherQueryString = implode('&', $anotherQueryStringParts);
+        self::assertEquals($expectedQueryString, $anotherQueryString);
+
+        foreach ($queryStringValues as $itemKey => $itemValue) {
+            [$key, $operator, $value, $path, $sourceKey] = $itemValue;
+            self::assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
+            self::assertEquals(
+                $this->getFilterValue($path, $value, $operator, $sourceKey),
+                $accessor->get($key),
+                $itemKey
+            );
+        }
+
+        self::assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
+        self::assertEquals(
+            [
+                'prm1' => $this->getFilterValue('prm1', '', 'eq', 'prm1')
+            ],
+            $accessor->getGroup('prm1')
+        );
+        self::assertEquals(
+            [
+                'group1[key]' => $this->getFilterValue('key', '', 'eq', 'group1[key]')
+            ],
+            $accessor->getGroup('group1')
+        );
+        self::assertEquals(
+            [
+                'group2[key]' => $this->getFilterValue('key', '', 'eq', 'group2[key]')
+            ],
+            $accessor->getGroup('group2')
+        );
+        self::assertEquals(
+            [
+                'group3[key1]' => $this->getFilterValue('key1', '', 'eq', 'group3[key1]'),
+                'group3[key2]' => $this->getFilterValue('key2', '', 'eq', 'group3[key2]')
+            ],
+            $accessor->getGroup('group3')
+        );
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
@@ -610,6 +685,83 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 'filter[field6]' => $this->getFilterValue('field6', 'val6', 'gte', 'filter[field6]')
             ],
             $accessor->getGroup('filter')
+        );
+    }
+
+    public function testRequestBodyWithEmptyValues()
+    {
+        $requestBody = [
+            'prm1'   => '',
+            'group1' => ['key' => ''],
+            'group2' => ['key' => ''],
+            'group3' => ['key1' => '', 'key2' => '']
+        ];
+        $request = Request::create(
+            'http://test.com',
+            'DELETE',
+            $requestBody
+        );
+
+        $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals(
+            'prm1='
+            . '&group1%5Bkey%5D='
+            . '&group2%5Bkey%5D='
+            . '&group3%5Bkey1%5D='
+            . '&group3%5Bkey2%5D=',
+            $accessor->getQueryString()
+        );
+
+        self::assertEquals(
+            $this->getFilterValue('prm1', '', 'eq', 'prm1'),
+            $accessor->get('prm1'),
+            'prm1'
+        );
+        self::assertEquals(
+            $this->getFilterValue('key', '', 'eq', 'group1[key]'),
+            $accessor->get('group1[key]'),
+            'group1[key]'
+        );
+        self::assertEquals(
+            $this->getFilterValue('key', '', 'eq', 'group2[key]'),
+            $accessor->get('group2[key]'),
+            'group2[key]'
+        );
+        self::assertEquals(
+            $this->getFilterValue('key1', '', 'eq', 'group3[key1]'),
+            $accessor->get('group3[key1]'),
+            'group3[key1]'
+        );
+        self::assertEquals(
+            $this->getFilterValue('key2', '', 'eq', 'group3[key2]'),
+            $accessor->get('group3[key2]'),
+            'group3[key2]'
+        );
+        self::assertEquals(
+            [
+                'prm1' => $this->getFilterValue('prm1', '', 'eq', 'prm1')
+            ],
+            $accessor->getGroup('prm1')
+        );
+        self::assertEquals(
+            [
+                'group1[key]' => $this->getFilterValue('key', '', 'eq', 'group1[key]')
+            ],
+            $accessor->getGroup('group1')
+        );
+        self::assertEquals(
+            [
+                'group2[key]' => $this->getFilterValue('key', '', 'eq', 'group2[key]')
+            ],
+            $accessor->getGroup('group2')
+        );
+        self::assertEquals(
+            [
+                'group3[key1]' => $this->getFilterValue('key1', '', 'eq', 'group3[key1]'),
+                'group3[key2]' => $this->getFilterValue('key2', '', 'eq', 'group3[key2]')
+            ],
+            $accessor->getGroup('group3')
         );
     }
 

@@ -5,5 +5,4 @@ dynamic-imports:
         - orosync/js/app/components/ping-handler
         - orosync/js/app/components/tag-content
         - orosync/js/content-manager
-        - orosync/js/content/grid-builder
         - orosync/js/sync

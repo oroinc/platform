@@ -295,7 +295,7 @@ define(function(require) {
          * @return {JQueryPromise}
          */
         loadModuleAndReplace: function(container, moduleProperty) {
-            if (_.isFunction(container[moduleProperty])) {
+            if (typeof container[moduleProperty] !== 'string') {
                 const deferred = $.Deferred();
                 deferred.resolve(container[moduleProperty]);
                 return deferred.promise();

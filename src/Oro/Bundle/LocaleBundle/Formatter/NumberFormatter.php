@@ -32,6 +32,12 @@ class NumberFormatter
      */
     private $numberFormatterFactory;
 
+    /** @var IntlNumberFormatter[] */
+    protected $formatters = [];
+
+    /** @var array */
+    protected $currencySymbols = [];
+
     /**
      * @param LocaleSettings $localeSettings
      * @param IntlNumberFormatterFactory $intlNumberFormatterFactory
@@ -102,7 +108,7 @@ class NumberFormatter
 
         $formattedString = $formatter->formatCurrency($value, $currencyCode);
         $fromCurrencySymbol = $formatter->getSymbol(IntlNumberFormatter::CURRENCY_SYMBOL);
-        $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode, $locale);
+        $toCurrencySymbol = $this->getCurrencySymbolByCurrency($currencyCode, $locale);
 
         if ($toCurrencySymbol === $currencyCode) {
             // Adds a space after currency if it is an ISO code.
@@ -110,14 +116,35 @@ class NumberFormatter
 
             // 1) replaces currency symbol with one provided by LocaleSettings;
             // 2) excludes the case with space duplication when space is already there.
-            $formattedString = trim(str_replace(
-                [$fromCurrencySymbol, '  '],
-                [$toCurrencySymbol, ' '],
-                $formattedString
-            ), ' ');
+            $formattedString = trim(
+                str_replace(
+                    [$fromCurrencySymbol, '  '],
+                    [$toCurrencySymbol, ' '],
+                    $formattedString
+                ),
+                ' '
+            );
         }
 
         return $formattedString;
+    }
+
+    /**
+     * @param string $currencyCode
+     * @param string $locale
+     *
+     * @return string
+     */
+    private function getCurrencySymbolByCurrency(string $currencyCode, string $locale): string
+    {
+        if (!isset($this->currencySymbols[$currencyCode][$locale])) {
+            $this->currencySymbols[$currencyCode][$locale] = $this->localeSettings->getCurrencySymbolByCurrency(
+                $currencyCode,
+                $locale
+            );
+        }
+
+        return $this->currencySymbols[$currencyCode][$locale];
     }
 
     /**
@@ -418,7 +445,18 @@ class NumberFormatter
         array $textAttributes = [],
         array $symbols = []
     ): IntlNumberFormatter {
-        return $this->numberFormatterFactory->create((string)$locale, $style, $attributes, $textAttributes, $symbols);
+        $cacheKey = sha1(\json_encode(func_get_args()));
+        if (!isset($this->formatters[$cacheKey])) {
+            $this->formatters[$cacheKey] = $this->numberFormatterFactory->create(
+                (string)$locale,
+                $style,
+                $attributes,
+                $textAttributes,
+                $symbols
+            );
+        }
+
+        return $this->formatters[$cacheKey];
     }
 
     /**

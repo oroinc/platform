@@ -353,6 +353,8 @@ services:
         public: false
         arguments:
             - '@oro_entity.doctrine_helper'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     oro_entity_config.entity_listener.attribute_group:
         class: Oro\Bundle\EntityConfigBundle\Entity\EntityListener\AttributeGroupListener
