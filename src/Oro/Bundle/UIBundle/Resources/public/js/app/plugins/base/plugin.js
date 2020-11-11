@@ -5,6 +5,7 @@ define(function(require) {
     const Backbone = require('backbone');
 
     function BasePlugin(main, manager, options) {
+        this.cid = _.uniqueId(this.cidPrefix);
         this.main = main;
         this.manager = manager;
         this.options = options;
@@ -12,6 +13,8 @@ define(function(require) {
     }
 
     _.extend(BasePlugin.prototype, Backbone.Events, {
+        cidPrefix: 'plugin',
+
         /**
          * Constructor
          *
@@ -21,7 +24,11 @@ define(function(require) {
         initialize: function(main, options) {},
 
         eventNamespace: function() {
-            return this.main.eventNamespace();
+            return this.main.eventNamespace() + this.ownEventNamespace();
+        },
+
+        ownEventNamespace: function() {
+            return this.main.eventNamespace.call(this);
         },
 
         /**

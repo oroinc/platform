@@ -342,7 +342,6 @@ services:
         alias: 'oro_attachment.provider.file_url'
 
     oro_attachment.provider.file_url_by_uuid.cache:
-        public: false
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_attachment_file_url_by_uuid' ] ]

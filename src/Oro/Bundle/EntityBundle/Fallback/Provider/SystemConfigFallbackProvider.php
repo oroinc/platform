@@ -73,12 +73,7 @@ class SystemConfigFallbackProvider extends AbstractEntityFallbackProvider
             );
         }
 
-        return $this->getMemoryCacheProvider()->get(
-            $systemConfig[self::CONFIG_NAME_KEY],
-            function () use ($systemConfig) {
-                return $this->configManager->get($systemConfig[self::CONFIG_NAME_KEY]);
-            }
-        );
+        return $this->configManager->get($systemConfig[self::CONFIG_NAME_KEY]);
     }
 
     /**

@@ -40,8 +40,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $style = IntlNumberFormatter::DECIMAL;
 
-        $this->mockFormat($style);
+        $this->mockFormat($style, 2);
 
+        $this->assertEquals(
+            self::FORMATTED_VALUE,
+            $this->formatter->format(self::UNFORMATTED_VALUE, $style, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
         $this->assertEquals(
             self::FORMATTED_VALUE,
             $this->formatter->format(self::UNFORMATTED_VALUE, $style, [], [], [], self::LOCALE)
@@ -50,8 +56,9 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $style
+     * @param int $formatCallsNumber
      */
-    private function mockFormat(string $style): void
+    private function mockFormat(string $style, int $formatCallsNumber = 1): void
     {
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
         $this->intlNumberFormatterFactory
@@ -61,7 +68,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly($formatCallsNumber))
             ->method('format')
             ->with(self::UNFORMATTED_VALUE)
             ->willReturn(self::FORMATTED_VALUE);
@@ -81,14 +88,14 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($intlNumberFormatter);
 
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('formatCurrency')
             ->with($value, self::CURRENCY)
             ->willReturn($formattedValue);
 
         $symbol = '$';
         $intlNumberFormatter
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getSymbol')
             ->with(IntlNumberFormatter::CURRENCY_SYMBOL)
             ->willReturn($symbol);
@@ -99,6 +106,12 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->with(self::CURRENCY, self::LOCALE)
             ->willReturn($symbol);
 
+        $this->assertEquals(
+            $formattedValue,
+            $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
+        );
+
+        // check local cache
         $this->assertEquals(
             $formattedValue,
             $this->formatter->formatCurrency($value, self::CURRENCY, [], [], [], self::LOCALE)
@@ -369,7 +382,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         $intlNumberFormatterDuration = $this->createMock(IntlNumberFormatter::class);
         $intlNumberFormatterDefault = $this->createMock(IntlNumberFormatter::class);
         $this->intlNumberFormatterFactory
-            ->expects($this->exactly(3))
+            ->expects($this->exactly(2))
             ->method('create')
             ->willReturnMap(
                 [

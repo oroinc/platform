@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -49,12 +51,12 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], null)
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -68,12 +70,12 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], $options[1])
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -88,16 +90,16 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], $this->identicalTo($options[1]))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -109,37 +111,33 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects($this->once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
         $uow->expects($this->once())
             ->method('isScheduledForInsert')
             ->with($options[1])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $uow->expects($this->once())
             ->method('isInIdentityMap')
             ->with($options[1])
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], $this->identicalTo($options[1]))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -151,35 +149,31 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects($this->once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
         $uow->expects($this->once())
             ->method('isScheduledForInsert')
             ->with($options[1])
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $uow->expects($this->never())
             ->method('isInIdentityMap');
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -191,37 +185,33 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects($this->once())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($uow));
+            ->willReturn($uow);
         $uow->expects($this->once())
             ->method('isScheduledForInsert')
             ->with($options[1])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
         $uow->expects($this->once())
             ->method('isInIdentityMap')
             ->with($options[1])
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(new \stdClass()));
+            ->willReturn(new \stdClass());
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -234,7 +224,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->authorizationChecker->expects($this->never())
             ->method('isGranted');

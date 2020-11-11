@@ -102,7 +102,8 @@ define([
 
             options = options || {
                 layoutSubtreeUrl: null,
-                layoutSubtreeCallback: null
+                layoutSubtreeCallback: null,
+                layoutSubtreeFailCallback: null
             };
 
             this._callViewMethod(eventBlockIds, 'beforeContentLoading');
@@ -124,6 +125,9 @@ define([
                 })
                 .fail(function(jqxhr) {
                     self._callViewMethod(eventBlockIds, 'contentLoadingFail');
+                    if (options.layoutSubtreeFailCallback) {
+                        options.layoutSubtreeFailCallback(jqxhr);
+                    }
                 });
         },
 

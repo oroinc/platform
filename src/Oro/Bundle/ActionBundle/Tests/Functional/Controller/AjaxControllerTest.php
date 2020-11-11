@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Provider\PhpArrayConfigCacheModifier;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 class AjaxControllerTest extends WebTestCase
@@ -299,6 +300,31 @@ class AjaxControllerTest extends WebTestCase
                 'headers' => [],
             ],
         ];
+    }
+
+    public function testExecuteActionNotFound(): void
+    {
+        $operationName = 'oro_action_test_action';
+        $this->client->request(
+            'POST',
+            $this->getUrl(
+                'oro_action_operation_execute',
+                [
+                    'operationName' => $operationName,
+                    'route' => 'oro_user_view',
+                    'entityId' => 42,
+                    'entityClass' => User::class,
+                ]
+            )
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertResponseStatusCodeEquals($result, Response::HTTP_NOT_FOUND);
+        $this->assertEquals(
+            ['error' => ['Operation with name "oro_action_test_action" not found']],
+            $this->getContainer()->get('session')->getFlashBag()->all()
+        );
     }
 
     /**

@@ -36,10 +36,10 @@ class EnabledLocalizationsGridListener
             return;
         }
 
-        $enabledLocalizationIds = $this->configManager->get(
+        $enabledLocalizationIds = (array) $this->configManager->get(
             Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
-            [],
-            null,
+            false,
+            false,
             $this->getScopeIdentifier($event->getDatagrid())
         );
 

@@ -68,6 +68,7 @@ app-modules:
     - oroui/js/app/modules/resizable-area-module
     - oroui/js/app/modules/responsive-layout-module
 #    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
+    - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs
