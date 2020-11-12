@@ -8,23 +8,19 @@ use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
- * Configure SMTP transport based on user IMAP settings
+ * Configures SMTP transport based on user IMAP settings.
  */
 class SendEmailTransportListener
 {
-    /**
-     * @var SymmetricCrypterInterface
-     */
-    protected $crypter;
-    
-    /**
-     * @var OAuth2ManagerRegistry
-     */
-    protected $oauthManagerRegistry;
+    /** @var SymmetricCrypterInterface */
+    private $crypter;
+
+    /** @var OAuth2ManagerRegistry */
+    private $oauthManagerRegistry;
 
     /**
      * @param SymmetricCrypterInterface $crypter
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuth2ManagerRegistry     $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $crypter,
@@ -42,33 +38,38 @@ class SendEmailTransportListener
     public function setSmtpTransport(SendEmailTransport $event)
     {
         $emailOrigin = $event->getEmailOrigin();
-        if ($emailOrigin instanceof UserEmailOrigin) {
-            $username = $emailOrigin->getUser();
-            $password = $this->crypter->decryptData($emailOrigin->getPassword());
-            $host = $emailOrigin->getSmtpHost();
-            $port = $emailOrigin->getSmtpPort();
-            $security = $emailOrigin->getSmtpEncryption();
+        if (!$emailOrigin instanceof UserEmailOrigin) {
+            return;
+        }
 
-            $transport = $event->getTransport();
-            if ($transport instanceof \Swift_Transport_EsmtpTransport) {
-                $transport->setHost($host);
-                $transport->setPort($port);
-                $transport->setEncryption($security);
-            } else {
-                $transport = new \Swift_SmtpTransport($host, $port, $security);
-            }
+        $transport = $event->getTransport();
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $transport->setHost($emailOrigin->getSmtpHost());
+            $transport->setPort($emailOrigin->getSmtpPort());
+            $transport->setEncryption($emailOrigin->getSmtpEncryption());
+        } else {
+            $transport = new \Swift_SmtpTransport(
+                $emailOrigin->getSmtpHost(),
+                $emailOrigin->getSmtpPort(),
+                $emailOrigin->getSmtpEncryption()
+            );
+            $event->setTransport($transport);
+        }
 
-            $transport->setUsername($username);
-            $manager = $this->oauthManagerRegistry->getManager($emailOrigin->getAccountType());
+        $transport->setUsername($emailOrigin->getUser());
+        $manager = $this->oauthManagerRegistry->hasManager($emailOrigin->getAccountType())
+            ? $this->oauthManagerRegistry->getManager($emailOrigin->getAccountType())
+            : null;
+        if (null !== $manager) {
             $accessToken = $manager->getAccessTokenWithCheckingExpiration($emailOrigin);
-            if ($accessToken !== null) {
+            if (null !== $accessToken) {
                 $transport->setAuthMode($manager->getAuthMode());
                 $transport->setPassword($accessToken);
             } else {
-                $transport->setPassword($password);
+                $transport->setPassword($this->crypter->decryptData($emailOrigin->getPassword()));
             }
-
-            $event->setTransport($transport);
+        } else {
+            $transport->setPassword($this->crypter->decryptData($emailOrigin->getPassword()));
         }
     }
 }

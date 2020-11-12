@@ -7,195 +7,272 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener;
 use Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface;
 use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
-use Oro\Bundle\ImapBundle\Tests\Unit\TestCase\OauthManagerRegistryAwareTestCase;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
-class SendEmailTransportListenerTest extends OauthManagerRegistryAwareTestCase
+class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|OAuth2ManagerRegistry */
-    protected $oauthManagerRegistry;
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $crypter;
+
+    /** @var OAuth2ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $oauthManagerRegistry;
+
+    /** @var SendEmailTransportListener */
+    private $listener;
 
     /**
      * {@inheritDoc}
      */
     protected function setUp(): void
     {
-        $this->oauthManagerRegistry = $this->getManagerRegistryMock();
+        $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
+        $this->oauthManagerRegistry = $this->createMock(OAuth2ManagerRegistry::class);
+
+        $this->listener = new SendEmailTransportListener($this->crypter, $this->oauthManagerRegistry);
     }
 
-    /**
-     * @dataProvider transportDataProvider
-     */
-    public function testSendWithSmtpConfigured($host, $port, $username, $encryption, $authMode, $password)
+    public function testSendWithSmtpConfigured()
     {
-        /** @var \Swift_Transport_EsmtpTransport|MockObject $smtpTransportMock */
-        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
+        $decryptedPassword = 'decrypted_pass1';
+
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setAccountType('other');
+        $userEmailOrigin->setSmtpHost('host1');
+        $userEmailOrigin->setSmtpPort(465);
+        $userEmailOrigin->setSmtpEncryption('ssl');
+        $userEmailOrigin->setUser('user1');
+        $userEmailOrigin->setPassword('pass1');
+
+        $this->crypter->expects($this->once())
+            ->method('decryptData')
+            ->with($userEmailOrigin->getPassword())
+            ->willReturn($decryptedPassword);
+
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
+        $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
             ->getMock();
         $streamOptions = ['ssl' => ['verify_peer' => false]];
-        $smtpTransportMock->setStreamOptions($streamOptions);
-
-        $smtpTransportMock->expects($this->once())
+        $smtpTransport->setStreamOptions($streamOptions);
+        $smtpTransport->expects($this->once())
             ->method('setHost')
-            ->with($host)
+            ->with($userEmailOrigin->getSmtpHost())
             ->willReturnSelf();
-        $smtpTransportMock->expects($this->once())
+        $smtpTransport->expects($this->once())
             ->method('setEncryption')
-            ->with($encryption)
+            ->with($userEmailOrigin->getSmtpEncryption())
             ->willReturnSelf();
-        $smtpTransportMock->expects($this->once())
+        $smtpTransport->expects($this->once())
             ->method('setPort')
-            ->with($port)
+            ->with($userEmailOrigin->getSmtpPort())
             ->willReturnSelf();
-        $smtpTransportMock->expects($this->once())
+        $smtpTransport->expects($this->once())
             ->method('setUsername')
-            ->with($username)
+            ->with($userEmailOrigin->getUser())
             ->willReturnSelf();
 
-        $encoder = $this->getEncoderMock($password);
-        /** @var Oauth2ManagerInterface|MockObject $manager */
-        $manager = $this->oauthManagerRegistry->getManager(self::MANAGER_TYPE_DEFAULT);
-        $userOriginMock = $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
-        if ($authMode) {
-            $manager
-                ->expects($this->once())
-                ->method('getAccessTokenWithCheckingExpiration')
-                ->willReturn('test');
-            $smtpTransportMock->expects($this->once())
-                ->method('setAuthMode')
-                ->with($authMode)
-                ->willReturnSelf();
-        } else {
-            $userOriginMock->expects($this->once())
-                ->method('getPassword')
-                ->willReturn($password);
-            $smtpTransportMock->expects($this->once())
-                ->method('setPassword')
-                ->with($password)
-                ->willReturnSelf();
-        }
-        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->oauthManagerRegistry);
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('hasManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn(false);
+        $this->oauthManagerRegistry->expects($this->never())
+            ->method('getManager');
 
-        $event = $this->prepareEventMock($smtpTransportMock, $userOriginMock);
+        $smtpTransport->expects($this->once())
+            ->method('setPassword')
+            ->with($decryptedPassword)
+            ->willReturnSelf();
 
-        $sendEmailTransportListener->setSmtpTransport($event);
-        $this->assertSame($streamOptions, $smtpTransportMock->getStreamOptions());
+        $event = new SendEmailTransport($userEmailOrigin, $smtpTransport);
+        $this->listener->setSmtpTransport($event);
+
+        $this->assertSame($smtpTransport, $event->getTransport());
+        $this->assertSame($streamOptions, $smtpTransport->getStreamOptions());
     }
 
     public function testNewTransportInstanceCreatedInSetSmtpTransport()
     {
-        $host = 'host';
-        $port = 442;
-        $encryption = 'tls';
-        $username = 'test';
-        $password = 'pass';
+        $decryptedPassword = 'decrypted_pass1';
 
-        /** @var \Swift_Transport_AbstractSmtpTransport|MockObject $smtpTransportMock */
-        $smtpTransportMock = $this->getMockBuilder(\Swift_Transport_AbstractSmtpTransport::class)
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $encoder = $this->getEncoderMock($password);
-        $sendEmailTransportListener = new SendEmailTransportListener($encoder, $this->oauthManagerRegistry);
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setAccountType('oauth1');
+        $userEmailOrigin->setSmtpHost('host1');
+        $userEmailOrigin->setSmtpPort(465);
+        $userEmailOrigin->setSmtpEncryption('ssl');
+        $userEmailOrigin->setUser('user1');
+        $userEmailOrigin->setPassword('pass1');
 
-        $userEmailOrigin = $this->prepareUserEmailOriginMock($host, $port, $username, $encryption);
-
-        $event = new SendEmailTransport($userEmailOrigin, $smtpTransportMock);
-        $sendEmailTransportListener->setSmtpTransport($event);
-
-        $transport = $event->getTransport();
-        $this->assertInstanceOf(\Swift_SmtpTransport::class, $transport);
-        $this->assertEquals($host, $transport->getHost());
-        $this->assertEquals($port, $transport->getPort());
-        $this->assertEquals($encryption, $transport->getEncryption());
-        $this->assertEquals($username, $transport->getUsername());
-        $this->assertEquals($password, $transport->getPassword());
-    }
-
-    /**
-     * @param $password
-     * @return SymmetricCrypterInterface|MockObject
-     */
-    protected function getEncoderMock($password)
-    {
-        $encoder = $this->createMock(SymmetricCrypterInterface::class);
-        $encoder->expects($this->once())
+        $this->crypter->expects($this->once())
             ->method('decryptData')
-            ->willReturn($password);
+            ->with($userEmailOrigin->getPassword())
+            ->willReturn($decryptedPassword);
 
-        return $encoder;
+        $smtpTransport = $this->createMock(\Swift_Transport_AbstractSmtpTransport::class);
+
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('hasManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn(false);
+        $this->oauthManagerRegistry->expects($this->never())
+            ->method('getManager');
+
+        $event = new SendEmailTransport($userEmailOrigin, $smtpTransport);
+        $this->listener->setSmtpTransport($event);
+
+        /** @var \Swift_SmtpTransport $transport */
+        $transport = $event->getTransport();
+        $this->assertNotSame($smtpTransport, $transport);
+        $this->assertInstanceOf(\Swift_SmtpTransport::class, $transport);
+        $this->assertEquals($userEmailOrigin->getSmtpHost(), $transport->getHost());
+        $this->assertEquals($userEmailOrigin->getSmtpPort(), $transport->getPort());
+        $this->assertEquals($userEmailOrigin->getSmtpEncryption(), $transport->getEncryption());
+        $this->assertEquals($userEmailOrigin->getUser(), $transport->getUsername());
+        $this->assertEquals($decryptedPassword, $transport->getPassword());
     }
 
-    /**
-     * @param string $host
-     * @param int $port
-     * @param string $username
-     * @param string $encryption
-     *
-     * @return MockObject|UserEmailOrigin
-     */
-    protected function prepareUserEmailOriginMock($host, $port, $username, $encryption)
+    public function testSendWithOAuthSmtpConfigured()
     {
-        $emailOrigin = $this->getEmailOriginMock(self::MANAGER_TYPE_DEFAULT);
-        $emailOrigin->expects($this->once())
-            ->method('getSmtpHost')
-            ->will($this->returnValue($host));
-        $emailOrigin->expects($this->once())
-            ->method('getSmtpPort')
-            ->will($this->returnValue($port));
-        $emailOrigin->expects($this->once())
-            ->method('getUser')
-            ->will($this->returnValue($username));
-        $emailOrigin->expects($this->once())
-            ->method('getSmtpEncryption')
-            ->will($this->returnValue($encryption));
+        $oauthAuthMode = 'XOAUTH1';
+        $oauthAccessToken = 'token1';
 
-        return $emailOrigin;
-    }
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setAccountType('oauth1');
+        $userEmailOrigin->setSmtpHost('host1');
+        $userEmailOrigin->setSmtpPort(465);
+        $userEmailOrigin->setSmtpEncryption('ssl');
+        $userEmailOrigin->setUser('user1');
+        $userEmailOrigin->setPassword('pass1');
 
-    /**
-     * @param MockObject|\Swift_Transport_EsmtpTransport $transport
-     * @param MockObject|UserEmailOrigin
-     * @return SendEmailTransport
-     */
-    protected function prepareEventMock($transport, $userOriginMock)
-    {
-        /** @var SendEmailTransport $event */
-        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\SendEmailTransport')
+        $this->crypter->expects($this->never())
+            ->method('decryptData');
+
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
+        $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
+            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
             ->getMock();
-        $event->expects($this->once())
-            ->method('getTransport')
-            ->willReturn($transport);
-        $event->expects($this->once())
-            ->method('getEmailOrigin')
-            ->willReturn($userOriginMock);
-        $event->expects($this->once())
-            ->method('setTransport');
+        $streamOptions = ['ssl' => ['verify_peer' => false]];
+        $smtpTransport->setStreamOptions($streamOptions);
+        $smtpTransport->expects($this->once())
+            ->method('setHost')
+            ->with($userEmailOrigin->getSmtpHost())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setEncryption')
+            ->with($userEmailOrigin->getSmtpEncryption())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setPort')
+            ->with($userEmailOrigin->getSmtpPort())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setUsername')
+            ->with($userEmailOrigin->getUser())
+            ->willReturnSelf();
 
-        return $event;
+        $manager = $this->createMock(Oauth2ManagerInterface::class);
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('hasManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn(true);
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('getManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn($manager);
+
+        $manager->expects($this->once())
+            ->method('getAccessTokenWithCheckingExpiration')
+            ->willReturn($oauthAccessToken);
+        $manager->expects($this->once())
+            ->method('getAuthMode')
+            ->willReturn($oauthAuthMode);
+
+        $smtpTransport->expects($this->once())
+            ->method('setPassword')
+            ->with($oauthAccessToken)
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setAuthMode')
+            ->with($oauthAuthMode)
+            ->willReturnSelf();
+
+        $event = new SendEmailTransport($userEmailOrigin, $smtpTransport);
+        $this->listener->setSmtpTransport($event);
+
+        $this->assertSame($smtpTransport, $event->getTransport());
+        $this->assertSame($streamOptions, $smtpTransport->getStreamOptions());
     }
 
-    public static function transportDataProvider(): array
+    public function testSendWithOAuthSmtpConfiguredButOAuthAccessTokenIsNotSet()
     {
-        return [
-            'imap' => [
-                'smtp.gmail.com',
-                465,
-                'user1',
-                'ssl',
-                'XOAUTH2',
-                'test',
-            ],
-            'oauth' => [
-                'smtp.gmail.com',
-                465,
-                'user1',
-                'ssl',
-                null,
-                'test',
-            ]
-        ];
+        $decryptedPassword = 'decrypted_pass1';
+        $oauthAuthMode = 'XOAUTH1';
+
+        $userEmailOrigin = new UserEmailOrigin();
+        $userEmailOrigin->setAccountType('oauth1');
+        $userEmailOrigin->setSmtpHost('host1');
+        $userEmailOrigin->setSmtpPort(465);
+        $userEmailOrigin->setSmtpEncryption('ssl');
+        $userEmailOrigin->setUser('user1');
+        $userEmailOrigin->setPassword('pass1');
+
+        $this->crypter->expects($this->once())
+            ->method('decryptData')
+            ->with($userEmailOrigin->getPassword())
+            ->willReturn($decryptedPassword);
+
+        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
+        $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
+            ->getMock();
+        $streamOptions = ['ssl' => ['verify_peer' => false]];
+        $smtpTransport->setStreamOptions($streamOptions);
+        $smtpTransport->expects($this->once())
+            ->method('setHost')
+            ->with($userEmailOrigin->getSmtpHost())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setEncryption')
+            ->with($userEmailOrigin->getSmtpEncryption())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setPort')
+            ->with($userEmailOrigin->getSmtpPort())
+            ->willReturnSelf();
+        $smtpTransport->expects($this->once())
+            ->method('setUsername')
+            ->with($userEmailOrigin->getUser())
+            ->willReturnSelf();
+
+        $manager = $this->createMock(Oauth2ManagerInterface::class);
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('hasManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn(true);
+        $this->oauthManagerRegistry->expects($this->once())
+            ->method('getManager')
+            ->with($userEmailOrigin->getAccountType())
+            ->willReturn($manager);
+
+        $manager->expects($this->once())
+            ->method('getAccessTokenWithCheckingExpiration')
+            ->willReturn(null);
+        $manager->expects($this->never())
+            ->method('getAuthMode');
+
+        $smtpTransport->expects($this->once())
+            ->method('setPassword')
+            ->with($decryptedPassword)
+            ->willReturnSelf();
+        $smtpTransport->expects($this->never())
+            ->method('setAuthMode');
+
+        $event = new SendEmailTransport($userEmailOrigin, $smtpTransport);
+        $this->listener->setSmtpTransport($event);
+
+        $this->assertSame($smtpTransport, $event->getTransport());
+        $this->assertSame($streamOptions, $smtpTransport->getStreamOptions());
     }
 }
