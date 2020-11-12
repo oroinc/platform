@@ -106,7 +106,6 @@ define(function(require) {
         _setMenuHeight: function() {
             this.menu.find('.ui-multiselect-checkboxes li:hidden, .ui-multiselect-checkboxes a:hidden')
                 .addClass('hidden-item');
-            this._super();
             this.menu.find('.hidden-item').removeClass('hidden-item');
         },
 
