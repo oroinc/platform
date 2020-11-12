@@ -27,7 +27,7 @@ class ConnectionControllerManager
     /** @var SymmetricCrypterInterface */
     protected $crypter;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var ImapConnectorFactory */
