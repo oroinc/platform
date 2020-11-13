@@ -17,9 +17,9 @@ class AddOAuthTypeMigration implements Migration
         $table = $schema->getTable('oro_email_origin');
         if (!$table->hasColumn('account_type')) {
             $table->addColumn('account_type', 'string', [
-                'notnull' => true,
                 'default' => 'other',
-                'length' => 255
+                'notnull' => false,
+                'length'  => 255
             ]);
 
             $this->alterExistingOrigins($queries);
