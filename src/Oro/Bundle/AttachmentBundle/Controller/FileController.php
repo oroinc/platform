@@ -11,6 +11,7 @@ use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -67,6 +68,8 @@ class FileController extends AbstractController
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
+        $this->unlockSession();
+
         $file = $this->getFileByIdAndFileName($id, $filename);
 
         /** @var ImageResizeManagerInterface $resizeManager */
@@ -92,6 +95,8 @@ class FileController extends AbstractController
      */
     public function getFilteredImageAction($id, $filter, $filename)
     {
+        $this->unlockSession();
+
         $file = $this->getFileByIdAndFileName($id, $filename);
 
         /** @var ImageResizeManagerInterface $resizeManager */
@@ -131,6 +136,22 @@ class FileController extends AbstractController
         }
 
         return $file;
+    }
+
+    private function unlockSession()
+    {
+        $session = $this->getSession();
+        if (null !== $session && $session->isStarted()) {
+            $session->save();
+        }
+    }
+
+    /**
+     * @return SessionInterface|null
+     */
+    private function getSession(): ?SessionInterface
+    {
+        return $this->get('session');
     }
 
     /**
