@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -14,11 +13,8 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
+class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var CustomizeLoadedDataContext */
-    private $context;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
     private $associationManager;
 
@@ -30,7 +26,8 @@ class BuildCustomTypesTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->context = new CustomizeLoadedDataContext();
+        parent::setUp();
+
         $this->associationManager = $this->createMock(AssociationManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 

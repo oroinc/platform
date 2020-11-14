@@ -34,12 +34,10 @@ class GetListProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context->setAction(ApiAction::GET_LIST);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
-        $this->context->setConfigExtras(
-            [
-                new EntityDefinitionConfigExtra($this->context->getAction()),
-                new FiltersConfigExtra(),
-                new SortersConfigExtra()
-            ]
-        );
+        $this->context->setConfigExtras([
+            new EntityDefinitionConfigExtra($this->context->getAction()),
+            new FiltersConfigExtra(),
+            new SortersConfigExtra()
+        ]);
     }
 }

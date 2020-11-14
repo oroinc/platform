@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDataProcessorTestCase;
 use Oro\Bundle\CurrencyBundle\Api\Processor\SetCurrency;
 use Oro\Bundle\CurrencyBundle\Tests\Unit\Api\Stub\CurrencyAwareStub;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class SetCurrencyTest extends TypeTestCase
+class SetCurrencyTest extends CustomizeFormDataProcessorTestCase
 {
     private const CURRENCY_FIELD_NAME = 'currency';
 
@@ -40,7 +39,7 @@ class SetCurrencyTest extends TypeTestCase
      */
     private function getFormBuilder()
     {
-        return $this->builder->create(
+        return $this->createFormBuilder()->create(
             null,
             FormType::class,
             ['data_class' => CurrencyAwareStub::class]
@@ -62,10 +61,9 @@ class SetCurrencyTest extends TypeTestCase
         $this->localeSettings->expects(self::never())
             ->method('getCurrency');
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
@@ -86,10 +84,9 @@ class SetCurrencyTest extends TypeTestCase
             ->method('getCurrency')
             ->willReturn($currency);
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
@@ -107,10 +104,9 @@ class SetCurrencyTest extends TypeTestCase
             ->method('getCurrency')
             ->willReturn($currency);
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
@@ -129,10 +125,9 @@ class SetCurrencyTest extends TypeTestCase
             ->method('getCurrency')
             ->willReturn($currency);
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
@@ -151,10 +146,9 @@ class SetCurrencyTest extends TypeTestCase
             ->method('getCurrency')
             ->willReturn($currency);
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
@@ -172,10 +166,9 @@ class SetCurrencyTest extends TypeTestCase
             ->method('getCurrency')
             ->willReturn(null);
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertNull($entity->getCurrency());
     }
@@ -194,10 +187,9 @@ class SetCurrencyTest extends TypeTestCase
         $this->localeSettings->expects(self::never())
             ->method('getCurrency');
 
-        $context = new CustomizeFormDataContext();
-        $context->setForm($form);
-        $context->setData($entity);
-        $this->processor->process($context);
+        $this->context->setForm($form);
+        $this->context->setData($entity);
+        $this->processor->process($this->context);
 
         self::assertSame($currency, $entity->getCurrency());
     }
