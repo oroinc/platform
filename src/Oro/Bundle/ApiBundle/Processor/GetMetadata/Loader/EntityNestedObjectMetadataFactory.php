@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 
+/**
+ * The metadata factory for nested objects for manageable entities.
+ */
 class EntityNestedObjectMetadataFactory
 {
     /** @var NestedObjectMetadataHelper */

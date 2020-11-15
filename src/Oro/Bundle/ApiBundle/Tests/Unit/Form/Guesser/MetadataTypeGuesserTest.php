@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Guesser;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Config\ConfigAccessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\CollectionType;
 use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
@@ -44,11 +45,11 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->typeGuesser = new MetadataTypeGuesser(
-            [
+            new DataTypeGuesser([
                 'integer'  => ['integer', []],
                 'datetime' => ['test_datetime', ['model_timezone' => 'UTC', 'view_timezone' => 'UTC']],
                 'array'    => ['array', []]
-            ],
+            ]),
             $this->doctrineHelper
         );
     }
@@ -1078,6 +1079,47 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
         $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
         $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY);
+    }
+
+    public function testGuessTypeForAssociationContainsNestedObjectWithoutDataClassInFormOptionsButWithInheritData()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            false,
+            'array'
+        );
+        $metadata->addAssociation($associationMetadata);
+
+        $targetMetadata = new EntityMetadata();
+        $targetMetadata->setClassName('Test\TargetEntity');
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY);
+        $associationConfig->setDataType('nestedObject');
+        $associationConfig->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $associationConfig->setFormOptions(['some_option' => 'option value', 'inherit_data' => true]);
+        $associationTargetConfig = $associationConfig->getOrCreateTargetEntity();
+        $associationTargetConfig->addField('childField');
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
+        self::assertEquals(
+            new TypeGuess(
+                CompoundObjectType::class,
+                [
+                    'some_option'  => 'option value',
+                    'inherit_data' => true,
+                    'metadata'     => $targetMetadata,
+                    'config'       => $associationTargetConfig
+                ],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
     }
 
     public function testGuessTypeForAssociationContainsNestedObjectWithoutFormOptions()

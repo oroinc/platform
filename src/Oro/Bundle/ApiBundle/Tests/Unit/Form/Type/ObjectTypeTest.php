@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\ObjectType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -44,6 +45,7 @@ class ObjectTypeTest extends TypeTestCase
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(DataTypeGuesser::class),
             $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );

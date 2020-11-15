@@ -91,6 +91,36 @@ api:
                     exclude: true
                 lastName:
                     exclude: true
+                middle:
+                    data_type: nestedObject
+                    form_options:
+                        data_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestNestedValue
+                        by_reference: false
+                        mapped: false
+                    fields:
+                        value:
+                            property_path: middleName
+                middleName:
+                    exclude: true
+                prefix:
+                    data_type: nestedObject
+                    form_options:
+                        inherit_data: true
+                    fields:
+                        value:
+                            property_path: namePrefix
+                namePrefix:
+                    exclude: true
+                suffix:
+                    data_type: nestedObject
+                    form_options:
+                        inherit_data: true
+                        mapped: false
+                    fields:
+                        value:
+                            property_path: nameSuffix
+                nameSuffix:
+                    exclude: true
                 links:
                     data_type: objects
                     exclusion_policy: all

@@ -17,6 +17,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The helper class to complete the configuration of different kind of ORM associations.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteAssociationHelper
 {
@@ -90,9 +92,16 @@ class CompleteAssociationHelper
         $target->setExcludeAll();
 
         $formOptions = $field->getFormOptions();
-        if (null === $formOptions || !\array_key_exists('property_path', $formOptions)) {
+        $inheritData = $formOptions['inherit_data'] ?? false;
+        if (!$inheritData && (null === $formOptions || !\array_key_exists('property_path', $formOptions))) {
             $formOptions['property_path'] = $fieldName;
             $field->setFormOptions($formOptions);
+        }
+        if ($inheritData && !($formOptions['mapped'] ?? true)) {
+            $targetFields = $target->getFields();
+            foreach ($targetFields as $targetField) {
+                $targetField->setFormOption('mapped', false);
+            }
         }
 
         $this->completeDependsOn($field);

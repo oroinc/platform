@@ -80,6 +80,10 @@ class CompoundObjectListener implements EventSubscriberInterface
     public function postSubmit(FormEvent $event): void
     {
         $form = $event->getForm();
+        if ($form->getConfig()->getInheritData()) {
+            return;
+        }
+
         $entity = $form->getData();
         if (null === $entity) {
             return;
