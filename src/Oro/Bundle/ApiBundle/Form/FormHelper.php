@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -27,6 +28,9 @@ class FormHelper
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    /** @var DataTypeGuesser */
+    private $dataTypeGuesser;
+
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
@@ -35,15 +39,18 @@ class FormHelper
 
     /**
      * @param FormFactoryInterface      $formFactory
+     * @param DataTypeGuesser           $dataTypeGuesser
      * @param PropertyAccessorInterface $propertyAccessor
      * @param ContainerInterface        $container
      */
     public function __construct(
         FormFactoryInterface $formFactory,
+        DataTypeGuesser $dataTypeGuesser,
         PropertyAccessorInterface $propertyAccessor,
         ContainerInterface $container
     ) {
         $this->formFactory = $formFactory;
+        $this->dataTypeGuesser = $dataTypeGuesser;
         $this->propertyAccessor = $propertyAccessor;
         $this->container = $container;
     }
@@ -113,15 +120,19 @@ class FormHelper
      * @param EntityDefinitionFieldConfig $fieldConfig
      * @param PropertyMetadata            $fieldMetadata
      * @param array                       $options
+     * @param bool                        $allowGuessType
      *
      * @return FormBuilderInterface
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addFormField(
         FormBuilderInterface $formBuilder,
         $fieldName,
         EntityDefinitionFieldConfig $fieldConfig,
         PropertyMetadata $fieldMetadata,
-        array $options = []
+        array $options = [],
+        bool $allowGuessType = false
     ) {
         $formType = $fieldConfig->getFormType();
         /**
@@ -132,11 +143,21 @@ class FormHelper
          * @see \Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser::getTypeGuessForCollapsedArrayAssociation
          */
         $configuredOptions = $this->getFormFieldOptions($fieldMetadata, $fieldConfig);
-        if (null !== $formType
-            || !DataType::isAssociationAsField($fieldConfig->getDataType())
-            || false === ($configuredOptions['mapped'] ?? true)
-        ) {
+        if ($configuredOptions
+            && (
+                null !== $formType
+                || !DataType::isAssociationAsField($fieldConfig->getDataType())
+                || false === ($configuredOptions['mapped'] ?? true)
+            )) {
             $options = array_replace($options, $configuredOptions);
+        }
+        if (null === $formType && $allowGuessType) {
+            $dataType = $fieldMetadata->getDataType();
+            if ($dataType) {
+                $guess = $this->dataTypeGuesser->guessType($dataType);
+                $formType = $guess->getType();
+                $options = array_replace($guess->getOptions(), $options);
+            }
         }
         $fieldFormBuilder = $formBuilder->add($fieldName, $formType, $options);
 

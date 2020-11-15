@@ -5,10 +5,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 class TestNestedName
 {
     /** @var string */
-    protected $firstName;
+    private $firstName;
 
     /** @var string */
-    protected $lastName;
+    private $lastName;
 
     /**
      * @param string|null $firstName

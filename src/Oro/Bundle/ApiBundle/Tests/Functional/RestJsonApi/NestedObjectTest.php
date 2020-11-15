@@ -37,6 +37,40 @@ class NestedObjectTest extends RestJsonApiTestCase
             ],
             $result['data']['attributes']['name']
         );
+        self::assertEquals(
+            [
+                'value' => 'middle name'
+            ],
+            $result['data']['attributes']['middle']
+        );
+        self::assertEquals(
+            [
+                'value' => 'name prefix'
+            ],
+            $result['data']['attributes']['prefix']
+        );
+        self::assertEquals(
+            [
+                'value' => 'name suffix'
+            ],
+            $result['data']['attributes']['suffix']
+        );
+    }
+
+    public function testGetWithoutNestedObjectData()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_empty_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
+
+        $result = self::jsonToArray($response->getContent());
+        self::assertEquals((string)$entity->getId(), $result['data']['id']);
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertNull($result['data']['attributes']['middle']);
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertNull($result['data']['attributes']['suffix']);
     }
 
     public function testCreate()
@@ -47,9 +81,18 @@ class NestedObjectTest extends RestJsonApiTestCase
             'data' => [
                 'type'       => $entityType,
                 'attributes' => [
-                    'name' => [
+                    'name'   => [
                         'firstName' => 'first name',
                         'lastName'  => 'last name'
+                    ],
+                    'middle' => [
+                        'value' => 'middle name'
+                    ],
+                    'prefix' => [
+                        'value' => 'name prefix'
+                    ],
+                    'suffix' => [
+                        'value' => 'name suffix'
                     ]
                 ]
             ]
@@ -65,12 +108,23 @@ class NestedObjectTest extends RestJsonApiTestCase
             ],
             $result['data']['attributes']['name']
         );
+        self::assertNull($result['data']['attributes']['middle']);
+        self::assertEquals(
+            [
+                'value' => 'name prefix'
+            ],
+            $result['data']['attributes']['prefix']
+        );
+        self::assertNull($result['data']['attributes']['suffix']);
 
         // test that the data was created
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
         self::assertEquals('first name', $entity->getFirstName());
         self::assertEquals('last name', $entity->getLastName());
+        self::assertNull($entity->getMiddleName());
+        self::assertEquals('name prefix', $entity->getNamePrefix());
+        self::assertNull($entity->getNameSuffix());
     }
 
     public function testCreateWithoutNestedObjectData()
@@ -86,15 +140,19 @@ class NestedObjectTest extends RestJsonApiTestCase
         $response = $this->post(['entity' => $entityType], $data);
 
         $result = self::jsonToArray($response->getContent());
-        self::assertNull(
-            $result['data']['attributes']['name']
-        );
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertNull($result['data']['attributes']['middle']);
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertNull($result['data']['attributes']['suffix']);
 
         // test that the data was created
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
         self::assertNull($entity->getFirstName());
         self::assertNull($entity->getLastName());
+        self::assertNull($entity->getMiddleName());
+        self::assertNull($entity->getNamePrefix());
+        self::assertNull($entity->getNameSuffix());
     }
 
     public function testUpdate()
@@ -108,9 +166,18 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
-                    'name' => [
+                    'name'   => [
                         'firstName' => 'new first name',
                         'lastName'  => 'new last name'
+                    ],
+                    'middle' => [
+                        'value' => 'new middle name'
+                    ],
+                    'prefix' => [
+                        'value' => 'new name prefix'
+                    ],
+                    'suffix' => [
+                        'value' => 'new name suffix'
                     ]
                 ]
             ]
@@ -129,12 +196,33 @@ class NestedObjectTest extends RestJsonApiTestCase
             ],
             $result['data']['attributes']['name']
         );
+        self::assertEquals(
+            [
+                'value' => 'middle name'
+            ],
+            $result['data']['attributes']['middle']
+        );
+        self::assertEquals(
+            [
+                'value' => 'new name prefix'
+            ],
+            $result['data']['attributes']['prefix']
+        );
+        self::assertEquals(
+            [
+                'value' => 'name suffix'
+            ],
+            $result['data']['attributes']['suffix']
+        );
 
         // test that the data was updated
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
         self::assertEquals('new first name', $entity->getFirstName());
         self::assertEquals('new last name', $entity->getLastName());
+        self::assertEquals('middle name', $entity->getMiddleName());
+        self::assertEquals('new name prefix', $entity->getNamePrefix());
+        self::assertEquals('name suffix', $entity->getNameSuffix());
     }
 
     public function testUpdateToNull()
@@ -148,7 +236,10 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
-                    'name' => null
+                    'name'   => null,
+                    'middle' => null,
+                    'prefix' => null,
+                    'suffix' => null
                 ]
             ]
         ];
@@ -159,8 +250,19 @@ class NestedObjectTest extends RestJsonApiTestCase
         );
 
         $result = self::jsonToArray($response->getContent());
-        self::assertNull(
-            $result['data']['attributes']['name']
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertEquals(
+            [
+                'value' => 'middle name'
+            ],
+            $result['data']['attributes']['middle']
+        );
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertEquals(
+            [
+                'value' => 'name suffix'
+            ],
+            $result['data']['attributes']['suffix']
         );
 
         // test that the data was updated
@@ -168,6 +270,9 @@ class NestedObjectTest extends RestJsonApiTestCase
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
         self::assertNull($entity->getFirstName());
         self::assertNull($entity->getLastName());
+        self::assertEquals('middle name', $entity->getMiddleName());
+        self::assertNull($entity->getNamePrefix());
+        self::assertEquals('name suffix', $entity->getNameSuffix());
     }
 
     public function testUpdateWithEmptyArray()
@@ -181,7 +286,10 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
-                    'name' => []
+                    'name'   => [],
+                    'middle' => [],
+                    'prefix' => [],
+                    'suffix' => []
                 ]
             ]
         ];
@@ -199,11 +307,32 @@ class NestedObjectTest extends RestJsonApiTestCase
             ],
             $result['data']['attributes']['name']
         );
+        self::assertEquals(
+            [
+                'value' => 'middle name'
+            ],
+            $result['data']['attributes']['middle']
+        );
+        self::assertEquals(
+            [
+                'value' => 'name prefix'
+            ],
+            $result['data']['attributes']['prefix']
+        );
+        self::assertEquals(
+            [
+                'value' => 'name suffix'
+            ],
+            $result['data']['attributes']['suffix']
+        );
 
         // test that the data was updated
         $this->getEntityManager()->clear();
         $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
         self::assertEquals('first name', $entity->getFirstName());
         self::assertEquals('last name', $entity->getLastName());
+        self::assertEquals('middle name', $entity->getMiddleName());
+        self::assertEquals('name prefix', $entity->getNamePrefix());
+        self::assertEquals('name suffix', $entity->getNameSuffix());
     }
 }

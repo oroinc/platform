@@ -58,6 +58,7 @@ services:
         class: Oro\Bundle\ApiBundle\Form\FormHelper
         arguments:
             - '@form.factory'
+            - '@oro_api.form.guesser.data_type'
             - '@oro_api.form_property_accessor'
             - '@service_container'
 
@@ -68,10 +69,15 @@ services:
             - '@oro_api.customize_form_data_handler'
             - '@oro_api.form_property_accessor'
 
+    oro_api.form.guesser.data_type:
+        class: Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser
+        arguments:
+            - [] # data type mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+
     oro_api.form.guesser.metadata:
         class: Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser
         arguments:
-            - [] # data type mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\FormCompilerPass
+            - '@oro_api.form.guesser.data_type'
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
