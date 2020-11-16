@@ -471,7 +471,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
             ->method('hasAssociation')
             ->with('field511')
             ->willReturn(false);
-        $association51ClassMetadata->expects(self::once())
+        $association51ClassMetadata->expects(self::exactly(2))
             ->method('hasField')
             ->with('field511')
             ->willReturn(true);

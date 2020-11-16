@@ -61,7 +61,7 @@ class EntityMetadataFactory
     ): MetaPropertyMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
-        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         if (!$fieldType && $classMetadata->hasField($fieldName)) {
             $fieldType = $this->getFieldType($classMetadata->getFieldMapping($fieldName));
         }
@@ -86,19 +86,32 @@ class EntityMetadataFactory
     ): FieldMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
-        list($classMetadata, $fieldName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
-        $mapping = $classMetadata->getFieldMapping($fieldName);
-        if (!$fieldType) {
+        [$classMetadata, $fieldName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        $mapping = $classMetadata->hasField($fieldName)
+            ? $classMetadata->getFieldMapping($fieldName)
+            : null;
+        if (!$fieldType && $mapping) {
             $fieldType = $this->getFieldType($mapping);
+        }
+        if (!$fieldType) {
+            throw new \InvalidArgumentException(\sprintf(
+                'The data type for "%s::%s" is not defined.',
+                $classMetadata->name,
+                $fieldName
+            ));
         }
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
         $fieldMetadata->setDataType($fieldType);
-        if (!empty($mapping[self::NULLABLE])) {
+        if ($mapping) {
+            if (!empty($mapping[self::NULLABLE])) {
+                $fieldMetadata->setIsNullable(true);
+            }
+            if (isset($mapping[self::LENGTH])) {
+                $fieldMetadata->setMaxLength($mapping[self::LENGTH]);
+            }
+        } else {
             $fieldMetadata->setIsNullable(true);
-        }
-        if (isset($mapping[self::LENGTH])) {
-            $fieldMetadata->setMaxLength($mapping[self::LENGTH]);
         }
 
         return $fieldMetadata;
@@ -118,7 +131,7 @@ class EntityMetadataFactory
     ): AssociationMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $associationName */
-        list($classMetadata, $associationName) = $this->getTargetClassMetadata($classMetadata, $propertyPath);
+        [$classMetadata, $associationName] = $this->getTargetClassMetadata($classMetadata, $propertyPath);
         $mapping = $classMetadata->getAssociationMapping($associationName);
 
         $targetClass = $mapping[self::TARGET_ENTITY];
