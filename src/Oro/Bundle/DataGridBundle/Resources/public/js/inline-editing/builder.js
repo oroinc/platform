@@ -26,7 +26,18 @@ define(function(require) {
          */
 
         processDatagridOptions: function(deferred, options) {
-            if (tools.isMobile() || !options.metadata.inline_editing || !options.metadata.inline_editing.enable) {
+            if (!options.metadata.inline_editing) {
+                deferred.resolve();
+                return;
+            }
+
+            const {mobile_enabled: mobileEnabled = false, enable = false} = options.metadata.inline_editing;
+
+            if (
+                (!mobileEnabled && tools.isMobile()) ||
+                !options.metadata.inline_editing ||
+                !enable
+            ) {
                 deferred.resolve();
                 return;
             }

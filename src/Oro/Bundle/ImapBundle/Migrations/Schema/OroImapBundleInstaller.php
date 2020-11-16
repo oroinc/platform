@@ -162,9 +162,9 @@ class OroImapBundleInstaller implements Installation
     {
         $table = $schema->getTable('oro_email_origin');
         $table->addColumn('account_type', 'string', [
-            'notnull' => true,
             'default' => 'other',
-            'length' => 255
+            'notnull' => false,
+            'length'  => 255
         ]);
     }
 }

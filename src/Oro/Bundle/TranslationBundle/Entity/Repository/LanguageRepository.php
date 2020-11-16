@@ -8,6 +8,9 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
+/**
+ * Repository for Language entity
+ */
 class LanguageRepository extends EntityRepository
 {
     /**
@@ -52,6 +55,8 @@ class LanguageRepository extends EntityRepository
         if ($onlyEnabled) {
             $qb->where($qb->expr()->eq('language.enabled', ':enabled'))->setParameter('enabled', true);
         }
+
+        $qb->orderBy('language.id');
 
         return $qb->getQuery()->getResult();
     }

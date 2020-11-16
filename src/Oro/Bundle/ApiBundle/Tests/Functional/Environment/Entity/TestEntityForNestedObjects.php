@@ -44,6 +44,27 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     /**
      * @var string
      *
+     * @ORM\Column(name="middle_name", type="string", nullable=true)
+     */
+    protected $middleName;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_prefix", type="string", nullable=true)
+     */
+    protected $namePrefix;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name_suffix", type="string", nullable=true)
+     */
+    protected $nameSuffix;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="related_class", type="string", nullable=true)
      */
     protected $relatedClass;
@@ -169,6 +190,66 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function setLastName($lastName)
     {
         $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMiddleName()
+    {
+        return $this->middleName;
+    }
+
+    /**
+     * @param string $middleName
+     *
+     * @return self
+     */
+    public function setMiddleName($middleName)
+    {
+        $this->middleName = $middleName;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNamePrefix()
+    {
+        return $this->namePrefix;
+    }
+
+    /**
+     * @param string $namePrefix
+     *
+     * @return self
+     */
+    public function setNamePrefix($namePrefix)
+    {
+        $this->namePrefix = $namePrefix;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNameSuffix()
+    {
+        return $this->nameSuffix;
+    }
+
+    /**
+     * @param string $nameSuffix
+     *
+     * @return self
+     */
+    public function setNameSuffix($nameSuffix)
+    {
+        $this->nameSuffix = $nameSuffix;
 
         return $this;
     }

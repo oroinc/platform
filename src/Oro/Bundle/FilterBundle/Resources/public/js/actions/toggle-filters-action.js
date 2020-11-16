@@ -43,8 +43,8 @@ define(function(require) {
                 this.toggleFilters(mode);
             }
 
-            if (this.launcherInstanse) {
-                this.launcherInstanse.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
+            if (this.launcherInstance) {
+                this.launcherInstance.$el.toggleClass('pressed', mode === FiltersManager.MANAGE_VIEW_MODE);
             }
 
             mediator.trigger('layout:adjustHeight');

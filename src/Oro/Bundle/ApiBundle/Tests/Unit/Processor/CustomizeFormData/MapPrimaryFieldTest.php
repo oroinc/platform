@@ -20,16 +20,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerTyp
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -40,7 +37,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MapPrimaryFieldTest extends TypeTestCase
+class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
     private $customizationProcessor;
@@ -62,18 +59,16 @@ class MapPrimaryFieldTest extends TypeTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
         $this->customizationHandler = new CustomizeFormDataHandler($this->customizationProcessor);
         $this->validator = Validation::createValidator();
+
         /* @var ClassMetadata $metadata */
         $metadata = $this->validator->getMetadataFor(Form::class);
         $metadata->addConstraint(new FormConstraint());
         $metadata->addPropertyConstraint('children', new Assert\Valid());
-
-        parent::setUp();
-
-        $this->dispatcher = new EventDispatcher();
-        $this->builder = new FormBuilder(null, null, $this->dispatcher, $this->factory);
 
         $configProvider = $this->createMock(ConfigProvider::class);
         $metadataProvider = $this->createMock(MetadataProvider::class);
@@ -114,7 +109,10 @@ class MapPrimaryFieldTest extends TypeTestCase
         );
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getFormExtensions()
     {
         return [
             new PreloadedExtension(
@@ -138,7 +136,7 @@ class MapPrimaryFieldTest extends TypeTestCase
     {
         $this->formContext->setConfig($config);
 
-        return $this->builder->create(
+        return $this->createFormBuilder()->create(
             null,
             FormType::class,
             [

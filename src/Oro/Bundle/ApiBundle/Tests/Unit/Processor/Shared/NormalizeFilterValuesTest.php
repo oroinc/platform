@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
+use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
+use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -52,6 +54,44 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         $context = clone $this->context;
         $this->processor->process($this->context);
         self::assertEquals($context, $this->context);
+    }
+
+    public function testProcessForNotStandaloneFilter()
+    {
+        $filters = $this->context->getFilters();
+        $filters->add('filter1', $this->createMock(FilterInterface::class));
+
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set('filter1', new FilterValue('filter1', 'test'));
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+
+        $this->context->setFilterValues($filterValues);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessForSpecialHandlingFilter()
+    {
+        $filters = $this->context->getFilters();
+        $filters->add('filter1', new FieldsFilter('string'));
+
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set('filter1', new FilterValue('filter1', 'test'));
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+        $this->entityIdTransformerRegistry->expects(self::never())
+            ->method('getEntityIdTransformer');
+
+        $this->context->setFilterValues($filterValues);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
     }
 
     public function testProcessForFieldFilters()

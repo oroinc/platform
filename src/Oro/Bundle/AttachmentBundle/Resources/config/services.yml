@@ -38,9 +38,6 @@ services:
             - '@oro_attachment.protocol_validator'
         lazy: true
 
-    Oro\Bundle\AttachmentBundle\Manager\FileManager:
-        alias: 'oro_attachment.file_manager'
-
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
         public: false
@@ -326,9 +323,6 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
-    Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider:
-        alias: oro_attachment.provider.attachment_file_name_provider
-
     oro_attachment.provider.attachment_file_name_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
 
@@ -341,18 +335,11 @@ services:
     Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
         alias: 'oro_attachment.provider.file_url'
 
-    oro_attachment.provider.file_url_by_uuid.cache:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_attachment_file_url_by_uuid' ] ]
-
     oro_attachment.provider.file_url_by_uuid:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider'
         arguments:
-            - '@oro_attachment.provider.file_url'
-            - '@oro_attachment.provider.file_url_by_uuid.cache'
             - '@doctrine'
+            - '@oro_attachment.provider.file_url'
 
     Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider:
         alias: 'oro_attachment.provider.file_url_by_uuid'
@@ -389,12 +376,8 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
-    Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager:
-        alias: oro_attachment.manager.image_resize
-
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'
-        public: true
         arguments:
             - '@oro_attachment.provider.resized_image'
             - '@oro_attachment.provider.resized_image_path'

@@ -129,7 +129,7 @@ final class BigDecimal extends BigNumber
      */
     public function unscaledValue()
     {
-        return $this->getTargetObject()->unscaledValue();
+        return $this->getTargetObject()->getUnscaledValue();
     }
 
     /**
@@ -139,7 +139,7 @@ final class BigDecimal extends BigNumber
      */
     public function scale()
     {
-        return $this->getTargetObject()->scale();
+        return $this->getTargetObject()->getScale();
     }
 
     /**
@@ -151,7 +151,7 @@ final class BigDecimal extends BigNumber
      */
     public function integral()
     {
-        return $this->getTargetObject()->integral();
+        return $this->getTargetObject()->getIntegralPart();
     }
 
     /**
@@ -165,7 +165,7 @@ final class BigDecimal extends BigNumber
      */
     public function fraction()
     {
-        return $this->getTargetObject()->fraction();
+        return $this->getTargetObject()->getFractionalPart();
     }
 
     /**

@@ -159,7 +159,7 @@ class RestFilterValueAccessor extends FilterValueAccessor
         $matchResult = \preg_match_all(
             '/(?P<key>((?P<group>[\w\d\-\.]+)(?P<path>((\[[\w\d\-\.]*\])|(%5B[\w\d\-\.]*%5D))*)))'
             . '(?P<operator>' . $this->operatorPattern . ')'
-            . '(?P<value>[^&]+)/',
+            . '(?P<value>[^&]*)/',
             $queryString,
             $matches,
             PREG_SET_ORDER

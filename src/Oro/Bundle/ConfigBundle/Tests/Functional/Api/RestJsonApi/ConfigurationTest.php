@@ -26,6 +26,7 @@ class ConfigurationTest extends RestJsonApiTestCase
                 $item['type'],
                 sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
             );
+            $this->assertArrayNotHasKey('attributes', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             $this->assertArrayNotHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             $sectionId = $item['id'];
             $this->checkGetConfigurationSection($sectionId);

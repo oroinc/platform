@@ -136,6 +136,7 @@ oro_api:
         time[]: array of times
         money[]: array of moneys
         scalar[]: array of scalars
+        nestedObject: object
 
     api_doc_cache:
         excluded_features: [ web_api ]
@@ -297,6 +298,8 @@ oro_api:
                 scale: 4
         duration:
             form_type: Oro\Bundle\FormBundle\Form\Type\OroDurationType
+        object:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
         array:
             form_type: Oro\Bundle\ApiBundle\Form\Type\ArrayType
         simple_array:

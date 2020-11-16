@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\LinkCollectionMetadataInterface;
 use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -245,6 +246,16 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             if (!$association->isOutput()) {
+                continue;
+            }
+
+            if (DataType::isAssociationAsField($association->getDataType())) {
+                $result[$name] = $this->getRelationshipValue(
+                    $data,
+                    $requestType,
+                    $name,
+                    $association
+                );
                 continue;
             }
 

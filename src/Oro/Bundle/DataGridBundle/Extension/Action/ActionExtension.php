@@ -141,7 +141,7 @@ class ActionExtension extends AbstractExtension
         }
 
         if (!empty($this->ownershipFields)) {
-            $aclResources = $this->getActionsAclResources($config);
+            $aclResources = $this->getUniqueAclResources($config);
             if (!empty($aclResources)) {
                 $aliases = array_keys($this->ownershipFields);
                 $entityAlias = reset($aliases);
@@ -152,28 +152,16 @@ class ActionExtension extends AbstractExtension
                     $ownerIdFieldAlias
                     ] = $this->ownershipFields[$entityAlias];
 
-                $disabledActions = [];
                 /** @var ResultRecord[] $records */
                 $records = $result->getData();
-                foreach ($records as $record) {
-                    $entityId = $record->getValue($entityIdFieldAlias);
-                    $entityReference = null;
-                    $ownerId = $record->getValue($ownerIdFieldAlias);
-                    if (null !== $ownerId) {
-                        $entityReference = new DomainObjectReference(
-                            $entityClass,
-                            $record->getValue($entityIdFieldAlias),
-                            $ownerId,
-                            $record->getValue($organizationIdFieldAlias)
-                        );
-                    }
-
-                    foreach ($aclResources as $actionName => $aclResource) {
-                        if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
-                            $disabledActions[$entityId][$actionName] = false;
-                        }
-                    }
-                }
+                $disabledActions = $this->getDisabledActions(
+                    $records,
+                    $entityClass,
+                    $entityIdFieldAlias,
+                    $organizationIdFieldAlias,
+                    $ownerIdFieldAlias,
+                    $aclResources
+                );
 
                 // set action_configuration callback only if there are some actions to disable.
                 if (!empty($disabledActions)) {
@@ -336,5 +324,67 @@ class ActionExtension extends AbstractExtension
 
             return $result;
         };
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     *
+     * @return array
+     */
+    private function getUniqueAclResources(DatagridConfiguration $config): array
+    {
+        $aclResources = $this->getActionsAclResources($config);
+
+        $uniqueAclResources = [];
+        foreach ($aclResources as $actionName => $aclResource) {
+            $uniqueAclResources[$aclResource][] = $actionName;
+        }
+
+        return $uniqueAclResources;
+    }
+
+    /**
+     * @param ResultRecord[] $records
+     * @param string $entityClass
+     * @param string $entityIdFieldAlias
+     * @param string $organizationIdFieldAlias
+     * @param string $ownerIdFieldAlias
+     * @param array $aclResources
+     *
+     * @return array
+     */
+    private function getDisabledActions(
+        array $records,
+        string $entityClass,
+        string $entityIdFieldAlias,
+        string $organizationIdFieldAlias,
+        string $ownerIdFieldAlias,
+        array $aclResources
+    ): array {
+        $disabledActions = [];
+
+        foreach ($records as $record) {
+            $entityId = $record->getValue($entityIdFieldAlias);
+            $entityReference = null;
+            $ownerId = $record->getValue($ownerIdFieldAlias);
+            if (null !== $ownerId) {
+                $entityReference = new DomainObjectReference(
+                    $entityClass,
+                    $record->getValue($entityIdFieldAlias),
+                    $ownerId,
+                    $record->getValue($organizationIdFieldAlias)
+                );
+            }
+
+            foreach ($aclResources as $aclResource => $actionNames) {
+                if (!$this->authorizationChecker->isGranted($aclResource, $entityReference)) {
+                    foreach ($actionNames as $actionName) {
+                        $disabledActions[$entityId][$actionName] = false;
+                    }
+                }
+            }
+        }
+
+        return $disabledActions;
     }
 }

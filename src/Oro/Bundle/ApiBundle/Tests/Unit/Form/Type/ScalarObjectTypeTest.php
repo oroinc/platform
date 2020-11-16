@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\ApiFormBuilder;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\ScalarObjectType;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -70,6 +71,7 @@ class ScalarObjectTypeTest extends TypeTestCase
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(DataTypeGuesser::class),
             $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );

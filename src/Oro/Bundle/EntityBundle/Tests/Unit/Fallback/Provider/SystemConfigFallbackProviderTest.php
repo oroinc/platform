@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Provider;
 
-use Oro\Bundle\CacheBundle\Tests\Unit\Provider\MemoryCacheProviderAwareTestTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Exception\Fallback\FallbackFieldConfigurationMissingException;
@@ -12,8 +11,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use MemoryCacheProviderAwareTestTrait;
-
     /**
      * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
      */
@@ -46,15 +43,14 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFallbackHolderEntityThrowsExceptionIfNoConfigFound()
     {
-        $this->getMemoryCacheProvider()
-            ->expects($this->never())
-            ->method('get');
-
         $this->expectException(FallbackFieldConfigurationMissingException::class);
         $entityConfig = $this->getEntityConfiguration();
         $entityConfig[EntityFieldFallbackValue::FALLBACK_LIST][SystemConfigFallbackProvider::FALLBACK_ID] = [];
         $this->setUpFallbackConfig($entityConfig);
 
+        $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
+
+        // check the local entity config cache
         $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
     }
 
@@ -65,29 +61,6 @@ class SystemConfigFallbackProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('get')
             ->willReturn($expectedValue);
-        $result = $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
-        $this->assertEquals($expectedValue, $result);
-    }
-
-    public function testGetFallbackHolderEntityReturnsCorrectValueWhenMemoryCacheProvider(): void
-    {
-        $this->mockMemoryCacheProvider();
-        $this->setMemoryCacheProvider($this->systemConfigFallbackProvider);
-
-        $this->testGetFallbackHolderEntityReturnsCorrectValue();
-    }
-
-    public function testGetFallbackHolderEntityWhenCache(): void
-    {
-        $expectedValue = 'testValue';
-
-        $this->setUpFallbackConfig($this->getEntityConfiguration());
-        $this->configManager->expects($this->never())
-            ->method('get');
-
-        $this->mockMemoryCacheProvider($expectedValue);
-        $this->setMemoryCacheProvider($this->systemConfigFallbackProvider);
-
         $result = $this->systemConfigFallbackProvider->getFallbackHolderEntity(new \stdClass(), 'test');
         $this->assertEquals($expectedValue, $result);
     }

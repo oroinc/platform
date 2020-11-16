@@ -611,6 +611,43 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testVisitResultForActionsWithDuplicatedAclResources(): void
+    {
+        $config = DatagridConfiguration::create([
+            'actions' => [
+                'action1' => ['type' => 'type1', 'acl_resource' => 'acl_resource1'],
+                'action2' => ['type' => 'type2', 'acl_resource' => 'acl_resource1'],
+                'action3' => ['type' => 'type3', 'acl_resource' => 'acl_resource3']
+            ],
+        ]);
+        $records = [
+            new ResultRecord(['id' => 1, 't_owner_id' => 123, 't_organization_id' => 456]),
+        ];
+
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['acl_resource1'],
+                ['acl_resource3']
+            )
+            ->willReturnCallback(function ($resource, DomainObjectReference $object = null) {
+                return false;
+            });
+
+        $this->setOwnershipFields(
+            ['t' => ['Test\Entity', 'id', 't_organization_id', 't_owner_id']]
+        );
+        $this->extension->visitResult($config, ResultsObject::create(['data' => $records]));
+
+        $actionConfiguration = $this->getActionConfigurationOption($config);
+        $this->assertNotNull($actionConfiguration);
+        $this->assertArrayHasKey('callable', $actionConfiguration);
+        foreach ($records as $record) {
+            $result = call_user_func($actionConfiguration['callable'], $record);
+            $this->assertEquals(['action1' => false, 'action2' => false, 'action3' => false], $result);
+        }
+    }
+
     public function testVisitResultWithOwnershipFieldsForActionWithAclResourceAndAccessGranted()
     {
         $config = DatagridConfiguration::create([

@@ -394,6 +394,10 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         dispose: function() {
+            if (this.isOpen()) {
+                this.close();
+            }
+
             if (this.disposed) {
                 return;
             }

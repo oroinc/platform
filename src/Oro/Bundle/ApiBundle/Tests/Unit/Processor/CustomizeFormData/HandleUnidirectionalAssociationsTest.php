@@ -4,16 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\HandleUnidirectionalAssociations;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter;
 use Symfony\Component\Form\FormInterface;
 
-class HandleUnidirectionalAssociationsTest extends \PHPUnit\Framework\TestCase
+class HandleUnidirectionalAssociationsTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var CustomizeFormDataContext */
-    private $context;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|UnidirectionalAssociationHandler */
     private $handler;
 
@@ -22,8 +18,7 @@ class HandleUnidirectionalAssociationsTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->context = new CustomizeFormDataContext();
-        $this->context->getRequestType()->add('test');
+        parent::setUp();
 
         $this->handler = $this->createMock(UnidirectionalAssociationHandler::class);
 

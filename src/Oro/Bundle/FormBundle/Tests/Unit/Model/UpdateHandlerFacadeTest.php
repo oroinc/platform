@@ -124,7 +124,13 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($redirectResponse, $result);
     }
 
-    public function testUpdateHandledWithWidget()
+    /**
+     * @dataProvider updateDataProvider
+     *
+     * @param bool $isManageableEntity
+     * @param array $expected
+     */
+    public function testUpdateHandledWithWidget(bool $isManageableEntity, array $expected): void
     {
         $update = $this->defaultUpdateBuilding();
 
@@ -149,7 +155,14 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         //in constructResponse
         //pasting saveId
         $this->doctrineHelper->expects($this->once())
-            ->method('getSingleEntityIdentifier')->with($this->data)->willReturn(42);
+            ->method('isManageableEntity')
+            ->with($this->data)
+            ->willReturn($isManageableEntity);
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($this->data)
+            ->willReturn(42);
 
         //execute
         $result = $this->facade->update(
@@ -162,14 +175,35 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertSame(
-            [
-                'form' => $formView,
-                'entity' => $this->data,
-                'isWidgetContext' => true,
-                'savedId' => 42
-            ],
+            array_merge(
+                [
+                    'form' => $formView,
+                    'entity' => $this->data,
+                    'isWidgetContext' => true,
+                ],
+                $expected
+            ),
             $result
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function updateDataProvider(): array
+    {
+        return [
+            [
+                'isManageableEntity' => false,
+                'expected' => [],
+            ],
+            [
+                'isManageableEntity' => true,
+                'expected' => [
+                    'savedId' => 42
+                ],
+            ],
+        ];
     }
 
     public function testUpdateNotHandled()

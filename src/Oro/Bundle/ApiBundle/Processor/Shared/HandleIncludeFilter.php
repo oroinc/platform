@@ -80,8 +80,8 @@ class HandleIncludeFilter implements ProcessorInterface
             return;
         }
 
-        if (!$includes) {
-            // expanding of related entities was not requested
+        if ($context->hasErrors()) {
+            // detected errors in the filter value
             return;
         }
 

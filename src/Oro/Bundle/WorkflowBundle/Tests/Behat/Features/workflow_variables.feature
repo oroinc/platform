@@ -1,7 +1,7 @@
 @fixture-OroWorkflowBundle:Users.yml
 @fixture-OroWorkflowBundle:TestWorkflow.yml
 Feature: Workflow variables
-  ToDo: BAP-16103 Add missing descriptions to the Behat features
+
   Scenario: Set up workflow variable configuration
     Given I login as administrator
     When go to System/ Localization/ Translations

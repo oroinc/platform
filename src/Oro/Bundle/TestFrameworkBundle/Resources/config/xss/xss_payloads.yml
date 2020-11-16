@@ -1,5 +1,6 @@
 xss_payloads:
     script: <script x>%2$s</script>
+    script_escaped_tag: "<div>Lorem text &lt;script x&gt;%2$s&lt;/script&gt;</div>"
     script_broken_tag: <desc><![CDATA[</desc><script x>%2$s</script>]]>
     break_json_single_quote: "';%2$s//';%2$s//"
     break_json_double_quote: '";%2$s//";%2$s//'

@@ -11,6 +11,8 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
+ * Responsible for formatting the datetime according to the time zone.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DateFilterSubscriber implements EventSubscriberInterface
@@ -61,6 +63,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
         $form = $event->getForm();
+        $config = $form->getConfig();
 
         $oid = spl_object_hash($form);
         if (!empty($this->processed[$oid])) {
@@ -69,7 +72,9 @@ class DateFilterSubscriber implements EventSubscriberInterface
             return;
         }
         $children = array_keys($form->get('value')->all());
-        $data     = $this->dateFilterModifier->modify($data, $children);
+        $data = $this->dateFilterModifier
+            ->setTimeZone($config->getOption('time_zone'))
+            ->modify($data, $children);
         // replace value form children to needed sub forms in case when part is selected
         if (array_key_exists($data['part'], static::$partChoicesMap)) {
             $min = static::$partChoicesMap[$data['part']][0];
