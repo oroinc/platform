@@ -539,9 +539,22 @@
             min-height: $select-filter-widget-checkboxes-list-offset-vertical;
             padding: $select-filter-widget-header-inner-offset;
             margin: $select-filter-widget-header-offset;
+            position: relative;
 
             & > div {
                 padding: $select-filter-widget-header-child-inner-offset;
+            }
+
+            .clear-search {
+                position: absolute;
+                #{$end}: 8px;
+                top: 8px;
+
+                border-radius: 0;
+            }
+
+            .input-with-search {
+                padding-#{$end}: $btn-icon-width;
             }
 
             .ui-helper-reset {
@@ -557,6 +570,10 @@
             a {
                 color: $link-color-hover;
             }
+        }
+
+        .no-data {
+            margin-top: 0;
         }
     }
 }
