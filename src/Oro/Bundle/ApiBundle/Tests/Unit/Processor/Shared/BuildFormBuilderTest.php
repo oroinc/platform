@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -50,6 +51,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
+                $this->createMock(DataTypeGuesser::class),
                 $this->createMock(PropertyAccessorInterface::class),
                 $this->container
             ),
@@ -714,6 +716,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->processor = new BuildFormBuilder(
             new FormHelper(
                 $this->formFactory,
+                $this->createMock(DataTypeGuesser::class),
                 $this->createMock(PropertyAccessorInterface::class),
                 $this->container
             ),

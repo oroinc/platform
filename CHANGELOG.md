@@ -6,6 +6,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### ApiBundle
+* Implemented support of the `inherit_data` form option for the `nestedObject` data type. It allows to configure
+  nested objects even if an entity does not have a setter method for it.
+
 #### LayoutBundle
 * Added `is_xml_http_request` option to the Layout context which lets you know if the current request is an ajax request.
 * Added two new options `onLoadingCssClass` and `disableControls` to the `layout_subtree_update` block configuration.

@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\ApiFormBuilder;
 use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -77,6 +78,7 @@ class CompoundObjectTypeTest extends TypeTestCase
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),
+            $this->createMock(DataTypeGuesser::class),
             $this->createMock(PropertyAccessorInterface::class),
             $this->createMock(ContainerInterface::class)
         );
