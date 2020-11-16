@@ -156,7 +156,8 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     }
 
     /**
-     * Indicates whether the given field is requested to be returned in response data.
+     * Indicates whether the given field is requested to be returned in response data
+     * and it does not exist in the given response data yet if the response data is specified.
      * This method takes into account whether the "customize_loaded_data" action is executed
      * for a relationship (in this case only identifier field is returned)
      * or for primary or included resource (in this case a list of returned fields
@@ -190,14 +191,16 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     }
 
     /**
-     * Indicates whether at least one of the given fields is requested to be returned in response data.
+     * Indicates whether at least one of the given fields is requested to be returned in response data
+     * and it does not exist in the given response data yet if the response data is specified.
      *
      * @see isFieldRequested
      *
      * @param array|null $data       Response data
      * @param string[]   $fieldNames The names under which fields should be represented in response data
      *
-     * @return bool
+     * @return bool TRUE if at least one of the given fields is requested to be returned in response data,
+     *              and it does not exist in the given response data, if it is specified
      */
     public function isAtLeastOneFieldRequested(array $fieldNames, array $data = null): bool
     {
@@ -212,14 +215,15 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Indicates whether the given field is requested to be returned
-     * in at least one element of response collection data.
+     * in at least one element of response collection data and it does not exist in the given response data yet.
      *
      * @see isFieldRequested
      *
      * @param array  $data      Response data
      * @param string $fieldName The name under which a field should be represented in response data
      *
-     * @return bool
+     * @return bool TRUE if the given field is requested to be returned in at least one element
+     *              of response collection data, and it does not exist in the given response data
      */
     public function isFieldRequestedForCollection(string $fieldName, array $data): bool
     {
@@ -234,14 +238,15 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
 
     /**
      * Indicates whether at least one of the given fields is requested to be returned
-     * in at least one element of response collection data.
+     * in at least one element of response collection data and it does not exist in the given response data yet.
      *
      * @see isAtLeastOneFieldRequested
      *
      * @param array    $data       Response data
      * @param string[] $fieldNames The names under which fields should be represented in response data
      *
-     * @return bool
+     * @return bool TRUE if at least one of the given fields is requested to be returned in at least one element
+     *              of response collection data, and it does not exist in the given response data
      */
     public function isAtLeastOneFieldRequestedForCollection(array $fieldNames, array $data): bool
     {
