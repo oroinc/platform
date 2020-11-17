@@ -7,6 +7,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
 {
     /**
@@ -24,6 +27,8 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->requestStack = $this->createMock(RequestStack::class);
 
         $this->storage = new CookieTokenStorage($this->requestStack);
+        $this->storage->setSecure('auto');
+        $this->storage->setHttpOnly(false);
     }
 
     public function testGetTokenNoRequest()
@@ -108,7 +113,64 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
 
         $this->storage->setToken($tokenId, $value);
 
-        $cookie = new Cookie($tokenId, $value, 0, '/', null, $request->isSecure(), false);
+        $cookie = new Cookie($tokenId, $value, 0, '/', null, false, false);
+        $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
+    }
+
+    public function testSetTokenWithHttpOnlyConfig()
+    {
+        $tokenId = 'test';
+        $value = 'val';
+        $request = Request::create('/');
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $storage = new CookieTokenStorage($this->requestStack);
+        $storage->setSecure('auto');
+        $storage->setHttpOnly(true);
+        $storage->setToken($tokenId, $value);
+
+        $cookie = new Cookie($tokenId, $value, 0, '/', null, false, true);
+        $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
+    }
+
+    public function testSetTokenWithSecureConfig()
+    {
+        $tokenId = 'test';
+        $value = 'val';
+        $request = Request::create('/');
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $storage = new CookieTokenStorage($this->requestStack);
+        $storage->setSecure(true);
+        $storage->setHttpOnly(false);
+        $storage->setToken($tokenId, $value);
+
+        $cookie = new Cookie($tokenId, $value, 0, '/', null, true, false);
+        $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
+    }
+
+    public function testSetTokenWithNotSecureConfig()
+    {
+        $tokenId = 'test';
+        $value = 'val';
+        $request = Request::create('/');
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+
+        $storage = new CookieTokenStorage($this->requestStack);
+        $storage->setSecure(false);
+        $storage->setHttpOnly(false);
+        $storage->setToken($tokenId, $value);
+
+        $cookie = new Cookie($tokenId, $value, 0, '/', null, false, false);
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 

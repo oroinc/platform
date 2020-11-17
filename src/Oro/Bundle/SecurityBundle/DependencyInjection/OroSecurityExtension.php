@@ -19,6 +19,9 @@ class OroSecurityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $configuration = new Configuration();
+        $config = $this->processConfiguration($configuration, $configs);
+
         $container->prependExtensionConfig(
             $this->getAlias(),
             array_intersect_key(
@@ -40,5 +43,18 @@ class OroSecurityExtension extends Extension
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $loader->load('services_debug.yml');
         }
+
+        $this->configureCookieTokenStorage($container, $config);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    private function configureCookieTokenStorage(ContainerBuilder $container, array $config): void
+    {
+        $container->getDefinition('oro_security.csrf.cookie_token_storage')
+            ->addMethodCall('setSecure', [$config['csrf_cookie']['cookie_secure']])
+            ->addMethodCall('setHttpOnly', [$config['csrf_cookie']['cookie_httponly']]);
     }
 }
