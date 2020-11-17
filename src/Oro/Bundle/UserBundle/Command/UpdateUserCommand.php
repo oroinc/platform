@@ -26,7 +26,7 @@ class UpdateUserCommand extends CreateUserCommand
             ->setDescription('Update user.')
             ->addArgument(
                 'user-name',
-                InputArgument::OPTIONAL,
+                InputArgument::REQUIRED,
                 'Username of user to update'
             )
             ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name')
