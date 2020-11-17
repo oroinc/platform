@@ -23,34 +23,22 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationHelper;
 
-    /**
-     * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
-    /**
-     * @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $securityChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /**
-     * @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $urlGenerator;
 
-    /**
-     * @var AttributesDatagridListener
-     */
+    /** @var AttributesDatagridListener */
     private $listener;
 
     protected function setUp(): void
@@ -58,14 +46,14 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
-        $this->securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
         $this->listener = new AttributesDatagridListener(
             $this->doctrineHelper,
             $this->localizationHelper,
             $this->aclHelper,
-            $this->securityChecker,
+            $this->authorizationChecker,
             $this->urlGenerator
         );
     }
@@ -117,7 +105,7 @@ class AttributesDatagridListenerTest extends \PHPUnit\Framework\TestCase
             ->with(AttributeGroupRelation::class)
             ->willReturn($repository);
 
-        $this->securityChecker->expects($this->exactly(2))
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
             ->withConsecutive(
                 ['oro_attribute_family_view', new ObjectIdentity(1, AttributeFamily::class)],

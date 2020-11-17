@@ -12,7 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * Validates whether an access to the requested action for the entity
  * specified in the "parentClass" property of the context is granted.
  */
-class ParentActionAvailabilityCheck implements ProcessorInterface
+class ValidateParentActionAvailability implements ProcessorInterface
 {
     /** @var ResourcesProvider */
     private $resourcesProvider;

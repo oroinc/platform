@@ -459,6 +459,20 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
+     * Adds a field to a list of fields on which this field depends on.
+     *
+     * @param string $fieldName
+     */
+    public function addDependsOn(string $fieldName)
+    {
+        $dependsOn = $this->getDependsOn();
+        if (!$dependsOn || !\in_array($fieldName, $dependsOn, true)) {
+            $dependsOn[] = $fieldName;
+            $this->setDependsOn($dependsOn);
+        }
+    }
+
+    /**
      * Indicates whether the collapse target entity flag is set explicitly.
      *
      * @return bool
