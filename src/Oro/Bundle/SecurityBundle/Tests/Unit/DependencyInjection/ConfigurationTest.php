@@ -13,12 +13,16 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                'settings' => [
-                    'resolved' => true,
+                'settings'    => [
+                    'resolved'                                       => true,
                     'symfony_profiler_collection_of_voter_decisions' => [
                         'value' => false,
-                        'scope' => 'app'
-                    ],
+                        'scope' => 'app',
+                    ]
+                ],
+                'csrf_cookie' => [
+                    'cookie_secure'   => 'auto',
+                    'cookie_httponly' => false,
                 ],
             ],
             $processor->processConfiguration(new Configuration(), [])

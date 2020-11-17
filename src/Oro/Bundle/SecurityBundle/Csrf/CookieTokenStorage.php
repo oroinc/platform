@@ -8,22 +8,30 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 /**
- * Cookie based storage for CSRF tokens
+ * Cookie based storage for CSRF tokens.
  */
 class CookieTokenStorage implements TokenStorageInterface
 {
     const CSRF_COOKIE_ATTRIBUTE = '_csrf_cookie';
 
-    /**
-     * @var RequestStack
-     */
+    /** @var mixed true, false, 'auto' */
+    private $secure;
+
+    /** @var bool */
+    private $httpOnly;
+
+    /** @var RequestStack */
     private $requestStack;
 
     /**
+     * @param mixed        $secure
+     * @param bool         $httpOnly
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct($secure, bool $httpOnly, RequestStack $requestStack)
     {
+        $this->secure = $secure;
+        $this->httpOnly = $httpOnly;
         $this->requestStack = $requestStack;
     }
 
@@ -70,11 +78,20 @@ class CookieTokenStorage implements TokenStorageInterface
     /**
      * @param string $tokenId
      * @param string $tokenValue
+     *
      * @return Cookie
      */
     private function createCookie($tokenId, $tokenValue): Cookie
     {
-        return new Cookie($tokenId, $tokenValue, 0, '/', null, $this->isSecure(), false);
+        return new Cookie(
+            $tokenId,
+            $tokenValue,
+            0,
+            '/',
+            null,
+            'auto' === $this->secure ? null : $this->secure,
+            $this->httpOnly
+        );
     }
 
     /**
@@ -83,14 +100,6 @@ class CookieTokenStorage implements TokenStorageInterface
     private function getCookieValue($tokenId)
     {
         return $this->getRequest() ? $this->getRequest()->cookies->get($tokenId, '') : '';
-    }
-
-    /**
-     * @return bool
-     */
-    private function isSecure()
-    {
-        return $this->getRequest() ? $this->getRequest()->isSecure() : false;
     }
 
     /**
