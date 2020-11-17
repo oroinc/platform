@@ -36,8 +36,8 @@ services:
     # data_security_check
     #
 
-    oro_api.delete.entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+    oro_api.delete.validate_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - DELETE

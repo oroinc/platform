@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck;
+use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTestCase
+class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /** @var ParentEntityObjectSecurityCheck */
+    /** @var ValidateParentEntityObjectAccess */
     private $processor;
 
     protected function setUp(): void
@@ -21,7 +21,7 @@ class ParentEntityObjectSecurityCheckTest extends ChangeRelationshipProcessorTes
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new ParentEntityObjectSecurityCheck(
+        $this->processor = new ValidateParentEntityObjectAccess(
             $this->authorizationChecker,
             'VIEW'
         );

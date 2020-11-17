@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
@@ -14,10 +14,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * Validates whether an access to the type of entities specified
- * in the "parentClass" property of the context is granted.
+ * in the "class" property of the context is granted.
  * The permission type is provided in $permission argument of the class constructor.
  */
-class ParentEntityTypeSecurityCheck implements ProcessorInterface
+class ValidateEntityTypeAccess implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -60,39 +60,39 @@ class ParentEntityTypeSecurityCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SubresourceContext $context */
+        /** @var Context $context */
 
-        $parentConfig = $context->getParentConfig();
+        $config = $context->getConfig();
 
         $isGranted = true;
-        if ($parentConfig && $parentConfig->hasAclResource()) {
-            $aclResource = $parentConfig->getAclResource();
+        if (null !== $config && $config->hasAclResource()) {
+            $aclResource = $config->getAclResource();
             if ($aclResource) {
                 if ($this->forcePermissionUsage) {
-                    $isGranted = $isGranted = $this->isGrantedForClass($context);
+                    $isGranted = $this->isGrantedForClass($context);
                 } else {
                     $isGranted = $this->authorizationChecker->isGranted($aclResource);
                 }
             }
         } else {
-            $isGranted = $isGranted = $this->isGrantedForClass($context);
+            $isGranted = $this->isGrantedForClass($context);
         }
 
         if (!$isGranted) {
-            throw new AccessDeniedException('No access to this type of parent entities.');
+            throw new AccessDeniedException('No access to this type of entities.');
         }
     }
 
     /**
-     * @param SubresourceContext $context
+     * @param Context $context
      *
      * @return bool
      */
-    private function isGrantedForClass(SubresourceContext $context): bool
+    private function isGrantedForClass(Context $context): bool
     {
         $isGranted = true;
 
-        $className = $context->getManageableParentEntityClass($this->doctrineHelper);
+        $className = $context->getManageableEntityClass($this->doctrineHelper);
         if ($className) {
             $isGranted = $this->authorizationChecker->isGranted(
                 $this->permission,
