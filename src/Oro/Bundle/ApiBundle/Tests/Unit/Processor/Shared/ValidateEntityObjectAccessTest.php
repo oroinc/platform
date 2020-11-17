@@ -3,17 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EntityObjectSecurityCheckTest extends GetProcessorTestCase
+class ValidateEntityObjectAccessTest extends GetProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /** @var EntityObjectSecurityCheck */
+    /** @var ValidateEntityObjectAccess */
     private $processor;
 
     protected function setUp(): void
@@ -22,7 +22,7 @@ class EntityObjectSecurityCheckTest extends GetProcessorTestCase
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new EntityObjectSecurityCheck(
+        $this->processor = new ValidateEntityObjectAccess(
             $this->authorizationChecker,
             'VIEW'
         );
