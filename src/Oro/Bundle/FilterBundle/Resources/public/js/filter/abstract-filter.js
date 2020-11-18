@@ -247,6 +247,7 @@ define(function(require, exports, module) {
          * @return {*}
          */
         reset: function() {
+            this.trigger('reset');
             this.setValue(this.emptyValue);
             return this;
         },

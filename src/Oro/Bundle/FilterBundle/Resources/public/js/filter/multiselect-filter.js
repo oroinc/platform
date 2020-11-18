@@ -183,11 +183,7 @@ define(function(require) {
             return (
                 !_.isUndefined(thisDOMValue.value) &&
                 _.isArray(thisDOMValue.value) &&
-                !_.isEqual(this.value, thisDOMValue) &&
-                (
-                    (!thisDOMValue.value.length && _.isEqual(this.value, [FILTER_EMPTY_VALUE])) ||
-                    thisDOMValue.value.length
-                )
+                !_.isEqual(this.value, thisDOMValue)
             );
         }
     });

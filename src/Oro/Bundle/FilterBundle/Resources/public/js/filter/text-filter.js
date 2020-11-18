@@ -302,7 +302,6 @@ define(function(require, exports, module) {
          */
         _showCriteria: function() {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
-            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).css({
                 marginLeft: 'auto',
                 visibility: 'visible'
@@ -312,6 +311,7 @@ define(function(require, exports, module) {
                 this._focusCriteria();
             }
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            this.trigger('showCriteria', this);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
@@ -351,12 +351,12 @@ define(function(require, exports, module) {
          * @protected
          */
         _hideCriteria: function() {
-            this.trigger('hideCriteria', this);
             this.$(this.criteriaSelector).css({
                 marginLeft: '-9999px',
                 visibility: 'hidden'
             }).attr('aria-hidden', true);
             this._setButtonPressed(this.$(this.criteriaSelector), false);
+            this.trigger('hideCriteria', this);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;

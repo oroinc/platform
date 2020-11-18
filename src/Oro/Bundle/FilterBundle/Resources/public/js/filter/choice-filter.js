@@ -260,7 +260,7 @@ define(function(require) {
                     this.isEmptyType(newValue.type) ||
                     this.isEmptyType(oldValue.type) ||
                     !this._isEmpty(newValue.value) ||
-                    (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value))
+                    !this._isEmpty(oldValue.value)
                 );
         },
 
