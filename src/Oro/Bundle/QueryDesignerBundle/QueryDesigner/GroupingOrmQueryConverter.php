@@ -8,6 +8,9 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * Provides a base functionality to convert a query definition created by the query designer to an ORM query.
+ */
 abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
 {
     /** @var array */
@@ -20,8 +23,6 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     protected $currentFilterPath;
 
     /**
-     * Constructor
-     *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
@@ -40,11 +41,14 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->filters           = [];
+        $this->filters = [];
         $this->currentFilterPath = '';
-        parent::doConvert($source);
-        $this->filters           = null;
-        $this->currentFilterPath = null;
+        try {
+            parent::doConvert($source);
+        } finally {
+            $this->filters = null;
+            $this->currentFilterPath = null;
+        }
     }
 
     /**
@@ -123,8 +127,8 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
      */
     protected function incrementCurrentFilterPath()
     {
-        $start                   = strrpos($this->currentFilterPath, '[');
-        $index                   = substr(
+        $start = strrpos($this->currentFilterPath, '[');
+        $index = substr(
             $this->currentFilterPath,
             $start + 1,
             strlen($this->currentFilterPath) - $start - 2
@@ -153,10 +157,10 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $filterById = false;
         if ($entityClassName && $this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
             $key = sprintf('%s::%s', $entityClassName, $fieldName);
-            if (isset($this->virtualColumnOptions[$key]['filter_by_id'])) {
-                if ($this->virtualColumnOptions[$key]['filter_by_id']) {
-                    $filterById = true;
-                };
+            if (isset($this->virtualColumnOptions[$key]['filter_by_id'])
+                && $this->virtualColumnOptions[$key]['filter_by_id']
+            ) {
+                $filterById = true;
             }
         }
 

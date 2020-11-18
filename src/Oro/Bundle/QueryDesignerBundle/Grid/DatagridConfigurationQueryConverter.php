@@ -14,53 +14,35 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
- * Provide data grid configuration based on given source (AbstractQueryDesigner instance).
+ * Converts a query definition created by the query designer to a data grid configuration.
  */
 class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 {
-    /**
-     * @var DatagridGuesser
-     */
+    /** @var DatagridGuesser */
     protected $datagridGuesser;
 
-    /**
-     * @var EntityNameResolver
-     */
+    /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /**
-     * @var DatagridConfiguration
-     */
+    /** @var DatagridConfiguration */
     protected $config;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $selectColumns;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $groupingColumns;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $from;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $innerJoins;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $leftJoins;
 
     /**
-     * Constructor
-     *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
@@ -84,6 +66,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      *
      * @param string                $gridName
      * @param AbstractQueryDesigner $source
+     *
      * @return DatagridConfiguration
      */
     public function convert($gridName, AbstractQueryDesigner $source)
@@ -99,17 +82,20 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->selectColumns   = [];
+        $this->selectColumns = [];
         $this->groupingColumns = [];
-        $this->from            = [];
-        $this->innerJoins      = [];
-        $this->leftJoins       = [];
-        parent::doConvert($source);
-        $this->selectColumns   = null;
-        $this->groupingColumns = null;
-        $this->from            = null;
-        $this->innerJoins      = null;
-        $this->leftJoins       = null;
+        $this->from = [];
+        $this->innerJoins = [];
+        $this->leftJoins = [];
+        try {
+            parent::doConvert($source);
+        } finally {
+            $this->selectColumns = null;
+            $this->groupingColumns = null;
+            $this->from = null;
+            $this->innerJoins = null;
+            $this->leftJoins = null;
+        }
 
         $this->config->setDatasourceType(OrmDatasource::TYPE);
     }
@@ -175,7 +161,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         }
 
         if (!$functionExpr && $fieldType === 'dictionary') {
-            list($entityAlias) = explode('.', $columnExpr);
+            [$entityAlias] = explode('.', $columnExpr);
             $nameDql = $this->entityNameResolver->getNameDQL(
                 $this->getTargetEntityClass($entityClassName, $fieldName),
                 $entityAlias
@@ -185,11 +171,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             }
         }
 
-        $this->selectColumns[] = sprintf(
-            '%s as %s',
-            $functionExpr !== null ? $functionExpr : $columnExpr,
-            $columnAlias
-        );
+        $this->selectColumns[] = sprintf('%s as %s', $functionExpr ?? $columnExpr, $columnAlias);
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
@@ -221,6 +203,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      *
      * @param string $entityClassName
      * @param string $fieldName
+     *
      * @return string
      */
     protected function getTargetEntityClass($entityClassName, $fieldName)
