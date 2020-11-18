@@ -17,7 +17,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -36,6 +36,7 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $this->createOroSecurityPermExclEntityTable($schema);
         $this->createOroSecurityPermissionTable($schema);
         $this->createOroSecurityPermissionEntityTable($schema);
+        $this->createRememberMeTokenTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroSecurityPermApplyEntityForeignKeys($schema);
@@ -100,6 +101,22 @@ class OroSecurityBundleInstaller implements Installation, ContainerAwareInterfac
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name']);
+    }
+
+    /**
+     * Create rememberme_token table
+     *
+     * @param Schema $schema
+     */
+    private function createRememberMeTokenTable(Schema $schema)
+    {
+        $table = $schema->createTable('rememberme_token');
+        $table->addColumn('series', 'string', ['fixed' => true, 'length' => 88]);
+        $table->addColumn('value', 'string', ['length' => 88]);
+        $table->addColumn('lastUsed', 'datetime', []);
+        $table->addColumn('class', 'string', ['length' => 255]);
+        $table->addColumn('username', 'string', ['length' => 255]);
+        $table->setPrimaryKey(['series']);
     }
 
     /**

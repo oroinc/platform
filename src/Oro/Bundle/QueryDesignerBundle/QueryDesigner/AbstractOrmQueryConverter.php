@@ -7,23 +7,17 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
- * Provides functionality to convert a query definition created by the query designer to doctrine ORM query
+ * Provides a base functionality to convert a query definition created by the query designer to an ORM query.
  */
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var ClassMetadataInfo[]
-     */
+    /** @var ClassMetadataInfo[] */
     protected $classMetadataLocalCache;
 
     /**
-     * Constructor
-     *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
@@ -47,14 +41,14 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
         if ($joinType === null) {
             $entityClassName = $this->getEntityClassName($joinId);
             if (!empty($entityClassName)) {
-                $fieldName          = $this->getFieldName($joinId);
-                $metadata           = $this->getClassMetadata($entityClassName);
+                $fieldName = $this->getFieldName($joinId);
+                $metadata = $this->getClassMetadata($entityClassName);
                 $associationMapping = $metadata->getAssociationMapping($fieldName);
-                $nullable           = true;
+                $nullable = true;
                 if (isset($associationMapping['joinColumns'])) {
                     $nullable = false;
                     foreach ($associationMapping['joinColumns'] as $joinColumn) {
-                        $nullable = ($nullable || (isset($joinColumn['nullable']) ? $joinColumn['nullable'] : false));
+                        $nullable = ($nullable || ($joinColumn['nullable'] ?? false));
                     }
                 }
                 $joinType = $nullable ? self::LEFT_JOIN : self::INNER_JOIN;
@@ -99,6 +93,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
      * Returns a metadata for the given entity
      *
      * @param string $className
+     *
      * @return ClassMetadataInfo
      */
     protected function getClassMetadata($className)
@@ -107,7 +102,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
             return $this->classMetadataLocalCache[$className];
         }
 
-        $classMetadata                             = $this->doctrine
+        $classMetadata = $this->doctrine
             ->getManagerForClass($className)
             ->getClassMetadata($className);
         $this->classMetadataLocalCache[$className] = $classMetadata;

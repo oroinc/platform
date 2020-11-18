@@ -11,6 +11,9 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * Converts a segment query definition created by the query designer to an ORM query.
+ */
 class SegmentQueryConverter extends GroupingOrmQueryConverter
 {
     /*
@@ -26,8 +29,6 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     protected $restrictionBuilder;
 
     /**
-     * Constructor
-     *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      * @param ManagerRegistry               $doctrine
@@ -60,11 +61,9 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
-     * Process convert
-     *
      * @param AbstractQueryDesigner $source
      *
-     * @return \Doctrine\ORM\QueryBuilder
+     * @return QueryBuilder
      */
     public function convert(AbstractQueryDesigner $source)
     {
@@ -106,10 +105,8 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
             );
         }
 
-        // @TODO find solution for aliases before generalizing this converter
         // column aliases are not used here, because of parser error
-        $select = $functionExpr !== null ? $functionExpr : $columnExpr;
-        $this->qb->addSelect($select);
+        $this->qb->addSelect($functionExpr ?? $columnExpr);
     }
 
     /**
@@ -169,6 +166,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
 
     /**
      * @param string $columnName
+     *
      * @return string
      */
     protected function getPrefixedColumnName($columnName)
