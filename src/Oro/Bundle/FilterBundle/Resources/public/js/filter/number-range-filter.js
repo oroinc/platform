@@ -202,7 +202,7 @@ define(function(require) {
             value = this._formatRawValue(value);
             const oldValue = tools.deepClone(value);
             value = this.swapValues(value);
-            if (this.isApplicable(value.type) && !tools.isEqualsLoosely(value, oldValue)) {
+            if (!tools.isEqualsLoosely(value, oldValue)) {
                 // apply new values and filter type
                 this.setValue(value);
             }
@@ -257,6 +257,9 @@ define(function(require) {
         },
 
         swapValues(data) {
+            if (!this.isApplicable(data.type)) {
+                return data;
+            }
             if (data.value && data.value_end) {
                 // if both values are filled
                 // start/end values if end value is lower than start

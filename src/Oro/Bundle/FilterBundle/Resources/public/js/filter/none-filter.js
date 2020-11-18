@@ -168,9 +168,9 @@ define(function(require) {
          * @protected
          */
         _showCriteria: function() {
-            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            this.trigger('showCriteria', this);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
@@ -182,9 +182,9 @@ define(function(require) {
          * @protected
          */
         _hideCriteria: function() {
-            this.trigger('hideCriteria', this);
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
+            this.trigger('hideCriteria', this);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
