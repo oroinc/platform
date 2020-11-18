@@ -439,6 +439,12 @@ services:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
         public: true
 
+    oro_security.token.provider.rememberme:
+        class: Symfony\Bridge\Doctrine\Security\RememberMe\DoctrineTokenProvider
+        public: true
+        arguments:
+            - '@doctrine.dbal.default_connection'
+
     oro_security.token.factory.organization_rememberme:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
 
