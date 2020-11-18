@@ -1,39 +1,29 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\QueryDesigner;
+namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FilterProcessor;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
+use Oro\Bundle\SegmentBundle\Query\FilterProcessor;
 
 class FilterProcessorTest extends OrmQueryConverterTest
 {
     /** @var RestrictionBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $restrictionBuilder;
+    private $restrictionBuilder;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $this->em = $this
-            ->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->restrictionBuilder = $this
-            ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManager::class);
+        $this->restrictionBuilder = $this->createMock(RestrictionBuilder::class);
     }
 
-    /**
-     * Tests that filterProcessor converts AbstractQueryConverter's filters to
-     * RestrictionBuilder filters configs.
-     */
-    public function testProcess()
+    public function testConvertQueryDesignerFilters()
     {
         $processor = new FilterProcessor(
             $this->getFunctionProvider(),
@@ -66,15 +56,14 @@ class FilterProcessorTest extends OrmQueryConverterTest
         ];
         $qb = new QueryBuilder($this->em);
 
-        $this->restrictionBuilder
-            ->expects($this->once())
+        $this->restrictionBuilder->expects($this->once())
             ->method('buildRestrictions')
             ->with($builderFilters, new GroupingOrmFilterDatasourceAdapter($qb));
 
         $processor->process($qb, 'TestEntityClass', $filters, 'test');
 
         $reflection = new \ReflectionObject($processor);
-        $property   = $reflection->getProperty('filters');
+        $property = $reflection->getProperty('filters');
         $property->setAccessible(true);
         $filters = $property->getValue($processor);
 
