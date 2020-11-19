@@ -69,8 +69,6 @@ class EntityFieldProvider
     private $metadataForEntitiesWithAssociations;
 
     /**
-     * Constructor
-     *
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
@@ -808,19 +806,16 @@ class EntityFieldProvider
      */
     protected function getFieldLabel(ClassMetadata $metadata, $fieldName)
     {
+        $label = null;
         $className = $metadata->getName();
-        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
-            // virtual field or relation
-            return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        if ($this->entityConfigProvider->hasConfig($className, $fieldName)) {
+            $label = $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
+        }
+        if (!$label) {
+            $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
         }
 
-        $label = $this->entityConfigProvider->hasConfig($className, $fieldName)
-            ? $this->entityConfigProvider->getConfig($className, $fieldName)->get('label')
-            : null;
-
-        return !empty($label)
-            ? $label
-            : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        return $label;
     }
 
     /**

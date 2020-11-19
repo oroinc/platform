@@ -16,8 +16,8 @@ services:
             - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }
             - { name: oro.api.processor, action: update, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }
 
-    oro_attachment.api.file_view_security_check:
-        class: Oro\Bundle\AttachmentBundle\Api\Processor\FileViewSecurityCheck
+    oro_attachment.api.validate_file_view_access:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileViewAccess
         arguments:
             - '@security.authorization_checker'
         tags:

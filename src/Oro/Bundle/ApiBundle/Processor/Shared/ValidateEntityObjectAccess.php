@@ -1,18 +1,18 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
- * Validates whether an access to the parent entity object is granted.
+ * Validates whether an access to the entity object is granted.
  * The permission type is provided in $permission argument of the class constructor.
  */
-class ParentEntityObjectSecurityCheck implements ProcessorInterface
+class ValidateEntityObjectAccess implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -37,34 +37,27 @@ class ParentEntityObjectSecurityCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var ChangeRelationshipContext $context */
+        /** @var SingleItemContext $context */
 
         $isGranted = true;
-        $parentEntity = $context->getParentEntity();
-        if ($parentEntity && $this->isParentEntityShouldBeChecked($context)) {
-            $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
+        $entity = $context->getResult();
+        if ($entity) {
+            $config = $context->getConfig();
+            if (null !== $config && $config->hasAclResource()) {
+                $aclResource = $config->getAclResource();
+                if ($aclResource) {
+                    $isGranted = $this->authorizationChecker->isGranted($aclResource, $entity);
+                }
+            } else {
+                $isGranted = $this->authorizationChecker->isGranted($this->permission, $entity);
+            }
         }
 
         if (!$isGranted) {
             throw new AccessDeniedException(sprintf(
-                'No access by "%s" permission to the parent entity.',
+                'No access by "%s" permission to the entity.',
                 $this->permission
             ));
         }
-    }
-
-    /**
-     * @param ChangeRelationshipContext $context
-     *
-     * @return bool
-     */
-    private function isParentEntityShouldBeChecked(ChangeRelationshipContext $context): bool
-    {
-        $parentConfig = $context->getParentConfig();
-        if (null === $parentConfig) {
-            return true;
-        }
-
-        return false === $parentConfig->hasAclResource() || null !== $parentConfig->getAclResource();
     }
 }

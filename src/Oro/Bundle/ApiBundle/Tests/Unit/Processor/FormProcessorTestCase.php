@@ -38,11 +38,9 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context = $this->createContext();
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
-        $this->context->setConfigExtras(
-            [
-                new EntityDefinitionConfigExtra($this->context->getAction())
-            ]
-        );
+        $this->context->setConfigExtras([
+            new EntityDefinitionConfigExtra($this->context->getAction())
+        ]);
     }
 
     /**

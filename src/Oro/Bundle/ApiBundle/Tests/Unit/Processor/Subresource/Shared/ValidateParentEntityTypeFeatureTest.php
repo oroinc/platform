@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck;
+use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
-class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
+class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|FeatureChecker */
     private $featureChecker;
 
-    /** @var ParentEntityTypeFeatureCheck */
+    /** @var ValidateParentEntityTypeFeature */
     private $processor;
 
     protected function setUp(): void
@@ -20,7 +20,7 @@ class ParentEntityTypeFeatureCheckTest extends GetSubresourceProcessorTestCase
 
         $this->featureChecker = $this->createMock(FeatureChecker::class);
 
-        $this->processor = new ParentEntityTypeFeatureCheck($this->featureChecker);
+        $this->processor = new ValidateParentEntityTypeFeature($this->featureChecker);
     }
 
     public function testProcessDisabled()

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
@@ -800,6 +801,36 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
                     ],
                     'missingToOne'  => null,
                     'missingToMany' => []
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testNestedObject()
+    {
+        $object = [
+            'id'     => 1,
+            'nested' => [
+                'name' => 'Name'
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $nestedObject = $metadata->addAssociation(
+            $this->createAssociationMetadata('nested', 'Test\NestedWithoutAlias', false, [])
+        );
+        $nestedObject->setDataType(DataType::NESTED_OBJECT);
+        $nestedObject->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $nestedObject->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'id'     => 1,
+                'nested' => [
+                    'name' => 'Name'
                 ]
             ],
             $this->documentBuilder->getDocument()

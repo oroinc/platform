@@ -3,17 +3,17 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
-use Oro\Bundle\AttachmentBundle\Api\Processor\FileViewSecurityCheck;
+use Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileViewAccess;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class FileViewSecurityCheckTest extends GetProcessorTestCase
+class ValidateFileViewAccessTest extends GetProcessorTestCase
 {
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var FileViewSecurityCheck */
+    /** @var ValidateFileViewAccess */
     private $processor;
 
     protected function setUp(): void
@@ -22,7 +22,7 @@ class FileViewSecurityCheckTest extends GetProcessorTestCase
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
-        $this->processor = new FileViewSecurityCheck($this->authorizationChecker);
+        $this->processor = new ValidateFileViewAccess($this->authorizationChecker);
     }
 
     public function testProcessWhenAccessGranted()

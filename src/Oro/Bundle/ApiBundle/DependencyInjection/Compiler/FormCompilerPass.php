@@ -32,7 +32,7 @@ class FormCompilerPass implements CompilerPassInterface
     private const API_FORM_TYPE_TAG                        = 'oro.api.form.type';
     private const API_FORM_TYPE_EXTENSION_TAG              = 'oro.api.form.type_extension';
     private const API_FORM_TYPE_GUESSER_TAG                = 'oro.api.form.type_guesser';
-    private const API_FORM_METADATA_GUESSER_SERVICE_ID     = 'oro_api.form.guesser.metadata';
+    private const API_FORM_DATA_TYPE_GUESSER_SERVICE_ID    = 'oro_api.form.guesser.data_type';
 
     /**
      * {@inheritdoc}
@@ -122,12 +122,12 @@ class FormCompilerPass implements CompilerPassInterface
             $serviceLocator = $container->getDefinition('oro_api.form.extension_locator');
             $serviceLocator->replaceArgument(0, $serviceLocatorServices ?? []);
         }
-        if ($container->hasDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)) {
+        if ($container->hasDefinition(self::API_FORM_DATA_TYPE_GUESSER_SERVICE_ID)) {
             $dataTypeMappings = [];
             foreach ($config['form_type_guesses'] as $dataType => $value) {
                 $dataTypeMappings[$dataType] = [$value['form_type'], $value['options']];
             }
-            $container->getDefinition(self::API_FORM_METADATA_GUESSER_SERVICE_ID)
+            $container->getDefinition(self::API_FORM_DATA_TYPE_GUESSER_SERVICE_ID)
                 ->replaceArgument(0, $dataTypeMappings);
         }
     }

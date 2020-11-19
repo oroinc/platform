@@ -82,7 +82,6 @@ services:
             - '@oro_security.encoder.default'
             - '@oro_security.token_accessor'
             - '@translator'
-            - '@oro_imap.manager_registry.registry'
         tags:
              - { name: form.type, alias: oro_imap_configuration }
 

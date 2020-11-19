@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentActionAvailabilityCheck;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateActionAvailability;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class ParentActionAvailabilityCheckTest extends GetSubresourceProcessorTestCase
+class ValidateActionAvailabilityTest extends GetListProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
     private $resourcesProvider;
 
-    /** @var ParentActionAvailabilityCheck */
+    /** @var ValidateActionAvailability */
     private $processor;
 
     protected function setUp(): void
@@ -20,34 +20,34 @@ class ParentActionAvailabilityCheckTest extends GetSubresourceProcessorTestCase
 
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
 
-        $this->processor = new ParentActionAvailabilityCheck($this->resourcesProvider);
+        $this->processor = new ValidateActionAvailability($this->resourcesProvider);
     }
 
     public function testProcessWhenActionIsExcluded()
     {
         $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
-        $parentEntityClass = 'Test\Class';
+        $entityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(['action1', 'action2']);
 
-        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setClassName($entityClass);
         $this->context->setAction('action1');
         $this->processor->process($this->context);
     }
 
     public function testProcessWhenActionIsNotExcluded()
     {
-        $parentEntityClass = 'Test\Class';
+        $entityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
-            ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn([]);
 
-        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setClassName($entityClass);
         $this->context->setAction('action1');
         $this->processor->process($this->context);
     }

@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -40,15 +41,16 @@ class CompoundObjectType extends AbstractType
         $metadata = $options['metadata'];
         /** @var EntityDefinitionConfig $config */
         $config = $options['config'];
+        $inheritData = $options['inherit_data'];
 
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
-            $this->addFormField($builder, $config, $name, $field);
+            $this->addFormField($builder, $config, $name, $field, $inheritData);
         }
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             if (DataType::isAssociationAsField($association->getDataType())) {
-                $this->addFormField($builder, $config, $name, $association);
+                $this->addFormField($builder, $config, $name, $association, $inheritData);
             }
         }
 
@@ -71,19 +73,33 @@ class CompoundObjectType extends AbstractType
      * @param EntityDefinitionConfig $config
      * @param string                 $fieldName
      * @param PropertyMetadata       $fieldMetadata
+     * @param bool                   $inheritData
      */
     private function addFormField(
         FormBuilderInterface $formBuilder,
         EntityDefinitionConfig $config,
-        $fieldName,
-        PropertyMetadata $fieldMetadata
-    ) {
+        string $fieldName,
+        PropertyMetadata $fieldMetadata,
+        bool $inheritData
+    ): void {
+        $fieldConfig = $config->getField($fieldName);
+        $options = ['required' => false];
+        if ($inheritData) {
+            $propertyPath = $fieldConfig->getPropertyPath();
+            if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+                $options['mapped'] = false;
+            } else {
+                $options['property_path'] = $fieldConfig->getPropertyPath();
+            }
+        }
+
         $this->formHelper->addFormField(
             $formBuilder,
             $fieldName,
-            $config->getField($fieldName),
+            $fieldConfig,
             $fieldMetadata,
-            ['required' => false]
+            $options,
+            true
         );
     }
 }
