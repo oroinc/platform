@@ -108,7 +108,7 @@ class UserEmailOrigin extends EmailOrigin
     /**
      * @var string
      *
-     * @ORM\Column(name="account_type", type="string", length=255, nullable=false, options={"default" = "other"})
+     * @ORM\Column(name="account_type", type="string", length=255, nullable=true, options={"default" = "other"})
      */
     protected $accountType = 'other';
 

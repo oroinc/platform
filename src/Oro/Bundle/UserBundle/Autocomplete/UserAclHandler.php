@@ -21,7 +21,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Autocomplete search handler for users with ACL access level protection
+ * Autocomplete search handler to get a list of available users that can be set as owner of the ACL protected entity
+ * with ownership type "User".
  */
 class UserAclHandler implements SearchHandlerInterface
 {
@@ -95,7 +96,7 @@ class UserAclHandler implements SearchHandlerInterface
      */
     public function search($query, $page, $perPage, $searchById = false)
     {
-        list($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
+        [$search, $entityClass, $permission, $entityId, $excludeCurrentUser] = explode(';', $query);
         $entityClass = $this->entityRoutingHelper->resolveEntityClass($entityClass);
 
         $hasMore  = false;
@@ -114,7 +115,7 @@ class UserAclHandler implements SearchHandlerInterface
                 $perPage += 1;
 
                 $user = $this->tokenAccessor->getUser();
-                $organization = $this->tokenAccessor->getOrganization();
+                $organization = $this->getOrganization();
                 $queryBuilder = $this->createQueryBuilder();
                 $this->addSearchCriteria($queryBuilder, $search);
                 if ((boolean)$excludeCurrentUser) {
@@ -333,11 +334,11 @@ class UserAclHandler implements SearchHandlerInterface
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {
             $queryBuilder->andWhere($queryBuilder->expr()->eq('user.id', ':aclUserId'))
                 ->setParameter('aclUserId', $user->getId());
-        } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-            $queryBuilder->join('user.organizations', 'org')
-                ->andWhere($queryBuilder->expr()->eq('org.id', ':aclOrganizationId'))
-                ->setParameter('aclOrganizationId', $organization->getId());
-        } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
+
+            return $queryBuilder->getQuery();
+        }
+
+        if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
                 $resultBuIds = $this->treeProvider->getTree()->getUserBusinessUnitIds(
                     $user->getId(),
@@ -359,6 +360,11 @@ class UserAclHandler implements SearchHandlerInterface
             }
         }
 
+        // data should be limited by organization
+        $queryBuilder->join('user.organizations', 'org')
+            ->andWhere($queryBuilder->expr()->eq('org.id', ':aclOrganizationId'))
+            ->setParameter('aclOrganizationId', $organization->getId());
+
         return $queryBuilder->getQuery();
     }
 
@@ -372,5 +378,15 @@ class UserAclHandler implements SearchHandlerInterface
     {
         $queryBuilder->andWhere('user.id != :userId');
         $queryBuilder->setParameter('userId', $user->getId());
+    }
+
+    /**
+     * Returns organization by which data should limit to
+     *
+     * @return Organization
+     */
+    protected function getOrganization(): Organization
+    {
+        return $this->tokenAccessor->getOrganization();
     }
 }

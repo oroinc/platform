@@ -10,3 +10,5 @@ services:
         arguments:
             - '@nelmio_api_doc.extractor.api_doc_extractor'
             - '@nelmio_api_doc.formatter.html_formatter'
+        calls:
+            - [setSession, ['@session']]
