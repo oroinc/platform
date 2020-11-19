@@ -686,6 +686,7 @@ services:
 
     Oro\Bundle\EntityBundle\Manager\PreloadingManager:
         alias: oro_entity.manager.preloading_manager
+        public: true
 
     oro_entity.event_listener.default_preloading:
         abstract: true
