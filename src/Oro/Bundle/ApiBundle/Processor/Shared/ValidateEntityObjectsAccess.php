@@ -11,9 +11,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  * Validates whether an access to the entity objects is granted
  * and remove all entities that cannot be deleted from the result.
  * The permission type is provided in $permission argument of the class constructor.
- * @todo: remove this processor in BAP-10836
  */
-class EntityObjectsSecurityCheck implements ProcessorInterface
+class ValidateEntityObjectsAccess implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;

@@ -9,7 +9,7 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 /**
- * Provides a core functionality to convert a query definition created by the query designer to another format.
+ * Provides a base functionality to convert a query definition created by the query designer to another format.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -28,99 +28,55 @@ abstract class AbstractQueryConverter
 
     const CONDITIONAL_JOIN = 'WITH';
 
-    /**
-     * @var JoinIdentifierHelper
-     */
+    /** @var JoinIdentifierHelper */
     protected $joinIdHelper;
 
-    /**
-     * @var FunctionProviderInterface
-     */
+    /** @var FunctionProviderInterface */
     protected $functionProvider;
 
-    /**
-     * @var VirtualFieldProviderInterface
-     */
+    /** @var VirtualFieldProviderInterface */
     protected $virtualFieldProvider;
 
-    /**
-     * @var VirtualRelationProviderInterface
-     */
+    /** @var VirtualRelationProviderInterface */
     protected $virtualRelationProvider;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     protected $tableAliasesCount = 0;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $rootEntity;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $definition;
 
-    /**
-     * @var array
-     *      key   = alias
-     *      value = joinId
-     */
+    /** @var array [key = alias, value = joinId] */
     protected $joins;
 
-    /**
-     * @var array
-     *      key   = joinId
-     *      value = alias
-     */
+    /** @var array [key = joinId, value = alias] */
     protected $tableAliases;
 
-    /**
-     * @var array
-     *      key   = column key (see buildColumnAliasKey method)
-     *      value = alias
-     */
+    /** @var array [key = column key {@see buildColumnAliasKey()}, value = alias */
     protected $columnAliases;
 
-    /**
-     * @var array
-     *      key   = column name
-     *      value = column expression
-     */
+    /** @var array [key = column name, value = column expression] */
     protected $virtualColumnExpressions;
 
-    /**
-     * @var array
-     *      key   = {declared entity class name}::{declared field name}
-     *      value = data type
-     */
+    /** @var array [key = {declared entity class name}::{declared field name}, value = data type] */
     protected $virtualColumnOptions;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $virtualRelationsJoins = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $aliases = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $queryAliases = [];
 
-    /**
-     * @var QueryBuilderTools
-     */
+    /** @var QueryBuilderTools */
     protected $qbTools;
 
     /**
-     * Constructor
-     *
      * @param FunctionProviderInterface     $functionProvider
      * @param VirtualFieldProviderInterface $virtualFieldProvider
      */
@@ -128,7 +84,7 @@ abstract class AbstractQueryConverter
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider
     ) {
-        $this->functionProvider     = $functionProvider;
+        $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
         $this->qbTools = new QueryBuilderTools();
     }
@@ -167,8 +123,6 @@ abstract class AbstractQueryConverter
      * @param string|FunctionInterface|null $functionExpr
      * @param string|null                   $functionReturnType
      * @param bool                          $isDistinct
-     *
-     * @return
      */
     abstract protected function addSelectColumn(
         $entityClassName,
@@ -273,9 +227,9 @@ abstract class AbstractQueryConverter
      */
     public function ensureSiblingTableJoined($tableAlias, $joinByFieldName)
     {
-        $joinId       = $this->getJoinIdentifierByTableAlias($tableAlias);
+        $joinId = $this->getJoinIdentifierByTableAlias($tableAlias);
         $parentJoinId = $this->getParentJoinIdentifier($joinId);
-        $newJoinId    = $this->buildSiblingJoinIdentifier($parentJoinId, $joinByFieldName);
+        $newJoinId = $this->buildSiblingJoinIdentifier($parentJoinId, $joinByFieldName);
 
         return $this->ensureTableJoined($newJoinId);
     }
@@ -297,7 +251,7 @@ abstract class AbstractQueryConverter
     public function ensureChildTableJoined($tableAlias, $joinByFieldName, $joinType = null)
     {
         $parentJoinId = $this->getJoinIdentifierByTableAlias($tableAlias);
-        $joinId       = $this->joinIdHelper->buildJoinIdentifier(
+        $joinId = $this->joinIdHelper->buildJoinIdentifier(
             $tableAlias . '.' . $joinByFieldName,
             $parentJoinId,
             $joinType
@@ -310,6 +264,7 @@ abstract class AbstractQueryConverter
      * Makes sure that a table identified by the given $joinId exists in the query
      *
      * @param string $joinId
+     *
      * @return string The table alias for the given join
      */
     public function ensureTableJoined($joinId)
@@ -330,9 +285,7 @@ abstract class AbstractQueryConverter
      */
     public function getJoinIdentifierByTableAlias($tableAlias)
     {
-        return isset($this->joins[$tableAlias])
-            ? $this->joins[$tableAlias]
-            : null;
+        return $this->joins[$tableAlias] ?? null;
     }
 
     /**
@@ -354,6 +307,7 @@ abstract class AbstractQueryConverter
      * @param string $joinId
      *
      * @return string
+     *
      * @throws \LogicException if incorrect join identifier specified
      */
     public function getParentJoinIdentifier($joinId)
@@ -380,22 +334,25 @@ abstract class AbstractQueryConverter
             throw new InvalidConfigurationException('The "columns" definition must not be empty.');
         }
 
-        $this->aliases                  = [];
-        $this->virtualRelationsJoins    = [];
-        $this->tableAliasesCount        = 0;
-        $this->joinIdHelper             = new JoinIdentifierHelper($this->rootEntity);
-        $this->joins                    = [];
-        $this->tableAliases             = [];
-        $this->columnAliases            = [];
+        $this->aliases = [];
+        $this->virtualRelationsJoins = [];
+        $this->tableAliasesCount = 0;
+        $this->joinIdHelper = new JoinIdentifierHelper($this->rootEntity);
+        $this->joins = [];
+        $this->tableAliases = [];
+        $this->columnAliases = [];
         $this->virtualColumnExpressions = [];
-        $this->virtualColumnOptions     = [];
-        $this->buildQuery();
-        $this->virtualColumnOptions     = null;
-        $this->virtualColumnExpressions = null;
-        $this->columnAliases            = null;
-        $this->tableAliases             = null;
-        $this->joins                    = null;
-        $this->joinIdHelper             = null;
+        $this->virtualColumnOptions = [];
+        try {
+            $this->buildQuery();
+        } finally {
+            $this->virtualColumnOptions = null;
+            $this->virtualColumnExpressions = null;
+            $this->columnAliases = null;
+            $this->tableAliases = null;
+            $this->joins = null;
+            $this->joinIdHelper = null;
+        }
     }
 
     /**
@@ -460,10 +417,8 @@ abstract class AbstractQueryConverter
                 $column['func']['group_type']
             );
 
-            $functionExpr       = $function['expr'];
-            $functionReturnType = isset($function['return_type'])
-                ? $function['return_type']
-                : null;
+            $functionExpr = $function['expr'];
+            $functionReturnType = $function['return_type'] ?? null;
 
             return [$functionExpr, $functionReturnType];
         }
@@ -477,14 +432,12 @@ abstract class AbstractQueryConverter
     protected function addSelectStatement()
     {
         foreach ($this->definition['columns'] as $column) {
-            $columnName         = $column['name'];
-            $fieldName          = $this->getFieldName($columnName);
+            $columnName = $column['name'];
+            $fieldName = $this->getFieldName($columnName);
             [$functionExpr, $functionReturnType] = $this->createColumnFunction($column);
             $isDistinct = !empty($column['distinct']);
             $tableAlias = $this->getTableAliasForColumn($columnName);
-            $columnLabel = isset($column['label'])
-                ? $column['label']
-                : $fieldName;
+            $columnLabel = $column['label'] ?? $fieldName;
             $this->addSelectColumn(
                 $this->getEntityClassName($columnName),
                 $tableAlias,
@@ -501,13 +454,12 @@ abstract class AbstractQueryConverter
 
     /**
      * @param string $columnAliasKey
-     * @return null|string
+     *
+     * @return string|null
      */
     protected function getColumnAlias($columnAliasKey)
     {
-        return isset($this->columnAliases[$columnAliasKey])
-            ? $this->columnAliases[$columnAliasKey]
-            : null;
+        return $this->columnAliases[$columnAliasKey] ?? null;
     }
 
     /**
@@ -542,7 +494,7 @@ abstract class AbstractQueryConverter
 
                 if ($this->joinIdHelper->isUnidirectionalJoin($joinId)) {
                     $entityClassName = $this->getEntityClassName($joinId);
-                    $joinFieldName   = $this->getFieldName($joinId);
+                    $joinFieldName = $this->getFieldName($joinId);
                     $this->addJoinStatement(
                         $this->getJoinType($joinId),
                         $entityClassName,
@@ -596,9 +548,7 @@ abstract class AbstractQueryConverter
      */
     protected function buildColumnExpression($columnName, $tableAlias, $fieldName)
     {
-        return isset($this->virtualColumnExpressions[$columnName])
-            ? $this->virtualColumnExpressions[$columnName]
-            : sprintf('%s.%s', $tableAlias, $fieldName);
+        return $this->virtualColumnExpressions[$columnName] ?? sprintf('%s.%s', $tableAlias, $fieldName);
     }
 
     /**
@@ -658,10 +608,10 @@ abstract class AbstractQueryConverter
      */
     protected function processFilter($filter)
     {
-        $columnName     = array_key_exists('columnName', $filter) ? $filter['columnName'] : '';
-        $fieldName      = $this->getFieldName($columnName);
+        $columnName = array_key_exists('columnName', $filter) ? $filter['columnName'] : '';
+        $fieldName = $this->getFieldName($columnName);
         $columnAliasKey = $this->buildColumnAliasKey($columnName);
-        $tableAlias     = $this->getTableAliasForColumn($columnName);
+        $tableAlias = $this->getTableAliasForColumn($columnName);
         $column = ['name' => $fieldName];
         if (isset($filter['func'])) {
             $column['func'] = $filter['func'];
@@ -688,7 +638,7 @@ abstract class AbstractQueryConverter
         if (isset($this->definition['grouping_columns'])) {
             foreach ($this->definition['grouping_columns'] as $column) {
                 $columnAliasKey = $this->buildColumnAliasKey($column);
-                $columnAlias    = $this->getColumnAlias($columnAliasKey);
+                $columnAlias = $this->getColumnAlias($columnAliasKey);
                 if (empty($columnAlias)) {
                     throw new InvalidConfigurationException(
                         sprintf(
@@ -1001,9 +951,7 @@ abstract class AbstractQueryConverter
      */
     protected function getQueryRootAlias(array $query)
     {
-        return isset($query['root_alias'])
-            ? $query['root_alias']
-            : 'entity';
+        return $query['root_alias'] ?? 'entity';
     }
 
     /**
@@ -1082,7 +1030,7 @@ abstract class AbstractQueryConverter
             return;
         }
 
-        // check if last field is virtual, if yes, add tableAlias to related virtual field. check BAP-15414 and OPS-637
+        // check if last field is virtual, if yes, add tableAlias to related virtual field
         $isLastVirtualField = $this->virtualFieldProvider->isVirtualField(
             $this->getEntityClassName($columnName),
             $this->getFieldName($columnName)
@@ -1257,7 +1205,7 @@ abstract class AbstractQueryConverter
             $joinId = $this->buildJoinIdentifier($join, $parentJoinId);
             if (isset($this->tableAliases[$joinId])) {
                 $this->aliases[$alias] = $this->tableAliases[$joinId];
-                $join['alias']         = $this->aliases[$alias];
+                $join['alias'] = $this->aliases[$alias];
             }
 
             $join['processed'] = true;
@@ -1290,9 +1238,7 @@ abstract class AbstractQueryConverter
      */
     protected function getJoinDefinitionConditionType(array $join)
     {
-        return isset($join['conditionType'])
-            ? $join['conditionType']
-            : null;
+        return $join['conditionType'] ?? null;
     }
 
     /**
@@ -1302,9 +1248,7 @@ abstract class AbstractQueryConverter
      */
     protected function getDefinitionJoinCondition(array $join)
     {
-        return isset($join['condition'])
-            ? $join['condition']
-            : null;
+        return $join['condition'] ?? null;
     }
 
     /**
@@ -1312,6 +1256,7 @@ abstract class AbstractQueryConverter
      * @param string $mainEntityJoinId
      *
      * @return array
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function registerVirtualColumnQueryAliases($query, $mainEntityJoinId)
@@ -1326,23 +1271,23 @@ abstract class AbstractQueryConverter
             $finished = false;
             while (!$finished) {
                 $finished = true;
-                $alias    = null;
+                $alias = null;
                 $newAlias = null;
-                $joinId   = null;
+                $joinId = null;
                 foreach ($joinMap as $alias => $mapItem) {
                     if (isset($mapItem['processed'])) {
                         continue;
                     }
-                    $joinType     = $mapItem['type'];
-                    $join         = $query['join'][$joinType][$mapItem['key']];
+                    $joinType = $mapItem['type'];
+                    $join = $query['join'][$joinType][$mapItem['key']];
                     $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
                         $joinMap,
                         $join['join'],
                         $mainEntityJoinId
                     );
                     if (null !== $parentJoinId) {
-                        $alias    = $join['alias'];
-                        $joinId   = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
+                        $alias = $join['alias'];
+                        $joinId = $this->buildJoinIdentifier($join, $parentJoinId, $joinType);
                         $newAlias = $this->findExistingTableAlias($joinId, $alias);
                         if ($newAlias) {
                             break;
@@ -1352,17 +1297,17 @@ abstract class AbstractQueryConverter
                 if (!$newAlias) {
                     foreach ($joinMap as $alias => $mapItem) {
                         if (!isset($mapItem['processed'])) {
-                            $joinType     = $mapItem['type'];
-                            $join         = $query['join'][$joinType][$mapItem['key']];
+                            $joinType = $mapItem['type'];
+                            $join = $query['join'][$joinType][$mapItem['key']];
                             $parentJoinId = $this->getParentJoinIdForVirtualColumnJoin(
                                 $joinMap,
                                 $join['join'],
                                 $mainEntityJoinId
                             );
                             if (null !== $parentJoinId) {
-                                $alias    = $join['alias'];
+                                $alias = $join['alias'];
                                 $newAlias = $this->generateTableAlias();
-                                $joinId   = str_replace(
+                                $joinId = str_replace(
                                     $alias,
                                     $newAlias,
                                     $this->buildJoinIdentifier($join, $parentJoinId, $joinType)
@@ -1641,7 +1586,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId
      *
-     * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
+     * @return string|null NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     protected function getJoinType($joinId)
     {
@@ -1670,7 +1615,7 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId
      *
-     * @return null|string
+     * @return string|null
      */
     protected function getJoinCondition($joinId)
     {
@@ -1771,17 +1716,19 @@ abstract class AbstractQueryConverter
      * @param string                   $columnAlias
      *
      * @return string
+     *
      * @throws InvalidConfigurationException if incorrect type $functionExpr specified
      */
     protected function prepareFunctionExpression($functionExpr, $tableAlias, $fieldName, $columnName, $columnAlias)
     {
         if (is_string($functionExpr) && strpos($functionExpr, '@') === 0) {
-            $className    = substr($functionExpr, 1);
+            $className = substr($functionExpr, 1);
             $functionExpr = new $className();
         }
         if ($functionExpr instanceof FunctionInterface) {
             return $functionExpr->getExpression($tableAlias, $fieldName, $columnName, $columnAlias, $this);
-        } elseif (!is_string($functionExpr)) {
+        }
+        if (!is_string($functionExpr)) {
             throw new InvalidConfigurationException(
                 'The function expression must be a string or instance of FunctionInterface'
             );

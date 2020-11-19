@@ -37,6 +37,7 @@ security:
             logout:
                 path:                       oro_user_security_logout
             organization-remember-me:
+                token_provider:             oro_security.token.provider.rememberme
                 secret:                     '%secret%'
                 name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks

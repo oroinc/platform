@@ -332,19 +332,16 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
      */
     private function getFieldLabel(ClassMetadata $metadata, $fieldName)
     {
+        $label = null;
         $className = $metadata->getName();
-        if (!$metadata->hasField($fieldName) && !$metadata->hasAssociation($fieldName)) {
-            // virtual field or relation
-            return ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        if ($this->configManager->hasConfig($className, $fieldName)) {
+            $label = $this->configManager->getFieldConfig('entity', $className, $fieldName)->get('label');
+        }
+        if (!$label) {
+            $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
         }
 
-        $label = $this->configManager->hasConfig($className, $fieldName)
-            ? $this->configManager->getFieldConfig('entity', $className, $fieldName)->get('label')
-            : null;
-
-        return !empty($label)
-            ? $label
-            : ConfigHelper::getTranslationKey('entity', 'label', $className, $fieldName);
+        return $label;
     }
 
     /**

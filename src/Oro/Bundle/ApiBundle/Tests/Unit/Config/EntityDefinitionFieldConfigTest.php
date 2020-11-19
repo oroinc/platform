@@ -366,6 +366,18 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setDependsOn([]);
         self::assertNull($config->getDependsOn());
         self::assertEquals([], $config->toArray());
+
+        $config->addDependsOn('field1');
+        self::assertEquals(['field1'], $config->getDependsOn());
+        self::assertEquals(['depends_on' => ['field1']], $config->toArray());
+
+        $config->addDependsOn('field2');
+        self::assertEquals(['field1', 'field2'], $config->getDependsOn());
+        self::assertEquals(['depends_on' => ['field1', 'field2']], $config->toArray());
+
+        $config->addDependsOn('field1');
+        self::assertEquals(['field1', 'field2'], $config->getDependsOn());
+        self::assertEquals(['depends_on' => ['field1', 'field2']], $config->toArray());
     }
 
     public function testAssociationQuery()

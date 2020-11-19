@@ -35,8 +35,8 @@ services:
     # security_check
     #
 
-    oro_api.update.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.update.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -53,8 +53,8 @@ services:
     # data_security_check
     #
 
-    oro_api.update.entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityObjectSecurityCheck
+    oro_api.update.validate_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - EDIT

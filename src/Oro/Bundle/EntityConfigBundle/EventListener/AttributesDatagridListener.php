@@ -22,49 +22,39 @@ class AttributesDatagridListener
     private const ATTRIBUTE_FAMILY_VIEW_ROUTE = 'oro_attribute_family_view';
     private const ATTRIBUTE_FAMILY_PERMISSION = 'oro_attribute_family_view';
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @var LocalizationHelper
-     */
+    /** @var LocalizationHelper */
     private $localizationHelper;
 
-    /**
-     * @var AclHelper
-     */
+    /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    private $securityChecker;
+    /** @var AuthorizationCheckerInterface */
+    private $authorizationChecker;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
+    /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param LocalizationHelper $localizationHelper
      * @param AclHelper $aclHelper
-     * @param AuthorizationCheckerInterface $securityChecker
+     * @param AuthorizationCheckerInterface $authorizationChecker
      * @param UrlGeneratorInterface $urlGenerator
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizationHelper $localizationHelper,
         AclHelper $aclHelper,
-        AuthorizationCheckerInterface $securityChecker,
+        AuthorizationCheckerInterface $authorizationChecker,
         UrlGeneratorInterface $urlGenerator
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizationHelper = $localizationHelper;
         $this->aclHelper = $aclHelper;
-        $this->securityChecker = $securityChecker;
+        $this->authorizationChecker = $authorizationChecker;
         $this->urlGenerator = $urlGenerator;
     }
 
@@ -95,7 +85,7 @@ class AttributesDatagridListener
             ) {
                 $familyId = $familyDataRow['id'];
                 if (!array_key_exists($familyId, $familyIsGranted)) {
-                    $familyIsGranted[$familyId] = $this->securityChecker->isGranted(
+                    $familyIsGranted[$familyId] = $this->authorizationChecker->isGranted(
                         self::ATTRIBUTE_FAMILY_PERMISSION,
                         new ObjectIdentity($familyId, AttributeFamily::class)
                     );

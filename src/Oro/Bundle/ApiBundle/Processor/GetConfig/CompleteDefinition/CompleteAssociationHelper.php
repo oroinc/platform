@@ -293,17 +293,9 @@ class CompleteAssociationHelper
      */
     private function completeDependsOn(EntityDefinitionFieldConfig $field)
     {
-        $dependsOn = $field->getDependsOn();
-        if (null === $dependsOn) {
-            $dependsOn = [];
-        }
         $targetFields = $field->getTargetEntity()->getFields();
         foreach ($targetFields as $targetFieldName => $targetField) {
-            $targetPropertyPath = $targetField->getPropertyPath($targetFieldName);
-            if (!\in_array($targetPropertyPath, $dependsOn, true)) {
-                $dependsOn[] = $targetPropertyPath;
-            }
+            $field->addDependsOn($targetField->getPropertyPath($targetFieldName));
         }
-        $field->setDependsOn($dependsOn);
     }
 }

@@ -3,9 +3,12 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
-class QueryDesignerModel extends AbstractQueryDesigner
+class QueryDesignerModel extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    public const GRID_PREFIX = 'test_grid_';
+
     /** @var string */
     private $entity;
 
@@ -30,5 +33,10 @@ class QueryDesignerModel extends AbstractQueryDesigner
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+    }
+
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
     }
 }
