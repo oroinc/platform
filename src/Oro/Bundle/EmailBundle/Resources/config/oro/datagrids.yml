@@ -9,7 +9,7 @@ datagrids:
                     - r.name
                     - r.active
                 from:
-                    - { table: OroEmailBundle:AutoResponseRule, alias: r }
+                    - { table: Oro\Bundle\EmailBundle\Entity\AutoResponseRule, alias: r }
                 where:
                     or:
                         - r.mailbox = :mailbox
@@ -107,14 +107,14 @@ datagrids:
 # counting logic moved to EmailQueryFactory:addEmailsCount
 #                    - >
 #                        (SELECT COUNT(_ec.id)
-#                        FROM OroEmailBundle:Email _ec
+#                        FROM Oro\Bundle\EmailBundle\Entity\Email _ec
 #                        WHERE _ec.thread = e.thread) AS thread_email_count
                     - >
                         CASE
                             WHEN e.thread IS NULL THEN eb.hasAttachments
                             WHEN EXISTS(
                                 SELECT 1
-                                FROM OroEmailBundle:EmailAttachment _ea
+                                FROM Oro\Bundle\EmailBundle\Entity\EmailAttachment _ea
                                 JOIN _ea.emailBody _eb
                                 JOIN _eb.email _e
                                 JOIN _e.thread _t
@@ -124,7 +124,7 @@ datagrids:
                         END AS has_attachments
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END AS is_new
                 from:
-                    - { table: OroEmailBundle:EmailUser, alias: eu }
+                    - { table: Oro\Bundle\EmailBundle\Entity\EmailUser, alias: eu }
                 join:
                     inner:
                         - { join: eu.email, alias: e }
@@ -137,7 +137,7 @@ datagrids:
                     and:
                         - >
                             EXISTS (
-                                SELECT 1 FROM OroEmailBundle:EmailUser act_eu
+                                SELECT 1 FROM Oro\Bundle\EmailBundle\Entity\EmailUser act_eu
                                 JOIN act_eu.folders act_f
                                 JOIN act_f.origin act_o
                                 WHERE act_o.isActive = true AND eu.id = act_eu.id
@@ -324,7 +324,7 @@ datagrids:
                     - eb.textBody AS body_content
                     - CASE WHEN eu.seen = true THEN 0 ELSE 1 END AS is_new
                 from:
-                    - { table: OroEmailBundle:EmailUser, alias: eu }
+                    - { table: Oro\Bundle\EmailBundle\Entity\EmailUser, alias: eu }
                 join:
                     inner:
                         - { join: eu.email, alias: e }
@@ -608,7 +608,7 @@ datagrids:
                 select:
                     - m
                 from:
-                    - { table: OroEmailBundle:Mailbox, alias: m }
+                    - { table: Oro\Bundle\EmailBundle\Entity\Mailbox, alias: m }
                 join:
                     left:
                         - { join: m.processSettings, alias: process }

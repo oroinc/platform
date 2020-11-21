@@ -16,7 +16,7 @@ datagrids:
                     - IDENTITY(t.taxonomy) as taxonomy
                     - ta.backgroundColor
                 from:
-                    - { table: OroTagBundle:Tag, alias: t }
+                    - { table: Oro\Bundle\TagBundle\Entity\Tag, alias: t }
                 join:
                     left:
                         taxonomy:
@@ -89,7 +89,7 @@ datagrids:
                     enabled: true
                     options:
                         field_options:
-                            class: OroTagBundle:Taxonomy
+                            class: Oro\Bundle\TagBundle\Entity\Taxonomy
                             choice_label: name
                             translatable_options: false
         actions:
@@ -124,7 +124,7 @@ datagrids:
                     - tt.entityName
                     - tt.recordId
                 from:
-                    - { table: OroTagBundle:Tagging, alias: tt }
+                    - { table: Oro\Bundle\TagBundle\Entity\Tagging, alias: tt }
                 groupBy: tt.entityName, tt.recordId
                 where:
                     and:
@@ -150,7 +150,7 @@ datagrids:
                     - t.backgroundColor
                     - COUNT(tt.id) as usage
                 from:
-                    - { table: OroTagBundle:Taxonomy, alias: t }
+                    - { table: Oro\Bundle\TagBundle\Entity\Taxonomy, alias: t }
                 join:
                     left:
                         tagging:

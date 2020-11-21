@@ -12,7 +12,7 @@ datagrids:
                     - file.fileSize as fileSize
                     - file.createdAt as createdAt
                 from:
-                    - { table: 'OroAttachmentBundle:Attachment', alias: attachment }
+                    - { table: Oro\Bundle\AttachmentBundle\Entity\Attachment, alias: attachment }
                 join:
                     left:
                         - { join: attachment.file, alias: file }
@@ -82,7 +82,7 @@ datagrids:
                     - CONCAT_WS(' ', fileOwner.firstName, fileOwner.lastName) as uploadedBy
                     - file.createdAt
                 from:
-                    - { table: 'OroAttachmentBundle:FileItem', alias: file_item }
+                    - { table: Oro\Bundle\AttachmentBundle\Entity\FileItem, alias: file_item }
                 join:
                     left:
                         - { join: file_item.file, alias: file }
