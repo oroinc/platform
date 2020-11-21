@@ -15,7 +15,7 @@ datagrids:
                     - ce.mode
                     - ce.data
                 from:
-                    - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
+                    - { table: Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel, alias: ce }
                 where:
                     and:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
@@ -79,7 +79,7 @@ datagrids:
                     - ce.id as entity_id
                     - cf.data
                 from:
-                    - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                    - { table: Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel, alias: cf }
                 join:
                     inner:
                         - { join: cf.entity, alias: ce }

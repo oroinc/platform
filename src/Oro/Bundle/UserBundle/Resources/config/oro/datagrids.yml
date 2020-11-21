@@ -313,7 +313,7 @@ datagrids:
                     - u.lastName
                     - u.enabled
                 from:
-                    - { table: OroUserBundle:User, alias: u }
+                    - { table: Oro\Bundle\UserBundle\Entity\User, alias: u }
 
         columns: []
 
