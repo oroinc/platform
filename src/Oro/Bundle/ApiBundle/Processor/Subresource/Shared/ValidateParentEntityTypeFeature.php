@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -11,12 +11,12 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Validates whether an feature is enabled for the type of entities specified
- * in the "class" property of the context.
+ * in the "parentClass" property of the context.
  */
-class EntityTypeFeatureCheck implements ProcessorInterface
+class ValidateParentEntityTypeFeature implements ProcessorInterface
 {
     /** @var FeatureChecker */
-    protected $featureChecker;
+    private $featureChecker;
 
     /**
      * @param FeatureChecker $featureChecker
@@ -31,10 +31,10 @@ class EntityTypeFeatureCheck implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var Context $context */
+        /** @var SubresourceContext $context */
 
         if (!$this->featureChecker->isResourceEnabled(
-            $context->getClassName(),
+            $context->getParentClassName(),
             FeatureConfigurationExtension::API_RESOURCE_KEY
         )) {
             throw new NotFoundHttpException();

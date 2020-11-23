@@ -8,7 +8,6 @@ use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\Form\AbstractType;
@@ -45,25 +44,19 @@ class ConfigurationType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var OAuth2ManagerRegistry */
-    protected $oauthManagerRegistry;
-
     /**
      * @param SymmetricCrypterInterface $encryptor
      * @param TokenAccessorInterface $tokenAccessor
      * @param TranslatorInterface $translator
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $encryptor,
         TokenAccessorInterface $tokenAccessor,
-        TranslatorInterface $translator,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        TranslatorInterface $translator
     ) {
         $this->encryptor = $encryptor;
         $this->tokenAccessor = $tokenAccessor;
         $this->translator = $translator;
-        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     /**

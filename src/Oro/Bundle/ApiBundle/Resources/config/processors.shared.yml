@@ -264,8 +264,8 @@ services:
     # resource_check
     #
 
-    oro_api.resource_availability_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\ActionAvailabilityCheck
+    oro_api.validate_action_availability:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateActionAvailability
         arguments:
             - '@oro_api.resources_provider'
         tags:
@@ -278,8 +278,8 @@ services:
             - { name: oro.api.processor, action: update_list, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: list|item, priority: 20 }
 
-    oro_api.subresource.parent_resource_availability_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentActionAvailabilityCheck
+    oro_api.subresource.validate_parent_action_availability:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentActionAvailability
         arguments:
             - '@oro_api.resources_provider'
         tags:
@@ -293,8 +293,8 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: resource_check, priority: 20 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: relationship|subresource, priority: 20 }
 
-    oro_api.entity_type_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeFeatureCheck
+    oro_api.validate_entity_type_feature:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeFeature
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -307,8 +307,8 @@ services:
             - { name: oro.api.processor, action: update_list, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: options, group: resource_check, actionType: list|item, priority: 10 }
 
-    oro_api.subresource.parent_entity_type_feature_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeFeatureCheck
+    oro_api.subresource.validate_parent_entity_type_feature:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -496,8 +496,8 @@ services:
     # security_check (primary resource)
     #
 
-    oro_api.get.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.get.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -507,8 +507,8 @@ services:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
 
-    oro_api.delete.entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.delete.validate_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -523,8 +523,8 @@ services:
     # the "security_check" group is disabled for the "get" action is executed by
     # the "oro_api.create.load_normalized_entity" and "oro_api.update.load_normalized_entity" processors
     # so, if you add own security processor for the "get" action, add it for "create" and "update" actions as well
-    oro_api.entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+    oro_api.validate_entity_type_access.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -539,8 +539,8 @@ services:
     # security_check (subresources)
     #
 
-    oro_api.subresource.parent_entity_type_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -550,8 +550,8 @@ services:
             - { name: oro.api.processor, action: get_relationship, group: security_check, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: security_check, priority: 10 }
 
-    oro_api.subresource.parent_entity_type_security_check.edit:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access.edit:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -566,8 +566,8 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: security_check, priority: 10 }
 
     # VIEW permissions for the parent entity are required because the response may contains the updated relationship
-    oro_api.subresource.parent_entity_type_security_check.view:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck
+    oro_api.subresource.validate_parent_entity_type_access.view:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeAccess
         arguments:
             - '@security.authorization_checker'
             - '@oro_api.doctrine_helper'
@@ -832,8 +832,8 @@ services:
     # data_security_check
     #
 
-    oro_api.subresource.parent_entity_object_security_check:
-        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityObjectSecurityCheck
+    oro_api.subresource.validate_parent_entity_object_access:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityObjectAccess
         arguments:
             - '@security.authorization_checker'
             - EDIT

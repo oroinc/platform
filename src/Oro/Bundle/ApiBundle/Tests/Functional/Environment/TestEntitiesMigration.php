@@ -179,6 +179,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('first_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name_prefix', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name_suffix', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_class', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('related_id', 'integer', ['notnull' => false]);
         $table->addColumn('parent_id', 'integer', ['notnull' => false]);

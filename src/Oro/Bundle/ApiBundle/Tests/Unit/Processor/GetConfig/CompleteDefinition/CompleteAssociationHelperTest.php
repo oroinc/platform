@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
@@ -447,6 +448,117 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                         'fields'           => [
                             'field11' => [
                                 'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteNestedObjectWithInheritData()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field1' => [
+                    'data_type'    => 'nestedObject',
+                    'form_options' => [
+                        'inherit_data' => true
+                    ],
+                    'fields'       => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ]);
+        $fieldName = 'field1';
+
+        $this->completeAssociationHelper->completeNestedObject(
+            $fieldName,
+            $config->getField($fieldName)
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'inherit_data' => true
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2'
+                            ]
+                        ],
+                        'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
+                        'exclusion_policy' => 'all',
+                        'depends_on'       => ['field2']
+                    ],
+                    'field2' => [
+                        'exclude' => true
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteNestedObjectWithInheritDataAndNotMapped()
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'field1' => [
+                    'data_type'    => 'nestedObject',
+                    'form_options' => [
+                        'inherit_data' => true,
+                        'mapped'       => false
+                    ],
+                    'fields'       => [
+                        'field11' => [
+                            'property_path' => 'field2'
+                        ]
+                    ]
+                ],
+                'field2' => [
+                    'exclude' => true
+                ]
+            ]
+        ]);
+        $fieldName = 'field1';
+
+        $this->completeAssociationHelper->completeNestedObject(
+            $fieldName,
+            $config->getField($fieldName)
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'field1' => [
+                        'data_type'        => 'nestedObject',
+                        'form_options'     => [
+                            'inherit_data' => true,
+                            'mapped'       => false
+                        ],
+                        'fields'           => [
+                            'field11' => [
+                                'property_path' => 'field2',
+                                'form_options'  => [
+                                    'mapped' => false
+                                ]
                             ]
                         ],
                         'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,

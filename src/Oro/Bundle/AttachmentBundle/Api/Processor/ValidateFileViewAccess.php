@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 /**
  * Checks if it is allowed to view File entity.
  */
-class FileViewSecurityCheck implements ProcessorInterface
+class ValidateFileViewAccess implements ProcessorInterface
 {
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;

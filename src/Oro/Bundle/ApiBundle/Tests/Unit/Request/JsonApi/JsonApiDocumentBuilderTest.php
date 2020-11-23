@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
@@ -1284,6 +1285,41 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
+    public function testNestedObject()
+    {
+        $object = [
+            'id'     => 1,
+            'nested' => [
+                'name' => 'Name'
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
+        $metadata->addField($this->createFieldMetadata('id'));
+        $nestedObject = $metadata->addAssociation(
+            $this->createAssociationMetadata('nested', 'Test\NestedWithoutAlias', false, [])
+        );
+        $nestedObject->setDataType(DataType::NESTED_OBJECT);
+        $nestedObject->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $nestedObject->getTargetMetadata()->addField($this->createFieldMetadata('name'));
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data' => [
+                    'type'       => 'test_entity',
+                    'id'         => 'Test\Entity::1',
+                    'attributes' => [
+                        'nested' => [
+                            'name' => 'Name'
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
     public function testSetErrorObject()
     {
         $error = new Error();
@@ -1877,9 +1913,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'meta'          => [
-                            '__path__'  => 'role',
-                            '__type__'  => 'test_role',
-                            '__id__'    => 'Test\Role::21'
+                            '__path__' => 'role',
+                            '__type__' => 'test_role',
+                            '__id__'   => 'Test\Role::21'
                         ],
                         'type'          => 'test_role',
                         'id'            => 'Test\Role::21',
@@ -1918,9 +1954,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     ],
                     [
                         'meta'          => [
-                            '__path__'  => 'roles.1',
-                            '__type__'  => 'test_anotherrole',
-                            '__id__'    => 'Test\Role::22'
+                            '__path__' => 'roles.1',
+                            '__type__' => 'test_anotherrole',
+                            '__id__'   => 'Test\Role::22'
                         ],
                         'type'          => 'test_anotherrole',
                         'id'            => 'Test\Role::22',
@@ -2126,9 +2162,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                 'included' => [
                     [
                         'meta'          => [
-                            '__path__'  => '0.role',
-                            '__type__'  => 'test_role',
-                            '__id__'    => 'Test\Role::21'
+                            '__path__' => '0.role',
+                            '__type__' => 'test_role',
+                            '__id__'   => 'Test\Role::21'
                         ],
                         'type'          => 'test_role',
                         'id'            => 'Test\Role::21',
@@ -2167,9 +2203,9 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                     ],
                     [
                         'meta'          => [
-                            '__path__'  => '0.roles.1',
-                            '__type__'  => 'test_anotherrole',
-                            '__id__'    => 'Test\Role::22'
+                            '__path__' => '0.roles.1',
+                            '__type__' => 'test_anotherrole',
+                            '__id__'   => 'Test\Role::22'
                         ],
                         'type'          => 'test_anotherrole',
                         'id'            => 'Test\Role::22',

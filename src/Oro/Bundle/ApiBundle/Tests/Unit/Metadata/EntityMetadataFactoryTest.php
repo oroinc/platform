@@ -190,6 +190,36 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
+    public function testCreateFieldMetadataForNonManageableField()
+    {
+        $expectedMetadata = new FieldMetadata();
+        $expectedMetadata->setName('another');
+        $expectedMetadata->setDataType('string');
+        $expectedMetadata->setIsNullable(true);
+
+        $metadata = $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'another',
+            'string'
+        );
+
+        self::assertEquals($expectedMetadata, $metadata);
+    }
+
+    public function testCreateFieldMetadataForNonManageableFieldWhenFieldTypeIsNotSpecified()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'The data type for "%s::another" is not defined.',
+            Entity\Product::class
+        ));
+
+        $this->metadataFactory->createFieldMetadata(
+            $this->doctrineHelper->getEntityMetadataForClass(Entity\Product::class),
+            'another'
+        );
+    }
+
     public function testCreateAssociationMetadataForManyToOne()
     {
         $expectedMetadata = new AssociationMetadata();

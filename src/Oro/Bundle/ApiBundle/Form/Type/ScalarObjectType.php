@@ -43,7 +43,8 @@ class ScalarObjectType extends AbstractType
             ConfigUtil::IGNORE_PROPERTY_PATH,
             $config->getField($fieldName),
             $metadata->getProperty($fieldName),
-            ['required' => false, 'error_bubbling' => true, 'property_path' => $fieldName]
+            ['required' => false, 'error_bubbling' => true, 'property_path' => $fieldName],
+            true
         );
 
         $builder->addEventSubscriber(new ScalarObjectListener());

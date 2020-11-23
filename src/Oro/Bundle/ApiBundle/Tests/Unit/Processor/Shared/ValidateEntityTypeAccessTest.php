@@ -1,16 +1,16 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ParentEntityTypeSecurityCheck;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
+class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
     private $authorizationChecker;
@@ -39,11 +39,11 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
     /**
      * @param bool $forcePermissionUsage
      *
-     * @return ParentEntityTypeSecurityCheck
+     * @return ValidateEntityTypeAccess
      */
     private function getProcessor($forcePermissionUsage = false)
     {
-        return new ParentEntityTypeSecurityCheck(
+        return new ValidateEntityTypeAccess(
             $this->authorizationChecker,
             $this->doctrineHelper,
             $this->aclGroupProvider,
@@ -52,99 +52,99 @@ class ParentEntityTypeSecurityCheckTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenAccessGrantedForManageableParentEntityWithoutConfigOfAclResource()
+    public function testProcessWhenAccessGrantedForManageableEntityWithoutConfigOfAclResource()
     {
-        $parentClassName = Product::class;
-        $parentConfig = new EntityDefinitionConfig();
+        $className = Product::class;
+        $config = new EntityDefinitionConfig();
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', 'entity:' . $parentClassName)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(true);
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessDeniedForManageableParentEntityWithoutConfigOfAclResource()
+    public function testProcessWhenAccessDeniedForManageableEntityWithoutConfigOfAclResource()
     {
         $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
-        $parentClassName = Product::class;
-        $parentConfig = new EntityDefinitionConfig();
+        $className = Product::class;
+        $config = new EntityDefinitionConfig();
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', 'entity:' . $parentClassName)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(false);
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessGrantedForParentEntityWithConfigOfAclResource()
+    public function testProcessWhenAccessGrantedForEntityWithConfigOfAclResource()
     {
-        $parentClassName = Product::class;
+        $className = Product::class;
         $aclResource = 'acme_product_test';
-        $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setAclResource($aclResource);
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource($aclResource);
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(true);
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor()->process($this->context);
     }
 
-    public function testProcessWhenAccessDeniedForParentEntityWithConfigOfAclResource()
+    public function testProcessWhenAccessDeniedForEntityWithConfigOfAclResource()
     {
         $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
-        $parentClassName = Product::class;
+        $className = Product::class;
         $aclResource = 'acme_product_test';
-        $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setAclResource($aclResource);
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource($aclResource);
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($aclResource)
             ->willReturn(false);
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor()->process($this->context);
     }
 
     public function testForcePermissionUsage()
     {
-        $parentClassName = Product::class;
-        $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setAclResource('acme_product_test');
+        $className = Product::class;
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource('acme_product_test');
 
         $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', 'entity:' . $parentClassName)
+            ->with('VIEW', 'entity:' . $className)
             ->willReturn(true);
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor(true)->process($this->context);
     }
 
     public function testForcePermissionUsageWhenAclCheckIsDisabled()
     {
-        $parentClassName = Product::class;
-        $parentConfig = new EntityDefinitionConfig();
-        $parentConfig->setAclResource(null);
+        $className = Product::class;
+        $config = new EntityDefinitionConfig();
+        $config->setAclResource(null);
 
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
-        $this->context->setParentClassName($parentClassName);
-        $this->context->setParentConfig($parentConfig);
+        $this->context->setClassName($className);
+        $this->context->setConfig($config);
         $this->getProcessor(true)->process($this->context);
     }
 }

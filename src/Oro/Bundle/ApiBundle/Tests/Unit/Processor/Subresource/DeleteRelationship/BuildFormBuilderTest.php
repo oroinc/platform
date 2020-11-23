@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\DeleteRelationsh
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\DataMapper\RemoveRelationshipMapper;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
+use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\DeleteRelationship\BuildFormBuilder;
@@ -41,7 +42,12 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
 
         $this->processor = new BuildFormBuilder(
-            new FormHelper($this->formFactory, $this->propertyAccessor, $this->container),
+            new FormHelper(
+                $this->formFactory,
+                $this->createMock(DataTypeGuesser::class),
+                $this->propertyAccessor,
+                $this->container
+            ),
             $this->propertyAccessor
         );
 

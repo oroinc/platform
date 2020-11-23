@@ -34,8 +34,9 @@ final class DataType
     public const ENTITY_CLASS     = 'entityClass';
     public const ORDER_BY         = 'orderBy';
 
-    private const NESTED_OBJECT               = 'nestedObject';
-    private const NESTED_ASSOCIATION          = 'nestedAssociation';
+    public const NESTED_OBJECT      = 'nestedObject';
+    public const NESTED_ASSOCIATION = 'nestedAssociation';
+
     private const EXTENDED_ASSOCIATION_PREFIX = 'association';
     private const EXTENDED_ASSOCIATION_MARKER = 'association:';
     private const ASSOCIATION_AS_FIELD_TYPES  = ['array', 'object', 'nestedObject', 'objects', 'strings', 'scalar'];

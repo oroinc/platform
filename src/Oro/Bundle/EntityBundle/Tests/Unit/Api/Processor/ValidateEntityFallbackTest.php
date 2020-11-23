@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDataProcessorTestCase;
 use Oro\Bundle\EntityBundle\Api\Processor\ValidateEntityFallback;
 use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
@@ -16,17 +16,13 @@ use Oro\Bundle\EntityBundle\Tests\Unit\Fallback\Stub\FallbackContainingEntity;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ValidateEntityFallbackTest extends TypeTestCase
+class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var CustomizeFormDataContext */
-    private $context;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFallbackResolver */
     private $fallbackResolver;
 
@@ -37,9 +33,8 @@ class ValidateEntityFallbackTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->context = new CustomizeFormDataContext();
-
         $this->fallbackResolver = $this->createMock(EntityFallbackResolver::class);
+
         $this->processor = new ValidateEntityFallback(
             $this->fallbackResolver,
             PropertyAccess::createPropertyAccessor()
@@ -53,7 +48,7 @@ class ValidateEntityFallbackTest extends TypeTestCase
      */
     private function getEntityFieldFallbackValueForm(EntityFieldFallbackValue $fallbackValue)
     {
-        $formBuilder = $this->builder->create(
+        $formBuilder = $this->createFormBuilder()->create(
             null,
             FormType::class,
             ['data_class' => EntityFieldFallbackValue::class]

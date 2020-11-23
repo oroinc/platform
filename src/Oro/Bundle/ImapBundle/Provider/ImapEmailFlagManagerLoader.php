@@ -24,13 +24,13 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var ManagerRegistry */
+    /** @var OAuth2ManagerRegistry */
     protected $oauthManagerRegistry;
 
     /**
      * @param ImapConnectorFactory $connectorFactory
      * @param SymmetricCrypterInterface $encryptor
-     * @param ManagerRegistry $oauthManagerRegistry
+     * @param OAuth2ManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         ImapConnectorFactory $connectorFactory,

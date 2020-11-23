@@ -10,13 +10,12 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Controller class with actions that work with files
+ * The controller with actions that work with files.
  */
 class FileController extends AbstractController
 {
@@ -25,22 +24,21 @@ class FileController extends AbstractController
      *   name="oro_attachment_get_file",
      *   requirements={"id"="\d+", "action"="(get|download)"}
      * )
-     * @param int $id
+     * @param int    $id
      * @param string $filename
      * @param string $action
-     * @param Request $request
      *
      * @return Response
      */
-    public function getFileAction(int $id, string $filename, string $action, Request $request): Response
+    public function getFileAction(int $id, string $filename, string $action): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->closeSession($request);
+        $this->unlockSession();
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
-        if ($action === FileUrlProviderInterface::FILE_ACTION_GET) {
+        if (FileUrlProviderInterface::FILE_ACTION_GET === $action) {
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
         } else {
             $response->headers->set('Content-Type', 'application/force-download');
@@ -51,7 +49,7 @@ class FileController extends AbstractController
         }
 
         $response->headers->set('Content-Length', $file->getFileSize());
-        $response->setContent($this->get(FileManager::class)->getContent($file));
+        $response->setContent($this->getFileManager()->getContent($file));
 
         return $response;
     }
@@ -61,22 +59,20 @@ class FileController extends AbstractController
      *   name="oro_resize_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
-     * @param int $id
-     * @param int $width
-     * @param int $height
+     * @param int    $id
+     * @param int    $width
+     * @param int    $height
      * @param string $filename
      * @param Request $request
      *
      * @return Response
      */
-    public function getResizedAttachmentImageAction($id, $width, $height, $filename, Request $request)
+    public function getResizedAttachmentImageAction(int $id, int $width, int $height, string $filename): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->closeSession($request);
+        $this->unlockSession();
 
-        /** @var ImageResizeManagerInterface $resizeManager */
-        $resizeManager = $this->get(ImageResizeManager::class);
-        $binary = $resizeManager->resize($file, $width, $height);
+        $binary = $this->getImageResizeManager()->resize($file, $width, $height);
         if (!$binary) {
             throw $this->createNotFoundException();
         }
@@ -89,21 +85,19 @@ class FileController extends AbstractController
      *   name="oro_filtered_attachment",
      *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
      * )
-     * @param int $id
+     * @param int    $id
      * @param string $filter
      * @param string $filename
      * @param Request $request
      *
      * @return Response
      */
-    public function getFilteredImageAction($id, $filter, $filename, Request $request)
+    public function getFilteredImageAction(int $id, string $filter, string $filename): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->closeSession($request);
+        $this->unlockSession();
 
-        /** @var ImageResizeManagerInterface $resizeManager */
-        $resizeManager = $this->get(ImageResizeManager::class);
-        $binary = $resizeManager->applyFilter($file, $filter);
+        $binary = $this->getImageResizeManager()->applyFilter($file, $filter);
         if (!$binary) {
             throw $this->createNotFoundException();
         }
@@ -112,35 +106,21 @@ class FileController extends AbstractController
     }
 
     /**
-     * @param Request $request
-     */
-    private function closeSession(Request $request): void
-    {
-        $session = $request->getSession();
-        if (null !== $session && $session->isStarted()) {
-            $session->save();
-        }
-    }
-
-    /**
-     * @param int $id
+     * @param int    $id
      * @param string $fileName
      *
      * @return File
-     *
-     * @throws NotFoundHttpException
      */
-    protected function getFileByIdAndFileName($id, $fileName)
+    private function getFileByIdAndFileName(int $id, string $fileName): File
     {
-        /** @var File $file */
-        $file = $this->get('doctrine')->getRepository(File::class)->find($id);
-        /** @var FileNameProviderInterface $filenameProvider */
-        $filenameProvider = $this->get(AttachmentFileNameProvider::class);
-        if (!$file || (
-            $filenameProvider->getFileName($file) !== $fileName
-            && $fileName !== $file->getFilename()
-            && $fileName !== $file->getOriginalFilename()
-        )) {
+        /** @var File|null $file */
+        $file = $this->getDoctrine()->getManagerForClass(File::class)->find(File::class, $id);
+        if (null === $file
+            || (
+                $fileName !== $file->getFilename()
+                && $fileName !== $file->getOriginalFilename()
+                && $fileName !== $this->getAttachmentFileNameProvider()->getFileName($file)
+            )) {
             throw $this->createNotFoundException('File not found');
         }
 
@@ -151,15 +131,46 @@ class FileController extends AbstractController
         return $file;
     }
 
+    private function unlockSession(): void
+    {
+        $session = $this->getSession();
+        if (null !== $session && $session->isStarted()) {
+            $session->save();
+        }
+    }
+
+    private function getFileManager(): FileManager
+    {
+        return $this->get('oro_attachment.file_manager');
+    }
+
+    private function getImageResizeManager(): ImageResizeManagerInterface
+    {
+        return $this->get('oro_attachment.manager.image_resize');
+    }
+
+    private function getAttachmentFileNameProvider(): FileNameProviderInterface
+    {
+        return $this->get('oro_attachment.provider.attachment_file_name_provider');
+    }
+
+    /**
+     * @return SessionInterface|null
+     */
+    private function getSession(): ?SessionInterface
+    {
+        return $this->get('session');
+    }
+
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedServices()
     {
         return array_merge(parent::getSubscribedServices(), [
-            FileManager::class,
-            ImageResizeManager::class,
-            AttachmentFileNameProvider::class
+            'oro_attachment.file_manager'                           => FileManager::class,
+            'oro_attachment.manager.image_resize'                   => ImageResizeManager::class,
+            'oro_attachment.provider.attachment_file_name_provider' => AttachmentFileNameProvider::class
         ]);
     }
 }

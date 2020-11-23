@@ -14,7 +14,7 @@ datagrids:
                     - e.status
                     - e.processedAt
                 from:
-                    - { table: OroNotificationBundle:MassNotification, alias: e }
+                    - { table: Oro\Bundle\NotificationBundle\Entity\MassNotification, alias: e }
 
         columns:
             sender:
@@ -97,7 +97,7 @@ datagrids:
                     - recipientList.email as emailRecipient
                     - template.name as templateName
                 from:
-                    - { table: OroNotificationBundle:EmailNotification, alias: e }
+                    - { table: Oro\Bundle\NotificationBundle\Entity\EmailNotification, alias: e }
                 join:
                     left:
                         - { join: e.template, alias: template }

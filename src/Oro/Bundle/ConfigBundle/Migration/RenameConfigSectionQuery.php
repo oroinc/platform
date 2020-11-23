@@ -22,11 +22,11 @@ class RenameConfigSectionQuery extends ParametrizedMigrationQuery
     private $name;
 
     /**
-     * @param string $oldSection
-     * @param string $newSection
-     * @param string $name
+     * @param string      $oldSection
+     * @param string      $newSection
+     * @param string|null $name
      */
-    public function __construct(string $oldSection, string $newSection, string $name)
+    public function __construct(string $oldSection, string $newSection, string $name = null)
     {
         $this->oldSection = $oldSection;
         $this->newSection = $newSection;
@@ -72,7 +72,7 @@ class RenameConfigSectionQuery extends ParametrizedMigrationQuery
             ];
         } else {
             $query = 'UPDATE oro_config_value SET section = :new_section WHERE section = :old_section';
-            $parameters = [$this->newSection, $this->oldSection];
+            $parameters = ['new_section' => $this->newSection, 'old_section' => $this->oldSection];
             $types = ['new_section' => Types::STRING, 'old_section' => Types::STRING];
         }
 
