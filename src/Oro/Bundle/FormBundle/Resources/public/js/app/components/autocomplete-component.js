@@ -116,6 +116,9 @@ define(function(require) {
 
         _searchForResults: function(query, callback) {
             const self = this;
+            if (this.disposed) {
+                return;
+            }
 
             if (this.jqXHR) {
                 this.jqXHR.abort(); // abort ajax call with out-dated results
