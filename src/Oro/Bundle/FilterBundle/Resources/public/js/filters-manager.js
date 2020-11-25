@@ -119,11 +119,18 @@ define(function(require, exports, module) {
         dropdownContainer: 'body',
 
         /**
+         * Separate container selector where filter hint will placed
+         *
+         * @property {string}
+         */
+        outerHintContainer: void 0,
+
+        /**
          * Flag for close previous open filters
          *
          * @property
          */
-        hidePreviousOpenFilters: true,
+        autoClose: true,
 
         /**
          * Key that's used to fetch data about filters state view mode from persistent storage
@@ -131,6 +138,12 @@ define(function(require, exports, module) {
          * @property
          */
         storageKey: null,
+
+        /**
+         * Show or hide Manage filters button
+         * @property {Boolean}
+         */
+        enableMultiselectWidget: false,
 
         /** @property */
         events: {
@@ -163,14 +176,17 @@ define(function(require, exports, module) {
          * @param {String} [options.addButtonHint]
          */
         initialize: function(options) {
-            _.extend(this, _.pick(options, 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement'));
+            _.extend(this, _.pick(options,
+                'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
+                'autoClose', 'outerHintContainer', 'enableMultiselectWidget', 'multiselectParameters'
+            ));
 
             this.template = this.getTemplateFunction();
             this.filters = _.extend({}, options.filters);
             this.storageKey = options.filtersStateStorageKey || config.filtersStateStorageKey || DEFAULT_STORAGE_KEY;
 
             if (options.forcedViewMode) {
-                this.viewMode = options.forceViewMode;
+                this.viewMode = options.forcedViewMode;
             } else if (this.renderMode === 'toggle-mode') {
                 this.viewMode = FiltersManager.STATE_VIEW_MODE;
             } else {
@@ -196,7 +212,10 @@ define(function(require, exports, module) {
 
             _.each(this.filters, function(filter) {
                 if (filter.wrappable) {
-                    _.extend(filter, filterWrapper);
+                    Object.assign(filter, filterWrapper);
+                }
+                if (this.autoClose === false) {
+                    Object.assign(filter, {autoClose: this.autoClose});
                 }
                 this.listenTo(filter, filterListeners);
                 filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
@@ -249,24 +268,33 @@ define(function(require, exports, module) {
         },
 
         checkFiltersVisibility: function() {
+            _.each(this.filters, filter => {
+                if (filter.visible && filter.enabled) {
+                    this._renderFilter(filter).show();
+                } else if (!filter.visible) {
+                    filter.hide();
+                }
+            });
+
+            this.checkFiltersSelectVisibility();
+        },
+
+        checkFiltersSelectVisibility: function() {
             const filterSelector = this.$(this.filterSelector);
+
             if (!filterSelector.length) {
                 return;
             }
-            _.each(this.filters, function(filter) {
-                const option = filterSelector.find('option[value="' + filter.name + '"]');
+
+            _.each(this.filters, filter => {
+                const option = filterSelector.find(`option[value="${filter.name}"]`);
+
                 if (filter.visible && option.hasClass('hidden')) {
                     option.removeClass('hidden');
-
-                    if (filter.enabled) {
-                        this._renderFilter(filter).show();
-                    }
                 } else if (!filter.visible && !option.hasClass('hidden')) {
                     option.addClass('hidden');
-
-                    filter.hide();
                 }
-            }, this);
+            });
 
             this._refreshSelectWidget();
         },
@@ -337,7 +365,7 @@ define(function(require, exports, module) {
         },
 
         _onFilterShowCriteria: function(shownFilter) {
-            if (this.hidePreviousOpenFilters) {
+            if (this.autoClose) {
                 _.each(this.filters, function(filter) {
                     if (filter !== shownFilter) {
                         _.result(filter, 'ensurePopupCriteriaClosed');
@@ -425,7 +453,7 @@ define(function(require, exports, module) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
 
@@ -458,7 +486,7 @@ define(function(require, exports, module) {
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
 
-            if (!this.$(this.filterSelector).length) {
+            if (!this.enableMultiselectWidget) {
                 return;
             }
             const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
@@ -498,7 +526,9 @@ define(function(require, exports, module) {
         getTemplateData: function() {
             return {
                 filters: this.filters,
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                outerHintContainer: this.outerHintContainer,
+                enableMultiselectWidget: this.enableMultiselectWidget
             };
         },
 
@@ -536,7 +566,7 @@ define(function(require, exports, module) {
 
             if (_.isEmpty(this.filters)) {
                 this.$el.hide();
-            } else {
+            } else if (this.enableMultiselectWidget) {
                 this._initializeSelectWidget();
             }
             const filtersStateView = this.subview('filters-state');
@@ -626,8 +656,21 @@ define(function(require, exports, module) {
             }, 0);
         },
 
+        /**
+         * @returns {jQuery.Element}
+         */
+        getHintContainer: function() {
+            let $container = this.dropdownContainer;
+
+            if (this.outerHintContainer) {
+                $container = $(this.outerHintContainer);
+            }
+
+            return $container.find('.filter-items-hint');
+        },
+
         _resetHintContainer: function() {
-            const $container = this.dropdownContainer.find('.filter-items-hint');
+            const $container = this.getHintContainer();
             let show = false;
             $container.children('span').each(function() {
                 if (this.style.display !== 'none') {
@@ -659,14 +702,17 @@ define(function(require, exports, module) {
                     at: 'left bottom'
                 }
             };
+
+            if (this.multiselectParameters.appendTo) {
+                this.multiselectParameters.appendTo = this.$el.find(this.multiselectParameters.appendTo);
+            }
+
             const options = _.extend(
                 multiselectDefaults,
                 {
+                    minWidth: 'none',
                     selectedText: this.addButtonHint,
                     beforeopen: _.bind(function() {
-                        _.each(this.filters, function(filter) {
-                            filter.close();
-                        });
                         this.selectWidget.onBeforeOpenDropdown();
                     }, this),
                     open: _.bind(function() {
@@ -683,10 +729,6 @@ define(function(require, exports, module) {
                 },
                 this.multiselectParameters
             );
-
-            if (!this.$(this.filterSelector).length) {
-                return;
-            }
 
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.filterSelector),
@@ -705,7 +747,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _refreshSelectWidget: function() {
-            if (!this.selectWidget) {
+            if (!this.selectWidget && !this.enableMultiselectWidget) {
                 return;
             }
             this.selectWidget.multiselect('refresh');

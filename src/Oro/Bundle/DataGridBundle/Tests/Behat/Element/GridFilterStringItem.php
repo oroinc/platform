@@ -55,7 +55,17 @@ class GridFilterStringItem extends AbstractGridFilterItem
      */
     public function setFilterValue($value)
     {
-        $this->find('css', 'div.value-field-frame input')->setValue($value);
+        $this->getInputField()->setValue($value);
+    }
+
+    /**
+     * Get field input element
+     *
+     * @return NodeElement|null
+     */
+    public function getInputField()
+    {
+        return $this->find('css', 'div.value-field-frame input');
     }
 
     /**

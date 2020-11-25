@@ -1,0 +1,68 @@
+/* @theme: blank; */
+
+// @private: background-image generator
+// Take a particle map and generate background-image value
+//
+// @param: Map $particle
+// @return: List of background-image value
+@function skeleton-image-ellipse($particle) {
+    $color: map-get($particle, 'color');
+
+    @return (
+        radial-gradient(closest-side, $color 100%, transparent 100%),
+    );
+}
+
+// @private: background-size generator
+// Take a particle map and generate background-size value
+//
+// @param: Map $particle
+// @return: List of background-size value
+@function skeleton-size-ellipse($particle) {
+    $width: map-get($particle, 'width');
+    $height: map-get($particle, 'height');
+
+    @return (
+        $width $height,
+    );
+}
+
+// @private: background-position generator
+// Take a particle map and generate background-position value
+//
+// @param: Map $particle
+// @return: List of background-position value
+@function skeleton-position-ellipse($particle) {
+    $x: map-get($particle, 'x');
+    $y: map-get($particle, 'y');
+
+    @return (
+        $x $y,
+    );
+}
+
+// @public: function for get $particle object for draw ellipse
+//
+// @param: $color
+// @param: $width
+// @param: $height
+// @param: $x: 0
+// @param: $y: 0
+// 
+// @return: Formated map of parameters
+@function skeleton-ellipse(
+    $color,
+    $width,
+    $height,
+    $x: 0,
+    $y: 0
+) {
+    @return (
+        'type': 'ellipse',
+        'color': $color,
+        'width': $width,
+        'height': $height,
+        'x': $x,
+        'y': $y
+    );
+}

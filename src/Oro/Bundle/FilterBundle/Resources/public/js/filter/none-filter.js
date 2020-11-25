@@ -152,6 +152,9 @@ define(function(require) {
                 renderMode: this.renderMode
             }));
             this._wrap($filter);
+            if (this.initiallyOpened) {
+                this._showCriteria();
+            }
             return this;
         },
 
@@ -165,9 +168,9 @@ define(function(require) {
          * @protected
          */
         _showCriteria: function() {
-            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            this.trigger('showCriteria', this);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
@@ -181,6 +184,7 @@ define(function(require) {
         _hideCriteria: function() {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
+            this.trigger('hideCriteria', this);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;

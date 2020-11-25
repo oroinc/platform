@@ -161,7 +161,7 @@ define(function(require, exports, module) {
          * @inheritDoc
          */
         _triggerUpdate: function(newValue, oldValue) {
-            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+            if (this.isUpdatable(newValue, oldValue)) {
                 this._updateTimeVisibility(newValue.part);
             }
             DatetimeFilter.__super__._triggerUpdate.call(this, newValue, oldValue);

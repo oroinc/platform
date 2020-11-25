@@ -60,7 +60,8 @@ define(function(require, exports, module) {
                 methods.combineOptions.call(this),
                 _.pick(this, 'collection'),
                 _.pick(this.metadata.options, 'defaultFiltersViewMode', 'filtersStateStorageKey',
-                    'useFiltersStateAnimationOnInit')
+                    'useFiltersStateAnimationOnInit'),
+                this.metadata.options.filtersManager
             );
 
             let filterContainer;
@@ -88,6 +89,7 @@ define(function(require, exports, module) {
             }
 
             const filtersList = new FiltersManager(options);
+            this.grid.trigger('filters:beforeRender');
             filtersList.render();
             filtersList.$el.prependTo(filterContainer);
 
