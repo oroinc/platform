@@ -43,6 +43,14 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
      */
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH): string
     {
+        if ($name === '_oro_filtered_attachment') {
+            @trigger_error(
+                'The "_oro_filtered_attachment" route is deprecated and will be removed in version 4.2, ' .
+                'use the "oro_filtered_attachment" route instead.',
+                E_USER_DEPRECATED
+            );
+        }
+
         if (!empty($parameters['filter'])) {
             $parameters['filterMd5'] = $this->getFilterHash($parameters['filter']);
         }
