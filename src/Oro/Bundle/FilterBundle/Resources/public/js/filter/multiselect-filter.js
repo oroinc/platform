@@ -143,6 +143,15 @@ define(function(require) {
         },
 
         /**
+         * @inheritDoc
+         */
+        _formatRawValue(value) {
+            const formatted = MultiSelectFilter.__super__._formatRawValue.call(this, value);
+
+            return this._normalizeValue(formatted);
+        },
+
+        /**
          * @param {Array} value
          * @param {Array} choices
          * @returns {Array}
@@ -174,11 +183,7 @@ define(function(require) {
             return (
                 !_.isUndefined(thisDOMValue.value) &&
                 _.isArray(thisDOMValue.value) &&
-                !_.isEqual(this.value, thisDOMValue) &&
-                (
-                    (!thisDOMValue.value.length && _.isEqual(this.value, [FILTER_EMPTY_VALUE])) ||
-                    thisDOMValue.value.length
-                )
+                !_.isEqual(this.value, thisDOMValue)
             );
         }
     });

@@ -132,7 +132,10 @@ define(function(require, exports, module) {
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange'
+            'change select': '_onSelectChange',
+            'multiselectbeforeclose': function() {
+                return this.autoClose !== false;
+            }
         },
 
         /**
@@ -234,6 +237,9 @@ define(function(require, exports, module) {
                 }));
                 this.subview('loading').show();
             }
+            if (this.initiallyOpened) {
+                this.selectWidget.multiselect('open');
+            }
 
             return this;
         },
@@ -284,9 +290,9 @@ define(function(require, exports, module) {
                     }, this),
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
-                        this.trigger('showCriteria', this);
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
+                        this.trigger('showCriteria', this);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
 
@@ -302,6 +308,7 @@ define(function(require, exports, module) {
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
+                        this.trigger('hideCriteria', this);
                         if (!this.disposed) {
                             this.selectDropdownOpened = false;
                         }
@@ -309,12 +316,12 @@ define(function(require, exports, module) {
                     appendTo: this._appendToContainer(),
                     refreshNotOpened: this.templateTheme !== ''
                 }, this.widgetOptions),
-                contextSearch: this.contextSearch
+                contextSearch: this.contextSearch,
+                filterLabel: this.label
             });
-
             this.selectWidget.setViewDesign(this);
             this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
-                if (e.keyCode === 27) {
+                if (e.keyCode === 27 && this.autoClose !== false) {
                     this._onClickFilterArea(e);
                 }
             }, this));
@@ -428,6 +435,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _onSelectChange: function() {
+            this._onValueChanged();
             // set value
             this.applyValue();
             // update dropdown

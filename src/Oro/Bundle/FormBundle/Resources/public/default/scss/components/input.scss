@@ -12,6 +12,16 @@
 
     &--size-s {
         padding: $input-padding--s;
+
+        &[type="date"],
+        &[type="time"] {
+            min-height: $input-date-size-s-height;
+
+            &::-webkit-calendar-picker-indicator{
+                height: 1em;
+                padding: 0;
+            }
+        }
     }
 
     &--size-x-s {

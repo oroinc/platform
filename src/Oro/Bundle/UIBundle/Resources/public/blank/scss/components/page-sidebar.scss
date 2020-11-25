@@ -2,6 +2,8 @@
 
 .page-sidebar {
     width: $page-sidebar-width;
+    display: $page-sidebar-display;
+    flex-direction: $page-sidebar-flex-direction;
 
     flex: $page-sidebar-flex;
 }

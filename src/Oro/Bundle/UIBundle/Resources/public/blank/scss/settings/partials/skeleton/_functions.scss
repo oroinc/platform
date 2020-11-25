@@ -1,0 +1,99 @@
+/* @theme: blank; */
+
+@import './rect';
+@import './ellipse';
+
+// Function for normalize arguments of "@mixin skeleton"
+// Make sure all items with any type (list or map) merged into flat list
+//
+// @param: List $particles
+// @return: Flat list of $particles
+@function skeleton-normalize($particles...) {
+    $result: ();
+    @each $particle in $particles {
+        @if type-of($particle) == 'list' {
+            $result: join($result, $particle, comma);
+        }
+
+        @if type-of($particle) == 'map' {
+            $result: append($result, $particle, comma);
+        }
+    }
+
+    @return $result;
+}
+
+// background-image generator
+// Take list of skeleton items and call generator by type
+//
+// @param: List $particles
+// @return: List of background-image value
+@function skeleton-image($particles...) {
+    $result: null;
+    @if length($particles) == 0 {
+        @return $result;
+    }
+
+    $result: ();
+    @each $particle in $particles {
+        @if map-get($particle, 'type') == 'rect' {
+            $result: append($result, skeleton-image-rect($particle), comma);
+        }
+
+        @if map-get($particle, 'type') == 'ellipse' {
+            $result: append($result, skeleton-image-ellipse($particle), comma);
+        }
+    }
+
+    @return $result;
+}
+
+// background-size generator
+// Take list of skeleton items and call generator by type
+//
+// @param: List $particles
+// @return: List of background-size value
+@function skeleton-size($particles...) {
+    $result: null;
+    @if length($particles) == 0 {
+        @return $result;
+    }
+
+    $result: ();
+    @each $particle in $particles {
+        @if map-get($particle, 'type') == 'rect' {
+            $result: append($result, skeleton-size-rect($particle), comma);
+        }
+
+        @if map-get($particle, 'type') == 'ellipse' {
+            $result: append($result, skeleton-size-ellipse($particle), comma);
+        }
+    }
+
+    @return $result;
+}
+
+// background-position generator
+// Take list of skeleton items and call generator by type
+//
+// @param: List $particles
+// @return: List of background-position value
+@function skeleton-position($particles...) {
+    $result: null;
+    @if length($particles) == 0 {
+        @return $result;
+    }
+
+    $result: ();
+    @each $particle in $particles {
+        @if map-get($particle, 'type') == 'rect' {
+            $result: append($result, skeleton-position-rect($particle), comma);
+        }
+
+        @if map-get($particle, 'type') == 'ellipse' {
+            $result: append($result, skeleton-position-ellipse($particle), comma);
+        }
+    }
+
+    @return $result;
+}
