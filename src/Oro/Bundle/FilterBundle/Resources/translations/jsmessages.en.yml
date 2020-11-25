@@ -85,3 +85,5 @@ oro:
             close: Close
         filter_results_trigger: Filter Results
         filter_reset: Reset
+        no_found: 'No matches found'
+        clear: '{0} Clear search field|[1,Inf[ Clear filter "{{ label }}"'

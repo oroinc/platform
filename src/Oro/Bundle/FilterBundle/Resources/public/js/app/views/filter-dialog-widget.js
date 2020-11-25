@@ -79,7 +79,7 @@ define(function(require) {
          * Bind action for action in dialog-widget
          */
         _bindActionEvents: function() {
-            this.actionsEl.on('click', '[data-role="reset-filters"]', _.bind(this.onResetAll));
+            this.actionsEl.on('click', '[data-role="reset-filters"]', this.onResetAll.bind(this));
         },
 
         /**

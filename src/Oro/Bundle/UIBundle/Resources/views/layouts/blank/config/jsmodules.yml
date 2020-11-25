@@ -24,8 +24,8 @@ aliases:
     jquery.cookie$: npmassets/jquery.cookie/jquery.cookie
     jquery.form$: npmassets/jquery-form/src/jquery.form
     jquery.mousewheel$: npmassets/jquery-mousewheel/jquery.mousewheel
-    jquery.multiselect$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.min
-    jquery.multiselect.filter$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
+    jquery.multiselect$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect
+    jquery.multiselect.filter$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter
     jquery.numeric$: npmassets/jquery-numeric/jquery.numeric
     jquery.select2$: npmassets/@oroinc/select2/select2
     jquery.timepicker$: npmassets/timepicker/jquery.timepicker

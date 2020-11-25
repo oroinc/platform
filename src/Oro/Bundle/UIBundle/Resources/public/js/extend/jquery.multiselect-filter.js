@@ -13,6 +13,7 @@ define(function(require) {
         _handler: function(e) {
             if (this.cache) {
                 this._super(e);
+                this.instance.position();
             }
         },
 
