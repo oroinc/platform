@@ -3,6 +3,9 @@
 @fixture-OroUserBundle:users.yml
 
 Feature: Report export with custom batch size
+  In order to ...
+  As an ...
+  I should be able to ...
 
   Scenario: Feature Background
     Given I login as administrator
