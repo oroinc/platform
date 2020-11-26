@@ -3,6 +3,7 @@ services:
     class: Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker\FixturesChecker
     arguments:
       - '@oro_test.context.fixture_loader'
+      - '@oro_test.alice_loader'
       - '@oro_behat_extension.isolation.doctrine_isolator'
       - '@symfony2_extension.kernel'
     tags:

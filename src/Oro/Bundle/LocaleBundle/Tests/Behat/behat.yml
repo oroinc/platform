@@ -32,7 +32,6 @@ oro_behat_extension:
           - OroDataGridBundle::GridContext
           - OroFormBundle::FormContext
           - OroConfigBundle::FeatureContext
-          - OroOrderBundle::FeatureContext
           - OroQueryDesignerBundle::QueryDesignerContext
           - OroReportBundle::FeatureContext
         paths:

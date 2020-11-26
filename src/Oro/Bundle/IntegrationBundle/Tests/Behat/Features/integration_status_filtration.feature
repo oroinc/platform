@@ -3,6 +3,9 @@
 @fixture-OroIntegrationBundle:IntegrationWithStatuses.yml
 
 Feature: Integration status filtration
+  In order to ...
+  As an ...
+  I should be able to ...
 
   Scenario: Check integration status filter
     Given I login as administrator
