@@ -214,7 +214,7 @@ class FixtureLoader
 
     /**
      * @param string $filename
-     * @return string Real path to file with fuxtures
+     * @return string Real path to file with fixtures
      * @throws \InvalidArgumentException
      */
     public function findFile($filename)

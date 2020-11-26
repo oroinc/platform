@@ -1,6 +1,9 @@
 @regression
 @fixture-OroUserBundle:user.yml
 Feature: Actions applicability in grid
+  In order to ...
+  As an ...
+  I should be able to ...
 
   Scenario: Administrator should see all actions except delete for system email templates
     Given I login as administrator
