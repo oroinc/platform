@@ -82,8 +82,12 @@ class FileController extends AbstractController
     }
 
     /**
-     * @Route("media/cache/attachment/resize/{filter}/{filterMd5}/{id}/{filename}",
+     * @Route("media/cache/attachment/filter/{filter}/{filterMd5}/{id}/{filename}",
      *   name="oro_filtered_attachment",
+     *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
+     * )
+     * @Route("media/cache/attachment/resize/{filter}/{filterMd5}/{id}/{filename}",
+     *   name="_oro_filtered_attachment",
      *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
      * )
      * @param int $id
