@@ -18,7 +18,7 @@ datagrids:
                     organization: IDENTITY(a.organization) as organization
                     impersonation: IDENTITY(a.impersonation) as impersonation
                 from:
-                    - { table: OroDataAuditBundle:AbstractAudit, alias: a }
+                    - { table: Oro\Bundle\DataAuditBundle\Entity\AbstractAudit, alias: a }
             hints:
                 - HINT_FORCE_PARTIAL_LOAD
         columns:
@@ -125,7 +125,7 @@ datagrids:
                     objectClass: a.objectClass
                     loggedAt: a.loggedAt
                 from:
-                    - { table: OroDataAuditBundle:AbstractAudit, alias: a }
+                    - { table: Oro\Bundle\DataAuditBundle\Entity\AbstractAudit, alias: a }
                 where:
                     and:
                         - a.objectClass = :objectClass AND a.objectId = :objectId

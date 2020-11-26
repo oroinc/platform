@@ -207,7 +207,7 @@ define([
                 this.filters[name].setValue(filterState);
             }, this);
 
-            mediator.trigger('filters-manager:after-applying-state');
+            mediator.trigger('filters-manager:after-applying-state', this);
             this.checkFiltersVisibility();
 
             return this;

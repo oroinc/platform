@@ -1,13 +1,9 @@
 <div class="filter-select-oro-wrapper" data-select-field-template>
-    <select data-skip-input-widgets
-
-            <% if (renderMode === 'toggle-mode') { %>
-                class="select select--size-m select--full"
-            <% } else { %>
-                class="select select--size-m"
-            <% } %>
-
-            name="<%= name %>"
+    <select class="select select--size-s select--full oro-select2 oro-select2--size-s"
+        name="<%= name %>"
+        <% if (_.isMobile()) { %>
+            data-skip-input-widgets
+        <% } %>
 
         <% if (typeof(dataName) !== "undefined") { %>
             data-name="<%= dataName %>"

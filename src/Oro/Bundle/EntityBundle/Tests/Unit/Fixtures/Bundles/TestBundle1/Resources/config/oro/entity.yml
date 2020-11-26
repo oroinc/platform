@@ -33,7 +33,7 @@ oro_entity:
                 query:
                     join:
                         left:
-                            - { join: entity.addresses, alias: addresses, conditionType: 'WITH', condition: 'addresses.primary = true' }
+                            - { join: entity.addresses, alias: addresses, conditionType: WITH, condition: 'addresses.primary = true' }
 
     entity_aliases:
         Test\Entity\Product:

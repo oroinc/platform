@@ -99,7 +99,7 @@ datagrids:
                     - s.message
                     - i.type as integrationType
                 from:
-                    - { table: OroIntegrationBundle:Status, alias: s }
+                    - { table: Oro\Bundle\IntegrationBundle\Entity\Status, alias: s }
                 join:
                     left:
                         - { join: s.channel, alias: i }

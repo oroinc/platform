@@ -1,16 +1,11 @@
 <div class="choice-filter" data-choice-filter-template>
     <div class="filter-select-oro-wrapper">
-        <select name="<%= name %>" data-choice-value-select
-
+        <select name="<%= name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s" data-choice-value-select
             <% if (typeof(dataName) !== "undefined") { %>
                 data-name="<%= dataName %>"
             <% } %>
-
-            <% if (renderMode === 'toggle-mode') { %>
+            <% if (_.isMobile()) { %>
                 data-skip-input-widgets
-                class="select select--size-m select--full"
-            <% } else { %>
-                class="select select--size-m"
             <% } %>
         >
             <% _.each(choices, function (option) { %>
@@ -25,11 +20,11 @@
         </select>
     </div>
     <div class="value-field-frame">
-        <input class="input input--size-m <% if (renderMode === 'toggle-mode') { %> input--full <% } %>" type="text" name="value" value="">
+        <input class="input input--size-s input--full" type="text" name="value" value="">
         <input class="name_input" type="hidden" name="<%= name %>" id="<%= name %>" value="<%= selectedChoice %>">
         <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">
-                <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                <button type="button" class="btn btn--action btn--size-s filter-update"><%- _.__("Apply") %></button>
             </div>
         <% } %>
     </div>
