@@ -239,6 +239,6 @@ class JobTest extends \PHPUnit\Framework\TestCase
         $job->setData($data);
 
         self::assertSame($properties, $job->getProperties());
-        self::assertSame($data, $job->getData());
+        self::assertSame(array_merge($data, ['_properties' => $properties]), $job->getData());
     }
 }
