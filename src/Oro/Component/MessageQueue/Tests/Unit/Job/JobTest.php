@@ -241,4 +241,41 @@ class JobTest extends \PHPUnit\Framework\TestCase
         self::assertSame($properties, $job->getProperties());
         self::assertSame($data, $job->getData());
     }
+
+    /**
+     * @param array $data
+     * @dataProvider getFullDataDataProvider
+     */
+    public function testShouldBePossibleToGetFullData(array $data): void
+    {
+        $job = new Job();
+        $job->setData($data);
+
+        self::assertSame($data, $job->getFullData());
+    }
+
+    /**
+     * @return array
+     */
+    public function getFullDataDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'data' => [],
+            ],
+            'without properties' => [
+                'data' => [
+                    'key' => 'value',
+                ],
+            ],
+            'with properties' => [
+                'data' => [
+                    'key' => 'value',
+                    '_properties' => [
+                        'key2' => 'value2',
+                    ],
+                ],
+            ],
+        ];
+    }
 }

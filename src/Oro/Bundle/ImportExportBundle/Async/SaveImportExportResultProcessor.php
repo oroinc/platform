@@ -135,7 +135,6 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
         return $optionResolver->resolve($parameters);
     }
 
-
     /**
      * @param $ownerId
      *
