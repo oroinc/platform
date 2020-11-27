@@ -68,7 +68,7 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/security-acl": "~3.0.0",
         "symfony/acl-bundle": "1.0.*",
-        "twig/twig": "2.12.*",
+        "twig/twig": "2.14.*",
         "doctrine/orm": "2.6.4",
         "doctrine/doctrine-bundle": "1.11.*",
         "doctrine/dbal": "2.10.*",
