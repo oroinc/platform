@@ -182,7 +182,7 @@ class JobManager implements JobManagerInterface
                 'stoppedAt' => $job->getStoppedAt(),
                 'lastActiveAt' => $job->getLastActiveAt(),
                 'rootJob' => $job->getRootJob() ? $job->getRootJob()->getId() : null,
-                'data' => $job->getData(),
+                'data' => $job->getFullData(), // need to save data as is (w/o cut of the properties)
                 'jobProgress' => $job->getJobProgress(),
             ], [
                 'ownerId' => Type::STRING,
@@ -247,7 +247,7 @@ class JobManager implements JobManagerInterface
                 'stoppedAt' => $job->getStoppedAt(),
                 'lastActiveAt' => $job->getLastActiveAt(),
                 'rootJob' => $job->getRootJob() ? $job->getRootJob()->getId() : null,
-                'data' => $job->getData(),
+                'data' => $job->getFullData(), // need to save data as is (w/o cut of the properties)
                 'jobProgress' => $job->getJobProgress(),
                 'id' => $job->getId(),
             ], [
