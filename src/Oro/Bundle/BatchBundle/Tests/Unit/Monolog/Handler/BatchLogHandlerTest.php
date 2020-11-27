@@ -25,9 +25,9 @@ class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIsActive()
     {
-        $this->assertTrue($this->batchLogHandler->isActive());
-        $this->batchLogHandler->setIsActive(false);
         $this->assertFalse($this->batchLogHandler->isActive());
+        $this->batchLogHandler->setIsActive(true);
+        $this->assertTrue($this->batchLogHandler->isActive());
     }
 
     public function testWrite()
@@ -35,7 +35,6 @@ class BatchLogHandlerTest extends \PHPUnit\Framework\TestCase
         $messageText = 'batch.DEBUG: Job execution started';
         $record      = ['formatted' => $messageText];
 
-        $this->batchLogHandler->setIsActive(false);
         $this->batchLogHandler->write($record);
         $this->assertFalse(is_file($this->batchLogHandler->getFilename()));
 
