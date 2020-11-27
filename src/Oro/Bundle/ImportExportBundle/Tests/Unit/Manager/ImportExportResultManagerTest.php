@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -21,10 +22,18 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportExportResultManager */
     private $importExportResultManager;
 
+    /** @var TokenAccessorInterface */
+    private $tokenAccessor;
+
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->importExportResultManager = new ImportExportResultManager($this->managerRegistry);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+
+        $this->importExportResultManager = new ImportExportResultManager(
+            $this->managerRegistry,
+            $this->tokenAccessor
+        );
     }
 
     /**
@@ -54,6 +63,10 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
+
+        $this->tokenAccessor->expects($this->once())
+            ->method('getOrganization')
+            ->willReturn($expected['organization']);
 
         $importExportResult = $this->importExportResultManager->saveResult(
             $actual['jobId'],
@@ -91,7 +104,8 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
                     'entity' => 'Acme',
-                    'options' => []
+                    'options' => [],
+                    'organization' => $organization
                 ],
             ],
             'with owner' => [
@@ -127,7 +141,8 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
                     'type' => 'import_or_export',
                     'filename' => 'file.csv',
                     'entity' => 'Acme',
-                    'options' => ['test1' => 'test2']
+                    'options' => ['test1' => 'test2'],
+                    'organization' => $organization
                 ],
             ],
         ];
