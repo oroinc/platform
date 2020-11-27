@@ -6576,20 +6576,20 @@
         },
         {
             "name": "php-http/logger-plugin",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/logger-plugin.git",
-                "reference": "fbf0c3e72e1738fdd45d4b3ad9cf03dda4cfcb26"
+                "reference": "f53a191c14717eedadc86e6f7fdd19be7a9583c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/logger-plugin/zipball/fbf0c3e72e1738fdd45d4b3ad9cf03dda4cfcb26",
-                "reference": "fbf0c3e72e1738fdd45d4b3ad9cf03dda4cfcb26",
+                "url": "https://api.github.com/repos/php-http/logger-plugin/zipball/f53a191c14717eedadc86e6f7fdd19be7a9583c2",
+                "reference": "f53a191c14717eedadc86e6f7fdd19be7a9583c2",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1 || ^7.0",
+                "php": "^7.0 || ^8.0",
                 "php-http/client-common": "^1.9 || ^2.0",
                 "php-http/message": "^1.0",
                 "psr/log": "^1.0",
@@ -6627,7 +6627,7 @@
                 "logger",
                 "plugin"
             ],
-            "time": "2020-07-14T08:00:44+00:00"
+            "time": "2020-11-27T10:38:40+00:00"
         },
         {
             "name": "php-http/message",
@@ -16311,7 +16311,7 @@
         },
         {
             "name": "symfony/class-loader",
-            "version": "v3.4.46",
+            "version": "v3.4.47",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/class-loader.git",
