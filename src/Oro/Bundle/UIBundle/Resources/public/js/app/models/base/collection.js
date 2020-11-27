@@ -24,6 +24,10 @@ define(function(require) {
          */
         serializeExtraData: function() {
             return {};
+        },
+
+        modelId(attrs) {
+            return attrs[this.model.prototype.idAttribute || 'id'];
         }
     });
 

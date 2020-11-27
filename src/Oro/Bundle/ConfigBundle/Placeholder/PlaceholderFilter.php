@@ -32,4 +32,16 @@ class PlaceholderFilter
     {
         return (bool)$this->configManager->get($name);
     }
+
+    /**
+     * Checks whether the given configuration option is switched off for the current logged in user.
+     *
+     * @param string $name The name of a config option in "{bundle}.{setting}" format
+     *
+     * @return bool
+     */
+    public function isDisabled(string $name): bool
+    {
+        return !$this->isEnabled($name);
+    }
 }
