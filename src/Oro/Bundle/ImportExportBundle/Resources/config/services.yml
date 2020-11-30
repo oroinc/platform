@@ -144,6 +144,8 @@ services:
         class: Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager
         arguments:
             - '@doctrine'
+        calls:
+            - [setTokenAccessor, ['@oro_security.token_accessor']]
 
     oro_importexport.validator.identity_validation_loader:
         class: Oro\Bundle\ImportExportBundle\Validator\IdentityValidationLoader
