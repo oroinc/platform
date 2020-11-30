@@ -23,7 +23,6 @@
         "ext-zip": "*",
         "psr/container": "^1.0",
         "psr/simple-cache": "1.0.*",
-        "nyholm/psr7": "1.2.*",
         "symfony/asset": "4.4.13",
         "symfony/cache": "4.4.13",
         "symfony/config": "4.4.13",
@@ -69,7 +68,7 @@
         "symfony/polyfill-ctype": "~1.8",
         "symfony/security-acl": "~3.0.0",
         "symfony/acl-bundle": "1.0.*",
-        "twig/twig": "2.12.*",
+        "twig/twig": "2.14.*",
         "doctrine/orm": "2.6.4",
         "doctrine/doctrine-bundle": "1.11.*",
         "doctrine/dbal": "2.10.*",
@@ -120,7 +119,7 @@
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
         "salsify/json-streaming-parser": "8.0.1",
-        "myclabs/deep-copy": "1.9.*",
+        "myclabs/deep-copy": "1.10.*",
         "oro/redis-config": "4.2.*"
     },
     "require-dev": {

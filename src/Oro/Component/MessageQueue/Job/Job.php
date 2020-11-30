@@ -362,10 +362,7 @@ class Job
      */
     public function getData()
     {
-        $data = $this->data;
-        unset($data['_properties']);
-
-        return $data;
+        return $this->data;
     }
 
     /**

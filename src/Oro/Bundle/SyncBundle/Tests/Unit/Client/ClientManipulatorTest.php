@@ -8,7 +8,7 @@ use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\ClientNotFoundException;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
-use Nyholm\Psr7\Request;
+use GuzzleHttp\Psr7\Request;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketProviderInterface;
 use Oro\Bundle\SyncBundle\Client\ClientManipulator;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
