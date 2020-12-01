@@ -49,7 +49,7 @@ class ColorsConfigBlock extends Form
      */
     protected function setColorValues($values)
     {
-        $xpath = $this->colorsStoreElement->getXpath();
+        $xpath = str_replace('"', '\\"', $this->colorsStoreElement->getXpath());
         $encodedValues = json_encode($values);
         $script = <<<JS
 var element = document.evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; 
