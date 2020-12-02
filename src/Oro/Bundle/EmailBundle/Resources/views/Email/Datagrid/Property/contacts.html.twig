@@ -36,7 +36,7 @@
 
 {% macro renderEmailAddressCell(label, isNew, maxLength) %}
     {% if maxLength and label|length > maxLength %}
-        {% set title, label = label, label|truncate(maxLength) %}
+        {% set title, label = label, label|slice(0, maxLength)|trim(side='right') ~ '...' %}
     {% endif %}
     {%- if isNew -%}
         <strong{% if title is defined %} title="{{ title }}"{% endif %}>{{ label|oro_html_strip_tags }}</strong>
