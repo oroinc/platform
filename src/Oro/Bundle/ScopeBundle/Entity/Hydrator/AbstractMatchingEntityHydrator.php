@@ -10,6 +10,8 @@ use Doctrine\ORM\Internal\Hydration\AbstractHydrator;
  */
 abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
 {
+    public const MATCHED_SCOPE_ID = 'matchedScopeId';
+
     /**
      * @return string
      */
@@ -39,13 +41,13 @@ abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
         }
 
         usort($rows, function ($a, $b) {
-            if ($a['scalars']['matchedScopeId'] === null && $b['scalars']['matchedScopeId'] === null) {
+            if ($a['scalars'][self::MATCHED_SCOPE_ID] === null && $b['scalars'][self::MATCHED_SCOPE_ID] === null) {
                 return 0;
             }
-            if ($a['scalars']['matchedScopeId'] === null) {
+            if ($a['scalars'][self::MATCHED_SCOPE_ID] === null) {
                 return 1;
             }
-            if ($b['scalars']['matchedScopeId'] === null) {
+            if ($b['scalars'][self::MATCHED_SCOPE_ID] === null) {
                 return -1;
             }
 
@@ -54,7 +56,7 @@ abstract class AbstractMatchingEntityHydrator extends AbstractHydrator
 
         $alias = $this->getRootEntityAlias();
         foreach ($rows as $row) {
-            if ($row['scalars']['matchedScopeId'] || !$this->hasScopes($row['data'][$alias]['id'])) {
+            if ($row['scalars'][self::MATCHED_SCOPE_ID] || !$this->hasScopes($row['data'][$alias]['id'])) {
                 return [$this->_uow->createEntity($this->getEntityClass(), $row['data'][$alias], $this->_hints)];
             }
         }
