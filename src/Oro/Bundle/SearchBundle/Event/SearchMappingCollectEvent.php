@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class SearchMappingCollectEvent extends Event
 {
-    const EVENT_NAME = 'oro_search.search_mapping_collect';
-
     /** @var array */
     protected $mappingConfig;
 
