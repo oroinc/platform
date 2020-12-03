@@ -52,7 +52,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
         $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()->getMock();
-        $mapperProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache);
+        $mapperProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache, 'test', 'test');
 
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
             ->disableOriginalConstructor()->getMock();
