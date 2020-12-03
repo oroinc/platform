@@ -11,7 +11,7 @@ use Monolog\Logger;
 class BatchLogHandler extends AkeneoBatchLogHandler
 {
     /** @var bool */
-    protected $isActive = true;
+    protected $isActive = false;
 
     /**
      * {@inheritDoc}
@@ -23,7 +23,7 @@ class BatchLogHandler extends AkeneoBatchLogHandler
         $this->filePermission = null;
         $this->useLocking = false;
 
-        $this->setLevel(Logger::WARNING);
+        $this->setLevel(Logger::DEBUG);
         $this->bubble = true;
     }
 
