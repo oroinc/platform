@@ -41,10 +41,12 @@ class FileController extends AbstractController
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
         } else {
             $response->headers->set('Content-Type', 'application/force-download');
-            $response->headers->set(
-                'Content-Disposition',
-                sprintf('attachment;filename="%s"', addslashes($file->getOriginalFilename()))
-            );
+
+            $contentDisposition = 'attachment';
+            if ($file->getOriginalFilename()) {
+                $contentDisposition .= sprintf(';filename="%s"', addslashes($file->getOriginalFilename()));
+            }
+            $response->headers->set('Content-Disposition', $contentDisposition);
         }
 
         $response->headers->set('Content-Length', $file->getFileSize());

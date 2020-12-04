@@ -126,17 +126,18 @@ class FileManager extends GaufretteFileManager
      *
      * @param File $file
      *
-     * @return File
+     * @return File|null
      */
     public function cloneFileEntity(File $file)
     {
+        $symfonyFile = $this->getFileFromFileEntity($file, false);
+        if (!$symfonyFile) {
+            return null;
+        }
+
         $fileCopy = clone $file;
         $fileCopy->setFilename(null);
-
-        $symfonyFile = $this->getFileFromFileEntity($file, false);
-        if ($symfonyFile) {
-            $fileCopy->setFile($symfonyFile);
-        }
+        $fileCopy->setFile($symfonyFile);
 
         return $fileCopy;
     }
@@ -169,7 +170,7 @@ class FileManager extends GaufretteFileManager
             $entity->setMimeType(null);
             $entity->setFileSize(null);
             $entity->setExtension(null);
-            $entity->setFilename(null);
+            $entity->setFilename($entity->getUuid());
         }
 
         $file = $entity->getFile();
