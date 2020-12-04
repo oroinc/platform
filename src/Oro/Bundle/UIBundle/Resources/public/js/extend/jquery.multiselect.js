@@ -103,10 +103,29 @@ define(function(require) {
             return this.menu.find('input').not('[type=search]').not(':checked');
         },
 
+        _getMinWidth: function() {
+            const width = this.options.minWidth;
+
+            if (['auto', 'none'].includes(width)) {
+                return width;
+            }
+
+            return this._super();
+        },
+
+        _setButtonWidth: function() {
+            const width = this._getMinWidth();
+
+            if (width === 'auto') {
+                this.button.outerWidth(width);
+            } else if (width !== 'none') {
+                this._super();
+            }
+        },
+
         _setMenuHeight: function() {
             this.menu.find('.ui-multiselect-checkboxes li:hidden, .ui-multiselect-checkboxes a:hidden')
                 .addClass('hidden-item');
-            this._super();
             this.menu.find('.hidden-item').removeClass('hidden-item');
         },
 

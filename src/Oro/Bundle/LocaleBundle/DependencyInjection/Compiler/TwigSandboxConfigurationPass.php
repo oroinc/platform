@@ -13,7 +13,6 @@ class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
     const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
     const DATE_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time';
     const NAME_FORMAT_EXTENSION_SERVICE_KEY = 'oro_entity.twig.extension.entity';
-    const INTL_EXTENSION_SERVICE_KEY = 'twig.extension.intl';
     const LOCALE_ADDRESS = 'oro_locale.twig.address';
     const DATETIME_ORGANIZATION_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time_organization';
     const NUMBER_EXTENSION_SERVICE_KEY = 'oro_locale.twig.number';
@@ -53,7 +52,6 @@ class TwigSandboxConfigurationPass extends AbstractTwigSandboxConfigurationPass
             self::DATE_FORMAT_EXTENSION_SERVICE_KEY,
             self::NAME_FORMAT_EXTENSION_SERVICE_KEY,
             self::NUMBER_EXTENSION_SERVICE_KEY,
-            self::INTL_EXTENSION_SERVICE_KEY, // Register Intl twig extension required for our date format extension
             self::DATETIME_ORGANIZATION_FORMAT_EXTENSION_SERVICE_KEY
         ];
     }

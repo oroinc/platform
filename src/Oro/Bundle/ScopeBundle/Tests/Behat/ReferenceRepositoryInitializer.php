@@ -20,6 +20,5 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $repository = $doctrine->getRepository(Scope::class);
 
         $referenceRepository->set('default_scope', $repository->findOneBy([]));
-        $referenceRepository->set('first_website_scope', $repository->findOneBy(['id' => 2]));
     }
 }

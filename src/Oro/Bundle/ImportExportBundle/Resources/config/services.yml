@@ -144,6 +144,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager
         arguments:
             - '@doctrine'
+            - '@oro_security.token_accessor'
 
     oro_importexport.validator.type_validation_loader:
         class: Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader

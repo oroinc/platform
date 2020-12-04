@@ -74,6 +74,10 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
     {
         /** @var DraftableInterface $entity */
         $entity = $this->doctrineHelper->getEntity($class, $identifier);
+        if (null === $entity) {
+            return self::ACCESS_ABSTAIN;
+        }
+
         if (!DraftHelper::isDraft($entity)) {
             return self::ACCESS_ABSTAIN;
         }
@@ -81,19 +85,21 @@ class BasicPermissionsDraftVoter extends AbstractEntityVoter
         switch ($attribute) {
             case BasicPermission::EDIT:
             case BasicPermission::VIEW:
-                return $this->checkBasicPermission($entity, $attribute);
+                $result = $this->checkBasicPermission($entity, $attribute);
                 break;
             case BasicPermission::DELETE:
-                return $this->checkDeletePermission($entity, $attribute);
+                $result = $this->checkDeletePermission($entity, $attribute);
                 break;
             case self::PERMISSION_CREATE:
             case self::PERMISSION_PUBLISH:
-                return $this->checkSourcePermission($entity, $attribute);
+                $result =  $this->checkSourcePermission($entity, $attribute);
                 break;
             default:
-                return self::ACCESS_ABSTAIN;
+                $result = self::ACCESS_ABSTAIN;
                 break;
         }
+
+        return $result;
     }
 
     /**

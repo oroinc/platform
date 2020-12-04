@@ -45,12 +45,17 @@ define(function(require) {
          *
          * @property
          */
-        events: {
-            'keyup input': '_onReadCriteriaInputKey',
-            'keydown [type="text"]': '_preventEnterProcessing',
-            'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            'click .choice-value': '_onClickChoiceValue'
+        events() {
+            const changeValueTypeEvent = `change ${this.criteriaValueSelectors.type}`;
+
+            return {
+                'keyup input': '_onReadCriteriaInputKey',
+                [changeValueTypeEvent]: '_onValueChanged',
+                'keydown [type="text"]': '_preventEnterProcessing',
+                'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
+                'click .disable-filter': '_onClickDisableFilter',
+                'click .choice-value': '_onClickChoiceValue'
+            };
         },
 
         /**
@@ -109,6 +114,9 @@ define(function(require) {
             // if there's no any wrapper, means it's embedded filter
             if (this.$el.html() === '') {
                 this._renderCriteria();
+            }
+            if (this.initiallyOpened) {
+                this._showCriteria();
             }
             return this;
         },
@@ -183,7 +191,7 @@ define(function(require) {
             const type = this.$(this.criteriaValueSelectors.type).val();
             const isEmptyType = this.isEmptyType(type);
             this.$('.filter-criteria').toggleClass('empty-type', isEmptyType);
-            if (!isEmptyType) {
+            if (!isEmptyType && this.autoClose !== false) {
                 this.$(this.criteriaValueSelectors.value).focus();
             }
         },
@@ -246,16 +254,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _triggerUpdate: function(newValue, oldValue) {
-            if (
-                !tools.isEqualsLoosely(newValue, oldValue) &&
+        isUpdatable: function(newValue, oldValue) {
+            return !tools.isEqualsLoosely(newValue, oldValue) &&
                 (
                     this.isEmptyType(newValue.type) ||
                     this.isEmptyType(oldValue.type) ||
                     !this._isEmpty(newValue.value) ||
-                    (!this._isEmpty(oldValue.value) && this._isEmpty(newValue.value))
-                )
-            ) {
+                    !this._isEmpty(oldValue.value)
+                );
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _triggerUpdate: function(newValue, oldValue) {
+            if (this.isUpdatable(newValue, oldValue)) {
                 this.trigger('update');
             }
         },

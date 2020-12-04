@@ -5,6 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\HealthChecker;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\DoctrineIsolator;
+use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader as AliceLoader;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -16,6 +17,11 @@ class FixturesChecker implements HealthCheckerInterface
      * @var FixtureLoader
      */
     protected $fixtureLoader;
+
+    /**
+     * @var AliceLoader
+     */
+    protected $aliceLoader;
 
     /**
      * @var DoctrineIsolator
@@ -34,15 +40,18 @@ class FixturesChecker implements HealthCheckerInterface
 
     /**
      * @param FixtureLoader $fixtureLoader
+     * @param AliceLoader $aliceLoader
      * @param DoctrineIsolator $doctrineIsolator
      * @param KernelInterface $kernel
      */
     public function __construct(
         FixtureLoader $fixtureLoader,
+        AliceLoader $aliceLoader,
         DoctrineIsolator $doctrineIsolator,
         KernelInterface $kernel
     ) {
         $this->fixtureLoader = $fixtureLoader;
+        $this->aliceLoader = $aliceLoader;
         $this->doctrineIsolator = $doctrineIsolator;
         $this->kernel = $kernel;
     }
@@ -67,11 +76,7 @@ class FixturesChecker implements HealthCheckerInterface
         $fixtureFiles = $this->doctrineIsolator->getFixtureFiles($event->getFeature()->getTags());
         foreach ($fixtureFiles as $fixtureFile) {
             try {
-                $this->fixtureLoader->load($fixtureFile);
-            } catch (\Exception $e) {
-                $message = sprintf('Error while load "%s" fixture', $fixtureFile);
-                $this->addDetails($message, $event, $e);
-                $this->addError($message);
+                $this->aliceLoader->load((array) $this->fixtureLoader->findFile($fixtureFile));
             } catch (\Throwable $e) {
                 $message = sprintf('Error while load "%s" fixture', $fixtureFile);
                 $this->addDetails($message, $event, $e);

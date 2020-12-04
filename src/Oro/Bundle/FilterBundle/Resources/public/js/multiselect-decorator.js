@@ -1,10 +1,14 @@
-define([
-    'jquery',
-    'underscore',
-    'jquery.multiselect',
-    'jquery.multiselect.filter'
-], function($, _) {
+define(function(require, exports, module) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const filtersNoFoundTemplate = require('tpl-loader!orofilter/templates/filters-no-found.html');
+    const clearSearchTemplate = require('tpl-loader!orofilter/templates/multiselect-clear-search.html');
+
+    require('jquery.multiselect');
+    require('jquery.multiselect.filter');
 
     /**
      * Multiselect decorator class.
@@ -36,6 +40,26 @@ define([
         contextSearch: true,
 
         /**
+         * @property {Boolean}
+         */
+        displayNoFoundMessage: true,
+
+        /**
+         * @property
+         */
+        notFoundTemplate: filtersNoFoundTemplate,
+
+        /**
+         * @property
+         */
+        clearSearchTemplate: clearSearchTemplate,
+
+        /**
+         * @property {string}
+         */
+        filterLabel: '',
+
+        /**
          * Initialize all required properties
          */
         initialize: function(options) {
@@ -46,6 +70,10 @@ define([
 
             if (_.has(options, 'contextSearch')) {
                 this.contextSearch = options.contextSearch;
+            }
+
+            if (options.filterLabel) {
+                this.filterLabel = options.filterLabel;
             }
 
             options.parameters = options.parameters || {};
@@ -65,6 +93,39 @@ define([
                 this.multiselectfilter(
                     _.extend(multiselectFilterDefaults, this.multiselectFilterParameters)
                 );
+
+                if (this.displayNoFoundMessage) {
+                    const multiselect = this.multiselect('instance');
+                    const multiselectfilter = this.multiselectfilter('instance');
+                    const widget = this.getWidget();
+
+                    multiselectfilter.element.on('multiselectfilterfilter', function(e, data) {
+                        const hasVisibleRows = multiselectfilter.rows.filter(function() {
+                            return $(this).css('display') !== 'none';
+                        }).length;
+
+                        if (!hasVisibleRows) {
+                            multiselect.$notFound.removeClass('hide');
+                            widget.addClass('no-matches');
+                        }
+                    });
+                    multiselectfilter.input.on(`input${multiselect._namespaceID}`, e => {
+                        if (e.target.value.length) {
+                            widget.addClass('search-shown');
+                            if (multiselect.$clearSearch) {
+                                multiselect.$clearSearch.removeClass('hide');
+                            }
+                        } else {
+                            if (multiselect.$clearSearch) {
+                                multiselect.$clearSearch.addClass('hide');
+                            }
+                            if (multiselect.$notFound) {
+                                multiselect.$notFound.addClass('hide');
+                            }
+                            widget.removeClass('no-matches search-shown');
+                        }
+                    });
+                }
             }
         },
 
@@ -101,12 +162,48 @@ define([
          */
         _setDropdownDesign: function() {
             const widget = this.getWidget();
+
             widget.addClass('dropdown-menu');
             widget.removeClass('ui-widget-content');
             widget.removeClass('ui-widget');
+
             widget.find('.ui-widget-header').removeClass('ui-widget-header');
             widget.find('.ui-multiselect-filter').removeClass('ui-multiselect-filter');
             widget.find('ul li label').removeClass('ui-corner-all');
+
+            this.appendNoFoundTemplate();
+        },
+
+        appendNoFoundTemplate: function() {
+            if (this.contextSearch) {
+                const multiselect = this.multiselect('instance');
+                const multiselectfilter = this.multiselectfilter('instance');
+                const widget = this.getWidget();
+
+                if (!multiselect.$clearSearch) {
+                    $(multiselect.header).find('input').addClass('input-with-search');
+                    $(multiselectfilter.input).after(this.clearSearchTemplate());
+                    multiselect.$clearSearch = widget.find('[data-role="clear"]');
+                    multiselect.$clearSearch
+                        .on(`click${multiselect._namespaceID}`, e => {
+                            multiselectfilter.input.val('').trigger('input', '').trigger('focus');
+                        })
+                        .attr('aria-label', __('oro.filter.clear',
+                            {
+                                label: this.filterLabel.trim()
+                            },
+                            this.filterLabel.trim().length
+                        ));
+                }
+
+                if (!multiselect.$notFound) {
+                    $(multiselect.header).after(this.notFoundTemplate());
+                    multiselect.$notFound = widget.find('[data-role="no-data"]');
+                }
+
+                multiselect.$notFound.addClass('hide');
+                multiselect.$clearSearch.addClass('hide');
+            }
         },
 
         onBeforeOpenDropdown: function() {
@@ -182,9 +279,9 @@ define([
         },
 
         /**
-         * Get multiselect trigger
+         * Get a multiselect trigger element
          *
-         * @return {Object}
+         * @return {HTMLElement}
          */
         getWidgetTrigger: function() {
             return this.multiselect('instance').button;

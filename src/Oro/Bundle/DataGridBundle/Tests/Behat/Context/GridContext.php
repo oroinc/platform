@@ -875,6 +875,126 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
+     * Set string value in grid filter
+     * Example: When I set filter First Name as contains "Adi"
+     * Example: And set filter Name as is equal to "User"
+     *
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty))$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )set filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )set filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $value
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    //@codingStandardsIgnoreEnd
+    public function setValueInStringFilter(
+        $filterName,
+        $type,
+        $value = '',
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        $value = $this->fixStepArgument($value);
+
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
+
+        $filterItem->open();
+        $filterItem->selectType($type);
+        // does not need set value if use filter 'is empty' or 'is not empty'
+        if (!in_array($type, ['is empty', 'is not empty'])) {
+            $filterItem->setFilterValue($value);
+        }
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Set string value in grid filter and press Enter key
+     * Example: When I set filter First Name as contains "Adi" and press Enter key
+     * Example: And set filter Name as is equal to "User" and press Enter key
+     *
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>(?:|is empty|is not empty)) and press Enter key$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" and press Enter key$/
+     * @When /^(?:|I )set filter "(?P<filterName>.+)" as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" and press Enter key$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" and press Enter key$/
+     * @When /^(?:|I )set filter (?P<filterName>[\w\s]+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid and press Enter key$/
+     * @When /^(?:|I )set filter (?P<filterName>.+) as (?P<type>[\w\s\=\<\>]+) "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly) and press Enter key$/
+     *
+     * @param string $filterName
+     * @param string $type
+     * @param string $value
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    //@codingStandardsIgnoreEnd
+    public function applyStringFilterByEnterKey(
+        $filterName,
+        $type,
+        $value = '',
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        self::setValueInStringFilter($filterName, $type, $value, $filterGridName, $strictly);
+
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
+
+        $field = $filterItem->getInputField();
+        $field->keyDown(13);
+        $field->keyUp(13);
+        $this->waitForAjax();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Check input value in string grid filter
+     * Example: When I should see filter First SKU field value is equal to "123"
+     * Example: And  should see filter First Name field value is equal to ""User"
+     *
+     * @When /^(?:|I )should see filter (?P<filterName>[\w\s]+) field value is equal to "(?P<value>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )should see filter (?P<filterName>[\w\s]+) field value is equal to ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )should see filter (?P<filterName>[\w\s]+) field value is equal to "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     * @When /^(?:|I )should see filter (?P<filterName>.+) field value is equal to "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid ?(?P<strictly>strictly)$/
+     *
+     * @param string $filterName
+     * @param string $value
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertsInputValueInStringFilterEqualToExpectedValue(
+        $filterName,
+        $value = '',
+        $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        /** @var GridFilterStringItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
+
+        $filterItem->open();
+
+        $field = $filterItem->getInputField();
+
+        static::assertEquals(
+            $value,
+            $field->getValue(),
+            sprintf('The "%s" filter value is not equal to "%s"', $filterName, $value)
+        );
+    }
+    //@codingStandardsIgnoreStart
+    /**
      * Filter grid by string filter
      * Example: When I filter First Name as contains "Aadi"
      * Example: And filter Name as is equal to "User"
@@ -913,6 +1033,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         if (!in_array($type, ['is empty', 'is not empty'])) {
             $filterItem->setFilterValue($value);
         }
+
         $filterItem->submit();
     }
 

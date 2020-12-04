@@ -127,6 +127,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
+            this._onValueChanged();
+
             if (e.which !== 13) {
                 return;
             }
@@ -180,7 +182,6 @@ define(function(require, exports, module) {
         _isDOMValueChanged: function() {
             const thisDOMValue = this._readDOMValue();
             return (
-                !_.isEmpty(thisDOMValue.value) &&
                 !_.isUndefined(thisDOMValue.value) &&
                 !_.isNull(thisDOMValue.value) &&
                 !_.isEqual(this.value, thisDOMValue)
@@ -253,7 +254,9 @@ define(function(require, exports, module) {
          * @protected
          */
         _applyValueAndHideCriteria: function() {
-            this._hideCriteria();
+            if (this.autoClose !== false) {
+                this._hideCriteria();
+            }
             if (this._isValid()) {
                 this.applyValue();
             }
@@ -299,14 +302,16 @@ define(function(require, exports, module) {
          */
         _showCriteria: function() {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
-            this.trigger('showCriteria', this);
             this.$(this.criteriaSelector).css({
                 marginLeft: 'auto',
                 visibility: 'visible'
             }).removeAttr('aria-hidden');
             this._alignCriteria();
-            this._focusCriteria();
+            if (this.autoClose !== false) {
+                this._focusCriteria();
+            }
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            this.trigger('showCriteria', this);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
@@ -351,6 +356,7 @@ define(function(require, exports, module) {
                 visibility: 'hidden'
             }).attr('aria-hidden', true);
             this._setButtonPressed(this.$(this.criteriaSelector), false);
+            this.trigger('hideCriteria', this);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Provider;
 
 use Doctrine\Common\Cache\Cache;
-use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
+use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProviderAbstract;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
@@ -16,12 +16,10 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     WarmableConfigCacheInterface,
     ClearableConfigCacheInterface
 {
-    private const CACHE_KEY = 'oro_search.mapping_config';
-
     /** @var EventDispatcherInterface */
     private $dispatcher;
 
-    /** @var MappingConfigurationProvider */
+    /** @var MappingConfigurationProviderAbstract */
     private $mappingConfigProvider;
 
     /** @var Cache */
@@ -30,19 +28,31 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     /** @var array|null */
     private $configuration;
 
+    /** @var string */
+    private $cacheKey;
+
+    /** @var string */
+    private $eventName;
+
     /**
-     * @param EventDispatcherInterface     $dispatcher
-     * @param MappingConfigurationProvider $mappingConfigProvider
-     * @param Cache                        $cache
+     * @param EventDispatcherInterface             $dispatcher
+     * @param MappingConfigurationProviderAbstract $mappingConfigProvider
+     * @param Cache                                $cache
+     * @param string                               $cacheKey
+     * @param string                               $eventName
      */
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        MappingConfigurationProvider $mappingConfigProvider,
-        Cache $cache
+        MappingConfigurationProviderAbstract $mappingConfigProvider,
+        Cache $cache,
+        string $cacheKey,
+        string $eventName
     ) {
         $this->dispatcher = $dispatcher;
         $this->mappingConfigProvider = $mappingConfigProvider;
         $this->cache = $cache;
+        $this->cacheKey = $cacheKey;
+        $this->eventName = $eventName;
     }
 
     /**
@@ -68,7 +78,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     public function clearCache(): void
     {
         $this->configuration = null;
-        $this->cache->delete(self::CACHE_KEY);
+        $this->cache->delete($this->cacheKey);
     }
 
     /**
@@ -77,7 +87,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     public function warmUpCache(): void
     {
         $this->configuration = null;
-        $this->cache->delete(self::CACHE_KEY);
+        $this->cache->delete($this->cacheKey);
         $this->getMappingConfig();
     }
 
@@ -87,9 +97,9 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     private function fetchMappingConfigFromCache(): ?array
     {
         $config = null;
-        $cachedData = $this->cache->fetch(self::CACHE_KEY);
+        $cachedData = $this->cache->fetch($this->cacheKey);
         if (false !== $cachedData) {
-            list($timestamp, $value) = $cachedData;
+            [$timestamp, $value] = $cachedData;
             if ($this->mappingConfigProvider->isCacheFresh($timestamp)) {
                 $config = $value;
             }
@@ -103,7 +113,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
      */
     private function saveMappingConfigToCache(array $config): void
     {
-        $this->cache->save(self::CACHE_KEY, [$this->mappingConfigProvider->getCacheTimestamp(), $config]);
+        $this->cache->save($this->cacheKey, [$this->mappingConfigProvider->getCacheTimestamp(), $config]);
     }
 
     /**
@@ -112,7 +122,7 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
     private function loadMappingConfig(): array
     {
         $event = new SearchMappingCollectEvent($this->mappingConfigProvider->getConfiguration());
-        $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, $this->eventName);
 
         return $event->getMappingConfig();
     }

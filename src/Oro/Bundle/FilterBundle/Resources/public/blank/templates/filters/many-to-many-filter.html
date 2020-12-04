@@ -1,15 +1,11 @@
 <div class="choice-filter" data-many-to-many-filter-template>
     <div class="filter-select-oro-wrapper">
-        <select name="<%= name %>"
-
-            <% if (renderMode === 'toggle-mode') { %>
+        <select name="<%= name %>" class="select select--size-s select--full oro-select2 oro-select2--size-s"
+            <% if (_.isMobile()) { %>
                 data-skip-input-widgets
-                class="select select--size-m select--full"
-            <% } else { %>
-                class="select select--size-m"
             <% } %>
 
-                data-choice-value-select
+            data-choice-value-select
         >
             <% _.each(choices, function (option) { %>
                 <option value="<%= option.value %>"
@@ -29,7 +25,7 @@
 
         <% if (renderMode !== 'toggle-mode') { %>
             <div class="filter-action-row">
-                <button type="button" class="btn btn--action filter-update"><%- _.__("Update") %></button>
+                <button type="button" class="btn btn--action btn--size-s filter-update"><%- _.__("Apply") %></button>
             </div>
         <% } %>
     </div>

@@ -312,12 +312,6 @@ services:
         tags:
             - { name: oro_feature.config_extension }
 
-    twig.extension.text:
-        class: Twig_Extensions_Extension_Text
-        public: false
-        tags:
-           - { name: twig.extension }
-
     oro_ui.twig.extension.formatter:
         class: Oro\Bundle\UIBundle\Twig\FormatExtension
         public: false
