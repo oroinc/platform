@@ -99,7 +99,7 @@ class AttachmentProvider
                 'attachmentURL'       => $this->attachmentManager
                     ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
                 'attachmentSize'      => BytesFormatter::format($attachment->getFileSize()),
-                'attachmentFileName'  => $attachment->getOriginalFilename(),
+                'attachmentFileName'  => $attachment->getOriginalFilename() ?: $attachment->getFilename(),
                 'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
                 'attachmentThumbnail' => $thumbnail
             ];
