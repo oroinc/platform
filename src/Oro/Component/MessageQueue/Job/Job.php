@@ -360,6 +360,14 @@ class Job
     /**
      * @return array
      */
+    public function getFullData(): array
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return array
+     */
     public function getData()
     {
         $data = $this->data;

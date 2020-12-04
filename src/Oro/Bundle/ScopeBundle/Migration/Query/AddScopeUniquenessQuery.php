@@ -62,23 +62,23 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
         LoggerInterface $logger,
         bool $dryRun
     ): void {
-        $types = ['toId' => Types::INTEGER, 'fromIds' => Connection::PARAM_INT_ARRAY];
-
         $references = $this->getReferenceTables('oro_scope', $logger);
+
         foreach ($references as $reference) {
-            $qb = $this->connection->createQueryBuilder();
-            $qb->update($reference['table_name'])
-                ->set($reference['column_name'], ':toId')
-                ->where($qb->expr()->in($reference['column_name'], ':fromIds'));
-
-            foreach ($newToOldScopeIdMap as $toId => $fromIds) {
-                $params = ['toId' => $toId, 'fromIds' => $fromIds];
-
-                $this->logQuery($logger, $qb->getSQL(), $params, $types);
-                if (!$dryRun) {
-                    $qb->setParameters($params, $types)->execute();
-                }
-            }
+            $this->removeDuplicatesForUniqueRecords(
+                $reference['table_name'],
+                $reference['column_name'],
+                $newToOldScopeIdMap,
+                $logger,
+                $dryRun
+            );
+            $this->migrateDuplicateScopes(
+                $reference['table_name'],
+                $reference['column_name'],
+                $newToOldScopeIdMap,
+                $logger,
+                $dryRun
+            );
         }
     }
 
@@ -134,6 +134,133 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
         $this->logQuery($logger, $deleteSql, $params, $types);
         if (!$dryRun) {
             $this->connection->executeUpdate($deleteSql, $params, $types);
+        }
+    }
+
+    /**
+     * @param string $tableName
+     * @param string $columnName
+     * @param array $newToOldScopeIdMap
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function removeDuplicatesForUniqueRecords(
+        string $tableName,
+        string $columnName,
+        array $newToOldScopeIdMap,
+        LoggerInterface $logger,
+        bool $dryRun
+    ): void {
+        $uniqueColumnNames = $this->getUniqueColumnNames($tableName, ['id', $columnName], $logger);
+        if ($uniqueColumnNames) {
+            foreach ($newToOldScopeIdMap as $toId => $fromIds) {
+                $types = [
+                    'oldScopeId' => Connection::PARAM_INT_ARRAY,
+                    'newScopeId' => Types::INTEGER,
+                ];
+                $params = ['oldScopeId' => $fromIds, 'newScopeId' => $toId];
+
+                $deleteSql = $this->getUpdateScopeQuery($tableName, $columnName, $uniqueColumnNames);
+
+                $this->logQuery($logger, $deleteSql, $params, $types);
+                if (!$dryRun) {
+                    $this->connection->executeQuery($deleteSql, $params, $types);
+                }
+            }
+        };
+    }
+
+    /**
+     * @param string $tableName
+     * @param string $columnName
+     * @param array $uniqueColumnNames
+     * @return string
+     */
+    protected function getUpdateScopeQuery(
+        string $tableName,
+        string $columnName,
+        array $uniqueColumnNames
+    ) {
+        $deleteSql = sprintf(
+            'delete from %s where %s in (:newScopeId, :oldScopeId)',
+            $tableName,
+            $columnName
+        );
+
+        foreach ($uniqueColumnNames as $uniqueColumnName) {
+            // double nested selects is a workaround for mysql not being able to delete from a table
+            // that is used in a sub-query
+            $deleteSql .= sprintf(
+                // Process only records that have duplicates and may lead to unique constraint violation
+                'AND %2$s.%1$s in (SELECT t1.%1$s from (
+                    SELECT %2$s.%1$s FROM %2$s
+                    WHERE %3$s in (:newScopeId, :oldScopeId)
+                    GROUP BY %2$s.%1$s
+                    HAVING COUNT(%2$s.%1$s) > 1
+                ) as t1)'
+                // Skip one record among all duplicate scopes that will be used as a new and only one scope + record
+                . 'AND (%2$s.%1$s, %3$s) not in (SELECT t2.%1$s, scope_id from (
+                    SELECT %2$s.%1$s, MIN(%3$s) as scope_id FROM %2$s
+                    WHERE %3$s in (:newScopeId, :oldScopeId)
+                    GROUP BY %2$s.%1$s
+                    HAVING COUNT(%2$s.%1$s) > 1
+                ) as t2)',
+                $uniqueColumnName['column_name'],
+                $tableName,
+                $columnName
+            );
+        }
+
+        /**
+         * Example of the resulting query: for oro_cus_product_visibility table
+         *
+         * DELETE FROM oro_cus_product_visibility
+         * WHERE scope_id in (:newScopeId, :oldScopeId)
+         * AND product_id in (SELECT product_id from (
+         *     SELECT product_id FROM oro_cus_product_visibility
+         *     WHERE scope_id in (:newScopeId, :oldScopeId)
+         *     GROUP BY product_id
+         *     HAVING COUNT(product_id) > 1
+         * ) as t1)
+         * AND (product_id, scope_id) not in (SELECT product_id, scope_id from (
+         *     SELECT product_id, MIN(scope_id) as scope_id FROM oro_cus_product_visibility
+         *     WHERE scope_id in (:newScopeId, :oldScopeId)
+         *     GROUP BY product_id
+         *     HAVING COUNT(product_id) > 1
+         * ) as t2)
+         */
+
+        return $deleteSql;
+    }
+
+    /**
+     * @param string $tableName
+     * @param string $columnName
+     * @param array $newToOldScopeIdMap
+     * @param LoggerInterface $logger
+     * @param bool $dryRun
+     */
+    protected function migrateDuplicateScopes(
+        string $tableName,
+        string $columnName,
+        array $newToOldScopeIdMap,
+        LoggerInterface $logger,
+        bool $dryRun
+    ): void {
+        $types = ['toId' => Types::INTEGER, 'fromIds' => Connection::PARAM_INT_ARRAY];
+        $qb = $this->connection->createQueryBuilder();
+        $qb->update($tableName)
+            ->set($columnName, ':toId')
+            ->where($qb->expr()->in($columnName, ':fromIds'));
+
+        foreach ($newToOldScopeIdMap as $toId => $fromIds) {
+            $params = ['toId' => $toId, 'fromIds' => $fromIds];
+
+            $this->logQuery($logger, $qb->getSQL(), $params, $types);
+            if (!$dryRun) {
+                $qb->setParameters($params, $types)->execute();
+            }
         }
     }
 }

@@ -142,6 +142,8 @@ class JobManagerTest extends WebTestCase
         $job->setName('2-name');
         $job->setStatus(Job::STATUS_NEW);
         $job->setCreatedAt(new \DateTime());
+        $jobProperties = ['key' => 'value'];
+        $job->setProperties($jobProperties);
 
         $this->jobManager->saveJob($job);
 
@@ -151,18 +153,22 @@ class JobManagerTest extends WebTestCase
         $createdJob = $this->jobStorage->findJobById($job->getId());
 
         $this->assertEquals($job->getId(), $createdJob->getId());
+        $this->assertEquals($jobProperties, $createdJob->getProperties());
     }
 
     public function testSaveJobUpdate(): void
     {
         $job = $this->getReference(LoadJobData::JOB_3);
         $job->setStatus(Job::STATUS_FAILED);
+        $jobProperties = ['key' => 'value'];
+        $job->setProperties($jobProperties);
 
         $this->jobManager->saveJob($job);
 
         $updatedJob = $this->jobStorage->findJobById($job->getId());
 
         $this->assertEquals(Job::STATUS_FAILED, $updatedJob->getStatus());
+        $this->assertEquals($jobProperties, $updatedJob->getProperties());
     }
 
     public function testSaveJobWithLock(): void
