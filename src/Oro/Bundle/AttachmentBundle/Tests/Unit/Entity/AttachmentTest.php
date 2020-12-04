@@ -88,10 +88,13 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     public function testToString()
     {
         $this->assertEquals('', $this->entity->__toString());
+
         $file = new File();
         $file->setFilename('file.txt');
-        $file->setOriginalFilename('original.txt');
         $this->entity->setFile($file);
+        $this->assertEquals('file.txt', $this->entity->__toString());
+
+        $file->setOriginalFilename('original.txt');
         $this->assertEquals('file.txt (original.txt)', $this->entity->__toString());
     }
 }

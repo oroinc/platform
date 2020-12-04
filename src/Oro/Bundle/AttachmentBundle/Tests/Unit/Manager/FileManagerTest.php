@@ -11,6 +11,7 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
+use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -297,10 +298,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $clonedFileEntity = $this->fileManager->cloneFileEntity($fileEntity);
 
-        $this->assertNotSame($fileEntity, $clonedFileEntity);
-        $this->assertEquals($fileEntity->getOriginalFilename(), $clonedFileEntity->getOriginalFilename());
-        $this->assertNull($clonedFileEntity->getFilename());
-        $this->assertNull($clonedFileEntity->getFile());
+        $this->assertNull($clonedFileEntity);
     }
 
     public function testGetFileFromFileEntity(): void
@@ -364,6 +362,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $fileEntity = $this->createFileEntity();
         $fileEntity
+            ->setUuid(UUIDGenerator::v4())
+            ->setFilename('test.txt')
+            ->setOriginalFilename('test-orig.txt')
             ->setEmptyFile(true)
             ->setExtension('txt')
             ->setFileSize(100)
@@ -375,7 +376,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($fileEntity->getExtension());
         $this->assertNull($fileEntity->getMimeType());
         $this->assertNull($fileEntity->getFileSize());
-        $this->assertNull($fileEntity->getFilename());
+        $this->assertEquals($fileEntity->getUuid(), $fileEntity->getFilename());
     }
 
     public function testPreUploadForUploadedFile()
