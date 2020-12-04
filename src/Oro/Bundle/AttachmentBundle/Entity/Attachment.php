@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Attachment
+ * Attachment ORM entity.
  *
  * @ORM\Table(name="oro_attachment")
  * @ORM\Entity()
@@ -257,9 +257,16 @@ class Attachment extends ExtendAttachment
 
     public function __toString()
     {
-        return $this->getFile() && (string)$this->getFile()->getFilename()
-            ? $this->getFile()->getFilename() . ' (' . $this->getFile()->getOriginalFilename() . ')'
-            : '';
+        if ($this->getFile()) {
+            $name = $this->getFile()->getFilename();
+            if ($this->getFile()->getOriginalFilename()) {
+                $name .= ' (' . $this->getFile()->getOriginalFilename() . ')';
+            }
+
+            return $name;
+        }
+
+        return '';
     }
 
     /**

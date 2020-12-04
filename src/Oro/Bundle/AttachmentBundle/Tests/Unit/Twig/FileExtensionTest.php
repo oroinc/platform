@@ -72,6 +72,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new FileExtension($serviceLocator);
 
         $this->file = new TestFile();
+        $this->file->setFilename('test.txt');
     }
 
     public function testGetFileUrl(): void
@@ -201,18 +202,6 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($this->file);
 
         self::callTwigFunction($this->extension, 'oro_attachment_icon', [$this->file]);
-    }
-
-    public function testGetEmptyFileView(): void
-    {
-        self::assertEquals(
-            '',
-            self::callTwigFunction(
-                $this->extension,
-                'oro_file_view',
-                [$this->createMock(\Twig\Environment::class), $this->file]
-            )
-        );
     }
 
     public function testGetFileView(): void
