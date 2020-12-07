@@ -7,6 +7,10 @@
         vertical-align: $datagrid-body-cell-vertical-align;
     }
 
+    .table-sm & {
+        padding: $datagrid-body-cell-sm-offset;
+    }
+
     .table-bordered & {
         border-width: $datagrid-body-cell-border-width;
     }
