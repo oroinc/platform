@@ -11,18 +11,20 @@ use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-use Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor;
+use Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor;
 use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
@@ -30,12 +32,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldConstructWithRequiredArguments()
     {
-        new SendEmailMessageProcessor(
+        new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $this->createLoggerMock(),
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
     }
@@ -43,10 +46,10 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldBeSubscribedForTopics()
     {
         $expectedSubscribedTopics = [
-            Topics::SEND_NOTIFICATION_EMAIL,
+            Topics::SEND_MASS_NOTIFICATION_EMAIL,
         ];
 
-        self::assertEquals($expectedSubscribedTopics, SendEmailMessageProcessor::getSubscribedTopics());
+        self::assertEquals($expectedSubscribedTopics, SendMassEmailMessageProcessor::getSubscribedTopics());
     }
 
     public function testShouldRejectIfBodyEmpty()
@@ -57,12 +60,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message');
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -90,12 +94,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message');
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -122,12 +127,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message');
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -155,12 +161,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message');
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -195,12 +202,21 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with('Cannot send message');
 
-        $processor = new SendEmailMessageProcessor(
+        $dispatcher = $this->createDispatcherMock();
+        $dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) {
+                self::assertEquals(NotificationSentEvent::NAME, $eventName);
+                self::assertEquals(0, $event->getSentCount());
+            });
+
+        $processor = new SendMassEmailMessageProcessor(
             $mailer,
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $dispatcher,
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -224,22 +240,29 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldSendEmailAndReturmACKIfAllParametersCorrect()
     {
         $mailer = $this->createMailerMock();
-        $mailer
-            ->expects($this->once())
+        $mailer->expects($this->once())
             ->method('send')
             ->willReturn(1);
 
         $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
+        $logger->expects($this->never())
             ->method('critical');
 
-        $processor = new SendEmailMessageProcessor(
+        $dispatcher = $this->createDispatcherMock();
+        $dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) {
+                self::assertEquals(NotificationSentEvent::NAME, $eventName);
+                self::assertEquals(1, $event->getSentCount());
+            });
+
+        $processor = new SendMassEmailMessageProcessor(
             $mailer,
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $dispatcher,
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -292,12 +315,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->isInstanceOf(EmailTemplate::class), $this->equalTo(['body_parameter' => 'value']))
             ->willReturn(['email subject', 'email body']);
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $managerRegistry,
             $emailRenderer,
             $this->createLoggerMock(),
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -346,12 +370,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('compileMessage');
 
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $managerRegistry,
             $emailRenderer,
             $this->createLoggerMock(),
+            $this->createDispatcherMock(),
             $this->createTemplateEmailMessageSenderMock()
         );
 
@@ -374,12 +399,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenMessageIsTranslatableAndMessageSent()
     {
         $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $this->createLoggerMock(),
+            $this->createDispatcherMock(),
             $templateEmailMessageSender
         );
 
@@ -437,12 +463,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $logger = $this->createLoggerMock();
         $templateEmailMessageSender = $this->createTemplateEmailMessageSenderMock();
-        $processor = new SendEmailMessageProcessor(
+        $processor = new SendMassEmailMessageProcessor(
             $this->createMailerMock(),
             $this->createEmailProcessorMock(),
             $this->createManagerRegistryMock(),
             $this->createEmailRendererMock(),
             $logger,
+            $this->createDispatcherMock(),
             $templateEmailMessageSender
         );
 
@@ -541,5 +568,13 @@ class SendEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private function createEmailRendererMock()
     {
         return $this->createMock(EmailRenderer::class);
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
+     */
+    private function createDispatcherMock()
+    {
+        return $this->createMock(EventDispatcherInterface::class);
     }
 }
