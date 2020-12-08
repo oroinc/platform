@@ -131,6 +131,6 @@ class DigitalAssetRepository extends EntityRepository
             ->getQuery()
             ->execute(['fileId' => $fileId], AbstractQuery::HYDRATE_ARRAY);
 
-        return $result ? current($result) : [];
+        return $result ? reset($result) : [];
     }
 }
