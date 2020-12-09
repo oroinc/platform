@@ -17,7 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Extension\SandboxExtension;
 use Twig\Loader\ArrayLoader;
-use Twig\NodeVisitor\SandboxNodeVisitor;
 use Twig\Sandbox\SecurityPolicy;
 
 class EmailRendererTest extends \PHPUnit\Framework\TestCase
@@ -59,7 +58,6 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $environment->addExtension(new SandboxExtension(new SecurityPolicy()));
         $environment->addExtension(new HttpKernelExtension());
         $environment->addExtension(new HtmlTagExtension($this->container));
-        $environment->addNodeVisitor(new SandboxNodeVisitor());
 
         $this->renderer = new EmailRenderer(
             $environment,

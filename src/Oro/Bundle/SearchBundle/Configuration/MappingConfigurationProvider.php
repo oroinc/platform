@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Configuration;
 
-use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
@@ -12,7 +11,7 @@ use Oro\Component\Config\ResourcesContainerInterface;
  * The provider for search mapping configuration
  * that is loaded from "Resources/config/oro/search.yml" files.
  */
-class MappingConfigurationProvider extends PhpArrayConfigProvider
+class MappingConfigurationProvider extends MappingConfigurationProviderAbstract
 {
     private const CONFIG_FILE = 'Resources/config/oro/search.yml';
 

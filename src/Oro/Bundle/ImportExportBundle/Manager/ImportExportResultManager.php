@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Manager;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
@@ -19,11 +20,18 @@ class ImportExportResultManager
     private $registry;
 
     /**
-     * @param ManagerRegistry $manager
+     * @var TokenAccessorInterface
      */
-    public function __construct(ManagerRegistry $manager)
+    private $tokenAccessor;
+
+    /**
+     * @param ManagerRegistry $manager
+     * @param TokenAccessorInterface $tokenAccessor
+     */
+    public function __construct(ManagerRegistry $manager, TokenAccessorInterface $tokenAccessor)
     {
         $this->registry = $manager;
+        $this->tokenAccessor = $tokenAccessor;
     }
 
     /**
@@ -52,9 +60,13 @@ class ImportExportResultManager
             ->setType($type)
             ->setOptions($options);
 
+        $organization = $this->tokenAccessor->getOrganization();
+        if ($organization) {
+            $importExportResult->setOrganization($organization);
+        }
+
         if ($owner) {
             $importExportResult->setOwner($owner);
-            $importExportResult->setOrganization($owner->getOrganization());
         }
 
         /** @var EntityManager $em */

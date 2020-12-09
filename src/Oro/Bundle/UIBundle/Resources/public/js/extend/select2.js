@@ -395,6 +395,13 @@ define(function(require) {
                     top += this.container.outerHeight(false);
                 }
 
+                // Fix bug on iOS with incorrect value of getBoundingClientRect
+                // when keyboard is appeared and window inner height is smaller than viewport height
+                if (tools.isIOS()) {
+                    const correction = document.documentElement.offsetHeight - window.innerHeight;
+                    top += correction;
+                }
+
                 this.dropdown.css({position: 'fixed', top: top});
             } else if (this.dropdown.css('position') === 'fixed') {
                 this.dropdown.css('position', '');

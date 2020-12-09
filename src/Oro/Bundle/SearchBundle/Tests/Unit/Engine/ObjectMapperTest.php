@@ -199,7 +199,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $cache->expects($this->any())
             ->method('fetch')
             ->willReturn(false);
-        $this->mapperProvider = new SearchMappingProvider($this->dispatcher, $configProvider, $cache);
+        $this->mapperProvider = new SearchMappingProvider($this->dispatcher, $configProvider, $cache, 'test', 'test');
 
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())

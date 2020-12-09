@@ -175,7 +175,10 @@ define([
             if (this.subviews.pageSize) {
                 this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
             }
-            this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
+
+            if (this.$(this.selector.actionsPanel).length) {
+                this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
+            }
 
             this.$(this.selector.itemsCounter).replaceWith(this.subviews.itemsCounter.render().$el);
 
