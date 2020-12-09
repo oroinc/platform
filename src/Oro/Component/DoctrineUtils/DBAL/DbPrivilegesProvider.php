@@ -69,7 +69,12 @@ class DbPrivilegesProvider
             }
             $db = trim($db, '`');
 
-            if ($db === $dbName || $db === '*') {
+            // MySQL wildcard support for DB name
+            $dbRegExp = str_replace(['*', '%'], '.*?', $db);
+            $dbRegExp = preg_replace('/(?<!\\\)_/', '.', $dbRegExp);
+            $dbRegExp = str_replace('\_', '_', $dbRegExp);
+
+            if ($db === $dbName || $db === '*' || preg_match('/^' . $dbRegExp . '$/', $dbName)) {
                 $privileges = array_map('trim', explode(',', $grants[1][0]));
                 $grantedPrivileges[] = $privileges;
             }
