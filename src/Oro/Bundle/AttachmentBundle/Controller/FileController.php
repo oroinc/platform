@@ -12,7 +12,6 @@ use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -34,9 +33,10 @@ class FileController extends AbstractController
     public function getFileAction(int $id, string $filename, string $action): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->unlockSession();
 
         $response = new Response();
-        $response->headers->set('Cache-Control', 'public');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         if ($action === FileUrlProviderInterface::FILE_ACTION_GET) {
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
@@ -70,9 +70,8 @@ class FileController extends AbstractController
      */
     public function getResizedAttachmentImageAction($id, $width, $height, $filename)
     {
-        $this->unlockSession();
-
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->unlockSession();
 
         /** @var ImageResizeManagerInterface $resizeManager */
         $resizeManager = $this->get(ImageResizeManager::class);
@@ -101,9 +100,8 @@ class FileController extends AbstractController
      */
     public function getFilteredImageAction($id, $filter, $filename)
     {
-        $this->unlockSession();
-
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->unlockSession();
 
         /** @var ImageResizeManagerInterface $resizeManager */
         $resizeManager = $this->get(ImageResizeManager::class);
@@ -120,8 +118,6 @@ class FileController extends AbstractController
      * @param string $fileName
      *
      * @return File
-     *
-     * @throws NotFoundHttpException
      */
     protected function getFileByIdAndFileName($id, $fileName)
     {
@@ -144,7 +140,7 @@ class FileController extends AbstractController
         return $file;
     }
 
-    private function unlockSession()
+    private function unlockSession(): void
     {
         $session = $this->getSession();
         if (null !== $session && $session->isStarted()) {
