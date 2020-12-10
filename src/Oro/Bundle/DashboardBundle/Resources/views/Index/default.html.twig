@@ -78,7 +78,8 @@
                             }) }}>
                                 {% for dashboardModel in dashboards %}
                                     <option value="{{ dashboardModel.id }}"{% if dashboardModel.id == dashboard.id %} selected="selected"{% endif %}>
-                                        {{ dashboardModel.getLabel()|trans|truncate(50) }}
+                                        {% set translatedLabel = dashboardModel.getLabel()|trans %}
+                                        {{ translatedLabel|length <= 50 ? translatedLabel : translatedLabel|slice(0, 50)|trim(side='right') ~ '...' }}
                                     </option>
                                 {% endfor %}
                             </select>

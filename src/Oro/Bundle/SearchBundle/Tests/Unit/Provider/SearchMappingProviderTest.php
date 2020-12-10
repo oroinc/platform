@@ -181,8 +181,8 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, SearchMappingCollectEvent $event) {
-                $this->assertEquals(SearchMappingCollectEvent::EVENT_NAME, $eventName);
+            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
+                $this->assertEquals('oro_search.search_mapping_collect', $eventName);
                 $this->assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
@@ -217,8 +217,8 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, SearchMappingCollectEvent $event) {
-                $this->assertEquals(SearchMappingCollectEvent::EVENT_NAME, $eventName);
+            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
+                $this->assertEquals('oro_search.search_mapping_collect', $eventName);
                 $this->assertEquals($this->testMapping, $event->getMappingConfig());
 
                 $event->setMappingConfig([]);
@@ -269,7 +269,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->method('fetch')->willReturn(false);
         $this->eventDispatcher->expects(static::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, SearchMappingCollectEvent $event) {
+            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
                 $event->setMappingConfig($this->testMapping);
             });
         $this->configProvider->expects(static::never())->method('clearCache');
@@ -287,15 +287,15 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(static::once())
             ->method('dispatch')
             ->with(
-                SearchMappingCollectEvent::EVENT_NAME,
                 static::logicalAnd(
                     static::isInstanceOf(SearchMappingCollectEvent::class),
                     static::callback(function (SearchMappingCollectEvent $event) {
                         return static::equalTo($this->testMapping)->evaluate($event->getMappingConfig());
                     })
-                )
+                ),
+                'oro_search.search_mapping_collect'
             )
-            ->willReturnCallback(function ($eventName, SearchMappingCollectEvent $event) {
+            ->willReturnCallback(function (SearchMappingCollectEvent $event, $eventName) {
                 $event->setMappingConfig($this->testMapping);
             });
 
@@ -315,7 +315,9 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
         $provider = new SearchMappingProvider(
             $this->eventDispatcher,
             $this->configProvider,
-            $this->cache
+            $this->cache,
+            'oro_search.mapping_config',
+            'oro_search.search_mapping_collect'
         );
         if ($mockFetch) {
             $this->configProvider->expects($this->once())

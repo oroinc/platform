@@ -3,6 +3,7 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL;
 
 use Oro\Component\DoctrineUtils\DBAL\DbPrivilegesProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -91,29 +92,55 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetMySqlGrantedPrivileges()
     {
         $dbName = 'test';
-        $pdo = $this->createMock(\PDO::class);
+        $pdo = $this->createPDOMockWithMySQLGrants([
+            'GRANT USAGE ON *.* TO `jeffrey`@`localhost`',
+            'GRANT SELECT, INSERT, UPDATE, TRIGGER ON `db1`.* TO `jeffrey`@`localhost`',
+            'GRANT SELECT, INSERT, TRIGGER ON `test`.* TO `jeffrey`@`localhost`',
+            "GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION",
+            'GRANT `r1`@`%`,`r2`@`%` TO `u1`@`localhost`',
+            "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION"
+        ]);
 
+        $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdo, $dbName);
+        \sort($privileges);
+
+        static::assertEquals(['ALL PRIVILEGES', 'INSERT', 'SELECT', 'TRIGGER', 'USAGE'], $privileges);
+    }
+
+    public function testGetMySqlGrantedPrivilegesWithWildcards()
+    {
+        $dbName = 'test_something';
+
+        // DB name with escaped _ and non-escaped _ and % wildcards
+        $pdoEscapedNonEscaped = $this->createPDOMockWithMySQLGrants([
+            'GRANT USAGE ON *.* TO `someuser`@`localhost`',
+            'GRANT ALL PRIVILEGES ON `test\_s_me%`.* TO `someuser`@`localhost`'
+        ]);
+
+        $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdoEscapedNonEscaped, $dbName);
+        \sort($privileges);
+
+        static::assertEquals(['ALL PRIVILEGES', 'USAGE'], $privileges);
+    }
+
+    /**
+     * @param string[] $grants
+     * @return MockObject|\PDO
+     */
+    private function createPDOMockWithMySQLGrants(array $grants = []): MockObject
+    {
+        $pdo = $this->createMock(\PDO::class);
         $stmt = $this->createMock(\PDOStatement::class);
-        $stmt->expects($this->once())
+        $stmt->expects(static::once())
             ->method('fetchAll')
             ->with(\PDO::FETCH_COLUMN)
-            ->willReturn([
-                'GRANT USAGE ON *.* TO `jeffrey`@`localhost`',
-                'GRANT SELECT, INSERT, UPDATE, TRIGGER ON `db1`.* TO `jeffrey`@`localhost`',
-                'GRANT SELECT, INSERT, TRIGGER ON `test`.* TO `jeffrey`@`localhost`',
-                "GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION",
-                'GRANT `r1`@`%`,`r2`@`%` TO `u1`@`localhost`',
-                "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION"
-            ]);
+            ->willReturn($grants);
 
-        $pdo->expects($this->once())
+        $pdo->expects(static::once())
             ->method('query')
             ->with('SHOW GRANTS')
             ->willReturn($stmt);
 
-        $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdo, $dbName);
-        sort($privileges);
-
-        $this->assertEquals(['ALL PRIVILEGES', 'INSERT', 'SELECT', 'TRIGGER', 'USAGE'], $privileges);
+        return $pdo;
     }
 }

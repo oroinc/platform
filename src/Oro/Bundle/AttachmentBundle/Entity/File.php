@@ -76,33 +76,33 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * @var string
      *
-     * @ORM\Column(name="filename", type="string", length=255, nullable=true)
+     * @ORM\Column(name="filename", type="string", length=255, nullable=false)
      */
     protected $filename;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="extension", type="string", length=10, nullable=true)
      */
     protected $extension;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="mime_type", type="string", length=100, nullable=true)
      */
     protected $mimeType;
 
     /**
-     * @var string
+     * @var string|null
      *
      * @ORM\Column(name="original_filename", type="string", length=255, nullable=true)
      */
     protected $originalFilename;
 
     /**
-     * @var integer
+     * @var integer|null
      *
      * @ORM\Column(name="file_size", type="integer", nullable=true)
      */
@@ -233,7 +233,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * Set originalFilename
      *
-     * @param string $originalFilename
+     * @param string|null $originalFilename
      * @return File
      */
     public function setOriginalFilename($originalFilename)
@@ -246,7 +246,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
     /**
      * Get originalFilename
      *
-     * @return string
+     * @return string|null
      */
     public function getOriginalFilename()
     {
@@ -421,12 +421,12 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
      */
     public function __toString()
     {
-        $fileName = (string)$this->getFilename();
-        if (!$fileName) {
-            return '';
+        $name = (string)$this->getFilename();
+        if ($this->getOriginalFilename()) {
+            $name .= ' (' . $this->getOriginalFilename() . ')';
         }
 
-        return $fileName . ' (' . $this->getOriginalFilename() . ')';
+        return $name;
     }
 
     /**

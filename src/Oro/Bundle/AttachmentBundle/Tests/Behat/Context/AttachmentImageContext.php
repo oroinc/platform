@@ -205,46 +205,42 @@ JS;
     /**
      * Example: I remember filename of the file "product1"
      *
-     * @Given /^I remember filename of the file "(?P<name>[^"]*)"$/
+     * @Given /^I remember filename of the file "(?P<name>(?:[^"]|\\")*)"$/
      * @param string $name
      */
     public function iRememberFilenameOfFile(string $name): void
     {
-        $link = $this->getSession()
-            ->getPage()
-            ->find(
-                'xpath',
-                sprintf('//a[contains(@data-filename, "%s")]', $name)
-            );
+        $name = $this->fixStepArgument($name);
 
-        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
+        $this->rememberedFilenames[$name] = $this->getFileFilename($name);
+    }
 
-        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+    /**
+     * Example: Then filename of the file "product1" is as remembered
+     *
+     * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is as remembered$/
+     * @param string $name
+     */
+    public function filenameOfFileIsAsRemembered(string $name): void
+    {
+        $name = $this->fixStepArgument($name);
 
-        $this->rememberedFilenames[$name] = $matches['filename'];
+        $this->assertArrayHasKey($name, $this->rememberedFilenames);
+        $this->assertEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
      * Example: Then filename of the file "product1" is not as remembered
      *
-     * @Then /^filename of the file "(?P<name>[^"]*)" is not as remembered$/
+     * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is not as remembered$/
      * @param string $name
      */
     public function filenameOfFileIsNotAsRemembered(string $name): void
     {
-        $link = $this->getSession()
-            ->getPage()
-            ->find(
-                'xpath',
-                sprintf('//a[contains(@data-filename, "%s")]', $name)
-            );
-
-        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
-
-        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+        $name = $this->fixStepArgument($name);
 
         $this->assertArrayHasKey($name, $this->rememberedFilenames);
-        $this->assertNotEquals($this->rememberedFilenames[$name], $matches['filename']);
+        $this->assertNotEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
@@ -317,6 +313,31 @@ JS;
             $matches
         );
         self::assertNotEmpty($matches['filename'], sprintf('Filename not found for image %s', $imageName));
+
+        return $matches['filename'];
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function getFileFilename(string $name): string
+    {
+        if ($this->hasElement($name)) {
+            $link = $this->createElement($name);
+        } else {
+            $link = $this->getSession()
+                ->getPage()
+                ->find(
+                    'xpath',
+                    sprintf('//a[contains(@data-filename, "%s")]', $name)
+                );
+
+            self::assertNotNull($link, sprintf('File with name "%s" was not found', $name));
+        }
+
+        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+        self::assertNotEmpty($matches['filename'], sprintf('Filename not found for file %s', $name));
 
         return $matches['filename'];
     }
