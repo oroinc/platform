@@ -193,6 +193,12 @@ define(function(require) {
          * @protected
          */
         _isRefreshNeeded: function(previousState) {
+            const {refresh} = this.grid.collection.state.parameters || {};
+
+            if (refresh) {
+                return false;
+            }
+
             return _.filter(this._createState(), function(columnState, columnName) {
                 return columnState.renderable && !previousState.columns[columnName].renderable;
             }).length > 0;
@@ -203,8 +209,9 @@ define(function(require) {
          */
         _refreshCollection: function() {
             this.grid.setAdditionalParameter('refresh', true);
-            this.grid.collection.fetch({reset: true});
-            this.grid.removeAdditionalParameter('refresh');
+            this.grid.collection.fetch({reset: true}).then(() => {
+                this.grid.removeAdditionalParameter('refresh');
+            });
         }
     });
 

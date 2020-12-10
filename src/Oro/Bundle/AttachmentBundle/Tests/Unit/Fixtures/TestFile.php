@@ -8,9 +8,12 @@ class TestFile extends File
 {
     /**
      * @param int $id
+     * @return self
      */
-    public function setId($id)
+    public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
     }
 }

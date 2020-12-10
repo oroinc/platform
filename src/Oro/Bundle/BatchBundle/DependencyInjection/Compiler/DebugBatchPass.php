@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\BatchBundle\DependencyInjection\Compiler;
 
-use Monolog\Logger;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -21,9 +20,7 @@ class DebugBatchPass implements CompilerPassInterface
     {
         if ($container->hasDefinition(self::BATCH_LOG_HANDLER)) {
             $isDebugBatchEnabled = $container->getParameter(self::LOG_BATCH_PARAMETER);
-            $container
-                ->getDefinition(self::BATCH_LOG_HANDLER)
-                ->addMethodCall('setLevel', [$isDebugBatchEnabled ? Logger::DEBUG : Logger::WARNING]);
+            $container->getDefinition(self::BATCH_LOG_HANDLER)->addMethodCall('setIsActive', [$isDebugBatchEnabled]);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Psr\Log\LoggerInterface;
@@ -163,5 +164,81 @@ abstract class AbstractTableInformationQuery extends ParametrizedMigrationQuery
                 WHERE 
                     rc.REFERENCED_TABLE_NAME = :table_name 
                     AND rc.CONSTRAINT_SCHEMA = :db_name';
+    }
+
+    /**
+     * @param string $tableName
+     * @param array|string[] $ignoredFields
+     * @param LoggerInterface|null $logger
+     * @return array|string[]
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    protected function getUniqueColumnNames(
+        string $tableName,
+        array $ignoredFields = ['id'],
+        ?LoggerInterface $logger = null
+    ): array {
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
+            $sql = $this->getPgSqlUniqueColumnNamesQuery();
+            $params = [
+                'namespace' => 'public',
+                'table_name' => $tableName,
+                'ignored_fields' => $ignoredFields,
+            ];
+            $types = [
+                'namespace' => Types::STRING,
+                'table_name' => Types::STRING,
+                'ignored_fields' => Connection::PARAM_STR_ARRAY
+            ];
+        } else {
+            $sql = $this->getMySqlUniqueColumnNamesQuery();
+            $params = [
+                'db_name' => $this->connection->getDatabase(),
+                'table_name' => $tableName,
+                'ignored_fields' => $ignoredFields,
+            ];
+            $types = [
+                'db_name' => Types::STRING,
+                'table_name' => Types::STRING,
+                'ignored_fields' => Connection::PARAM_STR_ARRAY
+            ];
+        }
+
+        if ($logger) {
+            $this->logQuery($logger, $sql, $params, $types);
+        }
+
+        return $this->connection->fetchAll($sql, $params, $types);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPgSqlUniqueColumnNamesQuery(): string
+    {
+        return 'SELECT DISTINCT attr.attname as column_name
+                FROM pg_index pgi
+                JOIN pg_class idx on idx.oid = pgi.indexrelid
+                JOIN pg_namespace insp on insp.oid = idx.relnamespace
+                JOIN pg_class tbl on tbl.oid = pgi.indrelid
+                JOIN pg_namespace tnsp on tnsp.oid = tbl.relnamespace
+                JOIN pg_attribute attr on attr.attrelid = tbl.oid and attr.attnum = any(pgi.indkey)
+                WHERE pgi.indisunique
+                    AND tnsp.nspname = :namespace
+                    AND tbl.relname = :table_name
+                    AND attr.attname NOT IN (:ignored_fields)';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getMySqlUniqueColumnNamesQuery(): string
+    {
+        return 'SELECT DISTINCT COLUMN_NAME as column_name
+                FROM information_schema.STATISTICS
+                WHERE TABLE_SCHEMA = :db_name
+                    AND TABLE_NAME = :table_name
+                    AND NON_UNIQUE = 0
+                    AND COLUMN_NAME not in (:ignored_fields)';
     }
 }
