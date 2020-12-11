@@ -818,3 +818,10 @@ services:
         class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
         decorates: twig.exception_listener
         parent: twig.exception_listener
+
+    oro_security.action.generate_uuid:
+        class: 'Oro\Bundle\SecurityBundle\Action\GenerateUuidAction'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: generate_uuid }
