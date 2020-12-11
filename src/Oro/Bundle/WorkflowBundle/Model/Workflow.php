@@ -250,7 +250,7 @@ class Workflow
      * @return bool
      * @throws InvalidTransitionException
      */
-    protected function checkTransitionValid(Transition $transition, WorkflowItem $workflowItem, $fireExceptions)
+    public function checkTransitionValid(Transition $transition, WorkflowItem $workflowItem, $fireExceptions)
     {
         // get current step
         $currentStep = null;
@@ -295,6 +295,7 @@ class Workflow
      *
      * @throws ForbiddenTransitionException
      * @throws InvalidTransitionException
+     * @throws WorkflowException
      */
     public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
@@ -304,6 +305,29 @@ class Workflow
 
         $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
         $transition->transit($workflowItem, $errors);
+        $workflowItem->addTransitionRecord($transitionRecord);
+
+        $this->aclManager->updateAclIdentities($workflowItem);
+        $this->restrictionManager->updateEntityRestrictions($workflowItem);
+    }
+
+    /**
+     * Transits a workflow item without checking for preconditions and conditions.
+     *
+     * @param WorkflowItem $workflowItem
+     * @param string|Transition $transition
+     *
+     * @throws InvalidTransitionException
+     * @throws WorkflowException
+     */
+    public function transitUnconditionally(WorkflowItem $workflowItem, $transition)
+    {
+        $transition = $this->transitionManager->extractTransition($transition);
+
+        $this->checkTransitionValid($transition, $workflowItem, true);
+
+        $transitionRecord = $this->createTransitionRecord($workflowItem, $transition);
+        $transition->transitUnconditionally($workflowItem);
         $workflowItem->addTransitionRecord($transitionRecord);
 
         $this->aclManager->updateAclIdentities($workflowItem);
