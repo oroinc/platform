@@ -335,7 +335,9 @@ services:
     oro_entity.entity_alias_loader:
         class: Oro\Bundle\EntityBundle\Provider\EntityAliasLoader
         public: false
-        lazy: true
+        arguments:
+            - !tagged_iterator oro_entity.class_provider
+            - !tagged_iterator oro_entity.alias_provider
 
     oro_entity.entity_alias_duplicate_resolver:
         class: Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver
