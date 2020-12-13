@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -15,31 +16,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Load workflow definitions from configuration files to the database
+ * Loads workflow definitions to the database.
  */
 class LoadWorkflowDefinitionsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:workflow:definitions:load';
 
-    /** @var WorkflowConfigurationProvider */
-    private $configurationProvider;
+    private WorkflowConfigurationProvider $configurationProvider;
+    private WorkflowDefinitionHandler $definitionHandler;
+    private WorkflowDefinitionConfigurationBuilder $configurationBuilder;
+    private ManagerRegistry $registry;
 
-    /** @var WorkflowDefinitionHandler */
-    private $definitionHandler;
-
-    /** @var WorkflowDefinitionConfigurationBuilder */
-    private $configurationBuilder;
-
-    /** @var ManagerRegistry */
-    private $registry;
-
-    /**
-     * @param WorkflowConfigurationProvider $configurationProvider
-     * @param WorkflowDefinitionHandler $definitionHandler
-     * @param WorkflowDefinitionConfigurationBuilder $configurationBuilder
-     * @param ManagerRegistry $registry
-     */
     public function __construct(
         WorkflowConfigurationProvider $configurationProvider,
         WorkflowDefinitionHandler $definitionHandler,
@@ -54,30 +42,47 @@ class LoadWorkflowDefinitionsCommand extends Command
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Load workflow definitions from configuration files to the database')
             ->addOption(
                 'directories',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Directories used to find configuration files'
+                'Directories with workflow configurations'
             )
             ->addOption(
                 'workflows',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Names of the workflow definitions that should be loaded'
-            );
+                'Workflow names'
+            )
+            ->setDescription('Loads workflow definitions to the database.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command loads workflow definitions
+from configuration files to the database.
+
+  <info>php %command.full_name%</info>
+
+The <info>--directories</info> option can be used to specify custom location(s)
+of the workflow configuration files:
+
+  <info>php %command.full_name% --directories=<path1> --directories=<path2></info>
+
+The <info>--workflows</info> option can be used to load only the specified workflows:
+
+  <info>php %command.full_name% --workflows=<workflow1> --workflows=<workflow2></info>
+
+HELP
+            )
+            ->addUsage('--directories=<path1> --directories=<path2>')
+            ->addUsage('--workflows=<workflow1> --workflows=<workflow2>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $usedDirectories = $input->getOption('directories') ?: null;

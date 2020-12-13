@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -12,27 +13,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Updates extended entities configuration during a database structure migration process.
+ * Updates extended entities configuration during the DB structure migration.
  */
 class MigrationUpdateConfigCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:entity-extend:migration:update-config';
 
-    /** var ExtendOptionsParser **/
-    private $extendOptionsParser;
+    private ExtendOptionsParser $extendOptionsParser;
+    private ExtendConfigProcessor $extendConfigProcessor;
 
-    /** var ExtendConfigProcessor **/
-    private $extendConfigProcessor;
+    private string $optionsPath;
 
-    /** @var string */
-    private $optionsPath;
-
-    /**
-     * @param ExtendOptionsParser $extendOptionsParser
-     * @param ExtendConfigProcessor $extendConfigProcessor
-     * @param string $optionsPath
-     */
     public function __construct(
         ExtendOptionsParser $extendOptionsParser,
         ExtendConfigProcessor $extendConfigProcessor,
@@ -45,27 +37,38 @@ class MigrationUpdateConfigCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Updates extended entities configuration during a database structure migration process.'
-                . ' This is an internal command. Please do not run it manually.'
-            )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Outputs modifications without apply them'
-            );
+                'Output modifications without applying them'
+            )
+            ->setHidden(true)
+            ->setDescription('Updates extended entities configuration during the DB structure migration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates extended entities configuration
+during the database structure migration process.
+
+  <info>php %command.full_name%</info>
+
+<error>This is an internal command. Please do not run it manually.</error>
+
+The <info>--dry-run</info> option outputs modifications without actually applying them.
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
+            )
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Update extended entities configuration');

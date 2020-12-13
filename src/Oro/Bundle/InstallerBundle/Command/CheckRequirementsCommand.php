@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
@@ -8,18 +9,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The command that checks whether the application meets system requirements.
+ * Checks that the environment meets the application requirements.
  */
 class CheckRequirementsCommand extends Command
 {
     protected static $defaultName = 'oro:check-requirements';
 
-    /** @var string */
-    private $projectDir;
+    private string $projectDir;
 
-    /**
-     * @param string $projectDir
-     */
     public function __construct(string $projectDir)
     {
         $this->projectDir = $projectDir;
@@ -27,32 +24,32 @@ class CheckRequirementsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Checks that the application meets the system requirements.')
+            ->setDescription('Checks that the environment meets the application requirements.')
             ->setHelp(
-                <<<EOT
-The <info>%command.name%</info> command checks that the application meets the system requirements.
+                <<<'HELP'
+The <info>%command.name%</info> command checks that the environment meets the application requirements.
 
-By default this command shows only errors, but you can specify the verbosity level to see warnings
-and information messages, e.g.:
+  <info>php %command.full_name%</info>
+
+By default this command shows only errors, but you can increase the verbosity
+to see warnings and informational messages as well:
 
   <info>php %command.full_name% -v</info>
-or
   <info>php %command.full_name% -vv</info>
 
-The process exit code will be 0 if all requirements are met and 1 if at least one requirement is not fulfilled.
-EOT
-            );
+The command will return 0 on exit if all application requirements are met
+and it will return 1 if some of the requirements are not fulfilled.
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Check system requirements');
@@ -101,7 +98,7 @@ EOT
      * @param string          $header
      * @param OutputInterface $output
      */
-    protected function renderTable(array $requirements, $header, OutputInterface $output)
+    protected function renderTable(array $requirements, string $header, OutputInterface $output): void
     {
         $rows = [];
         $verbosity = $output->getVerbosity();

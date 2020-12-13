@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ConfigBundle\Command;
 
@@ -9,19 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Update config parameter in global scope
+ * Updates a configuration value in the global scope.
  */
 class ConfigUpdateCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:config:update';
 
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -29,19 +26,33 @@ class ConfigUpdateCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Update config parameter in global scope')
             ->addArgument('name', InputArgument::REQUIRED, 'Config parameter name')
-            ->addArgument('value', InputArgument::REQUIRED, 'Config parameter value');
+            ->addArgument('value', InputArgument::REQUIRED, 'Config parameter value')
+            ->setDescription('Updates a configuration value in the global scope.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates a configuration value in the global scope.
+
+  <info>php %command.full_name% <name> <value></info>
+
+For example, to update the back-office and storefront URLs of an OroCommerce instance respectively:
+
+  <info>php %command.full_name% oro_ui.application_url 'http://admin.example.com'</info>
+  <info>php %command.full_name% oro_website.url 'http://store.example.com'</info>
+  <info>php %command.full_name% oro_website.secure_url 'https://store.example.com'</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

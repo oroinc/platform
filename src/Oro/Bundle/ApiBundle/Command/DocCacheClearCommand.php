@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to clear API documentation cache (ApiDoc cache).
+ * Clears the API documentation cache.
  */
 class DocCacheClearCommand extends Command
 {
@@ -19,14 +20,12 @@ class DocCacheClearCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:api:doc:cache:clear';
 
-    /** @var CacheManager */
-    private $cacheManager;
+    private CacheManager $cacheManager;
 
     /** @var string[] */
-    private $allApiDocViews;
+    private array $allApiDocViews;
 
-    /** @var string */
-    private $environment;
+    private string $environment;
 
     /**
      * @param CacheManager $cacheManager
@@ -45,44 +44,46 @@ class DocCacheClearCommand extends Command
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEnabled()
     {
         return $this->cacheManager->isApiDocCacheEnabled() && parent::isEnabled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Clears API documentation cache.')
             ->addOption(
                 'view',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'A view for which API documentation cache should be cleared.',
+                'View name',
                 [self::ALL_VIEWS]
             )
             ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
+            ->setDescription('Clears the API documentation cache.')
             ->setHelp(
-                <<<EOF
-The <info>%command.name%</info> command clears API documentation cache for a given view:
+                <<<'HELP'
+The <info>%command.name%</info> command clears the API documentation cache for all views.
 
   <info>php %command.full_name%</info>
+
+The <info>--view</info> option can be used to clear the cache only for a specific view:
+
   <info>php %command.full_name% --view=rest_json_api</info>
 
-If <info>--view</info> option is not provided this command clears cache for all views.
-EOF
-            );
+The <info>--no-warmup</info> option can be used to skip warming up the cache after cleaning:
+
+  <info>php %command.full_name% --no-warmup</info>
+
+HELP
+            )
+            ->addUsage('--view=rest_json_api')
+            ->addUsage('--no-warmup')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);

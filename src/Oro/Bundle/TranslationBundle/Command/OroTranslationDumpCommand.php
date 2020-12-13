@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
@@ -11,19 +12,15 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Dumps oro js-translations
+ * Dumps translations for use in JavaScript.
  */
 class OroTranslationDumpCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:translation:dump';
 
-    /** @var JsTranslationDumper */
-    private $dumper;
+    private JsTranslationDumper $dumper;
 
-    /**
-     * @param JsTranslationDumper $dumper
-     */
     public function __construct(JsTranslationDumper $dumper)
     {
         $this->dumper = $dumper;
@@ -31,30 +28,31 @@ class OroTranslationDumpCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Dumps oro js-translations')
-            ->addArgument(
-                'locale',
-                InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-                'List of locales, whose translations should to be dumped'
+            ->addArgument('locale', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, 'Locales')
+            ->addOption('debug', null, InputOption::VALUE_OPTIONAL, '[Obsolete option, do not use]', false)
+            ->setDescription('Dumps translations for use in JavaScript.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the translations used by JavaScript code
+into the predefined public resource files.
+
+  <info>php %command.full_name%</info>
+
+The <info>--locale</info> option can be used to dump translations only for the specified locales:
+
+  <info>php %command.full_name% --locale=<locale1> --locale=<locale2> --locale=<localeN></info>
+
+HELP
             )
-            ->addOption(
-                'debug',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Flag to dump js-translation resources with debug mode',
-                false
-            );
+            ->addUsage('--locale=<locale1> --locale=<locale2> --locale=<localeN>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $locales = $input->getArgument('locale');

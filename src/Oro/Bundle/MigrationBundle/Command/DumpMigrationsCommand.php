@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
@@ -13,64 +14,25 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Dump existing database structure.
+ * Displays database schema as code.
  */
 class DumpMigrationsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:migration:dump';
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
+    private ManagerRegistry $registry;
+    private SchemaDumper $schemaDumper;
+    private ConfigManager $configManager;
 
-    /**
-     * @var SchemaDumper
-     */
-    private $schemaDumper;
+    private array $bundles;
+    protected array $allowedTables = [];
+    protected array $extendedFieldOptions = [];
 
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
+    protected ?string $namespace = null;
+    protected ?string $className = null;
+    protected string $version;
 
-    /**
-     * @var array
-     */
-    private $bundles;
-
-    /**
-     * @var array
-     */
-    protected $allowedTables = [];
-
-    /**
-     * @var array
-     */
-    protected $extendedFieldOptions = [];
-
-    /**
-     * @var string
-     */
-    protected $namespace;
-
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var string
-     */
-    protected $version;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param SchemaDumper $schemaDumper
-     * @param ConfigManager $configManager
-     * @param array $bundles
-     */
     public function __construct(
         ManagerRegistry $registry,
         SchemaDumper $schemaDumper,
@@ -85,31 +47,44 @@ class DumpMigrationsCommand extends Command
         $this->bundles = $bundles;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Out schema as plain sql queries')
-            ->addOption(
-                'bundle',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Bundle name for which migration wll be generated'
+        $this
+            ->addOption('plain-sql', null, InputOption::VALUE_NONE, 'Output schema as plain SQL queries')
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Bundle to generate migration for')
+            ->addOption('migration-version', null, InputOption::VALUE_OPTIONAL, 'Migration version', 'v1_0')
+            ->setDescription('Displays database schema as code.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays the database schema as PHP code
+that can be used to create a migration script.
+
+  <info>php %command.full_name%</info>
+
+The <info>--plain-sql</info> option can be used to output schema as plain SQL queries:
+
+  <info>php %command.full_name% --plain-sql</info>
+
+The <info>--bundle</info> option can be used to show only the portion of the schema
+that is associated with the entities in a specific bundle:
+
+  <info>php %command.full_name% --bundle=<bundle-name></info>
+
+Use the <info>--migration-version</info> option to specify the migration version
+for the generated PHP code:
+
+  <info>php %command.full_name% --migration-version=<version-string></info>
+
+HELP
             )
-            ->addOption(
-                'migration-version',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Migration version',
-                'v1_0'
-            )
-            ->setDescription('Dump existing database structure.');
+            ->addUsage('--plain-sql')
+            ->addUsage('--bundle=<bundle-name>')
+            ->addUsage('--migration-version=<version-string>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->version = $input->getOption('migration-version');
@@ -131,10 +106,7 @@ class DumpMigrationsCommand extends Command
         }
     }
 
-    /**
-     * @param string $bundle
-     */
-    protected function initializeBundleRestrictions($bundle)
+    protected function initializeBundleRestrictions(?string $bundle): void
     {
         if ($bundle) {
             if (!array_key_exists($bundle, $this->bundles)) {
@@ -147,10 +119,7 @@ class DumpMigrationsCommand extends Command
         }
     }
 
-    /**
-     * Process metadata information.
-     */
-    protected function initializeMetadataInformation()
+    protected function initializeMetadataInformation(): void
     {
         /** @var ClassMetadata[] $allMetadata */
         $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
@@ -177,10 +146,8 @@ class DumpMigrationsCommand extends Command
 
     /**
      * Initialize extended field options by field.
-     *
-     * @param ClassMetadata $classMetadata
      */
-    protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata)
+    protected function initializeExtendedFieldsOptions(ClassMetadata $classMetadata): void
     {
         $className = $classMetadata->getName();
         $tableName = $classMetadata->getTableName();
@@ -195,14 +162,7 @@ class DumpMigrationsCommand extends Command
         }
     }
 
-    /**
-     * Get extended field options.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @return array
-     */
-    protected function getExtendedFieldOptions($className, $fieldName)
+    protected function getExtendedFieldOptions(string $className, string $fieldName): array
     {
         $config = [];
         foreach ($this->configManager->getProviders() as $provider) {
@@ -216,11 +176,7 @@ class DumpMigrationsCommand extends Command
         return $config;
     }
 
-    /**
-     * @param Schema          $schema
-     * @param OutputInterface $output
-     */
-    protected function dumpPhpSchema(Schema $schema, OutputInterface $output)
+    protected function dumpPhpSchema(Schema $schema, OutputInterface $output): void
     {
         $schema->visit($this->schemaDumper);
 

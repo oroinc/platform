@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\SearchBundle\Command;
 
@@ -11,30 +12,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Update and reindex (automatically) fulltext-indexed table(s).
- * Use carefully on large data sets - do not run this task too often.
+ * Rebuilds the search index.
  */
 class ReindexCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:search:reindex';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private IndexerInterface $asyncIndexer;
+    private IndexerInterface $syncIndexer;
 
-    /** @var IndexerInterface */
-    private $asyncIndexer;
-
-    /** @var IndexerInterface */
-    private $syncIndexer;
-
-    /**
-     * ReindexCommand constructor.
-     * @param DoctrineHelper $doctrineHelper
-     * @param IndexerInterface $asyncIndex
-     * @param IndexerInterface $syncIndexer
-     * @param string|null $name
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         IndexerInterface $asyncIndex,
@@ -48,31 +36,40 @@ class ReindexCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->addArgument(
-                'class',
-                InputArgument::OPTIONAL,
-                'Full or compact class name of entity which should be reindexed' .
-                '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
+            ->addArgument('class', InputArgument::OPTIONAL, 'Entity to reindex (FQCN or short name)')
+            ->addOption('scheduled', null, InputOption::VALUE_NONE, 'Schedule the reindexation in the background')
+            ->setDescription('Rebuilds the search index.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command rebuilds the search index.
+
+  <info>php %command.full_name%</info>
+
+You can limit the reindexation to a specific entity with the <info>--class</info> option.
+Both the FQCN (Oro\Bundle\UserBundle\Entity\User) and short (OroUserBundle:User)
+class names are accepted:
+
+  <info>php %command.full_name% --class=<entity></info>
+
+The <info>--scheduled</info> options allows to run the reindexation in the background.
+It will only schedule the job by adding a message to the message queue, so ensure
+that the message consumer processes (<info>oro:message-queue:consume</info>) are running
+for the reindexation to happen.
+
+  <info>php %command.full_name% --scheduled</info>
+
+HELP
             )
-            ->addOption(
-                'scheduled',
-                null,
-                InputOption::VALUE_NONE,
-                'Enforces a scheduled (background) reindexation'
-            )
-            ->setDescription('Rebuild search index')
+            ->addUsage('--class=<entity>')
+            ->addUsage('--scheduled')
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $class = $input->getArgument('class');
@@ -97,13 +94,8 @@ class ReindexCommand extends Command
         }
     }
 
-    /**
-     * @param bool $asyncIndexer False means regular, true async indexer
-     *
-     * @return IndexerInterface
-     */
-    protected function getSearchIndexer($asyncIndexer = false)
+    protected function getSearchIndexer($useAsynchronousIndexer = false): IndexerInterface
     {
-        return $asyncIndexer === true ? $this->asyncIndexer : $this->syncIndexer;
+        return $useAsynchronousIndexer === true ? $this->asyncIndexer : $this->syncIndexer;
     }
 }

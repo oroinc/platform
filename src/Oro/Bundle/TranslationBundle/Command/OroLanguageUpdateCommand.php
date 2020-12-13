@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
@@ -16,26 +17,17 @@ use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Locales;
 
 /**
- * Installs/Updates language's external translations
+ * Downloads and updates translations.
  */
 class OroLanguageUpdateCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:language:update';
 
-    /** @var ExternalTranslationsProvider */
-    private $externalTranslationsProvider;
+    private ExternalTranslationsProvider $externalTranslationsProvider;
+    private DoctrineHelper $doctrineHelper;
+    private ?LanguageRepository $languageRepository = null;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var LanguageRepository */
-    private $languageRepository;
-
-    /**
-     * @param ExternalTranslationsProvider $externalTranslationsProvider
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         ExternalTranslationsProvider $externalTranslationsProvider,
         DoctrineHelper $doctrineHelper
@@ -46,30 +38,35 @@ class OroLanguageUpdateCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Installs/Updates language\'s external translations')
-            ->addOption(
-                'language',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Language code to install/update translations'
+            ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Language code')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all installed languages')
+            ->setDescription('Downloads and updates translations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command downloads and installs a new version of translations for a specified language:
+
+  <info>php %command.full_name% --language=<language></info>
+
+The <info>--all</info> option can be used to download and update all installed languages:
+
+  <info>php %command.full_name% --all</info>
+
+The command will print the list of all languages added to the application if run without any options:
+
+  <info>php %command.full_name%</info>
+
+HELP
             )
-            ->addOption(
-                'all',
-                null,
-                InputOption::VALUE_NONE,
-                'Install/Update translations for all installed languages'
-            );
+            ->addUsage('--language=<language>')
+            ->addUsage('--all')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$input->getOption('language') && !$input->getOption('all')) {
@@ -94,11 +91,7 @@ class OroLanguageUpdateCommand extends Command
         }
     }
 
-    /**
-     * @param Language $language
-     * @param OutputInterface $output
-     */
-    private function updateLanguage(Language $language, OutputInterface $output)
+    private function updateLanguage(Language $language, OutputInterface $output): void
     {
         try {
             $output->writeln(sprintf('Processing language "%s" ...', $this->getLanguageName($language)));
@@ -113,12 +106,7 @@ class OroLanguageUpdateCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    private function outputList(OutputInterface $output)
+    private function outputList(OutputInterface $output): void
     {
         $table = new Table($output);
         $table->setHeaders([
@@ -145,24 +133,17 @@ class OroLanguageUpdateCommand extends Command
     }
 
 
-    /**
-     * @return LanguageRepository
-     */
-    private function getRepository()
+    private function getRepository(): LanguageRepository
     {
         if (!$this->languageRepository) {
+            /** @noinspection PhpFieldAssignmentTypeMismatchInspection */
             $this->languageRepository = $this->doctrineHelper->getEntityRepositoryForClass(Language::class);
         }
 
         return $this->languageRepository;
     }
 
-    /**
-     * @param Language $language
-     *
-     * @return string
-     */
-    private function getLanguageName(Language $language)
+    private function getLanguageName(Language $language): string
     {
         $code = $language->getCode();
         $name = Languages::getName($code, 'en');

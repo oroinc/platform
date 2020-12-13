@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
@@ -23,7 +24,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * The CLI command to show different kind of debug information about API.
+ * Displays registered API actions and processors.
+ *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterface
@@ -35,18 +37,9 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     /** @var string */
     protected static $defaultName = 'oro:api:debug';
 
-    /** @var ActionProcessorBagInterface */
-    private $actionProcessorBag;
+    private ActionProcessorBagInterface $actionProcessorBag;
+    private ProcessorBagInterface $processorBag;
 
-    /** @var ProcessorBagInterface */
-    private $processorBag;
-
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param ResourcesProvider           $resourcesProvider
-     * @param ActionProcessorBagInterface $actionProcessorBag
-     * @param ProcessorBagInterface       $processorBag
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         ResourcesProvider $resourcesProvider,
@@ -59,13 +52,9 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
-            ->setDescription('Shows details about registered API actions and processors.')
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
@@ -80,11 +69,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 'attribute',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Shows processors which will be executed only when the context has'
-                . ' a given attribute with the specified value.'
-                . ' The name and value should be separated by the colon,'
-                . ' e.g.: <info>--attribute=collection:true</info> for scalar value'
-                . ' or <info>--attribute=extra:[definition,filters]</info> for array value'
+                'Shows processors executed when the given attribute value is present'
             )
             ->addOption(
                 'processors',
@@ -96,22 +81,57 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 'processors-without-description',
                 null,
                 InputOption::VALUE_NONE,
-                'Shows a list of all processors without a description'
-            );
+                'Show a list of all processors without descriptions'
+            )
+            ->setDescription('Displays registered API actions and processors.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command display a list of available API actions.
+
+  <info>php %command.full_name%</info>
+
+To see the processors registered for a given action, specify the action name as an argument:
+
+  <info>php %command.full_name% <action></info>
+
+The list of the processors can be limited to some group specified as the second argument:
+
+  <info>php %command.full_name% <action> <group></info>
+
+The <info>--attribute</info> option can be used to show the processors that will be executed
+only when the context has a given attribute with the specified value.
+The attribute name and value should be separated by a colon, e.g. <info>--attribute=collection:true</info>
+for a scalar value, or <info>--attribute=extra:[definition,filters]</info> for an array value:
+
+  <info>php %command.full_name% --attribute=collection:true <action></info>
+  <info>php %command.full_name% --attribute=extra:[definition,filters] <action></info>
+
+The <info>--processors</info> and <info>--processors-without-description</info> options can be used
+to display all processors and all processors without descriptions respectively:
+
+  <info>php %command.full_name% --processors</info>
+  <info>php %command.full_name% --processors-without-description</info>
+
+HELP
+            )
+            ->addUsage('<action>')
+            ->addUsage('<action> <group>')
+            ->addUsage('--attribute=collection:true <action>')
+            ->addUsage('--attribute=extra:[definition,filters] <action>')
+            ->addUsage('--processors')
+            ->addUsage('--processors-without-description')
+        ;
+
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getDefaultRequestType()
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function getDefaultRequestType(): array
     {
         return ['any'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $showProcessors = $input->getOption('processors');
@@ -144,10 +164,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    private function dumpActions(OutputInterface $output)
+    private function dumpActions(OutputInterface $output): void
     {
         $publicActions = $this->actionProcessorBag->getActions();
 
@@ -213,7 +230,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param OutputInterface $output
      * @param array           $processors [action => [number of processors, groups], ...]
      */
-    private function dumpAllActions(OutputInterface $output, array $processors)
+    private function dumpAllActions(OutputInterface $output, array $processors): void
     {
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups', 'Details']);
@@ -232,11 +249,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $table->render();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param RequestType     $requestType
-     */
-    private function dumpAllProcessors(OutputInterface $output, RequestType $requestType)
+    private function dumpAllProcessors(OutputInterface $output, RequestType $requestType): void
     {
         $output->writeln('The processors are displayed in alphabetical order.');
 
@@ -276,11 +289,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $table->render();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param RequestType     $requestType
-     */
-    private function dumpProcessorsWithoutDescription(OutputInterface $output, RequestType $requestType)
+    private function dumpProcessorsWithoutDescription(OutputInterface $output, RequestType $requestType): void
     {
         $output->writeln('The list of processors that do not have a description:');
 
@@ -319,8 +328,12 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param RequestType     $requestType
      * @param string[]        $attributes
      */
-    private function dumpProcessors(OutputInterface $output, $action, RequestType $requestType, array $attributes)
-    {
+    private function dumpProcessors(
+        OutputInterface $output,
+        string $action,
+        RequestType $requestType,
+        array $attributes
+    ) {
         $output->writeln('The processors are displayed in the order they are executed.');
 
         $table = new Table($output);
@@ -377,12 +390,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $table->render();
     }
 
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
-    private function getClassDocComment($className)
+    private function getClassDocComment(string $className): string
     {
         $reflection = new \ReflectionClass($className);
 
@@ -400,9 +408,10 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param string $action
      *
      * @return string
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function formatProcessorAttributes(array $attributes, $action)
+    private function formatProcessorAttributes(array $attributes, string $action): string
     {
         $rows = [];
 
@@ -456,7 +465,7 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      *
      * @return string
      */
-    private function formatProcessorAttribute($name, $value, $bold = false)
+    private function formatProcessorAttribute(string $name, $value, $bold = false): string
     {
         $stringValue = $this->convertProcessorAttributeValueToString($value);
         if ($bold) {
@@ -470,9 +479,10 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
      * @param mixed $value
      *
      * @return string
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function convertProcessorAttributeValueToString($value)
+    private function convertProcessorAttributeValueToString($value): string
     {
         if (null === $value) {
             return '<comment>!exists</comment>';
@@ -522,11 +532,11 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
     }
 
     /**
-     * @param string $action
-     *
      * @return string[]
+     *
+     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    private function getProcessorIds($action)
+    private function getProcessorIds(string $action): array
     {
         $context = new Context();
         $context->setAction($action);
@@ -534,6 +544,8 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $processors->setApplicableChecker(new ChainApplicableChecker());
 
         $result = [];
+
+        /** * @noinspection PhpUnusedLocalVariableInspection */
         foreach ($processors as $processor) {
             $result[] = $processors->getProcessorId();
         }

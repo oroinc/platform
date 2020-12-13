@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\SecurityBundle\Provider\Console;
 
@@ -8,6 +9,7 @@ use Oro\Bundle\PlatformBundle\Provider\Console\AbstractGlobalOptionsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,56 +19,41 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
- * Provides "current-user" and "current-organization" options for all commands.
+ * Adds --current-user global command option to specify the user for the security context if necessary.
  */
 class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
-    public const OPTION_USER         = 'current-user';
-    public const OPTION_ORGANIZATION = 'current-organization';
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addGlobalOptions(Command $command)
     {
         $options = [
             new InputOption(
-                self::OPTION_USER,
+                'current-user',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'ID, username or email of the user that should be used as current user'
+                'ID, username or email'
             ),
             new InputOption(
-                self::OPTION_ORGANIZATION,
+                'current-organization',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'ID or name of the organization that should be used as current organization. '
-                    . 'If user have an access only to one organization, it will be used as current one.'
-                    . 'If user have an access to some organizations, the current organization must be specified.'
+                'ID or organization name (required if user has access to multiple organizations)'
             )
         ];
 
         $this->addOptionsToCommand($command, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function resolveGlobalOptions(InputInterface $input)
     {
-        $user = $input->getParameterOption('--' . self::OPTION_USER);
-        $organization = $input->getParameterOption('--' . self::OPTION_ORGANIZATION);
+        $user = $input->getParameterOption('--current-user');
+        $organization = $input->getParameterOption('--current-organization');
 
         if (!$user && !$organization) {
             return;
@@ -81,9 +68,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     }
 
     /**
-     * @param mixed $user
-     *
-     * @return TokenInterface|null
+     * @param string|int|null $user Username, email or user ID (int).
      */
     private function createToken($user): ?TokenInterface
     {
@@ -93,7 +78,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 
         $userEntity = $this->loadUser($user);
         if (null === $userEntity) {
-            throw new \InvalidArgumentException(sprintf('Can\'t find user with identifier %s', $user));
+            throw new \InvalidArgumentException(\sprintf('Can\'t find user with identifier %s', $user));
         }
 
         $token = new ConsoleToken($userEntity->getRoles());
@@ -103,13 +88,11 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     }
 
     /**
-     * @param mixed $user
-     *
-     * @return User|null
+     * @param string|int $user Username, email or user ID (int).
      */
-    private function loadUser($user): ?User
+    private function loadUser($user): ?UserInterface
     {
-        $userId = filter_var($user, FILTER_VALIDATE_INT);
+        $userId = \filter_var($user, FILTER_VALIDATE_INT);
         if ($userId) {
             return $this->getDoctrine()->getRepository(User::class)->find($userId);
         }
@@ -118,7 +101,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     }
 
     /**
-     * @param mixed                           $organization
+     * @param string|int|null $organization Organization name or ID
      * @param OrganizationAwareTokenInterface $token
      */
     private function setOrganization($organization, OrganizationAwareTokenInterface $token): void
@@ -139,14 +122,14 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
         }
 
         if (null === $organizationEntity) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'Can\'t find organization with identifier %s',
                 $organization
             ));
         }
 
         if (!$organizationEntity->isEnabled()) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'Organization %s is not enabled',
                 $organizationEntity->getName()
             ));
@@ -154,7 +137,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 
         $user = $token->getUser();
         if ($user instanceof User && !$user->isBelongToOrganization($organizationEntity)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \InvalidArgumentException(\sprintf(
                 'User %s is not in organization %s',
                 $user->getUsername(),
                 $organizationEntity->getName()
@@ -165,40 +148,32 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
     }
 
     /**
-     * @param mixed $organization
-     *
-     * @return Organization|null
+     * @param string|int $organization Organization name or ID
      */
     private function loadOrganization($organization): ?Organization
     {
         $organizationRepository = $this->getDoctrine()->getRepository(Organization::class);
-        $organizationId = filter_var($organization, FILTER_VALIDATE_INT);
+        $organizationId = \filter_var($organization, FILTER_VALIDATE_INT);
         if ($organizationId) {
+            /** @noinspection PhpIncompatibleReturnTypeInspection */
             return $organizationRepository->find($organizationId);
         }
 
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $organizationRepository->findOneBy(['name' => $organization]);
     }
 
-    /**
-     * @return ManagerRegistry
-     */
     private function getDoctrine(): ManagerRegistry
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->container->get('doctrine');
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
     private function getSecurityTokenStorage(): TokenStorageInterface
     {
         return $this->container->get('security.token_storage');
     }
 
-    /**
-     * @return UserManager
-     */
     private function getUserManager(): UserManager
     {
         return $this->container->get('oro_user.manager');

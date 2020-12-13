@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Command;
 
@@ -20,7 +21,7 @@ class ImportCommandTest extends WebTestCase
 
     public function testWithoutEmailOption()
     {
-        $result = $this->runCommand(
+        $result = static::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv')
@@ -32,7 +33,7 @@ class ImportCommandTest extends WebTestCase
 
     public function testInvalidEmail()
     {
-        $result = $this->runCommand(
+        $result = static::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv'),
@@ -51,17 +52,19 @@ class ImportCommandTest extends WebTestCase
         /** @var User $importOwner */
         $importOwner = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $result = $this->runCommand(
+        $result = static::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv'),
-                '--email' => $importOwner->getEmail()
+                '--email' => $importOwner->getEmail(),
+                '--processor' => 'oro_translation_translation.add_or_replace',
+                '--jobName' => 'language_translations_import_from_csv',
             ]
         );
 
         static::assertStringContainsString('Scheduled successfully.', $result);
 
-        $sentMessage = $this->getSentMessage(Topics::PRE_IMPORT);
+        $sentMessage = static::getSentMessage(Topics::PRE_IMPORT);
 
         // Unset randomly generated fileName for test purposes
         unset($sentMessage['fileName']);
@@ -69,22 +72,17 @@ class ImportCommandTest extends WebTestCase
         $expectedMessage = [
             'originFileName' => 'import.csv',
             'userId' => $importOwner->getId(),
-            'jobName' => null,
-            'processorAlias' => null,
+            'jobName' => 'language_translations_import_from_csv',
+            'processorAlias' => 'oro_translation_translation.add_or_replace',
             'process' => 'import'
         ];
 
-        $this->assertEquals($expectedMessage, $sentMessage);
+        static::assertEquals($expectedMessage, $sentMessage);
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return string
-     */
-    private function getFullPathToDataFile($fileName)
+    private function getFullPathToDataFile(string $fileName): string
     {
-        $dataDir = $this->getContainer()
+        $dataDir = static::getContainer()
             ->get('kernel')
             ->locateResource('@OroImportExportBundle/Tests/Functional/Async/Import/fixtures');
 

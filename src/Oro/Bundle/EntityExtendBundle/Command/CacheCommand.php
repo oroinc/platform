@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -16,35 +17,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Handles warmupping cache methods
+ * Base class for various extended entity cache warmup commands.
  */
 abstract class CacheCommand extends Command
 {
-    /** @var string|null */
-    protected $cacheDir;
+    protected ?string $cacheDir;
 
-    /** @var EntityProxyGenerator */
-    private $entityProxyGenerator;
+    private EntityProxyGenerator $entityProxyGenerator;
+    private EntityAliasResolver $entityAliasResolver;
+    protected ExtendConfigDumper $extendConfigDumper;
+    private Registry $doctrine;
+    private KernelInterface $kernel;
 
-    /** @var EntityAliasResolver */
-    private $entityAliasResolver;
-
-    /** @var ExtendConfigDumper */
-    protected $extendConfigDumper;
-
-    /** var Registry **/
-    private $doctrine;
-
-    /** @var KernelInterface */
-    private $kernel;
-
-    /**
-     * @param EntityProxyGenerator $entityProxyGenerator
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param ExtendConfigDumper $extendConfigDumper
-     * @param Registry $doctrine
-     * @param KernelInterface $kernel
-     */
     public function __construct(
         EntityProxyGenerator $entityProxyGenerator,
         EntityAliasResolver $entityAliasResolver,
@@ -60,10 +44,7 @@ abstract class CacheCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * @return KernelInterface
-     */
-    protected function getKernel()
+    protected function getKernel(): KernelInterface
     {
         $application = $this->getApplication();
 
@@ -74,10 +55,8 @@ abstract class CacheCommand extends Command
 
     /**
      * Warms up caches which may be affected by extended entities
-     *
-     * @param OutputInterface $output
      */
-    protected function warmup(OutputInterface $output)
+    protected function warmup(OutputInterface $output): void
     {
         $callable = function () use ($output) {
             $this->warmupExtendedEntityCache($output);
@@ -92,10 +71,9 @@ abstract class CacheCommand extends Command
 
     /**
      * Warms up extended entities cache
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupExtendedEntityCache(OutputInterface $output)
+    protected function warmupExtendedEntityCache(OutputInterface $output): void
     {
         $output->writeln('Dump the configuration of extended entities to the cache');
 
@@ -118,10 +96,9 @@ abstract class CacheCommand extends Command
 
     /**
      * Warms up Doctrine metadata cache
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupMetadataCache(OutputInterface $output)
+    protected function warmupMetadataCache(OutputInterface $output): void
     {
         $kernel              = $this->getKernel();
         $em                  = $this->doctrine->getManager();
@@ -163,10 +140,9 @@ abstract class CacheCommand extends Command
 
     /**
      * Generates Doctrine proxy classes for extended entities
-     *
-     * @param OutputInterface $output
+     * @throws \Exception
      */
-    protected function warmupProxies(OutputInterface $output)
+    protected function warmupProxies(OutputInterface $output): void
     {
         $em = $this->doctrine->getManager();
         if ($em->getConfiguration()->getAutoGenerateProxyClasses()) {
@@ -192,10 +168,8 @@ abstract class CacheCommand extends Command
 
     /**
      * Warms up entity aliases cache
-     *
-     * @param OutputInterface $output
      */
-    protected function warmupEntityAliasesCache(OutputInterface $output)
+    protected function warmupEntityAliasesCache(OutputInterface $output): void
     {
         $output->writeln('Warm up entity aliases cache');
         $this->entityAliasResolver->warmUpCache();
@@ -203,10 +177,8 @@ abstract class CacheCommand extends Command
 
     /**
      * Sets class aliases for extended entities.
-     *
-     * @param string $cacheDir The cache directory
      */
-    protected function setClassAliases($cacheDir)
+    protected function setClassAliases(string $cacheDir): void
     {
         ExtendClassLoadingUtils::setAliases($cacheDir);
     }

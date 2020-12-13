@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\NavigationBundle\Command;
 
@@ -12,22 +13,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Clears `oro_navigation_history` depending on datetime interval.
+ * Clears old navigation history.
  */
 class ClearNavigationHistoryCommand extends Command implements CronCommandInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:navigation:history:clear';
 
-    private const CLEAN_BEFORE_PARAM = 'interval';
     private const DEFAULT_INTERVAL = '1 day';
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -35,73 +31,64 @@ class ClearNavigationHistoryCommand extends Command implements CronCommandInterf
         parent::__construct();
     }
 
-    /**
-     * Run command at 00:05 every day.
-     *
-     * @return string
-     */
     public function getDefaultDefinition()
     {
+        // 00:05 every day
         return '5 0 * * *';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isActive()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->addOption(
-                self::CLEAN_BEFORE_PARAM,
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'All records taken earlier than now minus specified interval will be deleted. '.
-                '(default: "' . self::DEFAULT_INTERVAL . '") Interval examples: "630 seconds", "1 day", etc. ' . PHP_EOL
-                . 'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
+            ->addOption('interval', 'i', InputOption::VALUE_OPTIONAL, 'Relative date/time')
+            ->setDescription('Clears old navigation history.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears old navigation history.
+
+  <info>php %command.full_name%</info>
+
+The <info>--interval</info> option can be used to override the default time interval (1 day)
+past which a navigation history item is considered old. It accepts any relative date/time
+format recognized by PHP (<comment>https://php.net/manual/datetime.formats.relative.php</comment>):
+
+  <info>php %command.full_name% --interval=<relative-date></info>
+  <info>php %command.full_name% --interval="15 minutes"</info>
+  <info>php %command.full_name% --interval="3 days"</info>
+
+HELP
             )
-            ->setDescription('Clears `oro_navigation_history` depending on datetime interval.');
+            ->addUsage('--interval=<relative-date>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $interval = $input->getOption(self::CLEAN_BEFORE_PARAM) ?: self::DEFAULT_INTERVAL;
+            $interval = $input->getOption('interval') ?: self::DEFAULT_INTERVAL;
 
             $now = new \DateTime('now', new \DateTimeZone('UTC'));
             $cleanBefore = clone $now;
 
-            // Starting from 7.1.28 and 7.2.17 PHP versions, a PHP Warning will be thrown if the value is not correct.
-            // Disable error reporting to display own error without PHP Warning.
-            $errorLevel = error_reporting();
-            error_reporting(0);
-            $cleanBefore->sub(
-                \DateInterval::createFromDateString($interval)
-            );
-            error_reporting($errorLevel);
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            $dateInterval = @\DateInterval::createFromDateString($interval);
+            if ($dateInterval instanceof \DateInterval) {
+                $cleanBefore->sub($dateInterval);
+            }
 
             if ($cleanBefore >= $now) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        "Value '%s' should be valid date interval",
-                        $interval
-                    )
-                );
+                throw new \InvalidArgumentException(\sprintf("Value '%s' should be valid date interval", $interval));
             }
 
             /** @var HistoryItemRepository $historyItemRepository */
-            $historyItemRepository = $this->doctrine->getEntityManagerForClass(NavigationHistoryItem::class)
-                ->getRepository(NavigationHistoryItem::class);
+            $historyItemRepository = $this->doctrine->getRepository(NavigationHistoryItem::class);
 
             $deletedCnt = $historyItemRepository->clearHistoryItems($cleanBefore);
 
