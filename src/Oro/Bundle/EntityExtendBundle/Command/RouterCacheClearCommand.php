@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -14,26 +15,16 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Renews Symfony routing cache.
+ * Clears router cache.
  */
 class RouterCacheClearCommand extends Command
 {
     protected static $defaultName = 'router:cache:clear';
 
-    /** @var KernelInterface */
-    private $kernel;
+    private KernelInterface $kernel;
+    private RouterInterface $router;
+    private Filesystem $filesystem;
 
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var Filesystem */
-    private $filesystem;
-
-    /**
-     * @param KernelInterface $kernel
-     * @param RouterInterface $router
-     * @param Filesystem      $filesystem
-     */
     public function __construct(
         KernelInterface $kernel,
         RouterInterface $router,
@@ -46,9 +37,6 @@ class RouterCacheClearCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEnabled()
     {
         return
@@ -56,39 +44,48 @@ class RouterCacheClearCommand extends Command
             && parent::isEnabled();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Clears the routing cache.');
+        $this
+            ->setDescription('Clears router cache.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears router cache.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws \InvalidArgumentException When route does not exist
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         $cacheDir = $this->kernel->getCacheDir();
         $tmpDir = $cacheDir . '_tmp';
 
-        if (!is_writable($cacheDir)) {
-            throw new \RuntimeException(sprintf('Unable to write in the "%s" directory.', $cacheDir));
-        }
-
-        $io = new SymfonyStyle($input, $output);
-        $io->text(sprintf(
-            'Clearing the routing cache for the <info>%s</info> environment...',
-            $this->kernel->getEnvironment()
-        ));
-
-        $this->ensureDirNotExists($tmpDir);
-        $this->filesystem->mkdir($tmpDir);
         try {
+            if (!is_writable($cacheDir)) {
+                throw new \RuntimeException(sprintf('Unable to write in the "%s" directory.', $cacheDir));
+            }
+
+            $io->text(sprintf(
+                'Clearing the routing cache for the <info>%s</info> environment...',
+                $this->kernel->getEnvironment()
+            ));
+
+            $this->ensureDirNotExists($tmpDir);
+            $this->filesystem->mkdir($tmpDir);
             $this->router->warmUp($tmpDir);
             $this->moveToCacheDir($cacheDir, $tmpDir);
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+
+            return $e->getCode() ?: 1;
         } finally {
             $this->ensureDirNotExists($tmpDir);
         }
@@ -98,9 +95,6 @@ class RouterCacheClearCommand extends Command
         return 0;
     }
 
-    /**
-     * @param string $dir
-     */
     private function ensureDirNotExists(string $dir): void
     {
         if ($this->filesystem->exists($dir)) {
@@ -108,10 +102,6 @@ class RouterCacheClearCommand extends Command
         }
     }
 
-    /**
-     * @param string $cacheDir
-     * @param string $tmpDir
-     */
     private function moveToCacheDir(string $cacheDir, string $tmpDir): void
     {
         /** @var SplFileInfo[] $files */

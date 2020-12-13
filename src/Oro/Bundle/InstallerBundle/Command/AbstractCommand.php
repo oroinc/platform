@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
@@ -8,36 +9,43 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Base class for install and update commands that need to pass debug and timeout options to subsequent commands.
+ */
 abstract class AbstractCommand extends ContainerAwareCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->addOption(
-                'force-debug',
-                null,
-                InputOption::VALUE_NONE,
-                'Forces launching of child commands in debug mode. By default they are launched with --no-debug'
-            )
+            ->addOption('force-debug', null, InputOption::VALUE_NONE, 'Launch child commands in debug mode.')
             ->addOption(
                 'timeout',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Execution timeout for child commands',
+                'Maximum execution time (in seconds) of child commands',
                 CommandExecutor::DEFAULT_TIMEOUT
-            );
+            )
+            ->setHelp(
+                $this->getHelp() . <<<'HELP'
+
+The <info>--force-debug</info> option will launch the child commands in the debug mode
+(be default they are launched with --no-debug):
+
+  <info>php %command.full_name% --force-debug</info> <fg=green;options=underscore>other options</>
+
+The <info>--timeout</info> option can be used to limit execution time of the child commands:
+
+  <info>php %command.full_name% --timeout=<seconds></info> <fg=green;options=underscore>other options</>
+
+HELP
+            )
+            ->addUsage('--force-debug [other options]')
+            ->addUsage('--timeout=<seconds> [other options]')
+        ;
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return CommandExecutor
-     */
-    protected function getCommandExecutor(InputInterface $input, OutputInterface $output)
+    protected function getCommandExecutor(InputInterface $input, OutputInterface $output): CommandExecutor
     {
         $container = $this->getContainer();
 

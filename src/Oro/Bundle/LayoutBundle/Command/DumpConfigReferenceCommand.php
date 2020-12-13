@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
@@ -10,37 +11,39 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to show the structure of "Resources/views/layouts/{folder}/theme.yml".
+ * Dumps the reference structure for Resources/views/layouts/THEME_NAME/theme.yml.
  */
 class DumpConfigReferenceCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:layout:config:dump-reference';
 
-    /** @var ThemeConfiguration */
-    private $themeConfiguration;
+    private ThemeConfiguration $themeConfiguration;
 
-    /**
-     * @param ThemeConfiguration $themeConfiguration
-     */
     public function __construct(ThemeConfiguration $themeConfiguration)
     {
         parent::__construct();
         $this->themeConfiguration = $themeConfiguration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Dumps the structure of "Resources/views/layouts/*/theme.yml".');
+            ->setDescription('Dumps the reference structure for Resources/views/layouts/THEME_NAME/theme.yml.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the reference structure
+for <comment>Resources/views/layouts/*/theme.yml</comment> files.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output = new SymfonyStyle($input, $output);

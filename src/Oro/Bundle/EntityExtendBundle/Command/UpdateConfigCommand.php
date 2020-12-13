@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -10,48 +11,60 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to update extend entity config
+ * Updates extend entity config.
  */
 class UpdateConfigCommand extends Command
 {
     protected static $defaultName = 'oro:entity-extend:update-config';
 
-    /** @var ExtendConfigDumper */
-    private $extendConfigDumper;
+    private ExtendConfigDumper $extendConfigDumper;
 
-    /**
-     * @param ExtendConfigDumper $extendConfigDumper
-     */
     public function __construct(ExtendConfigDumper $extendConfigDumper)
     {
         $this->extendConfigDumper = $extendConfigDumper;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription('Prepare entity config')
             ->addOption(
                 'update-custom',
                 null,
                 InputOption::VALUE_NONE,
-                'Applies user changes that require schema update if specified'
+                'Apply user changes that require schema update'
             )
             ->addOption(
                 'initial-state-path',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'A path to a file contains initial states of entity configs'
-            );
+                'File containing the initial state of entity configs'
+            )
+            ->setDescription('Updates extend entity config.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates extend entity config.
+
+  <info>php %command.full_name%</info>
+
+Use the <info>--update-custom</info> option to apply user changes that require database schema update:
+
+  <info>php %command.full_name% --update-custom</info>
+
+The <info>--initial-state-path</info> option can be used to provide a path to the file
+that contains the initial state of the entity configs:
+
+  <info>php %command.full_name% --initial-state-path=<file-path></info>
+
+HELP
+            )
+            ->addUsage('--update-custom')
+            ->addUsage('--initial-state-path=<file-path>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
@@ -59,12 +72,7 @@ class UpdateConfigCommand extends Command
         $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return callable|null
-     */
-    protected function getFilter(InputInterface $input)
+    protected function getFilter(InputInterface $input): ?callable
     {
         $filter = null;
 

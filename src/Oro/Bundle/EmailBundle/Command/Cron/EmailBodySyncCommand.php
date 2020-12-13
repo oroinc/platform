@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
 
@@ -14,33 +15,22 @@ use Symfony\Component\Lock\Factory;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
- * The CLI command to synchronize email body.
+ * Synchronizes email bodies.
  */
 class EmailBodySyncCommand extends Command implements CronCommandInterface
 {
-    /**
-     * Number of emails in batch
-     */
-    const BATCH_SIZE = 25;
+    /** Number of emails in batch */
+    public const BATCH_SIZE = 25;
 
-    /**
-     * The maximum execution time (in minutes)
-     */
-    const MAX_EXEC_TIME_IN_MIN = 15;
+    /** The maximum execution time (in minutes) */
+    public const MAX_EXEC_TIME_IN_MIN = 15;
 
     /** @var string */
     protected static $defaultName = 'oro:cron:email-body-sync';
 
-    /** @var FeatureChecker */
-    protected $featureChecker;
+    protected FeatureChecker $featureChecker;
+    protected EmailBodySynchronizer $synchronizer;
 
-    /** @var EmailBodySynchronizer */
-    protected $synchronizer;
-
-    /**
-     * @param FeatureChecker $featureChecker
-     * @param EmailBodySynchronizer $synchronizer
-     */
     public function __construct(FeatureChecker $featureChecker, EmailBodySynchronizer $synchronizer)
     {
         parent::__construct();
@@ -49,9 +39,6 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
         $this->synchronizer = $synchronizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '*/30 * * * *';
@@ -65,32 +52,49 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
         return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Synchronize email body')
             ->addOption(
                 'max-exec-time',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'The maximum execution time (in minutes). -1 for unlimited. The default value is 15.',
+                'Maximum execution time in minutes (-1 for unlimited)',
                 self::MAX_EXEC_TIME_IN_MIN
             )
             ->addOption(
                 'batch-size',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Number of emails in batch. The default value is 25.',
+                'Number of emails to process in a single batch',
                 self::BATCH_SIZE
-            );
+            )
+            ->setDescription('Synchronizes email bodies.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command synchronizes email bodies.
+
+  <info>php %command.full_name%</info>
+
+The <info>--max-exec-time</info> option can be used to override the default execution timeout (use -1 for unlimited):
+
+  <info>php %command.full_name% --max-exec-time=<minutes></info>
+  <info>php %command.full_name% --max-exec-time=-1</info>
+
+Use <info>--batch-size</info> option to specify the number of email in a single processing batch:
+
+  <info>php %command.full_name% --batch-size=<number></info>
+
+HELP
+            )
+            ->addUsage('--max-exec-time=<minutes>')
+            ->addUsage('--max-exec-time=-1')
+            ->addUsage('--batch-size=<number>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$this->featureChecker->isFeatureEnabled('email')) {

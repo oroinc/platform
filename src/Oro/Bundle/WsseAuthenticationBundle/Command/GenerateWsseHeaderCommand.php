@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
@@ -8,28 +9,20 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
- * Generate X-WSSE HTTP header for a given API key.
+ * Generates X-WSSE HTTP header for a given user API key.
  */
 class GenerateWsseHeaderCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:wsse:generate-header';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private ContainerInterface $container;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param ContainerInterface $container
-     */
     public function __construct(ManagerRegistry $registry, ContainerInterface $container)
     {
         parent::__construct();
@@ -38,30 +31,20 @@ class GenerateWsseHeaderCommand extends Command
         $this->container = $container;
     }
 
-    /**
-     * Console command configuration
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Generate X-WSSE HTTP header for a given API key');
-        $this->setDefinition([
-            new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key.'),
-            new InputOption(
-                'firewall',
-                null,
-                InputArgument::OPTIONAL,
-                'Firewall name.',
-                $this->getDefaultSecurityFirewall()
-            ),
-        ]);
+        $this->addArgument('apiKey', InputArgument::REQUIRED, 'User API key')
+            ->addOption('firewall', null, InputArgument::OPTIONAL, 'Firewall name', $this->getDefaultSecurityFirewall())
+            ->setDescription('Generates X-WSSE HTTP header for a given user API key.')
+            ->addUsage('--firewall=<firewall-name> <apiKey>')
+        ;
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
      * @return int
      * @throws \InvalidArgumentException
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -123,9 +106,7 @@ class GenerateWsseHeaderCommand extends Command
     }
 
     /**
-     * @param string $firewallName
-     *
-     * @return PasswordEncoderInterface
+     * @throws \InvalidArgumentException if WSSE password encoder for a given firewall is not defined
      */
     private function getPasswordEncoder(string $firewallName): PasswordEncoderInterface
     {
@@ -139,17 +120,11 @@ class GenerateWsseHeaderCommand extends Command
         return $this->container->get($serviceId);
     }
 
-    /**
-     * @return string
-     */
     protected function getApiKeyEntityClass(): string
     {
         return UserApi::class;
     }
 
-    /**
-     * @return string
-     */
     protected function getDefaultSecurityFirewall(): string
     {
         return 'wsse_secured';

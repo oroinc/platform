@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Displays current "conditions" for an application
+ * Displays available conditions.
  */
 class DebugConditionCommand extends AbstractDebugCommand
 {
@@ -14,25 +15,28 @@ class DebugConditionCommand extends AbstractDebugCommand
     /** @var string */
     protected static $defaultName = 'oro:debug:condition';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Displays current "conditions" for an application')
-            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'A condition name')
+        $this
+            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Condition name')
+            ->setDescription('Displays available conditions.')
             ->setHelp(
-                <<<EOF
-The <info>%command.name%</info> displays list of all conditions with full description:
+                <<<'HELP'
+The <info>%command.name%</info> command displays available conditions.
 
   <info>php %command.full_name%</info>
-EOF
-            );
+
+To get information about a specific condition, specify its name:
+
+  <info>php %command.full_name% <condition></info>
+  <info>php %command.full_name% instanceof</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getArgumentName(): string
     {
         return self::ARGUMENT_NAME;

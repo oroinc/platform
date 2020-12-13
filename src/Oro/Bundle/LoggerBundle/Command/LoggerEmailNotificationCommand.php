@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
@@ -13,25 +14,15 @@ use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Update logger email notification configuration
+ * Updates logger email notification configuration.
  */
 class LoggerEmailNotificationCommand extends Command
 {
     protected static $defaultName = 'oro:logger:email-notification';
 
-    private const RECIPIENTS = 'recipients';
-    private const DISABLE = 'disable';
+    private ValidatorInterface $validator;
+    private ?ConfigManager $configManager;
 
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var ConfigManager|null */
-    private $configManager;
-
-    /**
-     * @param ValidatorInterface $validator
-     * @param ConfigManager $configManager
-     */
     public function __construct(ValidatorInterface $validator, ?ConfigManager $configManager)
     {
         $this->validator = $validator;
@@ -40,46 +31,48 @@ class LoggerEmailNotificationCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isEnabled(): bool
     {
         return (bool) $this->configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->addOption(
-                self::DISABLE,
-                null,
-                InputOption::VALUE_NONE,
-                'Add this option to disable email notifications about errors in log.'
+            ->addOption('disable', null, InputOption::VALUE_NONE, 'Disable email notifications about logged errors')
+            ->addOption('recipients', 'r', InputOption::VALUE_REQUIRED, 'Recipient email addresses separated by ;')
+            ->setDescription('Updates logger email notification configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates logger email notification configuration.
+
+The <info>--disable</info> option can be used to disable email notifications about the logged errors:
+
+  <info>php %command.full_name% --disable</info>
+
+The <info>--recipients</info> option can be used to update the list of the recipients
+that will receive email notifications about the logged errors:
+
+  <info>php %command.full_name% --recipients=<recipients></info>
+  <info>php %command.full_name% --recipients='email1@example.com;email2@example.com;emailN@example.com'</info>
+
+HELP
             )
-            ->addOption(
-                self::RECIPIENTS,
-                'r',
-                InputOption::VALUE_REQUIRED,
-                'To send notifications about errors in log write email addresses separated by semicolon (;).'
-            )
-            ->setDescription('Update logger email notification configuration');
+            ->addUsage('--disable')
+            ->addUsage('--recipients=<recipients>')
+            ->addUsage("--recipients='email1@example.com;email2@example.com;emailN@example.com'")
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
 
-        $user = null;
-        $recipients = $input->getOption(self::RECIPIENTS);
+        $recipients = $input->getOption('recipients');
 
-        $disable = $input->getOption(self::DISABLE);
+        $disable = $input->getOption('disable');
 
         $recipientsConfigKey = Configuration::getFullConfigKey(Configuration::EMAIL_NOTIFICATION_RECIPIENTS);
         if ($disable) {
@@ -112,11 +105,7 @@ class LoggerEmailNotificationCommand extends Command
         $io->error('Please provide --recipients or add --disable flag to the command.');
     }
 
-    /**
-     * @param string $recipients
-     * @return array
-     */
-    protected function validateRecipients($recipients)
+    protected function validateRecipients(string $recipients): array
     {
         $emails = explode(';', $recipients);
         $errors = [];

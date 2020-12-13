@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
@@ -9,36 +10,38 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to rebuild the translation cache.
+ * Rebuilds the translation cache.
  */
 class OroTranslationRebuildCacheCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:translation:rebuild-cache';
 
-    /** @var RebuildTranslationCacheProcessor */
-    private $rebuildTranslationCacheProcessor;
+    private RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor;
 
-    /**
-     * @param RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor
-     */
     public function __construct(RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor)
     {
         parent::__construct();
         $this->rebuildTranslationCacheProcessor = $rebuildTranslationCacheProcessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Rebuilds the translation cache.');
+        $this
+            ->setDescription('Rebuilds the translation cache.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command rebuilds the translation cache.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);

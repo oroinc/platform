@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 
 /**
- * Displays current "actions" for an application
+ * Displays available actions.
  */
 class DebugActionCommand extends AbstractDebugCommand
 {
@@ -14,25 +15,28 @@ class DebugActionCommand extends AbstractDebugCommand
     /** @var string */
     protected static $defaultName = 'oro:debug:action';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Displays current "actions" for an application')
-            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'An "action" name')
+        $this
+            ->addArgument(self::ARGUMENT_NAME, InputArgument::OPTIONAL, 'Action name')
+            ->setDescription('Displays available actions.')
             ->setHelp(
-                <<<'EOF'
-The <info>%command.name%</info> displays the configured 'actions':
+                <<<'HELP'
+The <info>%command.name%</info> command displays available actions.
 
   <info>php %command.full_name%</info>
-EOF
-            );
+
+To get information about a specific action, specify its name:
+
+  <info>php %command.full_name% <action></info>
+  <info>php %command.full_name% flash_message</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getArgumentName(): string
     {
         return self::ARGUMENT_NAME;

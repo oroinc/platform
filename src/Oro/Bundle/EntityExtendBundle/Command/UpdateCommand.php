@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -15,23 +16,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to update the database schema and all related caches to reflect changes made in extended entities.
+ * Applies extend entity changes to the database schema.
  */
 class UpdateCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:entity-extend:update';
 
-    /** @var EntityExtendUpdateProcessor */
-    private $entityExtendUpdateProcessor;
+    private EntityExtendUpdateProcessor $entityExtendUpdateProcessor;
+    private ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /**
-     * @param EntityExtendUpdateProcessor $entityExtendUpdateProcessor
-     * @param ConfigManager               $configManager
-     */
     public function __construct(
         EntityExtendUpdateProcessor $entityExtendUpdateProcessor,
         ConfigManager $configManager
@@ -41,21 +35,30 @@ class UpdateCommand extends Command
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Updates the database schema and all related caches to reflect changes made in extended entities.'
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Display changes without applying them')
+            ->setDescription('Applies extend entity changes to the database schema.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command applies extend entity changes
+to the database schema and updates all related caches.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to print the changes without applying them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
             )
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Shows changes without applying them.');
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
@@ -69,9 +72,6 @@ class UpdateCommand extends Command
         return $this->applyChanges($io);
     }
 
-    /**
-     * @param SymfonyStyle $io
-     */
     private function showChanges(SymfonyStyle $io): void
     {
         $changes = $this->getChanges();
@@ -132,11 +132,6 @@ class UpdateCommand extends Command
         return $changes;
     }
 
-    /**
-     * @param ConfigInterface $config
-     *
-     * @return bool
-     */
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
         return
@@ -145,11 +140,6 @@ class UpdateCommand extends Command
             && !$config->is('is_deleted');
     }
 
-    /**
-     * @param SymfonyStyle $io
-     *
-     * @return int
-     */
     private function applyChanges(SymfonyStyle $io): int
     {
         $io->text('Updating the database schema and all entity extend related caches ...');

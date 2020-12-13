@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client;
 
@@ -8,23 +9,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Creates all required queues for consumer
+ * Creates required message queues.
  */
 class CreateQueuesCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:message-queue:create-queues';
 
-    /** @var DriverInterface */
-    private $clientDriver;
+    private DriverInterface $clientDriver;
+    private DestinationMetaRegistry $destinationMetaRegistry;
 
-    /** @var DestinationMetaRegistry */
-    private $destinationMetaRegistry;
-
-    /**
-     * @param DriverInterface $clientDriver
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     */
     public function __construct(DriverInterface $clientDriver, DestinationMetaRegistry $destinationMetaRegistry)
     {
         $this->clientDriver = $clientDriver;
@@ -32,16 +26,25 @@ class CreateQueuesCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Creates all required queues');
+        $this
+            ->setDescription('Creates required message queues.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command creates required message queues.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

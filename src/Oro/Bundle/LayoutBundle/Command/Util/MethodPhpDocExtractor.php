@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
@@ -10,15 +11,8 @@ use phpDocumentor\Reflection\Types\ContextFactory;
  */
 class MethodPhpDocExtractor
 {
-    /**
-     * @var DocBlockFactory
-     */
-    private $docBlockFactory;
-
-    /**
-     * @var ContextFactory
-     */
-    private $contextFactory;
+    private DocBlockFactory $docBlockFactory;
+    private ContextFactory $contextFactory;
 
     public function __construct()
     {
@@ -26,10 +20,6 @@ class MethodPhpDocExtractor
         $this->contextFactory = new ContextFactory();
     }
 
-    /**
-     * @param $object
-     * @return array
-     */
     public function extractPublicMethodsInfo($object): array
     {
         $ro = new \ReflectionObject($object);
@@ -46,10 +36,6 @@ class MethodPhpDocExtractor
         return $methods;
     }
 
-    /**
-     * @param \ReflectionMethod $reflectionMethod
-     * @return array
-     */
     private function extractMethodInfo(\ReflectionMethod $reflectionMethod): array
     {
         $methodInfo = [
@@ -80,7 +66,7 @@ class MethodPhpDocExtractor
             $this->contextFactory->createFromReflector($reflectionMethod)
         );
         $methodInfo['description'] = trim($docBlock->getSummary());
-        $description = trim($docBlock->getDescription());
+        $description = \trim((string)$docBlock->getDescription());
         if (!empty($description)) {
             $methodInfo['description'] .= "\n".$description;
         }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Consumption;
 
@@ -11,7 +12,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A worker that consumes message from a broker.
+ * Processes a message-queue with a specific processor.
  */
 class ConsumeMessagesCommand extends Command
 {
@@ -20,16 +21,9 @@ class ConsumeMessagesCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:message-queue:transport:consume';
 
-    /** @var QueueConsumer */
-    protected $queueConsumer;
+    protected QueueConsumer $queueConsumer;
+    protected ContainerInterface $processorLocator;
 
-    /** @var ContainerInterface */
-    protected $processorLocator;
-
-    /**
-     * @param QueueConsumer $queueConsumer
-     * @param ContainerInterface $processorLocator
-     */
     public function __construct(QueueConsumer $queueConsumer, ContainerInterface $processorLocator)
     {
         parent::__construct();
@@ -38,24 +32,28 @@ class ConsumeMessagesCommand extends Command
         $this->processorLocator = $processorLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this->configureLimitsExtensions();
 
         $this
-            ->setDescription('A worker that consumes message from a broker. '.
-                'To use this broker you have to explicitly set a queue to consume from '.
-                'and a message processor service')
             ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
-            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service');
+            ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
+            ->setDescription('Processes a message-queue with a specific processor.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command consumes message from a specified message queue.
+The message processor service should be specified as the second argument.
+
+  <info>php %command.full_name% <queue> <processor-service></info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $queueName = $input->getArgument('queue');
@@ -68,11 +66,7 @@ class ConsumeMessagesCommand extends Command
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
     }
 
-    /**
-     * @param QueueConsumer      $consumer
-     * @param ExtensionInterface $extension
-     */
-    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
+    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         try {
             $consumer->consume($extension);
@@ -81,33 +75,21 @@ class ConsumeMessagesCommand extends Command
         }
     }
 
-    /**
-     * @param array $extensions
-     *
-     * @return ExtensionInterface
-     */
-    protected function getConsumerExtension(array $extensions)
+    protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions);
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return ExtensionInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpUnusedParameterInspection
      */
-    protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
+    protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension(new ConsoleLogger($output));
     }
 
-    /**
-     * @param string $processorServiceId
-     *
-     * @return MessageProcessorInterface
-     */
-    private function getMessageProcessor($processorServiceId)
+    private function getMessageProcessor(string $processorServiceId): MessageProcessorInterface
     {
         $processor = $this->processorLocator->get($processorServiceId);
         if (!$processor instanceof MessageProcessorInterface) {

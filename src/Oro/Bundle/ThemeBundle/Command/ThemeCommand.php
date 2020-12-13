@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ThemeBundle\Command;
 
@@ -9,35 +10,40 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to list all available themes
+ * Lists available themes.
  */
 class ThemeCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:theme:list';
 
-    /** @var ThemeRegistry */
-    private $themeRegistry;
+    private ThemeRegistry $themeRegistry;
 
-    /**
-     * @param ThemeRegistry $themeRegistry
-     */
     public function __construct(ThemeRegistry $themeRegistry)
     {
         $this->themeRegistry = $themeRegistry;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('List of all available themes');
+        $this
+            ->setDescription('Lists available themes.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available themes.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -54,12 +60,7 @@ class ThemeCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param Theme $theme
-     * @param bool $isActive
-     */
-    protected function outputTheme(OutputInterface $output, Theme $theme, bool $isActive)
+    protected function outputTheme(OutputInterface $output, Theme $theme, bool $isActive): void
     {
         if ($isActive) {
             $output->writeln(sprintf('<comment>%s</comment> (active)', $theme->getName()));

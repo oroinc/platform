@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
@@ -10,23 +11,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to validate configuration of actions.
+ * Validates action configuration.
  */
 class ValidateActionConfigurationCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:action:configuration:validate';
 
-    /** @var ConfigurationProviderInterface */
-    private $operationsProvider;
+    private ConfigurationProviderInterface $operationsProvider;
+    private ConfigurationValidatorInterface $configurationValidator;
 
-    /** @var ConfigurationValidatorInterface */
-    private $configurationValidator;
-
-    /**
-     * @param ConfigurationProviderInterface $operationsProvider
-     * @param ConfigurationValidatorInterface $configurationValidator
-     */
     public function __construct(
         ConfigurationProviderInterface $operationsProvider,
         ConfigurationValidatorInterface $configurationValidator
@@ -37,16 +31,25 @@ class ValidateActionConfigurationCommand extends Command
         $this->configurationValidator = $configurationValidator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Validate action configuration');
+        $this
+            ->setDescription('Validates action configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command validates action configuration and displays the encountered errors.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
