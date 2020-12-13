@@ -2,25 +2,26 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+/**
+ * Delegates the getting of entity class names to child providers.
+ */
 class ChainEntityClassNameProvider implements EntityClassNameProviderInterface
 {
-    /** @var EntityClassNameProviderInterface[] */
-    protected $providers = [];
+    /** @var iterable|EntityClassNameProviderInterface[] */
+    private $providers;
 
     /**
-     * Registers the given provider in the chain
-     *
-     * @param EntityClassNameProviderInterface $provider
+     * @param iterable|EntityClassNameProviderInterface[] $providers
      */
-    public function addProvider(EntityClassNameProviderInterface $provider)
+    public function __construct(iterable $providers = [])
     {
-        $this->providers[] = $provider;
+        $this->providers = $providers;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassName($entityClass)
+    public function getEntityClassName(string $entityClass): ?string
     {
         foreach ($this->providers as $provider) {
             $name = $provider->getEntityClassName($entityClass);
@@ -35,7 +36,7 @@ class ChainEntityClassNameProvider implements EntityClassNameProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassPluralName($entityClass)
+    public function getEntityClassPluralName(string $entityClass): ?string
     {
         foreach ($this->providers as $provider) {
             $name = $provider->getEntityClassPluralName($entityClass);

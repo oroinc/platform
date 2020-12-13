@@ -60,11 +60,6 @@ class OroEntityBundle extends Bundle
             'addEntityAliasProvider'
         ));
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_entity.entity_class_name_provider',
-            'oro_entity.class_name_provider',
-            'addProvider'
-        ));
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_entity.exclusion_provider',
             'oro_entity.exclusion_provider.default',
             'addProvider'

@@ -10,7 +10,6 @@ use Oro\Bundle\DataAuditBundle\Async\AbstractAuditProcessor;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Async\AuditChangedEntitiesExtensionTrait;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\StubEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
@@ -42,8 +41,6 @@ class DataAuditTest extends WebTestCase
             $this->findAdmin()->getRoles()
         );
         $this->getContainer()->get('security.token_storage')->setToken($token);
-        $this->getContainer()->get('oro_entity.entity_class_name_provider')
-            ->addProvider(new StubEntityClassNameProvider());
     }
 
     public function testCoverage()
