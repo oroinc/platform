@@ -19,6 +19,9 @@ use Oro\Bundle\UserBundle\Provider\RolePrivilegeAbstractProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The datasource for a datagrid of role permissions.
+ */
 class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements DatasourceInterface
 {
     /** @var PermissionManager */
@@ -65,7 +68,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
     {
         $gridData = [];
         $allPrivileges = $this->preparePrivileges($this->role, 'entity');
-        $categories = $this->categoryProvider->getPermissionCategories();
+        $categories = $this->categoryProvider->getCategories();
 
         foreach ($allPrivileges as $privilege) {
             /** @var AclPrivilege $privilege */
@@ -158,7 +161,7 @@ class RolePermissionDatasource extends RolePrivilegeAbstractProvider implements 
         $permissionName,
         AclPermission $permission
     ) {
-        $permissionLabel = $permissionEntity->getLabel() ? $permissionEntity->getLabel() : $permissionName;
+        $permissionLabel = $permissionEntity->getLabel() ?: $permissionName;
         $permissionLabel = $this->translator->trans($permissionLabel);
 
         $permissionDescription = '';
