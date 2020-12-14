@@ -21,7 +21,10 @@ class DeploymentConfigResolver
             return null;
         }
 
-        $parameters = Yaml::parse(file_get_contents($parametersConfig)) ?: [];
+        $parameters = Yaml::parse(
+            file_get_contents($parametersConfig),
+            Yaml::PARSE_CONSTANT | Yaml::PARSE_CUSTOM_TAGS
+        ) ?: [];
 
         $deploymentType = $parameters['parameters']['deployment_type'] ?? '';
         if (!$deploymentType) {

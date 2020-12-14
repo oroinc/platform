@@ -5,7 +5,6 @@ namespace Oro\Bundle\SecurityBundle;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
-use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclPrivilegeFilterPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\DecorateAuthorizationCheckerPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnerMetadataProvidersPass;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
@@ -41,7 +40,6 @@ class OroSecurityBundle extends Bundle
         $container->addCompilerPass(new OwnershipDecisionMakerPass());
         $container->addCompilerPass(new OwnerMetadataProvidersPass());
         $container->addCompilerPass(new AclGroupProvidersPass());
-        $container->addCompilerPass(new AclPrivilegeFilterPass());
         $container->addCompilerPass(new PriorityNamedTaggedServiceWithHandlerCompilerPass(
             'oro_security.access_rule_executor',
             'oro_security.access_rule',

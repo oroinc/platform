@@ -8,6 +8,22 @@ The current file describes significant changes in the code that may affect the u
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
 
+### Changed
+
+#### PlatformBundle
+* The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
+  `{ name: oro_platform.console.global_options_provider, priority: -100 }`
+
+#### SecurityBundle
+* The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
+  `{ name: oro.security.filter.acl_privilege, priority: -100 }`
+
 ## 4.2.0-rc
 
 ### Added
