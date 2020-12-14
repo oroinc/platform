@@ -402,12 +402,15 @@ services:
         class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
         public: true
         arguments:
+            - '@oro_user.provider.privilege_category_configuration_provider'
             - '@translator'
 
-    oro_user.provider.privilege_category_provider:
-        class: Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProvider
-        tags:
-            - { name: oro_user.privilege_category}
+    oro_user.provider.privilege_category_configuration_provider:
+        class: Oro\Bundle\UserBundle\Configuration\PrivilegeCategoryConfigurationProvider
+        parent: oro.static_config_provider.abstract
+        arguments:
+            - '%kernel.cache_dir%/oro/acl_categories.php'
+            - '%kernel.debug%'
 
     oro_user.provider.role_privilege_capability_provider:
         class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider

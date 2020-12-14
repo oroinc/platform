@@ -8,6 +8,10 @@ The current file describes significant changes in the code that may affect the u
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
 
+#### UserBundle
+* The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
+  Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
+
 ### Changed
 
 #### PlatformBundle
@@ -23,6 +27,13 @@ The current file describes significant changes in the code that may affect the u
   If you have services with this tag, change the sign of the priority value for them.
   E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
   `{ name: oro.security.filter.acl_privilege, priority: -100 }`
+
+#### UserBundle
+* The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
+  - the method `getPermissionCategories` was renamed to `getCategories`
+  - the method `getTabList` was renamed to `getTabIds`
+  - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
+    `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
 
 ## 4.2.0-rc
 
