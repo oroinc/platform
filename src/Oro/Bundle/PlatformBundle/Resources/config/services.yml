@@ -109,6 +109,8 @@ services:
 
     oro_platform.provider.console.global_options_provider_registry:
         class: Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry
+        arguments:
+            - !tagged_iterator oro_platform.console.global_options_provider
 
     oro_platform.provider.console.optional_listeners_global_options_provider:
         class: Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider

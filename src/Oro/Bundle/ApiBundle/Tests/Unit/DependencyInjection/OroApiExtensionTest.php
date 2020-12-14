@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -263,10 +264,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
@@ -553,24 +555,27 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.first')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.first')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new Reference('oro_api.entity_override_provider.first')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.first')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.second')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.second')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new Reference('oro_api.entity_override_provider.second')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.second')->getArguments()
         );
         self::assertEquals(
             [
@@ -1086,24 +1091,27 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.first')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.first')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new Reference('oro_api.entity_override_provider.first')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.first')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.second')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.second')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new Reference('oro_api.entity_override_provider.second')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.second')->getArguments()
         );
         self::assertEquals(
             [

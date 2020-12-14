@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -23,56 +25,64 @@ class EntityAliasCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        // find providers
-        $classProviders = $this->getClassProviders($container);
-        $aliasProviders = $this->getAliasProviders($container);
-
-        // register
+        $classProviders = $this->getProviders($container, self::CLASS_PROVIDER_TAG_NAME);
+        $aliasProviders = $this->getProviders($container, self::ALIAS_PROVIDER_TAG_NAME);
         $resolvers = $container->getDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)->getArgument(0);
         foreach ($resolvers as $resolver) {
             $loaderServiceId = (string)$container->getDefinition($resolver[0])->getArgument(0);
-            $resolverDef = $container->getDefinition($loaderServiceId);
-            foreach ($classProviders as $classProvider) {
-                $resolverDef->addMethodCall('addEntityClassProvider', [$classProvider]);
-            }
-            foreach ($aliasProviders as $aliasProvider) {
-                $resolverDef->addMethodCall('addEntityAliasProvider', [$aliasProvider]);
-            }
+            $this->addProviders($container, $loaderServiceId, 0, $classProviders);
+            $this->addProviders($container, $loaderServiceId, 1, $aliasProviders);
         }
     }
 
     /**
      * @param ContainerBuilder $container
+     * @param string           $tagName
      *
-     * @return string[]
+     * @return Reference[]
      */
-    private function getClassProviders(ContainerBuilder $container): array
+    private function getProviders(ContainerBuilder $container, string $tagName): array
     {
-        $classProviders = [];
-        $taggedServices = $container->findTaggedServiceIds(self::CLASS_PROVIDER_TAG_NAME);
+        $providers = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName);
         foreach ($taggedServices as $id => $tags) {
-            $classProviders[] = new Reference($id);
+            $providers[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
+        }
+        if ($providers) {
+            $providers = $this->sortByPriorityAndFlatten($providers);
         }
 
-        return $classProviders;
+        return $providers;
     }
 
     /**
      * @param ContainerBuilder $container
-     *
-     * @return string[]
+     * @param string           $loaderServiceId
+     * @param int              $argumentIndex
+     * @param Reference[]      $providers
      */
-    private function getAliasProviders(ContainerBuilder $container): array
-    {
-        $aliasProviders = [];
-        $taggedServices = $container->findTaggedServiceIds(self::ALIAS_PROVIDER_TAG_NAME);
-        foreach ($taggedServices as $id => $tags) {
-            $aliasProviders[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
-        }
-        if (!empty($aliasProviders)) {
-            $aliasProviders = $this->sortByPriorityAndFlatten($aliasProviders);
+    private function addProviders(
+        ContainerBuilder $container,
+        string $loaderServiceId,
+        int $argumentIndex,
+        array $providers
+    ): void {
+        $loaderDef = $container->getDefinition($loaderServiceId);
+
+        $existingArgument = $loaderDef->getArgument($argumentIndex);
+        if (!$existingArgument instanceof IteratorArgument) {
+            throw new InvalidArgumentException(sprintf(
+                'Invalid definition for service "%s": argument %d should be "%s", "%s" passed.',
+                $loaderServiceId,
+                $argumentIndex,
+                IteratorArgument::class,
+                is_object($existingArgument) ? get_class($existingArgument) : gettype($existingArgument)
+            ));
         }
 
-        return $aliasProviders;
+        $loaderDef->replaceArgument(
+            $argumentIndex,
+            new IteratorArgument(array_merge($existingArgument->getValues(), $providers))
+        );
     }
 }

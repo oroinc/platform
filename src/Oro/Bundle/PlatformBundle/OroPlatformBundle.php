@@ -3,7 +3,6 @@
 namespace Oro\Bundle\PlatformBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
-use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ConsoleGlobalOptionsCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyDoctrineOrmListenersPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerPass;
@@ -69,7 +68,6 @@ class OroPlatformBundle extends Bundle
             );
         }
         $container->addCompilerPass(new UndoLazyEntityManagerPass());
-        $container->addCompilerPass(new ConsoleGlobalOptionsCompilerPass());
         $container->addCompilerPass(new TwigServiceLocatorPass());
         $container->addCompilerPass(new ProfilerStorageCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 32);
         $container->addCompilerPass(new MergeServiceLocatorsCompilerPass(
