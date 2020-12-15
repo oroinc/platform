@@ -1,13 +1,29 @@
 parameters:
     nelmio_api_doc.twig.extension.extra_markdown.class: Oro\Bundle\ApiBundle\Twig\MarkdownExtension
 
-    # The names of API views
-    # they are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    # The names of API views.
+    # They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
     oro_api.api_doc.views: []
 
-    # The name of default API view
-    # it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    # The name of default API view.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
     oro_api.api_doc.default_view: ~
+
+    # The default page size. It is used when the page size is not specified in a request explicitly.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.default_page_size: ~
+
+    # The maximum number of primary entities that can be retrieved by a request.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.max_entities: ~
+
+    # The maximum number of related entities that can be retrieved by a request.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.max_related_entities: ~
+
+    # The maximum number of entities that can be deleted by one request.
+    # It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+    oro_api.max_delete_entities: ~
 
 services:
     oro_api.action_processor_bag:

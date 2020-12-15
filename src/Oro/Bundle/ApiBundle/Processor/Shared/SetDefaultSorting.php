@@ -14,7 +14,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Sets default sorting for different kind of requests.
+ * Sets default sorting filter.
  * The default sorting expression is "identifier field ASC".
  */
 class SetDefaultSorting implements ProcessorInterface
@@ -93,7 +93,7 @@ class SetDefaultSorting implements ProcessorInterface
 
     /**
      * @param EntityDefinitionConfig $config
-     * @param SortersConfig          $configOfSorters
+     * @param SortersConfig|null     $configOfSorters
      *
      * @return array [field name => direction, ...]
      */
@@ -153,6 +153,6 @@ class SetDefaultSorting implements ProcessorInterface
             }
         }
 
-        return \implode(',', $result);
+        return implode(',', $result);
     }
 }

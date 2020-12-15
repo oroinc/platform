@@ -37,7 +37,7 @@ final class FilterValue
     /**
      * @param string      $sourceKey
      * @param string      $path
-     * @param mixed       $value
+     * @param string      $value
      * @param string|null $operator
      *
      * @return FilterValue

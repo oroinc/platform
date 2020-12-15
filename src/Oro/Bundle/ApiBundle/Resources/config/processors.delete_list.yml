@@ -39,8 +39,10 @@ services:
 
     oro_api.delete_list.set_delete_limit:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
+        arguments:
+            - '%oro_api.max_delete_entities%'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -65 }
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -70 }
 
     oro_api.delete_list.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
