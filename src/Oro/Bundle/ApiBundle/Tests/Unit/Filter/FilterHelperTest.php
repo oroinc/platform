@@ -49,7 +49,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         );
         $this->filters->add(
             'page[size]',
-            new PageSizeFilter(DataType::UNSIGNED_INTEGER, 'page size')
+            new PageSizeFilter(DataType::INTEGER, 'page size')
         );
         $this->filters->add(
             'sorting',
@@ -81,7 +81,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         );
         $this->filters->add(
             'page[size]',
-            new PageSizeFilter(DataType::UNSIGNED_INTEGER, 'page size', 10)
+            new PageSizeFilter(DataType::INTEGER, 'page size', 10)
         );
         $this->filters->add(
             'sorting',
@@ -113,7 +113,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         );
         $this->filters->add(
             'page[size]',
-            new PageSizeFilter(DataType::UNSIGNED_INTEGER, 'page size', 10)
+            new PageSizeFilter(DataType::INTEGER, 'page size', 10)
         );
         $this->filters->add(
             'sorting',
