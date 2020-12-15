@@ -3,32 +3,38 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\Common\Collections\Criteria;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizePagingTest extends GetListProcessorTestCase
 {
-    /** @var NormalizePaging */
-    private $processor;
-
-    protected function setUp()
+    /**
+     * @param int $maxEntitiesLimit
+     *
+     * @return NormalizePaging
+     */
+    private function getProcessor(int $maxEntitiesLimit): NormalizePaging
     {
-        parent::setUp();
+        $processor = new NormalizePaging();
+        $processor->setMaxEntitiesLimit($maxEntitiesLimit);
 
-        $this->processor = new NormalizePaging();
+        return $processor;
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
-        $this->processor->process($this->context);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
         self::assertEquals($context, $this->context);
     }
 
     public function testProcessWhenCriteriaObjectDoesNotExist()
     {
-        $this->processor->process($this->context);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
 
         self::assertNull($this->context->getCriteria());
     }
@@ -39,8 +45,10 @@ class NormalizePagingTest extends GetListProcessorTestCase
         $criteria->setFirstResult(12);
         $criteria->setMaxResults(-1);
 
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setCriteria($criteria);
-        $this->processor->process($this->context);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
 
         self::assertNull($criteria->getMaxResults());
         self::assertNull($criteria->getFirstResult());
@@ -52,10 +60,99 @@ class NormalizePagingTest extends GetListProcessorTestCase
         $criteria->setFirstResult(2);
         $criteria->setMaxResults(10);
 
+        $this->context->setConfig(new EntityDefinitionConfig());
         $this->context->setCriteria($criteria);
-        $this->processor->process($this->context);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
 
-        self::assertEquals(10, $criteria->getMaxResults());
-        self::assertEquals(2, $criteria->getFirstResult());
+        self::assertSame(10, $criteria->getMaxResults());
+        self::assertSame(2, $criteria->getFirstResult());
+    }
+
+    public function testProcessWhenUnlimitedMaxResults()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(2);
+        $criteria->setMaxResults(10);
+
+        $config = new EntityDefinitionConfig();
+        $config->setMaxResults(-1);
+
+        $this->context->setConfig($config);
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
+
+        self::assertSame(10, $criteria->getMaxResults());
+        self::assertSame(2, $criteria->getFirstResult());
+    }
+
+    public function testProcessWhenMaxResultsGreaterThanRequestedPageSize()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(2);
+        $criteria->setMaxResults(10);
+
+        $config = new EntityDefinitionConfig();
+        $config->setMaxResults(11);
+
+        $this->context->setConfig($config);
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
+
+        self::assertSame(10, $criteria->getMaxResults());
+        self::assertSame(2, $criteria->getFirstResult());
+    }
+
+    public function testProcessWhenMaxResultsLessThanRequestedPageSize()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(2);
+        $criteria->setMaxResults(10);
+
+        $config = new EntityDefinitionConfig();
+        $config->setMaxResults(9);
+
+        $this->context->setConfig($config);
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(-1);
+        $processor->process($this->context);
+
+        self::assertSame(9, $criteria->getMaxResults());
+        self::assertSame(2, $criteria->getFirstResult());
+    }
+
+    public function testProcessWithMaxEntitiesLimit()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(1);
+        $criteria->setMaxResults(10);
+
+        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(9);
+        $processor->process($this->context);
+
+        self::assertSame(9, $criteria->getMaxResults());
+        self::assertSame(1, $criteria->getFirstResult());
+    }
+
+    public function testProcessWithMaxEntitiesLimitAndMaxResultsInConfig()
+    {
+        $criteria = new Criteria();
+        $criteria->setFirstResult(1);
+        $criteria->setMaxResults(10);
+
+        $config = new EntityDefinitionConfig();
+        $config->setMaxResults(11);
+
+        $this->context->setConfig($config);
+        $this->context->setCriteria($criteria);
+        $processor = $this->getProcessor(12);
+        $processor->process($this->context);
+
+        self::assertSame(10, $criteria->getMaxResults());
+        self::assertSame(1, $criteria->getFirstResult());
     }
 }

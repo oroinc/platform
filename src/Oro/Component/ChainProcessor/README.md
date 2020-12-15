@@ -108,8 +108,6 @@ class TextRepresentationProcessor extends ActionProcessor
 
 namespace Acme\Bundle\TextRepresentationBundle;
 
-use Oro\Component\ChainProcessor\Context;
-
 class ObjectToStringConverter
 {
     /** @var TextRepresentationProcessor */

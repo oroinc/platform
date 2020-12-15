@@ -22,7 +22,7 @@ class PageNumberFilter extends StandaloneFilterWithDefaultValue
             : $this->getDefaultValue();
         if (null !== $val) {
             if ($val < 1) {
-                throw new RuntimeException('The value should should be greater than or equals to 1.');
+                throw new RuntimeException('The value should be greater than or equals to 1.');
             }
             $pageSize = $criteria->getMaxResults();
             if (null !== $pageSize) {

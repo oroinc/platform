@@ -9,14 +9,14 @@ namespace Oro\Component\ChainProcessor;
  */
 class SimpleProcessorRegistry implements ProcessorRegistryInterface
 {
-    /** @var array [processor id => processor class, ...] */
+    /** @var array [processor id => processor class or [processor class, arguments], ...] */
     private $processors;
 
     /** @var ProcessorRegistryInterface */
     private $parentRegistry;
 
     /**
-     * @param array                      $processors [processor id => processor class, ...]
+     * @param array                      $processors
      * @param ProcessorRegistryInterface $parentRegistry
      */
     public function __construct(array $processors, ProcessorRegistryInterface $parentRegistry)
@@ -36,7 +36,9 @@ class SimpleProcessorRegistry implements ProcessorRegistryInterface
 
         $processor = $this->processors[$processorId];
         if (!\is_object($processor)) {
-            $processor = new $processor();
+            $processor = \is_string($processor)
+                ? new $processor()
+                : (new \ReflectionClass($processor[0]))->newInstanceArgs($processor[1]);
             $this->processors[$processorId] = $processor;
         }
 
