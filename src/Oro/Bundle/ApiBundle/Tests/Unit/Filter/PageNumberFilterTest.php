@@ -40,10 +40,21 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedOffset, $criteria->getFirstResult());
     }
 
+    public function testApplyWithFilterAndNullValue()
+    {
+        $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
+        $filterValue = new FilterValue('path', null, null);
+        $criteria = new Criteria();
+
+        $filter->apply($criteria, $filterValue);
+
+        self::assertNull($criteria->getFirstResult());
+    }
+
     public function testApplyWithFilterAndValueLessThan1()
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('The value should should be greater than or equals to 1.');
+        $this->expectExceptionMessage('The value should be greater than or equals to 1.');
 
         $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
         $filterValue = new FilterValue('path', 0, null);
