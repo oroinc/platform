@@ -8,6 +8,8 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit;
 
 class SetDeleteLimitTest extends DeleteListProcessorTestCase
 {
+    private const MAX_DELETE_ENTITIES_LIMIT = 100;
+
     /** @var SetDeleteLimit */
     private $processor;
 
@@ -15,7 +17,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
     {
         parent::setUp();
 
-        $this->processor = new SetDeleteLimit();
+        $this->processor = new SetDeleteLimit(self::MAX_DELETE_ENTITIES_LIMIT);
     }
 
     public function testProcessWhenQueryIsAlreadyBuilt()
@@ -44,7 +46,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
-        self::assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitIsRemoved()
@@ -57,7 +59,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
-        self::assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenNoLimitInConfig()
@@ -70,7 +72,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        self::assertEquals(100, $criteria->getMaxResults());
+        self::assertSame(self::MAX_DELETE_ENTITIES_LIMIT, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitExistsInConfig()
@@ -86,22 +88,21 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        self::assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
     public function testProcessWhenLimitIsRemovedByConfig()
     {
-        $maxResults = -1;
-
         $criteria = new Criteria();
 
         $config = new EntityDefinitionConfig();
-        $config->setMaxResults($maxResults);
+        $config->setMaxResults(-1);
 
         $this->context->setCriteria($criteria);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
 
-        self::assertEquals($maxResults, $criteria->getMaxResults());
+        self::assertNull($criteria->getFirstResult());
+        self::assertNull($criteria->getMaxResults());
     }
 }
