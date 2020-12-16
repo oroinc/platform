@@ -61,8 +61,16 @@
         }
 
         &--gutter {
+            &-l-none {
+                padding-left: 0;
+            }
+
             &-l-s {
                 padding-left: $offset-x-s;
+            }
+
+            &-r-none {
+                padding-right: 0;
             }
 
             &-r-s {
