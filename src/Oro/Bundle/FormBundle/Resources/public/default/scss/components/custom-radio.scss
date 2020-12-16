@@ -63,13 +63,14 @@
     }
 
     &__text {
-        display: inline-block;
-
+        display: inline-flex;
+        align-items: center;
         vertical-align: middle;
 
         word-break: break-word;
 
         &::before {
+            flex-shrink: 0;
             display: inline-block;
 
             width: $custom-radio-icon-size;
