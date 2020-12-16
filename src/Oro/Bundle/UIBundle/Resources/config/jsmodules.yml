@@ -132,7 +132,6 @@ dynamic-imports:
         - oroui/js/app/views/page/before-content-addition-view
         - oroui/js/app/views/page/breadcrumb-view
         - oroui/js/app/views/page/content-view
-        - oroui/js/app/views/page/debug-toolbar-view
         - oroui/js/app/views/page/main-menu-view
         - oroui/js/app/views/page/messages-view
         - oroui/js/app/views/page/organization-switch-view
