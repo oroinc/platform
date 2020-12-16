@@ -77,6 +77,13 @@ services:
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email.address.manager'
 
+    oro_email.email.address.association_metadata_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailAddressAssociationMetadataListener
+        arguments:
+            - '@oro_email.email.address.manager'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+
     oro_email.email.model.builder.helper:
         class: Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
         arguments:

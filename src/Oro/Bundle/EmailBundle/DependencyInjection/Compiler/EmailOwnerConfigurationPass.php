@@ -6,6 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Adds all email owner providers to an email owner storage.
+ */
 class EmailOwnerConfigurationPass implements CompilerPassInterface
 {
     const SERVICE_KEY = 'oro_email.email.owner.provider.storage';
@@ -68,16 +71,5 @@ class EmailOwnerConfigurationPass implements CompilerPassInterface
      */
     protected function setEmailAddressEntityResolver(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('doctrine.orm.listeners.resolve_target_entity')) {
-            $targetEntityResolver = $container->getDefinition('doctrine.orm.listeners.resolve_target_entity');
-            $targetEntityResolver->addMethodCall(
-                'addResolveTargetEntity',
-                array(
-                    'Oro\Bundle\EmailBundle\Entity\EmailAddress',
-                    sprintf('%s\EmailAddressProxy', $container->getParameter('oro_email.entity.cache_namespace')),
-                    array()
-                )
-            );
-        }
     }
 }
