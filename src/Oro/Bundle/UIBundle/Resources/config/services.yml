@@ -376,3 +376,10 @@ services:
             - '@oro_config.manager'
         tags:
             - { name: oro_message_queue.consumption.extension }
+
+    oro_ui.event_listener.symfony_debug_toolbar_replace:
+        class: Oro\Bundle\UIBundle\EventListener\SymfonyDebugToolbarReplaceListener
+        arguments:
+            - '@kernel'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response }

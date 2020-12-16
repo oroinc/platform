@@ -1,7 +1,0 @@
-{% if app.environment == 'dev' %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div {{ UI.renderPageComponentAttributes({
-        view: 'oroui/js/app/views/page/debug-toolbar-view',
-        options: {el: 'body .sf-toolbar'}
-    }) }}></div>
-{% endif %}
