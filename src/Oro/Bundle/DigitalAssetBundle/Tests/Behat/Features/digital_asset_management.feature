@@ -12,11 +12,11 @@ Feature:  Digital asset management
     Then I should see validation errors:
       | File | This value should not be blank. |
     And I fill "Digital Asset Form" with:
-      | File  | sample.csv              |
+      | File  | sample.html             |
       | Title | Not supported mime type |
     When I save form
     Then I should see validation errors:
-      | File | The mime type of the file is invalid ("text/csv"). Allowed mime types are "application/msword", "application/vnd.ms-excel", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
+      | File | The mime type of the file is invalid ("text/html"). Allowed mime types are "text/csv", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
 
   Scenario: Create digital assets with jpg mime types
     Given I fill "Digital Asset Form" with:
