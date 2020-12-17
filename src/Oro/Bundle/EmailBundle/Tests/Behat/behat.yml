@@ -14,9 +14,21 @@ oro_behat_extension:
         - OroConfigBundle::FeatureContext
         - OroSecurityBundle::ACLContext
         - OroEmailBundle::EmailContext
+        - OroEmailBundle::GoogleImapEnableContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
+    Email Synchronization Settings System Config Form Other:
+      selector: "div[id^='configuration-options-block']"
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Enable SMTP: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][useSmtp]'
+          SMTP Host: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpHost]'
+          SMTP Port: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpPort]'
+          Encryption: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpEncryption]'
+          User: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][user]'
+          Password: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][password]'
     Add Autoresponse Rule Form:
       selector: "form[id^='oro_email_autoresponserule']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
