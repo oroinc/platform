@@ -232,7 +232,7 @@ abstract class TemplateRenderer
 
     /**
      * Parses the given TWIG template and replaces entity variables
-     * (they are starts with "entity." or "computed.entity__") with expression that adds default filters.
+     * (they start with "entity." or "computed.entity__") with expression that adds default filters.
      *
      * @param string       $template
      * @param TemplateData $data
@@ -246,7 +246,7 @@ abstract class TemplateRenderer
         $errorMessage = $this->getVariableNotFoundMessage();
 
         return \preg_replace_callback(
-            '/{{\s([\w\_\-\.]+?)\s}}/u',
+            '/{{\s*([\w\_\-\.]+?)\s*}}/u',
             function ($match) use ($formatExtension, $errorMessage, $data) {
                 list($result, $variable) = $match;
                 $variablePath = $variable;
@@ -271,7 +271,7 @@ abstract class TemplateRenderer
 
     /**
      * Parses the given TWIG template and computes values for entity variables
-     * (they are starts with "entity.") that has a processor.
+     * (they start with "entity.") that has a processor.
      *
      * @param string       $template
      * @param TemplateData $data
@@ -281,17 +281,31 @@ abstract class TemplateRenderer
     private function processEntityVariables(string $template, TemplateData $data): string
     {
         return \preg_replace_callback(
-            '/({{\s)([\w\_\-\.]+?)((\|.+)*\s}})/u',
+            // Find expression that should be displayed by twig (strings between {{ and }})
+            '/{{(.+?)}}/u',
             function ($match) use ($data) {
-                list($result, $prefix, $variable, $suffix) = $match;
-                if (\strpos($variable, self::ENTITY_PREFIX) === 0) {
-                    $computedPath = $this->entityVariableComputer->computeEntityVariable($variable, $data);
-                    if ($computedPath) {
-                        $result = $prefix . $computedPath . $suffix;
-                    }
-                }
+                [$outputStr, $variableExpr] = $match;
 
-                return $result;
+                $replaceExpr = \preg_replace_callback(
+                    // Search entity variables (they start with "entity.")
+                    '/('. self::ENTITY_SECTION .'\.[\w|\.]+)/u',
+                    function ($m) use ($data) {
+                        // $variable contains string that starts with "entity."
+                        $variable = $m[0];
+
+                        // Trying to replace entity.* with data provided by processor if any
+                        $computedPath = $this->entityVariableComputer->computeEntityVariable($variable, $data);
+                        if ($computedPath) {
+                            return $computedPath;
+                        }
+
+                        // If no processor registered return raw variable
+                        return $variable;
+                    },
+                    $variableExpr
+                );
+
+                return \str_replace($variableExpr, $replaceExpr, $outputStr);
             },
             $template
         );
