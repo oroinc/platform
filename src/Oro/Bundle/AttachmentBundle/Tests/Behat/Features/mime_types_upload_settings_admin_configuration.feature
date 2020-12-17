@@ -12,14 +12,20 @@ Feature: Mime types upload settings admin configuration
     And I follow "System Configuration/General Setup/Upload Settings" on configuration sidebar
     And uncheck "Use default" for "File MIME types" field
     And I should see "File MIME Types" with options:
-      | Value                    |
-      | application/pdf          |
-      | application/vnd.ms-excel |
-      | application/msword       |
-      | application/zip          |
-      | image/gif                |
-      | image/jpeg               |
-      | image/png                |
+      | Value                                                                     |
+      | text/csv                                                                  |
+      | text/plain                                                                |
+      | application/msword                                                        |
+      | application/vnd.openxmlformats-officedocument.wordprocessingml.document   |
+      | application/vnd.ms-excel                                                  |
+      | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet         |
+      | application/vnd.ms-powerpoint                                             |
+      | application/vnd.openxmlformats-officedocument.presentationml.presentation |
+      | application/pdf                                                           |
+      | application/zip                                                           |
+      | image/gif                                                                 |
+      | image/jpeg                                                                |
+      | image/png                                                                 |
     And I should not see "image/svg+xml" for "File MIME Types" select
     And I unselect "application/vnd.ms-excel" option from "File MIME Types"
     And uncheck "Use default" for "Image MIME types" field
