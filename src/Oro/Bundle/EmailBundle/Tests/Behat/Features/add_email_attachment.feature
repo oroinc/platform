@@ -12,10 +12,10 @@ Feature: Add email attachment
     And I fill "Email Form" with:
       | To      | John Doe   |
       | Subject | Test MIME type email |
-    When I attach "text.txt" file to email
-    Then I should see "text.txt"
+    When I attach "page.html" file to email
+    Then I should see "page.html"
     When I click "Send"
-    Then I should see "The mime type of the file is invalid (\"text/plain\"). Allowed mime types are \"application/msword\", \"application/vnd.ms-excel\", \"application/pdf\", \"application/zip\", \"image/gif\", \"image/jpeg\", \"image/png\"."
+    Then I should see "The mime type of the file is invalid (\"text/html\"). Allowed mime types are \"text/csv\", \"text/plain\", \"application/msword\", \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\", \"application/vnd.ms-excel\", \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", \"application/vnd.ms-powerpoint\", \"application/vnd.openxmlformats-officedocument.presentationml.presentation\", \"application/pdf\", \"application/zip\", \"image/gif\", \"image/jpeg\", \"image/png\"."
     And I close ui dialog
 
   Scenario: Email attachment max file size validation
