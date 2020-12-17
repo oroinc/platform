@@ -13,8 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Sends maintenance mass notification to a configured group of email or to enabled users if no emails were configured.
- *
- * @package Oro\Bundle\NotificationBundle\Command
  */
 class MassNotificationCommand extends Command
 {
@@ -53,7 +51,7 @@ class MassNotificationCommand extends Command
                 'subject',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Subject of notification email. If emtpy, subject from the configured template is used'
+                'Subject of notification email. If empty, subject from the configured template is used'
             )
             ->addOption(
                 'message',

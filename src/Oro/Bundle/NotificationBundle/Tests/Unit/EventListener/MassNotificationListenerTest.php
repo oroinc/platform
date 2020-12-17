@@ -37,7 +37,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
         $message = $this->createMock('Swift_Mime_SimpleMessage');
         $message->expects(self::once())->method('getTo')->willReturn(['to@test.com' => 'test']);
         $message->expects(self::once())->method('getFrom')->willReturn(['from@test.com' => 'test']);
-        $message->expects(self::once())->method('getDate')->willReturn($date->getTimestamp());
+        $message->expects(self::once())->method('getDate')->willReturn($date);
         $message->expects(self::once())->method('getSubject')->willReturn('test subject');
         $message->expects(self::once())->method('getBody')->willReturn('test body');
 

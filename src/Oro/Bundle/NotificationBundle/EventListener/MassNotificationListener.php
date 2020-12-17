@@ -47,14 +47,11 @@ class MassNotificationListener
      */
     private function updateFromSwiftMessage(MassNotification $entity, $message, $sentCount)
     {
-        $dateScheduled = new \DateTime();
-        $dateScheduled->setTimestamp($message->getDate());
-
         $entity->setEmail($this->formatEmail($message->getTo()));
         $entity->setSender($this->formatEmail($message->getFrom()));
         $entity->setSubject($message->getSubject());
         $entity->setStatus($sentCount > 0 ? MassNotification::STATUS_SUCCESS : MassNotification::STATUS_FAILED);
-        $entity->setScheduledAt($dateScheduled);
+        $entity->setScheduledAt($message->getDate());
         $entity->setProcessedAt(new \DateTime());
         $entity->setBody($message->getBody());
     }
