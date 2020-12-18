@@ -118,4 +118,4 @@ services:
     arguments:
       - '@symfony2_extension.kernel'
     tags:
-      - { name: 'oro_behat.isolator', priority: 100 }
+      - { name: 'oro_behat.isolator', priority: 200 }

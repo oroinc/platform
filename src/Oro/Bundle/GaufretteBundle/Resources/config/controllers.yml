@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\GaufretteBundle\Controller\PublicFileController:
+        arguments:
+            - !tagged_iterator oro_gaufrette.public_filesystem_manager
+        tags:
+            - { name: container.service_subscriber }

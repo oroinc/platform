@@ -5,7 +5,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Component\Testing\Unit\EntityTrait;
@@ -24,9 +23,6 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     protected $attachmentManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $fileManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $validator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
@@ -37,12 +33,10 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->normalizer = new FileNormalizer();
 
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
-        $this->fileManager = $this->createMock(FileManager::class);
         $this->validator = $this->createMock(ConfigFileValidator::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->normalizer->setAttachmentManager($this->attachmentManager);
-        $this->normalizer->setFileManager($this->fileManager);
         $this->normalizer->setValidator($this->validator);
         $this->normalizer->setLogger($this->logger);
     }
@@ -173,17 +167,17 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'filesDir' => 'var/import_export/files',
+                'filesDir' => 'var/data/importexport/files',
                 'uri' => '/sample/url',
                 'expectedUri' => '/sample/url',
             ],
             [
-                'filesDir' => 'var/import_export/files/',
+                'filesDir' => 'var/data/importexport/files/',
                 'uri' => 'sample/url',
-                'expectedUri' => 'var/import_export/files/sample/url',
+                'expectedUri' => 'var/data/importexport/files/sample/url',
             ],
             [
-                'filesDir' => 'var/import_export/files/',
+                'filesDir' => 'var/data/importexport/files/',
                 'uri' => 'http://example.org/sample/url',
                 'expectedUri' => 'http://example.org/sample/url',
             ],

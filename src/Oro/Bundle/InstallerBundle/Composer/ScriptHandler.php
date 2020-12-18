@@ -219,7 +219,7 @@ class ScriptHandler
         $directories = [
             'var/cache',
             'var/logs',
-            'var/attachment',
+            'var/data',
             $webDir,
             $parametersFile
         ];
@@ -227,9 +227,6 @@ class ScriptHandler
         $permissionHandler = new PermissionsHandler();
         foreach ($directories as $directory) {
             $permissionHandler->setPermissions($directory);
-        }
-        if (file_exists($importExportDir = 'var/import_export')) {
-            $permissionHandler->setPermissions($importExportDir);
         }
     }
 

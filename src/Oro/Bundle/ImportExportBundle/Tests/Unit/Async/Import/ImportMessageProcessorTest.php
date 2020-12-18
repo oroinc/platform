@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Gaufrette\Filesystem;
 use Oro\Bundle\ImportExportBundle\Async\Import\ImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -155,15 +154,9 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('123456.csv')
             ->willReturn('123456.csv');
 
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem
-            ->expects($this->exactly($writeLog))
-            ->method('write');
-
         $fileManager
             ->expects($this->exactly($writeLog))
-            ->method('getFileSystem')
-            ->willReturn($filesystem);
+            ->method('writeToStorage');
 
         $processor = new ImportMessageProcessor(
             $jobRunner,

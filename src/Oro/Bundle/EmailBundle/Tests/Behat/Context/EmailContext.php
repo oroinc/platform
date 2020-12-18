@@ -251,15 +251,11 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
         }
 
         if ($found) {
-            $this->downloadedFile = tempnam(
-                sprintf(
-                    '%s%svar%simport_export',
-                    $this->getKernel()->getProjectDir(),
-                    DIRECTORY_SEPARATOR,
-                    DIRECTORY_SEPARATOR
-                ),
-                'file_from_email_'
-            );
+            $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'email';
+            if (!is_dir($path)) {
+                mkdir($path);
+            }
+            $this->downloadedFile = tempnam($path, 'file_from_email_');
 
             self::assertTrue((new FileDownloader())->download($found, $this->downloadedFile, $this->getSession()));
 
