@@ -51,7 +51,10 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $contentDisposition = $this->client->getResponse()->headers->get('Content-Disposition');
         preg_match('/^.*"?(export_template_[a-z0-9_]+.csv)"?$/', $contentDisposition, $matches);
 
-        $actualExportContent = $this->client->getResponse()->getContent();
+        ob_start();
+        $this->client->getResponse()->sendContent();
+        $actualExportContent = ob_get_clean();
+
         $exportFileContent = $this->getFileContent($expectedCsvFilePath);
 
         $expectedData = $this->getParsedDataFromCSVContent($actualExportContent);
@@ -469,7 +472,10 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             $this->getUrl('oro_importexport_export_download', ['jobId' => $jobId])
         );
 
-        return $this->client->getResponse()->getContent();
+        ob_start();
+        $this->client->getResponse()->sendContent();
+
+        return ob_get_clean();
     }
 
     /**
