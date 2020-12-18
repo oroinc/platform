@@ -43,18 +43,16 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
 
         $container = $this->createMock(ContainerBuilder::class);
         $container
-            ->expects($this->exactly(16))
+            ->expects($this->exactly(14))
             ->method('setParameter')
             ->withConsecutive(
-                ['oro_attachment.filesystem_dir.attachments', 'attachment'],
                 ['oro_attachment.filesystem_name.attachments', 'attachments'],
                 ['oro_attachment.filesystem_name.mediacache', 'mediacache'],
-                ['oro_attachment.filesystem_dir.mediacache', 'media/cache'],
                 ['oro_attachment.filesystem_name.protected_mediacache', 'protected_mediacache'],
-                ['oro_attachment.filesystem_dir.protected_mediacache', 'attachment/cache'],
+                ['oro_attachment.filesystem_dir.mediacache', 'media/cache'],
+                ['oro_attachment.import_files_dir', '%kernel.project_dir%/var/data/importexport/files/'],
                 ['oro_attachment.liip_imagine.unsupported_mime_types', ['image/svg+xml']],
                 ['oro_attachment.provider.resized_image_path.skip_prefix', 'media/cache'],
-                ['oro_attachment.import_files_dir', '%kernel.project_dir%/var/import_export/files/'],
                 ['oro_attachment.debug_images', true],
                 ['oro_attachment.upload_file_mime_types', []],
                 ['oro_attachment.upload_image_mime_types', []],

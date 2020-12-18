@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterfa
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
 use Oro\Bundle\ImportExportBundle\Controller\ImportExportController;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Form\Type\ImportType;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Tests\Functional\DataFixtures\LoadImportExportResultData;
@@ -41,17 +42,16 @@ class ImportExportControllerTest extends WebTestCase
             LoadImportExportResultData::class
         ]);
 
-        $this->existingFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+        $this->existingFiles = $this->getImportExportFileManager()->getFilesByFilePattern('*.csv');
     }
 
     protected function tearDown(): void
     {
-        $tempFiles = glob($this->getImportDir() . DIRECTORY_SEPARATOR . '*.csv');
+        $fileManager = $this->getImportExportFileManager();
+        $tempFiles = $fileManager->getFilesByFilePattern('*.csv');
         $diffFiles = array_diff($tempFiles, $this->existingFiles);
         foreach ($diffFiles as $file) {
-            if ($file && file_exists($file)) {
-                unlink($file);
-            }
+            $fileManager->deleteFile($file);
         }
     }
 
@@ -260,10 +260,11 @@ class ImportExportControllerTest extends WebTestCase
         );
         $this->assertJsonResponseSuccess();
         $message = $this->getSentMessage(Topics::PRE_IMPORT);
-        $importedFilePath = $this->getImportDir() . DIRECTORY_SEPARATOR . $message['fileName'];
-        $this->assertEquals(
+
+        $importedFileContent = $this->getImportExportFileManager()->getContent($message['fileName']);
+        self::assertEquals(
             substr_count(file_get_contents($file), "\n"),
-            substr_count(file_get_contents($importedFilePath), "\r\n")
+            substr_count($importedFileContent, "\r\n")
         );
     }
 
@@ -398,11 +399,11 @@ class ImportExportControllerTest extends WebTestCase
     }
 
     /**
-     * @return string
+     * @return FileManager
      */
-    private function getImportDir()
+    private function getImportExportFileManager(): FileManager
     {
-        return $this->getContainer()->getParameter('kernel.project_dir') . '/var/import_export';
+        return $this->getContainer()->get('oro_importexport.file.file_manager');
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager;
 
-use Gaufrette\Adapter\MetadataSupporter;
+use Gaufrette\Adapter\GridFS;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream\InMemoryBuffer;
@@ -74,12 +74,18 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn('attachments/' . $fileEntity->getFilename());
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileEntity->getFilename());
 
         $this->filesystem->expects($this->never())
             ->method('has');
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn($file);
 
         $this->assertEquals($fileContent, $this->fileManager->getContent($fileEntity));
@@ -94,7 +100,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('has');
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileName)
+            ->with('attachments/' . $fileName)
             ->willThrowException(new FileNotFound($fileName));
 
         $this->fileManager->getContent($fileName);
@@ -263,15 +269,21 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn($file);
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn('attachments/' . $fileEntity->getFilename());
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileEntity->getFilename());
 
         $clonedFileEntity = $this->fileManager->cloneFileEntity($fileEntity);
 
@@ -291,7 +303,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('get');
@@ -310,15 +322,21 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn($file);
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn('attachments/' . $fileEntity->getFilename());
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileEntity->getFilename());
 
         $symfonyFile = $this->fileManager->getFileFromFileEntity($fileEntity, false);
 
@@ -335,7 +353,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('get');
@@ -425,10 +443,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileEntity->getFilename())
+            ->with('attachments/' . $fileEntity->getFilename())
             ->willReturn($memoryBuffer);
 
-        $adapter = $this->createMock(MetadataSupporter::class);
+        $adapter = $this->createMock(GridFS::class);
         $this->filesystem->expects($this->any())
             ->method('getAdapter')
             ->willReturn($adapter);

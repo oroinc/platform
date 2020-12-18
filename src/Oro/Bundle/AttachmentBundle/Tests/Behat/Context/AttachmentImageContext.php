@@ -6,7 +6,6 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -137,7 +136,7 @@ JS;
      */
     public function rememberNumberOfAttachmentFiles(string $extension = ''): void
     {
-        $this->filesCount[$extension] = $this->countFilesInAttachmentDir($extension);
+        $this->filesCount[$extension] = $this->countFilesInAttachmentFilesystem($extension);
     }
 
     //@codingStandardsIgnoreStart
@@ -152,7 +151,7 @@ JS;
     //@codingStandardsIgnoreEnd
     public function numberOfAttachmentFilesIsChangedBy(string $operator, int $count, string $extension = ''): void
     {
-        $currentCount = $this->countFilesInAttachmentDir($extension);
+        $currentCount = $this->countFilesInAttachmentFilesystem($extension);
         $rememberedCount = $this->filesCount[$extension] ?? 0;
 
         if ($operator === 'less') {
@@ -187,19 +186,21 @@ JS;
      *
      * @return int
      */
-    private function countFilesInAttachmentDir(string $extension = ''): int
+    private function countFilesInAttachmentFilesystem(string $extension = ''): int
     {
-        $projectDir = $this->getContainer()->getParameter('kernel.project_dir');
-        $attachmentDir = $this->getContainer()->getParameter('oro_attachment.filesystem_dir.attachments');
-        $filesIterator = Finder::create()
-            ->in($projectDir . '/var/' . $attachmentDir)
-            ->files();
-
+        $files = $this->getContainer()->get('oro_attachment.file_manager')->findFiles();
         if ($extension) {
-            $filesIterator->name(sprintf('*.%s', ltrim($extension, '.')));
+            $resultFiles = [];
+            $pattern = sprintf('*.%s', ltrim($extension, '.'));
+            foreach ($files as $file) {
+                if (fnmatch($pattern, $file)) {
+                    $resultFiles[] = $file;
+                }
+            }
+            $files = $resultFiles;
         }
 
-        return iterator_count($filesIterator);
+        return count($files);
     }
 
     /**

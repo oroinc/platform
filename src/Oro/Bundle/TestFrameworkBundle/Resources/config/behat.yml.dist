@@ -31,8 +31,8 @@ default: &default
             artifacts:
                 handlers:
                     local:
-                        directory: '%paths.base%/public/uploads/behat'
-                        base_url: '%mink.base_url%/uploads/behat/'
+                        directory: '%paths.base%/public/media/behat'
+                        base_url: '%mink.base_url%/media/behat/'
                         auto_clear: false
             shared_contexts:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
