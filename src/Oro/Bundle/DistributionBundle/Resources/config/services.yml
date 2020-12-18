@@ -13,7 +13,6 @@ parameters:
         - vendor
         - public/bundles
         - public/js
-        - public/css
         - composer.json
 
 services:
