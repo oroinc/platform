@@ -1,7 +1,6 @@
 parameters:
     oro_importexport.import.size_of_batch: 100
     oro_importexport.export.size_of_batch: 5000
-    oro_importexport.importexport_dir: import_export
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -69,11 +68,16 @@ services:
     oro_importexport.reader.reader_chain:
         class: Oro\Bundle\ImportExportBundle\Reader\ReaderChain
 
+    oro_importexport.manager.importexport:
+        parent: 'oro_gaufrette.file_manager'
+        arguments:
+            - 'importexport'
+
     oro_importexport.file.file_manager:
         class: Oro\Bundle\ImportExportBundle\File\FileManager
         public: true
         arguments:
-          - '@knp_gaufrette.filesystem_map'
+          - '@oro_importexport.manager.importexport'
 
     Oro\Bundle\ImportExportBundle\File\FileManager:
         alias: 'oro_importexport.file.file_manager'

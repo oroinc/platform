@@ -63,7 +63,6 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
                 'vendor',
                 'public/bundles',
                 'public/js',
-                'public/css',
                 'composer.json',
             ],
             'twig.form.resources' => [],

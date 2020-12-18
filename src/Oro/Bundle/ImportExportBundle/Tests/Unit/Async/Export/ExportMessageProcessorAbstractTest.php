@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
-use Gaufrette\Filesystem;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -139,7 +138,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $this->fileManager
             ->expects($this->never())
-            ->method('getFileSystem');
+            ->method('writeToStorage');
 
         $result = $this->processor->process(new Message(), $this->createSessionMock());
 
@@ -166,13 +165,8 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $this->fileManager
             ->expects($this->once())
-            ->method('getFileSystem')
-            ->willReturn($filesystem = $this->createMock(Filesystem::class));
-
-        $filesystem
-            ->expects($this->once())
-            ->method('write')
-            ->with($this->isType(IsType::TYPE_STRING), json_encode($exportResult['errors']));
+            ->method('writeToStorage')
+            ->with(json_encode($exportResult['errors']));
 
         $result = $this->processor->process(new Message(), $this->createSessionMock());
 

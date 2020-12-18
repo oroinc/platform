@@ -516,7 +516,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->assertEquals(
             [
                 'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba: The file '
-                . '"invalid/filepath.jpg" was not found.',
+                . '"attachments/invalid/filepath.jpg" was not found.',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()

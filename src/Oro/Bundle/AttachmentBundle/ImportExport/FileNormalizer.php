@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
@@ -23,9 +22,6 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     /** @var AttachmentManager */
     protected $attachmentManager;
 
-    /** @var FileManager */
-    protected $fileManager;
-
     /** @var ConfigFileValidator */
     protected $validator;
 
@@ -41,14 +37,6 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
     public function setAttachmentManager(AttachmentManager $manager)
     {
         $this->attachmentManager = $manager;
-    }
-
-    /**
-     * @param FileManager $manager
-     */
-    public function setFileManager(FileManager $manager)
-    {
-        $this->fileManager = $manager;
     }
 
     /**

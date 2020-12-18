@@ -62,11 +62,11 @@ class AttachmentFilterConfigurationTest extends WebTestCase
     private function assertFilterEqual(array $filter, int $jpegQuality = 85, int $pngQuality = 100)
     {
         $this->assertEquals(
-            $filter['post_processors'],
             [
                 'pngquant' => ['quality' => $pngQuality],
                 'jpegoptim' => ['strip_all' => true, 'max' => $jpegQuality, 'progressive' => false],
-            ]
+            ],
+            $filter['post_processors']
         );
     }
 }
