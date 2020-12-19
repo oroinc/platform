@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
- * The class that helps get the name of the current ApiDoc view, API version and the request type.
+ * The class that helps to get the name of the current ApiDoc view, API version and the request type.
  */
 class RestDocViewDetector implements ResetInterface
 {
@@ -43,7 +43,7 @@ class RestDocViewDetector implements ResetInterface
     /**
      * @return string
      */
-    public function getView()
+    public function getView(): string
     {
         $view = $this->view;
         if (null === $view) {
@@ -63,7 +63,7 @@ class RestDocViewDetector implements ResetInterface
     /**
      * @param string|null $view
      */
-    public function setView($view = null)
+    public function setView(string $view = null): void
     {
         $this->view = $view;
         $this->requestType = null;
@@ -73,10 +73,10 @@ class RestDocViewDetector implements ResetInterface
     /**
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         if (null === $this->version) {
-            $this->setVersion(Version::normalizeVersion(null));
+            $this->version = Version::normalizeVersion(null);
         }
 
         return $this->version;
@@ -85,7 +85,7 @@ class RestDocViewDetector implements ResetInterface
     /**
      * @param string|null $version
      */
-    public function setVersion($version = null)
+    public function setVersion(string $version = null): void
     {
         $this->version = $version;
     }
@@ -93,7 +93,7 @@ class RestDocViewDetector implements ResetInterface
     /**
      * @return RequestType
      */
-    public function getRequestType()
+    public function getRequestType(): RequestType
     {
         if (null === $this->requestType) {
             foreach ($this->requestTypeProviders as $provider) {
@@ -120,7 +120,7 @@ class RestDocViewDetector implements ResetInterface
     /**
      * {@inheritDoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->setView();
         $this->initializedRequestTypeProviders = [];
