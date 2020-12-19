@@ -51,7 +51,12 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFilePath()
     {
         self::assertEquals(
-            sprintf('%s://%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME),
+            sprintf(
+                '%s://%s/%s/test.txt',
+                self::TEST_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
             $this->fileManager->getFilePath('test.txt')
         );
     }
@@ -62,7 +67,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->setProtocol(self::TEST_PROTOCOL);
 
         self::assertEquals(
-            sprintf('%s://%s/test.txt', self::TEST_PROTOCOL, 'testSubDir'),
+            sprintf('%s://%s/%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
             $fileManager->getFilePath('test.txt')
         );
     }

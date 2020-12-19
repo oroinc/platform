@@ -27,13 +27,13 @@ services:
         lazy: true
 
     Oro\Bundle\ImportExportBundle\Handler\ExportHandler:
-        alias: 'oro_importexport.handler.export'
+        alias: oro_importexport.handler.export
 
     oro_importexport.handler.csv.file:
         class: Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler
 
     Oro\Bundle\ImportExportBundle\Handler\CsvFileHandler:
-        alias: 'oro_importexport.handler.csv.file'
+        alias: oro_importexport.handler.csv.file
 
     oro_importexport.handler.postpone:
         class: Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler

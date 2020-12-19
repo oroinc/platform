@@ -96,8 +96,9 @@ class FileManager
         }
 
         return sprintf(
-            '%s://%s',
+            '%s://%s/%s',
             $this->protocol,
+            $this->filesystemName,
             $this->getFileNameWithPrefixDirectory($fileName)
         );
     }

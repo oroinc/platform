@@ -22,12 +22,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ExportHandler extends AbstractHandler
 {
     /**
-     * A gaufrette filesystem name for import-export.
-     * Mapping is located at Resources/oro/app.yml knp_gaufrette section
-     */
-    protected const FS_NAME = 'importexport';
-
-    /**
      * Get export result
      *
      * @param string $jobName
@@ -46,33 +40,25 @@ class ExportHandler extends AbstractHandler
         $outputFilePrefix = null,
         array $options = []
     ) {
-        if ($outputFilePrefix === null) {
+        if (null === $outputFilePrefix) {
             $outputFilePrefix = $processorType;
         }
         $fileName = FileManager::generateFileName($outputFilePrefix, $outputFormat);
         $filePath = FileManager::generateTmpFilePath($fileName);
-        $entityName = $this->processorRegistry->getProcessorEntityName(
-            $processorType,
-            $processorAlias
-        );
+        $entityName = $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias);
 
         $configuration = [
-            $processorType =>
-                array_merge(
-                    [
-                        'processorAlias' => $processorAlias,
-                        'entityName' => $entityName,
-                        'filePath' => $filePath
-                    ],
-                    $options
-                )
+            $processorType => array_merge(
+                [
+                    'processorAlias' => $processorAlias,
+                    'entityName' => $entityName,
+                    'filePath' => $filePath
+                ],
+                $options
+            )
         ];
 
-        $jobResult = $this->jobExecutor->executeJob(
-            $processorType,
-            $jobName,
-            $configuration
-        );
+        $jobResult = $this->jobExecutor->executeJob($processorType, $jobName, $configuration);
 
         try {
             $this->fileManager->writeFileToStorage($filePath, $fileName);
@@ -120,23 +106,20 @@ class ExportHandler extends AbstractHandler
      * @param string $jobName
      * @param string $processorType
      * @param string $processorAlias
-     * @param string $options
+     * @param array $options
      * @return array
      */
     public function getExportingEntityIds($jobName, $processorType, $processorAlias, $options)
     {
-        if (!($reader = $this->getJobReader($jobName, $processorType)) instanceof BatchIdsReaderInterface) {
+        $reader = $this->getJobReader($jobName, $processorType);
+        if (!$reader instanceof BatchIdsReaderInterface) {
             return [];
         }
 
-        $entityName = $this->processorRegistry->getProcessorEntityName(
-            $processorType,
-            $processorAlias
+        return $reader->getIds(
+            $this->processorRegistry->getProcessorEntityName($processorType, $processorAlias),
+            $options
         );
-
-        /** @var BatchIdsReaderInterface $reader */
-
-        return $reader->getIds($entityName, $options);
     }
 
     /**
@@ -147,7 +130,7 @@ class ExportHandler extends AbstractHandler
      *
      * @return string
      *
-     * @throws \Oro\Bundle\ImportExportBundle\Exception\RuntimeException
+     * @throws RuntimeException
      */
     public function exportResultFileMerge($jobName, $processorType, $outputFormat, array $files)
     {
@@ -241,16 +224,14 @@ class ExportHandler extends AbstractHandler
             throw new NotFoundHttpException();
         }
 
-        $response = new BinaryFileResponse(sprintf('gaufrette://%s/%s', self::FS_NAME, $fileName));
-
-        $disposition = $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $fileName
+        $response = new BinaryFileResponse($this->fileManager->getFilePath($fileName));
+        $response->headers->set(
+            'Content-Disposition',
+            $response->headers->makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $fileName)
         );
-        $response->headers->set('Content-Disposition', $disposition);
 
         $contentType = $this->fileManager->getMimeType($fileName);
-        if ($contentType !== null) {
+        if (null !== $contentType) {
             $response->headers->set('Content-Type', $contentType);
         }
 
