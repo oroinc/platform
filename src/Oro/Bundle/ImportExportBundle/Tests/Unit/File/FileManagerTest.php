@@ -1,19 +1,23 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\File;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Gaufrette\File;
 use Gaufrette\FilesystemInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileManagerTest extends TestCase
 {
     use TempDirExtension;
 
-    const FILENAME = 'file.png';
+    private const FILENAME = 'file.png';
 
     /** @var FileManager */
     private $fileManager;
@@ -265,5 +269,18 @@ class FileManagerTest extends TestCase
                 'expectedFiles' => ['secondFile']
             ],
         ];
+    }
+
+    public function testGetFilePath()
+    {
+        $fileName = 'test.txt';
+        $filePath = 'gaufrette://file_system/sub_dir/test.txt';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFilePath')
+            ->with($fileName)
+            ->willReturn($filePath);
+
+        self::assertEquals($filePath, $this->fileManager->getFilePath($fileName));
     }
 }

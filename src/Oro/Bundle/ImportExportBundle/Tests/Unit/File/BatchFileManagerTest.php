@@ -1,9 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\File;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 

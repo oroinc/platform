@@ -15,64 +15,45 @@ use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderChain;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    use TempDirExtension;
+
+    /** @var BatchFileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $batchFileManager;
 
-    /**
-     * @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ReaderChain|\PHPUnit\Framework\MockObject\MockObject */
     private $readerChain;
 
-    /**
-     * @var WriterChain|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var WriterChain|\PHPUnit\Framework\MockObject\MockObject */
     private $writerChain;
 
-    /**
-     * @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
-    /**
-     * @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $processorRegistry;
 
-    /**
-     * @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var JobExecutor|\PHPUnit\Framework\MockObject\MockObject */
     private $jobExecutor;
 
-    /**
-     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /**
-     * @var ExportHandler
-     */
+    /** @var ExportHandler */
     private $exportHandler;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $directory;
 
-    /**
-     * @var Filesystem
-     */
+    /** @var Filesystem */
     private $filesystem;
 
     protected function setUp(): void
@@ -97,11 +78,9 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager
         );
 
-        $this->directory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'importexport';
-        if (!is_dir($this->directory)) {
-            mkdir($this->directory);
-            file_put_contents($this->directory . DIRECTORY_SEPARATOR . 'test1.csv', '1,test,test2;');
-        }
+        $this->directory = $this->getTempDir('ExportHandler');
+        file_put_contents($this->directory . DIRECTORY_SEPARATOR . 'test1.csv', '1,test,test2;');
+
         $this->filesystem = new Filesystem(new LocalAdapter($this->directory));
         $this->registerLocalFilesystemInStream();
     }
@@ -122,10 +101,15 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
     public function testHandleDownloadExportResult()
     {
         $fileName = 'test1.csv';
+        $filePath = 'gaufrette://importexport/test1.csv';
         $this->fileManager->expects($this->once())
             ->method('isFileExist')
             ->with($fileName)
             ->willReturn(true);
+        $this->fileManager->expects($this->once())
+            ->method('getFilePath')
+            ->with($fileName)
+            ->willReturn($filePath);
         $this->fileManager->expects($this->once())
             ->method('getMimeType')
             ->willReturn('text/csv');
