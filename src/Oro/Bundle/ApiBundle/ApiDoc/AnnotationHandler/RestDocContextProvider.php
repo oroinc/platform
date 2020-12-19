@@ -120,14 +120,14 @@ class RestDocContextProvider
      */
     private static function createCannotBeLoadedException(string $type, Context $context): \LogicException
     {
-        $message = \sprintf(
+        $message = sprintf(
             'The %s for "%s" cannot be loaded. Action: %s.',
             $type,
             $context->getClassName(),
             $context->getAction()
         );
         if ($context instanceof SubresourceContext) {
-            $message .= \sprintf(' Association: %s.', $context->getAssociationName());
+            $message .= sprintf(' Association: %s.', $context->getAssociationName());
         }
 
         return new \LogicException($message);
@@ -183,10 +183,10 @@ class RestDocContextProvider
         if (!$actionType) {
             $controller = self::getController($route);
             if (self::endsWith($controller, self::ACTION_SUFFIX)) {
-                $startPos = \strrpos($controller, '::');
+                $startPos = strrpos($controller, '::');
                 if (false !== $startPos) {
                     $startPos += 2;
-                    $actionType = \substr(
+                    $actionType = substr(
                         $controller,
                         $startPos,
                         \strlen($controller) - \strlen(self::ACTION_SUFFIX) - $startPos
@@ -227,11 +227,11 @@ class RestDocContextProvider
         string $entityClass,
         string $associationName = null
     ): \LogicException {
-        $message .= \sprintf(' Entity Class: %s. Action: %s.', $entityClass, $action);
+        $message .= sprintf(' Entity Class: %s. Action: %s.', $entityClass, $action);
         if ($associationName) {
-            $message .= \sprintf(' Association: %s.', $associationName);
+            $message .= sprintf(' Association: %s.', $associationName);
         }
-        $message .= \sprintf(
+        $message .= sprintf(
             ' Route Path: %s. Controller: %s. Use "%s" route option to explicitly set the action type.',
             $route->getPath(),
             self::getController($route),
@@ -249,6 +249,6 @@ class RestDocContextProvider
      */
     private static function endsWith(string $haystack, string $needle): bool
     {
-        return \substr($haystack, -\strlen($needle)) === $needle;
+        return substr($haystack, -\strlen($needle)) === $needle;
     }
 }
