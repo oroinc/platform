@@ -76,12 +76,10 @@ class UserManager extends BaseUserManager
     {
         // make sure user has a default status
         if ($user instanceof User && null === $user->getAuthStatus()) {
-            $defaultStatus = $this->enumValueProvider->getDefaultEnumValuesByCode(self::AUTH_STATUS_ENUM_CODE);
-            if (is_array($defaultStatus)) {
-                $defaultStatus = reset($defaultStatus);
+            $defaultStatus = $this->enumValueProvider->getDefaultEnumValueByCode(self::AUTH_STATUS_ENUM_CODE);
+            if (null !== $defaultStatus) {
+                $user->setAuthStatus($defaultStatus);
             }
-
-            $user->setAuthStatus($defaultStatus);
         }
 
         parent::updateUser($user, $flush);
