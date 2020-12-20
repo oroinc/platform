@@ -45,4 +45,19 @@ class TestEntityWithEnum
      * )
      */
     protected $multipleEnumField;
+
+    /** @var string */
+    protected $multipleEnumFieldSnapshot;
+
+    public function getMultipleEnumFieldSnapshot()
+    {
+        return $this->multipleEnumFieldSnapshot;
+    }
+
+    public function setMultipleEnumFieldSnapshot($value)
+    {
+        $this->multipleEnumFieldSnapshot = $value;
+
+        return $this;
+    }
 }

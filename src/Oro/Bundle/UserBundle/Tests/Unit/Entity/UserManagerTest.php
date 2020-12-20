@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -13,7 +14,6 @@ use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
@@ -49,7 +49,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $enumValueProvider->expects(self::any())
             ->method('getEnumValueByCode')
             ->willReturnCallback(function ($code, $id) {
-                return new StubEnumValue($id, $id);
+                return new TestEnumValue($id, $id);
             });
 
         $emailProcessorLink = $this->createMock(ServiceLink::class);

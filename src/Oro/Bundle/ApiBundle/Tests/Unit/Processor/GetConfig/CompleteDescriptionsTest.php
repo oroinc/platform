@@ -25,8 +25,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue as EnumEntity;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -871,7 +871,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setClassName(EnumEntity::class);
+        $this->context->setClassName(TestEnumValue::class);
         $this->context->setTargetAction('get_list');
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

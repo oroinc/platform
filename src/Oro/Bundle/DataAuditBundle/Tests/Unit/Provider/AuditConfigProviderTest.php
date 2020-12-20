@@ -6,7 +6,7 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,7 +27,7 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsAuditableEntityWhenEnum(): void
     {
-        $this->assertTrue($this->provider->isAuditableEntity(StubEnumValue::class));
+        $this->assertTrue($this->provider->isAuditableEntity(TestEnumValue::class));
     }
 
     public function testIsAuditableEntityWhenNoConfig(): void
