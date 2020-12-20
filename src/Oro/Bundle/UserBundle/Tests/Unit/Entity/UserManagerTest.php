@@ -28,6 +28,9 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EncoderFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $encoderFactory;
 
+    /** @var EnumValueProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $enumValueProvider;
+
     /** var Processor|\PHPUnit\Framework\MockObject\MockObject */
     private $emailProcessor;
 
@@ -39,6 +42,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $this->userLoader = $this->createMock(UserLoaderInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->encoderFactory = $this->createMock(EncoderFactoryInterface::class);
+        $this->enumValueProvider = $this->createMock(EnumValueProvider::class);
         $this->emailProcessor = $this->createMock(Processor::class);
 
         $this->userLoader->expects(self::any())
@@ -61,7 +65,7 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
             $this->userLoader,
             $this->doctrine,
             $this->encoderFactory,
-            $enumValueProvider,
+            $this->enumValueProvider,
             $emailProcessorLink
         );
     }
@@ -147,6 +151,11 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
         $user->setPlainPassword($password);
         $user->setSalt($salt);
 
+        $this->enumValueProvider->expects(self::once())
+            ->method('getDefaultEnumValueByCode')
+            ->with('auth_status')
+            ->willReturn(null);
+
         $encoder = $this->expectGetPasswordEncoder($user);
         $encoder->expects(self::once())
             ->method('encodePassword')
@@ -154,7 +163,6 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($encodedPassword);
 
         $em = $this->expectGetEntityManager();
-
         $em->expects(self::once())
             ->method('persist')
             ->with(self::identicalTo($user));
@@ -165,11 +173,17 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull($user->getPlainPassword());
         self::assertEquals($encodedPassword, $user->getPassword());
+        self::assertNull($user->getAuthStatus());
     }
 
     public function testUpdateUserWithoutPlainPassword()
     {
         $user = new User();
+
+        $this->enumValueProvider->expects(self::once())
+            ->method('getDefaultEnumValueByCode')
+            ->with('auth_status')
+            ->willReturn(null);
 
         $em = $this->expectGetEntityManager();
         $em->expects(self::once())
@@ -182,12 +196,63 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertNull($user->getPlainPassword());
         self::assertNull($user->getPassword());
+        self::assertNull($user->getAuthStatus());
+    }
+
+    public function testUpdateUserForUserWithoutAuthStatus()
+    {
+        $user = new User();
+        $defaultAuthStatus = new TestEnumValue('auth_status_1', 'Auth Status 1');
+
+        $this->enumValueProvider->expects(self::once())
+            ->method('getDefaultEnumValueByCode')
+            ->with('auth_status')
+            ->willReturn($defaultAuthStatus);
+
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
+            ->method('persist')
+            ->with(self::identicalTo($user));
+        $em->expects(self::once())
+            ->method('flush');
+
+        $this->userManager->updateUser($user);
+
+        self::assertSame($defaultAuthStatus, $user->getAuthStatus());
+    }
+
+    public function testUpdateUserForUserWithAuthStatus()
+    {
+        $user = new User();
+        $authStatus = new TestEnumValue('auth_status_1', 'Auth Status 1');
+        $user->setAuthStatus($authStatus);
+
+        $this->enumValueProvider->expects(self::never())
+            ->method('getDefaultEnumValueByCode');
+
+        $em = $this->expectGetEntityManager();
+        $em->expects(self::once())
+            ->method('persist')
+            ->with(self::identicalTo($user));
+        $em->expects(self::once())
+            ->method('flush');
+
+        $this->userManager->updateUser($user);
+
+        self::assertSame($authStatus, $user->getAuthStatus());
     }
 
     public function testSetAuthStatus()
     {
         $user = new User();
         self::assertNull($user->getAuthStatus());
+
+        $this->enumValueProvider->expects(self::once())
+            ->method('getEnumValueByCode')
+            ->willReturnCallback(function ($code, $id) {
+                return new TestEnumValue($id, $id);
+            });
+
         $this->userManager->setAuthStatus($user, UserManager::STATUS_EXPIRED);
         self::assertEquals(UserManager::STATUS_EXPIRED, $user->getAuthStatus()->getId());
     }
