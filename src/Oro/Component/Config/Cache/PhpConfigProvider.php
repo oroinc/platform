@@ -82,13 +82,10 @@ abstract class PhpConfigProvider implements
     {
         if (false === $this->cacheTimestamp) {
             $cacheTimestamp = null;
-            if (\file_exists($this->cacheFile)) {
-                $cacheTimestamp = \filemtime($this->cacheFile);
+            if (file_exists($this->cacheFile)) {
+                $cacheTimestamp = filemtime($this->cacheFile);
                 if (false === $cacheTimestamp) {
-                    throw new IOException(\sprintf(
-                        'Cannot get modification time for "%s" file.',
-                        $this->cacheFile
-                    ));
+                    throw new IOException(sprintf('Cannot get modification time for "%s" file.', $this->cacheFile));
                 }
             }
             $this->cacheTimestamp = $cacheTimestamp;
@@ -106,7 +103,7 @@ abstract class PhpConfigProvider implements
         $this->config = null;
         $this->cacheTimestamp = false;
         $this->cacheFresh = null;
-        if (\is_file($this->cacheFile)) {
+        if (is_file($this->cacheFile)) {
             $fs = new Filesystem();
             $fs->remove($this->cacheFile);
         }
@@ -129,7 +126,7 @@ abstract class PhpConfigProvider implements
         if (null === $this->config) {
             $cache = $this->getConfigCache();
             if (!$cache->isFresh()) {
-                $overrideExistingCacheFile = $this->debug && \file_exists($cache->getPath());
+                $overrideExistingCacheFile = $this->debug && file_exists($cache->getPath());
 
                 $resourcesContainer = new ResourcesContainer();
                 $config = $this->doLoadConfig($resourcesContainer);
@@ -138,7 +135,7 @@ abstract class PhpConfigProvider implements
                 $this->cacheFresh = null;
 
                 if ($overrideExistingCacheFile) {
-                    \clearstatcache(false, $cache->getPath());
+                    clearstatcache(false, $cache->getPath());
                 }
             }
 

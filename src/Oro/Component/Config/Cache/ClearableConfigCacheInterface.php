@@ -3,7 +3,7 @@
 namespace Oro\Component\Config\Cache;
 
 /**
- * An interface for classes contains a configuration cache and able to clear it.
+ * An interface for a configuration cache that can clears itself.
  */
 interface ClearableConfigCacheInterface
 {
