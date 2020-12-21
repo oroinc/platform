@@ -183,6 +183,16 @@ class FileManager
     }
 
     /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    public function getFilePath(string $fileName): string
+    {
+        return $this->gaufretteFileManager->getFilePath($fileName);
+    }
+
+    /**
      * @param string|File $file
      *
      * @return string

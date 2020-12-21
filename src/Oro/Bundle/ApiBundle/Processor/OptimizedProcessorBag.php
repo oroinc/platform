@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface as ComponentContextInterface;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigProviderInterface;
+use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 
@@ -16,7 +17,7 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 class OptimizedProcessorBag extends ProcessorBag
 {
     /** @var ProcessorIteratorFactoryInterface */
-    protected $ungroupedProcessorIteratorFactory;
+    private $ungroupedProcessorIteratorFactory;
 
     /**
      * @param ProcessorBagConfigProviderInterface        $configProvider
@@ -29,7 +30,7 @@ class OptimizedProcessorBag extends ProcessorBag
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
         ProcessorRegistryInterface $processorRegistry,
-        $debug,
+        bool $debug,
         ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory,
         ProcessorIteratorFactoryInterface $processorIteratorFactory,
         ProcessorIteratorFactoryInterface $ungroupedProcessorIteratorFactory
@@ -47,7 +48,7 @@ class OptimizedProcessorBag extends ProcessorBag
     /**
      * {@inheritdoc}
      */
-    protected function createProcessorIterator(ComponentContextInterface $context)
+    protected function createProcessorIterator(ComponentContextInterface $context): ProcessorIterator
     {
         $action = $context->getAction();
 

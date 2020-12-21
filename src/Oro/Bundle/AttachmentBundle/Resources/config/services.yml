@@ -263,14 +263,14 @@ services:
           - { name: oro_formatter, formatter: image_src }
 
     oro_attachment.manager.public_mediacache:
-        parent: 'oro_gaufrette.file_manager'
+        parent: oro_gaufrette.file_manager
         public: true
         arguments:
             - '%oro_attachment.filesystem_name.mediacache%'
             - 'cache'
 
     oro_attachment.manager.protected_mediacache:
-        parent: 'oro_gaufrette.file_manager'
+        parent: oro_gaufrette.file_manager
         public: true
         arguments:
             - '%oro_attachment.filesystem_name.protected_mediacache%'

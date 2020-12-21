@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Security\DisabledLoginSubscriber;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -36,7 +36,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelRequestWithExpiredUser()
     {
-        $enum = new StubEnumValue(UserManager::STATUS_EXPIRED, UserManager::STATUS_EXPIRED);
+        $enum = new TestEnumValue(UserManager::STATUS_EXPIRED, UserManager::STATUS_EXPIRED);
         $this->user->setAuthStatus($enum);
 
         $this->tokenStorage->expects($this->once())
@@ -73,7 +73,7 @@ class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelRequestWithAllowedUser()
     {
         // custom added status
-        $enum = new StubEnumValue('allowed', 'allowed');
+        $enum = new TestEnumValue('allowed', 'allowed');
         $this->user->setAuthStatus($enum);
         $this->tokenStorage->expects($this->never())
             ->method('setToken')

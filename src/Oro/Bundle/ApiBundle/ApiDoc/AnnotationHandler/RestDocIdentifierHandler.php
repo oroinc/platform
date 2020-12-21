@@ -51,14 +51,14 @@ class RestDocIdentifierHandler
     {
         $idFields = $metadata->getIdentifierFieldNames();
         $dataType = DataType::STRING;
-        if (\count($idFields) === 1) {
-            $field = $metadata->getField(\reset($idFields));
+        if (count($idFields) === 1) {
+            $field = $metadata->getField(reset($idFields));
             if (!$field) {
-                throw new \RuntimeException(\sprintf(
+                throw new \RuntimeException(sprintf(
                     'The metadata for "%s" entity does not contains "%s" identity field. Resource: %s %s',
                     $metadata->getClassName(),
-                    \reset($idFields),
-                    \implode(' ', $route->getMethods()),
+                    reset($idFields),
+                    implode(' ', $route->getMethods()),
                     $route->getPath()
                 ));
             }
@@ -86,10 +86,9 @@ class RestDocIdentifierHandler
     private function getIdRequirement(EntityMetadata $metadata): string
     {
         $idFields = $metadata->getIdentifierFieldNames();
-        $idFieldCount = \count($idFields);
-        if ($idFieldCount === 1) {
+        if (count($idFields) === 1) {
             // single identifier
-            return $this->getIdFieldRequirement($metadata->getField(\reset($idFields))->getDataType());
+            return $this->getIdFieldRequirement($metadata->getField(reset($idFields))->getDataType());
         }
 
         // composite identifier
@@ -98,7 +97,7 @@ class RestDocIdentifierHandler
             $requirements[] = $field . '=' . $this->getIdFieldRequirement($metadata->getField($field)->getDataType());
         }
 
-        return \implode(',', $requirements);
+        return implode(',', $requirements);
     }
 
     /**

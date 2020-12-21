@@ -396,7 +396,9 @@ Here is a list of key classes:
 - [ActionProcessor](./ActionProcessor.php) - The base class for processors for your actions. This class executes processors registered in [ProcessorBag](./ProcessorBag.php) and suitable for the specified [Context](./Context.php).
 - [Context](./Context.php) - The base implementation of an execution context.
 - [ProcessorBag](./ProcessorBag.php) - A container for processors and applicable checkers.
-- [ProcessorBagConfigBuilder](./ProcessorBagConfigBuilder.php) - A builder for processors map used in the ProcessorBag.
+- [ProcessorBagConfigBuilder](./ProcessorBagConfigBuilder.php) - A builder for the processors map used in the ProcessorBag.
+- [ProcessorBagConfigProvider](./ProcessorBagConfigProvider.php) - A provider for the processors map used in the ProcessorBag.
+- [LazyProcessorBagConfigProvider](./LazyProcessorBagConfigProvider.php) - A provider for the processors map used in the ProcessorBag for case when each action has own configuration provider.
 - [ProcessorInterface](./ProcessorInterface.php) - An interface of processors.
 - [ApplicableCheckerInterface](./ApplicableCheckerInterface.php) - An interface of applicable checkers.
 - [ProcessorBagAwareApplicableCheckerInterface](./ProcessorBagAwareApplicableCheckerInterface.php) - An interface that should be implemented by applicable checkers that need access to the processor bag.

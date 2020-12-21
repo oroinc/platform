@@ -40,10 +40,10 @@ services:
             - '@oro_api.processor_iterator_factory.ungrouped'
 
     oro_api.processor_bag_config_provider:
-        class: Oro\Component\ChainProcessor\ProcessorBagConfigProvider
+        class: Oro\Component\ChainProcessor\LazyProcessorBagConfigProvider
         arguments:
-            - [] # groups. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
-            - [] # processors. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
+            - [] # actions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
+            - [] # providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass
 
     oro_api.processor_iterator_factory:
         class: Oro\Bundle\ApiBundle\Processor\OptimizedProcessorIteratorFactory
