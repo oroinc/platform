@@ -12,6 +12,17 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDefaultMaxRelatedEntities implements ProcessorInterface
 {
+    /** @var int */
+    private $maxRelatedEntitiesLimit;
+
+    /**
+     * @param int $maxRelatedEntitiesLimit
+     */
+    public function setMaxRelatedEntitiesLimit(int $maxRelatedEntitiesLimit)
+    {
+        $this->maxRelatedEntitiesLimit = $maxRelatedEntitiesLimit;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -31,6 +42,6 @@ class SetDefaultMaxRelatedEntities implements ProcessorInterface
      */
     protected function getDefaultRelatedEntitiesLimit()
     {
-        return 100;
+        return $this->maxRelatedEntitiesLimit ?? 100;
     }
 }

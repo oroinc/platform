@@ -207,7 +207,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessFilterWithDefaultValue()
     {
-        $filter = new PageSizeFilter(DataType::UNSIGNED_INTEGER);
+        $filter = new PageSizeFilter(DataType::INTEGER);
         $filter->setDefaultValue(5);
 
         $filers = $this->context->getFilters();

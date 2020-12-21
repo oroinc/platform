@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
@@ -74,7 +75,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -97,7 +98,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sortFilterSourceKey'))
             ],
             $this->context->getErrors()
@@ -115,7 +116,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -134,7 +135,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -153,7 +154,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "id, label" fields are not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "id, label" fields are not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -357,7 +358,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "category.name" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "category.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -380,7 +381,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "category1.name" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "category1.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -403,7 +404,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "category1.name" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "category1.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -428,7 +429,7 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
 
         self::assertEquals(
             [
-                Error::createValidationError('sort constraint', 'Sorting by "category.name" field is not supported.')
+                Error::createValidationError(Constraint::SORT, 'Sorting by "category.name" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()

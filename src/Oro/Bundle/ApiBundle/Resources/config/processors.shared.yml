@@ -148,6 +148,8 @@ services:
 
     oro_api.set_default_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
+        calls:
+            - [setMaxRelatedEntitiesLimit, ['%oro_api.max_related_entities%']]
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -10 }
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -10 }
@@ -236,6 +238,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultPaging
         arguments:
             - '@oro_api.filter_names_registry'
+        calls:
+            - [setDefaultPageSize, ['%oro_api.default_page_size%']]
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, priority: -100 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, collection: true, priority: -100 }
@@ -465,6 +469,16 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, requestType: json_api, priority: -50 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, requestType: json_api, priority: -50 }
 
+    oro_api.validate_paging:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidatePaging
+        arguments:
+            - '@oro_api.filter_names_registry'
+            - '%oro_api.max_entities%'
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_input, priority: -100 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_input, collection: true, priority: -100 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_input, collection: true, priority: -100 }
+
     oro_api.validate_sorting:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateSorting
         arguments:
@@ -618,9 +632,10 @@ services:
 
     oro_api.normalize_paging:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging
+        calls:
+            - [setMaxEntitiesLimit, ['%oro_api.max_entities%']]
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -70 }
-            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -70 }
             - { name: oro.api.processor, action: get_subresource, group: build_query, collection: true, priority: -70 }
             - { name: oro.api.processor, action: get_relationship, group: build_query, collection: true, priority: -70 }
 

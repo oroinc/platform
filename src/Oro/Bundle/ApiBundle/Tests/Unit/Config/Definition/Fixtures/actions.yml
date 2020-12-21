@@ -196,6 +196,14 @@ default_page_size:
     expected: []
     error: 'Invalid type for path "entity.actions.get_list.page_size". Expected int, but got NULL.'
 
+zero_page_size:
+    config:
+        actions:
+            get_list:
+                page_size: 0
+    expected: []
+    error: 'Invalid configuration for path "entity.actions.get_list.page_size": Expected a positive number or -1, but got 0.'
+
 disable_pagination:
     config:
         actions:
