@@ -7,10 +7,13 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\AbstractMatcher as Matcher;
 use Oro\Component\ChainProcessor\DependencyInjection\ProcessorsLoader;
+use Oro\Component\ChainProcessor\ProcessorBagActionConfigProvider;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds all registered API processors to the processor bag service.
@@ -37,19 +40,22 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     use ApiTaggedServiceTrait;
 
     private const PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID = 'oro_api.processor_bag_config_provider';
-    private const CUSTOMIZE_LOADED_DATA_ACTION             = 'customize_loaded_data';
-    private const CUSTOMIZE_FORM_DATA_ACTION               = 'customize_form_data';
-    private const GET_CONFIG_ACTION                        = 'get_config';
-    private const GET_METADATA_ACTION                      = 'get_metadata';
-    private const NORMALIZE_VALUE_ACTION                   = 'normalize_value';
-    private const DATA_TYPE_ATTRIBUTE                      = 'dataType';
-    private const IDENTIFIER_ONLY_ATTRIBUTE                = 'identifier_only';
-    private const EXTRA_ATTRIBUTE                          = 'extra';
-    private const GROUP_ATTRIBUTE                          = 'group';
-    private const COLLECTION_ATTRIBUTE                     = 'collection';
-    private const EVENT_ATTRIBUTE                          = 'event';
-    private const ITEM_GROUP                               = 'item';
-    private const COLLECTION_GROUP                         = 'collection';
+
+    private const CUSTOMIZE_LOADED_DATA_ACTION = 'customize_loaded_data';
+    private const CUSTOMIZE_FORM_DATA_ACTION   = 'customize_form_data';
+    private const GET_CONFIG_ACTION            = 'get_config';
+    private const GET_METADATA_ACTION          = 'get_metadata';
+    private const NORMALIZE_VALUE_ACTION       = 'normalize_value';
+
+    private const DATA_TYPE_ATTRIBUTE       = 'dataType';
+    private const IDENTIFIER_ONLY_ATTRIBUTE = 'identifier_only';
+    private const EXTRA_ATTRIBUTE           = 'extra';
+    private const GROUP_ATTRIBUTE           = 'group';
+    private const COLLECTION_ATTRIBUTE      = 'collection';
+    private const EVENT_ATTRIBUTE           = 'event';
+
+    private const ITEM_GROUP       = 'item';
+    private const COLLECTION_GROUP = 'collection';
 
     /**
      * {@inheritdoc}
@@ -75,16 +81,46 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         ];
         $processors = ProcessorsLoader::loadProcessors($container, DependencyInjectionUtil::PROCESSOR_TAG);
         $builder = new ProcessorBagConfigBuilder($groups, $processors);
-        $loadedGroups = $builder->getGroups();
-        $loadedProcessors = $this->normalizeProcessors($builder->getProcessors(), $groups);
+        $loadedGroups = $builder->getAllGroups();
+        $loadedProcessors = $this->normalizeProcessors($builder->getAllProcessors(), $groups);
         if (!empty($loadedProcessors[self::NORMALIZE_VALUE_ACTION])) {
             $loadedGroups[self::NORMALIZE_VALUE_ACTION] = $this->extractGroups(
                 $loadedProcessors[self::NORMALIZE_VALUE_ACTION]
             );
         }
         $container->getDefinition(self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID)
-            ->replaceArgument(0, $loadedGroups)
-            ->replaceArgument(1, $loadedProcessors);
+            ->replaceArgument(0, array_keys($loadedProcessors))
+            ->replaceArgument(
+                1,
+                ServiceLocatorTagPass::register(
+                    $container,
+                    $this->registerProcessorBagConfigProvider($container, $loadedGroups, $loadedProcessors)
+                )
+            );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $groups     [action => [group, ...], ...]
+     * @param array            $processors [action => [[processor id, [attr name => attr value, ...]], ...], ...]
+     *
+     * @return Reference[] [action => action config provider, ...]
+     */
+    private function registerProcessorBagConfigProvider(
+        ContainerBuilder $container,
+        array $groups,
+        array $processors
+    ): array {
+        $referenceMap = [];
+        foreach ($processors as $action => $actionProcessors) {
+            $serviceId = self::PROCESSOR_BAG_CONFIG_PROVIDER_SERVICE_ID . '.' . $action;
+            $container->register($serviceId, ProcessorBagActionConfigProvider::class)
+                ->setPublic(false)
+                ->setArguments([$groups[$action] ?? [], $actionProcessors]);
+            $referenceMap[$action] = new Reference($serviceId);
+        }
+
+        return $referenceMap;
     }
 
     /**

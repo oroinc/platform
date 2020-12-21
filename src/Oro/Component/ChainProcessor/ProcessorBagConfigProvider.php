@@ -3,7 +3,7 @@
 namespace Oro\Component\ChainProcessor;
 
 /**
- * The provider that can be used if the ProcessorBag configuration is already builded.
+ * The provider that can be used if the ProcessorBag configuration is already built.
  * For example it might be used in case when the configuration is build by DIC compiler pass.
  */
 class ProcessorBagConfigProvider implements ProcessorBagConfigProviderInterface
@@ -13,6 +13,9 @@ class ProcessorBagConfigProvider implements ProcessorBagConfigProviderInterface
 
     /** @var array [action => [[processor id, [attribute name => attribute value, ...]], ...], ...] */
     private $processors;
+
+    /** @var string[]|null */
+    private $actions;
 
     /**
      * @param array $groups     [action => [group, ...], ...]
@@ -27,16 +30,28 @@ class ProcessorBagConfigProvider implements ProcessorBagConfigProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getGroups()
+    public function getActions(): array
     {
-        return $this->groups;
+        if (null === $this->actions) {
+            $this->actions = array_keys($this->processors);
+        }
+
+        return $this->actions;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProcessors()
+    public function getGroups(string $action): array
     {
-        return $this->processors;
+        return $this->groups[$action] ?? [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcessors(string $action): array
+    {
+        return $this->processors[$action] ?? [];
     }
 }
