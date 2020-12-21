@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
  * via Gaufrette filesystem abstraction layer.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileManager
 {
@@ -35,12 +36,17 @@ class FileManager
     /** @var string */
     private $protocol;
 
+    /** @var string|null */
+    private $pathPrefixDirectory;
+
     /**
-     * @param string $filesystemName The name of Gaufrette filesystem this manager works with
+     * @param string      $filesystemName The name of Gaufrette filesystem this manager works with
+     * @param string|null $pathPrefixDirectory Directory should be used as files directory insteadof filesystem name
      */
-    public function __construct(string $filesystemName)
+    public function __construct(string $filesystemName, string $pathPrefixDirectory = null)
     {
         $this->filesystemName = $filesystemName;
+        $this->pathPrefixDirectory = $pathPrefixDirectory;
     }
 
     /**
@@ -89,7 +95,12 @@ class FileManager
             throw new ProtocolConfigurationException();
         }
 
-        return sprintf('%s://%s/%s', $this->protocol, $this->filesystemName, $fileName);
+        return sprintf(
+            '%s://%s/%s',
+            $this->protocol,
+            $this->filesystemName,
+            $this->getFileNameWithPrefixDirectory($fileName)
+        );
     }
 
     /**
@@ -101,9 +112,16 @@ class FileManager
      */
     public function findFiles(string $prefix = ''): array
     {
-        $result = $this->filesystem->listKeys($prefix);
-        if (!empty($result) && \array_key_exists('keys', $result)) {
+        $result = $this->filesystem->listKeys($this->getFileNameWithPrefixDirectory($prefix));
+        if (!empty($result) && array_key_exists('keys', $result)) {
+            $pathsWithoutPrefixDir = [];
             $result = $result['keys'];
+            if ($this->getPrefixDirectory()) {
+                foreach ($result as $path) {
+                    $pathsWithoutPrefixDir[] = $this->getFileNameWithoutPrefixDirectory($path);
+                }
+                $result = $pathsWithoutPrefixDir;
+            }
         }
 
         return $result;
@@ -120,7 +138,7 @@ class FileManager
      */
     public function hasFile(string $fileName): bool
     {
-        return $this->filesystem->has($fileName);
+        return $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName));
     }
 
     /**
@@ -138,8 +156,9 @@ class FileManager
     public function getFile(string $fileName, bool $throwException = true): ?File
     {
         $file = null;
-        if ($throwException || $this->filesystem->has($fileName)) {
-            $file = $this->filesystem->get($fileName);
+        if ($throwException || $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
+            $file = $this->filesystem->get($this->getFileNameWithPrefixDirectory($fileName));
+            $file->setName($this->getFileNameWithoutPrefixDirectory($file->getName()));
         }
 
         return $file;
@@ -158,6 +177,7 @@ class FileManager
      */
     public function getStream(string $fileName, bool $throwException = true): ?Stream
     {
+        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
         $hasFile = $this->filesystem->has($fileName);
         if (!$hasFile && $throwException) {
             throw new Exception\FileNotFound($fileName);
@@ -201,8 +221,8 @@ class FileManager
      */
     public function deleteFile(string $fileName): void
     {
-        if ($fileName && $this->filesystem->has($fileName)) {
-            $this->filesystem->delete($fileName);
+        if ($fileName && $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
+            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
         }
     }
 
@@ -215,7 +235,7 @@ class FileManager
     {
         $fileNames = $this->findFiles();
         foreach ($fileNames as $fileName) {
-            $this->filesystem->delete($fileName);
+            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
         }
     }
 
@@ -232,6 +252,7 @@ class FileManager
      */
     public function writeToStorage(string $content, string $fileName): void
     {
+        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
         $dstStream = $this->filesystem->createStream($fileName);
         $dstStream->open(new StreamMode('wb+'));
         try {
@@ -277,6 +298,7 @@ class FileManager
      */
     public function writeStreamToStorage(Stream $srcStream, string $fileName, bool $avoidWriteEmptyStream = false): bool
     {
+        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
         $srcStream->open(new StreamMode('rb'));
 
         $nonEmptyStream = true;
@@ -334,6 +356,20 @@ class FileManager
         }
 
         return new ComponentFile($tmpFileName, false);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefixDirectory(): string
+    {
+        if ($this->pathPrefixDirectory) {
+            $prefix = $this->pathPrefixDirectory;
+        } else {
+            $prefix = $this->filesystemName;
+        }
+
+        return $prefix;
     }
 
     /**
@@ -399,6 +435,21 @@ class FileManager
     }
 
     /**
+     * @param string $fileName
+     *
+     * @return string|null
+     */
+    public function mimeType(string $fileName):? string
+    {
+        try {
+            return $this->filesystem->mimeType($this->getFileNameWithPrefixDirectory($fileName));
+        } catch (\LogicException $e) {
+            // The filesystem adapter does support mimetype.
+            return null;
+        }
+    }
+
+    /**
      * Generates unique file name with the given extension.
      *
      * @param string|null $extension
@@ -426,7 +477,32 @@ class FileManager
         $success = $stream->flush();
         $stream->close();
         if (!$success) {
-            throw new FlushFailedException(sprintf('Failed to flush data to the "%s" file.', $fileName));
+            throw new FlushFailedException(sprintf(
+                'Failed to flush data to the "%s" file.',
+                $this->getFileNameWithoutPrefixDirectory($fileName)
+            ));
         }
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function getFileNameWithPrefixDirectory(string $fileName): string
+    {
+        return sprintf('%s/%s', $this->getPrefixDirectory(), ltrim($fileName, '/'));
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function getFileNameWithoutPrefixDirectory(string $fileName): string
+    {
+        $prefixDirectory = $this->getPrefixDirectory();
+
+        return substr($fileName, strlen($prefixDirectory) + 1);
     }
 }

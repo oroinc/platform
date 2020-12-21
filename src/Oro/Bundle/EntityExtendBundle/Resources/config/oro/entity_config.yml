@@ -338,7 +338,7 @@ entity_config:
 
                 # the relation key in the following format:
                 # relation_type|owning_entity|target_entity|field_name_in_owning_entity
-                # the relation key can be builded by ExtendHelper::buildRelationKey method
+                # the relation key can be built by ExtendHelper::buildRelationKey method
                 relation_key: # string
                     options:
                         auditable:          false

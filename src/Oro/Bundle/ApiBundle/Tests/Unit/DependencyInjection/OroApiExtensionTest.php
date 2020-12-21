@@ -10,6 +10,8 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -263,10 +265,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
@@ -553,24 +556,27 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.first')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.first')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new Reference('oro_api.entity_override_provider.first')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.first')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.second')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.second')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new Reference('oro_api.entity_override_provider.second')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.second')->getArguments()
         );
         self::assertEquals(
             [
@@ -1086,24 +1092,27 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.default')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.default')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.default')]),
+                new Reference('oro_api.entity_override_provider.default')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.default')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.first')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.first')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.first')]),
+                new Reference('oro_api.entity_override_provider.first')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.first')->getArguments()
         );
         self::assertEquals(
             [
-                ['addEntityAliasProvider', [new Reference('oro_api.entity_alias_provider.second')]],
-                ['addEntityClassProvider', [new Reference('oro_api.entity_alias_provider.second')]]
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new IteratorArgument([new Reference('oro_api.entity_alias_provider.second')]),
+                new Reference('oro_api.entity_override_provider.second')
             ],
-            $container->getDefinition('oro_api.entity_alias_loader.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_loader.second')->getArguments()
         );
         self::assertEquals(
             [
@@ -1197,12 +1206,45 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
     }
 
+    public function testRegisterDefaultConfigParameters()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load([], $container);
+
+        self::assertSame([], $container->getParameter('oro_api.api_doc.views'));
+        self::assertNull($container->getParameter('oro_api.api_doc.default_view'));
+
+        self::assertSame(10, $container->getParameter('oro_api.default_page_size'));
+        self::assertSame(-1, $container->getParameter('oro_api.max_entities'));
+        self::assertSame(100, $container->getParameter('oro_api.max_related_entities'));
+        self::assertSame(100, $container->getParameter('oro_api.max_delete_entities'));
+
+        self::assertServiceExists($container, 'oro_api.config_extension_registry');
+        self::assertSame(3, $container->getDefinition('oro_api.config_extension_registry')->getArgument(0));
+
+        self::assertServiceExists($container, 'oro_api.config_cache_warmer');
+        self::assertSame(
+            ['default' => ['api.yml']],
+            $container->getDefinition('oro_api.config_cache_warmer')->getArgument(0)
+        );
+
+        self::assertServiceExists($container, 'oro_api.cache_manager');
+        self::assertSame(['default' => []], $container->getDefinition('oro_api.cache_manager')->getArgument(0));
+        self::assertSame([], $container->getDefinition('oro_api.cache_manager')->getArgument(1));
+    }
+
     public function testRegisterConfigParameters()
     {
         $container = $this->getContainer();
 
         $config = [
             'config_max_nesting_level' => 2,
+            'default_page_size'        => 11,
+            'max_entities'             => 101,
+            'max_related_entities'     => 102,
+            'max_delete_entities'      => 103,
             'config_files'             => [
                 'first'  => [
                     'file_name'    => 'api_first.yml',
@@ -1228,20 +1270,16 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
 
-        self::assertEquals(
-            ['view_1', 'default_view'],
-            $container->getParameter('oro_api.api_doc.views')
-        );
-        self::assertEquals(
-            'default_view',
-            $container->getParameter('oro_api.api_doc.default_view')
-        );
+        self::assertSame(['view_1', 'default_view'], $container->getParameter('oro_api.api_doc.views'));
+        self::assertSame('default_view', $container->getParameter('oro_api.api_doc.default_view'));
+
+        self::assertSame(11, $container->getParameter('oro_api.default_page_size'));
+        self::assertSame(101, $container->getParameter('oro_api.max_entities'));
+        self::assertSame(102, $container->getParameter('oro_api.max_related_entities'));
+        self::assertSame(103, $container->getParameter('oro_api.max_delete_entities'));
 
         self::assertServiceExists($container, 'oro_api.config_extension_registry');
-        self::assertEquals(
-            2,
-            $container->getDefinition('oro_api.config_extension_registry')->getArgument(0)
-        );
+        self::assertSame(2, $container->getDefinition('oro_api.config_extension_registry')->getArgument(0));
 
         self::assertServiceExists($container, 'oro_api.config_cache_warmer');
         self::assertEquals(
@@ -1269,6 +1307,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $container->getDefinition('oro_api.cache_manager')->getArgument(1)
         );
+    }
+
+    public function testZeroMaxEntitiesLimit()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'Invalid configuration for path "oro_api.max_entities": Expected a positive number or -1, but got 0.'
+        );
+
+        $extension = new OroApiExtension();
+        $extension->load([['max_entities' => 0]], $this->getContainer());
     }
 
     public function testConfigurationForEmptyCors()

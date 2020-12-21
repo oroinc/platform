@@ -1,18 +1,17 @@
 parameters:
-    oro_attachment.filesystem_dir.attachments:                   attachment
     oro_attachment.filesystem_name.attachments:                  attachments
-
     oro_attachment.filesystem_name.mediacache:                   mediacache
+    oro_attachment.filesystem_name.protected_mediacache:         protected_mediacache
+
+    # path from which public resized files will be available.
     oro_attachment.filesystem_dir.mediacache:                    media/cache
 
-    oro_attachment.filesystem_name.protected_mediacache:         protected_mediacache
-    oro_attachment.filesystem_dir.protected_mediacache:          attachment/cache
+    # the directory where the files should be places to import from.
+    oro_attachment.import_files_dir:                             '%kernel.project_dir%/var/data/importexport/files/'
 
     oro_attachment.liip_imagine.unsupported_mime_types:          ['image/svg+xml']
 
     oro_attachment.provider.resized_image_path.skip_prefix:      'media/cache'
-
-    oro_attachment.import_files_dir: '%kernel.project_dir%/var/import_export/files/'
 
 services:
     oro_attachment.manager:
@@ -167,7 +166,6 @@ services:
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
-
     oro_attachment.migration.extension.attachment:
         class: Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension
         tags:
@@ -177,7 +175,6 @@ services:
         class: Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
         calls:
             - [setAttachmentManager, ['@oro_attachment.manager']]
-            - [setFileManager, ['@oro_attachment.file_manager']]
             - [setValidator, ['@oro_attachment.validator.file_config_validator']]
             - [setLogger, ['@logger']]
             - [setFilesDir, ['%oro_attachment.import_files_dir%']]
@@ -266,13 +263,14 @@ services:
           - { name: oro_formatter, formatter: image_src }
 
     oro_attachment.manager.public_mediacache:
-        parent: 'oro_gaufrette.file_manager'
+        parent: oro_gaufrette.file_manager
         public: true
         arguments:
             - '%oro_attachment.filesystem_name.mediacache%'
+            - 'cache'
 
     oro_attachment.manager.protected_mediacache:
-        parent: 'oro_gaufrette.file_manager'
+        parent: oro_gaufrette.file_manager
         public: true
         arguments:
             - '%oro_attachment.filesystem_name.protected_mediacache%'

@@ -14,10 +14,10 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 class ProcessorBagTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ProcessorBagConfigBuilder */
-    protected $builder;
+    private $builder;
 
     /** @var ProcessorBag */
-    protected $processorBag;
+    private $processorBag;
 
     protected function setUp(): void
     {
@@ -37,6 +37,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
     public function testEmptyBag()
     {
         $context = new Context();
+        $context->setAction('action1');
 
         self::assertProcessors(
             [],
@@ -420,7 +421,9 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The ProcessorBag is frozen.');
 
-        $this->processorBag->getProcessors(new Context());
+        $context = new Context();
+        $context->setAction('action1');
+        $this->processorBag->getProcessors($context);
 
         $this->builder->addProcessor('processor1', [], 'action1');
     }
@@ -430,7 +433,9 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The ProcessorBag is frozen.');
 
-        $this->processorBag->getProcessors(new Context());
+        $context = new Context();
+        $context->setAction('action1');
+        $this->processorBag->getProcessors($context);
 
         $this->builder->addGroup('group1', 'action1');
     }
@@ -615,7 +620,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
      *
      * @return int
      */
-    protected function callCalculatePriority($processorPriority, $groupPriority = null)
+    private function callCalculatePriority($processorPriority, $groupPriority = null)
     {
         $class  = new \ReflectionClass($this->builder);
         $method = $class->getMethod('calculatePriority');
@@ -628,7 +633,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
      * @param string[]  $expectedProcessorIds
      * @param \Iterator $processors
      */
-    protected static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */

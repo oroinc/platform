@@ -16,6 +16,7 @@ use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -69,13 +70,13 @@ class ConfigurationLoader
         $entityOverrideProvidersConfig = [];
         $configCacheStatesConfig = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
-            list(
+            [
                 $configBagServiceId,
                 $entityAliasResolverServiceId,
                 $exclusionProviderServiceId,
                 $entityOverrideProviderServiceId,
                 $configCacheStateServiceId
-                ) = $this->configureApi($configKey, $fileConfig['file_name']);
+                ] = $this->configureApi($configKey, $fileConfig['file_name']);
             $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
 
             $configBagsConfig[] = [$configBagServiceId, $requestTypeExpression];
@@ -346,11 +347,12 @@ class ConfigurationLoader
         $loaderServiceId = 'oro_api.entity_alias_loader.' . $configKey;
         $this->container
             ->register($loaderServiceId, EntityAliasLoader::class)
-            ->setArguments([new Reference($entityOverrideProviderServiceId)])
-            ->setPublic(false)
-            ->setLazy(true)
-            ->addMethodCall('addEntityAliasProvider', [new Reference($providerServiceId)])
-            ->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
+            ->setArguments([
+                new IteratorArgument([new Reference($providerServiceId)]),
+                new IteratorArgument([new Reference($providerServiceId)]),
+                new Reference($entityOverrideProviderServiceId)
+            ])
+            ->setPublic(false);
 
         $entityAliasResolverServiceId = 'oro_api.entity_alias_resolver.' . $configKey;
         $entityAliasResolverDef = $this->container

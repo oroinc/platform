@@ -2,6 +2,21 @@ This file includes only the most important items that should be addressed before
 
 Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes in the code that may affect the upgrade of some customizations.
 
+## FROM 4.1.0 to 4.2.0
+
+The File storage component was implement. Directories `var/attchment` and `var/import-export` are no longer used as storage
+and has been removed from the git source code.
+
+Files from these directories must be moved to new locations:
+
+ - files from `var/attachment` to `var/data/attachments`;
+ - files from `var/attachment/protected_mediacache` to `var/data/protected_mediacache`;
+ - files from `var/import-export` to `var/data/importexport`.
+ 
+Files for import should be placed into `var/data/importexport/files` instead of `var/import_export/files`.
+
+Directory `public/uploads` has been removed.
+
 ## FROM 4.1.0-rc to 4.1.0
 
 * The feature toggle for WEB API was implemented. After upgrade, the API feature will be disabled.

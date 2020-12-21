@@ -2,27 +2,26 @@
 
 namespace Oro\Bundle\ImportExportBundle\File;
 
-use Gaufrette\Adapter;
 use Gaufrette\File;
-use Gaufrette\Filesystem;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Handles file manipulation logic and all related stuff such as creating path, etc.
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileManager
 {
-    /** @var Filesystem */
-    protected $filesystem;
+    /** @var GaufretteFileManager */
+    private $gaufretteFileManager;
 
     /**
-     * @param FilesystemMap $filesystemMap
+     * @param GaufretteFileManager $gaufretteFileManager
      */
-    public function __construct(FilesystemMap $filesystemMap)
+    public function __construct(GaufretteFileManager $gaufretteFileManager)
     {
-        $this->filesystem = $filesystemMap->get('importexport');
+        $this->gaufretteFileManager = $gaufretteFileManager;
     }
 
     /**
@@ -32,7 +31,7 @@ class FileManager
      *
      * @return string
      */
-    public function saveImportingFile(UploadedFile $file)
+    public function saveImportingFile(UploadedFile $file): string
     {
         $tmpFileName = self::generateUniqueFileName($file->getClientOriginalExtension());
         $this->saveFileToStorage($file, $tmpFileName);
@@ -41,46 +40,20 @@ class FileManager
     }
 
     /**
-     * @param File|string $file
-     * @return null|int
+     * @param \DateTime|null $from
+     * @param \DateTime|null $to
+     *
+     * @return array [file name => Gaufrette\File, ...]
      */
-    public function getModifyDataFile($file)
-    {
-        if (! $file instanceof File) {
-            $file = $this->filesystem->get($file);
-        }
-
-        if (! $file instanceof File) {
-            return null;
-        }
-
-        $file->getMtime();
-    }
-
-
-    /**
-     * @return Adapter
-     */
-    public function getAdapter()
-    {
-        return $this->filesystem->getAdapter();
-    }
-
-    /**
-     * @param \DateTime $from
-     * @param \DateTime $to
-     * @return array [fileName => File]
-     */
-    public function getFilesByPeriod(\DateTime $from = null, \DateTime $to = null)
+    public function getFilesByPeriod(\DateTime $from = null, \DateTime $to = null): array
     {
         $files = [];
-
-        foreach ($this->filesystem->keys() as $fileName) {
-            if (!$this->filesystem->has($fileName)) {
+        foreach ($this->gaufretteFileManager->findFiles() as $fileName) {
+            if (!$this->gaufretteFileManager->hasFile($fileName)) {
                 continue;
             }
 
-            $file = $this->filesystem->get($fileName);
+            $file = $this->gaufretteFileManager->getFile($fileName);
             $mtime = $file->getMtime();
             $mDateTime = new \DateTime();
             $mDateTime->setTimestamp($mtime);
@@ -100,61 +73,62 @@ class FileManager
 
     /**
      * @param \SplFileInfo $file
-     * @param string $fileName
-     * @param bool $overwrite
+     * @param string       $fileName
      */
-    public function saveFileToStorage(\SplFileInfo $file, $fileName, $overwrite = false)
+    public function saveFileToStorage(\SplFileInfo $file, string $fileName): void
     {
-        $this->filesystem->write(
-            $fileName,
+        $this->gaufretteFileManager->writeToStorage(
             $this->removeByteOrderMark($file->openFile()->fread($file->getSize())),
-            $overwrite
+            $fileName
         );
     }
 
     /**
      * @param string $localFilePath
      * @param string $fileName
-     * @param boolean $overwrite
      */
-    public function writeFileToStorage($localFilePath, $fileName, $overwrite = false)
+    public function writeFileToStorage(string $localFilePath, string $fileName): void
     {
-        $this->filesystem->write(
-            $fileName,
+        $this->gaufretteFileManager->writeToStorage(
             $this->removeByteOrderMark(@file_get_contents($localFilePath, 'r')),
-            $overwrite
+            $fileName
         );
     }
 
     /**
-     * @return Filesystem
+     * @param string $content
+     * @param string $fileName
      */
-    public function getFileSystem()
+    public function writeToStorage(string $content, string $fileName): void
     {
-        return $this->filesystem;
+        $this->gaufretteFileManager->writeToStorage($content, $fileName);
     }
 
     /**
      * @param string $fileName
+     *
      * @return string
      */
-    public function writeToTmpLocalStorage($fileName)
+    public function writeToTmpLocalStorage(string $fileName): string
     {
-        $content = $this->filesystem->read($fileName);
+        $content = $this->gaufretteFileManager->getFileContent($fileName);
         $pathFile = self::generateTmpFilePath($fileName);
         @file_put_contents($pathFile, $content);
 
         return $pathFile;
     }
 
-    /** As ini_set('auto_detect_line_endings', true); does not fix problem of line endings in the file we forced to
+    /**
+     * As ini_set('auto_detect_line_endings', true); does not fix problem of line endings in the file we forced to
      * explicitly replace all possible `new lines` to one common
      * It is possible to replace it on field level (CsvFileStreamWriter::writeLine()) but it will be overhead because
      * it is called several times for each row in file
+     *
      * @param string $file
+     *
      * @return string
      */
-    public function fixNewLines($file)
+    public function fixNewLines(string $file): string
     {
         $allContent = file_get_contents($file);
         file_put_contents($file, preg_replace('~\R~u', PHP_EOL, $allContent));
@@ -169,7 +143,7 @@ class FileManager
      *
      * @return string
      */
-    public static function generateUniqueFileName($extension = null)
+    public static function generateUniqueFileName(string $extension = null): string
     {
         $fileName = str_replace('.', '', uniqid('', true));
         if ($extension) {
@@ -181,9 +155,10 @@ class FileManager
 
     /**
      * @param string $fileName
+     *
      * @return string
      */
-    public static function generateTmpFilePath($fileName)
+    public static function generateTmpFilePath(string $fileName): string
     {
         return sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName;
     }
@@ -193,9 +168,10 @@ class FileManager
      *
      * @param string $prefix
      * @param string $extension
+     *
      * @return string
      */
-    public static function generateFileName($prefix, $extension)
+    public static function generateFileName(string $prefix, string $extension): string
     {
         $filePrefix = sprintf('%s_%s', $prefix, date('Y_m_d_H_i_s'));
 
@@ -207,13 +183,24 @@ class FileManager
     }
 
     /**
-     * @param string|File $file
+     * @param string $fileName
+     *
      * @return string
      */
-    public function getContent($file)
+    public function getFilePath(string $fileName): string
+    {
+        return $this->gaufretteFileManager->getFilePath($fileName);
+    }
+
+    /**
+     * @param string|File $file
+     *
+     * @return string
+     */
+    public function getContent($file): string
     {
         if (!$file instanceof File) {
-            $file = $this->filesystem->get($file);
+            $file = $this->gaufretteFileManager->getFile($file);
         }
 
         return $file->getContent();
@@ -222,39 +209,41 @@ class FileManager
     /**
      * @param string|File $file
      */
-    public function deleteFile($file)
+    public function deleteFile($file): void
     {
         if ($file instanceof File) {
             $file = $file->getKey();
         }
 
-        if ($file && $this->filesystem->has($file)) {
-            $this->filesystem->delete($file);
+        if ($file && $this->gaufretteFileManager->hasFile($file)) {
+            $this->gaufretteFileManager->deleteFile($file);
         }
     }
 
     /**
-     * @param $fileName
+     * @param string $fileName
      *
      * @return bool
      */
-    public function isFileExist($fileName)
+    public function isFileExist(string $fileName): bool
     {
-        return $this->filesystem->has($fileName);
+        return $this->gaufretteFileManager->hasFile($fileName);
     }
 
     /**
      * @param string|File $file
+     *
+     * @return string|null
      */
-    public function getMimeType($file)
+    public function getMimeType($file): ?string
     {
         if ($file instanceof File) {
             $file = $file->getKey();
         }
 
-        if ($file && $this->filesystem->has($file)) {
+        if ($file && $this->gaufretteFileManager->hasFile($file)) {
             try {
-                return $this->filesystem->mimeType($file);
+                return $this->gaufretteFileManager->mimeType($file);
             } catch (\LogicException $e) {
                 // The underlying adapter does support mimetype.
                 return null;
@@ -265,9 +254,27 @@ class FileManager
     }
 
     /**
-     * Remove byte order mark (BOM) from the beginning of the file.
+     * @param string $pattern
+     *
+     * @return array
+     */
+    public function getFilesByFilePattern(string $pattern): array
+    {
+        $result = [];
+        foreach ($this->gaufretteFileManager->findFiles() as $fileName) {
+            if (fnmatch($pattern, $fileName)) {
+                $result[] = $fileName;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Removes byte order mark (BOM) from the beginning of the file.
      *
      * @param string $fileContent
+     *
      * @return string
      */
     private function removeByteOrderMark(string $fileContent): string
@@ -275,6 +282,8 @@ class FileManager
         $bom = pack('H*', 'EFBBBF');
         $sanitizedFileContent = preg_replace("/^$bom/", '', $fileContent);
 
-        return !is_string($sanitizedFileContent) ? '' : $sanitizedFileContent;
+        return is_string($sanitizedFileContent)
+            ? $sanitizedFileContent
+            : '';
     }
 }

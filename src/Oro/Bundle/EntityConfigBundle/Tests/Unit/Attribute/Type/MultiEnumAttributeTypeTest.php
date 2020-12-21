@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\MultiEnumAttributeType;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 {
@@ -29,8 +29,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSearchableValue()
     {
-        $value1 = new StubEnumValue('id1', 'name1', 101);
-        $value2 = new StubEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('id1', 'name1', 101);
+        $value2 = new TestEnumValue('id2', 'name2', 102);
 
         $this->assertSame(
             'name1 name2',
@@ -58,8 +58,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetFilterableValue()
     {
-        $value1 = new StubEnumValue('id1', 'name1', 101);
-        $value2 = new StubEnumValue('id2', 'name2', 102);
+        $value1 = new TestEnumValue('id1', 'name1', 101);
+        $value2 = new TestEnumValue('id2', 'name2', 102);
 
         $this->assertSame(
             [
