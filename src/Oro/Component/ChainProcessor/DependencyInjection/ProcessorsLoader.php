@@ -37,7 +37,7 @@ class ProcessorsLoader
                 }
 
                 if (!$action && $group) {
-                    throw new \InvalidArgumentException(\sprintf(
+                    throw new \InvalidArgumentException(sprintf(
                         'Tag attribute "group" can be used only if '
                         . 'the attribute "action" is specified. Service: "%s".',
                         $id
