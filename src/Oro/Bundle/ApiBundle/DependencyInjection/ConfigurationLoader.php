@@ -247,8 +247,7 @@ class ConfigurationLoader
             ->setArguments([
                 $configKey,
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ])
             ->setPublic(false);
 
