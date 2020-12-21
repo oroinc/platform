@@ -39,16 +39,12 @@ class ConfigCache extends ResourceCheckerConfigCache
      */
     public function isFresh()
     {
-        if (!$this->debug && \is_file($this->getPath())) {
+        if (!$this->debug && is_file($this->getPath())) {
             return true;
         }
 
-        if (!$this->debug || !$this->dependencies) {
-            return parent::isFresh();
-        }
-
         $result = parent::isFresh();
-        if ($result) {
+        if ($result && $this->dependencies && $this->debug) {
             $cacheTimestamp = filemtime($this->getPath());
             if (false !== $cacheTimestamp) {
                 foreach ($this->dependencies as $dependency) {
@@ -68,7 +64,7 @@ class ConfigCache extends ResourceCheckerConfigCache
      */
     public function write($content, array $metadata = null)
     {
-        if (!$this->debug && null !== $metadata) {
+        if (null !== $metadata && !$this->debug) {
             $metadata = null;
         }
 
@@ -83,5 +79,22 @@ class ConfigCache extends ResourceCheckerConfigCache
     public function addDependency(ConfigCacheStateInterface $configCache): void
     {
         $this->dependencies[] = $configCache;
+    }
+
+    /**
+     * Makes sure that all caches this cache depends on were warmed up.
+     */
+    protected function ensureDependenciesWarmedUp(): void
+    {
+        if ($this->dependencies && $this->debug) {
+            $cacheTimestamp = filemtime($this->getPath());
+            foreach ($this->dependencies as $dependency) {
+                if ($dependency instanceof WarmableConfigCacheInterface
+                    && !$dependency->isCacheFresh($cacheTimestamp)
+                ) {
+                    $dependency->warmUpCache();
+                }
+            }
+        }
     }
 }
