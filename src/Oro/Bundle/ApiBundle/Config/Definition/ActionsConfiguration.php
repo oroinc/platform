@@ -101,7 +101,17 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::ACL_RESOURCE)->end()
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
-            ->integerNode(ConfigUtil::PAGE_SIZE)->min(-1)->end()
+            ->integerNode(ConfigUtil::PAGE_SIZE)
+                ->min(-1)
+                ->validate()
+                    ->always(function ($v) {
+                        if (0 !== $v) {
+                            return $v;
+                        }
+                        throw new \InvalidArgumentException('Expected a positive number or -1, but got 0.');
+                    })
+                ->end()
+            ->end()
             ->arrayNode(ConfigUtil::ORDER_BY)
                 ->performNoDeepMerging()
                 ->useAttributeAsKey('')

@@ -32,8 +32,8 @@ class PhpConfigCacheAccessor
     public function load(ConfigCacheInterface $cache)
     {
         $file = $cache->getPath();
-        if (!\file_exists($file)) {
-            throw new \LogicException(\sprintf('The file "%s" does not exist.', $file));
+        if (!file_exists($file)) {
+            throw new \LogicException(sprintf('The file "%s" does not exist.', $file));
         }
 
         $config = require $file;
@@ -41,7 +41,7 @@ class PhpConfigCacheAccessor
             try {
                 \call_user_func($this->configValidator, $config);
             } catch (\Exception $e) {
-                throw new \LogicException(\sprintf(
+                throw new \LogicException(sprintf(
                     'The file "%s" has not valid content. %s',
                     $file,
                     $e->getMessage()
@@ -72,14 +72,14 @@ class PhpConfigCacheAccessor
                 \call_user_func($this->configValidator, $config);
             }
         } catch (\Exception $e) {
-            throw new \LogicException(\sprintf(
+            throw new \LogicException(sprintf(
                 'The config "%s" is not valid. %s',
                 $cache->getPath(),
                 $e->getMessage()
             ));
         }
         $cache->write(
-            \sprintf('<?php return %s;', \var_export($config, true)),
+            sprintf('<?php return %s;', var_export($config, true)),
             $metadata
         );
     }

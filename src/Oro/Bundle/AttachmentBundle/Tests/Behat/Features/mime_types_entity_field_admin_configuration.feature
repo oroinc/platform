@@ -18,14 +18,20 @@ Feature: Mime types entity field admin configuration
       | Type          | File         |
     And click "Continue"
     And I should see "Allowed MIME Types" with options:
-      | Value                    |
-      | application/pdf          |
-      | application/vnd.ms-excel |
-      | application/msword       |
-      | application/zip          |
-      | image/gif                |
-      | image/jpeg               |
-      | image/png                |
+      | Value                                                                     |
+      | text/csv                                                                  |
+      | text/plain                                                                |
+      | application/msword                                                        |
+      | application/vnd.openxmlformats-officedocument.wordprocessingml.document   |
+      | application/vnd.ms-excel                                                  |
+      | application/vnd.openxmlformats-officedocument.spreadsheetml.sheet         |
+      | application/vnd.ms-powerpoint                                             |
+      | application/vnd.openxmlformats-officedocument.presentationml.presentation |
+      | application/pdf                                                           |
+      | application/zip                                                           |
+      | image/gif                                                                 |
+      | image/jpeg                                                                |
+      | image/png                                                                 |
     And I fill form with:
       | File Size (MB)        | 10                           |
       | Allowed MIME types    | [application/pdf, image/png] |

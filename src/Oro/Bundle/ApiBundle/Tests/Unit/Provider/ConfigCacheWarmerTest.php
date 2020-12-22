@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
+use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
 use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResource;
@@ -14,7 +15,6 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Testing\TempDirExtension;
-use Symfony\Component\Config\ConfigCacheInterface;
 
 class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
@@ -388,7 +388,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $result = null;
-        $cache = $this->createMock(ConfigCacheInterface::class);
+        $cache = $this->createMock(ConfigCacheFile::class);
         $cache->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
@@ -448,21 +448,21 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $resultDefault = null;
         $resultFirst = null;
         $resultSecond = null;
-        $cacheDefault = $this->createMock(ConfigCacheInterface::class);
+        $cacheDefault = $this->createMock(ConfigCacheFile::class);
         $cacheDefault->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
             ->willReturnCallback(function ($content, $resources) use (&$resultDefault) {
                 $resultDefault = $this->decodeContent($content);
             });
-        $cacheFirst = $this->createMock(ConfigCacheInterface::class);
+        $cacheFirst = $this->createMock(ConfigCacheFile::class);
         $cacheFirst->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
             ->willReturnCallback(function ($content, $resources) use (&$resultFirst) {
                 $resultFirst = $this->decodeContent($content);
             });
-        $cacheSecond = $this->createMock(ConfigCacheInterface::class);
+        $cacheSecond = $this->createMock(ConfigCacheFile::class);
         $cacheSecond->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
@@ -554,21 +554,21 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $resultDefault = null;
         $resultFirst = null;
         $resultSecond = null;
-        $cacheDefault = $this->createMock(ConfigCacheInterface::class);
+        $cacheDefault = $this->createMock(ConfigCacheFile::class);
         $cacheDefault->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
             ->willReturnCallback(function ($content, $resources) use (&$resultDefault) {
                 $resultDefault = $this->decodeContent($content);
             });
-        $cacheFirst = $this->createMock(ConfigCacheInterface::class);
+        $cacheFirst = $this->createMock(ConfigCacheFile::class);
         $cacheFirst->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
             ->willReturnCallback(function ($content, $resources) use (&$resultFirst) {
                 $resultFirst = $this->decodeContent($content);
             });
-        $cacheSecond = $this->createMock(ConfigCacheInterface::class);
+        $cacheSecond = $this->createMock(ConfigCacheFile::class);
         $cacheSecond->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
@@ -615,7 +615,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $resultFirst = null;
-        $cacheFirst = $this->createMock(ConfigCacheInterface::class);
+        $cacheFirst = $this->createMock(ConfigCacheFile::class);
         $cacheFirst->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isNull())
@@ -697,21 +697,21 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $resourcesDefault = null;
         $resourcesFirst = null;
         $resourcesSecond = null;
-        $cacheDefault = $this->createMock(ConfigCacheInterface::class);
+        $cacheDefault = $this->createMock(ConfigCacheFile::class);
         $cacheDefault->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isType('array'))
             ->willReturnCallback(function ($content, $resources) use (&$resourcesDefault) {
                 $resourcesDefault = $resources;
             });
-        $cacheFirst = $this->createMock(ConfigCacheInterface::class);
+        $cacheFirst = $this->createMock(ConfigCacheFile::class);
         $cacheFirst->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isType('array'))
             ->willReturnCallback(function ($content, $resources) use (&$resourcesFirst) {
                 $resourcesFirst = $resources;
             });
-        $cacheSecond = $this->createMock(ConfigCacheInterface::class);
+        $cacheSecond = $this->createMock(ConfigCacheFile::class);
         $cacheSecond->expects(self::once())
             ->method('write')
             ->with(self::isType('string'), self::isType('array'))

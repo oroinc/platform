@@ -26,6 +26,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Validator\Constraints\Url;
 
 /**
  * Command installs application with all schema and data migrations, prepares assets and application cache
@@ -144,6 +145,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     {
         $this->inputOptionProvider = new InputOptionProvider($output, $input, $this->getHelperSet()->get('question'));
 
+        $this->validateApplicationUrl($input->getOption('application-url'));
         if (false === $input->isInteractive()) {
             $this->validate($input);
         }
@@ -449,8 +451,25 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $configManager = $this->getContainer()->get('oro_config.global');
         $options       = [
             'application-url' => [
-                'label'                  => 'Application URL',
-                'config_key'             => 'oro_ui.application_url',
+                'label' => 'Application URL',
+                'config_key' => 'oro_ui.application_url',
+                'options' => [
+                    'settings' => [
+                        'validator' => [
+                            function (?string $applicationUrl) {
+                                if (!$applicationUrl) {
+                                    throw new \InvalidArgumentException(
+                                        'The value of the "application-url" parameter should not be blank.'
+                                    );
+                                }
+
+                                $this->validateApplicationUrl($applicationUrl);
+
+                                return $applicationUrl;
+                            }
+                        ]
+                    ]
+                ]
             ]
         ];
 
@@ -462,7 +481,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 $optionName,
                 $optionData['label'],
                 $defaultValue,
-                ['constructorArgs' => [$defaultValue]]
+                array_merge(['constructorArgs' => [$defaultValue]], $optionData['options'])
             );
 
             // update setting if it's not empty and not equal to default value
@@ -781,6 +800,28 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         return $exceptionMessage;
+    }
+
+    /**
+     * @param string|null $applicationUrl
+     */
+    private function validateApplicationUrl(?string $applicationUrl): void
+    {
+        if (!$applicationUrl) {
+            return;
+        }
+
+        $violations = $this->getContainer()
+            ->get('validator')
+            ->validate($applicationUrl, new Url());
+
+        if (!$violations->count()) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(
+            'The value of the "application-url" parameter is invalid. ' . $violations->get(0)->getMessage()
+        );
     }
 
     /**

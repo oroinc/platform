@@ -149,6 +149,8 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
         // test that the cache is built after it was cleared
         self::assertEquals($initialConfig, $provider->getConfig());
+        self::assertIsInt($provider->getCacheTimestamp());
+        self::assertSame(filemtime($this->cacheFile), $provider->getCacheTimestamp());
     }
 
     public function testWarmUpCache()

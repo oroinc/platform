@@ -2,14 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Sets the maximum number of entities that can be deleted by one request. By default 100.
+ * Sets the maximum number of entities that can be deleted by one request.
  */
 class SetDeleteLimit implements ProcessorInterface
 {
+    /** @var int */
+    private $maxDeleteEntitiesLimit;
+
+    /**
+     * @param int $maxDeleteEntitiesLimit
+     */
+    public function setMaxDeleteEntitiesLimit(int $maxDeleteEntitiesLimit)
+    {
+        $this->maxDeleteEntitiesLimit = $maxDeleteEntitiesLimit;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,17 +40,29 @@ class SetDeleteLimit implements ProcessorInterface
             return;
         }
 
-        if (null === $criteria->getMaxResults()) {
-            $limit = null;
-            $config = $context->getConfig();
-            if (null !== $config) {
-                $limit = $config->getMaxResults();
-            }
-            if (null === $limit) {
-                $limit = $this->getDefaultDeleteLimit();
-            }
-            $criteria->setMaxResults($limit);
+        if (null !== $criteria->getMaxResults()) {
+            // the limit is already set
+            return;
         }
+
+        $maxDeleteEntitiesLimit = $this->getMaxDeleteEntitiesLimit($context->getConfig());
+        if ($maxDeleteEntitiesLimit > 0) {
+            $criteria->setMaxResults($maxDeleteEntitiesLimit);
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig|null $config
+     *
+     * @return int
+     */
+    private function getMaxDeleteEntitiesLimit(?EntityDefinitionConfig $config): int
+    {
+        if (null === $config) {
+            return $this->getDefaultDeleteLimit();
+        }
+
+        return $config->getMaxResults() ?? $this->getDefaultDeleteLimit();
     }
 
     /**
@@ -46,6 +70,6 @@ class SetDeleteLimit implements ProcessorInterface
      */
     protected function getDefaultDeleteLimit()
     {
-        return 100;
+        return $this->maxDeleteEntitiesLimit ?? 100;
     }
 }

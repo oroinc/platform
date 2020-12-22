@@ -73,6 +73,36 @@ class Configuration implements ConfigurationInterface
                 )
                 ->min(0)
                 ->defaultValue(3)
+            ->end()
+            ->integerNode('default_page_size')
+                ->info(
+                    'The default page size. It is used when the page size is not specified in a request explicitly.'
+                )
+                ->min(0)
+                ->defaultValue(10)
+            ->end()
+            ->integerNode('max_entities')
+                ->info('The maximum number of primary entities that can be retrieved by a request.')
+                ->min(-1)
+                ->defaultValue(-1)
+                ->validate()
+                    ->always(function ($v) {
+                        if (0 !== $v) {
+                            return $v;
+                        }
+                        throw new \InvalidArgumentException('Expected a positive number or -1, but got 0.');
+                    })
+                ->end()
+            ->end()
+            ->integerNode('max_related_entities')
+                ->info('The maximum number of related entities that can be retrieved by a request.')
+                ->min(0)
+                ->defaultValue(100)
+            ->end()
+            ->integerNode('max_delete_entities')
+                ->info('The maximum number of entities that can be deleted by one request.')
+                ->min(0)
+                ->defaultValue(100)
             ->end();
     }
 
