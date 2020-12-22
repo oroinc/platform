@@ -507,8 +507,10 @@
     }
 
     &-breadcrumbs {
+        position: relative;
         margin: $select2-breadcrumbs-offset;
         padding: $select2-breadcrumbs-inner-offset;
+        max-width: $select2-breadcrumbs-width;
 
         list-style: none;
 
@@ -517,7 +519,21 @@
         }
 
         .select2-breadcrumb-item {
+            display: inline-block;
+            font-size: $font-size-base;
+            line-height: $line-height-base * .8;
+            color: $link-color;
+            cursor: pointer;
+
+            &:hover {
+                color: $link-color-hover;
+            }
+
             &:after {
+                display: inline;
+                padding: 0 2px;
+                color: $body-color;
+                cursor: default;
                 content: $select2-breadcrumbs-item-sep;
             }
 
