@@ -87,11 +87,15 @@ class ConfigCache extends ResourceCheckerConfigCache
     protected function ensureDependenciesWarmedUp(): void
     {
         if ($this->dependencies && $this->debug) {
-            $cacheTimestamp = filemtime($this->getPath());
+            $cacheTimestamp = is_file($this->getPath())
+                ? filemtime($this->getPath())
+                : false;
+            if (false === $cacheTimestamp) {
+                $cacheTimestamp = PHP_INT_MAX;
+            }
             foreach ($this->dependencies as $dependency) {
                 if ($dependency instanceof WarmableConfigCacheInterface
-                    && !$dependency->isCacheFresh($cacheTimestamp)
-                ) {
+                    && !$dependency->isCacheFresh($cacheTimestamp)) {
                     $dependency->warmUpCache();
                 }
             }
