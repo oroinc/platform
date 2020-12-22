@@ -50,21 +50,6 @@ class OroEntityBundle extends Bundle
         parent::build($container);
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_entity.entity_alias_loader',
-            'oro_entity.class_provider',
-            'addEntityClassProvider'
-        ));
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_entity.entity_alias_loader',
-            'oro_entity.alias_provider',
-            'addEntityAliasProvider'
-        ));
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
-            'oro_entity.entity_class_name_provider',
-            'oro_entity.class_name_provider',
-            'addProvider'
-        ));
-        $container->addCompilerPass(new PriorityTaggedServiceViaAddMethodCompilerPass(
             'oro_entity.exclusion_provider',
             'oro_entity.exclusion_provider.default',
             'addProvider'

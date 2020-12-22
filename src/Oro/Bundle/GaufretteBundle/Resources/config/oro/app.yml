@@ -1,0 +1,8 @@
+knp_gaufrette:
+    adapters:
+        public:
+            local:
+                directory: '%kernel.project_dir%/public/media'
+        private:
+            local:
+                directory: '%kernel.project_dir%/var/data'

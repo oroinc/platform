@@ -3,39 +3,40 @@
 namespace Oro\Bundle\UserBundle\Provider;
 
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
+use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 
+/**
+ * Provides role capabilities.
+ */
 class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
 {
     /**
      * @param AbstractRole $role
      *
-     * @return mixed
+     * @return array
      */
     public function getCapabilities(AbstractRole $role)
     {
-        $categories = $this->categoryProvider->getPermissionCategories();
+        $categories = $this->categoryProvider->getCategories();
         $capabilitiesData = $this->getCapabilitiesData($categories);
         $allPrivileges = $this->preparePrivileges($role, 'action');
-
-        /** @var AclPrivilege $privilege */
         foreach ($allPrivileges as $privilege) {
-            $category = $this->getPrivilegeCategory($privilege, $categories);
             $permissions = $privilege->getPermissions()->toArray();
-            if (0 === count($permissions)) {
-                continue;
+            if ($permissions) {
+                $permission = reset($permissions);
+                $category = $this->getPrivilegeCategory($privilege, $categories);
+                $capabilitiesData[$category]['items'][] = [
+                    'id'                      => $privilege->getIdentity()->getId(),
+                    'identity'                => $privilege->getIdentity()->getId(),
+                    'label'                   => $privilege->getIdentity()->getName(),
+                    'description'             => $privilege->getDescription(),
+                    'name'                    => $permission->getName(),
+                    'access_level'            => $permission->getAccessLevel(),
+                    'selected_access_level'   => AccessLevel::SYSTEM_LEVEL,
+                    'unselected_access_level' => AccessLevel::NONE_LEVEL
+                ];
             }
-            $permission = reset($permissions);
-            $capabilitiesData[$category]['items'][] = [
-                'id'                      => $privilege->getIdentity()->getId(),
-                'identity'                => $privilege->getIdentity()->getId(),
-                'label'                   => $privilege->getIdentity()->getName(),
-                'description'             => $privilege->getDescription(),
-                'name'                    => $permission->getName(),
-                'access_level'            => $permission->getAccessLevel(),
-                'selected_access_level'   => AccessLevel::SYSTEM_LEVEL,
-                'unselected_access_level' => AccessLevel::NONE_LEVEL            ];
         }
         $capabilitiesData = $this->filterUnusedCategories($capabilitiesData);
 
@@ -43,7 +44,7 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
     }
 
     /**
-     * @param array $categories
+     * @param PrivilegeCategory[] $categories
      *
      * @return array
      */
@@ -51,8 +52,9 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
     {
         $capabilitiesData = [];
         foreach ($categories as $category) {
-            $capabilitiesData[$category->getId()] = [
-                'group' => $category->getId(),
+            $id = $category->getId();
+            $capabilitiesData[$id] = [
+                'group' => $id,
                 'label' => $this->translator->trans($category->getLabel()),
                 'items' => []
             ];
@@ -83,8 +85,8 @@ class RolePrivilegeCapabilityProvider extends RolePrivilegeAbstractProvider
     public function getCapabilitySetOptions(AbstractRole $role)
     {
         return [
-            'data' => $this->getCapabilities($role),
-            'tabIds' => $this->categoryProvider->getTabList()
+            'data'   => $this->getCapabilities($role),
+            'tabIds' => $this->categoryProvider->getTabIds()
         ];
     }
 }

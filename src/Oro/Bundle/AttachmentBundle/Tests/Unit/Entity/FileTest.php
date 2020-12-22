@@ -65,8 +65,9 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testToString(): void
     {
-        $this->assertSame('', $this->entity->__toString());
         $this->entity->setFilename('file.doc');
+        $this->assertEquals('file.doc', $this->entity->__toString());
+
         $this->entity->setOriginalFilename('original.doc');
         $this->assertEquals('file.doc (original.doc)', $this->entity->__toString());
     }

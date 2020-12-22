@@ -3,56 +3,73 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEntity;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEntityWithEnum;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const ENUM_VALUE_CLASS = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Filter\TestEnumValue';
-
-    /** @var MultiEnumManager */
-    protected $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
     private $uow;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var MultiEnumManager */
+    private $manager;
 
     protected function setUp(): void
     {
-        $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->uow = $this->createMock(UnitOfWork::class);
 
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->em->expects($this->any())
             ->method('getUnitOfWork')
-            ->will($this->returnValue($this->uow));
+            ->willReturn($this->uow);
 
         $this->manager = new MultiEnumManager();
+    }
+
+    /**
+     * @param object $owner
+     * @param array  $mapping
+     * @param array  $items
+     *
+     * @return PersistentCollection
+     */
+    private function getPersistentCollection($owner, array $mapping, array $items = [])
+    {
+        $coll = new PersistentCollection(
+            $this->em,
+            $this->createMock(ClassMetadata::class),
+            new ArrayCollection($items)
+        );
+
+        $mapping['inversedBy'] = 'test';
+        $coll->setOwner($owner, $mapping);
+
+        return $coll;
     }
 
     public function testHandleOnFlushWithNoChangesInCollections()
     {
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionUpdates')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionDeletions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->uow->expects($this->never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $event = $this->getOnFlushEventArgsMock();
-        $this->manager->handleOnFlush($event);
+        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
     }
 
     public function testHandleOnFlushWithNothingToChange()
@@ -63,8 +80,8 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 [
                     'type'         => ClassMetadata::MANY_TO_ONE,
                     'isOwningSide' => true,
-                    'fieldName'    => 'values',
-                    'targetEntity' => self::ENUM_VALUE_CLASS
+                    'fieldName'    => 'multipleEnumField',
+                    'targetEntity' => TestEnumValue::class
                 ],
                 [
                     new TestEnumValue('val1', 'Value 1')
@@ -75,7 +92,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 [
                     'type'         => ClassMetadata::MANY_TO_MANY,
                     'isOwningSide' => true,
-                    'fieldName'    => 'values',
+                    'fieldName'    => 'multipleEnumField',
                     'targetEntity' => 'Test\TargetEntity'
                 ],
                 ['val1']
@@ -84,28 +101,27 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionUpdates')
-            ->will($this->returnValue($collectionUpdates));
+            ->willReturn($collectionUpdates);
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionDeletions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $this->uow->expects($this->never())
             ->method('recomputeSingleEntityChangeSet');
 
-        $event = $this->getOnFlushEventArgsMock();
-        $this->manager->handleOnFlush($event);
+        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
     }
 
     public function testHandleOnFlush()
     {
-        $owner = new TestEntity();
+        $owner = new TestEntityWithEnum();
         $updatedColl = $this->getPersistentCollection(
             $owner,
             [
                 'type'         => ClassMetadata::MANY_TO_MANY,
                 'isOwningSide' => true,
-                'fieldName'    => 'values',
-                'targetEntity' => self::ENUM_VALUE_CLASS
+                'fieldName'    => 'multipleEnumField',
+                'targetEntity' => TestEnumValue::class
             ],
             [
                 new TestEnumValue('val2', 'Value 2'),
@@ -116,18 +132,16 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionUpdates')
-            ->will($this->returnValue([$updatedColl]));
+            ->willReturn([$updatedColl]);
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionDeletions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(get_class($owner))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->uow->expects($this->once())
             ->method('recomputeSingleEntityChangeSet')
@@ -136,25 +150,24 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 $owner
             );
 
-        $event = $this->getOnFlushEventArgsMock();
-        $this->manager->handleOnFlush($event);
+        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
 
         $this->assertEquals(
             'val1,val2,val3',
-            $owner->getValuesSnapshot()
+            $owner->getMultipleEnumFieldSnapshot()
         );
     }
 
     public function testHandleOnFlushWhenSnapshotLengthIsNotEnough()
     {
-        $owner = new TestEntity();
+        $owner = new TestEntityWithEnum();
         $updatedColl = $this->getPersistentCollection(
             $owner,
             [
                 'type'         => ClassMetadata::MANY_TO_MANY,
                 'isOwningSide' => true,
-                'fieldName'    => 'values',
-                'targetEntity' => self::ENUM_VALUE_CLASS
+                'fieldName'    => 'multipleEnumField',
+                'targetEntity' => TestEnumValue::class
             ],
             [
                 new TestEnumValue('value678901234567890123456789_01', 'Value 1'),
@@ -178,18 +191,16 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionUpdates')
-            ->will($this->returnValue([$updatedColl]));
+            ->willReturn([$updatedColl]);
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionDeletions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(get_class($owner))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->uow->expects($this->once())
             ->method('recomputeSingleEntityChangeSet')
@@ -198,12 +209,11 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
                 $owner
             );
 
-        $event = $this->getOnFlushEventArgsMock();
-        $this->manager->handleOnFlush($event);
+        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
 
         $this->assertLessThanOrEqual(
             ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
-            strlen($owner->getValuesSnapshot())
+            strlen($owner->getMultipleEnumFieldSnapshot())
         );
         $this->assertEquals(
             'value678901234567890123456789_01,value678901234567890123456789_02,value678901234567890123456789_03,'
@@ -211,20 +221,20 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
             . 'value678901234567890123456789_07,value678901234567890123456789_08,value678901234567890123456789_09,'
             . 'value678901234567890123456789_10,value678901234567890123456789_11,value678901234567890123456789_12,'
             . 'value678901234567890123456789_13,value678901234567890123456789_14,value678901234567890123456789_15,...',
-            $owner->getValuesSnapshot()
+            $owner->getMultipleEnumFieldSnapshot()
         );
     }
 
     public function testHandleOnFlushWhenSnapshotLengthIsNotEnoughAndTwoValuesAreReplacedWithDots()
     {
-        $owner = new TestEntity();
+        $owner = new TestEntityWithEnum();
         $updatedColl = $this->getPersistentCollection(
             $owner,
             [
                 'type'         => ClassMetadata::MANY_TO_MANY,
                 'isOwningSide' => true,
-                'fieldName'    => 'values',
-                'targetEntity' => self::ENUM_VALUE_CLASS
+                'fieldName'    => 'multipleEnumField',
+                'targetEntity' => TestEnumValue::class
             ],
             [
                 new TestEnumValue('value678901234567890123456789_01', 'Value 1'),
@@ -249,32 +259,26 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionUpdates')
-            ->will($this->returnValue([$updatedColl]));
+            ->willReturn([$updatedColl]);
         $this->uow->expects($this->once())
             ->method('getScheduledCollectionDeletions')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with(get_class($owner))
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->uow->expects($this->once())
             ->method('recomputeSingleEntityChangeSet')
-            ->with(
-                $this->identicalTo($metadata),
-                $owner
-            );
+            ->with($this->identicalTo($metadata), $owner);
 
-        $event = $this->getOnFlushEventArgsMock();
-        $this->manager->handleOnFlush($event);
+        $this->manager->handleOnFlush(new OnFlushEventArgs($this->em));
 
         $this->assertLessThanOrEqual(
             ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH,
-            strlen($owner->getValuesSnapshot())
+            strlen($owner->getMultipleEnumFieldSnapshot())
         );
         $this->assertEquals(
             'value678901234567890123456789_01,value678901234567890123456789_02,value678901234567890123456789_03,'
@@ -282,46 +286,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
             . 'value678901234567890123456789_07,value678901234567890123456789_08,value678901234567890123456789_09,'
             . 'value678901234567890123456789_10,value678901234567890123456789_11,value678901234567890123456789_12,'
             . 'value678901234567890123456789_13,value678901234567890123456789_14,value678901234567890123456789_15,...',
-            $owner->getValuesSnapshot()
+            $owner->getMultipleEnumFieldSnapshot()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getOnFlushEventArgsMock()
-    {
-        $flushEventArgs = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $flushEventArgs->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($this->em));
-
-        return $flushEventArgs;
-    }
-
-    /**
-     * @param object $owner
-     * @param array  $mapping
-     * @param array  $items
-     *
-     * @return PersistentCollection
-     */
-    protected function getPersistentCollection($owner, array $mapping, array $items = [])
-    {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $coll     = new PersistentCollection(
-            $this->em,
-            $metadata,
-            new ArrayCollection($items)
-        );
-
-        $mapping['inversedBy'] = 'test';
-        $coll->setOwner($owner, $mapping);
-
-        return $coll;
     }
 }

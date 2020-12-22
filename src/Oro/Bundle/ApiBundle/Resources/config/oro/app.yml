@@ -59,7 +59,7 @@ knp_gaufrette:
                     checksum: checksum
     filesystems:
         api_source_data:
-            adapter: importexport
+            adapter: private
             alias: api_source_data_filesystem
         api:
             adapter: api

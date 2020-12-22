@@ -11,7 +11,7 @@ use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 /**
  * Provides preview metadata for digital-asset-select-*-grid
  */
-class PreviewMetadataProvider
+class PreviewMetadataProvider implements PreviewMetadataProviderInterface
 {
     protected const PREVIEW_FILTER_NAME = 'digital_asset_icon';
 
@@ -46,9 +46,7 @@ class PreviewMetadataProvider
     }
 
     /**
-     * @param File $file
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getMetadata(File $file): array
     {

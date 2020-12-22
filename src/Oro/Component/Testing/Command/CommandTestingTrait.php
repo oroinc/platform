@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Testing\Command;
 
 use Oro\Component\Testing\Command\Assert\CommandOutputContains;
+use Oro\Component\Testing\Command\Assert\CommandOutputIsEmpty;
 use Oro\Component\Testing\Command\Assert\CommandProducedError;
 use Oro\Component\Testing\Command\Assert\CommandProducedWarning;
 use Oro\Component\Testing\Command\Assert\CommandSuccessReturnCode;
@@ -20,10 +22,11 @@ trait CommandTestingTrait
     /**
      * @param Command|string $command Command instance or command name (execute by name is supported only in functional
      *                                  tests or other tests based on KernelTestCase.
-     * @param array $params
+     * @param array $input
+     * @param array $options Additional options that will be used when instantiating the command (e.g. 'verbosity').
      * @return CommandTester
      */
-    private function doExecuteCommand($command, array $params = []): CommandTester
+    private function doExecuteCommand($command, array $input = [], array $options = []): CommandTester
     {
         if (\is_string($command)) {
             if (!$this instanceof KernelTestCase) {
@@ -37,27 +40,32 @@ trait CommandTestingTrait
             $command = $app->find($command);
         }
         $commandTester = new CommandTester($command);
-        $commandTester->execute($params);
+        $commandTester->execute($input, $options);
 
         return $commandTester;
     }
 
-    private function assertOutputContains(CommandTester $commandTester, string $expectedText)
+    private function assertOutputContains(CommandTester $commandTester, string $expectedText): void
     {
         self::assertThat($commandTester, new CommandOutputContains($expectedText));
     }
 
-    private function assertProducedWarning(CommandTester $commandTester, string $expectedWarningMessage = null)
+    private function assertOutputIsEmpty(CommandTester $commandTester): void
+    {
+        self::assertThat($commandTester, new CommandOutputIsEmpty());
+    }
+
+    private function assertProducedWarning(CommandTester $commandTester, string $expectedWarningMessage = null): void
     {
         self::assertThat($commandTester, new CommandProducedWarning($expectedWarningMessage));
     }
 
-    private function assertSuccessReturnCode(CommandTester $commandTester)
+    private function assertSuccessReturnCode(CommandTester $commandTester): void
     {
         self::assertThat($commandTester, new CommandSuccessReturnCode());
     }
 
-    private function assertProducedError(CommandTester $commandTester, string $expectedErrorMessage = null)
+    private function assertProducedError(CommandTester $commandTester, string $expectedErrorMessage = null): void
     {
         self::assertThat($commandTester, new CommandProducedError($expectedErrorMessage));
     }

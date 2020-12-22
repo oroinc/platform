@@ -16,6 +16,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -50,8 +51,24 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFilePath()
     {
         self::assertEquals(
-            sprintf('%s://%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME),
+            sprintf(
+                '%s://%s/%s/test.txt',
+                self::TEST_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
             $this->fileManager->getFilePath('test.txt')
+        );
+    }
+
+    public function testGetFilePathWithConfiguredPathPrefixDirectory()
+    {
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, 'testSubDir');
+        $fileManager->setProtocol(self::TEST_PROTOCOL);
+
+        self::assertEquals(
+            sprintf('%s://%s/%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
+            $fileManager->getFilePath('test.txt')
         );
     }
 
@@ -66,9 +83,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
-            ->with(self::identicalTo(''))
+            ->with(self::identicalTo(self::TEST_FILE_SYSTEM_NAME . '/'))
             ->willReturn([
-                'keys' => ['file1', 'file2'],
+                'keys' => [self::TEST_FILE_SYSTEM_NAME . '/file1', self::TEST_FILE_SYSTEM_NAME . '/file2'],
                 'dirs' => ['dir1']
             ]);
 
@@ -82,9 +99,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
-            ->with('prefix')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/prefix')
             ->willReturn([
-                'keys' => ['file1', 'file2'],
+                'keys' => [self::TEST_FILE_SYSTEM_NAME . '/file1', self::TEST_FILE_SYSTEM_NAME . '/file2'],
                 'dirs' => ['dir1']
             ]);
 
@@ -98,7 +115,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
-            ->with('prefix')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/prefix')
             ->willReturn([]);
 
         self::assertSame(
@@ -114,7 +131,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
-            ->with('prefix')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/prefix')
             ->willReturn(['file1', 'file2']);
 
         self::assertEquals(
@@ -129,7 +146,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
 
         $this->assertTrue($this->fileManager->hasFile($fileName));
@@ -141,7 +158,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
 
         $this->assertFalse($this->fileManager->hasFile($fileName));
@@ -152,12 +169,18 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileName = 'testFile.txt';
 
         $file = $this->createMock(File::class);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileName);
 
         $this->filesystem->expects($this->never())
             ->method('has');
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($file);
 
         $this->assertSame($file, $this->fileManager->getFile($fileName));
@@ -169,7 +192,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('get');
@@ -182,14 +205,20 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileName = 'testFile.txt';
 
         $file = $this->createMock(File::class);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileName);
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($file);
 
         $this->assertSame($file, $this->fileManager->getFile($fileName, false));
@@ -198,13 +227,13 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetStreamWhenFileDoesNotExist()
     {
         $this->expectException(\Gaufrette\Exception\FileNotFound::class);
-        $this->expectExceptionMessage('The file "testFile.txt" was not found.');
+        $this->expectExceptionMessage('The file "testFileSystem/testFile.txt" was not found.');
 
         $fileName = 'testFile.txt';
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('createStream');
@@ -218,7 +247,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('createStream');
@@ -233,11 +262,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($stream);
 
         $this->assertSame($stream, $this->fileManager->getStream($fileName, false));
@@ -252,12 +281,18 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileName);
 
         $this->filesystem->expects($this->never())
             ->method('has');
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($file);
 
         $this->assertEquals($fileContent, $this->fileManager->getFileContent($fileName));
@@ -269,7 +304,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('get');
@@ -286,14 +321,20 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $file->expects($this->once())
             ->method('getContent')
             ->willReturn($fileContent);
+        $file->expects($this->once())
+            ->method('getName')
+            ->willReturn(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $file->expects($this->once())
+            ->method('setName')
+            ->with($fileName);
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('get')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($file);
 
         $this->assertEquals($fileContent, $this->fileManager->getFileContent($fileName, false));
@@ -305,11 +346,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
         $this->filesystem->expects($this->once())
             ->method('delete')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $this->fileManager->deleteFile($fileName);
     }
@@ -320,7 +361,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('has')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects($this->never())
             ->method('delete');
@@ -340,7 +381,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFiles()
     {
-        $fileNames = ['text1.txt', 'text2.txt'];
+        $fileNames = [self::TEST_FILE_SYSTEM_NAME . '/' . 'text1.txt', self::TEST_FILE_SYSTEM_NAME . '/' . 'text2.txt'];
 
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -367,11 +408,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $this->fileManager->writeToStorage($content, $fileName);
 
@@ -403,11 +444,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $this->fileManager->writeToStorage($content, $fileName);
     }
@@ -421,11 +462,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $this->fileManager->writeFileToStorage($localFilePath, $fileName);
 
@@ -444,11 +485,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
 
@@ -481,11 +522,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         try {
             $this->fileManager->writeStreamToStorage($srcStream, $fileName);
@@ -528,11 +569,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName);
 
@@ -554,11 +595,11 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->filesystem->expects($this->once())
             ->method('createStream')
-            ->with($fileName)
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn($resultStream);
         $this->filesystem->expects($this->once())
             ->method('removeFromRegister')
-            ->with($fileName);
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $result = $this->fileManager->writeStreamToStorage($srcStream, $fileName, true);
 
@@ -687,5 +728,40 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         } finally {
             @unlink($tmpFileName);
         }
+    }
+
+    public function testGetPrefixDirectory()
+    {
+        self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $this->fileManager->getPrefixDirectory());
+    }
+
+    public function testGetPrefixDirectoryWithPredefinedDirectory()
+    {
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, 'predefinedDir');
+
+        self::assertEquals('predefinedDir', $fileManager->getPrefixDirectory());
+    }
+
+    public function testMimeType()
+    {
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
+
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/test_file.txt')
+            ->willReturn($mimeType);
+
+        self::assertEquals($mimeType, $this->fileManager->mimeType('test_file.txt'));
+    }
+
+    public function testMimeTypeOnNotSupportedMimeAdapter()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/test_file.txt')
+            ->willThrowException(new \LogicException());
+
+        self::assertNull($this->fileManager->mimeType('test_file.txt'));
     }
 }

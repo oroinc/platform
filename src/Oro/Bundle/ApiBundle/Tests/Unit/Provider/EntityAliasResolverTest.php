@@ -16,16 +16,13 @@ use Psr\Log\LoggerInterface;
  */
 class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasLoader */
+    /** @var EntityAliasLoader|\PHPUnit\Framework\MockObject\MockObject */
     private $loader;
 
-    /** @var MutableEntityOverrideProvider */
-    private $entityOverrideProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Cache */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var EntityAliasResolver */
@@ -34,13 +31,12 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->loader = $this->createMock(EntityAliasLoader::class);
-        $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']);
         $this->cache = $this->createMock(Cache::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->entityAliasResolver = new EntityAliasResolver(
             $this->loader,
-            $this->entityOverrideProvider,
+            new MutableEntityOverrideProvider(['Test\Entity2' => 'Test\Entity1']),
             $this->cache,
             $this->logger,
             ['api.yml']

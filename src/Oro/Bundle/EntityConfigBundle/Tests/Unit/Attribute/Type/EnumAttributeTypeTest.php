@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Attribute\Type;
 
 use Oro\Bundle\EntityConfigBundle\Attribute\Type\EnumAttributeType;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class EnumAttributeTypeTest extends AttributeTypeTestCase
 {
@@ -29,7 +29,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSearchableValue()
     {
-        $value = new StubEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('id', 'name', 100);
 
         $this->assertEquals(
             'name',
@@ -54,7 +54,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetFilterableValue()
     {
-        $value = new StubEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('id', 'name', 100);
 
         $this->assertEquals(
             [$this->attribute->getFieldName() . '_' . $value->getId() => 1],
@@ -82,7 +82,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
 
     public function testGetSortableValue()
     {
-        $value = new StubEnumValue('id', 'name', 100);
+        $value = new TestEnumValue('id', 'name', 100);
 
         $this->assertEquals(
             100,

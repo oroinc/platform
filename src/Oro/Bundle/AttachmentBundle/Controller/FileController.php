@@ -33,18 +33,21 @@ class FileController extends AbstractController
     public function getFileAction(int $id, string $filename, string $action): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
+        $this->unlockSession();
 
         $response = new Response();
-        $response->headers->set('Cache-Control', 'public');
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
         if (FileUrlProviderInterface::FILE_ACTION_GET === $action) {
             $response->headers->set('Content-Type', $file->getMimeType() ?: 'application/force-download');
         } else {
             $response->headers->set('Content-Type', 'application/force-download');
-            $response->headers->set(
-                'Content-Disposition',
-                sprintf('attachment;filename="%s"', addslashes($file->getOriginalFilename()))
-            );
+
+            $contentDisposition = 'attachment';
+            if ($file->getOriginalFilename()) {
+                $contentDisposition .= sprintf(';filename="%s"', addslashes($file->getOriginalFilename()));
+            }
+            $response->headers->set('Content-Disposition', $contentDisposition);
         }
 
         $response->headers->set('Content-Length', $file->getFileSize());
@@ -62,14 +65,15 @@ class FileController extends AbstractController
      * @param int    $width
      * @param int    $height
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
     public function getResizedAttachmentImageAction(int $id, int $width, int $height, string $filename): Response
     {
+        $file = $this->getFileByIdAndFileName($id, $filename);
         $this->unlockSession();
 
-        $file = $this->getFileByIdAndFileName($id, $filename);
         $binary = $this->getImageResizeManager()->resize($file, $width, $height);
         if (!$binary) {
             throw $this->createNotFoundException();
@@ -86,14 +90,15 @@ class FileController extends AbstractController
      * @param int    $id
      * @param string $filter
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
     public function getFilteredImageAction(int $id, string $filter, string $filename): Response
     {
+        $file = $this->getFileByIdAndFileName($id, $filename);
         $this->unlockSession();
 
-        $file = $this->getFileByIdAndFileName($id, $filename);
         $binary = $this->getImageResizeManager()->applyFilter($file, $filter);
         if (!$binary) {
             throw $this->createNotFoundException();

@@ -31,7 +31,7 @@ class CumulativeConfigProcessorUtil
         try {
             return $processor->processConfiguration($configDefinition, $configs);
         } catch (InvalidConfigurationException $e) {
-            throw new InvalidConfigurationException(\sprintf(
+            throw new InvalidConfigurationException(sprintf(
                 'Cannot parse "%s" configuration. %s',
                 $configFile,
                 $e->getMessage()

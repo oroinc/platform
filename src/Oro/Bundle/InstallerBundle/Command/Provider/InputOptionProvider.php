@@ -9,6 +9,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 
+/**
+ * Provides functionality for getting input values from the application console when a command is executed.
+ */
 class InputOptionProvider
 {
     /** @var OutputInterface */
@@ -106,6 +109,8 @@ class InputOptionProvider
         foreach ($settings as $setterName => $parameters) {
             $question->{'set'. ucfirst($setterName)}(...$parameters);
         }
+
+        $question->setMaxAttempts(5);
 
         return $question;
     }

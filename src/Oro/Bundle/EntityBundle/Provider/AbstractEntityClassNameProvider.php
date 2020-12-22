@@ -6,6 +6,9 @@ use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base class for services to get human-readable names in English of entity classes.
+ */
 abstract class AbstractEntityClassNameProvider
 {
     /** @var ConfigManager */

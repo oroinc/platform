@@ -9,8 +9,13 @@ use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base class for role privilege providers.
+ */
 abstract class RolePrivilegeAbstractProvider
 {
+    private const DEFAULT_ACTION_CATEGORY = 'account_management';
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -44,32 +49,26 @@ abstract class RolePrivilegeAbstractProvider
     protected function getPrivilegeCategory(AclPrivilege $privilege, $categories)
     {
         $categories = array_map(function ($category) {
-            /** @var PrivilegeCategory $category */
             return $category->getId();
         }, $categories);
         $category = $privilege->getCategory();
-        if (!in_array($category, $categories)) {
-            $category = PrivilegeCategoryProviderInterface::DEFAULT_ACTION_CATEGORY;
-
+        if (\in_array($category, $categories, true)) {
             return $category;
         }
 
-        return $category;
+        return self::DEFAULT_ACTION_CATEGORY;
     }
     
     /**
      * @param AbstractRole $role
-     * @param string $type
+     * @param string       $type
      *
-     * @return array|AclPrivilege[]
+     * @return AclPrivilege[]
      */
     protected function preparePrivileges(AbstractRole $role, $type)
     {
         $allPrivileges = [];
-        /**
-         * @var string $type
-         * @var ArrayCollection $sortedPrivileges
-         */
+        /** @var ArrayCollection $sortedPrivileges */
         foreach ($this->aclRoleHandler->getAllPrivileges($role) as $privilegeType => $sortedPrivileges) {
             if ($privilegeType === $type) {
                 $allPrivileges = array_merge($allPrivileges, $sortedPrivileges->toArray());

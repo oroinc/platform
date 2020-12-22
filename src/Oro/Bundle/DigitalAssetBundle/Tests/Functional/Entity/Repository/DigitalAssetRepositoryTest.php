@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\Entity\Repository;
 
+use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadFileData;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Entity\Repository\DigitalAssetRepository;
 use Oro\Bundle\DigitalAssetBundle\Tests\Functional\DataFixtures\LoadDigitalAssetData;
@@ -18,7 +19,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([LoadDigitalAssetData::class]);
+        $this->loadFixtures([LoadFileData::class, LoadDigitalAssetData::class]);
 
         $this->repository = $this->getContainer()->get('doctrine')
             ->getRepository(DigitalAsset::class);
@@ -75,5 +76,47 @@ class DigitalAssetRepositoryTest extends WebTestCase
                 $this->getContainer()->get('oro_security.acl_helper')
             )
         );
+    }
+
+    public function testGetFileDataForTwigTagWhenNotExists(): void
+    {
+        $this->assertSame([], $this->repository->getFileDataForTwigTag(999999));
+    }
+
+    /**
+     * @dataProvider getFileDataForTwigTagDataProvider
+     *
+     * @param string $referenceName
+     */
+    public function testGetFileDataForTwigTag(string $referenceName): void
+    {
+        $file = $this->getReference($referenceName);
+        $this->assertEquals(
+            [
+                'uuid' => $file->getUuid(),
+                'parentEntityClass' => $file->getParentEntityClass(),
+                'parentEntityId' => $file->getParentEntityId(),
+                'digitalAssetId' => $file->getDigitalAsset() ? $file->getDigitalAsset()->getId() : null,
+            ],
+            $this->repository->getFileDataForTwigTag($file->getId())
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function getFileDataForTwigTagDataProvider(): array
+    {
+        return [
+            'file is a digital asset source file' => [
+                'referenceName' => LoadDigitalAssetData::DIGITAL_ASSET_1_SOURCE,
+            ],
+            'file is a digital asset child file' => [
+                'referenceName' => LoadDigitalAssetData::DIGITAL_ASSET_1_CHILD_1,
+            ],
+            'file is a regular file' => [
+                'referenceName' => LoadFileData::FILE_1,
+            ],
+        ];
     }
 }

@@ -3,6 +3,8 @@
 namespace Oro\Bundle\GaufretteBundle;
 
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\SetGaufretteFilesystemsLazyPass;
+use Oro\Bundle\GaufretteBundle\DependencyInjection\Factory\LocalConfigurationFactory;
+use Oro\Bundle\GaufretteBundle\DependencyInjection\OroGaufretteExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -19,5 +21,9 @@ class OroGaufretteBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new SetGaufretteFilesystemsLazyPass());
+
+        /** @var OroGaufretteExtension $extension */
+        $extension = $container->getExtension('oro_gaufrette');
+        $extension->addConfigurationFactory(new LocalConfigurationFactory());
     }
 }

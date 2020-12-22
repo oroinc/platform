@@ -12,22 +12,24 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Sets default paging for different kind of requests.
- * The default page number is 1, the default page size is 10.
+ * Sets default paging filters.
  */
 class SetDefaultPaging implements ProcessorInterface
 {
-    private const DEFAULT_PAGE_SIZE = 10;
-
     /** @var FilterNamesRegistry */
     private $filterNamesRegistry;
 
+    /** @var int */
+    private $defaultPageSize;
+
     /**
      * @param FilterNamesRegistry $filterNamesRegistry
+     * @param int                 $defaultPageSize
      */
-    public function __construct(FilterNamesRegistry $filterNamesRegistry)
+    public function __construct(FilterNamesRegistry $filterNamesRegistry, int $defaultPageSize)
     {
         $this->filterNamesRegistry = $filterNamesRegistry;
+        $this->defaultPageSize = $defaultPageSize;
     }
 
     /**
@@ -62,24 +64,24 @@ class SetDefaultPaging implements ProcessorInterface
      * @param string           $filterName
      * @param FilterCollection $filters
      */
-    protected function addPageNumberFilter(string $filterName, FilterCollection $filters)
+    protected function addPageNumberFilter(string $filterName, FilterCollection $filters): void
     {
         /**
          * "page number" filter must be added after "page size" filter because it depends on this filter
          * @see \Oro\Bundle\ApiBundle\Filter\PageNumberFilter::apply
          */
-        if (!$filters->has($filterName)) {
-            $filters->add(
-                $filterName,
-                new PageNumberFilter(DataType::UNSIGNED_INTEGER, 'The page number, starting from 1.', 1),
-                false
+        $pageNumberFilter = $filters->get($filterName);
+        if (null === $pageNumberFilter) {
+            $pageNumberFilter = new PageNumberFilter(
+                DataType::UNSIGNED_INTEGER,
+                'The page number, starting from 1.',
+                1
             );
         } else {
-            // make sure that "page number" filter is added after "page size" filter
-            $pageFilter = $filters->get($filterName);
+            // remove "page number" filter to make sure that it is added after "page size" filter
             $filters->remove($filterName);
-            $filters->add($filterName, $pageFilter, false);
         }
+        $filters->add($filterName, $pageNumberFilter, false);
     }
 
     /**
@@ -87,26 +89,18 @@ class SetDefaultPaging implements ProcessorInterface
      * @param FilterCollection $filters
      * @param int|null         $pageSize
      */
-    protected function addPageSizeFilter(string $filterName, FilterCollection $filters, $pageSize)
+    protected function addPageSizeFilter(string $filterName, FilterCollection $filters, ?int $pageSize): void
     {
         if (!$filters->has($filterName)) {
             $filters->add(
                 $filterName,
                 new PageSizeFilter(
-                    DataType::UNSIGNED_INTEGER,
+                    DataType::INTEGER,
                     'The number of items per page.',
-                    $pageSize ?? $this->getDefaultPageSize()
+                    $pageSize ?? $this->defaultPageSize
                 ),
                 false
             );
         }
-    }
-
-    /**
-     * @return int
-     */
-    protected function getDefaultPageSize()
-    {
-        return self::DEFAULT_PAGE_SIZE;
     }
 }

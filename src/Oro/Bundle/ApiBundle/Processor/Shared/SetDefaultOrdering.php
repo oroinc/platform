@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Sets ordering be entity identifier to the Criteria object from the context
+ * Sets ordering by an entity identifier to the Criteria object from the context
  * if the ordering is not set yet.
  */
 class SetDefaultOrdering implements ProcessorInterface

@@ -22,16 +22,19 @@ class ExecutionFailedException extends \RuntimeException
      * @param string|null     $group
      * @param \Exception|null $previous
      */
-    public function __construct($processorId, $action = null, $group = null, \Exception $previous = null)
-    {
+    public function __construct(
+        string $processorId,
+        string $action = null,
+        string $group = null,
+        \Exception $previous = null
+    ) {
         $this->processorId = $processorId;
-        $this->action      = $action;
-        $this->group       = $group;
-        $this->processorId = $processorId;
+        $this->action = $action;
+        $this->group = $group;
 
-        $message = \sprintf('Processor failed: "%s".', $processorId);
+        $message = sprintf('Processor failed: "%s".', $processorId);
         if (null !== $previous) {
-            $message .= \sprintf(' Reason: %s', $previous->getMessage());
+            $message .= sprintf(' Reason: %s', $previous->getMessage());
         }
 
         parent::__construct($message, 0, $previous);
@@ -40,7 +43,7 @@ class ExecutionFailedException extends \RuntimeException
     /**
      * @return string
      */
-    public function getProcessorId()
+    public function getProcessorId(): string
     {
         return $this->processorId;
     }
@@ -48,7 +51,7 @@ class ExecutionFailedException extends \RuntimeException
     /**
      * @return string|null
      */
-    public function getAction()
+    public function getAction(): ?string
     {
         return $this->action;
     }
@@ -56,7 +59,7 @@ class ExecutionFailedException extends \RuntimeException
     /**
      * @return string|null
      */
-    public function getGroup()
+    public function getGroup(): ?string
     {
         return $this->group;
     }

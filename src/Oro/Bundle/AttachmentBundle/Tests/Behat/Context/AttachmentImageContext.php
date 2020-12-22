@@ -6,7 +6,6 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -137,7 +136,7 @@ JS;
      */
     public function rememberNumberOfAttachmentFiles(string $extension = ''): void
     {
-        $this->filesCount[$extension] = $this->countFilesInAttachmentDir($extension);
+        $this->filesCount[$extension] = $this->countFilesInAttachmentFilesystem($extension);
     }
 
     //@codingStandardsIgnoreStart
@@ -152,7 +151,7 @@ JS;
     //@codingStandardsIgnoreEnd
     public function numberOfAttachmentFilesIsChangedBy(string $operator, int $count, string $extension = ''): void
     {
-        $currentCount = $this->countFilesInAttachmentDir($extension);
+        $currentCount = $this->countFilesInAttachmentFilesystem($extension);
         $rememberedCount = $this->filesCount[$extension] ?? 0;
 
         if ($operator === 'less') {
@@ -187,64 +186,62 @@ JS;
      *
      * @return int
      */
-    private function countFilesInAttachmentDir(string $extension = ''): int
+    private function countFilesInAttachmentFilesystem(string $extension = ''): int
     {
-        $projectDir = $this->getContainer()->getParameter('kernel.project_dir');
-        $attachmentDir = $this->getContainer()->getParameter('oro_attachment.filesystem_dir.attachments');
-        $filesIterator = Finder::create()
-            ->in($projectDir . '/var/' . $attachmentDir)
-            ->files();
-
+        $files = $this->getContainer()->get('oro_attachment.file_manager')->findFiles();
         if ($extension) {
-            $filesIterator->name(sprintf('*.%s', ltrim($extension, '.')));
+            $resultFiles = [];
+            $pattern = sprintf('*.%s', ltrim($extension, '.'));
+            foreach ($files as $file) {
+                if (fnmatch($pattern, $file)) {
+                    $resultFiles[] = $file;
+                }
+            }
+            $files = $resultFiles;
         }
 
-        return iterator_count($filesIterator);
+        return count($files);
     }
 
     /**
      * Example: I remember filename of the file "product1"
      *
-     * @Given /^I remember filename of the file "(?P<name>[^"]*)"$/
+     * @Given /^I remember filename of the file "(?P<name>(?:[^"]|\\")*)"$/
      * @param string $name
      */
     public function iRememberFilenameOfFile(string $name): void
     {
-        $link = $this->getSession()
-            ->getPage()
-            ->find(
-                'xpath',
-                sprintf('//a[contains(@data-filename, "%s")]', $name)
-            );
+        $name = $this->fixStepArgument($name);
 
-        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
+        $this->rememberedFilenames[$name] = $this->getFileFilename($name);
+    }
 
-        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+    /**
+     * Example: Then filename of the file "product1" is as remembered
+     *
+     * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is as remembered$/
+     * @param string $name
+     */
+    public function filenameOfFileIsAsRemembered(string $name): void
+    {
+        $name = $this->fixStepArgument($name);
 
-        $this->rememberedFilenames[$name] = $matches['filename'];
+        $this->assertArrayHasKey($name, $this->rememberedFilenames);
+        $this->assertEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
      * Example: Then filename of the file "product1" is not as remembered
      *
-     * @Then /^filename of the file "(?P<name>[^"]*)" is not as remembered$/
+     * @Then /^filename of the file "(?P<name>(?:[^"]|\\")*)" is not as remembered$/
      * @param string $name
      */
     public function filenameOfFileIsNotAsRemembered(string $name): void
     {
-        $link = $this->getSession()
-            ->getPage()
-            ->find(
-                'xpath',
-                sprintf('//a[contains(@data-filename, "%s")]', $name)
-            );
-
-        self::assertNotNull($link, sprintf('File with name "%s" have not been found', $name));
-
-        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+        $name = $this->fixStepArgument($name);
 
         $this->assertArrayHasKey($name, $this->rememberedFilenames);
-        $this->assertNotEquals($this->rememberedFilenames[$name], $matches['filename']);
+        $this->assertNotEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
@@ -317,6 +314,31 @@ JS;
             $matches
         );
         self::assertNotEmpty($matches['filename'], sprintf('Filename not found for image %s', $imageName));
+
+        return $matches['filename'];
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function getFileFilename(string $name): string
+    {
+        if ($this->hasElement($name)) {
+            $link = $this->createElement($name);
+        } else {
+            $link = $this->getSession()
+                ->getPage()
+                ->find(
+                    'xpath',
+                    sprintf('//a[contains(@data-filename, "%s")]', $name)
+                );
+
+            self::assertNotNull($link, sprintf('File with name "%s" was not found', $name));
+        }
+
+        preg_match('/.+\/(?P<filename>.+?)$/', $link->getAttribute('href'), $matches);
+        self::assertNotEmpty($matches['filename'], sprintf('Filename not found for file %s', $name));
 
         return $matches['filename'];
     }
