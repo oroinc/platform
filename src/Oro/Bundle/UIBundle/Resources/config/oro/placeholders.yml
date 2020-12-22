@@ -35,9 +35,6 @@ placeholders:
             items:
                 update_buttons:
                     order: 200
-        before_body_end:
-            items:
-                debug_toolbar_view: ~
         url_actions:
             items:
                 oro_ui_url_copy_action_button:
@@ -64,8 +61,6 @@ placeholders:
             template: OroUIBundle::buttons.html.twig
             applicable: "@oro_ui.widget_provider.update_actions->supports($entity$)"
             data: "@oro_ui.widget_provider.update_actions->getWidgets($entity$)"
-        debug_toolbar_view:
-            template: OroUIBundle::debug_toolbar_view.html.twig
         oro_ui_url_copy_action_button:
             template: OroUIBundle::copy_button.html.twig
         assets_css:
