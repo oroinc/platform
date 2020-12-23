@@ -47,6 +47,15 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\EntityExtendBundle\Command\ValidatorCacheClearCommand:
+        arguments:
+            - '@kernel'
+            - '@validator.mapping.cache_warmer'
+            - '@filesystem'
+            - '%validator.mapping.cache.file%'
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand:
         arguments:
             - '@oro_entity_extend.tools.dumper'

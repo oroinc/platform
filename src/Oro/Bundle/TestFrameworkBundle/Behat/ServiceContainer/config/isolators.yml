@@ -24,6 +24,8 @@ services:
         - 'oro_data'
         - 'oro_entities'
         - 'translations'
+      -
+        - 'validation.php'
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 
@@ -36,6 +38,8 @@ services:
         - 'oro_data'
         - 'oro_entities'
         - 'translations'
+      -
+        - 'validation.php'
     tags:
       - { name: 'oro_behat.isolator', priority: 100 }
 

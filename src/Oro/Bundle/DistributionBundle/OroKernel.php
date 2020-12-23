@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
-use LogicException;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
@@ -33,7 +32,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class OroKernel extends Kernel
 {
-    /** @var string */
+    /** @var string|null */
     private $warmupDir;
 
     /** @var array */
@@ -64,26 +63,15 @@ abstract class OroKernel extends Kernel
      */
     public function registerBundles()
     {
-        $bundles = [];
-        $cacheDir = $this->getCacheDir();
-        if (!$cacheDir) {
-            foreach ($this->collectBundles() as $class => $params) {
-                $bundles[] = $params['kernel']
-                    ? new $class($this)
-                    : new $class;
-            }
-        } else {
-            $cache = new ConfigCache($cacheDir . '/bundles.php', false);
-            if (!$cache->isFresh()) {
-                $dumper = new PhpBundlesDumper($this->collectBundles());
-                $cache->write($dumper->dump());
-            }
-
-            // require instead of require_once used to correctly handle sub-requests
-            $bundles = require $cache->getPath();
+        $cacheDir = $this->warmupDir ?: $this->getCacheDir();
+        $cache = new ConfigCache($cacheDir . '/bundles.php', false);
+        if (!$cache->isFresh()) {
+            $dumper = new PhpBundlesDumper($this->collectBundles());
+            $cache->write($dumper->dump());
         }
 
-        return $bundles;
+        // require instead of require_once used to correctly handle sub-requests
+        return require $cache->getPath();
     }
 
     /**
@@ -462,7 +450,6 @@ abstract class OroKernel extends Kernel
     public function reboot($warmupDir)
     {
         $this->warmupDir = $warmupDir;
-
         parent::reboot($warmupDir);
     }
 
@@ -495,7 +482,7 @@ abstract class OroKernel extends Kernel
 
         try {
             $deploymentConfig = DeploymentConfigResolver::resolveConfig($this->getProjectDir());
-        } catch (LogicException $e) {
+        } catch (\LogicException $e) {
             $deploymentConfig = null;
             // do nothing, the warning message would be shown later by
             // {@ see \Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener}

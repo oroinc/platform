@@ -81,6 +81,7 @@ class EntityProcessor
             if ($warmUpConfigCache) {
                 $this->executeCommand('oro:entity-config:cache:warmup');
             }
+            $this->executeCommand('validator:cache:clear');
             if ($updateRouting) {
                 $this->executeCommand('router:cache:clear');
                 $this->executeCommand('fos:js-routing:dump');
