@@ -24,6 +24,11 @@
         top: $loading-bar-point-top;
         animation: $loading-bar-point-animation;
     }
+
+    &__actual-progress {
+        position: $loading-bar-block-process-position;
+        animation: none;
+    }
 }
 
 @include keyframe($loading-bar-point-animation-name) {

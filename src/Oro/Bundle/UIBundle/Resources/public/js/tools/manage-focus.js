@@ -72,7 +72,7 @@ export default {
         const tabbableElements = $container.find(':tabbable').toArray();
         let substitutionElement;
 
-        if (e.shiftKey) {
+        if (e.shiftKey || e.altKey) {
             if ($container.is(e.target) || this.getFirstTabbable(tabbableElements, false) === e.target) {
                 substitutionElement = this.getLastTabbable(tabbableElements, false);
             }

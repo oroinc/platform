@@ -81,8 +81,8 @@
 {%- endblock attributes -%}
 
 {%- block choice_widget_collapsed %}
-    {% set attr = layout_attr_defaults({
-        'class': 'select select--full'
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' select select--full'
     }, attr) %}
 
     {{ parent() }}

@@ -116,6 +116,7 @@ define(function(require) {
 
         _searchForResults: function(query, callback) {
             const self = this;
+
             if (this.disposed) {
                 return;
             }
