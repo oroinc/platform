@@ -23,6 +23,9 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** @var array */
     protected $cacheDirectories;
 
+    /** @var array */
+    protected $cacheFiles;
+
     /** @var  string */
     protected $cacheDir;
 
@@ -38,8 +41,9 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /**
      * @param KernelInterface $kernel
      * @param array $cacheDirectories
+     * @param array $cacheFiles
      */
-    public function __construct(KernelInterface $kernel, array $cacheDirectories)
+    public function __construct(KernelInterface $kernel, array $cacheDirectories, array $cacheFiles = [])
     {
         $this->cacheDir     = realpath($kernel->getCacheDir());
         $this->cacheTempDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Temp';
@@ -47,6 +51,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
             TokenGenerator::generateToken('cache');
 
         $this->cacheDirectories = $cacheDirectories;
+        $this->cacheFiles = $cacheFiles;
     }
 
     /** {@inheritdoc} */
