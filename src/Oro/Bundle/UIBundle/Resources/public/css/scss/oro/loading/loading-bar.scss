@@ -23,6 +23,11 @@
         top: $loading-bar-point-top;
         animation: $loading-bar-point-animation;
     }
+
+    &__actual-progress {
+        position: $loading-bar-block-process-position;
+        animation: none;
+    }
 }
 
 @-webkit-keyframes line-point {
