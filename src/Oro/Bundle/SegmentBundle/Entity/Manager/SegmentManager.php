@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -40,6 +41,16 @@ class SegmentManager
 
     /** @var AclHelper */
     private $aclHelper;
+
+    /**
+     * This property controls the segment nesting level.
+     * 0 - no segment query builders are under construction right now
+     * 1 - root segment query builder is under construction
+     * grater values are for segments that are used as filters.
+     *
+     * @var int
+     */
+    private $nestingLevel = 0;
 
     /**
      * @param EntityManager $em
@@ -160,8 +171,17 @@ class SegmentManager
      */
     public function getSegmentQueryBuilder(Segment $segment)
     {
+        $this->nestingLevel++;
         $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
+
+        // Get segment QB from cache if any if this is a root segment (not a filter)
+        // or when segment is taken from cache for a first time, otherwise alias conflicts will occur
+        if (($this->nestingLevel === 1 || !SegmentQueryConverter::hasAliases($segment))
+            && $this->cache->contains($cacheKey)
+        ) {
+            SegmentQueryConverter::ensureAliasRegistered($segment);
+            $this->nestingLevel--;
+
             return clone $this->cache->fetch($cacheKey);
         }
 
@@ -170,16 +190,17 @@ class SegmentManager
             try {
                 $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
                 $this->cache->save($cacheKey, clone $queryBuilder);
+                $this->nestingLevel--;
 
                 return $queryBuilder;
             } catch (InvalidConfigurationException $e) {
                 if ($this->logger) {
                     $this->logger->error($e->getMessage(), ['exception' => $e]);
                 }
-
-                return null;
             }
         }
+
+        $this->nestingLevel--;
 
         return null;
     }
@@ -258,13 +279,9 @@ class SegmentManager
      */
     private function applyOrderByParts(Segment $segment, QueryBuilder $qb, $alias)
     {
-        $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
-            $segmentQb = clone $this->cache->fetch($cacheKey);
-        } else {
-            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
-            $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
-            $this->cache->save($cacheKey, clone $segmentQb);
+        $segmentQb = $this->getSegmentQueryBuilder($segment);
+        if ($segmentQb === null) {
+            return $qb;
         }
 
         $orderBy = $segmentQb->getDQLPart('orderBy');
@@ -289,21 +306,9 @@ class SegmentManager
      */
     public function getFilterSubQuery(Segment $segment, QueryBuilder $externalQueryBuilder)
     {
-        $queryBuilder = null;
-        $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = clone $this->cache->fetch($cacheKey);
-        }
-
-        if (!$queryBuilder) {
-            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
-            if ($segmentQueryBuilder === null) {
-                return null;
-            }
-
-            $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-            $this->cache->save($cacheKey, clone $queryBuilder);
+        $queryBuilder = $this->getSegmentQueryBuilder($segment);
+        if ($queryBuilder === null) {
+            return null;
         }
 
         if ($segment->isDynamic()) {

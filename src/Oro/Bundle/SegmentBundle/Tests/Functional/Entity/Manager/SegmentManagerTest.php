@@ -34,6 +34,7 @@ class SegmentManagerTest extends WebTestCase
         ]);
 
         $this->manager = self::getContainer()->get('oro_segment.segment_manager');
+        self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
     }
 
     protected function tearDown()
@@ -67,33 +68,54 @@ class SegmentManagerTest extends WebTestCase
         $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
         /** @var Segment $staticSegmentWithSegmentFilter */
         $staticSegmentWithSegmentFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        /** @var Segment $segmentWithFilter1 */
+        $segmentWithFilter1 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER1);
+        /** @var Segment $segmentWithFilter2 */
+        $segmentWithFilter2 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER);
+        /** @var Segment $segmentWithFilter3 */
+        $segmentWithFilter3 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
 
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             [
                 'results' => [
                     [
-                        'id'   => 'segment_' . $dynamicSegment->getId(),
+                        'id' => 'segment_' . $dynamicSegment->getId(),
                         'text' => $dynamicSegment->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $dynamicSegmentWithFilter->getId(),
+                        'id' => 'segment_' . $dynamicSegmentWithFilter->getId(),
                         'text' => $dynamicSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegment->getId(),
+                        'id' => 'segment_' . $staticSegment->getId(),
                         'text' => $staticSegment->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegmentWithFilter->getId(),
+                        'id' => 'segment_' . $staticSegmentWithFilter->getId(),
                         'text' => $staticSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegmentWithSegmentFilter->getId(),
+                        'id' => 'segment_' . $staticSegmentWithSegmentFilter->getId(),
                         'text' => $staticSegmentWithSegmentFilter->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter1->getId(),
+                        'text' => $segmentWithFilter1->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter2->getId(),
+                        'text' => $segmentWithFilter2->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter3->getId(),
+                        'text' => $segmentWithFilter3->getName(),
                         'type' => 'segment',
                     ]
                 ],
@@ -231,6 +253,16 @@ class SegmentManagerTest extends WebTestCase
         $this->assertInstanceOf(QueryBuilder::class, $qb);
     }
 
+    public function testGetSegmentQueryBuilderForSegmentWithDuplicateSegmentFilters()
+    {
+        $segment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
+
+        $qb = $this->manager->getSegmentQueryBuilder($segment);
+        $this->assertInstanceOf(QueryBuilder::class, $qb);
+        // Check that Query Builder may be converted to real SQL without errors.
+        $this->assertStringStartsWith('SELECT ', $qb->getQuery()->getSQL());
+    }
+
     public function testGetSegmentQueryBuilderNotExistingType()
     {
         $segment = new Segment();
@@ -275,7 +307,7 @@ class SegmentManagerTest extends WebTestCase
                     'func' => null
                 ]
             ],
-            'filters' =>[
+            'filters' => [
                 [
                     'columnName' => 'firstName',
                     'criterion' => [

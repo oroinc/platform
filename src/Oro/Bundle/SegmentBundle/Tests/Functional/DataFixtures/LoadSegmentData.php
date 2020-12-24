@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
@@ -14,6 +15,9 @@ class LoadSegmentData extends AbstractLoadSegmentData
     const SEGMENT_STATIC = 'segment_static';
     const SEGMENT_STATIC_WITH_FILTER_AND_SORTING = 'segment_static_with_filter_and_sorting';
     const SEGMENT_STATIC_WITH_SEGMENT_FILTER = 'segment_static_with_segment_filter';
+    const SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS = 'segment_dynamic_with_duplicated_segment_filters';
+    const SEGMENT_DYNAMIC_WITH_FILTER1 = 'segment_dynamic_with_filter1';
+    const SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER = 'segment_dynamic_with_filter2_and_segment_filter';
 
     /** @var array */
     protected static $segments = [
@@ -31,7 +35,7 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         'sorting' => ''
                     ]
                 ],
-                'filters' =>[]
+                'filters' => []
             ]
         ],
         self::SEGMENT_DYNAMIC_WITH_FILTER => [
@@ -48,7 +52,7 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         'sorting' => 'DESC'
                     ]
                 ],
-                'filters' =>[
+                'filters' => [
                     [
                         'columnName' => 'name',
                         'criterion' => [
@@ -76,7 +80,7 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         'sorting' => ''
                     ]
                 ],
-                'filters' =>[]
+                'filters' => []
             ]
         ],
         self::SEGMENT_STATIC_WITH_FILTER_AND_SORTING => [
@@ -93,7 +97,7 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         'sorting' => 'DESC'
                     ]
                 ],
-                'filters' =>[
+                'filters' => [
                     [
                         'columnName' => 'name',
                         'criterion' => [
@@ -121,14 +125,14 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         'sorting' => 'DESC'
                     ]
                 ],
-                'filters' =>[
+                'filters' => [
                     [
                         'columnName' => 'id',
                         'criteria' => 'condition-segment',
                         'criterion' => [
                             'filter' => 'segment',
                             'data' => [
-                                'value' => null, //Will be set to static segment id
+                                'value' => self::SEGMENT_STATIC, //Will be set to static segment id
                                 'type' => null,
                             ]
                         ]
@@ -136,6 +140,126 @@ class LoadSegmentData extends AbstractLoadSegmentData
                 ]
             ]
         ],
+        self::SEGMENT_DYNAMIC_WITH_FILTER1 => [
+            'name' => 'Entity id > 0',
+            'description' => 'Entity id > 0',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'filters' => [
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'number',
+                            'data' => [
+                                'value' => 0,
+                                'type' => NumberFilterType::TYPE_GREATER_THAN,
+                            ],
+                        ],
+                    ],
+                ],
+                'columns' => [
+                    [
+                        'name' => 'id',
+                        'label' => 'Id',
+                        'func' => null,
+                        'sorting' => '',
+                    ],
+                ]
+            ]
+        ],
+        self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER => [
+            'name' => 'Entity id > 1',
+            'description' => 'Entity id > 1',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'filters' => [
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'number',
+                            'data' => [
+                                'value' => 1,
+                                'type' => NumberFilterType::TYPE_GREATER_THAN,
+                            ],
+                        ],
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER1,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
+                ],
+                'columns' => [
+                    [
+                        'name' => 'id',
+                        'label' => 'Id',
+                        'func' => null,
+                        'sorting' => '',
+                    ],
+                ]
+            ]
+        ],
+        self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS => [
+            'name' => 'Dynamic Segment with duplicate segment Filter',
+            'description' => 'Dynamic Segment with duplicate segment Filter',
+            'entity' => WorkflowAwareEntity::class,
+            'type' => SegmentType::TYPE_DYNAMIC,
+            'definition' => [
+                'filters' => [
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'number',
+                            'data' => [
+                                'value' => 2,
+                                'type' => NumberFilterType::TYPE_GREATER_THAN,
+                            ],
+                        ],
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER1,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
+                ],
+                'columns' => [
+                    [
+                        'name' => 'id',
+                        'label' => 'Id',
+                        'func' => null,
+                        'sorting' => '',
+                    ],
+                ],
+            ]
+        ]
     ];
 
     /**
@@ -161,11 +285,25 @@ class LoadSegmentData extends AbstractLoadSegmentData
      */
     private function applySegmentFilterToDefinition(ObjectManager $manager)
     {
-        $staticSegment = $this->getReference(self::SEGMENT_STATIC);
-        $staticSegmentWithSegmentFilter = $this->getReference(self::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
-        $definition = self::$segments[self::SEGMENT_STATIC_WITH_SEGMENT_FILTER]['definition'];
-        $definition['filters'][0]['criterion']['data']['value'] = $staticSegment->getId();
-        $staticSegmentWithSegmentFilter->setDefinition(json_encode($definition));
+        foreach (self::$segments as $reference => $data) {
+            $segment = $this->getReference($reference);
+            $definition = $data['definition'];
+
+            foreach ($definition['filters'] as &$filter) {
+                if (!is_array($filter)) {
+                    continue;
+                }
+                if (empty($filter['criteria']) || $filter['criteria'] !== 'condition-segment') {
+                    continue;
+                }
+
+                $criterionValue = $this->getReference($filter['criterion']['data']['value'])->getId();
+                $filter['criterion']['data']['value'] = $criterionValue;
+            }
+            unset($filter);
+
+            $segment->setDefinition(json_encode($definition));
+        }
         $manager->flush();
     }
 }
