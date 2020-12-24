@@ -41,13 +41,22 @@ class SegmentRepositoryTest extends WebTestCase
         $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
         /** @var Segment $staticSegmentWithSegmentFilter */
         $staticSegmentWithSegmentFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        /** @var Segment $segmentWithFilter1 */
+        $segmentWithFilter1 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER1);
+        /** @var Segment $segmentWithFilter2 */
+        $segmentWithFilter2 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER);
+        /** @var Segment $segmentWithFilter3 */
+        $segmentWithFilter3 = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
 
         $this->assertEquals([
             $dynamicSegment->getName() => $dynamicSegment->getId(),
             $dynamicSegmentWithFilter->getName() => $dynamicSegmentWithFilter->getId(),
             $staticSegment->getName() => $staticSegment->getId(),
             $staticSegmentWithFilter->getName() => $staticSegmentWithFilter->getId(),
-            $staticSegmentWithSegmentFilter->getName() => $staticSegmentWithSegmentFilter->getId()
+            $staticSegmentWithSegmentFilter->getName() => $staticSegmentWithSegmentFilter->getId(),
+            $segmentWithFilter1->getName() => $segmentWithFilter1->getId(),
+            $segmentWithFilter2->getName() => $segmentWithFilter2->getId(),
+            $segmentWithFilter3->getName() => $segmentWithFilter3->getId()
         ], $result);
     }
 }
