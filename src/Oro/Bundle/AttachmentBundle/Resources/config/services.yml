@@ -29,13 +29,12 @@ services:
         alias: oro_attachment.manager
 
     oro_attachment.file_manager:
-        public: true
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
+        public: true
         parent: oro_gaufrette.file_manager
         arguments:
             - '%oro_attachment.filesystem_name.attachments%'
             - '@oro_attachment.protocol_validator'
-        lazy: true
 
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator

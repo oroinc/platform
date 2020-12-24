@@ -39,7 +39,7 @@ class FileManagerTest extends TestCase
             ->with(self::FILENAME)
             ->willReturn(true);
         $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
+            ->method('getFileMimeType')
             ->with(self::FILENAME)
             ->willReturn($mimeType);
 
@@ -58,7 +58,7 @@ class FileManagerTest extends TestCase
             ->with(self::FILENAME)
             ->willReturn(true);
         $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
+            ->method('getFileMimeType')
             ->with(self::FILENAME)
             ->willReturn($mimeType);
 
@@ -75,16 +75,17 @@ class FileManagerTest extends TestCase
         $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
     }
 
-    public function testGetMimeTypeFromStringWithoutMimetypeAdapter(): void
+    public function testGetMimeTypeFromStringWhenGaufretteAdapterDoesNotSupportMimeTypes(): void
     {
         $this->gaufretteFileManager->expects($this->once())
             ->method('hasFile')
             ->with(self::FILENAME)
             ->willReturn(true);
         $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
+            ->method('getFileMimeType')
             ->with(self::FILENAME)
-            ->willThrowException(new \LogicException('no mime type.'));
+            ->willReturn(null);
+
         $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
     }
 

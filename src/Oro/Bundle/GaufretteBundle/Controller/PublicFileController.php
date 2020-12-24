@@ -4,14 +4,15 @@ namespace Oro\Bundle\GaufretteBundle\Controller;
 
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Controller to access file that stores at the public gaufrette filesystem.
+ * The controller to get files that are stored in public Gaufrette filesystems.
  */
 class PublicFileController extends AbstractController
 {
-    /** @var FileManager[] */
+    /** @var iterable|FileManager[] */
     private $publicFileManagers;
 
     /**
@@ -23,28 +24,41 @@ class PublicFileController extends AbstractController
     }
 
     /**
-     * @param string $filePrefixDir
-     * @param string $filePath
+     * @param string $subDirectory
+     * @param string $fileName
+     *
+     * @return Response
      */
-    public function getPublicFileAction(string $filePrefixDir, string $filePath)
+    public function getPublicFileAction(string $subDirectory, string $fileName): Response
+    {
+        $fileManager = $this->getPublicFileManager($subDirectory);
+        if (null === $fileManager || !$fileManager->hasFile($fileName)) {
+            throw $this->createNotFoundException();
+        }
+
+        $response = new BinaryFileResponse($fileManager->getFilePath($fileName));
+        $response->headers->set('Cache-Control', 'public');
+        $response->headers->set(
+            'Content-Type',
+            $fileManager->getFileMimeType($fileName) ?? 'application/octet-stream'
+        );
+
+        return $response;
+    }
+
+    /**
+     * @param string $subDirectory
+     *
+     * @return FileManager|null
+     */
+    private function getPublicFileManager(string $subDirectory): ?FileManager
     {
         foreach ($this->publicFileManagers as $fileManager) {
-            if ($fileManager->getPrefixDirectory() === $filePrefixDir) {
-                if (!$fileManager->hasFile($filePath)) {
-                    throw $this->createNotFoundException();
-                }
-                $response = new Response();
-                $response->headers->set('Cache-Control', 'public');
-                $response->headers->set(
-                    'Content-Type',
-                    $fileManager->mimeType($filePath)?: 'application/force-download'
-                );
-                $response->setContent($fileManager->getFileContent($filePath));
-
-                return $response;
+            if ($fileManager->getSubDirectory() === $subDirectory) {
+                return $fileManager;
             }
         }
 
-        throw $this->createNotFoundException();
+        return null;
     }
 }

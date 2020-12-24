@@ -11,4 +11,3 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_distribution.route_collection.expose, method: onCollectionAutoload, priority: -255 }
             - { name: kernel.event_listener, event: oro_distribution.route_collection.autoload, method: onCollectionAutoload, priority: -255 }
-        lazy: true
