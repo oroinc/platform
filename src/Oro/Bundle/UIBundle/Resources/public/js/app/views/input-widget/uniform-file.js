@@ -3,6 +3,8 @@ define(function(require) {
 
     const AbstractInputWidgetView = require('oroui/js/app/views/input-widget/abstract');
     const __ = require('orotranslation/js/translator');
+    const $ = require('jquery');
+    const clearButtonTemplate = require('tpl-loader!oroui/templates/clear_button.html');
     require('jquery.uniform');
 
     const UniformFileInputWidgetView = AbstractInputWidgetView.extend({
@@ -16,6 +18,9 @@ define(function(require) {
         refreshOptions: 'update',
 
         containerClassSuffix: 'file',
+
+        /** @property {jQuery} */
+        $clearButton: null,
 
         /**
          * @inheritDoc
@@ -33,14 +38,55 @@ define(function(require) {
                 this.$el.removeClass('error');
                 this.getContainer().addClass('error');
             }
+
+            this.getContainer().append(this.getClearButton());
+
+            this.toggleEmptyState();
+
+            this.$el.on(`change${this.eventNamespace()}`, () => this.toggleEmptyState());
+
+            this.getClearButton().on(`click${this.eventNamespace()}`, () => {
+                this.$el.val('').trigger('change').trigger('focus');
+            });
         },
 
         /**
          * @inheritDoc
          */
         disposeWidget: function() {
+            this.getClearButton().off(this.eventNamespace());
+            this.$el.off(this.eventNamespace());
             this.$el.uniform.restore(this.$el);
             UniformFileInputWidgetView.__super__.disposeWidget.call(this);
+        },
+
+        /**
+         * Get widget root element
+         *
+         * @returns {jQuery}
+         */
+        getClearButton: function() {
+            if (this.$clearButton) {
+                return this.$clearButton;
+            }
+
+            this.$clearButton = $(clearButtonTemplate({
+                ariaLabel: __('Clear')
+            }));
+
+            return this.$clearButton;
+        },
+
+        toggleEmptyState: function() {
+            this.getContainer().toggleClass('empty', this.isEmpty());
+        },
+
+        isEmpty: function() {
+            return !this.$el.val().length;
+        },
+
+        getFilenameButton: function() {
+            return this.getContainer().find('.filename');
         },
 
         /**
