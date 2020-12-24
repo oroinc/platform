@@ -2,7 +2,7 @@
 
 .input {
     @include placeholder {
-        color: get-color('additional', 'middle');
+        color: $base-ui-element-placeholder-color;
     }
 
     &--size-m {
