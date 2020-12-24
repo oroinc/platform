@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\Yaml\Yaml;
 
 class OroGaufretteExtension extends Extension implements PrependExtensionInterface
 {
@@ -34,6 +35,10 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('controllers.yml');
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**
@@ -44,6 +49,14 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         if ($container instanceof ExtendedContainerBuilder) {
             $this->addGaufretteConfig($container, $this->configureAdapters($container));
             $this->addGaufretteConfig($container, $this->configureFilesystems($container));
+        }
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $fileLocator = new FileLocator(__DIR__ . '/../Tests/Functional/Environment');
+            $configData = Yaml::parse(file_get_contents($fileLocator->locate('app.yml')));
+            foreach ($configData as $name => $config) {
+                $container->prependExtensionConfig($name, $config);
+            }
         }
     }
 
