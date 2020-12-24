@@ -20,13 +20,19 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      * Override to prevent naming conflicts
      */
     const COLUMN_ALIAS_TEMPLATE = 'cs%d';
-    const TABLE_ALIAS_TEMPLATE  = 'ts%d';
+    const TABLE_ALIAS_TEMPLATE  = 'ts%s';
+
+    /** @var array */
+    protected static $segmentTableAliases = [];
 
     /** @var QueryBuilder */
     protected $qb;
 
     /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
+
+    /** @var string */
+    private $aliasPrefix;
 
     /**
      * @param FunctionProviderInterface     $functionProvider
@@ -42,6 +48,38 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     ) {
         $this->restrictionBuilder = $restrictionBuilder;
         parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+    }
+
+    /**
+     * @param AbstractQueryDesigner $source
+     * @return string
+     */
+    private static function getAliasKeyBySource(AbstractQueryDesigner $source): string
+    {
+        return md5($source->getEntity() . '::' . $source->getDefinition());
+    }
+
+    /**
+     * @param AbstractQueryDesigner $source
+     * @return bool
+     */
+    public static function hasAliases(AbstractQueryDesigner $source): bool
+    {
+        $aliasKey = self::getAliasKeyBySource($source);
+
+        return array_key_exists($aliasKey, self::$segmentTableAliases);
+    }
+
+    /**
+     * @param AbstractQueryDesigner $source
+     */
+    public static function ensureAliasRegistered(AbstractQueryDesigner $source)
+    {
+        $aliasKey = self::getAliasKeyBySource($source);
+        if (!array_key_exists($aliasKey, self::$segmentTableAliases)) {
+            self::$segmentTableAliases[$aliasKey] = 0;
+        }
+        ++self::$segmentTableAliases[$aliasKey];
     }
 
     /**
@@ -67,6 +105,10 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     public function convert(AbstractQueryDesigner $source)
     {
+        $aliasKey = self::getAliasKeyBySource($source);
+        self::ensureAliasRegistered($source);
+        $this->aliasPrefix = $aliasKey . '_' . self::$segmentTableAliases[$aliasKey];
+
         $this->qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
         $this->doConvert($source);
 
@@ -76,9 +118,10 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function generateTableAlias($offset = 1)
+    protected function generateTableAlias()
     {
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
+        $key = '_' . $this->aliasPrefix . '_' . ++$this->tableAliasesCount;
+        return sprintf(static::TABLE_ALIAS_TEMPLATE, $key);
     }
 
     /**
