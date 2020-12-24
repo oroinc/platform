@@ -88,14 +88,16 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $counter = 0;
         $result = preg_replace_callback(
             '/(:[a-z]+)(\d+)/',
-            function ($matches) use (&$counter) {
+            static function ($matches) use (&$counter) {
                 return $matches[1] . (++$counter);
             },
             $result
         );
-        $result = preg_replace('/(ts)(\d+)/', 't1', $result);
+
         $this->assertSame(
-            'SELECT t1.userName, t1.id FROM AcmeBundle:UserEntity t1 WHERE t1.email LIKE :_gpnpstring1',
+            'SELECT ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.userName, ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.id ' .
+            'FROM AcmeBundle:UserEntity ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1 ' .
+            'WHERE ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.email LIKE :_gpnpstring1',
             $result
         );
     }

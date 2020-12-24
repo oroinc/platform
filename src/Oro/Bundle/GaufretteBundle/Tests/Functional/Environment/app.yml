@@ -1,0 +1,8 @@
+knp_gaufrette:
+    filesystems:
+        test_public:
+            adapter: public
+            alias: test_public_filesystem
+        test_not_public:
+            adapter: public
+            alias: test_not_public_filesystem

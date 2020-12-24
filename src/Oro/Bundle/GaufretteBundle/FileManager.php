@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\GaufretteBundle;
 
+use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Exception;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
@@ -28,25 +29,47 @@ class FileManager
     protected const READ_BATCH_SIZE = 100000;
 
     /** @var Filesystem */
-    protected $filesystem;
+    private $filesystem;
 
     /** @var string */
     private $filesystemName;
 
+    /** @var string|null */
+    private $subDirectory;
+
+    /** @var bool */
+    private $useSubDirectory = false;
+
     /** @var string */
     private $protocol;
 
-    /** @var string|null */
-    private $pathPrefixDirectory;
-
     /**
      * @param string      $filesystemName The name of Gaufrette filesystem this manager works with
-     * @param string|null $pathPrefixDirectory Directory should be used as files directory insteadof filesystem name
+     * @param string|null $subDirectory   The name of a sub-directory if it is different than the filesystem name
      */
-    public function __construct(string $filesystemName, string $pathPrefixDirectory = null)
+    public function __construct(string $filesystemName, string $subDirectory = null)
     {
+        if (!$filesystemName) {
+            throw new \InvalidArgumentException('The filesystem name must not be empty.');
+        }
         $this->filesystemName = $filesystemName;
-        $this->pathPrefixDirectory = $pathPrefixDirectory;
+        if ($subDirectory) {
+            $this->subDirectory = $subDirectory;
+            $this->useSubDirectory = true;
+        }
+    }
+
+    /**
+     * Sets a flag indicates whether files should be stored in a sub-directory.
+     *
+     * @param bool $useSubDirectory
+     */
+    public function useSubDirectory(bool $useSubDirectory): void
+    {
+        if (!$useSubDirectory && $this->subDirectory) {
+            throw new \LogicException('The Gaufrette file manager must be configured without a sub-directory.');
+        }
+        $this->useSubDirectory = $useSubDirectory;
     }
 
     /**
@@ -80,6 +103,18 @@ class FileManager
     }
 
     /**
+     * @return string|null
+     */
+    public function getSubDirectory(): ?string
+    {
+        if (!$this->useSubDirectory) {
+            return null;
+        }
+
+        return $this->subDirectory ?? $this->filesystemName;
+    }
+
+    /**
      * Gets the full path to a file in the Gaufrette file system.
      * This path can be used in the native file functions like "copy", "unlink", etc.
      *
@@ -99,8 +134,29 @@ class FileManager
             '%s://%s/%s',
             $this->protocol,
             $this->filesystemName,
-            $this->getFileNameWithPrefixDirectory($fileName)
+            $this->getFileNameWithSubDirectory($fileName)
         );
+    }
+
+    /**
+     * Gets the MIME type of a file in the Gaufrette file system.
+     *
+     * @param string $fileName
+     *
+     * @return string|null The MIME type or NULL if the Gaufrette file system does not support MIME types
+     *                     or cannot recognize MIME type
+     *
+     * @throws FileNotFound if the file does not exist
+     * @throws \InvalidArgumentException if the file name is empty string
+     */
+    public function getFileMimeType(string $fileName): ?string
+    {
+        try {
+            return $this->filesystem->mimeType($this->getFileNameWithSubDirectory($fileName)) ?: null;
+        } catch (\LogicException $e) {
+            // the Gaufrette filesystem adapter does support MIME types
+            return null;
+        }
     }
 
     /**
@@ -112,19 +168,16 @@ class FileManager
      */
     public function findFiles(string $prefix = ''): array
     {
-        $result = $this->filesystem->listKeys($this->getFileNameWithPrefixDirectory($prefix));
-        if (!empty($result) && array_key_exists('keys', $result)) {
-            $pathsWithoutPrefixDir = [];
-            $result = $result['keys'];
-            if ($this->getPrefixDirectory()) {
-                foreach ($result as $path) {
-                    $pathsWithoutPrefixDir[] = $this->getFileNameWithoutPrefixDirectory($path);
-                }
-                $result = $pathsWithoutPrefixDir;
+        $fileNames = $this->listFiles($prefix);
+        if ($fileNames && $this->getSubDirectory()) {
+            $fileNamesWithoutSubDirectory = [];
+            foreach ($fileNames as $fileName) {
+                $fileNamesWithoutSubDirectory[] = $this->getFileNameWithoutSubDirectory($fileName);
             }
+            $fileNames = $fileNamesWithoutSubDirectory;
         }
 
-        return $result;
+        return $fileNames;
     }
 
     /**
@@ -138,7 +191,7 @@ class FileManager
      */
     public function hasFile(string $fileName): bool
     {
-        return $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName));
+        return $this->filesystem->has($this->getFileNameWithSubDirectory($fileName));
     }
 
     /**
@@ -156,9 +209,10 @@ class FileManager
     public function getFile(string $fileName, bool $throwException = true): ?File
     {
         $file = null;
-        if ($throwException || $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
-            $file = $this->filesystem->get($this->getFileNameWithPrefixDirectory($fileName));
-            $file->setName($this->getFileNameWithoutPrefixDirectory($file->getName()));
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
+        if ($throwException || $this->filesystem->has($fileName)) {
+            $file = $this->filesystem->get($fileName);
+            $file->setName($this->getFileNameWithoutSubDirectory($file->getName()));
         }
 
         return $file;
@@ -177,7 +231,7 @@ class FileManager
      */
     public function getStream(string $fileName, bool $throwException = true): ?Stream
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $hasFile = $this->filesystem->has($fileName);
         if (!$hasFile && $throwException) {
             throw new Exception\FileNotFound($fileName);
@@ -221,8 +275,13 @@ class FileManager
      */
     public function deleteFile(string $fileName): void
     {
-        if ($fileName && $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
-            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
+        if (!$fileName) {
+            return;
+        }
+
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
+        if ($this->filesystem->has($fileName)) {
+            $this->filesystem->delete($fileName);
         }
     }
 
@@ -233,9 +292,9 @@ class FileManager
      */
     public function deleteAllFiles(): void
     {
-        $fileNames = $this->findFiles();
+        $fileNames = $this->listFiles();
         foreach ($fileNames as $fileName) {
-            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
+            $this->filesystem->delete($fileName);
         }
     }
 
@@ -252,7 +311,7 @@ class FileManager
      */
     public function writeToStorage(string $content, string $fileName): void
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $dstStream = $this->filesystem->createStream($fileName);
         $dstStream->open(new StreamMode('wb+'));
         try {
@@ -298,7 +357,7 @@ class FileManager
      */
     public function writeStreamToStorage(Stream $srcStream, string $fileName, bool $avoidWriteEmptyStream = false): bool
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $srcStream->open(new StreamMode('rb'));
 
         $nonEmptyStream = true;
@@ -356,20 +415,6 @@ class FileManager
         }
 
         return new ComponentFile($tmpFileName, false);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefixDirectory(): string
-    {
-        if ($this->pathPrefixDirectory) {
-            $prefix = $this->pathPrefixDirectory;
-        } else {
-            $prefix = $this->filesystemName;
-        }
-
-        return $prefix;
     }
 
     /**
@@ -435,21 +480,6 @@ class FileManager
     }
 
     /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
-    public function mimeType(string $fileName):? string
-    {
-        try {
-            return $this->filesystem->mimeType($this->getFileNameWithPrefixDirectory($fileName));
-        } catch (\LogicException $e) {
-            // The filesystem adapter does support mimetype.
-            return null;
-        }
-    }
-
-    /**
      * Generates unique file name with the given extension.
      *
      * @param string|null $extension
@@ -479,19 +509,40 @@ class FileManager
         if (!$success) {
             throw new FlushFailedException(sprintf(
                 'Failed to flush data to the "%s" file.',
-                $this->getFileNameWithoutPrefixDirectory($fileName)
+                $this->getFileNameWithoutSubDirectory($fileName)
             ));
         }
     }
 
     /**
-     * @param string $fileName
+     * Sets a metadata for a file is stored in the Gaufrette file system.
      *
-     * @return string
+     * @param string $fileName
+     * @param array  $content
      */
-    private function getFileNameWithPrefixDirectory(string $fileName): string
+    protected function setFileMetadata(string $fileName, array $content): void
     {
-        return sprintf('%s/%s', $this->getPrefixDirectory(), ltrim($fileName, '/'));
+        $adapter = $this->filesystem->getAdapter();
+        if ($adapter instanceof MetadataSupporter) {
+            $adapter->setMetadata($this->getFileNameWithSubDirectory($fileName), $content);
+        }
+    }
+
+    /**
+     * Gets names of all files are stored in the Gaufrette file system filtered by the given prefix.
+     *
+     * @param string $prefix
+     *
+     * @return string[] The list of file names with a sub-directory
+     */
+    private function listFiles(string $prefix = ''): array
+    {
+        $result = $this->filesystem->listKeys($this->getFileNameWithSubDirectory($prefix));
+        if (!empty($result) && \array_key_exists('keys', $result)) {
+            $result = $result['keys'];
+        }
+
+        return $result;
     }
 
     /**
@@ -499,10 +550,30 @@ class FileManager
      *
      * @return string
      */
-    private function getFileNameWithoutPrefixDirectory(string $fileName): string
+    private function getFileNameWithSubDirectory(string $fileName): string
     {
-        $prefixDirectory = $this->getPrefixDirectory();
+        $result = ltrim($fileName, '/');
 
-        return substr($fileName, strlen($prefixDirectory) + 1);
+        $subDirectory = $this->getSubDirectory();
+        if ($subDirectory) {
+            $result = $subDirectory . '/' . $result;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function getFileNameWithoutSubDirectory(string $fileName): string
+    {
+        $subDirectory = $this->getSubDirectory();
+        if ($subDirectory) {
+            return substr($fileName, \strlen($subDirectory) + 1);
+        }
+
+        return $fileName;
     }
 }

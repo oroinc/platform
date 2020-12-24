@@ -33,6 +33,7 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->container = new ExtendedContainerBuilder();
+        $this->container->setParameter('kernel.environment', 'prod');
         $this->container->registerExtension(new KnpGaufretteExtension());
         $this->container->setExtensionConfig('knp_gaufrette', self::CONFIG);
 

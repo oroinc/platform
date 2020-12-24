@@ -1,0 +1,16 @@
+services:
+    oro_gaufrette.tests.public_file_manager:
+        public: true
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'test_public'
+            - 'test-public'
+        tags:
+            - { name: oro_gaufrette.public_filesystem_manager }
+
+    oro_gaufrette.tests.not_public_file_manager:
+        public: true
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'test_not_public'
+            - 'test-not-public'

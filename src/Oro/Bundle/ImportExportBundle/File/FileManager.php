@@ -241,16 +241,9 @@ class FileManager
             $file = $file->getKey();
         }
 
-        if ($file && $this->gaufretteFileManager->hasFile($file)) {
-            try {
-                return $this->gaufretteFileManager->mimeType($file);
-            } catch (\LogicException $e) {
-                // The underlying adapter does support mimetype.
-                return null;
-            }
-        }
-
-        return null;
+        return $file && $this->gaufretteFileManager->hasFile($file)
+            ? $this->gaufretteFileManager->getFileMimeType($file)
+            : null;
     }
 
     /**
