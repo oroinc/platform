@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
-use Gaufrette\Exception\FileNotFound as GaufretteFileNotFoundException;
+use Gaufrette\Adapter;
+use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream;
@@ -30,9 +31,16 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
     private $filesystem;
 
+    /** @var Adapter|\PHPUnit\Framework\MockObject\MockObject */
+    private $filesystemAdapter;
+
     protected function setUp(): void
     {
         $this->filesystem = $this->createMock(Filesystem::class);
+        $this->filesystemAdapter = $this->createMock(Adapter::class);
+        $this->filesystem->expects(self::any())
+            ->method('getAdapter')
+            ->willReturn($this->filesystemAdapter);
     }
 
     /**
@@ -66,32 +74,70 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(self::TEST_PROTOCOL, $fileManager->getProtocol());
     }
 
+    public function testGetSubDirectory()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $fileManager->getSubDirectory());
+    }
+
+    public function testGetSubDirectoryForNotSubDirAwareManager()
+    {
+        $fileManager = $this->getFileManager(false);
+
+        self::assertNull($fileManager->getSubDirectory());
+    }
+
+    public function testGetSubDirectoryWithCustomSubDirectory()
+    {
+        $subDirectory = 'testDir';
+
+        $fileManager = $this->getFileManager(true, $subDirectory);
+
+        self::assertEquals($subDirectory, $fileManager->getSubDirectory());
+    }
+
     public function testGetFilePath()
     {
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(
             sprintf(
-                '%s://%s/%s/test.txt',
+                '%s://%s/%s/file.txt',
                 self::TEST_PROTOCOL,
                 self::TEST_FILE_SYSTEM_NAME,
                 self::TEST_FILE_SYSTEM_NAME
             ),
-            $fileManager->getFilePath('test.txt')
+            $fileManager->getFilePath('file.txt')
         );
     }
 
-    public function testGetFilePathForNotSubDirectoryAwareFileManager()
+    public function testGetFilePathForNotSubDirAwareManager()
     {
         $fileManager = $this->getFileManager(false);
 
         self::assertEquals(
             sprintf(
-                '%s://%s/test.txt',
+                '%s://%s/file.txt',
                 self::TEST_PROTOCOL,
                 self::TEST_FILE_SYSTEM_NAME
             ),
-            $fileManager->getFilePath('test.txt')
+            $fileManager->getFilePath('file.txt')
+        );
+    }
+
+    public function testGetFilePathWhenFileNameIsEmptyString()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(
+            sprintf(
+                '%s://%s/%s/',
+                self::TEST_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
+            $fileManager->getFilePath('')
         );
     }
 
@@ -101,8 +147,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->setProtocol(self::TEST_PROTOCOL);
 
         self::assertEquals(
-            sprintf('%s://%s/%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
-            $fileManager->getFilePath('test.txt')
+            sprintf('%s://%s/%s/file.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
+            $fileManager->getFilePath('file.txt')
         );
     }
 
@@ -112,8 +158,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->setProtocol(self::TEST_PROTOCOL);
 
         self::assertEquals(
-            sprintf('%s://%s/%s/test.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
-            $fileManager->getFilePath('test.txt')
+            sprintf('%s://%s/%s/file.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
+            $fileManager->getFilePath('file.txt')
         );
     }
 
@@ -123,7 +169,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         $fileManager = $this->getFileManager(true);
         $fileManager->setProtocol('');
-        $fileManager->getFilePath('test.txt');
+        $fileManager->getFilePath('file.txt');
     }
 
     public function testGetFilePathWhenFileNameHaveLeadingSlash()
@@ -132,23 +178,87 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             sprintf(
-                '%s://%s/%s/path/test.txt',
+                '%s://%s/%s/path/file.txt',
                 self::TEST_PROTOCOL,
                 self::TEST_FILE_SYSTEM_NAME,
                 self::TEST_FILE_SYSTEM_NAME
             ),
-            $fileManager->getFilePath('/path/test.txt')
+            $fileManager->getFilePath('/path/file.txt')
         );
     }
 
-    public function testFindAllFiles()
+    public function testGetFileMimeType()
+    {
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
+
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/file.txt')
+            ->willReturn($mimeType);
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
+    }
+
+    public function testGetFileMimeTypeForNotSubDirAwareManager()
+    {
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
+
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with('file.txt')
+            ->willReturn($mimeType);
+
+        $fileManager = $this->getFileManager(false);
+
+        self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
+    }
+
+    public function testGetFileMimeTypeWhenFileNameIsEmptyString()
+    {
+        $this->filesystem->expects(self::never())
+            ->method('mimeType');
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertNull($fileManager->getFileMimeType(''));
+    }
+
+    public function testGetFileMimeTypeWhenGaufretteAdapterCannotRecognizeMimeType()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/file.txt')
+            ->willReturn('');
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertNull($fileManager->getFileMimeType('file.txt'));
+    }
+
+    public function testGetFileMimeTypeWhenGaufretteAdapterDoesNotSupportMimeTypes()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/file.txt')
+            ->willThrowException(new \LogicException());
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertNull($fileManager->getFileMimeType('file.txt'));
+    }
+
+    public function testFindFiles()
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
             ->with(self::TEST_FILE_SYSTEM_NAME . '/')
             ->willReturn([
                 'keys' => [self::TEST_FILE_SYSTEM_NAME . '/file1', self::TEST_FILE_SYSTEM_NAME . '/file2'],
-                'dirs' => ['dir1']
+                'dirs' => [self::TEST_FILE_SYSTEM_NAME . '/dir1']
             ]);
 
         $fileManager = $this->getFileManager(true);
@@ -156,55 +266,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles());
     }
 
-    public function testFindFilesByPrefix()
-    {
-        $prefix = 'prefix';
-        $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
-
-        $this->filesystem->expects(self::once())
-            ->method('listKeys')
-            ->with($directory)
-            ->willReturn([
-                'keys' => [$directory . '_file1', $directory . '_file2'],
-                'dirs' => ['dir1']
-            ]);
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
-    }
-
-    public function testFindFilesWhenNoFilesFound()
-    {
-        $this->filesystem->expects(self::once())
-            ->method('listKeys')
-            ->with(self::TEST_FILE_SYSTEM_NAME . '/prefix')
-            ->willReturn([]);
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertSame([], $fileManager->findFiles('prefix'));
-    }
-
-    /**
-     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
-     */
-    public function testFindFilesWhenAdapterReturnsOnlyKeys()
-    {
-        $prefix = 'prefix';
-        $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
-
-        $this->filesystem->expects(self::once())
-            ->method('listKeys')
-            ->with($directory)
-            ->willReturn([$directory . '_file1', $directory . '_file2']);
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
-    }
-
-    public function testFindAllFilesForNotSubDirectoryAwareFileManager()
+    public function testFindFilesForNotSubDirAwareManager()
     {
         $this->filesystem->expects(self::once())
             ->method('listKeys')
@@ -219,7 +281,25 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['file1', 'file2'], $fileManager->findFiles());
     }
 
-    public function testFindFilesByPrefixForNotSubDirectoryAwareFileManager()
+    public function testFindFilesByPrefix()
+    {
+        $prefix = 'prefix';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([
+                'keys' => [$directory . '_file1', $directory . '_file2'],
+                'dirs' => [$directory . '/dir1']
+            ]);
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
+    }
+
+    public function testFindFilesByPrefixForNotSubDirAwareManager()
     {
         $prefix = 'prefix';
 
@@ -228,10 +308,77 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with($prefix)
             ->willReturn([
                 'keys' => [$prefix . '_file1', $prefix . '_file2'],
+                'dirs' => [$prefix . '/dir1']
+            ]);
+
+        $fileManager = $this->getFileManager(false);
+
+        self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
+    }
+
+    public function testFindFilesByPrefixWhenPrefixIsSlash()
+    {
+        $prefix = '/';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/')
+            ->willReturn([
+                'keys' => [$directory . 'file1', $directory . 'file2'],
+                'dirs' => [$directory . 'dir1']
+            ]);
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(['file1', 'file2'], $fileManager->findFiles($prefix));
+    }
+
+    public function testFindFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager()
+    {
+        $prefix = '/';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('')
+            ->willReturn([
+                'keys' => ['file1', 'file2'],
                 'dirs' => ['dir1']
             ]);
 
         $fileManager = $this->getFileManager(false);
+
+        self::assertEquals(['file1', 'file2'], $fileManager->findFiles($prefix));
+    }
+
+    public function testFindFilesWhenNoFilesFound()
+    {
+        $prefix = 'prefix';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([]);
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertSame([], $fileManager->findFiles($prefix));
+    }
+
+    /**
+     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
+     */
+    public function testFindFilesWhenAdapterReturnsOnlyKeys()
+    {
+        $prefix = 'prefix';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([$directory . '_file1', $directory . '_file2']);
+
+        $fileManager = $this->getFileManager(true);
 
         self::assertEquals([$prefix . '_file1', $prefix . '_file2'], $fileManager->findFiles($prefix));
     }
@@ -264,7 +411,17 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($fileManager->hasFile($fileName));
     }
 
-    public function testHasFileForNotSubDirectoryAwareFileManager()
+    public function testHasFileWhenFileNameIsEmptyString()
+    {
+        $this->filesystem->expects(self::never())
+            ->method('has');
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertFalse($fileManager->hasFile(''));
+    }
+
+    public function testHasFileForNotSubDirAwareManager()
     {
         $fileName = 'testFile.txt';
 
@@ -278,7 +435,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($fileManager->hasFile($fileName));
     }
 
-    public function testGetFileByFileName()
+    public function testGetFile()
     {
         $fileName = 'testFile.txt';
 
@@ -298,6 +455,30 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file);
 
         $fileManager = $this->getFileManager(true);
+
+        self::assertSame($file, $fileManager->getFile($fileName));
+    }
+
+    public function testGetFileForNotSubDirAwareManager()
+    {
+        $fileName = 'testFile.txt';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getName')
+            ->willReturn($fileName);
+        $file->expects(self::once())
+            ->method('setName')
+            ->with($fileName);
+
+        $this->filesystem->expects(self::never())
+            ->method('has');
+        $this->filesystem->expects(self::once())
+            ->method('get')
+            ->with($fileName)
+            ->willReturn($file);
+
+        $fileManager = $this->getFileManager(false);
 
         self::assertSame($file, $fileManager->getFile($fileName));
     }
@@ -344,33 +525,21 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($file, $fileManager->getFile($fileName, false));
     }
 
-    public function testGetFileForNotSubDirectoryAwareFileManager()
+    public function testGetFileWhenFileNameIsEmptyString()
     {
-        $fileName = 'testFile.txt';
-
-        $file = $this->createMock(File::class);
-        $file->expects(self::once())
-            ->method('getName')
-            ->willReturn($fileName);
-        $file->expects(self::once())
-            ->method('setName')
-            ->with($fileName);
-
         $this->filesystem->expects(self::never())
             ->method('has');
-        $this->filesystem->expects(self::once())
-            ->method('get')
-            ->with($fileName)
-            ->willReturn($file);
+        $this->filesystem->expects(self::never())
+            ->method('get');
 
-        $fileManager = $this->getFileManager(false);
+        $fileManager = $this->getFileManager(true);
 
-        self::assertSame($file, $fileManager->getFile($fileName));
+        self::assertNull($fileManager->getFile(''));
     }
 
     public function testGetStreamWhenFileDoesNotExist()
     {
-        $this->expectException(GaufretteFileNotFoundException::class);
+        $this->expectException(FileNotFound::class);
         $this->expectExceptionMessage('The file "testFileSystem/testFile.txt" was not found.');
 
         $fileName = 'testFile.txt';
@@ -422,7 +591,19 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($stream, $fileManager->getStream($fileName, false));
     }
 
-    public function testGetStreamForNotSubDirectoryAwareFileManager()
+    public function testGetStreamWhenFileNameIsEmptyString()
+    {
+        $this->filesystem->expects(self::never())
+            ->method('has');
+        $this->filesystem->expects(self::never())
+            ->method('createStream');
+
+        $fileManager = $this->getFileManager(true);
+
+        self::assertNull($fileManager->getStream(''));
+    }
+
+    public function testGetStreamForNotSubDirAwareManager()
     {
         $fileName = 'testFile.txt';
         $stream = new LocalStream('test');
@@ -441,7 +622,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($stream, $fileManager->getStream($fileName, false));
     }
 
-    public function testGetFileContentByFileName()
+    public function testGetFileContent()
     {
         $fileName = 'testFile.txt';
         $fileContent = 'test data';
@@ -465,6 +646,34 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($file);
 
         $fileManager = $this->getFileManager(true);
+
+        self::assertEquals($fileContent, $fileManager->getFileContent($fileName));
+    }
+
+    public function testGetFileContentForNotSubDirAwareManager()
+    {
+        $fileName = 'testFile.txt';
+        $fileContent = 'test data';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getContent')
+            ->willReturn($fileContent);
+        $file->expects(self::once())
+            ->method('getName')
+            ->willReturn($fileName);
+        $file->expects(self::once())
+            ->method('setName')
+            ->with($fileName);
+
+        $this->filesystem->expects(self::never())
+            ->method('has');
+        $this->filesystem->expects(self::once())
+            ->method('get')
+            ->with($fileName)
+            ->willReturn($file);
+
+        $fileManager = $this->getFileManager(false);
 
         self::assertEquals($fileContent, $fileManager->getFileContent($fileName));
     }
@@ -515,45 +724,81 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileContent, $fileManager->getFileContent($fileName, false));
     }
 
-    public function testGetFileContentForNotSubDirectoryAwareFileManager()
+    public function testGetFileContentWhenFileNameIsEmptyString()
     {
-        $fileName = 'testFile.txt';
-        $fileContent = 'test data';
-
-        $file = $this->createMock(File::class);
-        $file->expects(self::once())
-            ->method('getContent')
-            ->willReturn($fileContent);
-        $file->expects(self::once())
-            ->method('getName')
-            ->willReturn($fileName);
-        $file->expects(self::once())
-            ->method('setName')
-            ->with($fileName);
-
         $this->filesystem->expects(self::never())
             ->method('has');
-        $this->filesystem->expects(self::once())
-            ->method('get')
-            ->with($fileName)
-            ->willReturn($file);
+        $this->filesystem->expects(self::never())
+            ->method('get');
 
-        $fileManager = $this->getFileManager(false);
+        $fileManager = $this->getFileManager(true);
 
-        self::assertEquals($fileContent, $fileManager->getFileContent($fileName));
+        self::assertNull($fileManager->getFileContent(''));
     }
 
     public function testDeleteFile()
     {
-        $fileName = 'text.txt';
+        $fileName = 'file.txt';
 
         $this->filesystem->expects(self::once())
             ->method('has')
             ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(true);
         $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(false);
+        $this->filesystem->expects(self::once())
             ->method('delete')
             ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileForNotSubDirAwareManager()
+    {
+        $fileName = 'file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with($fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with($fileName)
+            ->willReturn(false);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with($fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileWhenFileNameIsDirectory()
+    {
+        $fileName = 'file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::never())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
 
         $fileManager = $this->getFileManager(true);
 
@@ -562,13 +807,17 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteFileForNotExistingFile()
     {
-        $fileName = 'text.txt';
+        $fileName = 'file.txt';
 
         $this->filesystem->expects(self::once())
             ->method('has')
             ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
             ->willReturn(false);
         $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::never())
+            ->method('delete');
+        $this->filesystemAdapter->expects(self::never())
             ->method('delete');
 
         $fileManager = $this->getFileManager(true);
@@ -576,11 +825,15 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile($fileName);
     }
 
-    public function testDeleteFileWhenFileNameIsEmpty()
+    public function testDeleteFileWhenFileNameIsEmptyString()
     {
         $this->filesystem->expects(self::never())
             ->method('has');
         $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::never())
+            ->method('delete');
+        $this->filesystemAdapter->expects(self::never())
             ->method('delete');
 
         $fileManager = $this->getFileManager(true);
@@ -588,17 +841,403 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->deleteFile('');
     }
 
-    public function testDeleteFileForNotSubDirectoryAwareFileManager()
+    public function testDeleteFileFromSubDirAndThereAreOtherFiles()
     {
-        $fileName = 'text.txt';
+        $fileName = 'dir/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir/')
+            ->willReturn(['keys' => [self::TEST_FILE_SYSTEM_NAME . '/dir/another_file.txt'], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    /**
+     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
+     */
+    public function testDeleteFileFromSubDirAndThereAreOtherFilesWhenAdapterReturnsOnlyKeys()
+    {
+        $fileName = 'dir/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir/')
+            ->willReturn([self::TEST_FILE_SYSTEM_NAME . '/dir/another_file.txt']);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromSubDirAndNoOtherFiles()
+    {
+        $fileName = 'dir/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir/')
+            ->willReturn(['keys' => [], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromSubDirAndNoOtherFilesForNotSubDirAwareManager()
+    {
+        $fileName = 'dir/file.txt';
 
         $this->filesystem->expects(self::once())
             ->method('has')
             ->with($fileName)
             ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [$fileName],
+                ['dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('dir/')
+            ->willReturn(['keys' => [], 'dirs' => []]);
         $this->filesystem->expects(self::once())
             ->method('delete')
             ->with($fileName);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with('dir');
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    /**
+     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
+     */
+    public function testDeleteFileFromSubDirAndNoOtherFilesWhenAdapterReturnsOnlyKeys()
+    {
+        $fileName = 'dir/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir/')
+            ->willReturn([]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromNestedSubDirAndNoOtherFiles()
+    {
+        $fileName = 'dir1/dir2/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(3))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                true
+            );
+        $this->filesystem->expects(self::exactly(2))
+            ->method('listKeys')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2/'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/']
+            )
+            ->willReturn(['keys' => [], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1']
+            );
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInFirstLevelDir()
+    {
+        $fileName = 'dir1/dir2/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(3))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                true
+            );
+        $this->filesystem->expects(self::exactly(2))
+            ->method('listKeys')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2/'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/']
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['keys' => [], 'dirs' => []],
+                ['keys' => [self::TEST_FILE_SYSTEM_NAME . '/dir1/another_file.txt'], 'dirs' => []]
+            );
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherFilesInSecondLevelDir()
+    {
+        $fileName = 'dir1/dir2/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2/')
+            ->willReturn(['keys' => [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2/another_file.txt'], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromNestedSubDirAndThereAreOtherDirsInFirstLevelDir()
+    {
+        $fileName = 'dir1/dir2/file.txt';
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(3))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileName],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                true
+            );
+        $this->filesystem->expects(self::exactly(2))
+            ->method('listKeys')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2/'],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir1/']
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['keys' => [], 'dirs' => []],
+                ['keys' => [], 'dirs' => [self::TEST_FILE_SYSTEM_NAME . '/dir1/another_dir']]
+            );
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir1/dir2');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlash()
+    {
+        $fileNameWithoutLeadingSlash = 'dir/file.txt';
+        $fileName = '/' . $fileNameWithoutLeadingSlash;
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileNameWithoutLeadingSlash)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/' . $fileNameWithoutLeadingSlash],
+                [self::TEST_FILE_SYSTEM_NAME . '/dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir/')
+            ->willReturn(['keys' => [], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileNameWithoutLeadingSlash);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileFromSubDirAndNoOtherFilesAndFileNameHaveLeadingSlashForNotSubDirAwareManager()
+    {
+        $fileNameWithoutLeadingSlash = 'dir/file.txt';
+        $fileName = '/' . $fileNameWithoutLeadingSlash;
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with($fileNameWithoutLeadingSlash)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('isDirectory')
+            ->withConsecutive(
+                [$fileNameWithoutLeadingSlash],
+                ['dir']
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true
+            );
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('dir/')
+            ->willReturn(['keys' => [], 'dirs' => []]);
+        $this->filesystem->expects(self::once())
+            ->method('delete')
+            ->with($fileNameWithoutLeadingSlash);
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with('dir');
 
         $fileManager = $this->getFileManager(false);
 
@@ -607,52 +1246,298 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllFiles()
     {
-        $fileNames = [self::TEST_FILE_SYSTEM_NAME . '/text1.txt', self::TEST_FILE_SYSTEM_NAME . '/text2.txt'];
-
         $this->filesystem->expects(self::once())
             ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/')
             ->willReturn([
-                'keys' => $fileNames,
-                'dirs' => ['dir1']
+                'keys' => [self::TEST_FILE_SYSTEM_NAME . '/file1', self::TEST_FILE_SYSTEM_NAME . '/file2'],
+                'dirs' => [self::TEST_FILE_SYSTEM_NAME . '/dir1']
             ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
         $this->filesystem->expects(self::exactly(2))
             ->method('delete')
             ->withConsecutive(
-                [$fileNames[0]],
-                [$fileNames[1]]
+                [self::TEST_FILE_SYSTEM_NAME . '/file1'],
+                [self::TEST_FILE_SYSTEM_NAME . '/file2']
             );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir1');
 
         $fileManager = $this->getFileManager(true);
 
         $fileManager->deleteAllFiles();
     }
 
-    public function testDeleteAllFilesForNotSubDirectoryAwareFileManager()
+    public function testDeleteAllFilesForNotSubDirAwareManager()
     {
-        $fileNames = ['text1.txt', 'text2.txt'];
-
         $this->filesystem->expects(self::once())
             ->method('listKeys')
+            ->with('')
             ->willReturn([
-                'keys' => $fileNames,
+                'keys' => ['file1', 'file2'],
                 'dirs' => ['dir1']
             ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
         $this->filesystem->expects(self::exactly(2))
             ->method('delete')
             ->withConsecutive(
-                [$fileNames[0]],
-                [$fileNames[1]]
+                ['file1'],
+                ['file2']
             );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with('dir1');
 
         $fileManager = $this->getFileManager(false);
 
         $fileManager->deleteAllFiles();
     }
 
+    /**
+     * E.g. this may happens when AwsS3 or GoogleCloudStorage adapters are used
+     */
+    public function testDeleteAllFilesWhenAdapterReturnsOnlyKeys()
+    {
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/')
+            ->willReturn([self::TEST_FILE_SYSTEM_NAME . '/file1', self::TEST_FILE_SYSTEM_NAME . '/file2']);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/file1'],
+                [self::TEST_FILE_SYSTEM_NAME . '/file2']
+            );
+        $this->filesystemAdapter->expects(self::never())
+            ->method('delete');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles();
+    }
+
+    public function testDeleteAllFilesByPrefix()
+    {
+        $prefix = 'prefix';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/' . $prefix;
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([
+                'keys' => [$directory . '_file1', $directory . '_file2'],
+                'dirs' => [$directory . '/dir1']
+            ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '_file1'],
+                [$directory . '_file2']
+            );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with($directory . '/dir1');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixForNotSubDirAwareManager()
+    {
+        $prefix = 'prefix';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with($prefix)
+            ->willReturn([
+                'keys' => [$prefix . '_file1', $prefix . '_file2'],
+                'dirs' => [$prefix . '/dir1']
+            ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$prefix . '_file1'],
+                [$prefix . '_file2']
+            );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with($prefix . '/dir1');
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixWhenPrefixIsSlash()
+    {
+        $prefix = '/';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/')
+            ->willReturn([
+                'keys' => [$directory . 'file1', $directory . 'file2'],
+                'dirs' => [$directory . 'dir1']
+            ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [self::TEST_FILE_SYSTEM_NAME . '/file1'],
+                [self::TEST_FILE_SYSTEM_NAME . '/file2']
+            );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/dir1');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixWhenPrefixIsSlashForNotSubDirAwareManager()
+    {
+        $prefix = '/';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with('')
+            ->willReturn([
+                'keys' => ['file1', 'file2'],
+                'dirs' => ['dir1']
+            ]);
+        $this->filesystem->expects(self::never())
+            ->method('isDirectory');
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                ['file1'],
+                ['file2']
+            );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with('dir1');
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixWithTailingSlash()
+    {
+        $prefix = 'prefix/';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([
+                'keys' => [$directory . '_file1', $directory . '_file2'],
+                'dirs' => [$directory . '/dir1']
+            ]);
+        $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with($directory)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '_file1'],
+                [$directory . '_file2']
+            );
+        $this->filesystemAdapter->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '/dir1'],
+                [$directory]
+            );
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixWithTailingSlashWhenFilesystemNotSupportDirectories()
+    {
+        $prefix = 'prefix/';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $prefix)
+            ->willReturn([
+                'keys' => [$directory . '_file1', $directory . '_file2'],
+                'dirs' => [$directory . '/dir1']
+            ]);
+        $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with($directory)
+            ->willReturn(false);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '_file1'],
+                [$directory . '_file2']
+            );
+        $this->filesystemAdapter->expects(self::once())
+            ->method('delete')
+            ->with($directory . '/dir1');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
+    public function testDeleteAllFilesByPrefixWithTwoTailingSlashes()
+    {
+        $prefix = 'prefix//';
+        $directory = self::TEST_FILE_SYSTEM_NAME . '/prefix';
+
+        $this->filesystem->expects(self::once())
+            ->method('listKeys')
+            ->with(self::TEST_FILE_SYSTEM_NAME . '/prefix/')
+            ->willReturn([
+                'keys' => [$directory . '_file1', $directory . '_file2'],
+                'dirs' => [$directory . '/dir1']
+            ]);
+        $this->filesystem->expects(self::once())
+            ->method('isDirectory')
+            ->with($directory)
+            ->willReturn(true);
+        $this->filesystem->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '_file1'],
+                [$directory . '_file2']
+            );
+        $this->filesystemAdapter->expects(self::exactly(2))
+            ->method('delete')
+            ->withConsecutive(
+                [$directory . '/dir1'],
+                [$directory]
+            );
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->deleteAllFiles($prefix);
+    }
+
     public function testWriteToStorage()
     {
         $content = 'Test data';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
 
@@ -673,13 +1558,37 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($content, $resultStream->read(100));
     }
 
+    public function testWriteToStorageForNotSubDirAwareManager()
+    {
+        $content = 'Test data';
+        $fileName = 'file.txt';
+
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->writeToStorage($content, $fileName);
+
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+        self::assertEquals($content, $resultStream->read(100));
+    }
+
     public function testWriteToStorageWhenFlushFailed()
     {
         $this->expectException(FlushFailedException::class);
-        $this->expectExceptionMessage('Failed to flush data to the "test2.txt" file.');
+        $this->expectExceptionMessage('Failed to flush data to the "file.txt" file.');
 
         $content = 'Test data';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $resultStream = $this->createMock(Stream::class);
         $resultStream->expects(self::once())
@@ -707,34 +1616,20 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->writeToStorage($content, $fileName);
     }
 
-    public function testWriteToStorageForNotSubDirectoryAwareFileManager()
+    public function testWriteToStorageWhenFileNameIsEmptyString()
     {
-        $content = 'Test data';
-        $fileName = 'test2.txt';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file name must not be empty.');
 
-        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+        $fileManager = $this->getFileManager(true);
 
-        $this->filesystem->expects(self::once())
-            ->method('createStream')
-            ->with($fileName)
-            ->willReturn($resultStream);
-        $this->filesystem->expects(self::once())
-            ->method('removeFromRegister')
-            ->with($fileName);
-
-        $fileManager = $this->getFileManager(false);
-
-        $fileManager->writeToStorage($content, $fileName);
-
-        $resultStream->open(new StreamMode('rb+'));
-        $resultStream->seek(0);
-        self::assertEquals($content, $resultStream->read(100));
+        $fileManager->writeToStorage('Test data', '');
     }
 
     public function testWriteFileToStorage()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
 
@@ -755,10 +1650,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
     }
 
-    public function testWriteFileToStorageForNotSubDirectoryAwareFileManager()
+    public function testWriteFileToStorageForNotSubDirAwareManager()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
 
@@ -779,10 +1674,30 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
     }
 
+    public function testWriteFileToStorageWhenLocalFilePathIsEmptyString()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The local path must not be empty.');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->writeFileToStorage('', 'file.txt');
+    }
+
+    public function testWriteFileToStorageWhenFileNameIsEmptyString()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file name must not be empty.');
+
+        $fileManager = $this->getFileManager(true);
+
+        $fileManager->writeFileToStorage(__DIR__ . '/Fixtures/test.txt', '');
+    }
+
     public function testWriteStreamToStorage()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $srcStream = new LocalStream($localFilePath);
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
@@ -807,10 +1722,38 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
+    public function testWriteStreamToStorageForNotSubDirAwareManager()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/test.txt';
+        $fileName = 'file.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        $fileManager = $this->getFileManager(false);
+
+        $result = $fileManager->writeStreamToStorage($srcStream, $fileName);
+
+        $resultStream->open(new StreamMode('rb'));
+        $resultStream->seek(0);
+        self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
+        self::assertTrue($result);
+        // test that the input stream is closed
+        self::assertFalse($srcStream->cast(1));
+    }
+
     public function testWriteStreamToStorageWhenFlushFailed()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $srcStream = new LocalStream($localFilePath);
         $resultStream = $this->createMock(Stream::class);
@@ -840,7 +1783,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             $fileManager->writeStreamToStorage($srcStream, $fileName);
             self::fail('Expected FlushFailedException');
         } catch (FlushFailedException $e) {
-            self::assertEquals('Failed to flush data to the "test2.txt" file.', $e->getMessage());
+            self::assertEquals('Failed to flush data to the "file.txt" file.', $e->getMessage());
             // test that the input stream is closed
             self::assertFalse($srcStream->cast(1));
         }
@@ -849,7 +1792,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testWriteStreamToStorageWithEmptyStreamAndAvoidWriteEmptyStream()
     {
         $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $srcStream = new LocalStream($localFilePath);
 
@@ -872,7 +1815,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testWriteStreamToStorageWithEmptyStream()
     {
         $localFilePath = __DIR__ . '/Fixtures/emptyFile.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $srcStream = new LocalStream($localFilePath);
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
@@ -900,7 +1843,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testWriteStreamToStorageAndAvoidWriteEmptyStream()
     {
         $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $fileName = 'file.txt';
 
         $srcStream = new LocalStream($localFilePath);
         $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
@@ -925,32 +1868,19 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($srcStream->cast(1));
     }
 
-    public function testWriteStreamToStorageForNotSubDirectoryAwareFileManager()
+    public function testWriteStreamToStorageWhenFileNameIsEmptyString()
     {
-        $localFilePath = __DIR__ . '/Fixtures/test.txt';
-        $fileName = 'test2.txt';
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The file name must not be empty.');
 
-        $srcStream = new LocalStream($localFilePath);
-        $resultStream = new InMemoryBuffer($this->filesystem, $fileName);
+        $this->filesystem->expects(self::never())
+            ->method('createStream');
+        $this->filesystem->expects(self::never())
+            ->method('removeFromRegister');
 
-        $this->filesystem->expects(self::once())
-            ->method('createStream')
-            ->with($fileName)
-            ->willReturn($resultStream);
-        $this->filesystem->expects(self::once())
-            ->method('removeFromRegister')
-            ->with($fileName);
+        $fileManager = $this->getFileManager(true);
 
-        $fileManager = $this->getFileManager(false);
-
-        $result = $fileManager->writeStreamToStorage($srcStream, $fileName);
-
-        $resultStream->open(new StreamMode('rb'));
-        $resultStream->seek(0);
-        self::assertStringEqualsFile($localFilePath, $resultStream->read(100));
-        self::assertTrue($result);
-        // test that the input stream is closed
-        self::assertFalse($srcStream->cast(1));
+        $fileManager->writeStreamToStorage(new LocalStream(__DIR__ . '/Fixtures/test.txt'), '');
     }
 
     public function testWriteToTemporaryFile()
@@ -976,7 +1906,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $content = 'Test data';
 
-        $srcStream = new InMemoryBuffer($this->filesystem, 'test.txt');
+        $srcStream = new InMemoryBuffer($this->filesystem, 'file.txt');
         $srcStream->open(new StreamMode('wb+'));
         $srcStream->write($content);
         $srcStream->seek(0);
@@ -1090,82 +2020,5 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         } finally {
             @unlink($tmpFileName);
         }
-    }
-
-    public function testGetSubDirectoryWithoutCustomSubDirectory()
-    {
-        $fileManager = $this->getFileManager(true);
-
-        self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $fileManager->getSubDirectory());
-    }
-
-    public function testGetSubDirectoryWithCustomSubDirectory()
-    {
-        $subDirectory = 'testDir';
-
-        $fileManager = $this->getFileManager(true, $subDirectory);
-
-        self::assertEquals($subDirectory, $fileManager->getSubDirectory());
-    }
-
-    public function testGetSubDirectoryForNotSubDirectoryAwareFileManager()
-    {
-        $fileManager = $this->getFileManager(false);
-
-        self::assertNull($fileManager->getSubDirectory());
-    }
-
-    public function testGetFileMimeType()
-    {
-        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
-
-        $this->filesystem->expects(self::once())
-            ->method('mimeType')
-            ->with(self::TEST_FILE_SYSTEM_NAME . '/test_file.txt')
-            ->willReturn($mimeType);
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertEquals($mimeType, $fileManager->getFileMimeType('test_file.txt'));
-    }
-
-    public function testGetFileMimeTypeWhenGaufretteAdapterCannotRecognizeMimeType()
-    {
-        $this->filesystem->expects(self::once())
-            ->method('mimeType')
-            ->with(self::TEST_FILE_SYSTEM_NAME . '/test_file.txt')
-            ->willReturn('');
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertNull($fileManager->getFileMimeType('test_file.txt'));
-    }
-
-    public function testGetFileMimeTypeWhenGaufretteAdapterDoesNotSupportMimeTypes()
-    {
-        $this->filesystem->expects(self::once())
-            ->method('mimeType')
-            ->with(self::TEST_FILE_SYSTEM_NAME . '/test_file.txt')
-            ->willThrowException(new \LogicException());
-
-        $fileManager = $this->getFileManager(true);
-
-        self::assertNull($fileManager->getFileMimeType('test_file.txt'));
-    }
-
-    public function testGetFileMimeTypeForNotSubDirectoryAwareFileManager()
-    {
-        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
-
-        $this->filesystem->expects(self::once())
-            ->method('mimeType')
-            ->with('test_file.txt')
-            ->willReturn($mimeType);
-
-        $fileManager = $this->getFileManager(false);
-
-        self::assertEquals($mimeType, $fileManager->getFileMimeType('test_file.txt'));
     }
 }
