@@ -4,7 +4,7 @@ namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener;
 use Oro\Bundle\InstallerBundle\InstallerEvent;
-use Oro\Component\Testing\Command\Assert\CommandOutputContains;
+use Oro\Component\Testing\Command\CommandOutputNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -31,12 +31,11 @@ class InstallCommandDeploymentTypeListenerTest extends TestCase
         );
         $listener->afterDatabasePreparation($event);
         $content = $output->fetch();
-        self::assertThat(
-            $content,
-            new CommandOutputContains(
-                '[WARNING] Deployment config "./config/deployment/config_staging.yml"' .
-                ' for deployment type "staging" not found.'
-            )
+
+        self::assertStringContainsString(
+            '[WARNING] Deployment config "./config/deployment/config_staging.yml"' .
+            ' for deployment type "staging" not found.',
+            CommandOutputNormalizer::toSingleLine($content)
         );
     }
 

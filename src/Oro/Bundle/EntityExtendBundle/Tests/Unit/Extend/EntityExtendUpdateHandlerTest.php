@@ -28,7 +28,7 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->handler->update();
         self::assertTrue($result->isSuccessful());
-        self::assertNull($result->getFailedMessage());
+        self::assertNull($result->getFailureMessage());
     }
 
     public function testUpdateWhenUpdateFailed()
@@ -39,6 +39,6 @@ class EntityExtendUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->handler->update();
         self::assertFalse($result->isSuccessful());
-        self::assertNull($result->getFailedMessage());
+        self::assertNull($result->getFailureMessage());
     }
 }
