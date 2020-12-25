@@ -212,10 +212,10 @@ class FileManager
     public function deleteFile($file): void
     {
         if ($file instanceof File) {
-            $file = $file->getKey();
+            $file = $file->getName();
         }
 
-        if ($file && $this->gaufretteFileManager->hasFile($file)) {
+        if ($file) {
             $this->gaufretteFileManager->deleteFile($file);
         }
     }
@@ -238,7 +238,7 @@ class FileManager
     public function getMimeType($file): ?string
     {
         if ($file instanceof File) {
-            $file = $file->getKey();
+            $file = $file->getName();
         }
 
         return $file && $this->gaufretteFileManager->hasFile($file)

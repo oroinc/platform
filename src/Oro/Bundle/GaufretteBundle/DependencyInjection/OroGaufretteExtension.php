@@ -52,6 +52,10 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         }
 
         if ('test' === $container->getParameter('kernel.environment')) {
+            $container->setParameter(
+                'oro_gaufrette.tests.test_local_adapter_directory',
+                rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'oro_test_local_fs'
+            );
             $fileLocator = new FileLocator(__DIR__ . '/../Tests/Functional/Environment');
             $configData = Yaml::parse(file_get_contents($fileLocator->locate('app.yml')));
             foreach ($configData as $name => $config) {

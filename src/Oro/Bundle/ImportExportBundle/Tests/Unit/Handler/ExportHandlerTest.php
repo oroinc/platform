@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Gaufrette\Adapter\Local as LocalAdapter;
-use Gaufrette\Filesystem;
-use Gaufrette\StreamWrapper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -53,9 +50,6 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $directory;
 
-    /** @var Filesystem */
-    private $filesystem;
-
     protected function setUp(): void
     {
         $this->jobExecutor = $this->createMock(JobExecutor::class);
@@ -80,50 +74,35 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->directory = $this->getTempDir('ExportHandler');
         file_put_contents($this->directory . DIRECTORY_SEPARATOR . 'test1.csv', '1,test,test2;');
-
-        $this->filesystem = new Filesystem(new LocalAdapter($this->directory));
-        $this->registerLocalFilesystemInStream();
-    }
-
-    protected function tearDown(): void
-    {
-        @unlink($this->directory . DIRECTORY_SEPARATOR . 'test1.csv');
-        @rmdir($this->directory);
-    }
-
-    private function registerLocalFilesystemInStream()
-    {
-        $filesystemMap = StreamWrapper::getFilesystemMap();
-        $filesystemMap->set('importexport', $this->filesystem);
-        StreamWrapper::register();
     }
 
     public function testHandleDownloadExportResult()
     {
         $fileName = 'test1.csv';
-        $filePath = 'gaufrette://importexport/test1.csv';
-        $this->fileManager->expects($this->once())
+        $filePath = $this->directory . DIRECTORY_SEPARATOR . 'test1.csv';
+
+        $this->fileManager->expects(self::once())
             ->method('isFileExist')
             ->with($fileName)
             ->willReturn(true);
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('getFilePath')
             ->with($fileName)
             ->willReturn($filePath);
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('getMimeType')
             ->willReturn('text/csv');
 
         $response = $this->exportHandler->handleDownloadExportResult($fileName);
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
-        $this->assertEquals('attachment; filename=test1.csv', $response->headers->get('Content-Disposition'));
-        $this->assertEquals('text/csv', $response->headers->get('Content-Type'));
+        self::assertInstanceOf(BinaryFileResponse::class, $response);
+        self::assertEquals('attachment; filename=test1.csv', $response->headers->get('Content-Disposition'));
+        self::assertEquals('text/csv', $response->headers->get('Content-Type'));
 
         ob_start();
         $response->sendContent();
         $content = ob_get_clean();
-        $this->assertStringEqualsFile($this->directory . DIRECTORY_SEPARATOR . $fileName, $content);
+        self::assertStringEqualsFile($this->directory . DIRECTORY_SEPARATOR . $fileName, $content);
     }
 
     public function testExportResultFileMergeThrowsRuntimeExceptionWhenCannotMerge()
@@ -134,46 +113,40 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
         $files = ['test1.csv', 'test2.csv'];
 
         $writer = $this->createMock(FileStreamWriter::class);
-        $this->writerChain
-            ->expects(self::once())
+        $this->writerChain->expects(self::once())
             ->method('getWriter')
             ->willReturn($writer);
 
         $reader = $this->createMock(AbstractFileReader::class);
-        $this->readerChain
-            ->expects(self::once())
+        $this->readerChain->expects(self::once())
             ->method('getReader')
             ->willReturn($reader);
 
-        $this->fileManager->expects($this->at(0))
+        $this->fileManager->expects(self::at(0))
             ->method('writeToTmpLocalStorage')
             ->with('test1.csv')
             ->willReturn('test1.csv');
-
-        $this->fileManager->expects($this->at(1))
+        $this->fileManager->expects(self::at(1))
             ->method('fixNewLines')
             ->with('test1.csv')
             ->willReturn('test1.csv');
-
-        $this->fileManager->expects($this->at(2))
+        $this->fileManager->expects(self::at(2))
             ->method('writeToTmpLocalStorage')
             ->with('test2.csv')
             ->willReturn('test2.csv');
-
-        $this->fileManager->expects($this->at(3))
+        $this->fileManager->expects(self::at(3))
             ->method('fixNewLines')
             ->with('test2.csv')
             ->willReturn('test2.csv');
 
         $exceptionMessage = 'Exception message';
         $exception = new \Exception($exceptionMessage);
-        $this->batchFileManager
-            ->expects(self::once())
+        $this->batchFileManager->expects(self::once())
             ->method('mergeFiles')
             ->willThrowException($exception);
 
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage(sprintf('Cannot merge export files into single summary file'));
+        $this->expectExceptionMessage('Cannot merge export files into single summary file');
 
         $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
     }

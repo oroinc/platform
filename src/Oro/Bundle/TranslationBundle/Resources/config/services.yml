@@ -343,6 +343,29 @@ services:
         tags:
             - { name: layout.data_provider, alias: translator }
 
+    oro_translation.rebuild_translation_cache_processor:
+        class: Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheProcessor
+        arguments:
+            - '@translator.default'
+            - '@oro_translation.provider.translation_domain'
+            - '@oro_translation.js_dumper'
+            - '@oro_ui.dynamic_asset_version_manager'
+            - '@logger'
+
+    oro_translation.rebuild_translation_cache_handler:
+        class: Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheHandler
+        arguments:
+            - '@oro_translation.rebuild_translation_cache_processor'
+
+    oro_translation.rebuild_translation_cache_action:
+        class: Oro\Bundle\TranslationBundle\Action\RebuildTranslationCacheAction
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_translation.rebuild_translation_cache_handler'
+            - '@translator.default'
+        tags:
+            - { name: oro_action.action, alias: rebuild_translation_cache }
+
     oro_translation.mass_action.reset_translation:
         class: Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction\ResetTranslationsMassAction
         shared: false

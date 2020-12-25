@@ -3,10 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
+use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheHandlerInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
-use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\TranslatorStub;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\RebuildTranslationCacheHandlerStub;
 
 class TranslationOperationsTest extends ActionTestCase
 {
@@ -21,23 +21,32 @@ class TranslationOperationsTest extends ActionTestCase
         ]);
     }
 
+    /**
+     * @return RebuildTranslationCacheHandlerStub
+     */
+    private function getRebuildTranslationCacheHandlerStub(): RebuildTranslationCacheHandlerStub
+    {
+        return self::getContainer()->get('oro_translation.rebuild_translation_cache_handler');
+    }
+
     public function testUpdateCacheOperation()
     {
-        $translatorMock = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
-        $translatorMock->expects($this->once())->method('rebuildCache');
-        $translatorMock->expects($this->any())->method('getTranslations')->willReturn([]);
+        $handlerMock = $this->createMock(RebuildTranslationCacheHandlerInterface::class);
+        $handlerMock->expects($this->once())
+            ->method('rebuildCache');
 
-        /** @var TranslatorStub $translator */
-        $translator = $this->getContainer()->get('translator.default');
-        $translator->setRebuildCache([$translatorMock, 'rebuildCache']);
-        $translator->setGetTranslations([$translatorMock, 'getTranslations']);
-
-        $this->assertExecuteOperation(
-            'oro_translation_rebuild_cache',
-            null,
-            null,
-            ['route' => 'oro_translation_translation_index']
-        );
+        $handlerStub = $this->getRebuildTranslationCacheHandlerStub();
+        $handlerStub->setRebuildCache([$handlerMock, 'rebuildCache']);
+        try {
+            $this->assertExecuteOperation(
+                'oro_translation_rebuild_cache',
+                null,
+                null,
+                ['route' => 'oro_translation_translation_index']
+            );
+        } finally {
+            $handlerStub->setRebuildCache(null);
+        }
     }
 
     /**

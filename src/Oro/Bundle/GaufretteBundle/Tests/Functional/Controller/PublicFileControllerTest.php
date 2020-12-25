@@ -81,11 +81,15 @@ class PublicFileControllerTest extends WebTestCase
                     'fileName'     => $fileName
                 ])
             );
-            /** @var BinaryFileResponse $result */
-            $result = $this->client->getResponse();
-            self::assertResponseStatusCodeEquals($result, 200);
-            self::assertInstanceOf(BinaryFileResponse::class, $result);
-            self::assertEquals($fileContent, file_get_contents($result->getFile()->getPathname()));
+
+            $response = $this->client->getResponse();
+            self::assertResponseStatusCodeEquals($response, 200);
+            self::assertInstanceOf(BinaryFileResponse::class, $response);
+
+            ob_start();
+            $response->sendContent();
+            $content = ob_get_clean();
+            self::assertEquals($fileContent, $content);
         } finally {
             $fileManager->deleteFile($fileName);
         }

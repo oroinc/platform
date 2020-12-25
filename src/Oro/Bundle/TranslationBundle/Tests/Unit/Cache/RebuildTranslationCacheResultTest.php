@@ -1,21 +1,21 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Extend;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Cache;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateResult;
+use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheResult;
 
-class EntityExtendUpdateResultTest extends \PHPUnit\Framework\TestCase
+class RebuildTranslationCacheResultTest extends \PHPUnit\Framework\TestCase
 {
     public function testSuccessResult()
     {
-        $result = new EntityExtendUpdateResult(true);
+        $result = new RebuildTranslationCacheResult(true);
         self::assertTrue($result->isSuccessful());
         self::assertNull($result->getFailureMessage());
     }
 
     public function testFailureResult()
     {
-        $result = new EntityExtendUpdateResult(false, 'some error');
+        $result = new RebuildTranslationCacheResult(false, 'some error');
         self::assertFalse($result->isSuccessful());
         self::assertEquals('some error', $result->getFailureMessage());
     }

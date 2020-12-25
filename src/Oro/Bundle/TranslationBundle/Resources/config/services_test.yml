@@ -1,6 +1,7 @@
 services:
-    translator.default.stub:
-        class: 'Oro\Bundle\TranslationBundle\Tests\Functional\Stub\TranslatorStub'
-        decorates: 'translator.default'
-        parent: 'translator.default'
-        public: true
+    oro_translation.tests.rebuild_translation_cache_handler:
+        class: Oro\Bundle\TranslationBundle\Tests\Functional\Stub\RebuildTranslationCacheHandlerStub
+        decorates: oro_translation.rebuild_translation_cache_handler
+        decoration_priority: -256
+        arguments:
+            - '@oro_translation.tests.rebuild_translation_cache_handler.inner'
