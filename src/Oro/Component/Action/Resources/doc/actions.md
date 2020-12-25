@@ -169,7 +169,7 @@ Create Entity
  - class - fully qualified class name of entity to be created;
  - attribute - attribute that will contain the created entity instance;
  - flush - (optional) when flush in DB should be performed.
-           Immediately after entity creation if ``true`` or later if ``false`` (default value: false);
+           Immediately after entity creation if ``true`` or later if ``false`` (default value: `false);
  - data - (optional) array of data that should be set to entity.
 
 **Configuration Example**
@@ -518,12 +518,13 @@ Flash Message
 **Alias:** flash_message
 
 **Description:** Add flash message to session flash bag. Provides ability to show flash messages on frontend.
-Messages are passed through translator.
+Messages are passed through a translator by default, but it can be disabled via the `translate` parameter.
 
 **Parameters:**
- - message - message itself, will be passed to translator;
- - message_parameters - (optional) message parameters, that will be passed to translator as second argument;
- - type - (optional) message type applicable for Flash Bag. Set to info by default;
+ - message - a message;
+ - message_parameters - (optional) message parameters;
+ - translate - (optional) whether a message is a translation key and it should be passed to a translator. The default value is `true`;
+ - type - (optional) message type applicable for Flash Bag. The default value is `'info'`;
 
 **Configuration Example**
 ```

@@ -282,23 +282,19 @@ operations:
             class: btn-danger icons-holder-text
         acl_resource: oro_translation_language_translate
         actions:
-            - '@call_service_method':
-                service: oro_translation.provider.translation_domain
-                method: clearCache
-            - '@call_service_method':
-                service: translator.default
-                method: rebuildCache
-            - '@call_service_method':
-                service: oro_platform.command_executor
-                method: runCommand
-                method_parameters: ['oro:translation:dump']
-            - '@call_service_method':
-                service: oro_ui.dynamic_asset_version_manager
-                method: updateAssetVersion
-                method_parameters: ['translations']
+            - '@rebuild_translation_cache':
+                attribute: $.result
             - '@flash_message':
+                conditions:
+                    '@equal': ['$.result[successful]', true]
                 message: oro.translation.translation.message.rebuild_cache
-                type: 'success'
+                type: success
+            - '@flash_message':
+                  conditions:
+                      '@equal': ['$.result[successful]', false]
+                  message: '$.result[message]'
+                  translate: false
+                  type: error
 
     oro_translation_translation_reset:
         label: oro.translation.action.reset.hint

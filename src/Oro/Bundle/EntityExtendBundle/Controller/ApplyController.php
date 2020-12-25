@@ -40,9 +40,9 @@ class ApplyController
         }
 
         $responseData = [];
-        $failedMessage = $result->getFailedMessage();
-        if ($failedMessage) {
-            $responseData['message'] = $failedMessage;
+        $failureMessage = $result->getFailureMessage();
+        if ($failureMessage) {
+            $responseData['message'] = $failureMessage;
         }
 
         return new JsonResponse($responseData, Response::HTTP_INTERNAL_SERVER_ERROR);
