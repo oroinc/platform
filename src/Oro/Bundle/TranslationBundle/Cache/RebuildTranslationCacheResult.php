@@ -1,11 +1,12 @@
 <?php
 
-namespace Oro\Bundle\EntityExtendBundle\Extend;
+namespace Oro\Bundle\TranslationBundle\Cache;
 
 /**
- * Represents a result of {@see \Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface::update}.
+ * Represents a result of
+ * {@see \Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheHandlerInterface::rebuildCache}.
  */
-final class EntityExtendUpdateResult
+class RebuildTranslationCacheResult
 {
     /** @var bool */
     private $successful;
@@ -25,7 +26,7 @@ final class EntityExtendUpdateResult
 
 
     /**
-     * Indicates whether the schema was successfully updated or not.
+     * Indicates whether the translation cache was successfully rebuilt or not.
      *
      * @return bool
      */
@@ -35,23 +36,12 @@ final class EntityExtendUpdateResult
     }
 
     /**
-     * Gets the message to be shown to a user when the update schema failed.
+     * Gets the message to be shown to a user when the translation cache rebuild failed.
      *
      * @return string|null
      */
     public function getFailureMessage(): ?string
     {
         return $this->failureMessage;
-    }
-
-    /**
-     * Gets the message to be shown to a user when the update schema failed.
-     * @deprecated use getFailureMessage
-     *
-     * @return string|null
-     */
-    public function getFailedMessage(): ?string
-    {
-        return $this->getFailureMessage();
     }
 }
