@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
@@ -16,28 +16,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailAttachmentType
-     */
-    protected $emailAttachmentType;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $em;
+    /** @var EmailAttachmentTransformer|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailAttachmentTransformer;
 
-    /**
-     * @var EmailAttachmentTransformer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $emailAttachmentTransformer;
-
+    /** @var EmailAttachmentType */
+    private $emailAttachmentType;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->emailAttachmentTransformer = $this->createMock(EmailAttachmentTransformer::class);
 
-        $this->emailAttachmentType = new EmailAttachmentType($this->em, $this->emailAttachmentTransformer);
+        $this->emailAttachmentType = new EmailAttachmentType($this->doctrine, $this->emailAttachmentTransformer);
     }
 
     public function testConfigureOptions()
@@ -52,7 +45,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $type = new EmailAttachmentType($this->em, $this->emailAttachmentTransformer);
+        $type = new EmailAttachmentType($this->doctrine, $this->emailAttachmentTransformer);
         $type->configureOptions($resolver);
     }
 
@@ -76,7 +69,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
      * @param $getRepositoryCalls
      * @param $getRepositoryArgument
      * @param $repoReturnObject
-     * @param $oroToEntityCalls
+     * @param $attachmentEntityToEntityCalls
      * @param $entityFromUploadedFileCalls
      *
      * @dataProvider attachmentProvider
@@ -86,7 +79,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $getRepositoryCalls,
         $getRepositoryArgument,
         $repoReturnObject,
-        $oroToEntityCalls,
+        $attachmentEntityToEntityCalls,
         $entityFromUploadedFileCalls
     ) {
         $attachment = $this->createMock(EmailAttachment::class);
@@ -118,19 +111,17 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
 
         if ($getRepositoryCalls) {
             $repo = $this->createMock(EntityRepository::class);
-
-            $this->em->expects($this->exactly($getRepositoryCalls))
+            $this->doctrine->expects($this->exactly($getRepositoryCalls))
                 ->method('getRepository')
                 ->with($getRepositoryArgument)
                 ->willReturn($repo);
-
             $repo->expects($this->once())
                 ->method('find')
                 ->willReturn($repoReturnObject);
         }
 
-        $this->emailAttachmentTransformer->expects($this->exactly($oroToEntityCalls))
-            ->method('oroToEntity');
+        $this->emailAttachmentTransformer->expects($this->exactly($attachmentEntityToEntityCalls))
+            ->method('attachmentEntityToEntity');
 
         $this->emailAttachmentTransformer->expects($this->exactly($entityFromUploadedFileCalls))
             ->method('entityFromUploadedFile');
@@ -149,7 +140,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
                 'getRepositoryCalls' => 1,
                 'getRepositoryArgument' => Attachment::class,
                 'repoReturnObject' => $this->createMock(Attachment::class),
-                'oroToEntityCalls' => 1,
+                'attachmentEntityToEntityCalls' => 1,
                 'entityFromUploadedFileCalls' => 0,
             ],
             [
@@ -157,7 +148,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
                 'getRepositoryCalls' => 1,
                 'getRepositoryArgument' => EmailAttachmentEntity::class,
                 'repoReturnObject' => $this->createMock(EmailAttachment::class),
-                'oroToEntityCalls' => 0,
+                'attachmentEntityToEntityCalls' => 0,
                 'entityFromUploadedFileCalls' => 0,
             ],
             [
@@ -165,7 +156,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
                 'getRepositoryCalls' => 0,
                 'getRepositoryArgument' => null,
                 'repoReturnObject' => null,
-                'oroToEntityCalls' => 0,
+                'attachmentEntityToEntityCalls' => 0,
                 'entityFromUploadedFileCalls' => 1,
             ],
         ];

@@ -800,7 +800,7 @@ services:
         public: true
         arguments:
             - '@oro_attachment.file_manager'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
@@ -831,7 +831,7 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
         arguments:
             - '@oro_email.email.thread.provider'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_attachment.provider.attachment'
             - '@oro_email.email_attachment_transformer'
 

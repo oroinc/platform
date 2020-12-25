@@ -1,4 +1,10 @@
 services:
+    oro_gaufrette.tests.local_file_manager:
+        public: true
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'test_local'
+
     oro_gaufrette.tests.public_file_manager:
         public: true
         parent: oro_gaufrette.file_manager
@@ -14,3 +20,10 @@ services:
         arguments:
             - 'test_not_public'
             - 'test-not-public'
+
+    oro_gaufrette.tests.private_file_manager:
+        public: true
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'test_private'
+            - 'test-private'
