@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Component\Testing\Command;
 
-use Oro\Component\Testing\Command\Assert\CommandOutputContains;
 use Oro\Component\Testing\Command\Assert\CommandOutputIsEmpty;
 use Oro\Component\Testing\Command\Assert\CommandProducedError;
 use Oro\Component\Testing\Command\Assert\CommandProducedWarning;
@@ -47,7 +46,12 @@ trait CommandTestingTrait
 
     private function assertOutputContains(CommandTester $commandTester, string $expectedText): void
     {
-        self::assertThat($commandTester, new CommandOutputContains($expectedText));
+        self::assertStringContainsString($expectedText, CommandOutputNormalizer::toSingleLine($commandTester));
+    }
+
+    private function assertOutputNotContains(CommandTester $commandTester, string $expectedText): void
+    {
+        self::assertStringNotContainsString($expectedText, CommandOutputNormalizer::toSingleLine($commandTester));
     }
 
     private function assertOutputIsEmpty(CommandTester $commandTester): void
