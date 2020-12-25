@@ -45,3 +45,9 @@ services:
             - '%kernel.default_locale%'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand:
+        arguments:
+            - '@oro_translation.rebuild_translation_cache_processor'
+        tags:
+            - { name: console.command }
