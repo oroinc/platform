@@ -412,7 +412,7 @@ services:
         arguments:
             - ~ # adapters
 
-    oro_translation.async.message_processor.dump_js_translations:
+    oro_translation.async.dump_js_translations_processor:
         class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor
         arguments:
             - '@oro_translation.js_dumper'

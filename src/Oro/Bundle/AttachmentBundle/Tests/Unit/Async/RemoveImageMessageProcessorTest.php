@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Tests\Unit\MessageProcessor;
+namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Async;
 
+use Oro\Bundle\AttachmentBundle\Async\RemoveImageMessageProcessor;
 use Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManagerInterface;
-use Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Bundle\ProductBundle\Entity\ProductImage;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -12,46 +12,39 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var ImageRemovalManagerInterface
-     */
+    /** @var ImageRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $imageRemovalManager;
 
-    /**
-     * @var ImageRemoveMessageProcessor
-     */
-    protected $processor;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /**
-     * @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $session;
+    /** @var RemoveImageMessageProcessor */
+    private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->imageRemovalManager = $this->createMock(ImageRemovalManagerInterface::class);
-        $this->session = $this->createMock(SessionInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->processor = new ImageRemoveMessageProcessor(
-            $this->logger,
-            $this->imageRemovalManager
+        $this->processor = new RemoveImageMessageProcessor(
+            $this->imageRemovalManager,
+            $this->logger
         );
+    }
+
+    /**
+     * @return SessionInterface
+     */
+    private function getSession()
+    {
+        return $this->createMock(SessionInterface::class);
     }
 
     public function testGetSubscribedTopics()
     {
-        $this->assertEquals(['oro_attachment.remove_image'], ImageRemoveMessageProcessor::getSubscribedTopics()) ;
+        $this->assertEquals(['oro_attachment.remove_image'], RemoveImageMessageProcessor::getSubscribedTopics());
     }
 
     public function testProcess()
@@ -80,7 +73,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $this->session)
+            $this->processor->process($message, $this->getSession())
         );
     }
 
@@ -116,7 +109,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $this->session)
+            $this->processor->process($message, $this->getSession())
         );
     }
 
@@ -141,12 +134,15 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setOriginalFilename($fileName);
         $file->setParentEntityClass(ProductImage::class);
 
-        $this->imageRemovalManager->expects($this->once())->method('removeImageWithVariants')->with($file);
-        $this->logger->expects($this->never())->method('warning');
+        $this->imageRemovalManager->expects($this->once())
+            ->method('removeImageWithVariants')
+            ->with($file);
+        $this->logger->expects($this->never())
+            ->method('warning');
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $this->session)
+            $this->processor->process($message, $this->getSession())
         );
     }
 
@@ -164,12 +160,14 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
         $message->setBody(JSON::encode($images));
 
-        $this->imageRemovalManager->expects($this->never())->method('removeImageWithVariants');
-        $this->logger->expects($this->once())->method('warning');
+        $this->imageRemovalManager->expects($this->never())
+            ->method('removeImageWithVariants');
+        $this->logger->expects($this->once())
+            ->method('warning');
 
         $this->assertEquals(
             MessageProcessorInterface::ACK,
-            $this->processor->process($message, $this->session)
+            $this->processor->process($message, $this->getSession())
         );
     }
 }
