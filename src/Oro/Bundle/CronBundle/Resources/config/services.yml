@@ -48,7 +48,7 @@ services:
         arguments:
             - '@kernel'
 
-    oro_cron.async.command_runner_message_processor:
+    oro_cron.async.command_runner_processor:
         class: Oro\Bundle\CronBundle\Async\CommandRunnerProcessor
         arguments:
             - '@oro_message_queue.job.runner'
