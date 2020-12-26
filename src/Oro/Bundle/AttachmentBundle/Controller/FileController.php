@@ -65,7 +65,6 @@ class FileController extends AbstractController
      * @param int    $width
      * @param int    $height
      * @param string $filename
-     * @param Request $request
      *
      * @return Response
      */
@@ -90,7 +89,6 @@ class FileController extends AbstractController
      * @param int    $id
      * @param string $filter
      * @param string $filename
-     * @param Request $request
      *
      * @return Response
      */
