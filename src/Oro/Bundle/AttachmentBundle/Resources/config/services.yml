@@ -274,7 +274,7 @@ services:
         arguments:
             - '%oro_attachment.filesystem_name.protected_mediacache%'
 
-    oro_attachment.manager.media_cache_manager_registry:
+    oro_attachment.media_cache_manager_registry:
         class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
         arguments:
             - '@oro_attachment.acl.file_access_control_checker'
@@ -320,14 +320,14 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
-    oro_attachment.provider.attachment_file_name_provider:
-        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
+    oro_attachment.provider.file_name:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
 
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
-            - '@oro_attachment.provider.attachment_file_name_provider'
+            - '@oro_attachment.provider.file_name'
 
     Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
         alias: 'oro_attachment.provider.file_url'
@@ -378,7 +378,7 @@ services:
         arguments:
             - '@oro_attachment.provider.resized_image'
             - '@oro_attachment.provider.resized_image_path'
-            - '@oro_attachment.manager.media_cache_manager_registry'
+            - '@oro_attachment.media_cache_manager_registry'
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
 
     oro_attachment.provider.file_icon:

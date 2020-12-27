@@ -1,7 +1,7 @@
 services:
     oro_attachment.tests.api.skipped_entity_provider:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
-        decorates: 'oro_api.tests.skipped_entity_provider'
+        decorates: oro_api.tests.skipped_entity_provider
         arguments:
             - '@oro_attachment.tests.api.skipped_entity_provider.inner'
         calls:

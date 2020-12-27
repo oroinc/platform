@@ -9,4 +9,4 @@ services:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_attachment.file_manager }
             - { name: container.service_subscriber, id: oro_attachment.manager.image_resize }
-            - { name: container.service_subscriber, id: oro_attachment.provider.attachment_file_name_provider }
+            - { name: container.service_subscriber, id: oro_attachment.provider.file_name }

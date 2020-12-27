@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Provider;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
+use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Configurator\AttachmentSettingsTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -41,9 +41,9 @@ class ResizedImageProviderTest extends WebTestCase
     }
 
     /**
-     * @return ResizedImageProvider
+     * @return ResizedImageProviderInterface
      */
-    private function getResizedImageProvider(): ResizedImageProvider
+    private function getResizedImageProvider(): ResizedImageProviderInterface
     {
         return self::getContainer()->get('oro_attachment.provider.resized_image');
     }
