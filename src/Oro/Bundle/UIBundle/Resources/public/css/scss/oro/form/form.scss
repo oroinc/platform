@@ -54,6 +54,10 @@
         overflow: hidden;
     }
 
+    .clear-search-button {
+        display: none;
+    }
+
     &.focus,
     &.hover {
         border-color: $uploader-hover-border-color;
@@ -132,7 +136,7 @@ select[multiple] {
         z-index: 1;
     }
 
-    &:disabled {;
+    &:disabled {
         color: $input-disabled-color;
     }
 

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
-use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as AttachmentModel;
+use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\AbstractType;
@@ -23,23 +23,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EmailAttachmentType extends AbstractType
 {
-    /**
-     * @var ObjectManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
+
+    /** @var EmailAttachmentTransformer */
+    private $emailAttachmentTransformer;
 
     /**
-     * @var EmailAttachmentTransformer
-     */
-    protected $emailAttachmentTransformer;
-
-    /**
-     * @param ObjectManager $objectManager
+     * @param ManagerRegistry            $doctrine
      * @param EmailAttachmentTransformer $emailAttachmentTransformer
      */
-    public function __construct(ObjectManager $objectManager, EmailAttachmentTransformer $emailAttachmentTransformer)
+    public function __construct(ManagerRegistry $doctrine, EmailAttachmentTransformer $emailAttachmentTransformer)
     {
-        $this->em = $objectManager;
+        $this->doctrine = $doctrine;
         $this->emailAttachmentTransformer = $emailAttachmentTransformer;
     }
 
@@ -65,7 +61,7 @@ class EmailAttachmentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => AttachmentModel::class,
+            'data_class' => EmailAttachmentModel::class,
             'csrf_token_id' => 'email_attachment',
         ]);
     }
@@ -99,42 +95,42 @@ class EmailAttachmentType extends AbstractType
      */
     public function initAttachmentEntity(FormEvent $event)
     {
-        /** @var AttachmentModel $attachment */
-        $attachment = $event->getData();
+        /** @var EmailAttachmentModel $emailAttachmentModel */
+        $emailAttachmentModel = $event->getData();
 
         // this check is necessary due to inability to capture file input dialog cancel event
-        if (!$attachment) {
+        if (!$emailAttachmentModel) {
             return;
         }
 
         $emailAttachment = null;
-        if (!$attachment->getEmailAttachment()) {
-            switch ($attachment->getType()) {
-                case AttachmentModel::TYPE_ATTACHMENT:
-                    $repo = $this->em->getRepository(Attachment::class);
-                    $oroAttachment = $repo->find($attachment->getId());
-                    $emailAttachment = $this->emailAttachmentTransformer->oroToEntity($oroAttachment);
+        if (!$emailAttachmentModel->getEmailAttachment()) {
+            switch ($emailAttachmentModel->getType()) {
+                case EmailAttachmentModel::TYPE_ATTACHMENT:
+                    $emailAttachment = $this->emailAttachmentTransformer->attachmentEntityToEntity(
+                        $this->doctrine->getRepository(Attachment::class)->find($emailAttachmentModel->getId())
+                    );
 
                     break;
-                case AttachmentModel::TYPE_EMAIL_ATTACHMENT:
-                    $repo = $this->em->getRepository(EmailAttachment::class);
-                    $emailAttachment = $repo->find($attachment->getId());
+                case EmailAttachmentModel::TYPE_EMAIL_ATTACHMENT:
+                    $emailAttachment = $this->doctrine->getRepository(EmailAttachment::class)
+                        ->find($emailAttachmentModel->getId());
 
                     break;
-                case AttachmentModel::TYPE_UPLOADED:
-                    if ($attachment->getFile() instanceof UploadedFile) {
+                case EmailAttachmentModel::TYPE_UPLOADED:
+                    if ($emailAttachmentModel->getFile() instanceof UploadedFile) {
                         $emailAttachment = $this->emailAttachmentTransformer
-                            ->entityFromUploadedFile($attachment->getFile());
+                            ->entityFromUploadedFile($emailAttachmentModel->getFile());
                     }
 
                     break;
                 default:
-                    throw new FormException(sprintf('Invalid attachment type: %s', $attachment->getType()));
+                    throw new FormException(sprintf('Invalid attachment type: %s', $emailAttachmentModel->getType()));
             }
 
-            $attachment->setEmailAttachment($emailAttachment);
+            $emailAttachmentModel->setEmailAttachment($emailAttachment);
         }
 
-        $event->setData($attachment);
+        $event->setData($emailAttachmentModel);
     }
 }

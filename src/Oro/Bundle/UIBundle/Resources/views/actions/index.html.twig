@@ -4,6 +4,8 @@
 {% set buttonsPlaceholderData = {} %}
 {% if entity_class is defined %}
     {% set buttonsPlaceholderData = {'entity_class': entity_class} %}
+{% elseif entity is defined %}
+    {% set buttonsPlaceholderData = {'entity_class': oro_class_name(entity)} %}
 {% endif %}
 
 {% block before_content_addition %}
@@ -12,6 +14,12 @@
 
 {% block content %}
     <div class="container-fluid page-title">
+        {% set pageActionsBlock -%}
+            {% block pageActions -%}
+                {% placeholder index_pageActions with buttonsPlaceholderData %}
+            {%- endblock pageActions %}
+        {%- endset %}
+
         <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
@@ -33,6 +41,17 @@
                      data-page-component-options="{{ {'view': 'oroui/js/app/views/page-center-title-view'}|json_encode }}">
                 </div>
             </div>
+            {% if pageActionsBlock|trim %}
+            <div class="row inline-info">
+                <div class="pull-right">
+                    <div class="inline-decorate-container">
+                        <ul class="inline-decorate">
+                            {{ pageActionsBlock }}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
     {% block content_datagrid %}

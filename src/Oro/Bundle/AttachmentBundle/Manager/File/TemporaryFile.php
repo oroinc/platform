@@ -14,7 +14,7 @@ class TemporaryFile extends File
     public function __destruct()
     {
         try {
-            $filesystem = new FileSystem();
+            $filesystem = new Filesystem();
             $filesystem->remove($this->getPathname());
         } catch (IOException $exception) {
             // Throwing exceptions from destructor results in fatal error

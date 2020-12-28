@@ -5,10 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
- * Get file name for a given file.
+ * Returns a filename for a specific File entity as is.
  */
-class AttachmentFileNameProvider implements FileNameProviderInterface
+class FileNameProvider implements FileNameProviderInterface
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getFileName(File $file): string
     {
         return $file->getFilename();

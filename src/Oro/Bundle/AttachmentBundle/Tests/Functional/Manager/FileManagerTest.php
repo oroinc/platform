@@ -1,15 +1,13 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Manager\File;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Manager;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FileManagerTest extends WebTestCase
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $someFile;
 
     protected function setUp(): void
@@ -34,10 +32,10 @@ class FileManagerTest extends WebTestCase
         $fileEntity = $fileManager->createFileEntity($this->someFile);
         $tmpFilePath = $fileEntity->getFile()->getPathname();
 
-        self::assertTrue(file_exists($tmpFilePath));
+        self::assertFileExists($tmpFilePath);
 
         $fileEntity = null;
 
-        self::assertFalse(file_exists($tmpFilePath));
+        self::assertFileDoesNotExist($tmpFilePath);
     }
 }

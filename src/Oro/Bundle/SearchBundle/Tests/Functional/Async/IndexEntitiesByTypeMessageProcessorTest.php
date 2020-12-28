@@ -99,6 +99,6 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
      */
     private function getIndexEntitiesByTypeMessageProcessor()
     {
-        return $this->getContainer()->get('oro_search.async.message_processor.index_entities_by_type');
+        return $this->getContainer()->get('oro_search.async.index_entities_by_type_processor');
     }
 }

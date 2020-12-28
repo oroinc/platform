@@ -3,27 +3,22 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Gaufrette\File;
-use Gaufrette\FilesystemInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Component\Testing\TempDirExtension;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileManagerTest extends TestCase
+class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    private const FILENAME = 'file.png';
+    /** @var GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $gaufretteFileManager;
 
     /** @var FileManager */
     private $fileManager;
-
-    /** @var MockObject|GaufretteFileManager */
-    private $gaufretteFileManager;
 
     protected function setUp(): void
     {
@@ -33,89 +28,91 @@ class FileManagerTest extends TestCase
 
     public function testGetMimeTypeFromString(): void
     {
+        $fileName = 'file.png';
         $mimeType = 'image/png';
-        $this->gaufretteFileManager->expects($this->once())
+
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
-            ->with(self::FILENAME)
+            ->with($fileName)
             ->willReturn(true);
-        $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
-            ->with(self::FILENAME)
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileMimeType')
+            ->with($fileName)
             ->willReturn($mimeType);
 
-        $this->assertEquals($mimeType, $this->fileManager->getMimeType(self::FILENAME));
+        self::assertEquals($mimeType, $this->fileManager->getMimeType($fileName));
     }
 
     public function testGetMimeTypeFromFileObject(): void
     {
-        $file = $this->createMock(File::class);
-        $file->expects($this->once())
-            ->method('getKey')
-            ->willReturn(self::FILENAME);
+        $fileName = 'file.png';
         $mimeType = 'image/png';
-        $this->gaufretteFileManager->expects($this->once())
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getName')
+            ->willReturn($fileName);
+
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
-            ->with(self::FILENAME)
+            ->with($fileName)
             ->willReturn(true);
-        $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
-            ->with(self::FILENAME)
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileMimeType')
+            ->with($fileName)
             ->willReturn($mimeType);
 
-        $this->assertEquals($mimeType, $this->fileManager->getMimeType($file));
+        self::assertEquals($mimeType, $this->fileManager->getMimeType($file));
     }
 
     public function testGetMimeTypeOfNotExistedFile(): void
     {
-        $this->gaufretteFileManager->expects($this->once())
+        $fileName = 'file.png';
+
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
-            ->with(self::FILENAME)
+            ->with($fileName)
             ->willReturn(false);
 
-        $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
+        self::assertNull($this->fileManager->getMimeType($fileName));
     }
 
-    public function testGetMimeTypeFromStringWithoutMimetypeAdapter(): void
+    public function testGetMimeTypeFromStringWhenGaufretteAdapterDoesNotSupportMimeTypes(): void
     {
-        $this->gaufretteFileManager->expects($this->once())
+        $fileName = 'file.png';
+
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
-            ->with(self::FILENAME)
+            ->with($fileName)
             ->willReturn(true);
-        $this->gaufretteFileManager->expects($this->once())
-            ->method('mimeType')
-            ->with(self::FILENAME)
-            ->willThrowException(new \LogicException('no mime type.'));
-        $this->assertNull($this->fileManager->getMimeType(self::FILENAME));
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFileMimeType')
+            ->with($fileName)
+            ->willReturn(null);
+
+        self::assertNull($this->fileManager->getMimeType($fileName));
     }
 
     /**
      * @dataProvider fileContentDataProvider
-     * @param string $fileContent
-     * @param string $expectedContent
      */
-    public function testSaveFileToStorage(string $fileContent, string $expectedContent)
+    public function testSaveFileToStorage(string $fileContent, string $expectedContent): void
     {
-        /** @var \SplFileObject|MockObject $fileObject */
         $fileObject = $this->getMockBuilder(\SplFileObject::class)
             ->setConstructorArgs(['php://memory'])
             ->getMock();
-
-        $fileObject
-            ->expects($this->once())
+        $fileObject->expects(self::once())
             ->method('fread')
             ->willReturn($fileContent);
 
-        /** @var \SplFileInfo|MockObject $fileInfo */
         $fileInfo = $this->getMockBuilder(\SplFileInfo::class)
             ->setConstructorArgs(['testFileName'])
             ->getMock();
-
-        $fileInfo
-            ->expects($this->once())
+        $fileInfo->expects(self::once())
             ->method('openFile')
             ->willReturn($fileObject);
 
-        $this->gaufretteFileManager->expects($this->once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('writeToStorage')
             ->with($expectedContent, 'fileNameForSave');
 
@@ -124,27 +121,21 @@ class FileManagerTest extends TestCase
 
     /**
      * @dataProvider fileContentDataProvider
-     * @param string $fileContent
-     * @param string $expectedContent
      */
-    public function testWriteFileToStorage(string $fileContent, string $expectedContent)
+    public function testWriteFileToStorage(string $fileContent, string $expectedContent): void
     {
         $tmpFileName = $this->getTempFile('import_export_file_manager');
 
         file_put_contents($tmpFileName, $fileContent);
 
-        $this->gaufretteFileManager->expects($this->once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('writeToStorage')
             ->with($expectedContent, 'fileNameForSave');
 
         $this->fileManager->writeFileToStorage($tmpFileName, 'fileNameForSave');
-
-        if (file_exists($tmpFileName)) {
-            unlink($tmpFileName);
-        }
     }
 
-    public function fileContentDataProvider()
+    public function fileContentDataProvider(): array
     {
         $bomBytes = pack('H*', 'EFBBBF');
 
@@ -155,15 +146,12 @@ class FileManagerTest extends TestCase
         ];
     }
 
-    public function testGetFilesByPeriodWithDirectory()
+    public function testGetFilesByPeriodWithDirectory(): void
     {
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('findFiles')
             ->willReturn(['firstDirectory']);
-
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
             ->with('firstDirectory')
             ->willReturn(false);
@@ -171,80 +159,61 @@ class FileManagerTest extends TestCase
         self::assertEquals([], $this->fileManager->getFilesByPeriod());
     }
 
-    public function testGetFilesByPeriodWithFile()
+    public function testGetFilesByPeriodWithFile(): void
     {
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('findFiles')
             ->willReturn(['someFile']);
-
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('hasFile')
             ->with('someFile')
             ->willReturn(true);
 
-        $filesystem = $this->createMock(FilesystemInterface::class);
-        $someFile = new File('someFile', $filesystem);
+        $someFile = $this->createMock(File::class);
+        $someFile->expects(self::once())
+            ->method('getMtime')
+            ->willReturn(mktime(0, 0, 0, 12, 31, 2010));
 
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('getFile')
             ->willReturn($someFile);
-
-        $filesystem
-            ->expects(self::once())
-            ->method('mtime')
-            ->with('someFile')
-            ->willReturn(mktime(0, 0, 0, 12, 31, 2010));
 
         self::assertEquals(['someFile' => $someFile], $this->fileManager->getFilesByPeriod());
     }
 
     /**
      * @dataProvider getFilesByPeriodDataProvider
-     * @param \DateTime|null $from
-     * @param \DateTime|null $to
      */
-    public function testGetFilesByPeriod(?\DateTime $from, ?\DateTime $to, array $expectedFiles)
+    public function testGetFilesByPeriod(?\DateTime $from, ?\DateTime $to, array $expectedFiles): void
     {
-        $this->gaufretteFileManager
-            ->expects(self::once())
+        $this->gaufretteFileManager->expects(self::once())
             ->method('findFiles')
             ->willReturn(['firstFile', 'secondFile']);
-
-        $this->gaufretteFileManager
-            ->expects(self::exactly(2))
+        $this->gaufretteFileManager->expects(self::exactly(2))
             ->method('hasFile')
             ->withConsecutive(['firstFile'], ['secondFile'])
             ->willReturn(true);
 
-        $filesystem = $this->createMock(FilesystemInterface::class);
-        $firstFile = new File('firstFile', $filesystem);
-        $secondFile = new File('secondFile', $filesystem);
+        $firstFile = $this->createMock(File::class);
+        $firstFile->expects(self::once())
+            ->method('getMtime')
+            ->willReturn(mktime(0, 0, 0, 12, 31, 2010));
 
-        $this->gaufretteFileManager
-            ->expects(self::exactly(2))
+        $secondFile = $this->createMock(File::class);
+        $secondFile->expects(self::once())
+            ->method('getMtime')
+            ->willReturn(mktime(0, 0, 0, 12, 31, 2011));
+
+        $this->gaufretteFileManager->expects(self::exactly(2))
             ->method('getFile')
             ->willReturnMap([
                ['firstFile', true, $firstFile],
                ['secondFile', true, $secondFile]
             ]);
 
-        $filesystem
-            ->expects(self::exactly(2))
-            ->method('mtime')
-            ->willReturnMap([
-                ['firstFile', mktime(0, 0, 0, 12, 31, 2010)],
-                ['secondFile', mktime(0, 0, 0, 12, 31, 2011)]
-            ]);
-
         self::assertEquals($expectedFiles, array_keys($this->fileManager->getFilesByPeriod($from, $to)));
     }
 
-    /**
-     * @return array
-     */
     public function getFilesByPeriodDataProvider(): array
     {
         return [
@@ -271,7 +240,7 @@ class FileManagerTest extends TestCase
         ];
     }
 
-    public function testGetFilePath()
+    public function testGetFilePath(): void
     {
         $fileName = 'test.txt';
         $filePath = 'gaufrette://file_system/sub_dir/test.txt';
@@ -282,5 +251,105 @@ class FileManagerTest extends TestCase
             ->willReturn($filePath);
 
         self::assertEquals($filePath, $this->fileManager->getFilePath($fileName));
+    }
+
+    public function testGetContent(): void
+    {
+        $fileName = 'test.txt';
+        $fileContent = 'test content';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getContent')
+            ->willReturn($fileContent);
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('getFile')
+            ->with($fileName)
+            ->willReturn($file);
+
+        self::assertEquals($fileContent, $this->fileManager->getContent($fileName));
+    }
+
+    public function testGetContentFromFileObject(): void
+    {
+        $fileContent = 'test content';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getContent')
+            ->willReturn($fileContent);
+
+        $this->gaufretteFileManager->expects(self::never())
+            ->method('getFile');
+
+        self::assertEquals($fileContent, $this->fileManager->getContent($file));
+    }
+
+    public function testDeleteFile(): void
+    {
+        $fileName = 'test.txt';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('deleteFile')
+            ->with($fileName);
+
+        $this->fileManager->deleteFile($fileName);
+    }
+
+    public function testDeleteFileByFileObject(): void
+    {
+        $fileName = 'test.txt';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getName')
+            ->willReturn($fileName);
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('deleteFile')
+            ->with($fileName);
+
+        $this->fileManager->deleteFile($file);
+    }
+
+    public function testDeleteFileByFileObjectWhenNoFileName(): void
+    {
+        $fileName = 'test.txt';
+
+        $file = $this->createMock(File::class);
+        $file->expects(self::once())
+            ->method('getName')
+            ->willReturn(null);
+
+        $this->gaufretteFileManager->expects(self::never())
+            ->method('deleteFile')
+            ->with($fileName);
+
+        $this->fileManager->deleteFile($file);
+    }
+
+    public function testisFileExistForExistingFile(): void
+    {
+        $fileName = 'test.txt';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('hasFile')
+            ->with($fileName)
+            ->willReturn(true);
+
+        self::assertTrue($this->fileManager->isFileExist($fileName));
+    }
+
+    public function testisFileExistForNotExistingFile(): void
+    {
+        $fileName = 'test.txt';
+
+        $this->gaufretteFileManager->expects(self::once())
+            ->method('hasFile')
+            ->with($fileName)
+            ->willReturn(false);
+
+        self::assertFalse($this->fileManager->isFileExist($fileName));
     }
 }

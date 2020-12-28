@@ -141,14 +141,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         if ($devMode) {
             self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
             self::assertEquals(
-                [['addDependency', [new Reference('oro_entity.entity_configuration.provider')]]],
+                [
+                    ['setConfigCacheWarmer', [new Reference('oro_api.config_cache_warmer')]],
+                    ['addDependency', [new Reference('oro_entity.entity_configuration.provider')]]
+                ],
                 $container->getDefinition('oro_api.config_cache_factory')->getMethodCalls()
             );
             self::assertServiceExists($container, 'oro_api.config_cache_state.default');
         } else {
             self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
-            self::assertSame(
-                [],
+            self::assertEquals(
+                [['setConfigCacheWarmer', [new Reference('oro_api.config_cache_warmer')]]],
                 $container->getDefinition('oro_api.config_cache_factory')->getMethodCalls()
             );
             self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
@@ -238,8 +241,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'default',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.default')->getArguments()
         );
@@ -475,8 +477,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'default',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.default')->getArguments()
         );
@@ -484,8 +485,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'first',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.first')->getArguments()
         );
@@ -493,8 +493,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'second',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.second')->getArguments()
         );
@@ -997,8 +996,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'default',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.default')->getArguments()
         );
@@ -1006,8 +1004,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'first',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.first')->getArguments()
         );
@@ -1015,8 +1012,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'second',
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ],
             $container->getDefinition('oro_api.config_cache.second')->getArguments()
         );

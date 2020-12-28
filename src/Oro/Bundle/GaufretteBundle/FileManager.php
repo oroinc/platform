@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\GaufretteBundle;
 
+use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Exception;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
@@ -27,26 +28,50 @@ class FileManager
     /** The number of bytes to be read from a source stream at a time */
     protected const READ_BATCH_SIZE = 100000;
 
+    private const DIRECTORY_SEPARATOR = '/';
+
     /** @var Filesystem */
-    protected $filesystem;
+    private $filesystem;
 
     /** @var string */
     private $filesystemName;
 
+    /** @var string|null */
+    private $subDirectory;
+
+    /** @var bool */
+    private $useSubDirectory = false;
+
     /** @var string */
     private $protocol;
 
-    /** @var string|null */
-    private $pathPrefixDirectory;
-
     /**
      * @param string      $filesystemName The name of Gaufrette filesystem this manager works with
-     * @param string|null $pathPrefixDirectory Directory should be used as files directory insteadof filesystem name
+     * @param string|null $subDirectory   The name of a sub-directory if it is different than the filesystem name
      */
-    public function __construct(string $filesystemName, string $pathPrefixDirectory = null)
+    public function __construct(string $filesystemName, string $subDirectory = null)
     {
+        if (!$filesystemName) {
+            throw new \InvalidArgumentException('The filesystem name must not be empty.');
+        }
         $this->filesystemName = $filesystemName;
-        $this->pathPrefixDirectory = $pathPrefixDirectory;
+        if ($subDirectory) {
+            $this->subDirectory = $subDirectory;
+            $this->useSubDirectory = true;
+        }
+    }
+
+    /**
+     * Sets a flag indicates whether files should be stored in a sub-directory.
+     *
+     * @param bool $useSubDirectory
+     */
+    public function useSubDirectory(bool $useSubDirectory): void
+    {
+        if (!$useSubDirectory && $this->subDirectory) {
+            throw new \LogicException('The Gaufrette file manager must be configured without a sub-directory.');
+        }
+        $this->useSubDirectory = $useSubDirectory;
     }
 
     /**
@@ -80,6 +105,18 @@ class FileManager
     }
 
     /**
+     * @return string|null
+     */
+    public function getSubDirectory(): ?string
+    {
+        if (!$this->useSubDirectory) {
+            return null;
+        }
+
+        return $this->subDirectory ?? $this->filesystemName;
+    }
+
+    /**
      * Gets the full path to a file in the Gaufrette file system.
      * This path can be used in the native file functions like "copy", "unlink", etc.
      *
@@ -95,12 +132,36 @@ class FileManager
             throw new ProtocolConfigurationException();
         }
 
-        return sprintf(
-            '%s://%s/%s',
-            $this->protocol,
-            $this->filesystemName,
-            $this->getFileNameWithPrefixDirectory($fileName)
-        );
+        return
+            $this->protocol
+            . '://'
+            . $this->filesystemName
+            . self::DIRECTORY_SEPARATOR
+            . $this->getFileNameWithSubDirectory($fileName);
+    }
+
+    /**
+     * Gets the MIME type of a file in the Gaufrette file system.
+     *
+     * @param string $fileName
+     *
+     * @return string|null The MIME type or NULL if the Gaufrette file system does not support MIME types
+     *                     or cannot recognize MIME type
+     *
+     * @throws FileNotFound if the file does not exist
+     */
+    public function getFileMimeType(string $fileName): ?string
+    {
+        if (!$fileName) {
+            return null;
+        }
+
+        try {
+            return $this->filesystem->mimeType($this->getFileNameWithSubDirectory($fileName)) ?: null;
+        } catch (\LogicException $e) {
+            // the Gaufrette filesystem adapter does support MIME types
+            return null;
+        }
     }
 
     /**
@@ -112,19 +173,20 @@ class FileManager
      */
     public function findFiles(string $prefix = ''): array
     {
-        $result = $this->filesystem->listKeys($this->getFileNameWithPrefixDirectory($prefix));
-        if (!empty($result) && array_key_exists('keys', $result)) {
-            $pathsWithoutPrefixDir = [];
-            $result = $result['keys'];
-            if ($this->getPrefixDirectory()) {
-                foreach ($result as $path) {
-                    $pathsWithoutPrefixDir[] = $this->getFileNameWithoutPrefixDirectory($path);
-                }
-                $result = $pathsWithoutPrefixDir;
-            }
+        $fileNames = $this->filesystem->listKeys($this->getFileNameWithSubDirectory($prefix));
+        if (!empty($fileNames) && \array_key_exists('keys', $fileNames)) {
+            $fileNames = $fileNames['keys'];
         }
 
-        return $result;
+        if ($fileNames && $this->getSubDirectory()) {
+            $fileNamesWithoutSubDirectory = [];
+            foreach ($fileNames as $fileName) {
+                $fileNamesWithoutSubDirectory[] = $this->getFileNameWithoutSubDirectory($fileName);
+            }
+            $fileNames = $fileNamesWithoutSubDirectory;
+        }
+
+        return $fileNames;
     }
 
     /**
@@ -133,12 +195,14 @@ class FileManager
      * @param string $fileName
      *
      * @return bool
-     *
-     * @throws \InvalidArgumentException if the file name is empty string
      */
     public function hasFile(string $fileName): bool
     {
-        return $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName));
+        if (!$fileName) {
+            return false;
+        }
+
+        return $this->filesystem->has($this->getFileNameWithSubDirectory($fileName));
     }
 
     /**
@@ -151,14 +215,18 @@ class FileManager
      * @return File|null
      *
      * @throws FileNotFound if the file does not exist and throw exception is requested
-     * @throws \InvalidArgumentException if the file name is empty string
      */
     public function getFile(string $fileName, bool $throwException = true): ?File
     {
+        if (!$fileName) {
+            return null;
+        }
+
         $file = null;
-        if ($throwException || $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
-            $file = $this->filesystem->get($this->getFileNameWithPrefixDirectory($fileName));
-            $file->setName($this->getFileNameWithoutPrefixDirectory($file->getName()));
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
+        if ($throwException || $this->filesystem->has($fileName)) {
+            $file = $this->filesystem->get($fileName);
+            $file->setName($this->getFileNameWithoutSubDirectory($file->getName()));
         }
 
         return $file;
@@ -173,11 +241,14 @@ class FileManager
      * @return Stream|null
      *
      * @throws FileNotFound if the file does not exist and throw exception is requested
-     * @throws \InvalidArgumentException if the file name is empty string
      */
     public function getStream(string $fileName, bool $throwException = true): ?Stream
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        if (!$fileName) {
+            return null;
+        }
+
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $hasFile = $this->filesystem->has($fileName);
         if (!$hasFile && $throwException) {
             throw new Exception\FileNotFound($fileName);
@@ -199,7 +270,6 @@ class FileManager
      *
      * @throws FileNotFound if the file does not exist and throw exception is requested
      * @throws \RuntimeException if the file cannot be read
-     * @throws \InvalidArgumentException if the file name is empty string
      */
     public function getFileContent(string $fileName, bool $throwException = true): ?string
     {
@@ -213,7 +283,7 @@ class FileManager
     }
 
     /**
-     * Checks whether the given file exists and, if so, deletes it from the Gaufrette file system.
+     * Deletes the given file from the Gaufrette file system if it exists.
      *
      * @param string $fileName
      *
@@ -221,21 +291,79 @@ class FileManager
      */
     public function deleteFile(string $fileName): void
     {
-        if ($fileName && $this->filesystem->has($this->getFileNameWithPrefixDirectory($fileName))) {
-            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
+        if (!$fileName) {
+            return;
+        }
+
+        $realFileName = $this->getFileNameWithSubDirectory($fileName);
+        if ($this->filesystem->has($realFileName) && !$this->filesystem->isDirectory($realFileName)) {
+            $this->filesystem->delete($realFileName);
+
+            // delete all parent directories that do not contain any files or sub-directories
+            $dirName = $this->getDirectoryName($fileName);
+            while ($dirName) {
+                $realDirName = $this->getFileNameWithSubDirectory($dirName);
+                if ($this->filesystem->isDirectory($realDirName) && $this->isDirectoryEmpty($realDirName)) {
+                    $this->deleteDirectory($realDirName);
+                    $dirName = $this->getDirectoryName($dirName);
+                } else {
+                    break;
+                }
+            }
         }
     }
 
     /**
-     * Deletes all files from the Gaufrette file system.
+     * Deletes all files that name beginning with the given prefix from the Gaufrette file system.
+     *
+     * @param string $prefix
      *
      * @throws \RuntimeException if any file cannot be deleted
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function deleteAllFiles(): void
+    public function deleteAllFiles(string $prefix = ''): void
     {
-        $fileNames = $this->findFiles();
+        $hasTailingDirectorySeparator = self::endsWith($prefix, self::DIRECTORY_SEPARATOR);
+        if ($hasTailingDirectorySeparator) {
+            $prefix = rtrim($prefix, self::DIRECTORY_SEPARATOR) . self::DIRECTORY_SEPARATOR;
+        }
+        $realDirName = $this->getFileNameWithSubDirectory($prefix);
+        $listResult = $this->filesystem->listKeys($realDirName);
+        if (empty($listResult)) {
+            return;
+        }
+
+        $fileNames = [];
+        $dirNames = [];
+        $isSimpleList = true;
+        if (\array_key_exists('keys', $listResult)) {
+            $fileNames = $listResult['keys'];
+            $isSimpleList = false;
+        }
+        if (\array_key_exists('dirs', $listResult)) {
+            $dirNames = $listResult['dirs'];
+            $isSimpleList = false;
+        }
+        if ($isSimpleList) {
+            $fileNames = $listResult;
+        }
+
         foreach ($fileNames as $fileName) {
-            $this->filesystem->delete($this->getFileNameWithPrefixDirectory($fileName));
+            $this->filesystem->delete($fileName);
+        }
+        foreach ($dirNames as $dirName) {
+            $this->deleteDirectory($dirName);
+        }
+        if ($hasTailingDirectorySeparator) {
+            $dirName = substr($prefix, 0, -\strlen(self::DIRECTORY_SEPARATOR));
+            if ($dirName) {
+                $dirName = $this->getFileNameWithSubDirectory($dirName);
+                if ($this->filesystem->isDirectory($dirName)) {
+                    $this->deleteDirectory($dirName);
+                }
+            }
         }
     }
 
@@ -252,7 +380,11 @@ class FileManager
      */
     public function writeToStorage(string $content, string $fileName): void
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        if (!$fileName) {
+            throw new \InvalidArgumentException('The file name must not be empty.');
+        }
+
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $dstStream = $this->filesystem->createStream($fileName);
         $dstStream->open(new StreamMode('wb+'));
         try {
@@ -272,13 +404,17 @@ class FileManager
      * @throws FlushFailedException if an error occurred during the flushing data to the destination stream
      * @throws \RuntimeException if the destination stream cannot be opened
      * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
-     * @throws \InvalidArgumentException if the local file path of the file name is empty string
+     * @throws \InvalidArgumentException if the local file path or the file name are empty string
      */
     public function writeFileToStorage(string $localFilePath, string $fileName): void
     {
-        if (empty($localFilePath)) {
-            throw new \InvalidArgumentException('Local path is empty.');
+        if (!$localFilePath) {
+            throw new \InvalidArgumentException('The local path must not be empty.');
         }
+        if (!$fileName) {
+            throw new \InvalidArgumentException('The file name must not be empty.');
+        }
+
         $this->writeStreamToStorage(new LocalStream($localFilePath), $fileName);
     }
 
@@ -298,7 +434,11 @@ class FileManager
      */
     public function writeStreamToStorage(Stream $srcStream, string $fileName, bool $avoidWriteEmptyStream = false): bool
     {
-        $fileName = $this->getFileNameWithPrefixDirectory($fileName);
+        if (!$fileName) {
+            throw new \InvalidArgumentException('The file name must not be empty.');
+        }
+
+        $fileName = $this->getFileNameWithSubDirectory($fileName);
         $srcStream->open(new StreamMode('rb'));
 
         $nonEmptyStream = true;
@@ -356,20 +496,6 @@ class FileManager
         }
 
         return new ComponentFile($tmpFileName, false);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPrefixDirectory(): string
-    {
-        if ($this->pathPrefixDirectory) {
-            $prefix = $this->pathPrefixDirectory;
-        } else {
-            $prefix = $this->filesystemName;
-        }
-
-        return $prefix;
     }
 
     /**
@@ -435,21 +561,6 @@ class FileManager
     }
 
     /**
-     * @param string $fileName
-     *
-     * @return string|null
-     */
-    public function mimeType(string $fileName):? string
-    {
-        try {
-            return $this->filesystem->mimeType($this->getFileNameWithPrefixDirectory($fileName));
-        } catch (\LogicException $e) {
-            // The filesystem adapter does support mimetype.
-            return null;
-        }
-    }
-
-    /**
      * Generates unique file name with the given extension.
      *
      * @param string|null $extension
@@ -479,19 +590,70 @@ class FileManager
         if (!$success) {
             throw new FlushFailedException(sprintf(
                 'Failed to flush data to the "%s" file.',
-                $this->getFileNameWithoutPrefixDirectory($fileName)
+                $this->getFileNameWithoutSubDirectory($fileName)
             ));
         }
     }
 
     /**
+     * Sets a metadata for a file is stored in the Gaufrette file system.
+     *
+     * @param string $fileName
+     * @param array  $content
+     */
+    protected function setFileMetadata(string $fileName, array $content): void
+    {
+        $adapter = $this->filesystem->getAdapter();
+        if ($adapter instanceof MetadataSupporter) {
+            $adapter->setMetadata($this->getFileNameWithSubDirectory($fileName), $content);
+        }
+    }
+
+    /**
+     * Checks if the given directory does not contain any files and sub-directories.
+     *
+     * @param string $realDirName
+     *
+     * @return bool
+     */
+    private function isDirectoryEmpty(string $realDirName): bool
+    {
+        $listResult = $this->filesystem->listKeys($realDirName . self::DIRECTORY_SEPARATOR);
+        if (empty($listResult)) {
+            return true;
+        }
+
+        return \array_key_exists('keys', $listResult) || \array_key_exists('dirs', $listResult)
+            ? empty($listResult['keys']) && empty($listResult['dirs'])
+            : false;
+    }
+
+    /**
+     * Deletes a directory from the Gaufrette file system.
+     *
+     * @param string $realDirName
+     */
+    private function deleteDirectory(string $realDirName): void
+    {
+        // use the adapter due to Filesystem::delete() is able to delete files only
+        $this->filesystem->getAdapter()->delete($realDirName);
+    }
+
+    /**
+     * Gets a directory where the given file is located.
+     *
      * @param string $fileName
      *
      * @return string
      */
-    private function getFileNameWithPrefixDirectory(string $fileName): string
+    private function getDirectoryName(string $fileName): string
     {
-        return sprintf('%s/%s', $this->getPrefixDirectory(), ltrim($fileName, '/'));
+        $normalizedFileName = ltrim($fileName, self::DIRECTORY_SEPARATOR);
+        $lastPos = strrpos($normalizedFileName, self::DIRECTORY_SEPARATOR);
+
+        return false !== $lastPos
+            ? substr($normalizedFileName, 0, $lastPos)
+            : '';
     }
 
     /**
@@ -499,10 +661,41 @@ class FileManager
      *
      * @return string
      */
-    private function getFileNameWithoutPrefixDirectory(string $fileName): string
+    private function getFileNameWithSubDirectory(string $fileName): string
     {
-        $prefixDirectory = $this->getPrefixDirectory();
+        $result = ltrim($fileName, self::DIRECTORY_SEPARATOR);
 
-        return substr($fileName, strlen($prefixDirectory) + 1);
+        $subDirectory = $this->getSubDirectory();
+        if ($subDirectory) {
+            $result = $subDirectory . self::DIRECTORY_SEPARATOR . $result;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return string
+     */
+    private function getFileNameWithoutSubDirectory(string $fileName): string
+    {
+        $subDirectory = $this->getSubDirectory();
+        if ($subDirectory) {
+            return substr($fileName, \strlen($subDirectory) + 1);
+        }
+
+        return $fileName;
+    }
+
+    /**
+     * @param string $haystack
+     * @param string $needle
+     *
+     * @return bool
+     */
+    private static function endsWith(string $haystack, string $needle): bool
+    {
+        return substr($haystack, -\strlen($needle)) === $needle;
     }
 }

@@ -3,9 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FileNameProvider;
 
-class AttachmentFileNameProviderTest extends \PHPUnit\Framework\TestCase
+class FileNameProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetFileName()
     {
@@ -14,7 +14,7 @@ class AttachmentFileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setOriginalFilename('original-filename.jpeg');
         $file->setExtension('jpeg');
 
-        $provider = new AttachmentFileNameProvider();
-        $this->assertSame($file->getFilename(), $provider->getFileName($file));
+        $provider = new FileNameProvider();
+        self::assertSame($file->getFilename(), $provider->getFileName($file));
     }
 }

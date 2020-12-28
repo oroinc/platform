@@ -29,13 +29,12 @@ services:
         alias: oro_attachment.manager
 
     oro_attachment.file_manager:
-        public: true
         class: Oro\Bundle\AttachmentBundle\Manager\FileManager
+        public: true
         parent: oro_gaufrette.file_manager
         arguments:
             - '%oro_attachment.filesystem_name.attachments%'
             - '@oro_attachment.protocol_validator'
-        lazy: true
 
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
@@ -275,7 +274,7 @@ services:
         arguments:
             - '%oro_attachment.filesystem_name.protected_mediacache%'
 
-    oro_attachment.manager.media_cache_manager_registry:
+    oro_attachment.media_cache_manager_registry:
         class: 'Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry'
         arguments:
             - '@oro_attachment.acl.file_access_control_checker'
@@ -321,14 +320,14 @@ services:
         calls:
             - [setLogger, ['@logger']]
 
-    oro_attachment.provider.attachment_file_name_provider:
-        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider
+    oro_attachment.provider.file_name:
+        class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
 
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
             - '@oro_attachment.url_generator'
-            - '@oro_attachment.provider.attachment_file_name_provider'
+            - '@oro_attachment.provider.file_name'
 
     Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface:
         alias: 'oro_attachment.provider.file_url'
@@ -379,7 +378,7 @@ services:
         arguments:
             - '@oro_attachment.provider.resized_image'
             - '@oro_attachment.provider.resized_image_path'
-            - '@oro_attachment.manager.media_cache_manager_registry'
+            - '@oro_attachment.media_cache_manager_registry'
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
 
     oro_attachment.provider.file_icon:
@@ -490,13 +489,13 @@ services:
             - 'public/%oro_attachment.filesystem_dir.mediacache%'
             - '%kernel.project_dir%'
 
-    oro_attachment.message_processor.image_remove:
-        class: Oro\Bundle\AttachmentBundle\MessageProcessor\ImageRemoveMessageProcessor
+    oro_attachment.async.remove_image_processor:
+        class: Oro\Bundle\AttachmentBundle\Async\RemoveImageMessageProcessor
         arguments:
-            - '@logger'
             - '@oro_attachment.manager.image_removal_manager'
+            - '@logger'
         tags:
-            - { name: 'oro_message_queue.client.message_processor' }
+            - { name: oro_message_queue.client.message_processor }
 
     oro_attachment.layout.data_provider.file_applications:
         class: 'Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider'

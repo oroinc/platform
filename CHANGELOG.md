@@ -14,6 +14,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### AttachmentBundle
+* The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
+* The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
+
 #### PlatformBundle
 * The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
   was changed to correspond Symfony recommendations.
