@@ -6,12 +6,12 @@ use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Oro\Bundle\ApiBundle\ApiDoc\Extractor\CachingApiDocExtractor;
 use Oro\Bundle\ApiBundle\Provider\CacheManager;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
+use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
-use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -113,9 +113,9 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
             $apiDocExtractor
         );
 
-        $configCache1 = $this->createMock(ConfigCacheInterface::class);
-        $configCache2 = $this->createMock(ConfigCacheInterface::class);
-        $configCache3 = $this->createMock(ConfigCacheInterface::class);
+        $configCache1 = $this->createMock(ConfigCacheFile::class);
+        $configCache2 = $this->createMock(ConfigCacheFile::class);
+        $configCache3 = $this->createMock(ConfigCacheFile::class);
 
         $this->configCacheFactory->expects(self::exactly(3))
             ->method('getCache')
@@ -168,9 +168,9 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         );
 
         $configCaches = [
-            'api1' => $this->createMock(ConfigCacheInterface::class),
-            'api2' => $this->createMock(ConfigCacheInterface::class),
-            'api3' => $this->createMock(ConfigCacheInterface::class)
+            'api1' => $this->createMock(ConfigCacheFile::class),
+            'api2' => $this->createMock(ConfigCacheFile::class),
+            'api3' => $this->createMock(ConfigCacheFile::class)
         ];
 
         $this->configCacheFactory->expects(self::exactly(3))
@@ -231,9 +231,9 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
             $apiDocExtractor
         );
 
-        $configCache1 = $this->createMock(ConfigCacheInterface::class);
-        $configCache2 = $this->createMock(ConfigCacheInterface::class);
-        $configCache3 = $this->createMock(ConfigCacheInterface::class);
+        $configCache1 = $this->createMock(ConfigCacheFile::class);
+        $configCache2 = $this->createMock(ConfigCacheFile::class);
+        $configCache3 = $this->createMock(ConfigCacheFile::class);
 
         $this->configCacheFactory->expects(self::exactly(3))
             ->method('getCache')

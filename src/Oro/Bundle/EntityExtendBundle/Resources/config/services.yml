@@ -612,8 +612,8 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate
         public: true
         arguments:
-            - ~ # link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
-            - ~ # link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
+            - ~ # a link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass
+            - ~ # a link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass
             - '@oro_entity.database_checker.state_manager'
 
     oro_entity_extend.cache_warmer:

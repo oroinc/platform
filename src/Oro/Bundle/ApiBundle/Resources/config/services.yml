@@ -279,6 +279,8 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/api'
             - '%kernel.debug%'
+        calls:
+            - [setConfigCacheWarmer, ['@oro_api.config_cache_warmer']]
 
     oro_api.config_cache_warmer:
         class: Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer

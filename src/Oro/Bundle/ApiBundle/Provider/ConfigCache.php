@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
-use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
@@ -20,13 +19,10 @@ class ConfigCache implements ConfigCacheStateInterface
     /** @var ConfigCacheFactory */
     private $configCacheFactory;
 
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
-
     /** @var array|null */
     private $data;
 
-    /** @var ConfigCacheInterface|null */
+    /** @var ConfigCacheFile|null */
     private $cache;
 
     /**
@@ -35,7 +31,7 @@ class ConfigCache implements ConfigCacheStateInterface
      * * NULL if cache file does not exist
      * * an integer for the timestamp of existing cache file
      */
-    private $cacheTimestamp;
+    private $cacheTimestamp = false;
 
     /** @var bool|null */
     private $cacheFresh;
@@ -44,7 +40,7 @@ class ConfigCache implements ConfigCacheStateInterface
      * @param string             $configKey
      * @param bool               $debug
      * @param ConfigCacheFactory $configCacheFactory
-     * @param ConfigCacheWarmer  $configCacheWarmer
+     * @param ConfigCacheWarmer  $configCacheWarmer deprecated since v4.2, kept to avoid BC break
      */
     public function __construct(
         string $configKey,
@@ -55,7 +51,6 @@ class ConfigCache implements ConfigCacheStateInterface
         $this->configKey = $configKey;
         $this->debug = $debug;
         $this->configCacheFactory = $configCacheFactory;
-        $this->configCacheWarmer = $configCacheWarmer;
     }
 
     /**
@@ -139,16 +134,13 @@ class ConfigCache implements ConfigCacheStateInterface
      */
     public function getCacheTimestamp(): ?int
     {
-        if (null === $this->cacheTimestamp) {
+        if (false === $this->cacheTimestamp) {
             $cacheTimestamp = null;
             $cacheFile = $this->getCache()->getPath();
-            if (\file_exists($cacheFile)) {
-                $cacheTimestamp = \filemtime($cacheFile);
+            if (file_exists($cacheFile)) {
+                $cacheTimestamp = filemtime($cacheFile);
                 if (false === $cacheTimestamp) {
-                    throw new IOException(\sprintf(
-                        'Cannot get modification time for "%s" file.',
-                        $cacheFile
-                    ));
+                    throw new IOException(sprintf('Cannot get modification time for "%s" file.', $cacheFile));
                 }
             }
             $this->cacheTimestamp = $cacheTimestamp;
@@ -179,14 +171,14 @@ class ConfigCache implements ConfigCacheStateInterface
             $cache = $this->getCache();
             $cacheFile = $cache->getPath();
             if (!$cache->isFresh()) {
-                $overrideExistingCacheFile = $this->debug && \file_exists($cacheFile);
+                $overrideExistingCacheFile = $this->debug && file_exists($cacheFile);
 
-                $this->configCacheWarmer->warmUp($this->configKey);
+                $cache->warmUpCache();
                 $this->cacheTimestamp = false;
                 $this->cacheFresh = null;
 
                 if ($overrideExistingCacheFile) {
-                    \clearstatcache(false, $cacheFile);
+                    clearstatcache(false, $cacheFile);
                 }
             }
 
@@ -201,9 +193,9 @@ class ConfigCache implements ConfigCacheStateInterface
     }
 
     /**
-     * @return ConfigCacheInterface
+     * @return ConfigCacheFile
      */
-    private function getCache(): ConfigCacheInterface
+    private function getCache(): ConfigCacheFile
     {
         if (null === $this->cache) {
             $this->cache = $this->configCacheFactory->getCache($this->configKey);

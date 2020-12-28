@@ -10,13 +10,13 @@ class EntityExtendUpdateResultTest extends \PHPUnit\Framework\TestCase
     {
         $result = new EntityExtendUpdateResult(true);
         self::assertTrue($result->isSuccessful());
-        self::assertNull($result->getFailedMessage());
+        self::assertNull($result->getFailureMessage());
     }
 
     public function testFailureResult()
     {
         $result = new EntityExtendUpdateResult(false, 'some error');
         self::assertFalse($result->isSuccessful());
-        self::assertEquals('some error', $result->getFailedMessage());
+        self::assertEquals('some error', $result->getFailureMessage());
     }
 }
