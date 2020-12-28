@@ -108,7 +108,7 @@ entity_config:
                         options:
                             choices:
                                 oro.entity_config.field_config.filter_by.exact_value.label: exact_value
-                                oro.entity_config.field_config.filter_by.fuzzy_search.label: fuzzy_search
+                                oro.entity_config.field_config.filter_by.fulltext_search.label: fulltext_search
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filter_by.label
