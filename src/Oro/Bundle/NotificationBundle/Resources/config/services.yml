@@ -181,7 +181,7 @@ services:
             - '@oro_notification.manager.template_email.mass'
             - '@oro_entity.doctrine_helper'
 
-    oro_notification.async.send_email_message_processor:
+    oro_notification.async.send_email_processor:
         class: Oro\Bundle\NotificationBundle\Async\SendEmailMessageProcessor
         arguments:
             - '@oro_email.direct_mailer'
@@ -193,7 +193,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor', topicName: oro.notification.send_notification_email }
 
-    oro_notification.async.send_mass_email_message_processor:
+    oro_notification.async.send_mass_email_processor:
         class: Oro\Bundle\NotificationBundle\Async\SendMassEmailMessageProcessor
         arguments:
             - '@oro_email.direct_mailer'

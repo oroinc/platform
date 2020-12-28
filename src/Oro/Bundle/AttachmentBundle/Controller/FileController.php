@@ -6,7 +6,6 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
-use Oro\Bundle\AttachmentBundle\Provider\AttachmentFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -65,7 +64,6 @@ class FileController extends AbstractController
      * @param int    $width
      * @param int    $height
      * @param string $filename
-     * @param Request $request
      *
      * @return Response
      */
@@ -90,7 +88,6 @@ class FileController extends AbstractController
      * @param int    $id
      * @param string $filter
      * @param string $filename
-     * @param Request $request
      *
      * @return Response
      */
@@ -121,7 +118,7 @@ class FileController extends AbstractController
             || (
                 $fileName !== $file->getFilename()
                 && $fileName !== $file->getOriginalFilename()
-                && $fileName !== $this->getAttachmentFileNameProvider()->getFileName($file)
+                && $fileName !== $this->getFileNameProvider()->getFileName($file)
             )) {
             throw $this->createNotFoundException('File not found');
         }
@@ -151,9 +148,9 @@ class FileController extends AbstractController
         return $this->get('oro_attachment.manager.image_resize');
     }
 
-    private function getAttachmentFileNameProvider(): FileNameProviderInterface
+    private function getFileNameProvider(): FileNameProviderInterface
     {
-        return $this->get('oro_attachment.provider.attachment_file_name_provider');
+        return $this->get('oro_attachment.provider.file_name');
     }
 
     /**
@@ -170,9 +167,9 @@ class FileController extends AbstractController
     public static function getSubscribedServices()
     {
         return array_merge(parent::getSubscribedServices(), [
-            'oro_attachment.file_manager'                           => FileManager::class,
-            'oro_attachment.manager.image_resize'                   => ImageResizeManager::class,
-            'oro_attachment.provider.attachment_file_name_provider' => AttachmentFileNameProvider::class
+            'oro_attachment.file_manager'         => FileManager::class,
+            'oro_attachment.manager.image_resize' => ImageResizeManager::class,
+            'oro_attachment.provider.file_name'   => FileNameProviderInterface::class
         ]);
     }
 }

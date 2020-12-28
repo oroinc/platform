@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\AttachmentBundle\MessageProcessor;
+namespace Oro\Bundle\AttachmentBundle\Async;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManagerInterface;
+use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -16,32 +16,26 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Removes product image files and directories when removing product images
+ * Removes image files related to removed attachment related entities.
  */
-class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const IMAGE_REMOVE_TOPIC = 'oro_attachment.remove_image';
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var ImageRemovalManagerInterface
-     */
+    /** @var FileRemovalManagerInterface */
     private $imageRemovalManager;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
-     * @param LoggerInterface $logger
-     * @param ImageRemovalManagerInterface $imageRemovalManager
+     * @param FileRemovalManagerInterface $imageRemovalManager
+     * @param LoggerInterface             $logger
      */
     public function __construct(
-        LoggerInterface $logger,
-        ImageRemovalManagerInterface $imageRemovalManager
+        FileRemovalManagerInterface $imageRemovalManager,
+        LoggerInterface $logger
     ) {
-        $this->logger = $logger;
         $this->imageRemovalManager = $imageRemovalManager;
+        $this->logger = $logger;
     }
 
     /**
@@ -49,7 +43,7 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     public static function getSubscribedTopics()
     {
-        return [self::IMAGE_REMOVE_TOPIC];
+        return [Topics::ATTACHMENT_REMOVE_IMAGE];
     }
 
     /**
@@ -79,7 +73,7 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
 
                 /** @var File $file */
                 $file = $this->getFile($fileId, $fileName, $originalFileName, $parentEntityClass);
-                $this->imageRemovalManager->removeImageWithVariants($file);
+                $this->imageRemovalManager->removeFiles($file);
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf('Unable to remove image %s', $fileName),
@@ -94,7 +88,7 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
     /**
      * @return OptionsResolver
      */
-    protected function getOptionsResolver()
+    private function getOptionsResolver(): OptionsResolver
     {
         $resolver = new OptionsResolver();
         $resolver->setRequired([
@@ -115,13 +109,14 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
     }
 
     /**
-     * @param int $id
+     * @param int    $id
      * @param string $filename
      * @param string $originalFileName
      * @param string $parentEntityClass
+     *
      * @return File
      */
-    private function getFile(int $id, string $filename, string $originalFileName, string $parentEntityClass)
+    private function getFile(int $id, string $filename, string $originalFileName, string $parentEntityClass): File
     {
         $file = new FileModel();
         $file->setId($id);
