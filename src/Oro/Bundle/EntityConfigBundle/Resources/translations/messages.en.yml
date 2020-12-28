@@ -104,7 +104,7 @@ oro:
             records_count.label: Number of records
             filter_by:
                 exact_value.label: Exact value
-                fuzzy_search.label: Fuzzy search
+                fulltext_search.label: Fulltext search
 
         info:
             new_field.label:     New Field
