@@ -6,7 +6,6 @@ define(function(require) {
      */
     const BaseView = require('oroui/js/app/views/base/view');
     const $ = require('jquery');
-    const _ = require('underscore');
 
     const LoadingBarView = BaseView.extend({
         autoRender: true,
@@ -90,7 +89,7 @@ define(function(require) {
             this.active = true;
         },
 
-        hideLoader: function() {
+        hideLoader: function(callback) {
             if (!this.active) {
                 return;
             }
@@ -98,13 +97,20 @@ define(function(require) {
             const loaderWidth = this.$el.width();
 
             this.$el.width(loaderWidth).css({animation: 'none'}).width('100%');
-            this.$el.delay(200).fadeOut(300, _.bind(function() {
+            this.$el.delay(200).fadeOut(300, () => {
                 this.$el.css({
                     width: '',
                     animation: ''
                 });
-            }, this));
+                if (callback) {
+                    callback();
+                }
+            });
             this.active = false;
+        },
+
+        setProgress(percentNumber) {
+            this.$el.width(`${percentNumber}%`);
         },
 
         dispose: function() {
