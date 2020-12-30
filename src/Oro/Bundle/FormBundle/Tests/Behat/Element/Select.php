@@ -3,11 +3,42 @@
 namespace Oro\Bundle\FormBundle\Tests\Behat\Element;
 
 use Behat\Mink\Element\NodeElement;
+use Behat\Mink\Selector\Xpath\Escaper;
+use Behat\Mink\Session;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use WebDriver\Exception\StaleElementReference;
 
+/**
+ * Select control that treats text of selected option as value
+ * (checks what user sees on UI)
+ */
 class Select extends Element
 {
+    /**
+     * @var Escaper
+     */
+    private $xpathEscaper;
+
+    /**
+     * @param Session $session
+     * @param OroElementFactory $elementFactory
+     * @param array|string $selector
+     */
+    public function __construct(
+        Session $session,
+        OroElementFactory $elementFactory,
+        $selector = ['type' => 'xpath', 'locator' => '/html/body']
+    ) {
+        $this->xpathEscaper = new Escaper();
+
+        parent::__construct(
+            $session,
+            $elementFactory,
+            $selector
+        );
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -54,5 +85,25 @@ class Select extends Element
     public function getSelectedOption()
     {
         return $this->find('css', 'option[selected]');
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getValue()
+    {
+        $text = null;
+
+        $value = parent::getValue();
+
+        $escapedValue = $this->xpathEscaper->escapeLiteral($value);
+        $optionQuery = sprintf('.//option[@value = %s or normalize-space(.) = %1$s]', $escapedValue);
+        $option = $this->find('xpath', $optionQuery);
+
+        if (null !== $option) {
+            $text = $option->getText();
+        }
+
+        return $text;
     }
 }
