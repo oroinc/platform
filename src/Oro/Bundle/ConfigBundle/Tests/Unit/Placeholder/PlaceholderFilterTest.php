@@ -43,4 +43,28 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
             [null, false]
         ];
     }
+
+    /**
+     * @dataProvider isDisabledDataProvider
+     */
+    public function testIsDisabled($configValue, bool $expectedResult): void
+    {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with('test_config_option')
+            ->willReturn($configValue);
+
+        self::assertSame($expectedResult, $this->filter->isDisabled('test_config_option'));
+    }
+
+    public function isDisabledDataProvider(): array
+    {
+        return [
+            [true, false],
+            [false, true],
+            [1, false],
+            [0, true],
+            [null, true]
+        ];
+    }
 }

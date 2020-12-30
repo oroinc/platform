@@ -13,12 +13,12 @@ Feature: Switching between transport types in settings
     And I fill form with:
       | Type | Test Channel |
     Then "Integration Channel Form" must contains values:
-      | Transport type    | test_transport_1 |
+      | Transport type    | Test Transport 1 |
       | Transport 1 Field |                  |
     And I fill form with:
-      | Transport type    | test_transport_2 |
+      | Transport type    | Test Transport 2 |
     Then "Integration Channel Form" must contains values:
-      | Transport type    | test_transport_2 |
+      | Transport type    | Test Transport 2 |
       | Transport 2 Field |                  |
     And I should not see "Transport 1 Field"
     When I save and close form
@@ -31,13 +31,13 @@ Feature: Switching between transport types in settings
     When I click edit "IntegrationName" in grid
     Then "Integration Channel Form" must contains values:
       | Name              | IntegrationName  |
-      | Transport type    | test_transport_2 |
+      | Transport type    | Test Transport 2 |
       | Transport 2 Field |                  |
     And I should not see "Transport 1 Field"
     And I fill form with:
-      | Transport type    | test_transport_1 |
+      | Transport type    | Test Transport 1 |
     Then "Integration Channel Form" must contains values:
-      | Transport type    | test_transport_1 |
+      | Transport type    | Test Transport 1 |
       | Transport 1 Field |                  |
     And I should not see "Transport 2 Field"
     When I save and close form
@@ -45,6 +45,6 @@ Feature: Switching between transport types in settings
     When I click edit "IntegrationName" in grid
     Then "Integration Channel Form" must contains values:
       | Name              | IntegrationName  |
-      | Transport type    | test_transport_1 |
+      | Transport type    | Test Transport 1 |
       | Transport 1 Field |                  |
     And I should not see "Transport 2 Field"

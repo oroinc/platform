@@ -271,7 +271,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         }
     };
 
-    $(document).on('click', '.add-list-item', function(e) {
+    $(document).on('click add-rows', '.add-list-item', function(e) {
         e.preventDefault();
         if ($(this).attr('disabled')) {
             return;
@@ -282,7 +282,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools'
         if ($(this).data('row-add-only-one')) {
             $(this).removeData('row-add-only-one');
         } else {
-            rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+            rowCountAdd = e.count || $(containerSelector).data('row-count-add') || 1;
         }
 
         const rowsHtml = generateOroCollectionRows($listContainer, rowCountAdd);
