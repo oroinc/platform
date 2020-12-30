@@ -71,7 +71,7 @@ class EntityFieldWriter implements ItemWriterInterface
     {
         $className = $configModel->getEntity()->getClassName();
         $fieldName = $configModel->getFieldName();
-        $state = ExtendScope::STATE_ACTIVE;
+        $state = $this->getFieldModelState($configModel);
 
         if (!$this->configManager->hasConfig($className, $fieldName)) {
             $this->configManager->createConfigFieldModel($className, $fieldName, $configModel->getType());
@@ -104,6 +104,18 @@ class EntityFieldWriter implements ItemWriterInterface
         }
 
         return $translations;
+    }
+
+    /**
+     * @param FieldConfigModel $fieldConfigModel
+     *
+     * @return string
+     */
+    private function getFieldModelState(FieldConfigModel $fieldConfigModel): string
+    {
+        $extendConfig = $fieldConfigModel->toArray('extend');
+
+        return array_key_exists('state', $extendConfig) ? $extendConfig['state'] : ExtendScope::STATE_ACTIVE;
     }
 
     /**
