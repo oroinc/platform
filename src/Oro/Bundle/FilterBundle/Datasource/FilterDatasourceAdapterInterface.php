@@ -5,7 +5,7 @@ namespace Oro\Bundle\FilterBundle\Datasource;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
- * Allows a filter to modify a data source
+ * Represents an adapter that allows a filter to modify a data source.
  */
 interface FilterDatasourceAdapterInterface
 {
@@ -45,7 +45,7 @@ interface FilterDatasourceAdapterInterface
     public function addGroupBy($_);
 
     /**
-     * Gets an expression builder object used for object-oriented construction of datasource restrictions
+     * Gets an expression builder object used for object-oriented construction of datasource restrictions.
      *
      * @return ExpressionBuilderInterface
      */
@@ -54,24 +54,26 @@ interface FilterDatasourceAdapterInterface
     /**
      * Sets a parameter for a data source being constructed.
      *
-     * @param string|integer $key   The parameter position or name.
-     * @param mixed          $value The parameter value.
-     * @param string|null    $type  The parameter type.
+     * @param string|int  $key   The parameter position or name.
+     * @param mixed       $value The parameter value.
+     * @param string|null $type  The parameter type.
      */
     public function setParameter($key, $value, $type = null);
 
     /**
-     * Generates unique parameter name
+     * Generates an unique parameter name.
      *
-     * @param string $filterName A filter name
+     * @param string $filterName
+     *
      * @return string
      */
     public function generateParameterName($filterName);
 
     /**
-     * Get field by alias
+     * Gets a field by its alias.
      *
      * @param string $fieldName
+     *
      * @return string
      */
     public function getFieldByAlias($fieldName);

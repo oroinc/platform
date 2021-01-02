@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * The filter by a percentage value or a percentage of monetary values for a datasource based on a search index.
+ */
 class SearchPercentFilter extends SearchNumberRangeFilter
 {
     /**
@@ -21,10 +24,17 @@ class SearchPercentFilter extends SearchNumberRangeFilter
     /**
      * {@inheritDoc}
      */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function parseData($data)
     {
         $data = parent::parseData($data);
-
         if ($data) {
             $valueKeys = ['value', 'value_end'];
             foreach ($valueKeys as $key) {

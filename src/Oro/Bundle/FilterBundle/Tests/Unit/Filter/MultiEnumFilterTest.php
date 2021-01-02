@@ -15,20 +15,19 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
 class MultiEnumFilterTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var MockObject */
-    protected $formFactory;
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
 
     /** @var MultiEnumFilter */
-    protected $filter;
+    private $filter;
 
     protected function setUp(): void
     {
@@ -40,80 +39,94 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-            ]
-        );
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
+        ]);
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
-        /** @var ManagerRegistry|MockObject $doctrine */
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-        $doctrine->expects(static::any())->method('getManagerForClass')->willReturn($this->em);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
 
         $manyRelationBuilder = new ManyRelationBuilder();
         $manyRelationBuilder->addBuilder(new OrmManyRelationBuilder($doctrine));
 
-        $this->filter = new class(
+        $this->filter = new MultiEnumFilter(
             $this->formFactory,
             new FilterUtility(),
             $manyRelationBuilder
-        ) extends MultiEnumFilter {
-            public function xgetParams(): array
-            {
-                return $this->params;
-            }
-        };
+        );
     }
 
     public function testInit()
     {
         $this->filter->init('test', []);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithNullValue()
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'null_value' => ':empty:',
                 'options' => []
             ],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithClass()
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options' => [
                     'class' => 'Test\EnumValue'
                 ]
             ],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithEnumCode()
     {
         $this->filter->init('test', ['enum_code' => 'test_enum']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
                 'options' => [
                     'enum_code' => 'test_enum'
                 ]
             ],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
@@ -121,20 +134,16 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $form = $this->createMock(FormInterface::class);
 
-        $this->formFactory->expects(static::once())
+        $this->formFactory->expects(self::once())
             ->method('create')
             ->with(EnumFilterType::class)
             ->willReturn($form);
 
-        static::assertSame($form, $this->filter->getForm());
+        self::assertSame($form, $this->filter->getForm());
     }
 
     /**
      * @dataProvider applyDataProvider
-     *
-     * @param array $values
-     * @param mixed $comparisonType
-     * @param string $expectedDQL
      */
     public function testApply(array $values, $comparisonType, string $expectedDQL)
     {
@@ -153,25 +162,22 @@ class MultiEnumFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|MockObject $ds */
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
             ->getMock();
 
-        $ds->expects(static::any())
+        $ds->expects(self::any())
             ->method('generateParameterName')
             ->willReturn('param1');
 
         $this->filter->apply($ds, $data);
 
-        static::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
-        static::assertEquals($values, $qb->getParameter('param1')->getValue());
+        self::assertEquals($expectedDQL, $qb->getQuery()->getDQL());
+        self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
-    /**
-     * @return array
-     */
     public function applyDataProvider(): array
     {
         return [
@@ -241,5 +247,11 @@ class MultiEnumFilterTest extends OrmTestCase
                     . ' WHERE filter_param1_rel IN(:param1))',
             ]
         ];
+    }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
     }
 }

@@ -8,7 +8,11 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Component\Exception\UnexpectedTypeException;
 
+/**
+ * The filter by an enum entity for a datasource based on a search index.
+ */
 class SearchEnumFilter extends EnumFilter
 {
     /**
@@ -27,10 +31,18 @@ class SearchEnumFilter extends EnumFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
-            throw new \RuntimeException('Invalid filter datasource adapter provided: ' . get_class($ds));
+            throw new UnexpectedTypeException($ds, SearchFilterDatasourceAdapter::class);
         }
 
         return $this->applyRestrictions($ds, $data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**

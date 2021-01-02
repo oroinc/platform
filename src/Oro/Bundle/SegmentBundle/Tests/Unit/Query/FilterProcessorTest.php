@@ -5,13 +5,13 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\SegmentBundle\Query\FilterProcessor;
 
 class FilterProcessorTest extends OrmQueryConverterTest
 {
-    /** @var RestrictionBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var RestrictionBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $restrictionBuilder;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -20,7 +20,7 @@ class FilterProcessorTest extends OrmQueryConverterTest
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
-        $this->restrictionBuilder = $this->createMock(RestrictionBuilder::class);
+        $this->restrictionBuilder = $this->createMock(RestrictionBuilderInterface::class);
     }
 
     public function testConvertQueryDesignerFilters()

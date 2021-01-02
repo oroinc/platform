@@ -7,13 +7,11 @@ aliases:
     oro/filter/datetime-filter$: orofilter/js/filter/datetime-filter
     oro/filter/dictionary-filter$: orofilter/js/filter/dictionary-filter
     oro/filter/empty-filter$: orofilter/js/filter/empty-filter
-    oro/filter/many-to-many-filter$: orofilter/js/filter/many-to-many-filter
     oro/filter/multiselect-filter$: orofilter/js/filter/multiselect-filter
     oro/filter/none-filter$: orofilter/js/filter/none-filter
     oro/filter/number-filter$: orofilter/js/filter/number-filter
     oro/filter/number-range-filter$: orofilter/js/filter/number-range-filter
     oro/filter/select-filter$: orofilter/js/filter/select-filter
-    oro/filter/select-row-filter$: orofilter/js/filter/select-row-filter
     oro/filter/text-filter$: orofilter/js/filter/text-filter
 configs:
     orofilter/js/datafilter-builder: {}
@@ -37,11 +35,9 @@ dynamic-imports:
         - oro/filter/datetime-filter
         - oro/filter/dictionary-filter
         - oro/filter/empty-filter
-        - oro/filter/many-to-many-filter
         - oro/filter/multiselect-filter
         - oro/filter/none-filter
         - oro/filter/number-filter
         - oro/filter/number-range-filter
         - oro/filter/select-filter
-        - oro/filter/select-row-filter
         - oro/filter/text-filter
