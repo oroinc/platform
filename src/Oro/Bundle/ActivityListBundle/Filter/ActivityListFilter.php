@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Filter;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
@@ -16,19 +17,24 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Provides activity list filter by creating query builder based on values passed to filter form fields.
+ * The filter by an activity list.
  */
 class ActivityListFilter extends EntityFilter
 {
     const TYPE_HAS_ACTIVITY = 'hasActivity';
     const TYPE_HAS_NOT_ACTIVITY = 'hasNotActivity';
+
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
 
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
@@ -57,16 +63,22 @@ class ActivityListFilter extends EntityFilter
     /**
      * @param FormFactoryInterface      $factory
      * @param FilterUtility             $util
+     * @param ManagerRegistry           $doctrine
+     * @param FilterExecutionContext    $filterExecutionContext
      * @param ActivityAssociationHelper $activityAssociationHelper
      * @param ActivityListChainProvider $activityListChainProvider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param EntityRoutingHelper       $entityRoutingHelper
      * @param QueryDesignerManager      $queryDesignerManager
      * @param ServiceLink               $datagridHelperLink
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
+        ManagerRegistry $doctrine,
+        FilterExecutionContext $filterExecutionContext,
         ActivityAssociationHelper $activityAssociationHelper,
         ActivityListChainProvider $activityListChainProvider,
         ActivityListFilterHelper $activityListFilterHelper,
@@ -74,7 +86,8 @@ class ActivityListFilter extends EntityFilter
         QueryDesignerManager $queryDesignerManager,
         ServiceLink $datagridHelperLink
     ) {
-        parent::__construct($factory, $util);
+        parent::__construct($factory, $util, $doctrine);
+        $this->filterExecutionContext = $filterExecutionContext;
         $this->activityAssociationHelper = $activityAssociationHelper;
         $this->activityListChainProvider = $activityListChainProvider;
         $this->activityListFilterHelper = $activityListFilterHelper;
@@ -108,15 +121,12 @@ class ActivityListFilter extends EntityFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            throw new UnexpectedTypeException($ds, OrmFilterDatasourceAdapter::class);
+        }
+
         $this->activityAlias = $ds->generateParameterName('r');
         $this->activityListAlias = $ds->generateParameterName('a');
-
-        if (!$ds instanceof OrmFilterDatasourceAdapter) {
-            throw new \LogicException(sprintf(
-                '"Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter" expected but "%s" given.',
-                get_class($ds)
-            ));
-        }
 
         $type = $data['filterType'];
         unset($data['filterType']);
@@ -339,13 +349,9 @@ class ActivityListFilter extends EntityFilter
             [FilterUtility::DATA_NAME_KEY => $field]
         );
 
-        $form = $filter->getForm();
-        if (!$form->isSubmitted()) {
-            $form->submit($data);
-        }
-
-        if ($form->isValid()) {
-            $filter->apply($ds, $form->getData());
+        $normalizedData = $this->filterExecutionContext->normalizedFilterData($filter, $data);
+        if (null !== $normalizedData) {
+            $filter->apply($ds, $normalizedData);
         }
     }
 
@@ -354,7 +360,7 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getEntityAlias()
     {
-        list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+        [$alias] = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
         QueryBuilderUtil::checkIdentifier($alias);
 
         return $alias;

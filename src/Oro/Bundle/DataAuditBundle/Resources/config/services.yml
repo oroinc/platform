@@ -5,6 +5,8 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@doctrine'
+            - '@oro_filter.execution_context'
             - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit }

@@ -13,24 +13,23 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
 
 class DictionaryFilterTest extends OrmTestCase
 {
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
-    /** @var MockObject */
-    protected $formFactory;
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formFactory;
 
     /** @var DictionaryFilter */
-    protected $filter;
+    private $filter;
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
+        $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
             'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
@@ -38,57 +37,72 @@ class DictionaryFilterTest extends OrmTestCase
 
         $this->em = $this->getTestEntityManager();
         $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-            ]
-        );
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
+        ]);
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $doctrine = $this->getMockBuilder(ManagerRegistry::class)->disableOriginalConstructor()->getMock();
-        $doctrine->method('getManagerForClass')->willReturn($this->em);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
 
-        $this->filter = new class($this->formFactory, new FilterUtility()) extends DictionaryFilter {
-            public function xgetParams(): array
-            {
-                return $this->params;
-            }
-        };
+        $this->filter = new DictionaryFilter($this->formFactory, new FilterUtility());
     }
 
     public function testInit()
     {
         $this->filter->init('test', []);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithNullValue()
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'null_value' => ':empty:', 'options' => []],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithClass()
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['class' => 'Test\EnumValue']],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
     public function testInitWithDictionaryCode()
     {
         $this->filter->init('test', ['dictionary_code' => 'test_dictionary']);
-        static::assertEquals(
+
+        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
+        $paramsProperty->setAccessible(true);
+        $params = $paramsProperty->getValue($this->filter);
+
+        self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['dictionary_code' => 'test_dictionary']],
-            $this->filter->xgetParams()
+            $params
         );
     }
 
@@ -96,15 +110,12 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $form = $this->createMock(FormInterface::class);
 
-        $this->formFactory->expects(static::once())
+        $this->formFactory->expects(self::once())
             ->method('create')
             ->with(DictionaryFilterType::class)
             ->willReturn($form);
 
-        static::assertSame(
-            $form,
-            $this->filter->getForm()
-        );
+        self::assertSame($form, $this->filter->getForm());
     }
 
     public function testApply()
@@ -127,19 +138,21 @@ class DictionaryFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|MockObject $ds */
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
             ->getMock();
-        $ds->method('generateParameterName')->willReturn('param1');
+        $ds->expects(self::once())
+            ->method('generateParameterName')
+            ->willReturn('param1');
 
         $this->filter->apply($ds, $data);
 
         $result = $qb->getQuery()->getDQL();
 
-        static::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)', $result);
-        static::assertEquals($values, $qb->getParameter('param1')->getValue());
+        self::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)', $result);
+        self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
     public function testApplyNot()
@@ -163,19 +176,27 @@ class DictionaryFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|MockObject $ds */
+        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
             ->getMock();
 
-        $ds->method('generateParameterName')->willReturn('param1');
+        $ds->expects(self::once())
+            ->method('generateParameterName')
+            ->willReturn('param1');
 
         $this->filter->apply($ds, $data);
 
         $result = $qb->getQuery()->getDQL();
 
-        static::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)', $result);
-        static::assertEquals($values, $qb->getParameter('param1')->getValue());
+        self::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)', $result);
+        self::assertEquals($values, $qb->getParameter('param1')->getValue());
+    }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
     }
 }

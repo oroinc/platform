@@ -17,13 +17,7 @@ services:
         arguments:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_config.manager'
-
-    oro_query_designer.filter.conditions_group:
-        class: Oro\Bundle\QueryDesignerBundle\Filter\ConditionsGroupFilter
-        arguments:
-            - '@oro_query_designer.query_designer.restriction_builder'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: conditions_group }
+            - '@oro_filter.execution_context'
 
     oro_query_designer.config.resolver:
         class: Oro\Bundle\QueryDesignerBundle\QueryDesigner\ConfigurationResolver
@@ -105,6 +99,7 @@ services:
     oro_query_designer.validator.query_validator:
         class: Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
         arguments:
+            - '@oro_filter.execution_context'
             - '@oro_datagrid.configuration.provider.chain'
             - '@oro_datagrid.datagrid.builder'
             - '@oro_entity.doctrine_helper'

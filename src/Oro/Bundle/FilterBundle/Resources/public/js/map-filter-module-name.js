@@ -6,7 +6,6 @@ define(function() {
         'string': 'choice',
         'choice': 'select',
         'single_choice': 'select',
-        'selectrow': 'select-row',
         'multichoice': 'multiselect',
         'boolean': 'boolean',
         'duplicate': 'select',
