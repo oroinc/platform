@@ -69,23 +69,23 @@ define(function(require) {
             const self = this;
 
             // if the container catches content changed event -- updates its layout
-            this.$el.on('content:changed' + this.eventNamespace, _.bind(function(e) {
-                if (e.isDefaultPrevented()) {
+            this.$el.on('content:changed' + this.eventNamespace, event => {
+                if (event.isDefaultPrevented()) {
                     return;
                 }
-                e.preventDefault();
+                event.preventDefault();
                 this.init(this.initOptions).done(function() {
-                    $(e.target).trigger('content:initialized');
+                    $(event.target).trigger('content:initialized');
                 });
-            }, this));
+            });
 
             // if the container catches content remove event -- disposes related components
-            this.$el.on('content:remove' + this.eventNamespace, function(e) {
-                if (e.isDefaultPrevented()) {
+            this.$el.on('content:remove' + this.eventNamespace, event => {
+                if (event.isDefaultPrevented()) {
                     return;
                 }
-                e.preventDefault();
-                $(e.target).find('[data-bound-component]').each(function() {
+                event.preventDefault();
+                $(event.target).find('[data-bound-component]').each(function() {
                     const el = this;
                     _.each(self.components, function(item) {
                         if (item.el === el) {

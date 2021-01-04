@@ -35,6 +35,10 @@ rules:
   no-loop-func: 'error'
   no-eval: 'error'
   no-undef: 'error'
+  no-unused-vars:
+    - 'error'
+    - ignoreRestSiblings: true
+      args: 'none'
   operator-linebreak:
     - 'error'
     - 'after'
