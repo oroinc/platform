@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
- * Default implementation of file path provider that assumes that image path is the same as absolute URL path.
+ * The file path provider that assumes that an image path is the same as absolute URL path.
  */
 class ResizedImagePathProvider implements ResizedImagePathProviderInterface
 {
@@ -23,25 +23,30 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPathForResizedImage(
-        File $entity,
-        int $width,
-        int $height
-    ): string {
-        $imageUrl = $this->fileUrlProvider->getResizedImageUrl($entity, $width, $height);
-
-        return '/' . ltrim($imageUrl, '/');
+    public function getPathForResizedImage(File $entity, int $width, int $height): string
+    {
+        return $this->normalizePath(
+            $this->fileUrlProvider->getResizedImageUrl($entity, $width, $height)
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPathForFilteredImage(
-        File $entity,
-        string $filterName
-    ): string {
-        $imageUrl = $this->fileUrlProvider->getFilteredImageUrl($entity, $filterName);
+    public function getPathForFilteredImage(File $entity, string $filterName): string
+    {
+        return $this->normalizePath(
+            $this->fileUrlProvider->getFilteredImageUrl($entity, $filterName)
+        );
+    }
 
-        return '/' . ltrim($imageUrl, '/');
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    private function normalizePath(string $path): string
+    {
+        return '/' . ltrim($path, '/');
     }
 }

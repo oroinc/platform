@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Validator;
 
 /**
- * Checks whether the protocol is one of "file://", "http://", "https://", "ftp://", "ftps://" or "ssh2://".
+ * Checks whether the protocol is one of "file://", "http://", "https://", "ftp://", "ftps://" or "ssh2.*://".
  */
 class ProtocolValidator implements ProtocolValidatorInterface
 {

@@ -6,39 +6,34 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
-use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var FileNormalizer */
-    protected $normalizer;
+    private $normalizer;
 
     /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attachmentManager;
+    private $attachmentManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $validator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject  */
+    private $fileManager;
 
     protected function setUp(): void
     {
-        $this->normalizer = new FileNormalizer();
-
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
-        $this->validator = $this->createMock(ConfigFileValidator::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->fileManager = $this->createMock(FileManager::class);
 
-        $this->normalizer->setAttachmentManager($this->attachmentManager);
-        $this->normalizer->setValidator($this->validator);
-        $this->normalizer->setLogger($this->logger);
+        $this->normalizer = new FileNormalizer($this->attachmentManager, $this->fileManager);
     }
 
     /**
@@ -46,7 +41,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsDenormalization($type, $isSupport)
     {
-        $this->assertEquals($isSupport, $this->normalizer->supportsDenormalization([], $type));
+        self::assertEquals($isSupport, $this->normalizer->supportsDenormalization([], $type));
     }
 
     public function supportsDenormalizationData()
@@ -62,7 +57,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSupportsNormalization($data, $isSupport)
     {
-        $this->assertEquals($isSupport, $this->normalizer->supportsNormalization($data));
+        self::assertEquals($isSupport, $this->normalizer->supportsNormalization($data));
     }
 
     public function supportsNormalizationData()
@@ -80,13 +75,12 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $sampleUuid = 'sample-uuid';
 
         $file = $this->getEntity(File::class, ['id' => 1, 'uuid' => $sampleUuid]);
-        $this->attachmentManager
-            ->expects($this->once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFileUrl')
             ->with($file, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD, UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn($sampleUrl);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'uuid' => $sampleUuid,
                 'uri' => $sampleUrl,
@@ -100,11 +94,10 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $sampleUuid = 'sample-uuid';
 
         $file = $this->getEntity(File::class, ['uuid' => $sampleUuid]);
-        $this->attachmentManager
-            ->expects($this->never())
-            ->method($this->anything());
+        $this->attachmentManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'uuid' => $sampleUuid,
                 'uri' => '',
@@ -120,7 +113,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedFile = new File();
         $expectedFile->setUuid($sampleUuid);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedFile,
             $this->normalizer->denormalize(['uuid' => $sampleUuid], File::class)
         );
@@ -128,59 +121,80 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testDenormalizeWhenNoUuid(): void
     {
-        $sampleUri = '/sample/uri';
+        $sampleUri = __DIR__ . '/FileNormalizerTest.php';
         $expectedFile = new File();
         $expectedFile->setFile(new SymfonyFile($sampleUri, false));
 
+        $this->fileManager->expects(self::never())
+            ->method('getFilePath');
+
         $file = $this->normalizer->denormalize(['uri' => $sampleUri], File::class);
-        $this->assertEquals($expectedFile->getFile(), $expectedFile->getFile());
-        $this->assertNotEmpty($file->getUuid());
+        self::assertEquals($expectedFile->getFile(), $expectedFile->getFile());
+        self::assertNotEmpty($file->getUuid());
     }
 
-    /**
-     * @dataProvider denormalizeWhenUriDataProvider
-     *
-     * @param string $filesDir
-     * @param string $uri
-     * @param string $expectedUri
-     */
-    public function testDenormalizeWhenUri(string $filesDir, string $uri, string $expectedUri): void
+    public function testDenormalizeWithFullUrl(): void
     {
         $sampleUuid = 'sample-uuid';
 
         $expectedFile = new File();
         $expectedFile->setUuid($sampleUuid);
-        $expectedFile->setFile(new SymfonyFile($expectedUri, false));
+        $expectedFile->setFile(new SymfonyFile('http://example.org/sample/url', false));
 
-        $this->normalizer->setFilesDir($filesDir);
+        $this->fileManager->expects(self::never())
+            ->method('getFilePath');
 
-        $file = $this->normalizer->denormalize(['uri' => $uri, 'uuid' => $sampleUuid], File::class);
+        $file = $this->normalizer->denormalize(
+            ['uri' => 'http://example.org/sample/url', 'uuid' => $sampleUuid],
+            File::class
+        );
 
-        $this->assertEquals($expectedFile, $file);
-        $this->assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }
 
-    /**
-     * @return array
-     */
-    public function denormalizeWhenUriDataProvider(): array
+    public function testDenormalizeWithFullLocalPath(): void
     {
-        return [
-            [
-                'filesDir' => 'var/data/importexport/files',
-                'uri' => '/sample/url',
-                'expectedUri' => '/sample/url',
-            ],
-            [
-                'filesDir' => 'var/data/importexport/files/',
-                'uri' => 'sample/url',
-                'expectedUri' => 'var/data/importexport/files/sample/url',
-            ],
-            [
-                'filesDir' => 'var/data/importexport/files/',
-                'uri' => 'http://example.org/sample/url',
-                'expectedUri' => 'http://example.org/sample/url',
-            ],
-        ];
+        $sampleUuid = 'sample-uuid';
+        $path = __FILE__;
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new SymfonyFile($path, false));
+
+        $this->fileManager->expects(self::never())
+            ->method('getFilePath');
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $path, 'uuid' => $sampleUuid],
+            File::class
+        );
+
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+    }
+
+    public function testDenormalizeWithRelativePath(): void
+    {
+        $sampleUuid = 'sample-uuid';
+        $path = 'some_file.php';
+        $expectedFilePath = 'gaufrette://import_files/some_file.php';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new SymfonyFile($expectedFilePath, false));
+
+        $this->fileManager->expects(self::once())
+            ->method('getFilePath')
+            ->with($path)
+            ->willReturn($expectedFilePath);
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $path, 'uuid' => $sampleUuid],
+            File::class
+        );
+
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }
 }

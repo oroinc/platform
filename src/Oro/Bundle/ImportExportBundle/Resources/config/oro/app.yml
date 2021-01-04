@@ -1,5 +1,5 @@
 knp_gaufrette:
     filesystems:
         importexport:
-            adapter:    private
-            alias:      importexport_filesystem
+            adapter: private
+            alias: importexport_filesystem
