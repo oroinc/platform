@@ -1,9 +1,4 @@
 liip_imagine:
-    loaders:
-        default:
-            filesystem:
-                bundle_resources:
-                    enabled: true
     filter_sets:
         avatar_med:
             quality:          95

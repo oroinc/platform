@@ -2,18 +2,23 @@
 
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Parser;
 
-class OroAttachmentExtension extends Extension
+class OroAttachmentExtension extends Extension implements PrependExtensionInterface
 {
+    private const IMAGINE_DATA_ROOT    = '%kernel.project_dir%/public';
+    private const IMAGINE_FILE_MANAGER = 'oro_attachment.manager.public_mediacache';
+
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -41,5 +46,167 @@ class OroAttachmentExtension extends Extension
         $container->setParameter('oro_attachment.files', $value['file-icons']);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepend(ContainerBuilder $container): void
+    {
+        if ($container instanceof ExtendedContainerBuilder) {
+            $this->configureImagine($container);
+        }
+    }
+
+    /**
+     * @param ExtendedContainerBuilder $container
+     */
+    private function configureImagine(ExtendedContainerBuilder $container): void
+    {
+        $configs = $this->ensureImagineDefaultConfigSet($container->getExtensionConfig('liip_imagine'));
+
+        /**
+         * add empty config for "default" loader and resolver to each config item to avoid misconfiguration
+         * @see \Liip\ImagineBundle\DependencyInjection\Configuration::getConfigTreeBuilder
+         */
+        foreach ($configs as $i => $config) {
+            if (!isset($config['loaders']['default'])) {
+                $configs[$i]['loaders']['default'] = [];
+            }
+            if (!isset($config['resolvers']['default'])) {
+                $configs[$i]['resolvers']['default'] = [];
+            }
+        }
+
+        $container->setExtensionConfig('liip_imagine', $configs);
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return array
+     */
+    private function ensureImagineDefaultConfigSet(array $configs): array
+    {
+        /**
+         * update the last config item that contains "default" loader and resolver to avoid misconfiguration
+         * due to {@see \Liip\ImagineBundle\DependencyInjection\Configuration} is not intended to work with several
+         * config items contains "default" loader or resolver
+         */
+        /** @var int $i */
+        $i = $this->getImagineDefaultConfigIndex($configs);
+        if (null === $i) {
+            $configs[] = [
+                'loaders'   => ['default' => ['filesystem' => null]],
+                'resolvers' => ['default' => ['oro_gaufrette' => null]]
+            ];
+            $i = count($configs) - 1;
+        }
+        if ($this->isImagineDefaultLoaderFilesystem($configs)) {
+            if (!$this->hasImagineDefaultLoaderDataRoot($configs[$i])) {
+                $configs[$i]['loaders']['default']['filesystem']['data_root'] = self::IMAGINE_DATA_ROOT;
+            }
+            if (!$this->hasImagineDefaultLoaderBundleResourcesEnabled($configs[$i])) {
+                $configs[$i]['loaders']['default']['filesystem']['bundle_resources']['enabled'] = true;
+            }
+        }
+        if ($this->isImagineDefaultResolverOroGaufrette($configs)
+            && !$this->hasImagineDefaultResolverFileManagerService($configs[$i])
+        ) {
+            $configs[$i]['resolvers']['default']['oro_gaufrette']['file_manager_service'] = self::IMAGINE_FILE_MANAGER;
+        }
+
+        return $configs;
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return int|null
+     */
+    private function getImagineDefaultConfigIndex(array $configs): ?int
+    {
+        $lastIndex = null;
+        foreach ($configs as $i => $config) {
+            if (!empty($config['loaders']) && \array_key_exists('default', $config['loaders'])) {
+                $lastIndex = $i;
+            } elseif (!empty($config['resolvers']) && \array_key_exists('default', $config['resolvers'])) {
+                $lastIndex = $i;
+            }
+        }
+
+        return $lastIndex;
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return bool
+     */
+    private function isImagineDefaultLoaderFilesystem(array $configs): bool
+    {
+        foreach ($configs as $config) {
+            if (!empty($config['loaders']['default'])
+                && !\array_key_exists('filesystem', $config['loaders']['default'])
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $configs
+     *
+     * @return bool
+     */
+    private function isImagineDefaultResolverOroGaufrette(array $configs): bool
+    {
+        foreach ($configs as $config) {
+            if (!empty($config['resolvers']['default'])
+                && !\array_key_exists('oro_gaufrette', $config['resolvers']['default'])
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return bool
+     */
+    private function hasImagineDefaultLoaderDataRoot(array $config): bool
+    {
+        return
+            !empty($config['loaders']['default']['filesystem'])
+            && \array_key_exists('data_root', $config['loaders']['default']['filesystem']);
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return bool
+     */
+    private function hasImagineDefaultLoaderBundleResourcesEnabled(array $config): bool
+    {
+        return
+            !empty($config['loaders']['default']['filesystem']['bundle_resources'])
+            && \array_key_exists('enabled', $config['loaders']['default']['filesystem']['bundle_resources']);
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return bool
+     */
+    private function hasImagineDefaultResolverFileManagerService(array $config): bool
+    {
+        return
+            !empty($config['resolvers']['default']['oro_gaufrette'])
+            && \array_key_exists('file_manager_service', $config['resolvers']['default']['oro_gaufrette']);
     }
 }

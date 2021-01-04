@@ -68,7 +68,7 @@ services:
     oro_importexport.reader.reader_chain:
         class: Oro\Bundle\ImportExportBundle\Reader\ReaderChain
 
-    oro_importexport.manager.importexport:
+    oro_importexport.file_manager:
         parent: oro_gaufrette.file_manager
         arguments:
             - 'importexport'
@@ -77,7 +77,7 @@ services:
         class: Oro\Bundle\ImportExportBundle\File\FileManager
         public: true
         arguments:
-            - '@oro_importexport.manager.importexport'
+            - '@oro_importexport.file_manager'
 
     Oro\Bundle\ImportExportBundle\File\FileManager:
         alias: oro_importexport.file.file_manager

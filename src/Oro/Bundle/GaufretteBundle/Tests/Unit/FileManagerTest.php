@@ -3,6 +3,8 @@
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
 use Gaufrette\Adapter;
+use Gaufrette\Adapter\InMemory;
+use Gaufrette\Adapter\Local;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
@@ -67,6 +69,39 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         return $fileManager;
     }
 
+    /**
+     * @param Adapter     $filesystemAdapter
+     * @param bool        $useSubDirectory
+     * @param string|null $subDirectory
+     *
+     * @return FileManager
+     */
+    private function getFileManagerWithCustomAdapter(
+        Adapter $filesystemAdapter,
+        bool $useSubDirectory,
+        string $subDirectory = null
+    ): FileManager {
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);
+        $fileManager->setProtocol(self::TEST_PROTOCOL);
+        if ($useSubDirectory) {
+            $fileManager->useSubDirectory(true);
+        }
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::any())
+            ->method('getAdapter')
+            ->willReturn($filesystemAdapter);
+
+        $filesystemMap = $this->createMock(FilesystemMap::class);
+        $filesystemMap->expects(self::once())
+            ->method('get')
+            ->with(self::TEST_FILE_SYSTEM_NAME)
+            ->willReturn($filesystem);
+        $fileManager->setFilesystemMap($filesystemMap);
+
+        return $fileManager;
+    }
+
     public function testGetProtocol()
     {
         $fileManager = $this->getFileManager(true);
@@ -90,11 +125,25 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubDirectoryWithCustomSubDirectory()
     {
-        $subDirectory = 'testDir';
+        $subDirectory = 'testSubDir';
 
         $fileManager = $this->getFileManager(true, $subDirectory);
 
         self::assertEquals($subDirectory, $fileManager->getSubDirectory());
+    }
+
+    public function testGetSubDirectoryWithoutCustomSubDirectory()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(self::TEST_FILE_SYSTEM_NAME, $fileManager->getSubDirectory());
+    }
+
+    public function testGetSubDirectoryForNotSubDirectoryAwareFileManager()
+    {
+        $fileManager = $this->getFileManager(false);
+
+        self::assertNull($fileManager->getSubDirectory());
     }
 
     public function testGetFilePath()
@@ -187,6 +236,72 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetFilePathWithoutProtocol()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(
+            'testFileSystem/testFileSystem/file.txt',
+            $fileManager->getFilePathWithoutProtocol('file.txt')
+        );
+    }
+
+    public function testGetFilePathWithoutProtocolForNotSubDirAwareManager()
+    {
+        $fileManager = $this->getFileManager(false);
+
+        self::assertEquals(
+            'testFileSystem/file.txt',
+            $fileManager->getFilePathWithoutProtocol('file.txt')
+        );
+    }
+
+    public function testGetFilePathWithoutProtocolWithCustomSubDirectory()
+    {
+        $fileManager = $this->getFileManager(true, 'testSubDir');
+
+        self::assertEquals(
+            'testFileSystem/testSubDir/file.txt',
+            $fileManager->getFilePathWithoutProtocol('file.txt')
+        );
+    }
+
+    public function testGetAdapterDescriptionForLocalAdapter()
+    {
+        $adapter = new Local('/path/to/files');
+
+        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, true);
+
+        self::assertEquals('/path/to/files/testFileSystem', $fileManager->getAdapterDescription());
+    }
+
+    public function testGetAdapterDescriptionForLocalAdapterAndForNotSubDirAwareManager()
+    {
+        $adapter = new Local('/path/to/files');
+
+        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, false);
+
+        self::assertEquals('/path/to/files', $fileManager->getAdapterDescription());
+    }
+
+    public function testGetAdapterDescriptionForLocalAdapterAndWithCustomSubDirectory()
+    {
+        $adapter = new Local('/path/to/files');
+
+        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, false, 'testSubDir');
+
+        self::assertEquals('/path/to/files/testSubDir', $fileManager->getAdapterDescription());
+    }
+
+    public function testGetAdapterDescriptionForNonLocalAdapter()
+    {
+        $adapter = new InMemory();
+
+        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, true);
+
+        self::assertEquals('InMemory', $fileManager->getAdapterDescription());
+    }
+
     public function testGetFileMimeType()
     {
         $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
@@ -249,6 +364,21 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager = $this->getFileManager(true);
 
         self::assertNull($fileManager->getFileMimeType('file.txt'));
+    }
+
+    public function testGetFileMimeTypeForNotSubDirectoryAwareFileManager()
+    {
+        $fileInfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $fileInfo->file(__DIR__ . '/Fixtures/test.txt');
+
+        $this->filesystem->expects(self::once())
+            ->method('mimeType')
+            ->with('file.txt')
+            ->willReturn($mimeType);
+
+        $fileManager = $this->getFileManager(false);
+
+        self::assertEquals($mimeType, $fileManager->getFileMimeType('file.txt'));
     }
 
     public function testFindFiles()
@@ -1585,7 +1715,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testWriteToStorageWhenFlushFailed()
     {
         $this->expectException(FlushFailedException::class);
-        $this->expectExceptionMessage('Failed to flush data to the "file.txt" file.');
+        $this->expectExceptionMessage(
+            sprintf('Failed to flush data to the "%s/file.txt" file.', self::TEST_FILE_SYSTEM_NAME)
+        );
 
         $content = 'Test data';
         $fileName = 'file.txt';
@@ -1612,6 +1744,74 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_FILE_SYSTEM_NAME . '/' . $fileName);
 
         $fileManager = $this->getFileManager(true);
+
+        $fileManager->writeToStorage($content, $fileName);
+    }
+
+    public function testWriteToStorageWhenFlushFailedForNotSubDirAwareManager()
+    {
+        $this->expectException(FlushFailedException::class);
+        $this->expectExceptionMessage('Failed to flush data to the "file.txt" file.');
+
+        $content = 'Test data';
+        $fileName = 'file.txt';
+
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects(self::once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects(self::once())
+            ->method('write')
+            ->with($content);
+        $resultStream->expects(self::once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects(self::once())
+            ->method('close');
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        $fileManager = $this->getFileManager(false);
+
+        $fileManager->writeToStorage($content, $fileName);
+    }
+
+    public function testWriteToStorageWhenFlushFailedWithCustomSubDirectory()
+    {
+        $this->expectException(FlushFailedException::class);
+        $this->expectExceptionMessage('Failed to flush data to the "testSubDir/file.txt" file.');
+
+        $content = 'Test data';
+        $fileName = 'file.txt';
+
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects(self::once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects(self::once())
+            ->method('write')
+            ->with($content);
+        $resultStream->expects(self::once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects(self::once())
+            ->method('close');
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with('testSubDir/' . $fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with('testSubDir/' . $fileName);
+
+        $fileManager = $this->getFileManager(true, 'testSubDir');
 
         $fileManager->writeToStorage($content, $fileName);
     }
@@ -1783,7 +1983,94 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             $fileManager->writeStreamToStorage($srcStream, $fileName);
             self::fail('Expected FlushFailedException');
         } catch (FlushFailedException $e) {
-            self::assertEquals('Failed to flush data to the "file.txt" file.', $e->getMessage());
+            self::assertEquals(
+                sprintf('Failed to flush data to the "%s/file.txt" file.', self::TEST_FILE_SYSTEM_NAME),
+                $e->getMessage()
+            );
+            // test that the input stream is closed
+            self::assertFalse($srcStream->cast(1));
+        }
+    }
+
+    public function testWriteStreamToStorageWhenFlushFailedForNotSubDirAwareManager()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/test.txt';
+        $fileName = 'file.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects(self::once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects(self::once())
+            ->method('write')
+            ->with(file_get_contents($localFilePath));
+        $resultStream->expects(self::once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects(self::once())
+            ->method('close');
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with($fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with($fileName);
+
+        $fileManager = $this->getFileManager(false);
+
+        try {
+            $fileManager->writeStreamToStorage($srcStream, $fileName);
+            self::fail('Expected FlushFailedException');
+        } catch (FlushFailedException $e) {
+            self::assertEquals(
+                'Failed to flush data to the "file.txt" file.',
+                $e->getMessage()
+            );
+            // test that the input stream is closed
+            self::assertFalse($srcStream->cast(1));
+        }
+    }
+
+    public function testWriteStreamToStorageWhenFlushFailedWithCustomSubDirectory()
+    {
+        $localFilePath = __DIR__ . '/Fixtures/test.txt';
+        $fileName = 'file.txt';
+
+        $srcStream = new LocalStream($localFilePath);
+        $resultStream = $this->createMock(Stream::class);
+        $resultStream->expects(self::once())
+            ->method('open')
+            ->with(new StreamMode('wb+'));
+        $resultStream->expects(self::once())
+            ->method('write')
+            ->with(file_get_contents($localFilePath));
+        $resultStream->expects(self::once())
+            ->method('flush')
+            ->willReturn(false);
+        $resultStream->expects(self::once())
+            ->method('close');
+
+        $this->filesystem->expects(self::once())
+            ->method('createStream')
+            ->with('testSubDir/' . $fileName)
+            ->willReturn($resultStream);
+        $this->filesystem->expects(self::once())
+            ->method('removeFromRegister')
+            ->with('testSubDir/' . $fileName);
+
+        $fileManager = $this->getFileManager(true, 'testSubDir');
+
+        try {
+            $fileManager->writeStreamToStorage($srcStream, $fileName);
+            self::fail('Expected FlushFailedException');
+        } catch (FlushFailedException $e) {
+            self::assertEquals(
+                'Failed to flush data to the "testSubDir/file.txt" file.',
+                $e->getMessage()
+            );
             // test that the input stream is closed
             self::assertFalse($srcStream->cast(1));
         }

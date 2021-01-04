@@ -1,13 +1,21 @@
 knp_gaufrette:
+    adapters:
+        import_files:
+            local:
+                directory: '%kernel.project_dir%/var/data/import_files'
+
     filesystems:
         attachments:
-            adapter:    private
-            alias:      attachments_filesystem
-        mediacache:
-            adapter:    public
-            alias:      mediacache_filesystem
+            adapter: private
+            alias: attachments_filesystem
+        public_mediacache:
+            adapter: public
+            alias: public_mediacache_filesystem
         protected_mediacache:
-            adapter:    private
-            alias:      protected_mediacache_filesystem
+            adapter: private
+            alias: protected_mediacache_filesystem
+        import_files:
+            adapter: import_files
+            alias: import_files_filesystem
 
     stream_wrapper: ~
