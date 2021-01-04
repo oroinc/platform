@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
@@ -17,16 +18,9 @@ class CacheClearCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:entity-config:cache:clear';
 
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
+    private ConfigCacheWarmer $configCacheWarmer;
 
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
-
-    /**
-     * @param ConfigManager $configManager
-     * @param ConfigCacheWarmer $configCacheWarmer
-     */
     public function __construct(ConfigManager $configManager, ConfigCacheWarmer $configCacheWarmer)
     {
         parent::__construct();
@@ -35,19 +29,29 @@ class CacheClearCommand extends Command
         $this->configCacheWarmer = $configCacheWarmer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
+            ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.')
             ->setDescription('Clears the entity config cache.')
-            ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'Do not warm up the cache.');
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears the entity config cache.
+
+  <info>php %command.full_name%</info>
+
+The <info>--no-warmup</info> option can be used to skip warming up the cache after cleaning:
+
+  <info>php %command.full_name% --no-warmup</info>
+
+HELP
+            )
+            ->addUsage('--no-warmup')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Clear the entity config cache');

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Responsible for deleting temporary files with a given periodicity
+ * Deletes old temporary import/export files.
  */
 class CleanupStorageCommand extends Command implements CronCommandInterface
 {
@@ -21,16 +22,9 @@ class CleanupStorageCommand extends Command implements CronCommandInterface
     /** @var string */
     protected static $defaultName = 'oro:cron:import-clean-up-storage';
 
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
+    private ImportExportResultManager $importExportResultManager;
 
-    /** @var ImportExportResultManager */
-    private $importExportResultManager;
-
-    /**
-     * @param FileManager $fileManager
-     * @param ImportExportResultManager $importExportResultManager
-     */
     public function __construct(FileManager $fileManager, ImportExportResultManager $importExportResultManager)
     {
         $this->fileManager = $fileManager;
@@ -39,29 +33,20 @@ class CleanupStorageCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    /**
-     * {@internaldoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 0 */1 * *';
     }
 
-    /**
-     * {@internaldoc}
-     */
     public function isActive()
     {
         return true;
     }
 
-    /**
-     * {@internaldoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Clear old files from import storage.')
             ->addOption(
                 'interval',
                 'i',
@@ -69,12 +54,25 @@ class CleanupStorageCommand extends Command implements CronCommandInterface
                 'Time interval (days) to keep the import and export files.'.
                 ' Will be removed files older than today-interval.',
                 self::DEFAULT_PERIOD
-            );
+            )
+            ->setDescription('Deletes old temporary import/export files.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command deletes old temporary import/export files.
+
+  <info>php %command.full_name%</info>
+
+The <info>--interval</info> option can be used to override the default time period (14 days)
+past which the temporary import files are considered old:
+
+  <info>php %command.full_name% --interval=<days></info>
+
+HELP
+            )
+            ->addUsage('--interval=<days>')
+        ;
     }
 
-    /**
-     * {@internaldoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $period = (int)$input->getOption('interval');

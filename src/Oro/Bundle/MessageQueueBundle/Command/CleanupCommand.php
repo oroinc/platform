@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
@@ -15,47 +16,35 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Clears successes and failed jobs from message_queue_job table
+ * Clears old records from message_queue_job table.
  */
 class CleanupCommand extends Command implements CronCommandInterface
 {
-    const INTERVAL_FOR_SUCCESSES = '-2 weeks';
-    const INTERVAL_FOR_FAILED = '-1 month';
+    public const INTERVAL_FOR_SUCCESSES = '-2 weeks';
+    public const INTERVAL_FOR_FAILED = '-1 month';
 
     /** @var string */
     protected static $defaultName = 'oro:cron:message-queue:cleanup';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isActive()
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
@@ -63,14 +52,29 @@ class CleanupCommand extends Command implements CronCommandInterface
                 'dry-run',
                 'd',
                 InputOption::VALUE_NONE,
-                'If option exists jobs won\'t be deleted, job count that match cleanup criteria will be shown'
+                'Show the number of jobs that match the cleanup criteria instead of deletion'
             )
-            ->setDescription('Clear successes and failed jobs from message_queue_job table');
+            ->setDescription('Clears old records from message_queue_job table.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears successful job records
+that are older than 2 weeks and failed job records older than 1 month
+from <comment>message_queue_job</comment> table.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to show the number of jobs that match
+the cleanup criteria instead of deleting them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
+            )
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('dry-run')) {
@@ -128,10 +132,7 @@ class CleanupCommand extends Command implements CronCommandInterface
         return $this->doctrineHelper->getEntityManagerForClass(Job::class);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
-    private function addOutdatedJobsCriteria(QueryBuilder $qb)
+    private function addOutdatedJobsCriteria(QueryBuilder $qb): void
     {
         $qb
             ->where($qb->expr()->andX(

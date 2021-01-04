@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LoggerBundle\Command;
 
@@ -15,31 +16,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Updates logger level configuration.
+ * Temporarily changes the configured logging level.
  */
 class LoggerLevelCommand extends Command
 {
-    const LEVEL_PARAM         = 'level';
-    const DISABLE_AFTER_PARAM = 'disable-after';
-    const USER_PARAM          = 'user';
-
     /** @var string */
     protected static $defaultName = 'oro:logger:level';
 
-    /** @var ConfigManager */
-    private $globalConfigManager;
+    private ConfigManager $globalConfigManager;
+    private ConfigManager $userConfigManager;
+    private CacheProvider $cache;
+    private UserManager $userManager;
 
-    /** @var ConfigManager */
-    private $userConfigManager;
-
-    /** @var CacheProvider */
-    private $cache;
-
-    /** @var UserManager */
-    private $userManager;
-
-    /** @var array */
-    protected static $loggingLevels = [
+    protected static array $loggingLevels = [
         LogLevel::EMERGENCY,
         LogLevel::ALERT,
         LogLevel::CRITICAL,
@@ -50,12 +39,6 @@ class LoggerLevelCommand extends Command
         LogLevel::DEBUG,
     ];
 
-    /**
-     * @param ConfigManager $globalConfigManager
-     * @param ConfigManager $userConfigManager
-     * @param CacheProvider $cache
-     * @param UserManager $userManager
-     */
     public function __construct(
         ConfigManager $globalConfigManager,
         ConfigManager $userConfigManager,
@@ -70,45 +53,41 @@ class LoggerLevelCommand extends Command
         $this->userManager = $userManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->addArgument(
-                self::LEVEL_PARAM,
-                InputArgument::REQUIRED,
-                'Log level (warning|notice|info|debug)'
-            )
-            ->addArgument(
-                self::DISABLE_AFTER_PARAM,
-                InputArgument::REQUIRED,
-                'Disable logging after interval. For example: "630 seconds", "1 hour + 30 minutes", etc. ' .
-                'See: <info>http://php.net/manual/en/datetime.formats.relative.php<info>'
-            )
-            ->addOption(
-                self::USER_PARAM,
-                'u',
-                InputOption::VALUE_REQUIRED,
-                'Email of existing user'
-            )
-            ->setDescription('Update logger level configuration')
+            ->addArgument('level', InputArgument::REQUIRED, 'Log level (warning, notice, info, debug)')
+            ->addArgument('disable-after', InputArgument::REQUIRED, 'Disable logging after specified time interval')
+            ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
+            ->setDescription('Temporarily changes the configured logging level.')
             ->setHelp(
-                'If “user” param is not set - update global scope, otherwise update user scope'
-            );
+                <<<'HELP'
+The <info>%command.name%</info> command temporarily increases the configured logging level for
+the specified duration of time. The second argument accepts any relative date/time
+format recognized by PHP (<comment>https://php.net/manual/datetime.formats.relative.php</comment>).
+
+  <info>php %command.full_name% <level> <disable-after></info>
+
+The <info>--user</info> option can be used to modify the logger level to the configuration
+scope of a specific user (the global configuration is changed otherwise):
+
+  <info>php %command.full_name% --user=<user-email> <level> <disable-after></info>
+
+HELP
+            )
+            ->addUsage('--user=<user-email> <level> <disable-after>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $user = null;
-        $level = $this->getLogLevel($input->getArgument(self::LEVEL_PARAM));
-        $disableAfter = $this->getDisableAfterDateTime($input->getArgument(self::DISABLE_AFTER_PARAM));
+        $level = $this->getLogLevel($input->getArgument('level'));
+        $disableAfter = $this->getDisableAfterDateTime($input->getArgument('disable-after'));
 
-        $user = $this->getUser($input->getOption(self::USER_PARAM));
+        $user = $this->getUser($input->getOption('user'));
 
         if ($user) {
             $configManager = $this->userConfigManager;
@@ -148,21 +127,13 @@ class LoggerLevelCommand extends Command
     }
 
     /**
-     * @param string $value
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return string
      */
-    public function getLogLevel($value)
+    public function getLogLevel(string $value): string
     {
         if (!in_array($value, self::$loggingLevels)) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    "Wrong '%s' value for '%s' argument",
-                    $value,
-                    self::LEVEL_PARAM
-                )
+                \sprintf("Wrong '%s' value for '%s' argument", $value, 'level')
             );
         }
 
@@ -170,31 +141,22 @@ class LoggerLevelCommand extends Command
     }
 
     /**
-     * @param string $value
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return \DateTime
      */
-    public function getDisableAfterDateTime($value)
+    public function getDisableAfterDateTime(string $value): \DateTime
     {
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter = clone $now;
 
-        // Starting from 7.1.28 and 7.2.17 PHP versions, a PHP Warning will be thrown if the value is not correct.
-        // Disable error reporting to display own error without PHP Warning.
-        $errorLevel = error_reporting();
-        error_reporting(0);
-        $disableAfter->add(\DateInterval::createFromDateString($value));
-        error_reporting($errorLevel);
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $interval = @\DateInterval::createFromDateString($value);
+        if ($interval instanceof \DateInterval) {
+            $disableAfter->add($interval);
+        }
 
         if ($disableAfter <= $now) {
             throw new \InvalidArgumentException(
-                sprintf(
-                    "Value '%s' for '%s' argument should be valid date interval",
-                    $value,
-                    self::DISABLE_AFTER_PARAM
-                )
+                \sprintf("Value '%s' for '%s' argument should be valid date interval", $value, 'disable-after')
             );
         }
 
@@ -202,30 +164,19 @@ class LoggerLevelCommand extends Command
     }
 
     /**
-     * @param string $email
-     *
      * @throws \InvalidArgumentException
-     *
-     * @return User|null
      */
-    public function getUser($email)
+    public function getUser(?string $email): ?User
     {
         $user = null;
 
         if ($email) {
-            /** @var User $user */
             $user = $this->userManager->findUserByEmail($email);
-
             if (is_null($user)) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        "User with email '%s' not exists.",
-                        $email
-                    )
-                );
+                throw new \InvalidArgumentException(\sprintf("User with email '%s' not exists.", $email));
             }
         }
-
+        /** @var User $user */
         return $user;
     }
 }

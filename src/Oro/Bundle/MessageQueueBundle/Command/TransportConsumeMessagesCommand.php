@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
@@ -14,25 +15,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Consume messages from selected queue (or list of all available queues if queue is not defined) with own processor
+ * Processes a message-queue with a specific processor.
  */
 class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
 {
     /** @var string */
     protected static $defaultName = 'oro:message-queue:transport:consume';
 
-    /** @var ConsumerState */
-    private $consumerState;
+    private ConsumerState $consumerState;
+    private LoggerInterface $logger;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    /**
-     * @param QueueConsumer $queueConsumer
-     * @param ContainerInterface $processorLocator
-     * @param ConsumerState $consumerState
-     * @param LoggerInterface $logger
-     */
     public function __construct(
         QueueConsumer $queueConsumer,
         ContainerInterface $processorLocator,
@@ -45,10 +37,7 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
+    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         $this->consumerState->startConsumption();
         try {
@@ -58,18 +47,17 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getConsumerExtension(array $extensions)
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions, $this->consumerState);
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
+    protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension($this->logger);
     }

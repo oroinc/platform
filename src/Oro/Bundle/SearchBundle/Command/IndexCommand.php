@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\SearchBundle\Command;
 
@@ -11,23 +12,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Update search index for specified entities with the same type
+ * Updates search index for specified entities.
  */
 class IndexCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:search:index';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private IndexerInterface $asyncIndexer;
 
-    /** @var IndexerInterface */
-    private $asyncIndexer;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param IndexerInterface $asyncIndexer
-     */
     public function __construct(ManagerRegistry $registry, IndexerInterface $asyncIndexer)
     {
         parent::__construct();
@@ -36,28 +30,29 @@ class IndexCommand extends Command
         $this->asyncIndexer = $asyncIndexer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Update search index for specified entities with the same type')
-            ->addArgument(
-                'class',
-                InputArgument::REQUIRED,
-                'Full or compact class name of indexed entities ' .
-                '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
-            )
+        $this
+            ->addArgument('class', InputArgument::REQUIRED, 'Entity to reindex (FQCN or short name)')
             ->addArgument(
                 'identifiers',
                 InputArgument::REQUIRED|InputArgument::IS_ARRAY,
-                'Identifiers of indexed entities (f.e. 42)'
-            );
+                'IDs of the entities to reindex'
+            )
+            ->setDescription('Updates search index for specified entities.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates search index for specified entities.
+
+  <info>php %command.full_name% <entity> <id1> [<id2> ...]</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $class = $input->getArgument('class');

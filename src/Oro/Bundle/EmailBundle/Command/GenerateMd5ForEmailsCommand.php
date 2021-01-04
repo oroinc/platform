@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
 
@@ -9,19 +10,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Generates and prints md5 for email templates content from `oro_email_template` table. Hashes
- * can be used in email template migrations.
+ * Generates MD5 hashes for email template contents.
  */
 class GenerateMd5ForEmailsCommand extends Command
 {
     protected static $defaultName = 'oro:email:generate-md5';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -29,20 +25,26 @@ class GenerateMd5ForEmailsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription(
-                'Generates and prints md5 for email templates content from `oro_email_template` table. Hashes 
-                can be used in email migrations'
-            );
+            ->setDescription('Generates MD5 hashes for email template contents.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command generates and prints MD5 hashes for email template contents
+from <comment>oro_email_template</comment> table. These hashes can be used in email migrations.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

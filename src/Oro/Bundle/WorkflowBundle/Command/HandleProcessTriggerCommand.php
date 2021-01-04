@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -13,23 +14,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Handle process trigger with specified identifier and process name
+ * Executes a process trigger.
  */
 class HandleProcessTriggerCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:process:handle-trigger';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private ProcessHandler $processHandler;
 
-    /** @var ProcessHandler */
-    private $processHandler;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param ProcessHandler $processHandler
-     */
     public function __construct(ManagerRegistry $registry, ProcessHandler $processHandler)
     {
         parent::__construct();
@@ -38,29 +32,26 @@ class HandleProcessTriggerCommand extends Command
         $this->processHandler = $processHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Handle process trigger with specified identifier and process name')
-            ->addOption(
-                'name',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Process definition name'
+        $this
+            ->addOption('name', null, InputOption::VALUE_REQUIRED, 'Process name')
+            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Trigger ID')
+            ->setDescription('Executes a process trigger.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command executes a specified process trigger.
+
+  <info>php %command.full_name% --name=<process-name> --id=<trigger-id></info>
+
+HELP
             )
-            ->addOption(
-                'id',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Identifier of the process trigger'
-            );
+            ->addUsage('--name=<process-name> --id=<trigger-id>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $processName = $input->getOption('name');

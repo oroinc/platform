@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
 
@@ -9,19 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to update associations to emails
+ * Updates email associations.
  */
 class UpdateAssociationsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:email:update-associations';
 
-    /** @var MessageProducerInterface */
-    private $producer;
+    private MessageProducerInterface $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(MessageProducerInterface $producer)
     {
         parent::__construct();
@@ -29,16 +26,24 @@ class UpdateAssociationsCommand extends Command
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Update associations to emails');
+        $this->setDescription('Updates email associations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates email associations.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

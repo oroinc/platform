@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
@@ -12,19 +13,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to show the structure of "Resources/config/oro/api.yml".
+ * Dumps the reference structure for Resources/config/oro/api.yml.
  */
 class DumpConfigReferenceCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:api:config:dump-reference';
 
-    /** @var ConfigExtensionRegistry */
-    private $configExtensionRegistry;
+    private ConfigExtensionRegistry $configExtensionRegistry;
 
-    /**
-     * @param ConfigExtensionRegistry $configExtensionRegistry
-     */
     public function __construct(ConfigExtensionRegistry $configExtensionRegistry)
     {
         parent::__construct();
@@ -32,24 +29,35 @@ class DumpConfigReferenceCommand extends Command
         $this->configExtensionRegistry = $configExtensionRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Dumps the structure of "Resources/config/oro/api.yml".')
             ->addOption(
                 'max-nesting-level',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The maximum number of nesting target entities.'
-            );
+                'Maximum depth of nesting target entities.'
+            )
+            ->setDescription('Dumps the reference structure for Resources/config/oro/api.yml.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the reference structure
+for <comment>Resources/config/oro/api.yml</comment> files.
+
+  <info>php %command.full_name%</info>
+
+The <info>--max-nesting-level</info> option can be used to limit the depth of nesting target entities:
+
+  <info>php %command.full_name% --max-nesting-level=<number></info>
+
+HELP
+            )
+            ->addUsage('--max-nesting-level=<number>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output = new SymfonyStyle($input, $output);

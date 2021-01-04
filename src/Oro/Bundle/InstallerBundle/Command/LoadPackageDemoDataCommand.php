@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
@@ -10,32 +11,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 /**
- * Loads demo data from specified package(s) to your database.
+ * Loads demo data fixtures from the specified package directories.
  */
 class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 {
     /** @var string */
     protected static $defaultName = 'oro:package:demo:load';
 
-    /**
-     * @inheritdoc
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Load demo data from specified package(s) to your database.')
-            ->addArgument(
-                'package',
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                'Package directories'
-            )
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of fixtures without apply them');
+        $this
+            ->addArgument('package', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Package directories')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the list of fixtures without applying them')
+            ->setDescription('Loads demo data fixtures from the specified package directories.')
+            ->addUsage('<package1> <package2> <package3>')
+            ->addUsage('--dry-run <package>')
+        ;
     }
 
     /**
-     * @inheritdoc
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
-    protected function getFixtures(InputInterface $input, OutputInterface $output)
+    protected function getFixtures(InputInterface $input, OutputInterface $output): array
     {
         $suppliedPackagePaths = $input->getArgument('package');
         $packageDirectories = [];
@@ -83,9 +82,9 @@ class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
     }
 
     /**
-     * @inheritdoc
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    protected function getTypeOfFixtures(InputInterface $input)
+    protected function getTypeOfFixtures(InputInterface $input): string
     {
         return LoadDataFixturesCommand::DEMO_FIXTURES_TYPE;
     }

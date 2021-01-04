@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -15,27 +16,17 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to identifier of the transition cron trigger
+ * Triggers a workflow transition cron trigger.
  */
 class HandleTransitionCronTriggerCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:workflow:handle-transition-cron-trigger';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private MessageProducerInterface $producer;
+    private TransitionCronTriggerHandler $triggerHandler;
 
-    /** @var MessageProducerInterface */
-    private $producer;
-
-    /** @var TransitionCronTriggerHandler */
-    private $triggerHandler;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param MessageProducerInterface $producer
-     * @param TransitionCronTriggerHandler $triggerHandler
-     */
     public function __construct(
         ManagerRegistry $registry,
         MessageProducerInterface $producer,
@@ -48,24 +39,31 @@ class HandleTransitionCronTriggerCommand extends Command
         $this->triggerHandler = $triggerHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription('Handle workflow transition cron trigger with specified identifier')
             ->addOption(
                 'id',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Identifier of the transition cron trigger'
-            );
+                'Transition cron trigger ID'
+            )
+            ->setDescription('Triggers a workflow transition cron trigger.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command triggers
+a specified workflow transition cron trigger.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+            ->addUsage('--id=<transition-cron-trigger-id>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $triggerId = $input->getOption('id');

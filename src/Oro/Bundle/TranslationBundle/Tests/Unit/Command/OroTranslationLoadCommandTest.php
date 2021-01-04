@@ -61,7 +61,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManager::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
-        $entityManager->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+        $managerRegistry->expects($this->any())->method('getRepository')->willReturn($entityRepository);
 
         /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject $databasePersister */
         $databasePersister = $this->createMock(DatabasePersister::class);
