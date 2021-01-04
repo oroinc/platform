@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -11,30 +12,17 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * Renews Symfony validator metadata cache.
+ * Clears validator metadata cache.
  */
 class ValidatorCacheClearCommand extends Command
 {
     protected static $defaultName = 'validator:cache:clear';
 
-    /** @var KernelInterface */
-    private $kernel;
+    private KernelInterface $kernel;
+    private ValidatorCacheWarmer $validatorCacheWarmer;
+    private Filesystem $filesystem;
+    private string $validatorCacheFile;
 
-    /** @var ValidatorCacheWarmer */
-    private $validatorCacheWarmer;
-
-    /** @var Filesystem */
-    private $filesystem;
-
-    /** @var string */
-    private $validatorCacheFile;
-
-    /**
-     * @param KernelInterface      $kernel
-     * @param ValidatorCacheWarmer $validatorCacheWarmer
-     * @param Filesystem           $filesystem
-     * @param string               $validatorCacheFile
-     */
     public function __construct(
         KernelInterface $kernel,
         ValidatorCacheWarmer $validatorCacheWarmer,
@@ -49,17 +37,23 @@ class ValidatorCacheClearCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Clears the validator metadata cache.');
+        $this
+            ->setDescription('Clears validator metadata cache.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command clears validator metadata cache.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $cacheDir = $this->kernel->getCacheDir();

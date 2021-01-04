@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -13,28 +14,17 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Load process configuration from configuration files to the database
+ * Loads process definitions to the database.
  */
 class LoadProcessConfigurationCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:process:configuration:load';
 
-    /** @var ProcessConfigurationProvider */
-    private $configurationProvider;
+    private ProcessConfigurationProvider $configurationProvider;
+    private ProcessConfigurator $processConfigurator;
+    private EventTriggerCache $eventTriggerCache;
 
-    /** @var ProcessConfigurator */
-    private $processConfigurator;
-
-    /** @var EventTriggerCache */
-    private $eventTriggerCache;
-
-    /**
-     * @param ProcessConfigurationProvider $configurationProvider
-     * @param ProcessConfigurator $processConfigurator
-     * @param EventTriggerCache $eventTriggerCache
-     * @param string|null $name
-     */
     public function __construct(
         ProcessConfigurationProvider $configurationProvider,
         ProcessConfigurator $processConfigurator,
@@ -47,30 +37,47 @@ class LoadProcessConfigurationCommand extends Command
         $this->eventTriggerCache = $eventTriggerCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Load process configuration from configuration files to the database')
             ->addOption(
                 'directories',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Directories used to find configuration files'
+                'Directories with process configurations'
             )
             ->addOption(
                 'definitions',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Names of the process definitions that should be loaded'
-            );
+                'Process names'
+            )
+            ->setDescription('Loads process definitions to the database.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command loads process definitions
+from configuration files to the database.
+
+  <info>php %command.full_name%</info>
+
+The <info>--directories</info> option can be used to specify custom location(s)
+of the process configuration files:
+
+  <info>php %command.full_name% --directories=<path1> --directories=<path2></info>
+
+The <info>--definitions</info> option can be used to load only the specified processes:
+
+  <info>php %command.full_name% --definitions=<definition1> --definitions=<definition2></info>
+
+HELP
+            )
+            ->addUsage('--directories=<path1> --directories=<path2>')
+            ->addUsage('--definitions=<definition1> --definitions=<definition2>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $processConfiguration = $this->configurationProvider->getProcessConfiguration(
@@ -85,12 +92,7 @@ class LoadProcessConfigurationCommand extends Command
         $this->eventTriggerCache->build();
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return ConsoleLogger
-     */
-    protected function createConsoleLogger(OutputInterface $output)
+    protected function createConsoleLogger(OutputInterface $output): ConsoleLogger
     {
         return new ConsoleLogger($output, [
             LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,

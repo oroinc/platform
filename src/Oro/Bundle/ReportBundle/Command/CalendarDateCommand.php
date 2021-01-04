@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ReportBundle\Command;
 
@@ -9,7 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Generate calendar dates
+ * Generates calendar date records.
  */
 class CalendarDateCommand extends Command implements CronCommandInterface
 {
@@ -18,44 +19,45 @@ class CalendarDateCommand extends Command implements CronCommandInterface
     /** @var string */
     protected static $defaultName = 'oro:cron:calendar:date';
 
-    /** @var CalendarDateManager */
-    private $calendarDateManager;
+    private CalendarDateManager $calendarDateManager;
 
-    /**
-     * @param CalendarDateManager $calendarDateManager
-     */
     public function __construct(CalendarDateManager $calendarDateManager)
     {
         $this->calendarDateManager = $calendarDateManager;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '01 00 * * *';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isActive()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Generate calendar dates');
+        $this
+            ->setDescription('Generates calendar date records.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command adds new date records to the database
+to simplify grouping by date in some reports.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

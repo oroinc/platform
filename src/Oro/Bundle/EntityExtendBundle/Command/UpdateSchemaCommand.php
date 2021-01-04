@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to update schema according to data stored in entity config caches
+ * Updates database schema for extend entities.
  */
 class UpdateSchemaCommand extends Command
 {
@@ -24,20 +25,10 @@ class UpdateSchemaCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:entity-extend:update-schema';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private ExtendEntityConfigProviderInterface $extendEntityConfigProvider;
+    private EnumSynchronizer $enumSynchronizer;
 
-    /** @var ExtendEntityConfigProviderInterface */
-    private $extendEntityConfigProvider;
-
-    /** @var EnumSynchronizer */
-    private $enumSynchronizer;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param ExtendEntityConfigProviderInterface $extendEntityConfigProvider
-     * @param EnumSynchronizer $enumSynchronizer
-     */
     public function __construct(
         ManagerRegistry $registry,
         ExtendEntityConfigProviderInterface $extendEntityConfigProvider,
@@ -50,33 +41,30 @@ class UpdateSchemaCommand extends Command
         $this->enumSynchronizer = $enumSynchronizer;
     }
 
-    /**
-     * Console command configuration
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription('Synchronize extended and custom entities metadata with a database schema')
-            ->setDefinition(
-                [
-                    new InputOption(
-                        'dry-run',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Dumps the generated SQL statements to the screen (does not execute them).'
-                    )
-                ]
-            );
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the generated SQL instead of executing it')
+            ->setDescription('Updates database schema for extend entities.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command updates database schema for extend entities.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to print the generated SQL statements instead
+of applying them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
+            )
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * Runs command
-     *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     *
-     * @return int|null|void
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
@@ -113,12 +101,7 @@ class UpdateSchemaCommand extends Command
         }
     }
 
-    /**
-     * @param EntityManager $em
-     *
-     * @return array
-     */
-    protected function getClassesMetadata(EntityManager $em)
+    protected function getClassesMetadata(EntityManager $em): array
     {
         $extendConfigs = $this->extendEntityConfigProvider->getExtendEntityConfigs();
         $metadata = [];

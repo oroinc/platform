@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
@@ -7,8 +8,8 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Flushes WSSE nonce cache.
@@ -18,12 +19,8 @@ class DeleteNoncesCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:wsse:nonces:delete';
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         parent::__construct();
@@ -31,51 +28,51 @@ class DeleteNoncesCommand extends Command
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure(): void
     {
-        $this->setDescription('Flushes WSSE nonce cache');
-        $this->setDefinition([
-            new InputOption(
-                'firewall',
-                null,
-                InputArgument::OPTIONAL,
-                'Firewall name. Default: wsse_secured',
-                'wsse_secured'
-            ),
-        ]);
+        $this
+            ->addOption('firewall', null, InputArgument::OPTIONAL, 'Firewall name', 'wsse_secured')
+            ->setDescription('Flushes WSSE nonce cache.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command flushes WSSE nonce cache.
+
+  <info>php %command.full_name%</info>
+
+The <info>--firewall</info> option can be used to provide a name of the firewall:
+
+  <info>php %command.full_name% --firewall=<firewall-name></info>
+
+HELP
+            )
+            ->addUsage('--firewall=<firewall-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $firewall = $input->getOption('firewall');
+        $io = new SymfonyStyle($input, $output);
 
-        $this->getNonceCache($firewall)->clear();
+        try {
+            $firewall = $input->getOption('firewall');
+            $this->getNonceCache($firewall)->clear();
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+            return $e->getCode() ?: 1;
+        }
 
-        $output->writeln(
-            sprintf(
-                'Deleted nonce cache for <comment>%s</comment> firewall.',
-                $firewall
-            )
-        );
+        $io->success(\sprintf('Deleted nonce cache for %s firewall.', $firewall));
+        return 0;
     }
 
-    /**
-     * @param string $firewallName
-     *
-     * @return CacheInterface
-     */
     private function getNonceCache(string $firewallName): CacheInterface
     {
         $serviceId = 'oro_wsse_authentication.nonce_cache.' . $firewallName;
         if (!$this->container->has($serviceId)) {
             throw new \InvalidArgumentException(
-                sprintf('WSSE nonce cache for firewall "%s" is not defined', $firewallName)
+                \sprintf('WSSE nonce cache for firewall "%s" is not defined.', $firewallName)
             );
         }
 

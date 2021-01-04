@@ -20,7 +20,7 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
     {
         $this->assertEquals(
             $this->getTupleLengthFromQuery($this->getUserExportQuery()),
-            $this->getContainer()->get('oro_entity_config.provider.export_query_tuple_length.test')
+            $this->getContainer()->get('oro_entity_config.tests.provider.export_query_tuple_length')
                 ->getTupleLength(User::class)
         );
     }
@@ -31,7 +31,7 @@ class ExportQueryTupleLengthProviderTest extends WebTestCase
     private function getUserExportQuery(): Query
     {
         /** @var EntityReader $entityReader */
-        $entityReader = $this->getContainer()->get('oro_importexport.reader.entity.test');
+        $entityReader = $this->getContainer()->get('oro_importexport.tests.reader.entity');
         $entityReader->setSourceEntityName(User::class);
         /** @var AbstractBufferedQueryResultIterator $sourceIterator */
         $sourceIterator = $entityReader->getSourceIterator();

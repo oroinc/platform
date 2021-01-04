@@ -5,7 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
- * Resized image path provider decorator that cuts configured prefix.
+ * A decorator for a resized image path provider that removes a specified prefix from a path.
  */
 class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInterface
 {
@@ -13,56 +13,52 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
     private $resizedImagePathProvider;
 
     /** @var string */
-    private $skipPrefix;
+    private $prefix;
+
+    /** @var int */
+    private $prefixLength;
 
     /**
      * @param ResizedImagePathProviderInterface $resizedImagePathProvider
-     * @param string $skipPrefix
+     * @param string                            $prefix
      */
-    public function __construct(ResizedImagePathProviderInterface $resizedImagePathProvider, string $skipPrefix)
+    public function __construct(ResizedImagePathProviderInterface $resizedImagePathProvider, string $prefix)
     {
         $this->resizedImagePathProvider = $resizedImagePathProvider;
-        $this->skipPrefix = '/' . trim($skipPrefix, '/');
+        $this->prefix = '/' . trim($prefix, '/') . '/';
+        $this->prefixLength = \strlen($this->prefix);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPathForResizedImage(
-        File $entity,
-        int $width,
-        int $height
-    ): string {
-        $path = $this->resizedImagePathProvider->getPathForResizedImage($entity, $width, $height);
-
-        return $this->preparePath($path);
+    public function getPathForResizedImage(File $entity, int $width, int $height): string
+    {
+        return $this->removePrefix(
+            $this->resizedImagePathProvider->getPathForResizedImage($entity, $width, $height)
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPathForFilteredImage(
-        File $entity,
-        string $filterName
-    ): string {
-        $path = $this->resizedImagePathProvider->getPathForFilteredImage($entity, $filterName);
-
-        return $this->preparePath($path);
+    public function getPathForFilteredImage(File $entity, string $filterName): string
+    {
+        return $this->removePrefix(
+            $this->resizedImagePathProvider->getPathForFilteredImage($entity, $filterName)
+        );
     }
 
     /**
-     * Cuts off the prefix (e.g. admin/media/cache) from the beginning of the image path.
-     *
      * @param string $path
      *
      * @return string
      */
-    private function preparePath(string $path): string
+    private function removePrefix(string $path): string
     {
         $path = '/' . ltrim($path, '/');
-
-        if (stripos($path, $this->skipPrefix) === 0) {
-            $path = substr_replace($path, '', 0, \strlen($this->skipPrefix));
+        if (strncmp($path, $this->prefix, $this->prefixLength) === 0) {
+            $path = substr($path, $this->prefixLength - 1);
         }
 
         return $path;

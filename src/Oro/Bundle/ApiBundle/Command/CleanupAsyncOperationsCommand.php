@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ApiBundle\Command;
 
@@ -22,24 +23,12 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandInterf
     /** @var string */
     protected static $defaultName = 'oro:cron:api:async_operations:cleanup';
 
-    /** @var int */
-    private $operationLifetime;
+    private int $operationLifetime;
+    private int $cleanupProcessTimeout;
 
-    /** @var int */
-    private $cleanupProcessTimeout;
+    private DoctrineHelper $doctrineHelper;
+    private EntityDeleteHandlerRegistry $deleteHandlerRegistry;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityDeleteHandlerRegistry */
-    private $deleteHandlerRegistry;
-
-    /**
-     * @param int                         $operationLifetime
-     * @param int                         $cleanupProcessLifetime
-     * @param DoctrineHelper              $doctrineHelper
-     * @param EntityDeleteHandlerRegistry $deleteHandlerRegistry
-     */
     public function __construct(
         int $operationLifetime,
         int $cleanupProcessLifetime,
@@ -54,41 +43,45 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandInterf
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function isActive()
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription('Deletes all obsolete asynchronous operations.')
             ->addOption(
                 'dry-run',
                 'd',
                 InputOption::VALUE_NONE,
-                'If option exists asynchronous operations won\'t be deleted,'
-                . ' the number of operations that match cleanup criteria will be shown.'
-            );
+                'Show the number of obsolete asynchronous operations without deleting them'
+            )
+            ->setDescription('Deletes all obsolete asynchronous operations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command deletes all obsolete asynchronous operations.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to see the number of obsolete asynchronous operations
+without deleting them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
+            )
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $minDate = date_sub(
@@ -135,11 +128,6 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandInterf
         return 0;
     }
 
-    /**
-     * @param \DateTime $minDate
-     *
-     * @return QueryBuilder
-     */
     private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate): QueryBuilder
     {
         return $this->doctrineHelper

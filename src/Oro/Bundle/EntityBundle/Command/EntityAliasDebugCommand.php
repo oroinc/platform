@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityBundle\Command;
 
@@ -15,37 +16,39 @@ class EntityAliasDebugCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:entity-alias:debug';
 
-    /** @var EntityAliasResolver */
-    private $entityAliasResolver;
+    private EntityAliasResolver $entityAliasResolver;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     */
     public function __construct(EntityAliasResolver $entityAliasResolver)
     {
         $this->entityAliasResolver = $entityAliasResolver;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Displays entity aliases.');
+        $this
+            ->setDescription('Displays entity aliases.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays singular and plural aliases for entity classes.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->outputEntityAliases($output);
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     protected function outputEntityAliases(OutputInterface $output)
     {
         $entityAliases = $this->entityAliasResolver->getAll();

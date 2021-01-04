@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
@@ -15,28 +16,34 @@ class CacheWarmupCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:entity-config:cache:warmup';
 
-    /** @var ConfigCacheWarmer */
-    private $configCacheWarmer;
+    private ConfigCacheWarmer $configCacheWarmer;
 
-    /**
-     * @param ConfigCacheWarmer $configCacheWarmer
-     */
     public function __construct(ConfigCacheWarmer $configCacheWarmer)
     {
         $this->configCacheWarmer = $configCacheWarmer;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Warms up the entity config cache.');
+        $this
+            ->setDescription('Warms up the entity config cache.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command warms up the entity config cache.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

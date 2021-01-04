@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
@@ -13,31 +14,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to debug configuration of actions.
+ * Displays available operations and action groups.
  */
 class DebugOperationCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:debug:operation';
 
-    /** @var ConfigurationProviderInterface */
-    private $operationsProvider;
+    private ConfigurationProviderInterface $operationsProvider;
+    private OperationRegistry $operationRegistry;
+    private ConfigurationProviderInterface $actionGroupsProvider;
+    private ActionGroupRegistry $actionGroupRegistry;
 
-    /** @var OperationRegistry */
-    private $operationRegistry;
-
-    /** @var ConfigurationProviderInterface */
-    private $actionGroupsProvider;
-
-    /** @var ActionGroupRegistry */
-    private $actionGroupRegistry;
-
-    /**
-     * @param ConfigurationProviderInterface $operationsProvider
-     * @param OperationRegistry $operationRegistry
-     * @param ConfigurationProviderInterface $actionGroupsProvider
-     * @param ActionGroupRegistry $actionGroupRegistry
-     */
     public function __construct(
         ConfigurationProviderInterface $operationsProvider,
         OperationRegistry $operationRegistry,
@@ -52,21 +40,48 @@ class DebugOperationCommand extends Command
         $this->actionGroupRegistry = $actionGroupRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Debug operation configuration')
-            ->addArgument('name', InputArgument::OPTIONAL, 'Names of the name of node that should be dumped')
-            ->addOption('action-group', null, InputOption::VALUE_NONE, 'Debug action_group')
-            ->addOption('assemble', null, InputOption::VALUE_NONE, 'Assemble configuration');
+            ->addArgument('name', InputArgument::OPTIONAL, 'Operation or action group')
+            ->addOption('action-group', null, InputOption::VALUE_NONE, 'Show action groups instead of operations')
+            ->addOption('assemble', null, InputOption::VALUE_NONE, 'Show instantiated objects')
+            ->setDescription('Displays available operations and action groups.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays available operations by default:
+
+  <info>php %command.full_name%</info>
+
+Use the <info>--action-group</info> option to see action groups instead of operations:
+
+  <info>php %command.full_name% --action-group</info>
+
+To get information about a specific operation or action group, specify its name:
+
+  <info>php %command.full_name% <operation-name></info>
+  <info>php %command.full_name% --action-group <action-group-name></info>
+  <info>php %command.full_name% DELETE</info>
+  <info>php %command.full_name% --action-group DELETE</info>
+
+The <info>--assemble</info> option can be used to display instantiated objects instead of plain data:
+
+  <info>php %command.full_name% --assemble <operation-name></info>
+  <info>php %command.full_name% --assemble --action-group <action-group-name></info>
+  <info>php %command.full_name% --assemble DELETE</info>
+  <info>php %command.full_name% --assemble --action-group DELETE</info>
+
+HELP
+            )
+            ->addUsage('--action-group')
+            ->addUsage('--action-group <name>')
+            ->addUsage('--assemble --action-group')
+            ->addUsage('--assemble --action-group <name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->getOption('action-group')) {

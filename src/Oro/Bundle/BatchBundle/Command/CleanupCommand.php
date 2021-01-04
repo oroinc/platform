@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\BatchBundle\Command;
 
@@ -16,25 +17,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to clean up old batch job records
+ * Deletes old batch job records.
  */
 class CleanupCommand extends Command implements CronCommandInterface
 {
-    const FLUSH_BATCH_SIZE = 100;
+    public const FLUSH_BATCH_SIZE = 100;
 
     /** @var string */
     protected static $defaultName = 'oro:cron:batch:cleanup';
 
-    /** @var DoctrineJobRepository */
-    private $akeneoJobRepository;
+    private DoctrineJobRepository $akeneoJobRepository;
 
-    /** @var string */
-    private $batchCleanupInterval;
+    private string $batchCleanupInterval;
 
-    /**
-     * @param DoctrineJobRepository $akeneoJobRepository
-     * @param string $batchCleanupInterval
-     */
     public function __construct(DoctrineJobRepository $akeneoJobRepository, string $batchCleanupInterval)
     {
         $this->akeneoJobRepository = $akeneoJobRepository;
@@ -42,9 +37,6 @@ class CleanupCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
@@ -66,24 +58,37 @@ class CleanupCommand extends Command implements CronCommandInterface
         return ($count > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Clean up batch history')
             ->addOption(
                 'interval',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Time interval to keep the batch records. Example "2 weeks"'
-            );
+                'Time interval to keep the batch records (e.g. "2 weeks")'
+            )
+            ->setDescription('Deletes old batch job records.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command deletes old batch job records.
+
+  <info>php %command.full_name%</info>
+
+The <info>--interval</info> option allows to clean only those job records that are older than the provided
+time interval. Any notation that can be parsed by <comment>\DateInterval::createFromDateString()</comment>
+is accepted (see <comment>https://php.net/manual/dateinterval.createfromdatestring.php</comment>):
+
+  <info>php %command.full_name% --interval=<interval></info>
+  <info>php %command.full_name% --interval="2 weeks"</info>
+
+HELP
+            )
+            ->addUsage('--interval=<interval>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $interval = $input->getOption('interval');
@@ -107,12 +112,8 @@ class CleanupCommand extends Command implements CronCommandInterface
 
     /**
      * Subtract given interval from current date time
-     *
-     * @param string $intervalString
-     *
-     * @return \DateTime
      */
-    protected function prepareDateInterval($intervalString = null)
+    protected function prepareDateInterval(?string $intervalString = null): \DateTime
     {
         $date           = new \DateTime('now', new \DateTimeZone('UTC'));
         $intervalString = $intervalString ?: $this->batchCleanupInterval;
@@ -124,13 +125,9 @@ class CleanupCommand extends Command implements CronCommandInterface
     /**
      * Delete records using iterator
      *
-     * @param BufferedIdentityQueryResultIterator $iterator
-     *
-     * @param string                      $className Entity FQCN
-     *
      * @throws \Exception
      */
-    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, $className)
+    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, string $fqcn): void
     {
         $iteration = 0;
 
@@ -140,19 +137,15 @@ class CleanupCommand extends Command implements CronCommandInterface
 
             $iteration++;
             if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                $this->processBatch($ids, $className);
+                $this->processBatch($ids, $fqcn);
             }
         }
         if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-            $this->processBatch($ids, $className);
+            $this->processBatch($ids, $fqcn);
         }
     }
 
-    /**
-     * @param array $ids
-     * @param string $className
-     */
-    protected function processBatch($ids, $className)
+    protected function processBatch(array $ids, string $className): void
     {
         $this->getEntityManager()
             ->getRepository($className)

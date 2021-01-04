@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TestFrameworkBundle\Command;
 
@@ -10,86 +11,93 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Displays documented information for dependency injection tags
+ * Lists available documentation for dependency injection tags.
  */
 class ContainerTagsDocumentationCommand extends Command
 {
     protected static $defaultName = 'oro:debug:container:tag-documentation';
 
-    private const OPTION_WITHOUT_DOCUMENTATION = 'without-documentation';
-    private const OPTION_WITH_DOCUMENTATION = 'with-documentation';
-    private const OPTION_SKIP_CODE_EXAMPLES = 'skip-code-examples';
-    private const OPTION_EXCLUDE = 'exclude';
-    private const OPTION_INCLUDED = 'included';
+    private ContainerTagsDocumentationInformationProvider $docInfoProvider;
 
-    /** @var ContainerTagsDocumentationInformationProvider */
-    private $containerTagsDocumentationInformationProvider;
-
-    /**
-     * @param ContainerTagsDocumentationInformationProvider $containerTagsDocumentationInformationProvider
-     */
     public function __construct(
         ContainerTagsDocumentationInformationProvider $containerTagsDocumentationInformationProvider
     ) {
-        $this->containerTagsDocumentationInformationProvider = $containerTagsDocumentationInformationProvider;
+        $this->docInfoProvider = $containerTagsDocumentationInformationProvider;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Displays documented information for dependency injection tags')
+            ->addOption('without-documentation', null, InputOption::VALUE_NONE, 'List undocumented tags')
+            ->addOption('with-documentation', null, InputOption::VALUE_NONE, 'List documented tags')
             ->addOption(
-                self::OPTION_WITHOUT_DOCUMENTATION,
-                null,
-                InputOption::VALUE_NONE,
-                'Show list of undocumented tags'
-            )
-            ->addOption(
-                self::OPTION_WITH_DOCUMENTATION,
-                null,
-                InputOption::VALUE_NONE,
-                'Show list of documented tags'
-            )
-            ->addOption(
-                self::OPTION_SKIP_CODE_EXAMPLES,
+                'skip-code-examples',
                 null,
                 InputOption::VALUE_NONE,
                 'Skip documentation where tag is mentioned in code example blocks'
             )
             ->addOption(
-                self::OPTION_EXCLUDE,
+                'exclude',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'List of tag name patterns to exclude'
+                'Tag name patterns to exclude'
             )
             ->addOption(
-                self::OPTION_INCLUDED,
+                'included',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'List of tag name patterns to include'
-            );
+                'Tag name patterns to include'
+            )
+            ->setDescription('Lists available documentation for dependency injection tags.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available documentation
+for dependency injection tags.
+
+  <info>php %command.full_name%</info>
+
+The <info>--without-documentation</info> and <info>--with-documentation</info> options can be used
+to display only undocumented or documented tags respectively:
+
+  <info>php %command.full_name% --without-documentation</info>
+  <info>php %command.full_name% --with-documentation</info>
+
+Use <info>--skip-code-examples</info> option not to consider code examples as documentation:
+
+  <info>php %command.full_name% --skip-code-examples</info>
+
+The <info>--exclude</info> and <info>--included</info> options can be used
+to exclude or include certain tags respectively:
+
+  <info>php %command.full_name% --exclude=<pattern1> --exclude=<pattern2> --exclude=<patternN></info>
+  <info>php %command.full_name% --included=<pattern1> --included=<pattern2> --included=<patternN></info>
+
+HELP
+            )
+            ->addUsage('--without-documentation')
+            ->addUsage('--with-documentation')
+            ->addUsage('--skip-code-examples')
+            ->addUsage('--exclude=<pattern1> --exclude=<pattern2> --exclude=<patternN>')
+            ->addUsage('--included=<pattern1> --included=<pattern2> --included=<patternN>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $includedTags = (array)$input->getOption(self::OPTION_INCLUDED);
-        $excludedTags = (array)$input->getOption(self::OPTION_EXCLUDE);
-        $skipCodeExamples = (bool)$input->getOption(self::OPTION_SKIP_CODE_EXAMPLES);
-        $withDocs = (bool)$input->getOption(self::OPTION_WITH_DOCUMENTATION);
-        $withoutDocs = (bool)$input->getOption(self::OPTION_WITHOUT_DOCUMENTATION);
+        $includedTags = (array)$input->getOption('included');
+        $excludedTags = (array)$input->getOption('exclude');
+        $skipCodeExamples = (bool)$input->getOption('skip-code-examples');
+        $withDocs = (bool)$input->getOption('with-documentation');
+        $withoutDocs = (bool)$input->getOption('without-documentation');
 
-        $oroTags = $this->containerTagsDocumentationInformationProvider->getOroTags($includedTags, $excludedTags);
+        $oroTags = $this->docInfoProvider->getOroTags($includedTags, $excludedTags);
         $io = new SymfonyStyle($input, $output);
 
-        $documentationInfo = $this->containerTagsDocumentationInformationProvider
+        $documentationInfo = $this->docInfoProvider
             ->getTagsDocumentationInformation($oroTags, $skipCodeExamples);
         ksort($documentationInfo);
         $rows = $this->getAsTableRows($documentationInfo, $withDocs, $withoutDocs);
@@ -102,13 +110,7 @@ class ContainerTagsDocumentationCommand extends Command
         }
     }
 
-    /**
-     * @param array $documentationInfo
-     * @param bool $withDocs
-     * @param bool $withoutDocs
-     * @return array
-     */
-    protected function getAsTableRows(array $documentationInfo, $withDocs, $withoutDocs): array
+    protected function getAsTableRows(array $documentationInfo, bool $withDocs, bool $withoutDocs): array
     {
         $rows = [];
         $noSkip = !$withDocs && !$withoutDocs;
@@ -117,23 +119,17 @@ class ContainerTagsDocumentationCommand extends Command
         foreach ($documentationInfo as $tag => $docs) {
             foreach ($docs as &$doc) {
                 $doc = '<info>'
-                    . str_replace($this->containerTagsDocumentationInformationProvider->getInstallDir() . '/', '', $doc)
+                    . str_replace($this->docInfoProvider->getInstallDir() . '/', '', $doc)
                     . '</info>';
             }
             unset($doc);
 
             if ($docs) {
                 if ($includeWithDoc) {
-                    $rows[] = [
-                        '<info>' . $tag . '</info>',
-                        implode(PHP_EOL, $docs)
-                    ];
+                    $rows[] = ['<info>' . $tag . '</info>', implode(PHP_EOL, $docs)];
                 }
             } elseif ($includeWithoutDoc) {
-                $rows[] = [
-                    '<error>' . $tag . '</error>',
-                    'N/A'
-                ];
+                $rows[] = ['<error>' . $tag . '</error>', 'N/A'];
             }
         }
 

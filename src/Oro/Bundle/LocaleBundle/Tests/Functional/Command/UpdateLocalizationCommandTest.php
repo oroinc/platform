@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Command;
 
@@ -14,15 +15,9 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
  */
 class UpdateLocalizationCommandTest extends WebTestCase
 {
-    /** @var LocalizationRepository */
-    private $localizationRepository;
+    private LocalizationRepository $localizationRepository;
+    private LanguageRepository $languageRepository;
 
-    /** @var LanguageRepository */
-    private $languageRepository;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -45,8 +40,8 @@ class UpdateLocalizationCommandTest extends WebTestCase
         $this->runCommand(
             UpdateLocalizationCommand::getDefaultName(),
             [
-                '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'de_DE',
-                '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'de'
+                '--' . 'formatting-code' => 'de_DE',
+                '--' . 'language' => 'de'
             ]
         );
 
@@ -59,8 +54,8 @@ class UpdateLocalizationCommandTest extends WebTestCase
         $this->runCommand(
             UpdateLocalizationCommand::getDefaultName(),
             [
-                '--' . UpdateLocalizationCommand::OPTION_FORMATTING_CODE => 'it_IT',
-                '--' . UpdateLocalizationCommand::OPTION_LANGUAGE => 'it'
+                '--' . 'formatting-code' => 'it_IT',
+                '--' . 'language' => 'it'
             ]
         );
 
@@ -71,42 +66,31 @@ class UpdateLocalizationCommandTest extends WebTestCase
         $this->assertEnglishLanguageExists(); // And English language is present
     }
 
-    /**
-     * @param string $languageCode
-     * @param string $formattingCode
-     * @param string $name
-     */
     private function assertLocalizationExists(string $languageCode, string $formattingCode, string $name): void
     {
         $localizations = $this->localizationRepository->findAll();
-        $this->assertCount(1, $localizations);
+        static::assertCount(1, $localizations);
         /** @var Localization $localization */
         $localization = reset($localizations);
 
-        $this->assertEquals($languageCode, $localization->getLanguageCode());
-        $this->assertEquals($formattingCode, $localization->getFormattingCode());
-        $this->assertEquals($name, $localization->getName());
-        $this->assertEquals($name, $localization->getTitle());
+        static::assertEquals($languageCode, $localization->getLanguageCode());
+        static::assertEquals($formattingCode, $localization->getFormattingCode());
+        static::assertEquals($name, $localization->getName());
+        static::assertEquals($name, $localization->getTitle());
     }
 
     private function assertEnglishLanguageExists(): void
     {
-        $this->assertFalse(null === $this->languageRepository->findOneBy(['code' => 'en']));
+        static::assertFalse(null === $this->languageRepository->findOneBy(['code' => 'en']));
     }
 
-    /**
-     * @param string $formattingCode
-     */
     private function assertLocalizationNotExists(string $formattingCode): void
     {
-        $this->assertTrue(null === $this->localizationRepository->findOneBy(['formattingCode' => $formattingCode]));
+        static::assertTrue(null === $this->localizationRepository->findOneBy(['formattingCode' => $formattingCode]));
     }
 
-    /**
-     * @param string $code
-     */
     private function assertLanguageNotExists(string $code): void
     {
-        $this->assertTrue(null === $this->languageRepository->findOneBy(['code' => $code]));
+        static::assertTrue(null === $this->languageRepository->findOneBy(['code' => $code]));
     }
 }
