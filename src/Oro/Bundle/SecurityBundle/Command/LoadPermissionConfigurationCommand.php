@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\SecurityBundle\Command;
 
@@ -14,31 +15,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Load permissions configuration from configuration files to the database.
+ * Loads permission configuration to the database.
  */
 class LoadPermissionConfigurationCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'security:permission:configuration:load';
 
-    /** @var PermissionManager */
-    private $permissionManager;
+    private PermissionManager $permissionManager;
+    private PermissionConfigurationProvider $permissionConfigurationProvider;
+    private PermissionConfigurationBuilder $permissionConfigurationBuilder;
+    private DoctrineHelper $doctrineHelper;
 
-    /** @var PermissionConfigurationProvider */
-    private $permissionConfigurationProvider;
-
-    /** @var PermissionConfigurationBuilder */
-    private $permissionConfigurationBuilder;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /**
-     * @param PermissionManager $permissionManager
-     * @param PermissionConfigurationProvider $permissionConfigurationProvider
-     * @param PermissionConfigurationBuilder $permissionConfigurationBuilder
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         PermissionManager $permissionManager,
         PermissionConfigurationProvider $permissionConfigurationProvider,
@@ -53,23 +41,36 @@ class LoadPermissionConfigurationCommand extends Command
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @inheritdoc
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Load permissions configuration from configuration files to the database')
+        $this
             ->addOption(
                 'permissions',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Names of the permissions that should be loaded'
-            );
+                'Permissions to load'
+            )
+            ->setDescription('Loads permission configuration to the database.')
+            ->setHelp(
+                // @codingStandardsIgnoreStart
+                <<<'HELP'
+The <info>%command.name%</info> command loads permission configuration from the configuration files to the database.
+
+  <info>php %command.full_name%</info>
+
+The <info>--permissions</info> option can be used to load only the specified permission configurations:
+
+  <info>php %command.full_name% --permissions=<permission1> --permissions=<permission2> --permissions=<permissionN></info>
+
+HELP
+                // @codingStandardsIgnoreEnd
+            )
+            ->addUsage('--permissions=<permission1> --permissions=<permission2> --permissions=<permissionN>')
+        ;
     }
 
-    /**
-     * @inheritdoc
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $acceptedPermissions = $input->getOption('permissions') ?: null;
@@ -91,11 +92,7 @@ class LoadPermissionConfigurationCommand extends Command
         }
     }
 
-    /**
-     * @param Permission $permission
-     * @param OutputInterface $output
-     */
-    protected function validatePermissionEntities(Permission $permission, OutputInterface $output)
+    protected function validatePermissionEntities(Permission $permission, OutputInterface $output): void
     {
         /** @var PermissionEntity[] $permissionEntities */
         $permissionEntities = array_merge(
@@ -113,11 +110,7 @@ class LoadPermissionConfigurationCommand extends Command
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @return bool
-     */
-    protected function isManageableEntityClass($entityClass)
+    protected function isManageableEntityClass(string $entityClass): bool
     {
         try {
             return $this->doctrineHelper->isManageableEntityClass($entityClass);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\GaufretteBundle;
 
+use Gaufrette\Adapter\Local;
 use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Exception;
 use Gaufrette\Exception\FileNotFound;
@@ -13,6 +14,7 @@ use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
@@ -132,12 +134,55 @@ class FileManager
             throw new ProtocolConfigurationException();
         }
 
+        return $this->protocol . '://' . $this->getFilePathWithoutProtocol($fileName);
+    }
+
+    /**
+     * Gets the full path to a file in the Gaufrette file system but without the protocol part.
+     * For example, if a full path is "gaufrette://my_filesystem/file.txt",
+     * the full full path the protocol part is "my_filesystem/file.txt".
+     *
+     * @param string $fileName
+     *
+     * @return string
+     */
+    public function getFilePathWithoutProtocol(string $fileName): string
+    {
         return
-            $this->protocol
-            . '://'
-            . $this->filesystemName
+            $this->filesystemName
             . self::DIRECTORY_SEPARATOR
             . $this->getFileNameWithSubDirectory($fileName);
+    }
+
+    /**
+     * Returns a human readable representation of a Gaufrette adapter used by this file manager:
+     * * for Local adapter the full path to the directory will be returned.
+     * * for other adapters the name of the adapter will be returned.
+     */
+    public function getAdapterDescription(): string
+    {
+        $adapter = $this->filesystem->getAdapter();
+        $reflection = new \ReflectionClass($adapter);
+
+        if ($adapter instanceof Local) {
+            $directoryProperty = ReflectionUtil::getProperty($reflection, 'directory');
+            if (null === $directoryProperty) {
+                throw new \LogicException(sprintf(
+                    'The class "%s" does not have "directory" property.',
+                    get_class($adapter)
+                ));
+            }
+            $directoryProperty->setAccessible(true);
+            $directory = $directoryProperty->getValue($adapter);
+            $subDirectory = $this->getSubDirectory();
+            if ($subDirectory) {
+                $directory .= '/' . $subDirectory;
+            }
+
+            return $directory;
+        }
+
+        return $reflection->getShortName();
     }
 
     /**
@@ -590,7 +635,7 @@ class FileManager
         if (!$success) {
             throw new FlushFailedException(sprintf(
                 'Failed to flush data to the "%s" file.',
-                $this->getFileNameWithoutSubDirectory($fileName)
+                $fileName
             ));
         }
     }

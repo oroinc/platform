@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
@@ -12,7 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Cron command that checks that consumers are alive and pushes the message if there are no available consumers.
+ * Pushes a websocket notification if there are no available MQ consumers.
  */
 class ConsumerHeartbeatCommand extends Command implements
     CronCommandInterface,
@@ -21,24 +22,12 @@ class ConsumerHeartbeatCommand extends Command implements
     /** @var string */
     protected static $defaultName = 'oro:cron:message-queue:consumer_heartbeat_check';
 
-    /** @var ConsumerHeartbeat */
-    private $consumerHeartbeat;
+    private ConsumerHeartbeat $consumerHeartbeat;
+    private ConnectionChecker $connectionChecker;
+    private WebsocketClientInterface $websocketClient;
 
-    /** var ConnectionChecker **/
-    private $connectionChecker;
+    private int $heartBeatUpdatePeriod;
 
-    /** var WebsocketClientInterface **/
-    private $websocketClient;
-
-    /** @var int */
-    private $heartBeatUpdatePeriod;
-
-    /**
-     * @param ConsumerHeartbeat $consumerHeartbeat
-     * @param ConnectionChecker $connectionChecker
-     * @param WebsocketClientInterface $websocketClient
-     * @param int $heartBeatUpdatePeriod
-     */
     public function __construct(
         ConsumerHeartbeat $consumerHeartbeat,
         ConnectionChecker $connectionChecker,
@@ -52,28 +41,39 @@ class ConsumerHeartbeatCommand extends Command implements
         parent::__construct();
     }
 
-    /** {@inheritdoc} */
     public function getDefaultDefinition()
     {
-        return sprintf(
-            '*/%s * * * *',
+        return \sprintf(
+            '*/%u * * * *',
             $this->heartBeatUpdatePeriod
         );
     }
 
-    /** {@inheritdoc} */
     public function isActive()
     {
         return true;
     }
 
-    /** {@inheritdoc} */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Checks if there is alive consumers');
+        $this->setDescription('Pushes a websocket notification if there are no available MQ consumers.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command checks if there are any active message queue consumers
+running, and pushes a websocket notification if there are none. This notification will be shown
+as a flash message to the back-office users upon sign in.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            );
     }
 
-    /** {@inheritdoc} */
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         // do nothing if check was disabled with 0 config option value

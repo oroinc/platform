@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Command;
 
@@ -9,28 +10,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Console command to dump locale settings to the JS file for using on frontend.
+ * Dumps locale settings for use in JavaScript.
  */
 class OroLocalizationDumpCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:localization:dump';
 
-    /** @var LocaleSettings */
-    private $localeSettings;
+    private LocaleSettings $localeSettings;
+    private Filesystem $filesystem;
 
-    /** @var Filesystem */
-    private $filesystem;
+    private string $projectDir;
 
-    /** @var string */
-    private $projectDir;
-
-    /**
-     * @param LocaleSettings $localeSettings
-     * @param Filesystem $filesystem
-     * @param string $projectDir
-     * @param string|null $name
-     */
     public function __construct(
         LocaleSettings $localeSettings,
         Filesystem $filesystem,
@@ -44,16 +35,26 @@ class OroLocalizationDumpCommand extends Command
         parent::__construct($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Dumps oro js-localization');
+        $this
+            ->setDescription('Dumps locale settings for use in JavaScript.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the locale settings used by JavaScript code
+into the predefined public resource file.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -86,11 +87,8 @@ class OroLocalizationDumpCommand extends Command
 
     /**
      * Get address formats converted to simplified structure.
-     *
-     * @param LocaleSettings $localeSettings
-     * @return array
      */
-    protected function getAddressFormats(LocaleSettings $localeSettings)
+    protected function getAddressFormats(LocaleSettings $localeSettings): array
     {
         $result = [];
         $formats = $localeSettings->getAddressFormats();

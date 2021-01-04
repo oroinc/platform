@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
@@ -9,19 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Shows all available topics and some information about them.
+ * Lists available message queue topics.
  */
 class TopicsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:message-queue:topics';
 
-    /** @var TopicMetaRegistry */
-    private $topicMetaRegistry;
+    private TopicMetaRegistry $topicMetaRegistry;
 
-    /**
-     * @param TopicMetaRegistry $topicMetaRegistry
-     */
     public function __construct(TopicMetaRegistry $topicMetaRegistry)
     {
         parent::__construct();
@@ -29,17 +26,25 @@ class TopicsCommand extends Command
         $this->topicMetaRegistry = $topicMetaRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('A command shows all available topics and some information about them.');
+            ->setDescription('Lists available message queue topics.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available message queue topics.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -48,7 +53,7 @@ class TopicsCommand extends Command
 
         $count = 0;
         $firstRow = true;
-        foreach ($this->getTopics() as $topic) {
+        foreach ($this->topicMetaRegistry->getTopicsMeta() as $topic) {
             if (!$firstRow) {
                 $table->addRow(new TableSeparator());
             }
@@ -62,13 +67,5 @@ class TopicsCommand extends Command
         $output->writeln(sprintf('Found %s topics', $count));
         $output->writeln('');
         $table->render();
-    }
-
-    /**
-     * @return TopicMeta[]
-     */
-    private function getTopics()
-    {
-        return $this->topicMetaRegistry->getTopicsMeta();
     }
 }

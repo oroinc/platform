@@ -18,19 +18,19 @@ class ResizedImagePathProviderDecoratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider pathDataProvider
-     *
-     * @param string $path
-     * @param string $skipPrefix
-     * @param string $expectedPath
      */
-    public function testGetPathforResizedImage(string $path, string $skipPrefix, string $expectedPath): void
+    public function testGetPathForResizedImage(string $path, string $prefix, string $expectedPath): void
     {
-        $provider = new ResizedImagePathProviderDecorator($this->innerResizedImagePathProvider, $skipPrefix);
+        $entity = new File();
+        $width = 10;
+        $height = 20;
 
-        $this->innerResizedImagePathProvider
+        $this->innerResizedImagePathProvider->expects(self::once())
             ->method('getPathForResizedImage')
-            ->with($entity = new File(), $width = 10, $height = 20)
+            ->with(self::identicalTo($entity), $width, $height)
             ->willReturn($path);
+
+        $provider = new ResizedImagePathProviderDecorator($this->innerResizedImagePathProvider, $prefix);
 
         self::assertEquals(
             $expectedPath,
@@ -39,53 +39,152 @@ class ResizedImagePathProviderDecoratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     */
-    public function pathDataProvider(): array
-    {
-        return [
-            [
-                'path' => '/sample/foo/bar/file.jpg',
-                'skipPrefix' => 'sample/prefix',
-                'expectedPath' => '/sample/foo/bar/file.jpg',
-            ],
-            [
-                'path' => '/sample/prefix/foo/bar/file.jpg',
-                'skipPrefix' => 'sample/prefix',
-                'expectedPath' => '/foo/bar/file.jpg',
-            ],
-            [
-                'path' => '/sample/prefix/foo/bar/file.jpg',
-                'skipPrefix' => '/sample/prefix/',
-                'expectedPath' => '/foo/bar/file.jpg',
-            ],
-            [
-                'path' => 'sample/prefix/foo/bar/file.jpg',
-                'skipPrefix' => 'sample/prefix/',
-                'expectedPath' => '/foo/bar/file.jpg',
-            ],
-        ];
-    }
-
-    /**
      * @dataProvider pathDataProvider
-     *
-     * @param string $path
-     * @param string $skipPrefix
-     * @param string $expectedPath
      */
-    public function testGetPathforFilteredImage(string $path, string $skipPrefix, string $expectedPath): void
+    public function testGetPathForFilteredImage(string $path, string $prefix, string $expectedPath): void
     {
-        $provider = new ResizedImagePathProviderDecorator($this->innerResizedImagePathProvider, $skipPrefix);
+        $entity = new File();
+        $filter = 'sample-filter';
 
-        $this->innerResizedImagePathProvider
+        $this->innerResizedImagePathProvider->expects(self::once())
             ->method('getPathForFilteredImage')
-            ->with($entity = new File(), $filter = 'sample-filter')
+            ->with(self::identicalTo($entity), $filter)
             ->willReturn($path);
+
+        $provider = new ResizedImagePathProviderDecorator($this->innerResizedImagePathProvider, $prefix);
 
         self::assertEquals(
             $expectedPath,
             $provider->getPathForFilteredImage($entity, $filter)
         );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function pathDataProvider(): array
+    {
+        return [
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/baz',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/baz/',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/baz/',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/baz',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => '',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => '/',
+                'expectedPath' => '/sample/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => 'sample',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => 'sample/foo/bar/file.jpg',
+                'prefix'       => '/sample',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample',
+                'expectedPath' => '/foo/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/foo',
+                'expectedPath' => '/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/foo/',
+                'expectedPath' => '/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => 'sample/foo/',
+                'expectedPath' => '/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo/bar/file.jpg',
+                'prefix'       => '/sample/foo',
+                'expectedPath' => '/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo-baz/bar/file.jpg',
+                'prefix'       => 'sample/foo',
+                'expectedPath' => '/sample/foo-baz/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo-baz/bar/file.jpg',
+                'prefix'       => '/sample/foo/',
+                'expectedPath' => '/sample/foo-baz/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo-baz/bar/file.jpg',
+                'prefix'       => 'sample/foo/',
+                'expectedPath' => '/sample/foo-baz/bar/file.jpg'
+            ],
+            [
+                'path'         => '/sample/foo-baz/bar/file.jpg',
+                'prefix'       => '/sample/foo',
+                'expectedPath' => '/sample/foo-baz/bar/file.jpg'
+            ]
+        ];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -16,7 +17,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * List workflow definitions registered within application
+ * Displays current workflow definitions.
  */
 class DebugWorkflowDefinitionsCommand extends Command
 {
@@ -25,8 +26,7 @@ class DebugWorkflowDefinitionsCommand extends Command
 
     private const INLINE_DEPTH = 20;
 
-    /** @var array */
-    protected static $tableHeader = [
+    protected static array $tableHeader = [
         'System Name',
         'Label',
         'Related Entity',
@@ -37,16 +37,9 @@ class DebugWorkflowDefinitionsCommand extends Command
         'Exclusive Record Groups'
     ];
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
+    private TranslatorInterface $translator;
 
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ManagerRegistry $doctrine, TranslatorInterface $translator)
     {
         $this->doctrine = $doctrine;
@@ -55,23 +48,30 @@ class DebugWorkflowDefinitionsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('List workflow definitions registered within application')
-            ->addArgument(
-                'workflow-name',
-                InputArgument::OPTIONAL,
-                'Name of the workflow definition that should be dumped'
-            );
+            ->addArgument('workflow-name', InputArgument::OPTIONAL, 'Workflow name')
+            ->setDescription('Displays current workflow definitions.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays workflow definitions
+that are registered in the application.
+
+  <info>php %command.full_name%</info>
+
+Use <info>--workflow-name</info> option to display the definition of a specific workflow:
+
+  <info>php %command.full_name% --workflow-name=<workflow-name></info>
+
+HELP
+            )
+            ->addUsage('--workflow-name=<workflow-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if ($input->hasArgument('workflow-name') && $input->getArgument('workflow-name')) {
@@ -81,31 +81,26 @@ class DebugWorkflowDefinitionsCommand extends Command
         return $this->listWorkflowDefinitions($output);
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    protected function listWorkflowDefinitions(OutputInterface $output)
+    protected function listWorkflowDefinitions(OutputInterface $output): int
     {
         /** @var WorkflowDefinition[] $workflows */
         $workflows = $this->getWorkflowDefinitionRepository()->findAll();
-        if (count($workflows)) {
+        if (\count($workflows)) {
             $table = new Table($output);
             $table->setHeaders(self::$tableHeader)->setRows([]);
 
             foreach ($workflows as $workflow) {
-                $activeGroups = implode(', ', $workflow->getExclusiveActiveGroups());
+                $activeGroups = \implode(', ', $workflow->getExclusiveActiveGroups());
                 if (!$activeGroups) {
                     $activeGroups = 'N/A';
                 }
 
-                $recordGroups = implode(', ', $workflow->getExclusiveRecordGroups());
+                $recordGroups = \implode(', ', $workflow->getExclusiveRecordGroups());
                 if (!$recordGroups) {
                     $recordGroups = 'N/A';
                 }
 
-                $applications = implode(', ', $workflow->getApplications());
+                $applications = \implode(', ', $workflow->getApplications());
 
                 $row = [
                     $workflow->getName(),
@@ -129,13 +124,7 @@ class DebugWorkflowDefinitionsCommand extends Command
         return 1;
     }
 
-    /**
-     * @param string $workflowName
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    protected function dumpWorkflowDefinition($workflowName, OutputInterface $output)
+    protected function dumpWorkflowDefinition($workflowName, OutputInterface $output): int
     {
         /** @var WorkflowDefinition $workflow */
         $workflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
@@ -146,9 +135,7 @@ class DebugWorkflowDefinitionsCommand extends Command
                 'entity_attribute' => $workflow->getEntityAttributeName(),
                 'steps_display_ordered' => $workflow->isStepsDisplayOrdered(),
                 'priority' => $workflow->getPriority() ?: 0,
-                'defaults' => [
-                    'active' => $workflow->isActive()
-                ],
+                'defaults' => ['active' => $workflow->isActive()],
                 WorkflowConfiguration::NODE_APPLICATIONS => $workflow->getApplications()
             ];
 
@@ -169,11 +156,7 @@ class DebugWorkflowDefinitionsCommand extends Command
 
             $this->clearConfiguration($configuration);
 
-            $definition = [
-                'workflows' => [
-                    $workflow->getName() => array_merge($general, $configuration)
-                ]
-            ];
+            $definition = ['workflows' => [$workflow->getName() => \array_merge($general, $configuration)]];
 
             $output->write(Yaml::dump($definition, self::INLINE_DEPTH), true);
 
@@ -187,29 +170,26 @@ class DebugWorkflowDefinitionsCommand extends Command
 
     /**
      * Clear "label" and "message" options from configuration
-     *
-     * @param $array
      */
-    protected function clearConfiguration(&$array)
+    protected function clearConfiguration(array &$array): void
     {
         foreach ($array as $key => &$value) {
-            if (is_array($value)) {
-                $countBefore = count($value);
+            if (\is_array($value)) {
+                $countBefore = \count($value);
                 $this->clearConfiguration($value);
                 if (empty($value) && $countBefore) {
                     $array[$key] = null;
                 }
             }
-            if (in_array(strtolower($key), ['label', 'message', 'button_label', 'button_title'], true)) {
+            if (\is_string($key)
+                && \in_array(\strtolower($key), ['label', 'message', 'button_label', 'button_title'], true)
+            ) {
                 unset($array[$key]);
             }
         }
     }
 
-    /**
-     * @return WorkflowDefinitionRepository
-     */
-    protected function getWorkflowDefinitionRepository()
+    protected function getWorkflowDefinitionRepository(): WorkflowDefinitionRepository
     {
         return $this->doctrine->getRepository(WorkflowDefinition::class);
     }

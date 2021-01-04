@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\PlatformBundle\Command;
 
@@ -8,18 +9,14 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Get list of Doctrine listeners which can be disabled during process console command
+ * Lists Doctrine listeners that can be disabled.
  */
 class OptionalListenersCommand extends Command
 {
     protected static $defaultName = 'oro:platform:optional-listeners';
 
-    /** @var OptionalListenerManager */
-    private $optionalListenerManager;
+    private OptionalListenerManager $optionalListenerManager;
 
-    /**
-     * @param OptionalListenerManager $optionalListenerManager
-     */
     public function __construct(OptionalListenerManager $optionalListenerManager)
     {
         $this->optionalListenerManager = $optionalListenerManager;
@@ -27,17 +24,27 @@ class OptionalListenersCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Get list of Doctrine listeners which can be disabled during process console command');
+            ->setDescription('Lists Doctrine listeners that can be disabled.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists optional Doctrine listeners
+that can be disabled when running console commands by using
+the <comment>--disabled-listeners</comment> option.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

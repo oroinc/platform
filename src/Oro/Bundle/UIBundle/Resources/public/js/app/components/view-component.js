@@ -35,7 +35,7 @@ define(function(require) {
             options._sourceElement.attr('data-bound-view', options.view);
 
             this._deferredInit();
-            if (subPromises.length) {
+            if (subPromises.length && !options.ignoreSubPromises) {
                 // ensure that all nested components are already initialized
                 $.when(...subPromises).then(function() {
                     loadModules(options.view, initializeView);

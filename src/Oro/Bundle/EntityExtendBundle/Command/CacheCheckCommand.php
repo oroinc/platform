@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -9,20 +10,14 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Makes sure that extended entity configs are ready to be processed by other commands.
+ * Prepares extended entity configs for processing by other commands.
  */
 class CacheCheckCommand extends Command
 {
     protected static $defaultName = 'oro:entity-extend:cache:check';
 
-    /**
-     * @var ExtendConfigDumper
-     */
-    private $extendConfigDumper;
+    private ExtendConfigDumper $extendConfigDumper;
 
-    /**
-     * @param ExtendConfigDumper $extendConfigDumper
-     */
     public function __construct(ExtendConfigDumper $extendConfigDumper)
     {
         $this->extendConfigDumper = $extendConfigDumper;
@@ -30,26 +25,36 @@ class CacheCheckCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Makes sure that extended entity configs are ready to be processed by other commands.'
-                . ' This is an internal command. Please do not run it manually.'
+            ->addOption('cache-dir', null, InputOption::VALUE_REQUIRED, 'Cache directory')
+            ->setHidden(true)
+            ->setDescription('Prepares extended entity configs for processing by other commands.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command makes sure that extended entity configs
+are ready to be processed by other commands.
+
+  <info>php %command.full_name%</info>
+
+<error>This is an internal command. Please do not run it manually.</error>
+
+The <info>--cache-dir</info> option can be used to dump the extended entity config cache
+to a different location and check it there.
+
+  <info>php %command.full_name% --cache-dir=<path></info>
+
+HELP
             )
-            ->addOption(
-                'cache-dir',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The cache directory'
-            );
+            ->addUsage('--cache-dir=<path>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @noinspection PhpMissingParentCallCommonInspection
+     * @throws \Exception
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {

@@ -406,6 +406,11 @@ class ImportExportContext extends OroFeatureContext implements
                     } elseif ($value === '<notEmpty()>') {
                         static::assertNotEmpty($entityDataFromCsv[$property]);
                     } else {
+                        static::assertArrayHasKey(
+                            $property,
+                            $entityDataFromCsv,
+                            sprintf('Failed asserting that the column "%s" exists in importing file', $property)
+                        );
                         static::assertEquals(
                             $value,
                             $entityDataFromCsv[$property],

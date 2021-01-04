@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Async;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
-use Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManagerInterface;
+use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -18,20 +18,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Removes image files related to removed attachment related entities.
  */
-class RemoveImageMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
+class ImageFileRemovalProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var ImageRemovalManagerInterface */
+    /** @var FileRemovalManagerInterface */
     private $imageRemovalManager;
 
     /** @var LoggerInterface */
     private $logger;
 
     /**
-     * @param ImageRemovalManagerInterface $imageRemovalManager
-     * @param LoggerInterface              $logger
+     * @param FileRemovalManagerInterface $imageRemovalManager
+     * @param LoggerInterface             $logger
      */
     public function __construct(
-        ImageRemovalManagerInterface $imageRemovalManager,
+        FileRemovalManagerInterface $imageRemovalManager,
         LoggerInterface $logger
     ) {
         $this->imageRemovalManager = $imageRemovalManager;
@@ -73,7 +73,7 @@ class RemoveImageMessageProcessor implements MessageProcessorInterface, TopicSub
 
                 /** @var File $file */
                 $file = $this->getFile($fileId, $fileName, $originalFileName, $parentEntityClass);
-                $this->imageRemovalManager->removeImageWithVariants($file);
+                $this->imageRemovalManager->removeFiles($file);
             } catch (\Exception $e) {
                 $this->logger->warning(
                     sprintf('Unable to remove image %s', $fileName),

@@ -27,14 +27,12 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var TokenStorage */
-    private $tokenStorage;
+    private TokenStorage $tokenStorage;
 
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
-    /** @var ConsoleContextGlobalOptionsProvider */
-    private $provider;
+    private ConsoleContextGlobalOptionsProvider $provider;
 
     protected function setUp(): void
     {
@@ -98,15 +96,15 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $this->provider->addGlobalOptions($command);
         $this->assertEquals(
             [
-                ConsoleContextGlobalOptionsProvider::OPTION_USER,
-                ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION,
+                'current-user',
+                'current-organization',
             ],
             array_keys($command->getApplication()->getDefinition()->getOptions())
         );
         $this->assertEquals(
             [
-                ConsoleContextGlobalOptionsProvider::OPTION_USER,
-                ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION,
+                'current-user',
+                'current-organization',
             ],
             array_keys($command->getDefinition()->getOptions())
         );
@@ -119,8 +117,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn(null, null);
 
@@ -135,8 +133,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn(null, $organizationId);
 
@@ -151,8 +149,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($userId, null);
 
@@ -175,8 +173,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($userId, null);
 
@@ -209,8 +207,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($userId, null);
 
@@ -244,8 +242,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($userId, null);
 
@@ -280,8 +278,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($userId, null);
 
@@ -309,8 +307,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($username, null);
 
@@ -343,8 +341,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -374,8 +372,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -408,8 +406,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($username, $organizationId);
 
@@ -447,8 +445,8 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $input->expects($this->exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_USER],
-                ['--' . ConsoleContextGlobalOptionsProvider::OPTION_ORGANIZATION]
+                ['--' . 'current-user'],
+                ['--' . 'current-organization']
             )
             ->willReturn($username, $organizationId);
 

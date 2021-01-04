@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
@@ -14,7 +15,7 @@ use Symfony\Component\Translation\Util\ArrayConverter;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Dump workflow translations
+ * Dumps workflow translations.
  */
 class DumpWorkflowTranslationsCommand extends Command
 {
@@ -23,16 +24,9 @@ class DumpWorkflowTranslationsCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:workflow:translations:dump';
 
-    /** @var WorkflowManager */
-    private $workflowManager;
+    private WorkflowManager $workflowManager;
+    private WorkflowTranslationHelper $workflowTranslationHelper;
 
-    /** @var WorkflowTranslationHelper */
-    private $workflowTranslationHelper;
-
-    /**
-     * @param WorkflowManager $workflowManager
-     * @param WorkflowTranslationHelper $workflowTranslationHelper
-     */
     public function __construct(WorkflowManager $workflowManager, WorkflowTranslationHelper $workflowTranslationHelper)
     {
         parent::__construct();
@@ -41,29 +35,32 @@ class DumpWorkflowTranslationsCommand extends Command
         $this->workflowTranslationHelper = $workflowTranslationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Dump translations')
-            ->addArgument(
-                'workflow',
-                InputArgument::REQUIRED,
-                'Workflow name whose translations should to be dumped'
+        $this
+            ->addArgument('workflow', InputArgument::REQUIRED, 'Workflow name')
+            ->addOption('locale', null, InputOption::VALUE_OPTIONAL, 'Locale', Translator::DEFAULT_LOCALE)
+            ->setDescription('Dumps workflow translations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps (prints) workflow translations
+(workflow label, step labels, attribute labels, transition labels, button labels,
+button title and warning messages) of a specified workflow.
+
+  <info>php %command.full_name% <workflow></info>
+
+The <info>--locale</info> option can be used to specify a different target locale.
+
+  <info>php %command.full_name% --locale=<locale> <workflow></info>
+
+HELP
             )
-            ->addOption(
-                'locale',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Locale whose translations should to be dumped',
-                Translator::DEFAULT_LOCALE
-            );
+            ->addUsage('--locale=<locale> <workflow>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $locale = $input->getOption('locale');

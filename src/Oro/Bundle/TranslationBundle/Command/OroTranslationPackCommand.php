@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Command;
 
@@ -15,38 +16,21 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Dumps translation messages and optionally uploads them to third-party service
+ * Creates, uploads or downloads translation packs.
  */
 class OroTranslationPackCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:translation:pack';
 
-    /** @var string */
-    protected $path;
+    protected string $path;
+    private string $kernelProjectDir;
 
-    /** @var TranslationPackDumper */
-    private $translationPackDumper;
+    private TranslationPackDumper $translationPackDumper;
+    private TranslationServiceProvider $translationServiceProvider;
+    private TranslationPackageProvider $translationPackageProvider;
+    private TranslationAdaptersCollection $translationAdaptersCollection;
 
-    /** @var TranslationServiceProvider */
-    private $translationServiceProvider;
-
-    /** @var TranslationPackageProvider */
-    private $translationPackageProvider;
-
-    /** @var string */
-    private $kernelProjectDir;
-
-    /** @var TranslationAdaptersCollection */
-    private $translationAdaptersCollection;
-
-    /**
-     * @param TranslationPackDumper $translationPackDumper
-     * @param TranslationServiceProvider $translationServiceProvider
-     * @param TranslationPackageProvider $translationPackageProvider
-     * @param TranslationAdaptersCollection $translationAdaptersCollection
-     * @param string $kernelProjectDir
-     */
     public function __construct(
         TranslationPackDumper $translationPackDumper,
         TranslationServiceProvider $translationServiceProvider,
@@ -62,102 +46,103 @@ class OroTranslationPackCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Dump translation messages and optionally upload them to third-party service')
             ->setDefinition(
                 [
-                    new InputArgument('project', InputArgument::REQUIRED, 'The project [e.g Oro, OroCRM etc]'),
-                    new InputArgument(
-                        'locale',
-                        InputArgument::OPTIONAL,
-                        'The locale for creating language pack [en by default]',
-                        'en'
-                    ),
-                    new InputArgument(
-                        'adapter',
-                        InputArgument::OPTIONAL,
-                        'Uploader adapter, representing third-party service API, config value will be used if empty'
-                    ),
-                    new InputOption(
-                        'project-id',
-                        'i',
-                        InputOption::VALUE_REQUIRED,
-                        'API project ID'
-                    ),
-                    new InputOption(
-                        'api-key',
-                        'k',
-                        InputOption::VALUE_REQUIRED,
-                        'API key'
-                    ),
-                    new InputOption(
-                        'upload-mode',
-                        'm',
-                        InputOption::VALUE_OPTIONAL,
-                        'Uploader mode: add or update',
-                        'add'
-                    ),
-                    new InputOption(
-                        'output-format',
-                        null,
-                        InputOption::VALUE_OPTIONAL,
-                        'Override the default output format',
-                        'yml'
-                    ),
+                    new InputArgument('project', InputArgument::REQUIRED, 'Project name'),
+                    new InputArgument('locale', InputArgument::OPTIONAL, 'Locale', 'en'),
+                    new InputArgument('adapter', InputArgument::OPTIONAL, 'Upload adapter'),
+                    new InputOption('project-id', 'i', InputOption::VALUE_REQUIRED, 'Project ID'),
+                    new InputOption('api-key', 'k', InputOption::VALUE_REQUIRED, 'API key'),
+                    new InputOption('upload-mode', 'm', InputOption::VALUE_OPTIONAL, 'Mode (add or update)', 'add'),
+                    new InputOption('output-format', null, InputOption::VALUE_OPTIONAL, 'Format', 'yml'),
                     new InputOption(
                         'path',
                         null,
                         InputOption::VALUE_OPTIONAL,
-                        'Dump destination (or upload source), relative to %kernel.project_dir%',
+                        'Dump destination relative to %kernel.project_dir%',
                         '/var/language-pack/'
                     ),
-                    new InputOption(
-                        'dump',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Create language pack for uploading to translation service'
-                    ),
-                    new InputOption(
-                        'upload',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Upload language pack to translation service'
-                    ),
+                    new InputOption('dump', null, InputOption::VALUE_NONE, 'Create a language pack for uploading'),
+                    new InputOption('upload', null, InputOption::VALUE_NONE, 'Upload to the translation service'),
                     new InputOption(
                         'download',
                         null,
                         InputOption::VALUE_NONE,
-                        'Download all language packs from project at translation service'
+                        'Download all language packs from the translation service'
                     ),
-                    new InputOption(
-                        'show',
-                        null,
-                        InputOption::VALUE_NONE,
-                        'Show all enabled project namespaces for dump/load translations packages.'
-                    ),
+                    new InputOption('show', null, InputOption::VALUE_NONE, 'Show enabled project namespaces'),
                 ]
             )
+            ->setDescription('Creates, uploads or downloads translation packs.')
             ->setHelp(
-                <<<EOF
-The <info>%command.name%</info> command extract translation files for each bundle in
-specified vendor namespace(project) and creates language pack that's placed at
-%kernel.project_dir%/var/language-pack
+                <<<'HELP'
+The <info>%command.name%</info> command extracts translation files for all bundles in
+the specified project (vendor namespace) and creates a language pack:
 
-    <info>php %command.full_name% --dump OroCRM</info>
-    <info>php %command.full_name% --upload OroCRM</info>
-    <info>php %command.full_name% --show project</info>
-EOF
-            );
+  <info>php %command.full_name% --dump <project></info>
+
+The <info>--path</info> option can be used to override the default target directory
+(<comment>%kernel.project_dir%/var/language-pack/</comment>) by specifying a different path
+relative to <comment>%kernel.project_dir%</comment>:
+
+  <info>php %command.full_name% --path=<directory> --dump <project></info>
+  
+Use the <info>--output-format</info> to change the default output format (yml):
+
+  <info>php %command.full_name% --output-format=<format> --dump <project></info>
+
+You can upload the created language pack to a 3-rd party translation service
+with the <info>--upload</info> option:
+
+  <info>php %command.full_name% --upload <project></info>
+
+The destination service can be selected by specifying a different adapter as the 3-rd argument:
+
+  <info>php %command.full_name% --upload <project> <locale> <adapter></info>
+
+The <info>--upload-mode</info> option allows to specify whether the language pack should be
+simply uploaded to the translation service (<comment>add</comment>), or if the command should first
+download the existing translations, merge the new translations with the existing
+translations, and upload the result to the translation service (<comment>update</comment>):
+
+  <info>php %command.full_name% --upload --upload-mode=add <project> <locale> <adapter></info>
+  <info>php %command.full_name% --upload --upload-mode=update <project> <locale> <adapter></info>
+
+Use the <info>--project-id</info> and <info>--api-key</info> options to supply the translation service credentials:
+
+  <info>php %command.full_name% --project-id=<project-id> --api-key=<api-key> --upload <project></info>
+
+The <info>--show</info> option will print the list of all packages registered in the application:
+
+  <info>php %command.full_name% --show all</info>
+
+This command can also be used to download translations from the translation service
+and <options=bold>load them into the application database</> by using the <info>--download</info> option:
+
+  <info>php %command.full_name% --download <project> <locale></info>
+
+HELP
+            )
+            ->addUsage('--dump <project>')
+            ->addUsage('--path=<directory> --dump <project>')
+            ->addUsage('--output-format=<format> --dump <project>')
+            ->addUsage('--upload <project>')
+            ->addUsage('--upload <project> <locale> <adapter>')
+            ->addUsage('--upload --upload-mode=add <project> <locale> <adapter>')
+            ->addUsage('--upload --upload-mode=update <project> <locale> <adapter>')
+            ->addUsage('--project-id=<project-id> --api-key=<api-key> --upload <project>')
+            ->addUsage('--show all')
+            ->addUsage('--download <project> <locale>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -212,15 +197,11 @@ EOF
         return 0;
     }
 
-    /**
-     * @param TranslationServiceProvider $translationService
-     * @param string                     $mode
-     * @param array                      $languagePackPath one or few dirs
-     *
-     * @return void
-     */
-    protected function upload(TranslationServiceProvider $translationService, $mode, $languagePackPath)
-    {
+    protected function upload(
+        TranslationServiceProvider $translationService,
+        string $mode,
+        array $languagePackPath
+    ): void {
         if ('update' == $mode) {
             $translationService->update($languagePackPath);
         } else {
@@ -228,11 +209,7 @@ EOF
         }
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function download(InputInterface $input, OutputInterface $output)
+    protected function download(InputInterface $input, OutputInterface $output): void
     {
         $projectName = $input->getArgument('project');
         $locale      = $input->getArgument('locale');
@@ -252,13 +229,7 @@ EOF
         $output->writeln(sprintf("Download %s", $result ? 'successful' : 'failed'));
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return TranslationServiceProvider
-     */
-    protected function getTranslationService(InputInterface $input, OutputInterface $output)
+    protected function getTranslationService(InputInterface $input, OutputInterface $output): TranslationServiceProvider
     {
         $this->translationServiceProvider->setLogger(new OutputLogger($output));
 
@@ -284,16 +255,13 @@ EOF
     }
 
     /**
-     * @param InputInterface $input
-     *
      * @throws \RuntimeException
-     * @return APIAdapterInterface
      */
-    protected function getAdapterFromInput(InputInterface $input)
+    protected function getAdapterFromInput(InputInterface $input): ?APIAdapterInterface
     {
         $adapterOption = $input->getArgument('adapter');
         if (null === $adapterOption) {
-            return false;
+            return null;
         }
 
         $adapterService = $this->translationAdaptersCollection->getAdapter($adapterOption);
@@ -304,18 +272,12 @@ EOF
         return $adapterService;
     }
 
-    /**
-     * Performs dump operation
-     *
-     * @param string          $projectNamespace
-     * @param string          $locale
-     * @param OutputInterface $output
-     * @param string          $outputFormat
-     *
-     * @return bool
-     */
-    protected function dump($projectNamespace, $locale, OutputInterface $output, $outputFormat)
-    {
+    protected function dump(
+        string $projectNamespace,
+        string $locale,
+        OutputInterface $output,
+        string $outputFormat
+    ): bool {
         $output->writeln(sprintf('Dumping language pack for <info>%s</info>', $projectNamespace));
 
         $this->translationPackDumper->setLogger(new OutputLogger($output));
@@ -331,15 +293,7 @@ EOF
         return true;
     }
 
-    /**
-     * Return lang pack location
-     *
-     * @param string      $projectNamespace
-     * @param null|string $bundleName
-     *
-     * @return string
-     */
-    protected function getLangPackDir($projectNamespace, $bundleName = null)
+    protected function getLangPackDir(string $projectNamespace, ?string $bundleName = null): string
     {
         $path = $this->path . $projectNamespace . DIRECTORY_SEPARATOR;
 
@@ -350,14 +304,7 @@ EOF
         return $path;
     }
 
-    /**
-     * Show enabled project namespaces.
-     *
-     * @param OutputInterface $output
-     *
-     * @return void
-     */
-    private function showEnabledProject(OutputInterface $output)
+    private function showEnabledProject(OutputInterface $output): void
     {
         $output->writeln('Enabled project namespaces for dump/load translations packages:');
 

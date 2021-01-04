@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Async;
 
-use Oro\Bundle\AttachmentBundle\Async\RemoveImageMessageProcessor;
-use Oro\Bundle\AttachmentBundle\Manager\ImageRemovalManagerInterface;
+use Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor;
+use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Bundle\ProductBundle\Entity\ProductImage;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -12,23 +12,23 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
-class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImageRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FileRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $imageRemovalManager;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /** @var RemoveImageMessageProcessor */
+    /** @var ImageFileRemovalProcessor */
     private $processor;
 
     protected function setUp(): void
     {
-        $this->imageRemovalManager = $this->createMock(ImageRemovalManagerInterface::class);
+        $this->imageRemovalManager = $this->createMock(FileRemovalManagerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->processor = new RemoveImageMessageProcessor(
+        $this->processor = new ImageFileRemovalProcessor(
             $this->imageRemovalManager,
             $this->logger
         );
@@ -44,22 +44,20 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubscribedTopics()
     {
-        $this->assertEquals(['oro_attachment.remove_image'], RemoveImageMessageProcessor::getSubscribedTopics());
+        $this->assertEquals(['oro_attachment.remove_image'], ImageFileRemovalProcessor::getSubscribedTopics());
     }
 
     public function testProcess()
     {
         $message = new Message();
-
-        $images = [
+        $message->setBody(JSON::encode([
             [
                 'id' => 1,
                 'fileName' => '12345.jpg',
                 'originalFileName' => 'orig_name.jpg',
                 'parentEntityClass' => ProductImage::class
             ]
-        ];
-        $message->setBody(JSON::encode($images));
+        ]));
 
         $file = new FileModel();
         $file->setId(1);
@@ -68,7 +66,7 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass(ProductImage::class);
 
         $this->imageRemovalManager->expects($this->once())
-            ->method('removeImageWithVariants')
+            ->method('removeFiles')
             ->with($file);
 
         $this->assertEquals(
@@ -80,16 +78,14 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessException()
     {
         $message = new Message();
-
-        $images = [
+        $message->setBody(JSON::encode([
             [
                 'id' => 2,
                 'fileName' => '12345.jpg',
                 'originalFileName' => 'orig_name.jpg',
                 'parentEntityClass' => ProductImage::class
             ]
-        ];
-        $message->setBody(JSON::encode($images));
+        ]));
 
         $file = new FileModel();
         $file->setId(2);
@@ -99,7 +95,7 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $exception = new \RuntimeException('Error');
         $this->imageRemovalManager->expects($this->once())
-            ->method('removeImageWithVariants')
+            ->method('removeFiles')
             ->with($file)
             ->willThrowException($exception);
 
@@ -115,18 +111,17 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithEmptyOriginalFileName()
     {
-        $message = new Message();
-
         $fileName = '12345.jpg';
-        $images = [
+
+        $message = new Message();
+        $message->setBody(JSON::encode([
             [
                 'id' => 2,
                 'fileName' => $fileName,
                 'originalFileName' => null,
                 'parentEntityClass' => ProductImage::class
             ]
-        ];
-        $message->setBody(JSON::encode($images));
+        ]));
 
         $file = new FileModel();
         $file->setId(2);
@@ -135,7 +130,7 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setParentEntityClass(ProductImage::class);
 
         $this->imageRemovalManager->expects($this->once())
-            ->method('removeImageWithVariants')
+            ->method('removeFiles')
             ->with($file);
         $this->logger->expects($this->never())
             ->method('warning');
@@ -149,19 +144,17 @@ class RemoveImageMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testProcessWithInvalidMessage()
     {
         $message = new Message();
-
-        $images = [
+        $message->setBody(JSON::encode([
             [
                 'id' => 2,
                 'fileName' => null,
                 'originalFileName' => null,
                 'parentEntityClass' => ProductImage::class
             ]
-        ];
-        $message->setBody(JSON::encode($images));
+        ]));
 
         $this->imageRemovalManager->expects($this->never())
-            ->method('removeImageWithVariants');
+            ->method('removeFiles');
         $this->logger->expects($this->once())
             ->method('warning');
 

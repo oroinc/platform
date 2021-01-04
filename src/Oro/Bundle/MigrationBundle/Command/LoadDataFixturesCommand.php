@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
@@ -13,34 +14,21 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
- * The CLI command to load data fixtures.
+ * Loads data fixtures.
  */
 class LoadDataFixturesCommand extends Command
 {
-    const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
-    const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
+    public const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
+    public const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
 
     /** @var string */
     protected static $defaultName = 'oro:migration:data:load';
 
-    /** @var KernelInterface */
-    protected $kernel;
+    protected KernelInterface $kernel;
+    protected DataFixturesLoader $dataFixturesLoader;
+    protected DataFixturesExecutorInterface $dataFixturesExecutor;
+    protected FixturePathLocatorInterface $fixturePathLocator;
 
-    /** @var DataFixturesLoader */
-    protected $dataFixturesLoader;
-
-    /** @var DataFixturesExecutorInterface */
-    protected $dataFixturesExecutor;
-
-    /** @var FixturePathLocatorInterface */
-    protected $fixturePathLocator;
-
-    /**
-     * @param KernelInterface $kernel
-     * @param DataFixturesLoader $dataFixturesLoader
-     * @param DataFixturesExecutorInterface $dataFixturesExecutor
-     * @param FixturePathLocatorInterface $fixturePathLocator
-     */
     public function __construct(
         KernelInterface $kernel,
         DataFixturesLoader $dataFixturesLoader,
@@ -55,42 +43,70 @@ class LoadDataFixturesCommand extends Command
         $this->fixturePathLocator = $fixturePathLocator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Load data fixtures.')
+        $this
             ->addOption(
                 'fixtures-type',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 sprintf(
-                    'Select fixtures type to be loaded (%s or %s). By default - %s',
+                    'Fixtures type to be loaded (%s or %s). By default - %s',
                     self::MAIN_FIXTURES_TYPE,
                     self::DEMO_FIXTURES_TYPE,
                     self::MAIN_FIXTURES_TYPE
                 ),
                 self::MAIN_FIXTURES_TYPE
             )
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Outputs list of fixtures without apply them')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the list of fixtures without applying them')
             ->addOption(
                 'bundles',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundle names to load data from'
+                'Bundles to load the data from'
             )
             ->addOption(
                 'exclude',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'A list of bundle names which fixtures should be skipped'
-            );
+                'Bundles with the fixtures that should be skipped'
+            )
+            ->setDescription('Loads data fixtures.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command loads data fixtures.
+The fixtures type ("main", or "demo") can be specified with the <info>--fixtures-type</info> option:
+
+  <info>php %command.full_name% --fixtures-type=<type></info>
+
+The <info>--dry-run</info> option can be used to print the list of fixtures without applying them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+The <info>--bundles</info> option can be used to load the fixtures only from the specified bundles:
+
+  <info>php %command.full_name% --bundles=<BundleOne> --bundles=<BundleTwo> --bundles=<BundleThree></info>
+
+The <info>--exclude</info> option will skip loading fixtures from the specified bundles:
+
+  <info>php %command.full_name% --exclude=<BundleOne> --exclude=<BundleTwo> --exclude=<BundleThree></info>
+
+HELP
+            )
+            ->addUsage('--fixtures-type=main')
+            ->addUsage('--fixtures-type=demo')
+            ->addUsage('--dry-run')
+            ->addUsage('--bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--dry-run --fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--exclude=<BundleOne> --exclude=<BundleTwo>')
+            ->addUsage('--fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
+            ->addUsage('--dry-run --fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $fixtures = null;
@@ -115,12 +131,10 @@ class LoadDataFixturesCommand extends Command
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @return array
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @throws \RuntimeException if loading of data fixtures should be terminated
      */
-    protected function getFixtures(InputInterface $input, OutputInterface $output)
+    protected function getFixtures(InputInterface $input, OutputInterface $output): array
     {
         $includeBundles = $input->getOption('bundles');
         $excludeBundles = $input->getOption('exclude');
@@ -145,14 +159,7 @@ class LoadDataFixturesCommand extends Command
         return $this->dataFixturesLoader->getFixtures();
     }
 
-    /**
-     * Output list of fixtures
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     */
-    protected function outputFixtures(InputInterface $input, OutputInterface $output, $fixtures)
+    protected function outputFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void
     {
         $output->writeln(
             sprintf(
@@ -165,14 +172,7 @@ class LoadDataFixturesCommand extends Command
         }
     }
 
-    /**
-     * Process fixtures
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     */
-    protected function processFixtures(InputInterface $input, OutputInterface $output, $fixtures)
+    protected function processFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void
     {
         $output->writeln(
             sprintf(
@@ -184,12 +184,7 @@ class LoadDataFixturesCommand extends Command
         $this->executeFixtures($output, $fixtures, $this->getTypeOfFixtures($input));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array           $fixtures
-     * @param string          $fixturesType
-     */
-    protected function executeFixtures(OutputInterface $output, $fixtures, $fixturesType)
+    protected function executeFixtures(OutputInterface $output, array $fixtures, string $fixturesType): void
     {
         $this->dataFixturesExecutor->setLogger(
             function ($message) use ($output) {
@@ -199,21 +194,12 @@ class LoadDataFixturesCommand extends Command
         $this->dataFixturesExecutor->execute($fixtures, $fixturesType);
     }
 
-    /**
-     * @param InputInterface $input
-     * @return string
-     */
-    protected function getTypeOfFixtures(InputInterface $input)
+    protected function getTypeOfFixtures(InputInterface $input): string
     {
         return $input->getOption('fixtures-type');
     }
 
-    /**
-     * @param InputInterface $input
-     *
-     * @return string
-     */
-    protected function getFixtureRelativePath(InputInterface $input)
+    protected function getFixtureRelativePath(InputInterface $input): string
     {
         $fixtureType         = (string)$this->getTypeOfFixtures($input);
         $fixtureRelativePath = $this->fixturePathLocator->getPath($fixtureType);

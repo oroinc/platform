@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\NavigationBundle\Command;
 
@@ -7,29 +8,22 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
- * Resets menu updates depends on scope (organization/user).
+ * Resets menu updates.
  */
 class ResetMenuUpdatesCommand extends Command
 {
     protected static $defaultName = 'oro:navigation:menu:reset';
 
-    /** @var UserManager */
-    private $userManager;
-
-    /** @var ScopeManager */
-    private $scopeManager;
-
-    /** @var MenuUpdateManager */
-    private $menuUpdateManager;
-
-    /** @var string */
-    private $menuUpdateScopeType;
+    private UserManager $userManager;
+    private ScopeManager $scopeManager;
+    private MenuUpdateManager $menuUpdateManager;
+    private string $menuUpdateScopeType;
 
     public function __construct(
         UserManager $userManager,
@@ -44,31 +38,40 @@ class ResetMenuUpdatesCommand extends Command
         $this->menuUpdateScopeType = $menuUpdateScopeType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->addOption(
-                'user',
-                'u',
-                InputArgument::OPTIONAL,
-                'Email of existing user'
+            ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Email of existing user')
+            ->addOption('menu', 'm', InputOption::VALUE_REQUIRED, 'Menu name to reset')
+            ->setDescription('Resets menu updates.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command resets all menu updates.
+
+  <info>php %command.full_name%</info>
+
+The <info>--user</info> option can be used to reset menu updates for a specific user:
+
+  <info>php %command.full_name% --user=<user-email></info>
+
+The <info>--menu</info> option can be used to reset only a specific menu:
+
+  <info>php %command.full_name% --menu=<menu-name></info>
+
+Both options can be combined to further limit the scope being reset.
+
+  <info>php %command.full_name% --user=<user-email> --menu=<menu-name></info>
+
+HELP
             )
-            ->addOption(
-                'menu',
-                'm',
-                InputArgument::OPTIONAL,
-                'Menu name to reset'
-            )
-            ->setDescription('Resets menu updates depends on scope (organization/user).')
-            ->setHelp('If “user” param is not set - reset global scope, otherwise reset user scope.');
+            ->addUsage('--menu=<menu-name>')
+            ->addUsage('--user=<user-email>')
+            ->addUsage('--user=<user-email> --menu=<menu-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $menu = $input->getOption('menu');
@@ -117,11 +120,7 @@ class ResetMenuUpdatesCommand extends Command
         $output->writeln($message);
     }
 
-    /**
-     * @param User|null   $user
-     * @param string|null $menuName
-     */
-    private function resetMenuUpdates($user = null, $menuName = null)
+    private function resetMenuUpdates(?User $user = null, ?string $menuName = null): void
     {
         if (null !== $user) {
             $context = ['user' => $user];

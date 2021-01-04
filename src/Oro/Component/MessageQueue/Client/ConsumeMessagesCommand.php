@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client;
 
@@ -16,7 +17,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A client's worker that processes messages.
+ * Processes messages from the message-queue.
  */
 class ConsumeMessagesCommand extends Command
 {
@@ -25,20 +26,10 @@ class ConsumeMessagesCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:message-queue:consume';
 
-    /** @var QueueConsumer */
-    protected $queueConsumer;
+    protected QueueConsumer $queueConsumer;
+    protected DestinationMetaRegistry $destinationMetaRegistry;
+    protected MessageProcessorInterface $messageProcessor;
 
-    /** @var DestinationMetaRegistry */
-    protected $destinationMetaRegistry;
-
-    /** @var MessageProcessorInterface */
-    protected $messageProcessor;
-
-    /**
-     * @param QueueConsumer $queueConsumer
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     * @param MessageProcessorInterface $messageProcessor
-     */
     public function __construct(
         QueueConsumer $queueConsumer,
         DestinationMetaRegistry $destinationMetaRegistry,
@@ -51,23 +42,31 @@ class ConsumeMessagesCommand extends Command
         $this->messageProcessor = $messageProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->configureLimitsExtensions();
-
         $this
-            ->setDescription('A client\'s worker that processes messages. '.
-                'By default it connects to default queue. '.
-                'It select an appropriate message processor based on a message headers')
-            ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from');
+            ->addArgument('clientDestinationName', InputArgument::OPTIONAL, 'Queues to consume messages from')
+            ->setDescription('Processes messages from the message-queue.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command processes messages from the message-queue
+using an appropriate message processor based on message headers.
+
+  <info>php %command.full_name%</info>
+
+It connects to the default queue, but a different name can be provided as the argument: 
+
+  <info>php %command.full_name% <clientDestinationName></info>
+
+HELP
+            )
+        ;
+
+        $this->configureLimitsExtensions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $clientDestinationName = $input->getArgument('clientDestinationName');
@@ -91,11 +90,7 @@ class ConsumeMessagesCommand extends Command
         $this->consume($this->queueConsumer, $this->getConsumerExtension($extensions));
     }
 
-    /**
-     * @param QueueConsumer      $consumer
-     * @param ExtensionInterface $extension
-     */
-    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension)
+    protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         try {
             $consumer->consume($extension);
@@ -104,23 +99,16 @@ class ConsumeMessagesCommand extends Command
         }
     }
 
-    /**
-     * @param array $extensions
-     *
-     * @return ExtensionInterface
-     */
-    protected function getConsumerExtension(array $extensions)
+    protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions);
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return ExtensionInterface
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpUnusedParameterInspection
      */
-    protected function getLoggerExtension(InputInterface $input, OutputInterface $output)
+    protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension(new ConsoleLogger($output));
     }
