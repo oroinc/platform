@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SegmentBundle\Grid;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * The provider for configuration of datagrids for segments.
@@ -15,17 +15,15 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
     /** @var SegmentDatagridConfigurationBuilder */
-    protected $builder;
+    private $builder;
 
     /** @var ManagerRegistry */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var DatagridConfiguration[] */
     private $configuration = [];
 
     /**
-     * Constructor
-     *
      * @param SegmentDatagridConfigurationBuilder $builder
      * @param ManagerRegistry                     $doctrine
      */
@@ -33,7 +31,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
         SegmentDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine
     ) {
-        $this->builder  = $builder;
+        $this->builder = $builder;
         $this->doctrine = $doctrine;
     }
 
@@ -59,7 +57,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
 
         if (empty($this->configuration[$gridName])) {
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
-            $segment           = $segmentRepository->find($id);
+            $segment = $segmentRepository->find($id);
 
             $this->builder->setGridName($gridName);
             $this->builder->setSource($segment);

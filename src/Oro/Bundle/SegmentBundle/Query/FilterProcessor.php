@@ -47,31 +47,40 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
             // nothing to do
             return $qb;
         }
+
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias = $rootEntityAlias;
-        $this->definition['filters'] = $filters;
-        $this->definition['columns'] = [];
-        $this->qb = $qb;
         $this->joinIdHelper = new JoinIdentifierHelper($this->getRootEntity());
+        $this->definition = ['filters' => $filters, 'columns' => []];
         $this->joins = [];
+        $this->tableAliasesCount = 0;
         $this->tableAliases = [];
         $this->columnAliases = [];
+        $this->aliases = [];
+        $this->queryAliases = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions = [];
+        $this->virtualRelationsJoins = [];
         $this->filters = [];
         $this->currentFilterPath = '';
+        $this->qb = $qb;
         try {
             $this->buildQuery();
         } finally {
-            $this->virtualColumnOptions = null;
-            $this->virtualColumnExpressions = null;
-            $this->columnAliases = null;
-            $this->tableAliases = null;
-            $this->joins = null;
-            $this->joinIdHelper = null;
+            $this->resetConvertState();
         }
 
-        return $this->qb;
+        return $qb;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resetConvertState(): void
+    {
+        parent::resetConvertState();
+        $this->rootEntityAlias = null;
+        $this->qb = null;
     }
 
     /**

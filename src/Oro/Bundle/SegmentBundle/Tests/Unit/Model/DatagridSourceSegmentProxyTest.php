@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
@@ -32,7 +32,7 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
             ->method('getIdentifier')
             ->willReturn([self::TEST_IDENTIFIER_NAME]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getClassMetadata')
             ->with(self::TEST_ENTITY)
@@ -111,7 +111,7 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
         $segment->setEntity(self::TEST_ENTITY);
         $segment->setDefinition($definition);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->never())
             ->method('getClassMetadata');
 

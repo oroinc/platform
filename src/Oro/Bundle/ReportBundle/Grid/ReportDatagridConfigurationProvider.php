@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ReportBundle\Grid;
 
 use Doctrine\Common\Cache\Cache;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * The provider for configuration of datagrids used to show reports.

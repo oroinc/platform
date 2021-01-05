@@ -3,8 +3,9 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
 /**
  * Provides a base functionality to convert a query definition created by the query designer to an ORM query.
@@ -18,16 +19,18 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     protected $classMetadataLocalCache;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param ManagerRegistry                  $doctrine
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine
     ) {
-        parent::__construct($functionProvider, $virtualFieldProvider);
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider);
         $this->doctrine = $doctrine;
     }
 

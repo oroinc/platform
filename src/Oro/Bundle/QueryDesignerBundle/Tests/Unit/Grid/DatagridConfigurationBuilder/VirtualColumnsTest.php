@@ -425,6 +425,7 @@ class VirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             $doctrine,
             null,
             $virtualColumnProvider,
+            null,
             [],
             $entityNameResolver
         );

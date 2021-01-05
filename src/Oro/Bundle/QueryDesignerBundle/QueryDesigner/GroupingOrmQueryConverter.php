@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -13,26 +14,28 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  */
 abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
 {
-    /** @var array */
-    protected $filters = [];
-
     /** @var PropertyAccessor */
     protected $accessor;
+
+    /** @var array */
+    protected $filters = [];
 
     /** string */
     protected $currentFilterPath;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param ManagerRegistry                  $doctrine
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine
     ) {
-        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrine);
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -43,12 +46,17 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     {
         $this->filters = [];
         $this->currentFilterPath = '';
-        try {
-            parent::doConvert($source);
-        } finally {
-            $this->filters = null;
-            $this->currentFilterPath = null;
-        }
+        parent::doConvert($source);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resetConvertState(): void
+    {
+        parent::resetConvertState();
+        $this->filters = [];
+        $this->currentFilterPath = null;
     }
 
     /**

@@ -2,61 +2,110 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\ORM\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
 abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
 {
-    protected function getVirtualFieldProvider(array $config = [])
+    /**
+     * @param array $config
+     *
+     * @return VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getVirtualFieldProvider(array $config = []): VirtualFieldProviderInterface
     {
-        $provider = $this->createMock('Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface');
-        $provider->expects($this->any())
+        $provider = $this->createMock(VirtualFieldProviderInterface::class);
+        $provider->expects(self::any())
             ->method('isVirtualField')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use (&$config) {
-                        $result = false;
-                        foreach ($config as $item) {
-                            if ($item[0] === $className && $item[1] === $fieldName) {
-                                $result = true;
-                                break;
-                            }
-                        }
-
-                        return $result;
+            ->willReturnCallback(function ($className, $fieldName) use (&$config) {
+                $result = false;
+                foreach ($config as $item) {
+                    if ($item[0] === $className && $item[1] === $fieldName) {
+                        $result = true;
+                        break;
                     }
-                )
-            );
-        $provider->expects($this->any())
+                }
+
+                return $result;
+            });
+        $provider->expects(self::any())
             ->method('getVirtualFieldQuery')
-            ->will(
-                $this->returnCallback(
-                    function ($className, $fieldName) use (&$config) {
-                        $result = [];
-                        foreach ($config as $item) {
-                            if ($item[0] === $className && $item[1] === $fieldName) {
-                                $result = $item[2];
-                                break;
-                            }
-                        }
-
-                        return $result;
+            ->willReturnCallback(function ($className, $fieldName) use (&$config) {
+                $result = [];
+                foreach ($config as $item) {
+                    if ($item[0] === $className && $item[1] === $fieldName) {
+                        $result = $item[2];
+                        break;
                     }
-                )
-            );
+                }
+
+                return $result;
+            });
 
         return $provider;
     }
 
-    protected function getFunctionProvider(array $config = [])
+    /**
+     * @param array $config
+     *
+     * @return VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getVirtualRelationProvider(array $config = []): VirtualRelationProviderInterface
     {
-        $provider = $this->createMock('Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface');
+        $provider = $this->createMock(VirtualRelationProviderInterface::class);
+        $provider->expects(self::any())
+            ->method('isVirtualRelation')
+            ->willReturnCallback(function ($className, $fieldName) use ($config) {
+                return !empty($config[$className][$fieldName]);
+            });
+        $provider->expects(self::any())
+            ->method('getVirtualRelationQuery')
+            ->willReturnCallback(function ($className, $fieldName) use ($config) {
+                return $config[$className][$fieldName] ?? [];
+            });
+        $provider->expects(self::any())
+            ->method('getTargetJoinAlias')
+            ->willReturnCallback(function ($className, $fieldName) use ($config) {
+                if (!empty($config[$className][$fieldName]['target_join_alias'])) {
+                    return $config[$className][$fieldName]['target_join_alias'];
+                }
+
+                $joins = [];
+                foreach ($config[$className][$fieldName]['join'] as $typeJoins) {
+                    $joins = array_merge($joins, $typeJoins);
+                }
+                if (1 !== count($joins)) {
+                    return null;
+                }
+
+                $join = reset($joins);
+
+                return $join['alias'];
+            });
+
+        return $provider;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getFunctionProvider(array $config = []): FunctionProviderInterface
+    {
+        $provider = $this->createMock(FunctionProviderInterface::class);
         if (empty($config)) {
-            $provider->expects($this->never())
+            $provider->expects(self::never())
                 ->method('getFunction');
         } else {
-            $provider->expects($this->any())
+            $provider->expects(self::any())
                 ->method('getFunction')
-                ->will($this->returnValueMap($config));
+                ->willReturnMap($config);
         }
 
         return $provider;
@@ -75,31 +124,25 @@ abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
      *
      * @return ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getDoctrine(array $config = [], array $identifiersConfig = [])
+    protected function getDoctrine(array $config = [], array $identifiersConfig = []): ManagerRegistry
     {
-        $doctrine = $this->getMockBuilder('Symfony\Bridge\Doctrine\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
         $emMap = [];
 
-        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configuration->expects($this->any())
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects(self::any())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
-        $configuration->expects($this->any())
+            ->willReturn([]);
+        $configuration->expects(self::any())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         foreach ($config as $entity => $fields) {
-            $em      = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $em->expects($this->any())
+            $em = $this->createMock(EntityManagerInterface::class);
+            $em->expects(self::any())
                 ->method('getConfiguration')
-                ->will($this->returnValue($configuration));
+                ->willReturn($configuration);
 
             $emMap[] = [$entity, $em];
 
@@ -117,36 +160,38 @@ abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
                 }
             }
 
-            $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
+            $metadata = $this->getMockBuilder(ClassMetadata::class)
                 ->disableOriginalConstructor()
                 ->getMock();
-            $metadata->expects($this->any())
+            $metadata->expects(self::any())
+                ->method('getIdentifier')
+                ->willReturn($identifiersConfig[$entity] ?? []);
+            $metadata->expects(self::any())
                 ->method('getTypeOfField')
-                ->will($this->returnValueMap($typeMap));
-
-            if (!empty($identifiersConfig[$entity])) {
-                $metadata->expects($this->any())->method('getIdentifier')
-                    ->will($this->returnValue($identifiersConfig[$entity]));
-            }
-            if (!empty($associationMap)) {
-                $metadata->expects($this->any())
+                ->willReturnMap($typeMap);
+            if ($associationMap) {
+                $metadata->expects(self::any())
                     ->method('hasAssociation')
                     ->willReturn(true);
-                $metadata->expects($this->any())
+                $metadata->expects(self::any())
                     ->method('getAssociationMapping')
-                    ->will($this->returnValueMap($associationMap));
+                    ->willReturnMap($associationMap);
+            } else {
+                $metadata->expects(self::any())
+                    ->method('hasAssociation')
+                    ->willReturn(false);
             }
 
-            $em->expects($this->any())
+            $em->expects(self::any())
                 ->method('getClassMetadata')
                 ->with($entity)
-                ->will($this->returnValue($metadata));
+                ->willReturn($metadata);
         }
 
         if (!empty($emMap)) {
-            $doctrine->expects($this->any())
+            $doctrine->expects(self::any())
                 ->method('getManagerForClass')
-                ->will($this->returnValueMap($emMap));
+                ->willReturnMap($emMap);
         }
 
         return $doctrine;
