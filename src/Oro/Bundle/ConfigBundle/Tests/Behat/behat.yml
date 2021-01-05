@@ -45,7 +45,7 @@ oro_behat_extension:
       selector: 'div.system-configuration-container div[data-role="sidebar"] [data-name="clear-search"]'
 
     Sidebar Last Section:
-      selector: 'div.system-configuration-container div[data-role="sidebar"] [data-role="jstree-container"] > [role="group"] > li[role="presentation"]:last-child'
+      selector: 'div.system-configuration-container div[data-role="sidebar"] [data-role="jstree-container"] > [role="group"] > li.jstree-node:last-child'
 
     Search Input:
       selector: 'input[type="search"]'
@@ -57,7 +57,7 @@ oro_behat_extension:
       selector: '.highlight-text'
 
     Configuration Menu Item:
-      selector: 'div.system-configuration-container div[data-role="sidebar"] li[role="presentation"]'
+      selector: 'div.system-configuration-container div[data-role="sidebar"] li.jstree-node'
 
     Configuration Section Label:
       selector: '.user-fieldset'
