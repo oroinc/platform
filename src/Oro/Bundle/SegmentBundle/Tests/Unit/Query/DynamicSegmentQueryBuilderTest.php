@@ -23,7 +23,6 @@ use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -224,16 +223,12 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             ->willReturn(new SegmentQueryConverter(
                 $manager,
                 $virtualFieldProvider,
+                $this->getVirtualRelationProvider(),
                 $doctrine,
                 new RestrictionBuilder($manager, $configManager, $filterExecutionContext)
             ));
 
-        $serviceLink = $this->createMock(ServiceLink::class);
-        $serviceLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($segmentQueryConverterFactory);
-
-        return new DynamicSegmentQueryBuilder($serviceLink, $doctrine);
+        return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);
     }
 
 

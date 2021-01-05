@@ -42,6 +42,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
+            $this->getVirtualRelationProvider(),
             $this->doctrine,
             new DatagridGuesser([]),
             $entityNameResolver

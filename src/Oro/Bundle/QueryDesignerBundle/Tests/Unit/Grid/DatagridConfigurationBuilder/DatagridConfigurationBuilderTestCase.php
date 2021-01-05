@@ -16,6 +16,7 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
      * @param \PHPUnit\Framework\MockObject\MockObject|null $doctrine
      * @param \PHPUnit\Framework\MockObject\MockObject|null $functionProvider
      * @param \PHPUnit\Framework\MockObject\MockObject|null $virtualFieldProvider
+     * @param \PHPUnit\Framework\MockObject\MockObject|null $virtualRelationProvider
      * @param array                                         $guessers
      *
      * @return DatagridConfigurationBuilder
@@ -25,6 +26,7 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
         $doctrine = null,
         $functionProvider = null,
         $virtualFieldProvider = null,
+        $virtualRelationProvider = null,
         array $guessers = [],
         $entityNameResolver = null
     ) {
@@ -40,6 +42,7 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTest
         $builder = new DatagridConfigurationBuilder(
             $functionProvider ? : $this->getFunctionProvider(),
             $virtualFieldProvider ? : $this->getVirtualFieldProvider(),
+            $virtualRelationProvider ? : $this->getVirtualRelationProvider(),
             $doctrine ? : $this->getDoctrine(),
             new DatagridGuesser($guessers),
             $entityNameResolver

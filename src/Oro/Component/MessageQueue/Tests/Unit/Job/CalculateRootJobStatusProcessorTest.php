@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
@@ -10,7 +11,6 @@ use Oro\Component\MessageQueue\Job\RootJobStatusCalculatorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
 {

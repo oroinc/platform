@@ -27,6 +27,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Filter\SegmentFilter;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
@@ -37,6 +38,7 @@ use Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity\CmsUser;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -77,7 +79,10 @@ class SegmentFilterTest extends OrmTestCase
     private $em;
 
     /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $subqueryLimitHelper;
+    private $subQueryLimitHelper;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var SegmentFilter */
     private $filter;
@@ -137,17 +142,19 @@ class SegmentFilterTest extends OrmTestCase
             ->method('getEntityManager')
             ->willReturn($this->em);
 
-        $segmentQueryBuilderRegistry = new SegmentQueryBuilderRegistry();
-        $segmentQueryBuilderRegistry->addQueryBuilder('static', $this->staticSegmentQueryBuilder);
-        $segmentQueryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
-        $this->subqueryLimitHelper = $this->createMock(SubQueryLimitHelper::class);
+        $queryBuilderRegistry = new SegmentQueryBuilderRegistry();
+        $queryBuilderRegistry->addQueryBuilder('static', $this->staticSegmentQueryBuilder);
+        $queryBuilderRegistry->addQueryBuilder('dynamic', $this->dynamicSegmentQueryBuilder);
+        $this->subQueryLimitHelper = $this->createMock(SubQueryLimitHelper::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $segmentManager = new SegmentManager(
-            $this->em,
-            $segmentQueryBuilderRegistry,
-            $this->subqueryLimitHelper,
+            $this->doctrine,
+            $queryBuilderRegistry,
+            $this->subQueryLimitHelper,
             new ArrayCache(),
-            $this->createMock(AclHelper::class)
+            $this->createMock(AclHelper::class),
+            $this->logger
         );
 
         $this->filter = new SegmentFilter(
@@ -315,7 +322,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
-            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->from(SegmentSnapshot::class, 'ts1')
             ->andWhere('ts1.segmentId = :segment')
             ->setParameter('segment', self::TEST_PARAM_VALUE);
 
@@ -329,11 +336,12 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
         $this->filter->apply($ds, $filterData);
 
-        $expectedResult = [
-            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
-            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :_s1_segment)'
-        ];
-        $expectedResult = implode(' ', $expectedResult);
+        $expectedResult = 'SELECT t1.name'
+            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' WHERE t1.id IN('
+            . 'SELECT ts1.id'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'
+            . ' WHERE ts1.segmentId = :_s1_segment)';
 
         self::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
 
@@ -356,11 +364,9 @@ class SegmentFilterTest extends OrmTestCase
 
         $em = $this->getTestEntityManager();
         $em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $em->getConfiguration()->setEntityNamespaces(
-            [
-                'OroSegmentBundle' => 'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
-            ]
-        );
+        $em->getConfiguration()->setEntityNamespaces([
+            'OroSegmentBundle' => 'Oro\Bundle\SegmentBundle\Tests\Unit\Stub\Entity'
+        ]);
 
         return $em;
     }
@@ -380,7 +386,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
-            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->from(SegmentSnapshot::class, 'ts1')
             ->andWhere('ts1.segmentId = :segment')
             ->setParameter('segment', self::TEST_PARAM_VALUE);
 
@@ -394,11 +400,12 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
         $this->filter->apply($ds, $filterData);
 
-        $expectedResult = [
-            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
-            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :_s1_segment)'
-        ];
-        $expectedResult = implode(' ', $expectedResult);
+        $expectedResult = 'SELECT t1.name'
+            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' WHERE t1.id IN('
+            . 'SELECT ts1.id'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'
+            . ' WHERE ts1.segmentId = :_s1_segment)';
 
         self::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
 
@@ -424,7 +431,7 @@ class SegmentFilterTest extends OrmTestCase
 
         $queryBuilder = new QueryBuilder($em);
         $queryBuilder->select(['ts1.id'])
-            ->from('OroSegmentBundle:SegmentSnapshot', 'ts1')
+            ->from(SegmentSnapshot::class, 'ts1')
             ->andWhere('ts1.segmentId = :segment')
             ->setParameter('segment', self::TEST_PARAM_VALUE);
 
@@ -435,7 +442,7 @@ class SegmentFilterTest extends OrmTestCase
             ->with($dynamicSegment)
             ->willReturn($queryBuilder);
 
-        $this->subqueryLimitHelper->expects(self::once())
+        $this->subQueryLimitHelper->expects(self::once())
             ->method('setLimit')
             ->with($queryBuilder, 10, 'id')
             ->willReturn($queryBuilder);
@@ -443,11 +450,12 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('someName', [FilterUtility::DATA_NAME_KEY => self::TEST_FIELD_NAME]);
         $this->filter->apply($ds, $filterData);
 
-        $expectedResult = [
-            'SELECT t1.name FROM OroSegmentBundle:CmsUser t1 WHERE',
-            't1.id IN(SELECT ts1.id FROM OroSegmentBundle:SegmentSnapshot ts1 WHERE ts1.segmentId = :_s1_segment)'
-        ];
-        $expectedResult = implode(' ', $expectedResult);
+        $expectedResult = 'SELECT t1.name'
+            . ' FROM OroSegmentBundle:CmsUser t1'
+            . ' WHERE t1.id IN('
+            . 'SELECT ts1.id'
+            . ' FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot ts1'
+            . ' WHERE ts1.segmentId = :_s1_segment)';
 
         self::assertEquals($expectedResult, $ds->getQueryBuilder()->getDQL());
 

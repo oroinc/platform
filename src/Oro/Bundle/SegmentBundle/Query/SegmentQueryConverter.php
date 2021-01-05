@@ -3,13 +3,14 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Converts a segment query definition created by the query designer to an ORM query.
@@ -25,29 +26,31 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /** @var array */
     protected static $segmentTableAliases = [];
 
-    /** @var QueryBuilder */
-    protected $qb;
-
     /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
+
+    /** @var QueryBuilder */
+    protected $qb;
 
     /** @var string */
     private $aliasPrefix;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
-     * @param RestrictionBuilderInterface   $restrictionBuilder
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param ManagerRegistry                  $doctrine
+     * @param RestrictionBuilderInterface      $restrictionBuilder
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine,
         RestrictionBuilderInterface $restrictionBuilder
     ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrine);
         $this->restrictionBuilder = $restrictionBuilder;
-        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
     }
 
     /**
@@ -103,16 +106,27 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      *
      * @return QueryBuilder
      */
-    public function convert(AbstractQueryDesigner $source)
+    public function convert(AbstractQueryDesigner $source): QueryBuilder
     {
         $aliasKey = self::getAliasKeyBySource($source);
         self::ensureAliasRegistered($source);
         $this->aliasPrefix = $aliasKey . '_' . self::$segmentTableAliases[$aliasKey];
 
-        $this->qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
+        $qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
+        $this->qb = $qb;
         $this->doConvert($source);
 
-        return $this->qb;
+        return $qb;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resetConvertState(): void
+    {
+        parent::resetConvertState();
+        $this->qb = null;
+        $this->aliasPrefix = null;
     }
 
     /**

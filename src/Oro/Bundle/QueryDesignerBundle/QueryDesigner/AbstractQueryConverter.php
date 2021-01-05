@@ -77,24 +77,19 @@ abstract class AbstractQueryConverter
     protected $qbTools;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
     protected function __construct(
         FunctionProviderInterface $functionProvider,
-        VirtualFieldProviderInterface $virtualFieldProvider
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider
     ) {
         $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
-        $this->qbTools = new QueryBuilderTools();
-    }
-
-    /**
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     */
-    public function setVirtualRelationProvider(VirtualRelationProviderInterface $virtualRelationProvider)
-    {
         $this->virtualRelationProvider = $virtualRelationProvider;
+        $this->qbTools = new QueryBuilderTools();
     }
 
     /**
@@ -324,35 +319,47 @@ abstract class AbstractQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->rootEntity = $source->getEntity();
-        $this->definition = json_decode($source->getDefinition(), true);
-
-        if (!isset($this->definition['columns'])) {
+        $definition = json_decode($source->getDefinition(), true);
+        if (!isset($definition['columns'])) {
             throw new InvalidConfigurationException('The "columns" definition does not exist.');
         }
-        if (empty($this->definition['columns'])) {
+        if (empty($definition['columns'])) {
             throw new InvalidConfigurationException('The "columns" definition must not be empty.');
         }
 
-        $this->aliases = [];
-        $this->virtualRelationsJoins = [];
-        $this->tableAliasesCount = 0;
+        $this->rootEntity = $source->getEntity();
         $this->joinIdHelper = new JoinIdentifierHelper($this->rootEntity);
+        $this->definition = $definition;
         $this->joins = [];
+        $this->tableAliasesCount = 0;
         $this->tableAliases = [];
         $this->columnAliases = [];
+        $this->aliases = [];
+        $this->queryAliases = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions = [];
+        $this->virtualRelationsJoins = [];
         try {
             $this->buildQuery();
         } finally {
-            $this->virtualColumnOptions = null;
-            $this->virtualColumnExpressions = null;
-            $this->columnAliases = null;
-            $this->tableAliases = null;
-            $this->joins = null;
-            $this->joinIdHelper = null;
+            $this->resetConvertState();
         }
+    }
+
+    protected function resetConvertState(): void
+    {
+        $this->rootEntity = null;
+        $this->joinIdHelper = null;
+        $this->definition = null;
+        $this->joins = null;
+        $this->tableAliasesCount = 0;
+        $this->tableAliases = null;
+        $this->columnAliases = null;
+        $this->aliases = [];
+        $this->queryAliases = [];
+        $this->virtualColumnExpressions = null;
+        $this->virtualColumnOptions = null;
+        $this->virtualRelationsJoins = [];
     }
 
     /**
@@ -793,10 +800,6 @@ abstract class AbstractQueryConverter
      */
     protected function replaceJoinsForVirtualRelation($joinId)
     {
-        if (!$this->virtualRelationProvider) {
-            return $joinId;
-        }
-
         /**
          * mainEntityJoinId - parent join definition
          *

@@ -7,9 +7,9 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentDefinitionTestCase extends OrmQueryConverterTest
 {
-    const TEST_ENTITY          = 'AcmeBundle:UserEntity';
-    const TEST_IDENTIFIER_NAME = 'id';
-    const TEST_IDENTIFIER      = 32;
+    protected const TEST_ENTITY          = 'AcmeBundle:UserEntity';
+    protected const TEST_IDENTIFIER_NAME = 'id';
+    protected const TEST_IDENTIFIER      = 32;
 
     /**
      * @param bool|string $entity
