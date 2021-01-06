@@ -6,20 +6,18 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Responsible for formatting the datetime according to the time zone.
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * Responsible for formatting the datetime according to the time zone
+ * and copying submitted "start" and "end" values to model data under "start_original" and "end_original" keys.
  */
 class DateFilterSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var DateFilterModifier
-     */
+    /** @var DateFilterModifier */
     protected $dateFilterModifier;
 
     /** @var array */
@@ -49,7 +47,8 @@ class DateFilterSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SUBMIT => 'preSubmit'
+            FormEvents::PRE_SUBMIT => 'preSubmit',
+            FormEvents::SUBMIT     => 'submit'
         ];
     }
 
@@ -71,6 +70,17 @@ class DateFilterSubscriber implements EventSubscriberInterface
             // in case when DateTimeFilter already process and parent subscription is not necessary
             return;
         }
+
+        // Remembers submitted values.
+        // It is required to correct work of date interval filters, e.g. the "day without year" variable.
+        $context = $this->getSubmitContext($config);
+        if (isset($data['value']['start'])) {
+            $context->addValue('start_original', $data['value']['start']);
+        }
+        if (isset($data['value']['end'])) {
+            $context->addValue('end_original', $data['value']['end']);
+        }
+
         $children = array_keys($form->get('value')->all());
         $data = $this->dateFilterModifier->modifyWithTimeZone($data, $children, true, $config->getOption('time_zone'));
         // replace value form children to needed sub forms in case when part is selected
@@ -86,10 +96,23 @@ class DateFilterSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param FormEvent $event
+     */
+    public function submit(FormEvent $event)
+    {
+        // Adds submitted values to model data.
+        // It is required to correct work of date interval filters, e.g. the "day without year" variable.
+        $data = $event->getData();
+        if (\is_array($data)) {
+            $event->setData($this->getSubmitContext($event->getForm()->getConfig())->applyValues($data));
+        }
+    }
+
+    /**
      * Returns array combined by range of $min and $max for keys and for values
      *
-     * @param integer $min
-     * @param integer $max
+     * @param int $min
+     * @param int $max
      *
      * @return array
      */
@@ -109,15 +132,18 @@ class DateFilterSubscriber implements EventSubscriberInterface
     private function replaceValueFields(FormInterface $form, array $choices)
     {
         $children = array_keys($form->all());
-
         foreach ($children as $child) {
-            $form->add(
-                $child,
-                ChoiceType::class,
-                [
-                    'choices' => array_flip($choices),
-                ]
-            );
+            $form->add($child, ChoiceType::class, ['choices' => array_flip($choices)]);
         }
+    }
+
+    /**
+     * @param FormConfigInterface $config
+     *
+     * @return DateFilterSubmitContext
+     */
+    private function getSubmitContext(FormConfigInterface $config): DateFilterSubmitContext
+    {
+        return $config->getOption('submit_context');
     }
 }

@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Filter;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Expr\Comparison;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -21,29 +24,25 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formFactory;
+    private $formFactory;
 
-    /** @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-    protected $filterUtility;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var SearchEntityFilter */
-    protected $filter;
+    private $filter;
 
     protected function setUp()
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->filterUtility = $this->createMock(FilterUtility::class);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
-
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-
-        $this->filter = new SearchEntityFilter($this->formFactory, $this->filterUtility, $this->doctrineHelper);
+        $this->filter = new SearchEntityFilter(
+            $this->formFactory,
+            new FilterUtility(),
+            $this->createMock(DoctrineHelper::class)
+        );
+        $this->filter->setDoctrine($this->doctrine);
     }
 
     /**
@@ -74,7 +73,6 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         $formView->children['value'] = $valueFormView;
         $formView->vars['populate_default'] = true;
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->any())
             ->method('createView')
@@ -94,11 +92,6 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
                 'name' => 'test',
                 'label' => 'Test',
                 'choices' => [],
-                'data_name' => 'field',
-                'ftype' => 'choice',
-                'options' => [
-                    'class' => \stdClass::class
-                ],
                 'lazy' => false,
                 'populateDefault' => true,
                 'type' => 'multichoice',
@@ -114,22 +107,31 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
         $entity2 = $this->getEntity(Item::class, ['id' => 2002]);
         $entity3 = $this->getEntity(Item::class, ['id' => null]);
 
-        $value = new ArrayCollection([$entity1, $entity2]);
+        $value = new ArrayCollection([$entity1, $entity2, $entity3]);
 
-        $this->doctrineHelper->expects($this->exactly(2))
-            ->method('getSingleEntityIdentifier')
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->exactly(3))
+            ->method('getClassMetadata')
+            ->with(Item::class)
+            ->willReturn($classMetadata);
+        $this->doctrine->expects($this->exactly(3))
+            ->method('getManagerForClass')
+            ->with(Item::class)
+            ->willReturn($em);
+        $classMetadata->expects($this->exactly(3))
+            ->method('getIdentifierValues')
             ->withConsecutive(
-                [$entity1, false],
-                [$entity2, false],
-                [$entity3, false]
+                [$entity1],
+                [$entity2],
+                [$entity3]
             )
             ->willReturnOnConsecutiveCalls(
-                $entity1->getId(),
-                $entity2->getId(),
-                $entity3->getId()
+                ['id' => $entity1->getId()],
+                ['id' => $entity2->getId()],
+                ['id' => $entity3->getId()]
             );
 
-        /** @var SearchFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
         $ds->expects($this->once())
             ->method('addRestriction')
@@ -148,14 +150,12 @@ class SearchEntityFilterTest extends \PHPUnit\Framework\TestCase
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
 
-        $this->assertTrue(
-            $this->filter->apply(
-                $ds,
-                [
-                    'type' => null,
-                    'value' => $value,
-                ]
-            )
-        );
+        $this->assertTrue($this->filter->apply($ds, ['type' => null, 'value' => $value]));
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

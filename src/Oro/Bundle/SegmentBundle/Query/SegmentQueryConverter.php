@@ -84,6 +84,11 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         ++self::$segmentTableAliases[$aliasKey];
     }
 
+    public static function resetAliases()
+    {
+        self::$segmentTableAliases = [];
+    }
+
     /**
      * {@inheritdoc}
      */

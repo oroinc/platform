@@ -17,135 +17,135 @@ use Oro\Bundle\UserBundle\Entity\User;
 class DictionaryFilterTest extends WebTestCase
 {
     /** @var DictionaryFilter */
-    protected $filter;
+    private $filter;
 
     public function setUp()
     {
         $this->initClient();
         $this->loadFixtures([LoadUserWithBUAndOrganization::class]);
-        $this->filter = $this->getContainer()->get('oro_filter.dictionary_filter');
+        $this->filter = self::getContainer()->get('oro_filter.dictionary_filter');
     }
 
     /**
-     * @dataProvider filterProvider
+     * @param string $alias
      *
-     * @param string $join
-     * @param string $dataName
-     * @param callable $filterFormData
-     * @param array $expectedResult
+     * @return QueryBuilder
      */
-    public function testFilter($join, $dataName, callable $filterFormData, array $expectedResult)
+    private function createQueryBuilder(string $alias): QueryBuilder
     {
-        $qb = $this->createQueryBuilder('u');
-        $qb
-            ->select('u.username')
-            ->orderBy('u.username')
-            ->leftJoin('u.' . $join, $join)
-            ->andWhere(
-                $qb->expr()->in(
-                    'u.username',
-                    ['u1', 'u2', 'u3']
-                )
-            );
+        $doctrine = self::getContainer()->get('doctrine');
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
-
-        $filterForm = $this->filter->getForm();
-        $filterForm->submit($filterFormData());
-
-        $this->assertTrue($filterForm->isValid());
-        self::assertTrue($filterForm->isSynchronized());
-
-        $this->filter->init($dataName, ['data_name' => $dataName]);
-        $this->filter->apply($ds, $filterForm->getData());
-
-        $result = $ds->getQueryBuilder()->getQuery()->getResult();
-
-        $this->assertSame($expectedResult, $result);
+        return $doctrine->getRepository(User::class)->createQueryBuilder($alias);
     }
 
     /**
-     * @return array
-     */
-    public function filterProvider()
-    {
-        return [
-            'Filter "is any of" for toOne relation' => [
-                'join' => 'organization',
-                'dataName' => 'organization.id',
-                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_IN, 'mainOrganization'),
-                'expectedResult' => [
-                    ['username' => 'u3'],
-                ],
-            ],
-            'Filter "is any of"' => [
-                'join' => 'businessUnits',
-                'dataName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(DictionaryFilterType::TYPE_IN, 'mainBusinessUnit'),
-                'expectedResult' => [
-                    ['username' => 'u1'],
-                    ['username' => 'u2'],
-                ],
-            ],
-            'Filter "is not any of"' => [
-                'join' => 'businessUnits',
-                'dataName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(
-                    DictionaryFilterType::TYPE_NOT_IN,
-                    'mainBusinessUnit'
-                ),
-                'expectedResult' => [
-                    [
-                        'username' => 'u3',
-                    ],
-                ],
-            ],
-            'Filter "is empty"' => [
-                'join' => 'businessUnits',
-                'dataName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(FilterUtility::TYPE_EMPTY, null),
-                'expectedResult' => [
-                    ['username' => 'u3'],
-                ],
-            ],
-            'Filter "is not empty"' => [
-                'join' => 'businessUnits',
-                'dataName' => 'businessUnits.id',
-                'filterFormData' => $this->getFilterFormDataCallback(FilterUtility::TYPE_NOT_EMPTY, null),
-                'expectedResult' => [
-                    ['username' => 'u1'],
-                    ['username' => 'u2'],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @param int $type
-     * @param string $reference
+     * @param string|int  $type
+     * @param string|null $reference
      *
      * @return \Closure
      */
-    private function getFilterFormDataCallback($type, $reference)
+    private function getFilterDataCallback($type, $reference): \Closure
     {
         return function () use ($type, $reference) {
             return [
-                'type' => $type,
-                'value' => $reference ? $this->getReference($reference)->getId() : null,
+                'type'  => $type,
+                'value' => $reference ? $this->getReference($reference)->getId() : null
             ];
         };
     }
 
     /**
-     * @param string $alias
-     * @return QueryBuilder
+     * @dataProvider filterProvider
      */
-    private function createQueryBuilder($alias)
+    public function testFilterWithForm(string $join, string $dataName, callable $filterData, array $expectedResult)
     {
-        $doctrine = $this->getContainer()->get('doctrine');
-        $objectManager = $doctrine->getManagerForClass(User::class);
-        $repository = $objectManager->getRepository(User::class);
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username')
+            ->leftJoin('u.' . $join, $join)
+            ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
 
-        return $repository->createQueryBuilder($alias);
+        $this->filter->init($dataName, ['data_name' => $dataName]);
+
+        $filterForm = $this->filter->getForm();
+        $filterForm->submit($filterData());
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $filterForm->getData());
+
+        $result = $ds->getQueryBuilder()->getQuery()->getResult();
+        self::assertSame($expectedResult, $result);
+    }
+
+    /**
+     * @dataProvider filterProvider
+     */
+    public function testFilterWithoutForm(string $join, string $dataName, callable $filterData, array $expectedResult)
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username')
+            ->leftJoin('u.' . $join, $join)
+            ->andWhere($qb->expr()->in('u.username', ['u1', 'u2', 'u3']));
+
+        $this->filter->init($dataName, ['data_name' => $dataName]);
+
+        $data = $this->filter->prepareData($filterData());
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $data);
+
+        $result = $ds->getQueryBuilder()->getQuery()->getResult();
+        self::assertSame($expectedResult, $result);
+    }
+
+    public function filterProvider()
+    {
+        return [
+            'Filter "is any of" for toOne relation' => [
+                'join'           => 'organization',
+                'dataName'       => 'organization.id',
+                'filterData'     => $this->getFilterDataCallback(DictionaryFilterType::TYPE_IN, 'mainOrganization'),
+                'expectedResult' => [
+                    ['username' => 'u3']
+                ]
+            ],
+            'Filter "is any of"'                    => [
+                'join'           => 'businessUnits',
+                'dataName'       => 'businessUnits.id',
+                'filterData'     => $this->getFilterDataCallback(DictionaryFilterType::TYPE_IN, 'mainBusinessUnit'),
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2']
+                ]
+            ],
+            'Filter "is not any of"'                => [
+                'join'           => 'businessUnits',
+                'dataName'       => 'businessUnits.id',
+                'filterData'     => $this->getFilterDataCallback(DictionaryFilterType::TYPE_NOT_IN, 'mainBusinessUnit'),
+                'expectedResult' => [
+                    ['username' => 'u3']
+                ]
+            ],
+            'Filter "is empty"'                     => [
+                'join'           => 'businessUnits',
+                'dataName'       => 'businessUnits.id',
+                'filterData'     => $this->getFilterDataCallback(FilterUtility::TYPE_EMPTY, null),
+                'expectedResult' => [
+                    ['username' => 'u3']
+                ]
+            ],
+            'Filter "is not empty"'                 => [
+                'join'           => 'businessUnits',
+                'dataName'       => 'businessUnits.id',
+                'filterData'     => $this->getFilterDataCallback(FilterUtility::TYPE_NOT_EMPTY, null),
+                'expectedResult' => [
+                    ['username' => 'u1'],
+                    ['username' => 'u2']
+                ]
+            ]
+        ];
     }
 }

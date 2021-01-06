@@ -16,9 +16,6 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
-    /** @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-    protected $filterUtility;
-
     /** @var DictionaryApiEntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $dictionaryManager;
 
@@ -28,12 +25,6 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-
-        $this->filterUtility = $this->createMock(FilterUtility::class);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
-
         $this->dictionaryManager = $this->createMock(DictionaryApiEntityManager::class);
     }
 
@@ -56,7 +47,6 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
         $formView = new FormView();
         $formView->children['type'] = $childFormView;
 
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('createView')
@@ -80,11 +70,7 @@ abstract class AbstractSearchEnumFilterTest extends \PHPUnit\Framework\TestCase
                 'name' => 'test',
                 'label' => 'Test',
                 'choices' => [],
-                'data_name' => 'field',
-                'ftype' => 'multiselect',
-                'options' => [
-                    'class' => \stdClass::class
-                ],
+                'type' => 'multiselect',
                 'lazy' => false,
                 'class' => 'stdClass',
                 'initialData' => null

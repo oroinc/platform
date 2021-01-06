@@ -232,7 +232,15 @@ class DateGroupingFilter extends ChoiceFilter
      */
     protected function parseData($data)
     {
-        if (is_array($data) && !$data['value']) {
+        return parent::parseData($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseValue(array $data)
+    {
+        if (!isset($data['value']) || !$data['value']) {
             $data['value'] = self::TYPE_DAY;
         }
 

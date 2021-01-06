@@ -151,4 +151,10 @@ class ChoiceTreeFilterTest extends OrmTestCase
         $form->expects(self::once())->method('createView')->willReturn($formView);
         $this->formFactory->expects(self::once())->method('create')->willReturn($form);
     }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
+    }
 }

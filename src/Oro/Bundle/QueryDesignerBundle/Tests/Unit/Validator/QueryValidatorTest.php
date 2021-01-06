@@ -10,12 +10,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -42,7 +43,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);
         $this->gridBuilder = $this->createMock(Builder::class);
@@ -56,23 +57,22 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             false
         );
+        $this->validator->setFilterExecutionContext(new FilterExecutionContext());
 
         $this->context = $this->createMock(ExecutionContextInterface::class);
         $this->validator->initialize($this->context);
 
         $this->constraint = new QueryConstraint();
 
-        $this->translator
-            ->expects($this->any())
+        $this->translator->expects(self::any())
             ->method('trans')
             ->with($this->constraint->message)
-            ->will($this->returnValue('Invalid query'));
+            ->willReturn('Invalid query');
     }
 
     public function testValidateNotMatchedQuery()
     {
-        $this->context
-            ->expects($this->never())
+        $this->context->expects(self::never())
             ->method('addViolation');
 
         $this->validator->validate(new \stdClass(), $this->constraint);
@@ -89,49 +89,40 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValidate($datasource, $useOrmDatasource, $exception, $configurationException, $expectsCount)
     {
-        $value = new Segment();
-        $this->doctrineHelper
-            ->expects($this->any())
+        $value = new QueryDesignerModel();
+        $this->doctrineHelper->expects(self::any())
             ->method('getSingleEntityIdentifier')
             ->willReturn(123);
-
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
         $builder = $this->createMock(DatagridConfigurationBuilder::class);
 
-        $provider
-            ->expects($this->once())
+        $provider->expects(self::once())
             ->method('isApplicable')
-            ->will($this->returnValue(true));
-        $provider
-            ->expects($this->once())
+            ->willReturn(true);
+        $provider->expects(self::once())
             ->method('getBuilder')
-            ->will($this->returnValue($builder));
-        $this->configurationProvider
-            ->expects($this->once())
+            ->willReturn($builder);
+        $this->configurationProvider->expects(self::once())
             ->method('getProviders')
-            ->will($this->returnValue([$provider, new \stdClass()]));
+            ->willReturn([$provider, new \stdClass()]);
 
         if ($configurationException) {
-            $builder
-                ->expects($this->once())
+            $builder->expects(self::once())
                 ->method('getConfiguration')
-                ->will($this->throwException($configurationException));
+                ->will(self::throwException($configurationException));
         } else {
             $configuration = $this->createMock(DatagridConfiguration::class);
-            $builder
-                ->expects($this->once())
+            $builder->expects(self::once())
                 ->method('getConfiguration')
-                ->will($this->returnValue($configuration));
+                ->willReturn($configuration);
         }
         $datagrid = $this->createMock(DatagridInterface::class);
 
-        $this->gridBuilder
-            ->expects($this->exactly($expectsCount))
+        $this->gridBuilder->expects(self::exactly($expectsCount))
             ->method('build')
-            ->will($this->returnValue($datagrid));
-        $datagrid
-            ->expects($this->exactly($expectsCount))
+            ->willReturn($datagrid);
+        $datagrid->expects(self::exactly($expectsCount))
             ->method('getAcceptedDatasource')
             ->willReturnCallback(function () use ($datasource, $value) {
                 $this->validator->initialize($this->createMock(ExecutionContextInterface::class));
@@ -140,36 +131,30 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
                 return $datasource;
             });
         $qb = $this->createMock(QueryBuilder::class);
-        $datasource
-            ->expects($this->exactly($expectsCount))
+        $datasource->expects(self::exactly($expectsCount))
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
         if ($useOrmDatasource) {
-            $qb
-                ->expects($this->exactly($expectsCount))
+            $qb->expects(self::exactly($expectsCount))
                 ->method('setMaxResults')
-                ->will($this->returnSelf());
+                ->will(self::returnSelf());
         }
         if ($exception) {
-            $datasource
-                ->expects($this->exactly($expectsCount))
+            $datasource->expects(self::exactly($expectsCount))
                 ->method('getResults')
-                ->will($this->throwException($exception));
+                ->will(self::throwException($exception));
         } else {
-            $datasource
-                ->expects($this->exactly($expectsCount))
+            $datasource->expects(self::exactly($expectsCount))
                 ->method('getResults')
-                ->will($this->returnValue([]));
+                ->willReturn([]);
         }
 
         if ($exception || $configurationException) {
-            $this->context
-                ->expects($this->once())
+            $this->context->expects(self::once())
                 ->method('addViolation');
         } else {
-            $this->context
-                ->expects($this->never())
+            $this->context->expects(self::never())
                 ->method('addViolation');
         }
 
@@ -227,65 +212,63 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testBuilderIsMissing()
     {
-        $this->configurationProvider
-            ->expects($this->once())
-            ->method('getProviders')
-            ->will($this->returnValue([]));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
 
-        $this->validator->validate(new Segment(), $this->constraint);
+        $value = new QueryDesignerModel();
+        $this->doctrineHelper->expects(self::any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(1);
+
+        $this->configurationProvider->expects(self::once())
+            ->method('getProviders')
+            ->willReturn([]);
+
+        $this->validator->validate($value, $this->constraint);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testExistingEntityValidation()
     {
-        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(1);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
+
+        $value = new QueryDesignerModel();
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(1);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
-
-        $provider
-            ->expects($this->once())
+        $provider->expects(self::once())
             ->method('isApplicable')
-            ->with(Segment::GRID_PREFIX.'1')
-            ->will($this->returnValue(false));
-
-        $this->configurationProvider
-            ->expects($this->once())
+            ->with(QueryDesignerModel::GRID_PREFIX . '1')
+            ->willReturn(false);
+        $this->configurationProvider->expects(self::once())
             ->method('getProviders')
-            ->will($this->returnValue([$provider]));
+            ->willReturn([$provider]);
 
-        $this->validator->validate(new Segment(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException
-     * @expectedExceptionMessage Builder is missing
-     */
     public function testNewEntityValidation()
     {
-        $this->doctrineHelper->expects($this->once())->method('getSingleEntityIdentifier')->willReturn(null);
+        $this->expectException(InvalidConfigurationException::class);
+
+        $value = new QueryDesignerModel();
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(null);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
-
-        $provider
-            ->expects($this->once())
+        $provider->expects(self::once())
             ->method('isApplicable')
-            ->with($this->stringStartsWith(Segment::GRID_PREFIX))
-            ->will($this->returnValue(false));
-
-        $this->configurationProvider
-            ->expects($this->once())
+            ->with(self::stringStartsWith(QueryDesignerModel::GRID_PREFIX))
+            ->willReturn(false);
+        $this->configurationProvider->expects(self::once())
             ->method('getProviders')
-            ->will($this->returnValue([$provider]));
+            ->willReturn([$provider]);
 
-        $this->validator->validate(new Segment(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 }

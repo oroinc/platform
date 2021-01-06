@@ -5,6 +5,9 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType;
 
+/**
+ * The filter by selected rows.
+ */
 class SelectRowFilter extends ChoiceFilter
 {
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubmitContext;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
@@ -52,10 +53,10 @@ abstract class AbstractDateFilterType extends AbstractType
     protected $dateModifiers;
 
     /** @var null|array */
-    protected $dateVarsChoices = null;
+    protected $dateVarsChoices;
 
     /** @var null|array */
-    protected $datePartsChoices = null;
+    protected $datePartsChoices;
 
     /** @var DateFilterSubscriber */
     protected $subscriber;
@@ -110,13 +111,15 @@ abstract class AbstractDateFilterType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'date_parts'   => $this->getDateParts(),
-                'date_vars'    => $this->getDateVariables(),
-                'compile_date' => true
-            ]
-        );
+        $resolver->setDefaults([
+            'date_parts'     => $this->getDateParts(),
+            'date_vars'      => $this->getDateVariables(),
+            'compile_date'   => true,
+            'submit_context' => null
+        ]);
+        $resolver->setNormalizer('submit_context', function () {
+            return new DateFilterSubmitContext();
+        });
     }
 
     /**

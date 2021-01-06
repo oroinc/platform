@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\Lexer;
 use Oro\Bundle\FilterBundle\Expression\Date\Parser;
+use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubmitContext;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
@@ -19,75 +20,85 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DateFilterSubscriber */
-    protected $subscriber;
-
-    /** @var DateFilterModifier|\PHPUnit\Framework\MockObject\MockObject */
-    protected $modifier;
-
     private const TIMEZONE = 'Asia/Tokyo';
 
-    protected function setUp()
+    /** @var DateFilterSubscriber */
+    private $subscriber;
+
+    protected function setUp(): void
     {
-        /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings */
-        $localeSettings = self::createMock(LocaleSettings::class);
-        $localeSettings
-            ->expects(self::any())
-            ->method('getTimezone')
-            ->will(self::returnValue(self::TIMEZONE));
-
-        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translatorMock */
-        $translatorMock = self::createMock(TranslatorInterface::class);
-
-        /** @var DateModifierProvider|\PHPUnit\Framework\MockObject\MockObject $providerMock */
-        $providerMock = self::createMock(DateModifierProvider::class);
-
-        $this->modifier = new DateFilterModifier(
+        $localeSettings = $this->createMock(LocaleSettings::class);
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $providerMock = $this->createMock(DateModifierProvider::class);
+        $modifier = new DateFilterModifier(
             new Compiler(new Lexer($translatorMock, $providerMock), new Parser($localeSettings))
         );
-        $this->subscriber = new DateFilterSubscriber($this->modifier);
+
+        $localeSettings->expects(self::any())
+            ->method('getTimezone')
+            ->willReturn(self::TIMEZONE);
+
+        $this->subscriber = new DateFilterSubscriber($modifier);
+    }
+
+    /**
+     * @param string $dateTime
+     *
+     * @return string
+     */
+    private function getUtcDate(string $dateTime): string
+    {
+        return (new \DateTime($dateTime, new \DateTimeZone(self::TIMEZONE)))
+            ->setTimezone(new \DateTimeZone('UTC'))
+            ->format('Y-m-d H:i:00\Z');
     }
 
     public function testSubscribedEvents()
     {
-        $events = DateFilterSubscriber::getSubscribedEvents();
-        self::assertCount(1, $events);
-
-        $eventNames = array_keys($events);
-        self::assertEquals(FormEvents::PRE_SUBMIT, $eventNames[0]);
+        self::assertEquals(
+            [
+                FormEvents::PRE_SUBMIT => 'preSubmit',
+                FormEvents::SUBMIT     => 'submit'
+            ],
+            DateFilterSubscriber::getSubscribedEvents()
+        );
     }
 
     public function testPreSubmitWithCustomFormTimeZoneConfig()
     {
         $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00']];
+        $submitContext = new DateFilterSubmitContext();
         $form = $this->createMock(FormInterface::class);
         $valueForm = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form
-            ->expects($this->any())
+        $form->expects(self::any())
             ->method('get')
-            ->with($this->equalTo('value'))
+            ->with(self::equalTo('value'))
             ->willReturn($valueForm);
-        $form
-            ->expects($this->any())
+        $form->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig
-            ->expects($this->once())
+        $formConfig->expects(self::exactly(2))
             ->method('getOption')
-            ->willReturn('time_zone')
-            ->willReturn('UTC');
-        $valueForm
-            ->expects($this->any())
+            ->willReturnMap([
+                ['time_zone', null, 'UTC'],
+                ['submit_context', null, $submitContext]
+            ]);
+        $valueForm->expects(self::any())
             ->method('all')
             ->willReturn(['start' => 'start subform']);
+
         $this->subscriber->preSubmit($event);
 
         self::assertEquals(
             ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']],
             $event->getData()
+        );
+        self::assertEquals(
+            ['value' => ['start_original' => $data['value']['start']]],
+            $submitContext->applyValues([])
         );
     }
 
@@ -101,31 +112,29 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = [])
     {
+        $submitContext = new DateFilterSubmitContext();
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
         $valueForm = $this->createMock(FormInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form
-            ->expects($this->any())
+        $form->expects(self::any())
             ->method('get')
-            ->with($this->equalTo('value'))
+            ->with(self::equalTo('value'))
             ->willReturn($valueForm);
-        $form
-            ->expects($this->any())
+        $form->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig
-            ->expects($this->once())
+        $formConfig->expects(self::exactly(2))
             ->method('getOption')
-            ->willReturn('time_zone')
-            ->willReturn(null);
-        $valueForm
-            ->expects($this->any())
+            ->willReturnMap([
+                ['time_zone', null, null],
+                ['submit_context', null, $submitContext]
+            ]);
+        $valueForm->expects(self::any())
             ->method('all')
             ->willReturn($valueSubforms);
-        $valueForm
-            ->expects($this->exactly(count($shouldAddFields)))
+        $valueForm->expects(self::exactly(count($shouldAddFields)))
             ->method('add');
 
         $this->subscriber->preSubmit($event);
@@ -133,6 +142,15 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->preSubmit($event);
 
         self::assertEquals($expectedData, $event->getData());
+
+        $expectedSubmitContextData = [];
+        if (isset($data['value']['start'])) {
+            $expectedSubmitContextData['value']['start_original'] = $data['value']['start'];
+        }
+        if (isset($data['value']['end'])) {
+            $expectedSubmitContextData['value']['end_original'] = $data['value']['end'];
+        }
+        self::assertEquals($expectedSubmitContextData, $submitContext->applyValues([]));
     }
 
     /**
@@ -277,15 +295,63 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $dateTime
-     *
-     * @return string
-     */
-    private function getUtcDate(string $dateTime): string
+    public function testSubmitWithNullData()
     {
-        return (new \DateTime($dateTime, new \DateTimeZone(self::TIMEZONE)))
-                ->setTimezone(new \DateTimeZone('UTC'))
-                ->format('Y-m-d H:i:00\Z');
+        $form = $this->createMock(FormInterface::class);
+        $event = new FormEvent($form, null);
+
+        $form->expects(self::never())
+            ->method('getConfig');
+
+        $this->subscriber->submit($event);
+
+        self::assertNull($event->getData());
+    }
+
+    public function testSubmitWithoutStoredSubmittedValues()
+    {
+        $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']];
+        $submitContext = new DateFilterSubmitContext();
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $event = new FormEvent($form, $data);
+
+        $form->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig->expects(self::once())
+            ->method('getOption')
+            ->with('submit_context')
+            ->willReturn($submitContext);
+
+        $this->subscriber->submit($event);
+
+        self::assertEquals($data, $event->getData());
+    }
+
+    public function testSubmitWithStoredSubmittedValues()
+    {
+        $submittedStartValue = '2001-01-01 12:00:00';
+        $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00Z']];
+        $submitContext = new DateFilterSubmitContext();
+        $form = $this->createMock(FormInterface::class);
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $event = new FormEvent($form, $data);
+
+        $form->expects(self::once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+        $formConfig->expects(self::once())
+            ->method('getOption')
+            ->with('submit_context')
+            ->willReturn($submitContext);
+
+        $submitContext->addValue('start_original', $submittedStartValue);
+
+        $this->subscriber->submit($event);
+
+        $expectedData = $data;
+        $expectedData['value']['start_original'] = $submittedStartValue;
+        self::assertEquals($expectedData, $event->getData());
     }
 }

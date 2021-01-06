@@ -15,42 +15,19 @@ use Symfony\Component\Form\FormView;
 
 class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
-    private $filterName = 'filter-name';
-
-    /**
-     * @var string
-     */
-    private $dataName = 'field-name';
-
-    /**
-     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /**
-     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $filterUtility;
-
-    /**
-     * @var SearchNumberFilter
-     */
+    /** @var SearchNumberFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $this->filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new SearchNumberFilter($this->formFactory, $this->filterUtility);
-        $this->filter->init($this->filterName, [
-            FilterUtility::DATA_NAME_KEY => $this->dataName,
+        $this->filter = new SearchNumberFilter($this->formFactory, new FilterUtility());
+        $this->filter->init('test-filter', [
+            FilterUtility::DATA_NAME_KEY => 'field_name'
         ]);
     }
 
@@ -65,18 +42,14 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $filterType
-     * @param string $comparisonOperator
      * @dataProvider applyDataProvider
      */
-    public function testApply($filterType, $comparisonOperator)
+    public function testApply(int $filterType, string $comparisonOperator)
     {
         $fieldName = 'decimal.field';
         $fieldValue = 100;
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new BaseComparison($fieldName, $comparisonOperator, $fieldValue);
         $ds->expects($this->once())
@@ -124,9 +97,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new Comparison($fieldName, Comparison::NOT_EXISTS, null);
         $ds->expects($this->once())
@@ -141,9 +112,7 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $restriction = new Comparison($fieldName, Comparison::EXISTS, null);
         $ds->expects($this->once())
@@ -173,16 +142,11 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
         $form->expects($this->any())
             ->method('createView')
             ->willReturn($view);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
 
         $expected = [
-            'name' => 'filter-name',
-            'label' => 'Filter-name',
+            'name' => 'test-filter',
+            'label' => 'Test-filter',
             'choices' => [],
-            'data_name' => 'field-name',
-            'options' => [],
             'lazy' => false,
             'formatterOptions' => [
                 'decimals' => 0,
@@ -193,5 +157,11 @@ class SearchNumberFilterTest extends \PHPUnit\Framework\TestCase
             'dataType' => 'data_integer',
         ];
         $this->assertEquals($expected, $this->filter->getMetadata());
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

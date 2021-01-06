@@ -12,7 +12,7 @@ use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 /**
- * The filter model that will be used to display and apply boolean filters in the search process.
+ * The filter by a boolean value for a datasource based on a search index.
  */
 class SearchBooleanFilter extends BooleanFilter
 {
@@ -69,5 +69,13 @@ class SearchBooleanFilter extends BooleanFilter
             $builder->in($fieldName, $values),
             FilterUtility::CONDITION_AND
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 }

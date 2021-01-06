@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterPrepareDataInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
@@ -11,7 +12,10 @@ use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchStringFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
 
-class SearchStringFilter extends AbstractFilter
+/**
+ * The filter by a string value for a datasource based on a search index.
+ */
+class SearchStringFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
     /**
      * {@inheritDoc}
@@ -42,19 +46,22 @@ class SearchStringFilter extends AbstractFilter
         switch ($data['type']) {
             case TextFilterType::TYPE_EQUAL:
                 $ds->addRestriction($builder->eq($fieldName, $data['value']), FilterUtility::CONDITION_AND);
-
-                return;
-
+                break;
             case TextFilterType::TYPE_CONTAINS:
                 $this->addRestrictionForContains($ds, $builder, $data['value']);
-
-                return;
-
+                break;
             case TextFilterType::TYPE_NOT_CONTAINS:
                 $this->addRestrictionForNotContains($ds, $builder, $data['value']);
-
-                return;
+                break;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**

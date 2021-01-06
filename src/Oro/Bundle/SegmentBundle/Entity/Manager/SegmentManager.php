@@ -173,36 +173,39 @@ class SegmentManager
     {
         $this->nestingLevel++;
         $cacheKey = $this->getQBCacheKey($segment);
+        try {
+            // the cache can be used only for a root segment query (not a filter),
+            // otherwise table alias conflicts may occur
+            if ($this->nestingLevel === 1) {
+                $cachedSegmentQueryBuilder = $this->cache->fetch($cacheKey);
+                if (false !== $cachedSegmentQueryBuilder) {
+                    SegmentQueryConverter::ensureAliasRegistered($segment);
 
-        // Get segment QB from cache if any if this is a root segment (not a filter)
-        // or when segment is taken from cache for a first time, otherwise alias conflicts will occur
-        if (($this->nestingLevel === 1 || !SegmentQueryConverter::hasAliases($segment))
-            && $this->cache->contains($cacheKey)
-        ) {
-            SegmentQueryConverter::ensureAliasRegistered($segment);
-            $this->nestingLevel--;
-
-            return clone $this->cache->fetch($cacheKey);
-        }
-
-        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
-        if ($segmentQueryBuilder) {
-            try {
-                $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-                $this->cache->save($cacheKey, clone $queryBuilder);
-                $this->nestingLevel--;
-
-                return $queryBuilder;
-            } catch (InvalidConfigurationException $e) {
-                if ($this->logger) {
-                    $this->logger->error($e->getMessage(), ['exception' => $e]);
+                    return clone $cachedSegmentQueryBuilder;
                 }
             }
+
+            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
+            if ($segmentQueryBuilder) {
+                try {
+                    $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
+                    $this->cache->save($cacheKey, clone $queryBuilder);
+
+                    return $queryBuilder;
+                } catch (InvalidConfigurationException $e) {
+                    if ($this->logger) {
+                        $this->logger->error($e->getMessage(), ['exception' => $e]);
+                    }
+                }
+            }
+
+            return null;
+        } finally {
+            $this->nestingLevel--;
+            if (0 === $this->nestingLevel) {
+                SegmentQueryConverter::resetAliases();
+            }
         }
-
-        $this->nestingLevel--;
-
-        return null;
     }
 
     /**

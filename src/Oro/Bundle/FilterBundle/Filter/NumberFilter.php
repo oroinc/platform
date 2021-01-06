@@ -4,11 +4,12 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 
 /**
- * Basic number filter which supports multiple operators, for "orm" datasource.
+ * The filter by a numeric value.
  */
-class NumberFilter extends AbstractFilter
+class NumberFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
     /**
      * {@inheritdoc}
@@ -17,6 +18,9 @@ class NumberFilter extends AbstractFilter
         FilterUtility::TYPE_NOT_EMPTY => FilterUtility::TYPE_EMPTY,
         NumberFilterType::TYPE_NOT_EQUAL => NumberFilterType::TYPE_EQUAL,
     ];
+
+    /** @var NumberToLocalizedStringTransformer */
+    private $valueTransformer;
 
     /**
      * {@inheritdoc}
@@ -32,7 +36,7 @@ class NumberFilter extends AbstractFilter
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -45,32 +49,139 @@ class NumberFilter extends AbstractFilter
     }
 
     /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        if (!isset($data['value']) || '' === $data['value']) {
+            $data['value'] = null;
+        } else {
+            $type = null;
+            if (isset($data['type'])) {
+                $type = $this->normalizeType($data['type']);
+            }
+            if (\in_array($type, NumberFilterType::ARRAY_TYPES, true)) {
+                $this->assertScalarValue($data['value']);
+                $normalizedValues = [];
+                $items = explode(NumberFilterType::ARRAY_SEPARATOR, (string)$data['value']);
+                foreach ($items as $item) {
+                    $normalizedValues[] = $this->normalizeValue(trim($item));
+                }
+                $data['value'] = $normalizedValues;
+            } else {
+                $this->assertScalarValue($data['value']);
+                $data['value'] = $this->normalizeValue($data['value']);
+            }
+        }
+
+        return $data;
+    }
+    /**
+     * {@inheritdoc}
      */
     public function parseData($data)
     {
-        if (!is_array($data) || !array_key_exists('value', $data)) {
+        if (!\is_array($data)) {
             return false;
         }
 
-        $data['type'] = isset($data['type']) ? $data['type'] : null;
-        if ($this->isArrayComparison($data['type'])) {
-            return $this->getArrayValues($data);
+        $data = parent::parseData($data);
+
+        if (!$this->isValueRequired($data['type'])) {
+            return $data;
         }
 
-        if (!is_numeric($data['value'])) {
-            if (in_array($data['type'], [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-                return $data;
-            }
+        return $this->parseValue($data);
+    }
 
+    /**
+     * @param array $data
+     *
+     * @return mixed
+     */
+    protected function parseValue(array $data)
+    {
+        if (!isset($data['value'])) {
             return false;
         }
 
-        $data['value'] = $this->applyDivisor($data['value']);
+        $value = \in_array($data['type'], NumberFilterType::ARRAY_TYPES, true)
+            ? $this->parseArrayValue($data['value'])
+            : $this->parseNumericValue($data['value']);
+        if (false === $value) {
+            return false;
+        }
+        $data['value'] = $value;
 
         return $data;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    protected function parseNumericValue($value)
+    {
+        if (!is_numeric($value)) {
+            return false;
+        }
+
+        $divisor = $this->getOr(FilterUtility::DIVISOR_KEY);
+        if ($divisor) {
+            $value *= $divisor;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    protected function parseArrayValue($value)
+    {
+        $result = [];
+        $items = \is_array($value)
+            ? $value
+            : explode(NumberFilterType::ARRAY_SEPARATOR, $value);
+        foreach ($items as $item) {
+            $val = $this->parseNumericValue(trim($item));
+            if (false === $val) {
+                return false;
+            }
+            $result[] = $val;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    protected function normalizeValue($value)
+    {
+        if (null === $this->valueTransformer) {
+            $this->valueTransformer = new NumberToLocalizedStringTransformer();
+        }
+
+        return $this->valueTransformer->reverseTransform((string)$value);
+    }
+
+    /**
+     * @param mixed $value
+     */
+    protected function assertScalarValue($value): void
+    {
+        if (!is_scalar($value)) {
+            throw new \RuntimeException(sprintf(
+                'The value is not valid. Expected a scalar value, "%s" given.',
+                \is_object($value) ? \get_class($value) : \gettype($value)
+            ));
+        }
     }
 
     /**

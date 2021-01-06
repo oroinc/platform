@@ -3,22 +3,27 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 
 /**
- * Build and apply query designer filters to given Data source.
+ * Applies the query designer filters to a data source.
  */
 class RestrictionBuilder implements RestrictionBuilderInterface
 {
     /** @var Manager */
     protected $manager;
 
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /** @var FilterExecutionContext */
+    private $filterExecutionContext;
+
+    /** @var bool|null */
+    private $conditionsGroupingEnabled;
 
     /**
      * @param Manager $manager
@@ -28,6 +33,14 @@ class RestrictionBuilder implements RestrictionBuilderInterface
     {
         $this->manager = $manager;
         $this->configManager = $configManager;
+    }
+
+    /**
+     * @param FilterExecutionContext $filterExecutionContext
+     */
+    public function setFilterExecutionContext(FilterExecutionContext $filterExecutionContext)
+    {
+        $this->filterExecutionContext = $filterExecutionContext;
     }
 
     /**
@@ -103,34 +116,26 @@ class RestrictionBuilder implements RestrictionBuilderInterface
         $operator,
         array $item,
         bool $isInGroup
-    ) {
-        $params = [];
-        if ($operator !== null) {
-            $params[FilterUtility::CONDITION_KEY] = $operator;
+    ): void {
+        $data = $item['filterData'];
+        $params = null;
+        if (isset($data['params'])) {
+            $params = $data['params'];
+            unset($data['params']);
         }
-        if (isset($item['filterData']['params'])) {
-            $params = $item['filterData']['params'];
-            unset($item['filterData']['params']);
-        }
-        $filter = $this->getFilterObject($item['filter'], $item['column'], $params);
+        $filter = $this->getFilterObject(
+            $item['filter'],
+            $item['column'],
+            $params ?? [FilterUtility::CONDITION_KEY => $operator]
+        );
 
-        $form = $filter->getForm();
-        if (!$form->isSubmitted()) {
-            $form->submit($item['filterData']);
-        }
-        if ($form->isValid()) {
+        $normalizedData = $this->filterExecutionContext->normalizedFilterData($filter, $data);
+        if (null !== $normalizedData) {
+            if (!isset($normalizedData['in_group'])) {
+                $normalizedData['in_group'] = $isInGroup;
+            }
             $ds->beginRestrictionGroup($operator);
-
-            $originalValues = ['in_group' => $isInGroup];
-            if (isset($item['filterData']['value']['start'])) {
-                $originalValues['value']['start_original'] = $item['filterData']['value']['start'];
-            }
-            if (isset($item['filterData']['value']['end'])) {
-                $originalValues['value']['end_original'] = $item['filterData']['value']['end'];
-            }
-            $data = array_merge_recursive($form->getData(), $originalValues);
-
-            $filter->apply($ds, $data);
+            $filter->apply($ds, $normalizedData);
             $ds->endRestrictionGroup();
         }
     }
@@ -156,6 +161,11 @@ class RestrictionBuilder implements RestrictionBuilderInterface
      */
     private function isConditionsGroupingEnabled(): bool
     {
-        return (bool)$this->configManager->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
+        if (null === $this->conditionsGroupingEnabled) {
+            $this->conditionsGroupingEnabled = (bool)$this->configManager
+                ->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
+        }
+
+        return $this->conditionsGroupingEnabled;
     }
 }

@@ -8,14 +8,15 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -23,6 +24,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class QueryValidator extends ConstraintValidator
 {
+    /** @var FilterExecutionContext */
+    private $filterExecutionContext;
+
     /** @var ChainConfigurationProvider */
     private $configurationProvider;
 
@@ -63,12 +67,23 @@ class QueryValidator extends ConstraintValidator
     }
 
     /**
-     * @param GridQueryDesignerInterface|AbstractQueryDesigner $value
-     * @param QueryConstraint|Constraint                       $constraint
+     * @param FilterExecutionContext $filterExecutionContext
+     */
+    public function setFilterExecutionContext(FilterExecutionContext $filterExecutionContext)
+    {
+        $this->filterExecutionContext = $filterExecutionContext;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function validate($value, Constraint $constraint)
     {
-        if (!$value instanceof GridQueryDesignerInterface) {
+        if (!$constraint instanceof QueryConstraint) {
+            throw new UnexpectedTypeException($constraint, QueryConstraint::class);
+        }
+
+        if (!$value instanceof AbstractQueryDesigner) {
             return;
         }
 
@@ -96,6 +111,7 @@ class QueryValidator extends ConstraintValidator
         $builder = $this->getBuilder($gridName);
         $builder->setGridName($gridName);
         $builder->setSource($value);
+        $this->filterExecutionContext->enableValidation();
         try {
             $dataGrid = $this->gridBuilder->build($builder->getConfiguration(), new ParameterBag());
             $dataSource = $dataGrid->getAcceptedDatasource();
@@ -109,6 +125,7 @@ class QueryValidator extends ConstraintValidator
             );
         } finally {
             unset($this->processing[$gridName]);
+            $this->filterExecutionContext->disableValidation();
         }
     }
 
@@ -119,17 +136,20 @@ class QueryValidator extends ConstraintValidator
      */
     private function getBuilder($gridName)
     {
-        foreach ($this->configurationProvider->getProviders() as $provider) {
-            /** @var ConfigurationProviderInterface|BuilderAwareInterface $provider */
+        /** @var ConfigurationProviderInterface[] $providers */
+        $providers = $this->configurationProvider->getProviders();
+        foreach ($providers as $provider) {
             if (!$provider instanceof BuilderAwareInterface) {
                 continue;
             }
-
             if ($provider->isApplicable($gridName)) {
                 return $provider->getBuilder();
             }
         }
 
-        throw new InvalidConfigurationException('Builder is missing');
+        throw new InvalidConfigurationException(sprintf(
+            'A builder for the "%s" data grid is not found.',
+            $gridName
+        ));
     }
 }

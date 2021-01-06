@@ -24,13 +24,9 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp()
     {
-        /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->createMock(FormFactoryInterface::class);
 
-        /** @var FilterUtility $filterUtility */
-        $filterUtility = $this->createMock(FilterUtility::class);
-
-        $this->filter = new SearchPercentFilter($formFactory, $filterUtility);
+        $this->filter = new SearchPercentFilter($formFactory, new FilterUtility());
 
         $this->datasource = $this->createMock(SearchFilterDatasourceAdapter::class);
     }
@@ -83,7 +79,7 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $this->datasource->expects($this->exactly(1))
+        $this->datasource->expects($this->once())
             ->method('addRestriction')
             ->with(
                 new CompositeExpression(
@@ -107,5 +103,11 @@ class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
                 ]
             )
         );
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

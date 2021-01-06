@@ -10,6 +10,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by CLI command.
+ */
 class CommandWithArgsFilter extends StringFilter
 {
     /** @var CommandArgsTokenizer */
@@ -38,15 +41,17 @@ class CommandWithArgsFilter extends StringFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $this->ds = $ds;
-        $data     = $this->parseData($data);
-        $this->ds = null;
+        try {
+            $data = $this->parseData($data);
+        } finally {
+            $this->ds = null;
+        }
 
         if (!$data) {
             return false;
         }
 
         $type = $data['type'];
-
         $values = is_array($data['value']) ? $data['value'] : [$data['value']];
         foreach ($values as $value) {
             $parameterName = $ds->generateParameterName($this->getName());
@@ -59,7 +64,7 @@ class CommandWithArgsFilter extends StringFilter
                     $parameterName
                 )
             );
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
+            if ($this->isValueRequired($type)) {
                 $ds->setParameter($parameterName, $value);
             }
         }

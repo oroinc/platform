@@ -6,7 +6,10 @@ use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 
-class StringFilter extends AbstractFilter
+/**
+ * The filter by a string value.
+ */
+class StringFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
     /**
      * {@inheritdoc}
@@ -31,11 +34,8 @@ class StringFilter extends AbstractFilter
             $parameterName
         );
         $this->resetCaseSensitivity($ds);
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
-            $ds->setParameter(
-                $parameterName,
-                $this->convertValue($data['value'])
-            );
+        if ($this->isValueRequired($comparisonType)) {
+            $ds->setParameter($parameterName, $this->convertValue($data['value']));
         }
 
         return $expr;
@@ -43,17 +43,20 @@ class StringFilter extends AbstractFilter
 
     /**
      * @param array $data
+     *
      * @return array|mixed|string
      */
     protected function convertValue($data)
     {
         if (is_array($data) && !$this->isCaseInsensitive()) {
             // used when e.g. we have type TextFilterType::TYPE_IN and search is case-sensitive
-            return array_map(array($this, 'convertData'), $data);
-        } elseif (is_array($data)) {
+            return array_map([$this, 'convertData'], $data);
+        }
+        if (is_array($data)) {
             // used when e.g. we have type TextFilterType::TYPE_IN and search is case-insensitive
             return array_map('mb_strtolower', $data);
-        } elseif (!$this->isCaseInsensitive()) {
+        }
+        if (!$this->isCaseInsensitive()) {
             // used when e.g. we have type other then TextFilterType::TYPE_IN and search is case sensitive
             return $this->convertData($data);
         }
@@ -70,20 +73,36 @@ class StringFilter extends AbstractFilter
     }
 
     /**
-     * @param mixed $data
-     *
-     * @return array|bool
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function parseData($data)
     {
-        $type = isset($data['type']) ? $data['type'] : null;
-        if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])
-            && (!is_array($data) || !array_key_exists('value', $data) || $data['value'] === '')
-        ) {
+        $data = parent::parseData($data);
+
+        if (!\is_array($data)) {
             return false;
         }
 
-        $data['type'] = $type;
+        if (!$this->isValueRequired($data['type'])) {
+            return $data;
+        }
+
+        if (!isset($data['value']) || '' === $data['value']) {
+            return false;
+        }
+
+        if (!$data['type']) {
+            $data['type'] = TextFilterType::TYPE_EQUAL;
+        }
+
         $data['value'] = $this->parseValue($data['type'], $data['value']);
 
         return $data;

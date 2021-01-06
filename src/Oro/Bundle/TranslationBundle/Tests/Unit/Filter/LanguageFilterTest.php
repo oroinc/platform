@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Filter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
@@ -13,6 +14,9 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
 
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
     /** @var LanguageFilter */
     protected $filter;
 
@@ -22,8 +26,10 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->filter = new LanguageFilter($this->formFactory, new FilterUtility());
+        $this->filter->setDoctrine($this->doctrine);
     }
 
     /**

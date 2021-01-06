@@ -325,7 +325,11 @@ services:
     oro_translation.filter.language:
         class: Oro\Bundle\TranslationBundle\Filter\LanguageFilter
         public: false
-        parent: oro_filter.entity_filter
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: language }
 

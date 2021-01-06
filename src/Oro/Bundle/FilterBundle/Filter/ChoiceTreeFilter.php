@@ -10,7 +10,10 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ChoiceTreeFilter extends AbstractFilter
+/**
+ * The filter by extendable list of values.
+ */
+class ChoiceTreeFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -59,7 +62,6 @@ class ChoiceTreeFilter extends AbstractFilter
         $metadata = parent::getMetadata();
 
         $entities = [];
-
         if ($this->getOr('className') && $this->state) {
             $data = $this->parseData($this->state);
 
@@ -82,10 +84,10 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
+        if (count($data['value']) > 1 || (isset($data['value'][0]) && '' != $data['value'][0])) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if ($this->isValueRequired($comparisonType)) {
                 $ds->setParameter($parameterName, $data['value']);
             }
 
@@ -94,13 +96,21 @@ class ChoiceTreeFilter extends AbstractFilter
     }
 
     /**
-     * @param array $data
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function parseData($data)
+    public function prepareData(array $data): array
     {
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseData($data)
+    {
+        $data = parent::parseData($data);
         $data['value'] = explode(',', $data['value']);
+
         return $data;
     }
 
@@ -109,8 +119,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getAutocompleteAlias()
     {
-        return $this->getOr('autocomplete_alias') ?
-            $this->getOr('autocomplete_alias') : false;
+        return $this->getOr('autocomplete_alias') ?: false;
     }
 
     /**
@@ -118,10 +127,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getAutocompleteUrl()
     {
-        $routeName = $this->getOr('autocomplete_url') ?
-            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
-
-        return $this->router->generate($routeName);
+        return $this->router->generate($this->getOr('autocomplete_url') ?: 'oro_form_autocomplete_search');
     }
 
     /**
@@ -129,7 +135,6 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getRenderedPropertyName()
     {
-        return $this->getOr('renderedPropertyName') ?
-            $this->getOr('renderedPropertyName') : false;
+        return $this->getOr('renderedPropertyName') ?: false;
     }
 }
