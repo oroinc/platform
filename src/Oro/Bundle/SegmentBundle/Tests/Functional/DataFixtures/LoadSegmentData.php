@@ -249,6 +249,42 @@ class LoadSegmentData extends AbstractLoadSegmentData
                         ],
                         'criteria' => 'condition-segment',
                     ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER1,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
+                    'AND',
+                    [
+                        'columnName' => 'id',
+                        'criterion' => [
+                            'filter' => 'segment',
+                            'data' => [
+                                'type' => null,
+                                'value' => self::SEGMENT_DYNAMIC_WITH_FILTER1,
+                            ],
+                        ],
+                        'criteria' => 'condition-segment',
+                    ],
                 ],
                 'columns' => [
                     [

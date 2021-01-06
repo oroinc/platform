@@ -9,10 +9,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowTemplate;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * The filter by a workflow for translations.
+ */
 class WorkflowTranslationFilter extends WorkflowFilter
 {
-    /** @var TranslationKeyGenerator */
-    protected $generator;
+    /** @var TranslationKeyGenerator|null */
+    private $generator;
 
     /**
      * {@inheritdoc}
@@ -28,7 +31,7 @@ class WorkflowTranslationFilter extends WorkflowFilter
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         QueryBuilderUtil::checkIdentifier($fieldName);
-        /* @var $definition WorkflowDefinition */
+        /* @var WorkflowDefinition $definition */
         $definition = reset($data['value']);
 
         $keyParameter = $ds->generateParameterName('key');

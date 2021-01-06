@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Provider\ChainConfigurationProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
@@ -50,6 +51,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->validator = new QueryValidator(
+            new FilterExecutionContext(),
             $this->configurationProvider,
             $this->gridBuilder,
             $this->doctrineHelper,
@@ -91,7 +93,6 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper->expects(self::any())
             ->method('getSingleEntityIdentifier')
             ->willReturn(123);
-
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
         $builder = $this->createMock(DatagridConfigurationBuilder::class);
@@ -214,58 +215,61 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
     public function testBuilderIsMissing()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Builder is missing');
+        $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
+
+        $value = new QueryDesignerModel();
+        $this->doctrineHelper->expects(self::any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(1);
 
         $this->configurationProvider->expects(self::once())
             ->method('getProviders')
             ->willReturn([]);
 
-        $this->validator->validate(new QueryDesignerModel(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 
     public function testExistingEntityValidation()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Builder is missing');
+        $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
 
+        $value = new QueryDesignerModel();
         $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
             ->willReturn(1);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
-
         $provider->expects(self::once())
             ->method('isApplicable')
             ->with(QueryDesignerModel::GRID_PREFIX . '1')
             ->willReturn(false);
-
         $this->configurationProvider->expects(self::once())
             ->method('getProviders')
             ->willReturn([$provider]);
 
-        $this->validator->validate(new QueryDesignerModel(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 
     public function testNewEntityValidation()
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('Builder is missing');
+        $this->expectExceptionMessageMatches('/A builder for the "test_grid_.+" data grid is not found\./');
 
+        $value = new QueryDesignerModel();
         $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
             ->willReturn(null);
 
         $provider = $this->createMock(ReportDatagridConfigurationProvider::class);
-
         $provider->expects(self::once())
             ->method('isApplicable')
             ->with(self::stringStartsWith(QueryDesignerModel::GRID_PREFIX))
             ->willReturn(false);
-
         $this->configurationProvider->expects(self::once())
             ->method('getProviders')
             ->willReturn([$provider]);
 
-        $this->validator->validate(new QueryDesignerModel(), $this->constraint);
+        $this->validator->validate($value, $this->constraint);
     }
 }

@@ -6,11 +6,13 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
@@ -19,62 +21,42 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReportDatagridConfigurationProvider
-     */
-    protected $target;
+    /** @var ReportDatagridConfigurationProvider */
+    private $target;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $functionProvider;
+    /** @var FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $functionProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $virtualFieldProvider;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrine;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateGroupingBuilder;
 
-    /**
-     * @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dateGroupingBuilder;
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    private $reportCacheManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject | Cache
-     */
-    protected $reportCacheManager;
-
-    /**
-     * @var ReportDatagridConfigurationBuilder
-     */
-    protected $builder;
+    /** @var ReportDatagridConfigurationBuilder */
+    private $builder;
 
     protected function setUp(): void
     {
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
         $this->reportCacheManager = $this->createMock(Cache::class);
-        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
-            $this->virtualFieldProvider,
+            $this->createMock(VirtualFieldProviderInterface::class),
+            $this->createMock(VirtualRelationProviderInterface::class),
             $this->doctrine,
             new DatagridGuesser([]),
             $entityNameResolver
@@ -350,7 +332,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      *
      * @return DatagridConfiguration
      */
-    protected function buildConfiguration($gridName, Report $report)
+    private function buildConfiguration($gridName, Report $report)
     {
         $this->builder->setGridName($gridName);
         $this->builder->setSource($report);
@@ -361,7 +343,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function prepareMetadata()
+    private function prepareMetadata()
     {
         $manager = $this->createMock(ObjectManager::class);
         $this->doctrine->expects($this->any())
@@ -384,7 +366,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      *
      * @return Report|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getReportEntity($className, array $definition)
+    private function getReportEntity($className, array $definition)
     {
         $report = $this->createMock(Report::class);
         $definition = json_encode($definition);
@@ -405,7 +387,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      *
      * @param Report $report
      */
-    protected function prepareRepository(Report $report)
+    private function prepareRepository(Report $report)
     {
         $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->once())
@@ -421,7 +403,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      *
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getEntityMetadata($viewRoute)
+    private function getEntityMetadata($viewRoute)
     {
         $entityMetadata = $this->createMock(EntityMetadata::class);
         $entityMetadata->routeView = $viewRoute;

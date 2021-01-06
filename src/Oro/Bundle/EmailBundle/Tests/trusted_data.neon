@@ -29,12 +29,16 @@ trusted_data:
         Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository:
             getOwnerIdsWithEmailsQb:
                 ownerClassName: true
+        Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter:
+            applyInboxFilter:
+                dql: true
+            applySentFilter:
+                dql: true
     safe_methods:
         Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager:
             getEmailAddressProxyClass: true
         Oro\Bundle\EmailBundle\Filter\ChoiceMessageTypeFilter:
             getUserOwnerFieldName: true
-            createDQLWithReplacedAliases: true
         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage:
             getEmailOwnerFieldName: true
         Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository:

@@ -9,8 +9,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Enum filter supports the ability to select multiple values at once and
- * provides possibility to create filter form and build an expression by passed enum data.
+ * The filter by a multi-enum entity.
  */
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {
@@ -39,7 +38,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -67,6 +66,14 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         }
 
         parent::init($name, $params);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        return $data;
     }
 
     /**
