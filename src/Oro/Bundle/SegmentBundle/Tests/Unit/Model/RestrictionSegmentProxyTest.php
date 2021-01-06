@@ -20,7 +20,7 @@ class RestrictionSegmentProxyTest extends SegmentDefinitionTestCase
             $this->expectException($expectedException);
         }
 
-        $segment            = $this->getSegment(false, $definition);
+        $segment = $this->getSegment($definition);
         $expectedDefinition = json_encode($expectedDefinition);
 
         $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')

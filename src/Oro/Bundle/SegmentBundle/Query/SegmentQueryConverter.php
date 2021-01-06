@@ -11,23 +11,18 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
+use Oro\Bundle\SegmentBundle\Model\SegmentIdentityAwareInterface;
 
 /**
  * Converts a segment query definition created by the query designer to an ORM query.
  */
 class SegmentQueryConverter extends GroupingOrmQueryConverter
 {
-    /*
-     * Override to prevent naming conflicts
-     */
-    const COLUMN_ALIAS_TEMPLATE = 'cs%d';
-    const TABLE_ALIAS_TEMPLATE  = 'ts%s';
-
-    /** @var array */
-    protected static $segmentTableAliases = [];
-
     /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
+
+    /** @var SegmentQueryConverterState|null */
+    private $state;
 
     /** @var QueryBuilder */
     protected $qb;
@@ -41,48 +36,19 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      * @param ManagerRegistry                  $doctrine
      * @param RestrictionBuilderInterface      $restrictionBuilder
+     * @param SegmentQueryConverterState|null  $state
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine,
-        RestrictionBuilderInterface $restrictionBuilder
+        RestrictionBuilderInterface $restrictionBuilder,
+        SegmentQueryConverterState $state = null
     ) {
         parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrine);
         $this->restrictionBuilder = $restrictionBuilder;
-    }
-
-    /**
-     * @param AbstractQueryDesigner $source
-     * @return string
-     */
-    private static function getAliasKeyBySource(AbstractQueryDesigner $source): string
-    {
-        return md5($source->getEntity() . '::' . $source->getDefinition());
-    }
-
-    /**
-     * @param AbstractQueryDesigner $source
-     * @return bool
-     */
-    public static function hasAliases(AbstractQueryDesigner $source): bool
-    {
-        $aliasKey = self::getAliasKeyBySource($source);
-
-        return array_key_exists($aliasKey, self::$segmentTableAliases);
-    }
-
-    /**
-     * @param AbstractQueryDesigner $source
-     */
-    public static function ensureAliasRegistered(AbstractQueryDesigner $source)
-    {
-        $aliasKey = self::getAliasKeyBySource($source);
-        if (!array_key_exists($aliasKey, self::$segmentTableAliases)) {
-            self::$segmentTableAliases[$aliasKey] = 0;
-        }
-        ++self::$segmentTableAliases[$aliasKey];
+        $this->state = $state;
     }
 
     /**
@@ -108,10 +74,43 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     public function convert(AbstractQueryDesigner $source): QueryBuilder
     {
-        $aliasKey = self::getAliasKeyBySource($source);
-        self::ensureAliasRegistered($source);
-        $this->aliasPrefix = $aliasKey . '_' . self::$segmentTableAliases[$aliasKey];
+        if (null === $this->state) {
+            return $this->convertToQueryBuilder($source);
+        }
 
+        $segmentId = $this->getSegmentId($source);
+        if (!$segmentId) {
+            return $this->convertToQueryBuilder($source);
+        }
+
+        $this->state->registerQuery($segmentId);
+        try {
+            // the cache can be used only for a root segment query (not a filter),
+            // otherwise table alias conflicts may occur
+            if ($this->state->isRootQuery($segmentId)) {
+                $qb = $this->state->getQueryFromCache($segmentId);
+                if (null !== $qb) {
+                    return $qb;
+                }
+            }
+
+            $this->aliasPrefix = $this->state->buildQueryAlias($segmentId, $source);
+            $qb = $this->convertToQueryBuilder($source);
+            $this->state->saveQueryToCache($segmentId, $qb);
+
+            return $qb;
+        } finally {
+            $this->state->unregisterQuery($segmentId);
+        }
+    }
+
+    /**
+     * @param AbstractQueryDesigner $source
+     *
+     * @return QueryBuilder
+     */
+    protected function convertToQueryBuilder(AbstractQueryDesigner $source): QueryBuilder
+    {
         $qb = $this->doctrine->getManagerForClass($source->getEntity())->createQueryBuilder();
         $this->qb = $qb;
         $this->doConvert($source);
@@ -134,8 +133,12 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function generateTableAlias()
     {
-        $key = '_' . $this->aliasPrefix . '_' . ++$this->tableAliasesCount;
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, $key);
+        $tableAlias = parent::generateTableAlias();
+        if ($this->aliasPrefix) {
+            $tableAlias .= '_' . $this->aliasPrefix;
+        }
+
+        return $tableAlias;
     }
 
     /**
@@ -228,7 +231,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function getPrefixedColumnName($columnName)
     {
-        $joinId =  $this->joinIdHelper->buildColumnJoinIdentifier($columnName);
+        $joinId = $this->joinIdHelper->buildColumnJoinIdentifier($columnName);
         if (array_key_exists($joinId, $this->virtualColumnOptions)
             && array_key_exists($columnName, $this->virtualColumnExpressions)
         ) {
@@ -236,5 +239,17 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         }
 
         return $this->getTableAliasForColumn($columnName) . '.' . $columnName;
+    }
+
+    /**
+     * @param AbstractQueryDesigner $source
+     *
+     * @return int|null
+     */
+    private function getSegmentId(AbstractQueryDesigner $source): ?int
+    {
+        return $source instanceof SegmentIdentityAwareInterface
+            ? $source->getSegmentId()
+            : null;
     }
 }

@@ -10,7 +10,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 /**
  * This class is used by DynamicSegmentQueryBuilder to convert a segment to an ORM query.
  */
-class RestrictionSegmentProxy extends AbstractQueryDesigner
+class RestrictionSegmentProxy extends AbstractQueryDesigner implements SegmentIdentityAwareInterface
 {
     /** @var Segment */
     private $segment;
@@ -29,6 +29,14 @@ class RestrictionSegmentProxy extends AbstractQueryDesigner
     {
         $this->segment = $segment;
         $this->em = $em;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSegmentId(): ?int
+    {
+        return $this->segment->getId();
     }
 
     /**

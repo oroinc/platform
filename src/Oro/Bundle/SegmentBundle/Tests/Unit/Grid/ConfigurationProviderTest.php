@@ -98,7 +98,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
         $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()->getMock();
         $repository->expects($this->once())->method('find')->with(2)
-            ->will($this->returnValue($this->getSegment(false, $definition)));
+            ->will($this->returnValue($this->getSegment($definition)));
 
         $this->doctrine->expects($this->once())->method('getRepository')->with('OroSegmentBundle:Segment')
             ->will($this->returnValue($repository));

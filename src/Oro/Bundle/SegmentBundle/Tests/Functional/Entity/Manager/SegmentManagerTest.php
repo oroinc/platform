@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -13,12 +14,37 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SegmentManagerTest extends WebTestCase
 {
+    private const SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY =
+        'SELECT t0_.id AS id_0, t0_.id AS id_1'
+        . ' FROM test_workflow_aware_entity t0_'
+        . ' WHERE t0_.id > ?'
+        . ' AND t0_.id IN ('
+        . 'SELECT t1_.id FROM test_workflow_aware_entity t1_ WHERE t1_.id > ?)';
+
+    private const SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY =
+        'SELECT t0_.id AS id_0, t0_.id AS id_1'
+        . ' FROM test_workflow_aware_entity t0_'
+        . ' WHERE t0_.id > ?'
+        . ' AND (t0_.id IN ('
+        . 'SELECT t1_.id FROM test_workflow_aware_entity t1_ WHERE t1_.id > ? AND t1_.id IN ('
+        . 'SELECT t2_.id FROM test_workflow_aware_entity t2_ WHERE t2_.id > ?)))'
+        . ' AND t0_.id IN ('
+        . 'SELECT t3_.id FROM test_workflow_aware_entity t3_ WHERE t3_.id > ?)'
+        . ' AND t0_.id IN ('
+        . 'SELECT t4_.id FROM test_workflow_aware_entity t4_ WHERE t4_.id > ?)'
+        . ' AND (t0_.id IN ('
+        . 'SELECT t5_.id FROM test_workflow_aware_entity t5_ WHERE t5_.id > ? AND t5_.id IN ('
+        . 'SELECT t6_.id FROM test_workflow_aware_entity t6_ WHERE t6_.id > ?)))'
+        . ' AND t0_.id IN ('
+        . 'SELECT t7_.id FROM test_workflow_aware_entity t7_ WHERE t7_.id > ?)';
+
     /** @var SegmentManager */
     private $manager;
 
@@ -31,17 +57,40 @@ class SegmentManagerTest extends WebTestCase
         ]);
 
         $this->manager = self::getContainer()->get('oro_segment.segment_manager');
-        $this->clearSegmentManagerCache();
+        $this->clearSegmentQueryConverterCache();
     }
 
     protected function tearDown(): void
     {
-        $this->clearSegmentManagerCache();
+        if ($this->getFilterExecutionContext()->isValidationEnabled()) {
+            $this->getFilterExecutionContext()->disableValidation();
+        }
+        $this->clearSegmentQueryConverterCache();
     }
 
-    private function clearSegmentManagerCache(): void
+    private function clearSegmentQueryConverterCache(): void
     {
-        self::getContainer()->get('oro_segment.segment_manager.cache')->deleteAll();
+        $this->getSegmentQueryConverterCache()->deleteAll();
+    }
+
+    private function clearSegmentQueryConverterCacheStats(): void
+    {
+        $cache = $this->getSegmentQueryConverterCache();
+        // unfortunately the reflection is only way to reset the cache stats
+        $hitsCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'hitsCount');
+        $hitsCountProperty->setAccessible(true);
+        $hitsCountProperty->setValue($cache, 0);
+        $missesCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'missesCount');
+        $missesCountProperty->setAccessible(true);
+        $missesCountProperty->setValue($cache, 0);
+    }
+
+    private function getSegmentQueryConverterCache(): ArrayCache
+    {
+        $cache = self::getContainer()->get('oro_segment.query.segment_query_cache');
+        self::assertInstanceOf(ArrayCache::class, $cache, 'These tests can work only with ArrayCache.');
+
+        return $cache;
     }
 
     private function getEntityRepository(string $entityClass): EntityRepository
@@ -49,9 +98,62 @@ class SegmentManagerTest extends WebTestCase
         return self::getContainer()->get('doctrine')->getRepository($entityClass);
     }
 
+    private function getFilterExecutionContext(): FilterExecutionContext
+    {
+        return self::getContainer()->get('oro_filter.execution_context');
+    }
+
+    private function enableFilterValidation(bool $enable): void
+    {
+        if ($enable) {
+            $this->getFilterExecutionContext()->enableValidation();
+        }
+    }
+
     private function getSegment(string $reference): Segment
     {
         return $this->getReference($reference);
+    }
+
+    private function assertGetSegmentQueryBuilder(
+        Segment $segment,
+        string $expectedSql = null,
+        array $firstTryCacheStats = null,
+        array $secondTryCacheStats = null
+    ): void {
+        $this->clearSegmentQueryConverterCacheStats();
+        $qb = $this->manager->getSegmentQueryBuilder($segment);
+        $sql = $qb->getQuery()->getSQL();
+        if ($expectedSql) {
+            self::assertEquals($expectedSql, $sql, 'SQL - First Try');
+        }
+        if ($firstTryCacheStats) {
+            self::assertEquals(
+                $firstTryCacheStats,
+                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $firstTryCacheStats),
+                'Cache Stats - First Try'
+            );
+        }
+
+        // do get the segment query builder one more time to ensure that it returns the same query
+        $this->clearSegmentQueryConverterCacheStats();
+        $qb = $this->manager->getSegmentQueryBuilder($segment);
+        self::assertEquals($sql, $qb->getQuery()->getSQL(), 'SQL - Second Try');
+        if ($secondTryCacheStats) {
+            self::assertEquals(
+                $secondTryCacheStats,
+                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $secondTryCacheStats),
+                'Cache Stats - Second Try'
+            );
+        }
+    }
+
+    public function filterExecutionContextDataProvider(): array
+    {
+        return [
+            ['enableFilterValidation' => false],
+            ['enableFilterValidation' => true]
+        ];
     }
 
     public function testGetSegmentTypeChoices()
@@ -236,22 +338,90 @@ class SegmentManagerTest extends WebTestCase
         );
     }
 
-    public function testGetSegmentQueryBuilder()
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilder(bool $enableFilterValidation)
     {
-        $segment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $this->enableFilterValidation($enableFilterValidation);
 
-        $qb = $this->manager->getSegmentQueryBuilder($segment);
-        self::assertInstanceOf(QueryBuilder::class, $qb);
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER)
+        );
     }
 
-    public function testGetSegmentQueryBuilderForSegmentWithDuplicateSegmentFilters()
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithSegmentFilter(bool $enableFilterValidation)
     {
-        $segment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
+        $this->enableFilterValidation($enableFilterValidation);
 
-        $qb = $this->manager->getSegmentQueryBuilder($segment);
-        self::assertInstanceOf(QueryBuilder::class, $qb);
-        // Check that Query Builder may be converted to real SQL without errors.
-        self::assertStringStartsWith('SELECT ', $qb->getQuery()->getSQL());
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithDuplicateSegmentFilters(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithSegmentAndWithDuplicateFilter(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithDuplicateAndWithSegmentFilter(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 1, 'misses' => 0],
+            ['hits' => 1, 'misses' => 0]
+        );
     }
 
     public function testGetSegmentQueryBuilderNotExistingType()

@@ -115,7 +115,7 @@ class QueryBuilderUtil
      *
      * @return string|null
      *
-     * @throws QueryException
+     * @throws QueryException if the given query builder does not have a root alias or has more than one root aliases
      */
     public static function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
@@ -144,7 +144,7 @@ class QueryBuilderUtil
      *
      * @return string|null
      *
-     * @throws QueryException
+     * @throws QueryException if the given query builder does not have a root entity or has more than one root entities
      */
     public static function getSingleRootEntity(QueryBuilder $qb, $throwException = true)
     {
@@ -228,7 +228,7 @@ class QueryBuilderUtil
         }
 
         foreach ($optimizedValues[self::IN_BETWEEN] as $range) {
-            list($min, $max) = $range;
+            [$min, $max] = $range;
             $minParam = self::generateParameterName($field);
             $maxParam = self::generateParameterName($field);
 
@@ -257,7 +257,7 @@ class QueryBuilderUtil
 
         $ranges = ArrayUtil::intRanges($values);
         foreach ($ranges as $range) {
-            list($min, $max) = $range;
+            [$min, $max] = $range;
             if ($min === $max) {
                 $result[self::IN][] = $min;
             } else {
@@ -326,7 +326,7 @@ class QueryBuilderUtil
             $aliasToClassMap[$from->getAlias()] = $from->getFrom();
         }
 
-        list($parentAlias, $field) = explode('.', $join->getJoin());
+        [$parentAlias, $field] = explode('.', $join->getJoin());
         $parentClass = $aliasToClassMap[$parentAlias]
             ?? self::getJoinClass($qb, self::findJoinByAlias($qb, $parentAlias));
 
@@ -389,7 +389,7 @@ class QueryBuilderUtil
         $metadata = $em->getClassMetadata($rootEntities[0]);
         $startIndex = count($joins) - 1;
         for ($i = $startIndex; $i >= 0; $i--) {
-            list(, $field) = explode('.', $joins[$i]);
+            [, $field] = explode('.', $joins[$i]);
             if (!isset($metadata->associationMappings[$field])) {
                 return false;
             }
@@ -445,7 +445,7 @@ class QueryBuilderUtil
     public static function checkField($str)
     {
         if (strpos($str, '.') !== false) {
-            list($alias, $field) = explode('.', $str, 2);
+            [$alias, $field] = explode('.', $str, 2);
             self::checkIdentifier($alias);
             self::checkIdentifier($field);
         } else {
@@ -505,7 +505,7 @@ class QueryBuilderUtil
         foreach ($joinPart as $joins) {
             foreach ($joins as $join) {
                 if ($join->getAlias() === $alias) {
-                    list($parentAlias) = explode('.', $join->getJoin());
+                    [$parentAlias] = explode('.', $join->getJoin());
 
                     return [$parentAlias => $join->getJoin()];
                 }

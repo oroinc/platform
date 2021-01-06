@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
+use Doctrine\Common\Cache\VoidCache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
@@ -22,6 +23,7 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -95,9 +97,9 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         );
 
         $this->assertSame(
-            'SELECT ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.userName, ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.id ' .
-            'FROM AcmeBundle:UserEntity ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1 ' .
-            'WHERE ts_0d251dec2c395afb3e7cd2d87ee40bbc_1_1.email LIKE :_gpnpstring1',
+            'SELECT t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.userName, t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.id ' .
+            'FROM AcmeBundle:UserEntity t1_0d251dec2c395afb3e7cd2d87ee40bbc_1 ' .
+            'WHERE t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.email LIKE :_gpnpstring1',
             $result
         );
     }
@@ -105,7 +107,6 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     public function testBuildExtended()
     {
         $segment = $this->getSegment(
-            false,
             [
                 'columns'          => [
                     [
@@ -225,7 +226,8 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 $virtualFieldProvider,
                 $this->getVirtualRelationProvider(),
                 $doctrine,
-                new RestrictionBuilder($manager, $configManager, $filterExecutionContext)
+                new RestrictionBuilder($manager, $configManager, $filterExecutionContext),
+                new SegmentQueryConverterState(new VoidCache())
             ));
 
         return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);
