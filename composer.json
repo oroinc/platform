@@ -95,7 +95,7 @@
         "laminas/laminas-mail": "^2.12.0",
         "dragonmantank/cron-expression": "3.0.*",
         "gos/web-socket-bundle": "3.3.*",
-        "guzzlehttp/guzzle": "7.0.*",
+        "guzzlehttp/guzzle": "7.2.*",
         "lexik/maintenance-bundle": "2.1.5",
         "composer/composer": "1.6.*",
         "akeneo/batch-bundle": "0.4.12",
