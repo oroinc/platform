@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
@@ -152,7 +151,6 @@ class SegmentFilterTest extends OrmTestCase
             $this->doctrine,
             $queryBuilderRegistry,
             $this->subQueryLimitHelper,
-            new ArrayCache(),
             $this->createMock(AclHelper::class),
             $this->logger
         );

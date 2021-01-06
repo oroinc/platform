@@ -23,14 +23,8 @@ services:
             - '@doctrine'
             - '@oro_segment.query_builder_registry'
             - '@oro_query_designer.query_designer.subquery_limit_helper'
-            - '@oro_segment.segment_manager.cache'
             - '@oro_security.acl_helper'
             - '@logger'
-
-    oro_segment.segment_manager.cache:
-        class: Doctrine\Common\Cache\ArrayCache
-        calls:
-            - [ setNamespace, [ 'oro_segment_manager' ] ]
 
     oro_segment.segment_manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -51,6 +45,16 @@ services:
     Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider:
         alias: oro_segment.datagrid.configuration.provider
 
+    oro_segment.query.segment_query_cache:
+        class: Doctrine\Common\Cache\ArrayCache
+        calls:
+            - [ setNamespace, [ 'oro_segment_query_cache' ] ]
+
+    oro_segment.query.segment_query_converter_state:
+        class: Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState
+        arguments:
+            - '@oro_segment.query.segment_query_cache'
+
     oro_segment.query.segment_query_converter_factory:
         class: Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory
         lazy: true
@@ -60,6 +64,7 @@ services:
             - '@oro_entity.virtual_relation_provider'
             - '@doctrine'
             - '@oro_query_designer.query_designer.restriction_builder'
+            - '@oro_segment.query.segment_query_converter_state'
 
     oro_segment.query.filter_processor:
         class: Oro\Bundle\SegmentBundle\Query\FilterProcessor

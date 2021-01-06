@@ -18,8 +18,9 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  */
 abstract class AbstractQueryConverter
 {
-    const COLUMN_ALIAS_TEMPLATE = 'c%d';
-    const TABLE_ALIAS_TEMPLATE  = 't%d';
+    private const COLUMN_ALIAS_TEMPLATE = 'c%s';
+    private const TABLE_ALIAS_TEMPLATE  = 't%s';
+
     const ROOT_ALIAS_KEY = '';
     const MAX_ITERATIONS = 100;
 
@@ -406,7 +407,10 @@ abstract class AbstractQueryConverter
     protected function prepareColumnAliases()
     {
         foreach ($this->definition['columns'] as $column) {
-            $this->columnAliases[$this->buildColumnAliasKey($column)] = $this->generateColumnAlias();
+            $columnAliasKey = $this->buildColumnAliasKey($column);
+            if (!isset($this->columnAliases[$columnAliasKey])) {
+                $this->columnAliases[$columnAliasKey] = $this->generateColumnAlias();
+            }
         }
     }
 
@@ -1648,7 +1652,8 @@ abstract class AbstractQueryConverter
     protected function generateTableAlias()
     {
         $this->tableAliasesCount++;
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
+
+        return sprintf(self::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
     }
 
     /**
@@ -1658,7 +1663,7 @@ abstract class AbstractQueryConverter
      */
     protected function generateColumnAlias()
     {
-        return sprintf(static::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
+        return sprintf(self::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
     }
 
     /**

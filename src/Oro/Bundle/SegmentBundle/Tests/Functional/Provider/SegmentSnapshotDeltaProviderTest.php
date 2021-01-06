@@ -17,7 +17,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $this->initClient();
         $this->loadFixtures([LoadSegmentDeltaData::class]);
 
-        $this->provider = self::getContainer()->get('oro_segment.provider.segment_snapshot_delta_provider');
+        $this->provider = self::getContainer()->get('oro_segment.tests.provider.segment_snapshot_delta_provider');
     }
 
     public function testGetAddedEntityIds()

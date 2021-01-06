@@ -28,25 +28,31 @@ class SegmentQueryConverterFactory
     /** @var RestrictionBuilderInterface */
     private $restrictionBuilder;
 
+    /** @var SegmentQueryConverterState */
+    private $segmentQueryConverterState;
+
     /**
      * @param FunctionProviderInterface        $functionProvider
      * @param VirtualFieldProviderInterface    $virtualFieldProvider
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      * @param ManagerRegistry                  $doctrine
      * @param RestrictionBuilderInterface      $restrictionBuilder
+     * @param SegmentQueryConverterState       $segmentQueryConverterState
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine,
-        RestrictionBuilderInterface $restrictionBuilder
+        RestrictionBuilderInterface $restrictionBuilder,
+        SegmentQueryConverterState $segmentQueryConverterState
     ) {
         $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
         $this->virtualRelationProvider = $virtualRelationProvider;
         $this->doctrine = $doctrine;
         $this->restrictionBuilder = $restrictionBuilder;
+        $this->segmentQueryConverterState = $segmentQueryConverterState;
     }
 
     /**
@@ -59,7 +65,8 @@ class SegmentQueryConverterFactory
             $this->virtualFieldProvider,
             $this->virtualRelationProvider,
             $this->doctrine,
-            $this->restrictionBuilder
+            $this->restrictionBuilder,
+            $this->segmentQueryConverterState
         );
     }
 }

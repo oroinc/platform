@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\From;
@@ -16,7 +15,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
-use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Psr\Log\LoggerInterface;
 
@@ -36,9 +34,6 @@ class SegmentManager
     /** @var SubQueryLimitHelper */
     private $subQueryLimitHelper;
 
-    /** @var Cache */
-    private $cache;
-
     /** @var AclHelper */
     private $aclHelper;
 
@@ -46,20 +41,9 @@ class SegmentManager
     private $logger;
 
     /**
-     * This property controls the segment nesting level.
-     * 0 - no segment query builders are under construction right now
-     * 1 - root segment query builder is under construction
-     * grater values are for segments that are used as filters.
-     *
-     * @var int
-     */
-    private $nestingLevel = 0;
-
-    /**
      * @param ManagerRegistry             $doctrine
      * @param SegmentQueryBuilderRegistry $queryBuilderRegistry
      * @param SubQueryLimitHelper         $subQueryLimitHelper
-     * @param Cache                       $cache
      * @param AclHelper                   $aclHelper
      * @param LoggerInterface             $logger
      */
@@ -67,14 +51,12 @@ class SegmentManager
         ManagerRegistry $doctrine,
         SegmentQueryBuilderRegistry $queryBuilderRegistry,
         SubQueryLimitHelper $subQueryLimitHelper,
-        Cache $cache,
         AclHelper $aclHelper,
         LoggerInterface $logger
     ) {
         $this->doctrine = $doctrine;
         $this->queryBuilderRegistry = $queryBuilderRegistry;
         $this->subQueryLimitHelper = $subQueryLimitHelper;
-        $this->cache = $cache;
         $this->aclHelper = $aclHelper;
         $this->logger = $logger;
     }
@@ -164,34 +146,14 @@ class SegmentManager
      */
     public function getSegmentQueryBuilder(Segment $segment): ?QueryBuilder
     {
-        $this->nestingLevel++;
-        $cacheKey = $this->getQBCacheKey($segment);
-
-        // Get segment QB from cache if any if this is a root segment (not a filter)
-        // or when segment is taken from cache for a first time, otherwise alias conflicts will occur
-        if (($this->nestingLevel === 1 || !SegmentQueryConverter::hasAliases($segment))
-            && $this->cache->contains($cacheKey)
-        ) {
-            SegmentQueryConverter::ensureAliasRegistered($segment);
-            $this->nestingLevel--;
-
-            return clone $this->cache->fetch($cacheKey);
-        }
-
         $segmentQueryBuilder = $this->queryBuilderRegistry->getQueryBuilder($segment->getType()->getName());
-        if ($segmentQueryBuilder) {
+        if (null !== $segmentQueryBuilder) {
             try {
-                $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-                $this->cache->save($cacheKey, clone $queryBuilder);
-                $this->nestingLevel--;
-
-                return $queryBuilder;
+                return $segmentQueryBuilder->getQueryBuilder($segment);
             } catch (InvalidConfigurationException $e) {
                 $this->logger->error($e->getMessage(), ['exception' => $e]);
             }
         }
-
-        $this->nestingLevel--;
 
         return null;
     }
@@ -367,20 +329,6 @@ class SegmentManager
     private function getEntityRepository(string $entityClass): EntityRepository
     {
         return $this->doctrine->getRepository($entityClass);
-    }
-
-    /**
-     * @param Segment $segment
-     *
-     * @return string
-     */
-    private function getQBCacheKey(Segment $segment): string
-    {
-        if ($segment->getId()) {
-            return sprintf('%s:%s', 'qb', $segment->getId());
-        }
-
-        return sprintf('%s:%s:%s', 'qb', $segment->getEntity(), $segment->getDefinition());
     }
 
     /**
