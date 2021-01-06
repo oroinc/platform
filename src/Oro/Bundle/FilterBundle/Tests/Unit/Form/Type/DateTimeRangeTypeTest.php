@@ -11,19 +11,10 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class DateTimeRangeTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var DateRangeType
-     */
+    /** @var DateRangeType */
     private $type;
 
-    /**
-     * @var string
-     */
-    protected $defaultLocale = 'en';
-
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultTimezone = 'Pacific/Honolulu';
 
     protected function setUp(): void
@@ -36,7 +27,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
             ->method('getTimezone')
             ->will($this->returnValue($this->defaultTimezone));
 
-        $this->type = new DateTimeRangeType($localeSettings);
+        $this->type = new DateTimeRangeType();
         $this->formExtensions[] = new CustomFormExtension([new DateRangeType($localeSettings)]);
         $this->formExtensions[] = new PreloadedExtension(
             [$this->type],
@@ -66,9 +57,7 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
                 'defaultOptions' => array(
                     'field_type' => DateTimeType::class,
                     'field_options' => array(
-                        'format' => 'yyyy-MM-dd HH:mm',
-                        'view_timezone' => $this->defaultTimezone,
-                        'model_timezone' => $this->defaultTimezone
+                        'format' => 'yyyy-MM-dd HH:mm'
                     )
                 )
             )

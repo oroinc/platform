@@ -361,7 +361,7 @@ class EmailController extends Controller
             $request->get('targetActivityClass'),
             $request->get('targetActivityId'),
             $request->get('_wid'),
-            $this->get('oro_filter.datetime_range_filter')->getMetadata()
+            $this->get('oro_filter.extension.orm_filter_bag')->getFilter('datetime')->getMetadata()
         );
 
         return ['results' => $results];

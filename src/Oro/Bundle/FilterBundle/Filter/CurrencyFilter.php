@@ -4,6 +4,9 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * The filter by a monetary value or a range of monetary values.
+ */
 class CurrencyFilter extends NumberRangeFilter
 {
     /**

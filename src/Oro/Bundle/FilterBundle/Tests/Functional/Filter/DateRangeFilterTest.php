@@ -28,58 +28,86 @@ class DateRangeFilterTest extends WebTestCase
     }
 
     /**
-     * @dataProvider filterProvider
+     * @param string $alias
      *
-     * @param callable $filterFormData
-     * @param array    $expectedResult
+     * @return QueryBuilder
      */
-    public function testFilter(callable $filterFormData, array $expectedResult)
+    private function createQueryBuilder($alias)
+    {
+        return $this->getUserRepository()->createQueryBuilder($alias);
+    }
+
+    /**
+     * @dataProvider filterProvider
+     */
+    public function testFilterWithForm(callable $filterData, array $expectedResult)
     {
         $this->updateUserCreatedAt();
+
         $qb = $this->createQueryBuilder('u');
-        $qb
-            ->select('u.username')
+        $qb->select('u.username')
             ->orderBy('u.username');
 
-        $ds = new OrmFilterDatasourceAdapter($qb);
-
         $filter = $this->getFilter();
-        $filterForm = $filter->getForm();
-        $filterForm->submit($filterFormData());
+        $filter->init('createdAt', ['data_name' => 'u.createdAt', 'type' => 'date']);
 
+        $filterForm = $filter->getForm();
+        $filterForm->submit($filterData());
         self::assertTrue($filterForm->isValid());
         self::assertTrue($filterForm->isSynchronized());
 
-        $filter->init(
-            'createdAt',
-            [
-                'data_name' => 'u.createdAt',
-                'type'      => 'datetime'
-            ]
-        );
-        $formData = $filterForm->getData();
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $data = $filterForm->getData();
 
         /**
          * Fix timezone for filter datetime field
          */
-        $formData['value']['start'] = $this->fixTimeZone($formData['value']['start']);
-        $formData['value']['end'] = $this->fixTimeZone($formData['value']['end']);
+        $data['value']['start'] = $this->fixTimeZone($data['value']['start']);
+        $data['value']['end'] = $this->fixTimeZone($data['value']['end']);
 
-        $filter->apply($ds, $formData);
+        $filter->apply($ds, $data);
 
         $result = $ds->getQueryBuilder()->getQuery()->getResult();
         self::assertSame($expectedResult, $result);
     }
 
     /**
-     * @return array
+     * @dataProvider filterProvider
+     */
+    public function testFilterWithoutForm(callable $filterData, array $expectedResult)
+    {
+        $this->updateUserCreatedAt();
+
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username');
+
+        $filter = $this->getFilter();
+        $filter->init('createdAt', ['data_name' => 'u.createdAt', 'type' => 'date']);
+
+        $data = $filter->prepareData($filterData());
+
+        /**
+         * Fix timezone for filter datetime field
+         */
+        $data['value']['start'] = $this->fixTimeZone($data['value']['start']);
+        $data['value']['end'] = $this->fixTimeZone($data['value']['end']);
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $filter->apply($ds, $data);
+
+        $result = $ds->getQueryBuilder()->getQuery()->getResult();
+        self::assertSame($expectedResult, $result);
+    }
+
+    /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function filterProvider()
     {
         return [
             'equals'            => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_EQUAL,
                         'value' => [
@@ -93,7 +121,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'not equals'        => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_NOT_EQUAL,
                         'value' => [
@@ -109,7 +137,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'between'           => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_BETWEEN,
                         'value' => [
@@ -123,7 +151,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'not between'       => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_NOT_BETWEEN,
                         'value' => [
@@ -139,7 +167,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'equals today'      => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_EQUAL,
                         'value' => [
@@ -155,7 +183,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'not equals today'  => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_NOT_EQUAL,
                         'value' => [
@@ -169,7 +197,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'between today'     => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_BETWEEN,
                         'value' => [
@@ -185,7 +213,7 @@ class DateRangeFilterTest extends WebTestCase
                 ]
             ],
             'not between today' => [
-                'filterFormData' => function () {
+                'filterData'     => function () {
                     return [
                         'type'  => DateRangeFilterType::TYPE_NOT_BETWEEN,
                         'value' => [
@@ -204,38 +232,33 @@ class DateRangeFilterTest extends WebTestCase
     public function testFilterWithStartOfMonthShouldNotThrowExceptionAndReturnAllData()
     {
         $this->updateUserCreatedAt(true);
-        $filterFormData = [
+
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username');
+
+        $filterData = [
             'type'  => DateRangeFilterType::TYPE_EQUAL,
-            'part' =>  DateModifierInterface::PART_VALUE,
+            'part'  => DateModifierInterface::PART_VALUE,
             'value' => [
                 'start' => sprintf('{{%s}}', DateModifierInterface::VAR_THIS_MONTH_W_Y),
                 'end'   => ''
             ]
         ];
-        $qb = $this->createQueryBuilder('u');
-        $qb
-            ->select('u.username')
-            ->orderBy('u.username');
-
-        $ds = new OrmFilterDatasourceAdapter($qb);
 
         $filter = $this->getFilter();
-        $filterForm = $filter->getForm();
-        $filterForm->submit($filterFormData);
+        $filter->init('createdAt', ['data_name' => 'u.createdAt', 'type' => 'datetime']);
 
+        $filterForm = $filter->getForm();
+        $filterForm->submit($filterData);
         self::assertTrue($filterForm->isValid());
         self::assertTrue($filterForm->isSynchronized());
 
-        $filter->init(
-            'createdAt',
-            [
-                'data_name' => 'u.createdAt',
-                'type'      => 'datetime'
-            ]
-        );
-        $formData = $filterForm->getData();
-        $formData['value']['start_original'] = $filterFormData['value']['start'];
-        $filter->apply($ds, $formData);
+        $data = $filterForm->getData();
+        $data['value']['start_original'] = $filterData['value']['start'];
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $filter->apply($ds, $data);
 
         $result = $ds->getQueryBuilder()->getQuery()->getResult();
         self::assertSame(
@@ -254,29 +277,22 @@ class DateRangeFilterTest extends WebTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsafe value passed createdAt is NULL; DELETE * FROM oro_user;');
 
-        $filterFormData = [
+        $this->updateUserCreatedAt();
+
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username')
+            ->orderBy('u.username');
+
+        $filterData = [
             'type'  => DateRangeFilterType::TYPE_EQUAL,
-            'part' =>  DateModifierInterface::PART_VALUE,
+            'part'  => DateModifierInterface::PART_VALUE,
             'value' => [
                 'start' => sprintf('{{%s}}', DateModifierInterface::VAR_THIS_MONTH_W_Y),
                 'end'   => ''
             ]
         ];
-        $this->updateUserCreatedAt();
-        $qb = $this->createQueryBuilder('u');
-        $qb
-            ->select('u.username')
-            ->orderBy('u.username');
-
-        $ds = new OrmFilterDatasourceAdapter($qb);
 
         $filter = $this->getFilter();
-        $filterForm = $filter->getForm();
-        $filterForm->submit($filterFormData);
-
-        self::assertTrue($filterForm->isValid());
-        self::assertTrue($filterForm->isSynchronized());
-
         $filter->init(
             'createdAt',
             [
@@ -284,9 +300,17 @@ class DateRangeFilterTest extends WebTestCase
                 'type'      => 'datetime'
             ]
         );
-        $formData = $filterForm->getData();
-        $formData['value']['start_original'] = $filterFormData['value']['start'];
-        $filter->apply($ds, $formData);
+
+        $filterForm = $filter->getForm();
+        $filterForm->submit($filterData);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
+
+        $data = $filterForm->getData();
+        $data['value']['start_original'] = $filterData['value']['start'];
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $filter->apply($ds, $data);
     }
 
     /**
@@ -349,15 +373,5 @@ class DateRangeFilterTest extends WebTestCase
     private function getUser()
     {
         return $this->getUserRepository()->findOneBy(['username' => 'admin']);
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($alias)
-    {
-        return $this->getUserRepository()->createQueryBuilder($alias);
     }
 }

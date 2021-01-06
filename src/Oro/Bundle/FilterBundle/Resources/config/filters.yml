@@ -12,15 +12,6 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: string }
 
-    oro_filter.select_row_filter:
-        class: Oro\Bundle\FilterBundle\Filter\SelectRowFilter
-        public: false
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: selectrow }
-
     oro_filter.number_filter:
         class: Oro\Bundle\FilterBundle\Filter\NumberFilter
         public: false
@@ -81,6 +72,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@doctrine'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: entity }
 
@@ -90,15 +82,17 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-        calls:
-            - [setTranslator, ['@translator']]
+            - '@translator'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: boolean }
 
     oro_filter.duplicate_filter:
         class: Oro\Bundle\FilterBundle\Filter\DuplicateFilter
         public: false
-        parent: oro_filter.boolean_filter
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@translator'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: duplicate }
 
@@ -116,30 +110,22 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
+            - '@oro_locale.settings'
+            - '@oro_filter.utils.date_filter_modifier'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date }
 
     oro_filter.datetime_range_filter:
         class: Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter
-        public: true
-        arguments:
-            - '@form.factory'
-            - '@oro_filter.filter_utility'
-            - '@oro_filter.date_filter_utility'
-        tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: datetime }
-
-    Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter:
-        alias: 'oro_filter.datetime_range_filter'
-
-    oro_filter.many_to_many_filter:
-        class: Oro\Bundle\FilterBundle\Filter\ManyToManyFilter
         public: false
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@oro_filter.date_filter_utility'
+            - '@oro_locale.settings'
+            - '@oro_filter.utils.date_filter_modifier'
         tags:
-            - { name: oro_filter.extension.orm_filter.filter, type: many-to-many }
+            - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 
     oro_filter.choice_tree_filter:
         class: Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter
@@ -147,7 +133,6 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@doctrine'
             - '@router'
             - '@event_dispatcher'
         tags:

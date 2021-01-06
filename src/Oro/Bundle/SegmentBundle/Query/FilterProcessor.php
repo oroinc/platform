@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a functionality to apply a segment filters to a widget query.
@@ -27,7 +28,7 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         if (!$rootEntity) {
             return;
         }
-        $rootEntityAlias = $this->getRootAlias($queryBuilder);
+        $rootEntityAlias = QueryBuilderUtil::getSingleRootAlias($queryBuilder);
 
         $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
     }
@@ -47,31 +48,40 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
             // nothing to do
             return $qb;
         }
+
         $this->setRootEntity($rootEntity);
         $this->rootEntityAlias = $rootEntityAlias;
-        $this->definition['filters'] = $filters;
-        $this->definition['columns'] = [];
-        $this->qb = $qb;
         $this->joinIdHelper = new JoinIdentifierHelper($this->getRootEntity());
+        $this->definition = ['filters' => $filters, 'columns' => []];
         $this->joins = [];
+        $this->tableAliasesCount = 0;
         $this->tableAliases = [];
         $this->columnAliases = [];
+        $this->aliases = [];
+        $this->queryAliases = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions = [];
+        $this->virtualRelationsJoins = [];
         $this->filters = [];
         $this->currentFilterPath = '';
+        $this->qb = $qb;
         try {
             $this->buildQuery();
         } finally {
-            $this->virtualColumnOptions = null;
-            $this->virtualColumnExpressions = null;
-            $this->columnAliases = null;
-            $this->tableAliases = null;
-            $this->joins = null;
-            $this->joinIdHelper = null;
+            $this->resetConvertState();
         }
 
-        return $this->qb;
+        return $qb;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function resetConvertState(): void
+    {
+        parent::resetConvertState();
+        $this->rootEntityAlias = null;
+        $this->qb = null;
     }
 
     /**
@@ -103,29 +113,5 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         $joinId = self::ROOT_ALIAS_KEY;
         $this->tableAliases[$joinId] = $this->rootEntityAlias;
         $this->joins[$this->rootEntityAlias] = $joinId;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     *
-     * @return string
-     *
-     * @throws \RuntimeException
-     */
-    public function getRootAlias(QueryBuilder $qb)
-    {
-        $aliases = $qb->getRootAliases();
-        if (count($aliases) !== 1) {
-            if (count($aliases) === 0) {
-                throw new \RuntimeException(
-                    'Cannot get root alias. A query builder has no root entity.'
-                );
-            }
-            throw new \RuntimeException(
-                'Cannot get root alias. A query builder has more than one root entity.'
-            );
-        }
-
-        return $aliases[0];
     }
 }

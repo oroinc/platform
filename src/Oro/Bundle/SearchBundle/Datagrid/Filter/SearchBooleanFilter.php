@@ -10,9 +10,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchBooleanFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Component\Exception\UnexpectedTypeException;
 
 /**
- * The filter model that will be used to display and apply boolean filters in the search process.
+ * The filter by a boolean value for a datasource based on a search index.
  */
 class SearchBooleanFilter extends BooleanFilter
 {
@@ -39,7 +40,7 @@ class SearchBooleanFilter extends BooleanFilter
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof SearchFilterDatasourceAdapter) {
-            throw new \RuntimeException('Invalid filter datasource adapter provided: '.get_class($ds));
+            throw new UnexpectedTypeException($ds, SearchFilterDatasourceAdapter::class);
         }
 
         if (!isset($data['value']) || !is_array($data['value'])) {
@@ -69,5 +70,13 @@ class SearchBooleanFilter extends BooleanFilter
             $builder->in($fieldName, $values),
             FilterUtility::CONDITION_AND
         );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 }

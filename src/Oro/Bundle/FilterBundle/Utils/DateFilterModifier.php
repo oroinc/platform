@@ -20,7 +20,7 @@ class DateFilterModifier
     protected $dateCompiler;
 
     /** @var null|string  */
-    protected $timeZone = null;
+    protected $timeZone;
 
     /** @var array */
     protected static $partFormatsMap = [
@@ -65,7 +65,7 @@ class DateFilterModifier
             $data = $this->mapValues($valueKeys, $data, $this->getCompileClosure());
         }
 
-        $data['part'] = isset($data['part']) ? $data['part'] : null;
+        $data['part'] = $data['part'] ?? null;
 
         // change value type depending on date part
         if (array_key_exists($data['part'], static::$partFormatsMap)) {

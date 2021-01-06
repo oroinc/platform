@@ -2,11 +2,11 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\StatusCalculator;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class QueryCalculatorTest extends \PHPUnit\Framework\TestCase
 {

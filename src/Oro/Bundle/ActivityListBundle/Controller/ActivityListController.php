@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Controller;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,25 +21,20 @@ class ActivityListController extends AbstractController
      * @Route("/view/widget/{entityClass}/{entityId}", name="oro_activity_list_widget_activities")
      * @Template("OroActivityListBundle:ActivityList:activities.html.twig")
      *
-     * @param string  $entityClass The entity class which activities should be rendered
-     * @param integer $entityId    The entity object id which activities should be rendered
+     * @param string $entityClass The entity class which activities should be rendered
+     * @param int    $entityId    The entity object id which activities should be rendered
      *
      * @return array
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $entity = $this->get(EntityRoutingHelper::class)->getEntity($entityClass, $entityId);
-
-        /** @var ActivityListChainProvider $activitiesProvider */
-        $activitiesProvider = $this->get(ActivityListChainProvider::class);
-
-        /** @var DateTimeRangeFilter $dateRangeFilter */
-        $dateRangeFilter = $this->get(DateTimeRangeFilter::class);
-
         return [
-            'entity'                  => $entity,
-            'configuration'           => $activitiesProvider->getActivityListOption($this->get('oro_config.user')),
-            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
+            'entity'                  => $this->getEntityRoutingHelper()
+                ->getEntity($entityClass, $entityId),
+            'configuration'           => $this->getActivityListProvider()
+                ->getActivityListOption($this->getConfigManager()),
+            'dateRangeFilterMetadata' => $this->getFilterBag()->getFilter('datetime')
+                ->getMetadata()
         ];
     }
 
@@ -49,10 +44,42 @@ class ActivityListController extends AbstractController
     public static function getSubscribedServices()
     {
         return [
-            'oro_config.user' => ConfigManager::class,
-            ActivityListChainProvider::class,
-            DateTimeRangeFilter::class,
             EntityRoutingHelper::class,
+            'oro_config.user'                     => ConfigManager::class,
+            'oro_filter.extension.orm_filter_bag' => FilterBagInterface::class,
+            'oro_activity_list.provider.chain'    => ActivityListChainProvider::class
         ];
+    }
+
+    /**
+     * @return EntityRoutingHelper
+     */
+    private function getEntityRoutingHelper(): EntityRoutingHelper
+    {
+        return $this->get(EntityRoutingHelper::class);
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    private function getConfigManager(): ConfigManager
+    {
+        return $this->get('oro_config.user');
+    }
+
+    /**
+     * @return FilterBagInterface
+     */
+    private function getFilterBag(): FilterBagInterface
+    {
+        return $this->get('oro_filter.extension.orm_filter_bag');
+    }
+
+    /**
+     * @return ActivityListChainProvider
+     */
+    private function getActivityListProvider(): ActivityListChainProvider
+    {
+        return $this->get('oro_activity_list.provider.chain');
     }
 }

@@ -15,7 +15,7 @@ trusted_data:
         Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager:
             getFilterSubQuery:
                 tableAlias: true
-            applyOrderByParts:
+            applyOrderByPart:
                 part: true
     safe_methods:
         Oro\Bundle\SegmentBundle\Filter\SegmentFilter:

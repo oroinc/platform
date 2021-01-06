@@ -7,26 +7,26 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 class SegmentDefinitionTestCase extends OrmQueryConverterTest
 {
-    const TEST_ENTITY          = 'AcmeBundle:UserEntity';
-    const TEST_IDENTIFIER_NAME = 'id';
-    const TEST_IDENTIFIER      = 32;
+    protected const TEST_ENTITY          = 'AcmeBundle:UserEntity';
+    protected const TEST_IDENTIFIER_NAME = 'id';
+    protected const TEST_IDENTIFIER      = 32;
 
     /**
-     * @param bool|string $entity
-     * @param array|bool  $definition
-     * @param bool|int    $identifier
+     * @param array|null  $definition
+     * @param string|null $entity
+     * @param int|null    $identifier
      *
      * @return Segment
      */
-    public function getSegment($entity = false, $definition = false, $identifier = false)
+    public function getSegment(array $definition = null, string $entity = null, bool $identifier = null)
     {
         $segment = new Segment();
-        $segment->setEntity(false === $entity ? self::TEST_ENTITY : $entity);
-        $segment->setDefinition(json_encode(false === $definition ? $this->getDefaultDefinition() : $definition));
+        $segment->setEntity($entity ?? self::TEST_ENTITY);
+        $segment->setDefinition(json_encode($definition ?? $this->getDefaultDefinition(), JSON_THROW_ON_ERROR));
 
         $refProperty = new \ReflectionProperty(get_class($segment), 'id');
         $refProperty->setAccessible(true);
-        $refProperty->setValue($segment, false === $identifier ? self::TEST_IDENTIFIER : $identifier);
+        $refProperty->setValue($segment, $identifier ?? self::TEST_IDENTIFIER);
 
         return $segment;
     }

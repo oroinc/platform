@@ -5,6 +5,9 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 
+/**
+ * The filter by predefined values that allows to select only one item from a choice list.
+ */
 class SingleChoiceFilter extends ChoiceFilter
 {
     /**
@@ -25,14 +28,23 @@ class SingleChoiceFilter extends ChoiceFilter
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        if (isset($data['value']) && !$this->getOr('keep_string_value', false) && is_numeric($data['value'])) {
+            $data['value'] = (int)$data['value'];
+        }
+
+        return $data;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function parseData($data)
+    protected function parseValue(array $data)
     {
-        if (!is_array($data)
-            || !array_key_exists('value', $data)
-            || !$data['value']
-        ) {
+        if (!isset($data['value']) || !$data['value']) {
             return false;
         }
 

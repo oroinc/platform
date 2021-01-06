@@ -2,16 +2,17 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Converts a query definition created by the query designer to a data grid configuration.
@@ -43,20 +44,22 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     protected $leftJoins;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
-     * @param DatagridGuesser               $datagridGuesser
-     * @param EntityNameResolver            $entityNameResolver
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param ManagerRegistry                  $doctrine
+     * @param DatagridGuesser                  $datagridGuesser
+     * @param EntityNameResolver               $entityNameResolver
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine,
         DatagridGuesser $datagridGuesser,
         EntityNameResolver $entityNameResolver
     ) {
-        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrine);
         $this->datagridGuesser = $datagridGuesser;
         $this->entityNameResolver = $entityNameResolver;
     }
@@ -69,35 +72,29 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      *
      * @return DatagridConfiguration
      */
-    public function convert($gridName, AbstractQueryDesigner $source)
+    public function convert(string $gridName, AbstractQueryDesigner $source): DatagridConfiguration
     {
-        $this->config = DatagridConfiguration::createNamed($gridName, []);
+        $config = DatagridConfiguration::createNamed($gridName, []);
+        $config->setDatasourceType(OrmDatasource::TYPE);
+
+        $this->config = $config;
         $this->doConvert($source);
 
-        return $this->config;
+        return $config;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function doConvert(AbstractQueryDesigner $source)
+    protected function resetConvertState(): void
     {
-        $this->selectColumns = [];
-        $this->groupingColumns = [];
-        $this->from = [];
-        $this->innerJoins = [];
-        $this->leftJoins = [];
-        try {
-            parent::doConvert($source);
-        } finally {
-            $this->selectColumns = null;
-            $this->groupingColumns = null;
-            $this->from = null;
-            $this->innerJoins = null;
-            $this->leftJoins = null;
-        }
-
-        $this->config->setDatasourceType(OrmDatasource::TYPE);
+        parent::resetConvertState();
+        $this->config = null;
+        $this->selectColumns = null;
+        $this->groupingColumns = null;
+        $this->from = null;
+        $this->innerJoins = null;
+        $this->leftJoins = null;
     }
 
     /**

@@ -15,18 +15,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SegmentChoiceType extends AbstractType
 {
     /** @var ManagerRegistry */
-    private $registry;
+    private $doctrine;
 
     /** @var AclHelper */
     private $aclHelper;
 
     /**
-     * @param ManagerRegistry $registry
-     * @param AclHelper $aclHelper
+     * @param ManagerRegistry $doctrine
+     * @param AclHelper       $aclHelper
      */
-    public function __construct(ManagerRegistry $registry, AclHelper $aclHelper)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->aclHelper = $aclHelper;
     }
 
@@ -42,7 +42,7 @@ class SegmentChoiceType extends AbstractType
         $resolver->setNormalizer(
             'choices',
             function (OptionsResolver $options) {
-                return $this->registry->getManagerForClass(Segment::class)
+                return $this->doctrine->getManagerForClass(Segment::class)
                     ->getRepository(Segment::class)
                     ->findByEntity($this->aclHelper, $options['entityClass']);
             }

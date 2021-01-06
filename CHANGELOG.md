@@ -8,6 +8,12 @@ The current file describes significant changes in the code that may affect the u
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
 
+### FilterBundle
+* The outdated filter `selectrow` was removed, as well as `Oro\Bundle\FilterBundle\Filter\SelectRowFilter`
+  and `Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType` classes.
+* The outdated filter `many-to-many` was removed, as well as `Oro\Bundle\FilterBundle\Filter\ManyToManyFilter`
+  and `Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType` classes.
+
 #### UserBundle
 * The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
   Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
@@ -17,6 +23,10 @@ The current file describes significant changes in the code that may affect the u
 #### AttachmentBundle
 * The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
 * The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
+
+#### EntityBundle
+* The service `oro_entity.virtual_field_provider.chain` was renamed to `oro_entity.virtual_field_provider`.
+* The service `oro_entity.virtual_relation_provider.chain` was renamed to `oro_entity.virtual_relation_provider`.
 
 #### PlatformBundle
 * The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag

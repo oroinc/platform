@@ -18,8 +18,9 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  */
 abstract class AbstractQueryConverter
 {
-    const COLUMN_ALIAS_TEMPLATE = 'c%d';
-    const TABLE_ALIAS_TEMPLATE  = 't%d';
+    private const COLUMN_ALIAS_TEMPLATE = 'c%s';
+    private const TABLE_ALIAS_TEMPLATE  = 't%s';
+
     const ROOT_ALIAS_KEY = '';
     const MAX_ITERATIONS = 100;
 
@@ -77,24 +78,19 @@ abstract class AbstractQueryConverter
     protected $qbTools;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
     protected function __construct(
         FunctionProviderInterface $functionProvider,
-        VirtualFieldProviderInterface $virtualFieldProvider
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider
     ) {
         $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
-        $this->qbTools = new QueryBuilderTools();
-    }
-
-    /**
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     */
-    public function setVirtualRelationProvider(VirtualRelationProviderInterface $virtualRelationProvider)
-    {
         $this->virtualRelationProvider = $virtualRelationProvider;
+        $this->qbTools = new QueryBuilderTools();
     }
 
     /**
@@ -324,35 +320,47 @@ abstract class AbstractQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->rootEntity = $source->getEntity();
-        $this->definition = json_decode($source->getDefinition(), true);
-
-        if (!isset($this->definition['columns'])) {
+        $definition = json_decode($source->getDefinition(), true);
+        if (!isset($definition['columns'])) {
             throw new InvalidConfigurationException('The "columns" definition does not exist.');
         }
-        if (empty($this->definition['columns'])) {
+        if (empty($definition['columns'])) {
             throw new InvalidConfigurationException('The "columns" definition must not be empty.');
         }
 
-        $this->aliases = [];
-        $this->virtualRelationsJoins = [];
-        $this->tableAliasesCount = 0;
+        $this->rootEntity = $source->getEntity();
         $this->joinIdHelper = new JoinIdentifierHelper($this->rootEntity);
+        $this->definition = $definition;
         $this->joins = [];
+        $this->tableAliasesCount = 0;
         $this->tableAliases = [];
         $this->columnAliases = [];
+        $this->aliases = [];
+        $this->queryAliases = [];
         $this->virtualColumnExpressions = [];
         $this->virtualColumnOptions = [];
+        $this->virtualRelationsJoins = [];
         try {
             $this->buildQuery();
         } finally {
-            $this->virtualColumnOptions = null;
-            $this->virtualColumnExpressions = null;
-            $this->columnAliases = null;
-            $this->tableAliases = null;
-            $this->joins = null;
-            $this->joinIdHelper = null;
+            $this->resetConvertState();
         }
+    }
+
+    protected function resetConvertState(): void
+    {
+        $this->rootEntity = null;
+        $this->joinIdHelper = null;
+        $this->definition = null;
+        $this->joins = null;
+        $this->tableAliasesCount = 0;
+        $this->tableAliases = null;
+        $this->columnAliases = null;
+        $this->aliases = [];
+        $this->queryAliases = [];
+        $this->virtualColumnExpressions = null;
+        $this->virtualColumnOptions = null;
+        $this->virtualRelationsJoins = [];
     }
 
     /**
@@ -399,7 +407,10 @@ abstract class AbstractQueryConverter
     protected function prepareColumnAliases()
     {
         foreach ($this->definition['columns'] as $column) {
-            $this->columnAliases[$this->buildColumnAliasKey($column)] = $this->generateColumnAlias();
+            $columnAliasKey = $this->buildColumnAliasKey($column);
+            if (!isset($this->columnAliases[$columnAliasKey])) {
+                $this->columnAliases[$columnAliasKey] = $this->generateColumnAlias();
+            }
         }
     }
 
@@ -793,10 +804,6 @@ abstract class AbstractQueryConverter
      */
     protected function replaceJoinsForVirtualRelation($joinId)
     {
-        if (!$this->virtualRelationProvider) {
-            return $joinId;
-        }
-
         /**
          * mainEntityJoinId - parent join definition
          *
@@ -1645,7 +1652,8 @@ abstract class AbstractQueryConverter
     protected function generateTableAlias()
     {
         $this->tableAliasesCount++;
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
+
+        return sprintf(self::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
     }
 
     /**
@@ -1655,7 +1663,7 @@ abstract class AbstractQueryConverter
      */
     protected function generateColumnAlias()
     {
-        return sprintf(static::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
+        return sprintf(self::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
     }
 
     /**
