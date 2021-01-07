@@ -273,6 +273,7 @@ services:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_search.extension.search_filter_bag'
             - '@oro_filter.provider.state.filters'
+            - '@oro_filter.execution_context'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }

@@ -2,14 +2,13 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Calculate root job status asynchronously.
@@ -83,7 +82,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
     }
 
     /**
-     * @return JobRepositoryInterface|ObjectRepository
+     * @return JobRepositoryInterface
      */
     private function getJobRepository(): JobRepositoryInterface
     {

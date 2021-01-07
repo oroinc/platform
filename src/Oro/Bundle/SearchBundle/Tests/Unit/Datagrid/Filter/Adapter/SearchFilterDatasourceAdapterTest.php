@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 class SearchFilterDatasourceAdapterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchQueryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $searchQuery;
+    private $searchQuery;
 
     protected function setUp(): void
     {

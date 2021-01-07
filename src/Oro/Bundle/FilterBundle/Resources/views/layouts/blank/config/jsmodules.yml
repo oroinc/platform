@@ -7,13 +7,11 @@ aliases:
     oro/filter/datetime-filter$: orofilter/js/filter/datetime-filter
     oro/filter/dictionary-filter$: orofilter/js/filter/dictionary-filter
     oro/filter/empty-filter$: orofilter/js/filter/empty-filter
-    oro/filter/many-to-many-filter$: orofilter/js/filter/many-to-many-filter
     oro/filter/multiselect-filter$: orofilter/js/filter/multiselect-filter
     oro/filter/none-filter$: orofilter/js/filter/none-filter
     oro/filter/number-filter$: orofilter/js/filter/number-filter
     oro/filter/number-range-filter$: orofilter/js/filter/number-range-filter
     oro/filter/select-filter$: orofilter/js/filter/select-filter
-    oro/filter/select-row-filter$: orofilter/js/filter/select-row-filter
     oro/filter/text-filter$: orofilter/js/filter/text-filter
 configs:
     oro/filter/abstract-filter: {}
@@ -37,13 +35,11 @@ dynamic-imports:
         - oro/filter/datetime-filter
         - oro/filter/dictionary-filter
         - oro/filter/empty-filter
-        - oro/filter/many-to-many-filter
         - oro/filter/multiselect-filter
         - oro/filter/none-filter
         - oro/filter/number-filter
         - oro/filter/number-range-filter
         - oro/filter/select-filter
-        - oro/filter/select-row-filter
         - oro/filter/text-filter
 map:
     "*":
@@ -56,7 +52,6 @@ map:
         orofilter/templates/filter/embedded/simple-choice-filter.html: orofilter/blank/templates/filters/embedded/simple-choice-filter.html
         orofilter/templates/filter/filter-hint.html: orofilter/blank/templates/filters/filter-hint.html
         orofilter/templates/filter/filter-wrapper.html: orofilter/blank/templates/filters/filter-wrapper.html
-        orofilter/templates/filter/many-to-many-filter.html: orofilter/blank/templates/filters/many-to-many-filter.html
         orofilter/templates/filter/multiselect-filter.html: orofilter/blank/templates/filters/multiselect-filter.html
         orofilter/templates/filter/none-filter.html: orofilter/blank/templates/filters/none-filter.html
         orofilter/templates/filter/number-range-filter.html: orofilter/blank/templates/filters/number-range-filter.html

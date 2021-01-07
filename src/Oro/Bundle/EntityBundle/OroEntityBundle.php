@@ -55,11 +55,11 @@ class OroEntityBundle extends Bundle
             'addProvider'
         ));
         $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
-            'oro_entity.virtual_field_provider.chain',
+            'oro_entity.virtual_field_provider',
             'oro_entity.virtual_field_provider'
         ));
         $container->addCompilerPass(new InverseTaggedIteratorCompilerPass(
-            'oro_entity.virtual_relation_provider.chain',
+            'oro_entity.virtual_relation_provider',
             'oro_entity.virtual_relation_provider'
         ));
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());

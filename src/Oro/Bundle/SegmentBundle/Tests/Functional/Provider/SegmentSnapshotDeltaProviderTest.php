@@ -9,9 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SegmentSnapshotDeltaProviderTest extends WebTestCase
 {
-    /**
-     * @var SegmentSnapshotDeltaProvider
-     */
+    /** @var SegmentSnapshotDeltaProvider */
     private $provider;
 
     protected function setUp(): void
@@ -19,10 +17,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         $this->initClient();
         $this->loadFixtures([LoadSegmentDeltaData::class]);
 
-        $this->provider = new SegmentSnapshotDeltaProvider(
-            $this->getContainer()->get('doctrine'),
-            $this->getContainer()->get('oro_segment.query.dynamic_segment.query_builder')
-        );
+        $this->provider = self::getContainer()->get('oro_segment.tests.provider.segment_snapshot_delta_provider');
     }
 
     public function testGetAddedEntityIds()
@@ -34,7 +29,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         ];
 
         $addedEntityIds = $this->provider->getAddedEntityIds($segment);
-        $this->assertEquals($expectedEntityIds, $addedEntityIds->current());
+        self::assertEquals($expectedEntityIds, $addedEntityIds->current());
     }
 
     public function testGetRemovedEntityIds()
@@ -45,7 +40,7 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         ];
 
         $removedEntityIds = $this->provider->getRemovedEntityIds($segment);
-        $this->assertEquals($expectedEntityIds, $removedEntityIds->current());
+        self::assertEquals($expectedEntityIds, $removedEntityIds->current());
     }
 
     public function testGetAllEntityIds()
@@ -58,6 +53,6 @@ class SegmentSnapshotDeltaProviderTest extends WebTestCase
         ];
 
         $removedEntityIds = $this->provider->getAllEntityIds($segment);
-        $this->assertEquals($expectedEntityIds, $removedEntityIds->current());
+        self::assertEquals($expectedEntityIds, $removedEntityIds->current());
     }
 }

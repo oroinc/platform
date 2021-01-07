@@ -2,13 +2,13 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)

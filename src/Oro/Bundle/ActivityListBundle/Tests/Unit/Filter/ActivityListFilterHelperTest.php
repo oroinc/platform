@@ -2,23 +2,30 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Filter;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Symfony\Component\Form\Form;
 
 class ActivityListFilterHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddFiltersToQuery()
     {
-        $dateTimeFilter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter')
-            ->disableOriginalConstructor()->getMock();
+        $filterBag = $this->createMock(FilterBagInterface::class);
+        $routingHelper = $this->createMock(EntityRoutingHelper::class);
+        $chainProvider = $this->createMock(ActivityListChainProvider::class);
 
-        $choiceFilter = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\ChoiceFilter')
-            ->disableOriginalConstructor()->getMock();
-
-        $routingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
-            ->disableOriginalConstructor()->getMock();
-
-        $chainProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()->getMock();
+        $dateTimeFilter = $this->createMock(FilterInterface::class);
+        $choiceFilter = $this->createMock(FilterInterface::class);
+        $filterBag->expects($this->exactly(2))
+            ->method('getFilter')
+            ->willReturnMap([
+                ['datetime', $dateTimeFilter],
+                ['choice', $choiceFilter]
+            ]);
 
         $filterData = [
             'dateRange' => [
@@ -29,39 +36,33 @@ class ActivityListFilterHelperTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $filter = new ActivityListFilterHelper($dateTimeFilter, $choiceFilter, $routingHelper, $chainProvider);
+        $filter = new ActivityListFilterHelper($filterBag, $routingHelper, $chainProvider);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
 
         $dateTimeFilter->expects($this->once())
             ->method('init')
             ->with('updatedAt', ['data_name' => 'activity.updatedAt']);
 
-        $dateTimeForm = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
-
+        $dateTimeForm = $this->createMock(Form::class);
         $dateTimeFilter->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($dateTimeForm));
-
+            ->willReturn($dateTimeForm);
         $dateTimeForm->expects($this->once())
             ->method('isSubmitted')->willReturn(false);
-
         $dateTimeForm->expects($this->once())
             ->method('submit')
             ->with(['value' => 'dateRangeFilter']);
-
         $dateTimeFilter->expects($this->once())
             ->method('apply');
 
         $routingHelper->expects($this->once())
             ->method('resolveEntityClass')
             ->with('Acme\TestBundle\Entity\TestEntity')
-            ->will($this->returnValue('Acme\TestBundle\Entity\TestEntity'));
+            ->willReturn('Acme\TestBundle\Entity\TestEntity');
         $chainProvider->expects($this->once())
             ->method('getSupportedActivities')
-            ->will($this->returnValue(['Acme\TestBundle\Entity\TestEntity']));
+            ->willReturn(['Acme\TestBundle\Entity\TestEntity']);
 
         $choiceFilter->expects($this->once())
             ->method('init')
@@ -78,20 +79,15 @@ class ActivityListFilterHelperTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $choiceForm = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
-
+        $choiceForm = $this->createMock(Form::class);
         $choiceFilter->expects($this->once())
             ->method('getForm')
-            ->will($this->returnValue($choiceForm));
-
+            ->willReturn($choiceForm);
         $choiceForm->expects($this->once())
             ->method('isSubmitted')->willReturn(false);
-
         $choiceForm->expects($this->once())
             ->method('submit')
             ->with(['value' => ['Acme\TestBundle\Entity\TestEntity']]);
-
         $choiceFilter->expects($this->once())
             ->method('apply');
 

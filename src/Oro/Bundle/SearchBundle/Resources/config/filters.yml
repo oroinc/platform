@@ -51,7 +51,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
             - { name: oro_search.extension.search_filter.filter, type: entity }
 
@@ -61,5 +61,6 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@translator'
         tags:
             - { name: oro_search.extension.search_filter.filter, type: boolean }

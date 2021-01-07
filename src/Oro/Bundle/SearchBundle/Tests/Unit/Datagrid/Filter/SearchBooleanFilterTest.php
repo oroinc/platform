@@ -9,32 +9,26 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\BooleanFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\SearchBooleanFilter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
+use Oro\Component\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 {
     private const FIELD_NAME = 'testField';
 
-    /**
-     * @var FormInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
-    /**
-     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /**
-     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $filterUtility;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var SearchBooleanFilter
-     */
+    /** @var SearchBooleanFilter */
     private $filter;
 
     /**
@@ -42,28 +36,26 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->form = $this->createMock(FormInterface::class);
-
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+
+        $this->form = $this->createMock(FormInterface::class);
         $this->formFactory->expects($this->any())
             ->method('create')
             ->willReturn($this->form);
 
-        $this->filterUtility = $this->createMock(FilterUtility::class);
-        $this->filterUtility->expects($this->any())
-            ->method('getExcludeParams')
-            ->willReturn([]);
-
-        $this->filter = new SearchBooleanFilter($this->formFactory, $this->filterUtility);
+        $this->filter = new SearchBooleanFilter(
+            $this->formFactory,
+            new FilterUtility(),
+            $this->translator
+        );
     }
 
     public function testApplyWhenWrongDatasource()
     {
-        /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
-        $dataSource = $this->createMock(FilterDatasourceAdapterInterface::class);
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid filter datasource adapter provided: '.get_class($dataSource));
-        $this->filter->apply($dataSource, []);
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->filter->apply($this->createMock(FilterDatasourceAdapterInterface::class), []);
     }
 
     public function testGetMetadata()
@@ -89,9 +81,8 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
                 'name' => 'test',
                 'label' => 'Test',
                 'choices' => [],
-                FilterUtility::FRONTEND_TYPE_KEY => 'search-boolean',
+                'type' => 'search-boolean',
                 'contextSearch' => false,
-                'options' => [],
                 'lazy' => false,
             ],
             $this->filter->getMetadata()
@@ -100,7 +91,6 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhenNoValue()
     {
-        /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->never())
             ->method('addRestriction');
@@ -111,7 +101,6 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhenYes()
     {
-        /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->once())
             ->method('addRestriction')
@@ -123,7 +112,6 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhenYesAndNo()
     {
-        /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->once())
             ->method('addRestriction')
@@ -138,12 +126,17 @@ class SearchBooleanFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWhenSomeOther()
     {
-        /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject $dataSource */
         $dataSource = $this->createMock(SearchFilterDatasourceAdapter::class);
         $dataSource->expects($this->never())
             ->method('addRestriction');
 
         $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => self::FIELD_NAME]);
         $this->filter->apply($dataSource, ['value' => 'all']);
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

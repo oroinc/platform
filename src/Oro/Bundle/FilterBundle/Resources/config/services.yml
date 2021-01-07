@@ -1,10 +1,14 @@
 services:
+    oro_filter.execution_context:
+        class: Oro\Bundle\FilterBundle\Filter\FilterExecutionContext
+
     oro_filter.extension.orm_filter:
         class: Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension
         arguments:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_filter.extension.orm_filter_bag'
             - '@oro_filter.provider.state.filters'
+            - '@oro_filter.execution_context'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }

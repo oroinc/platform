@@ -44,6 +44,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
+            $this->getVirtualRelationProvider(),
             $doctrine,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->entityNameResolver
@@ -76,6 +77,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
+            $this->getVirtualRelationProvider(),
             $doctrine,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
             $this->entityNameResolver

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -10,44 +11,38 @@ use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+/**
+ * Builds a data grid configuration based on a query definition created by the query designer.
+ */
 class DatagridConfigurationBuilder
 {
-    /**
-     * @var DatagridConfigurationQueryConverter
-     */
+    /** @var DatagridConfigurationQueryConverter */
     protected $converter;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var AbstractQueryDesigner
-     */
+    /** @var AbstractQueryDesigner */
     protected $source;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $gridName;
 
     /**
-     * Constructor
-     *
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
-     * @param DatagridGuesser               $datagridGuesser
-     * @param EntityNameResolver            $entityNameResolver
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param ManagerRegistry                  $doctrine
+     * @param DatagridGuesser                  $datagridGuesser
+     * @param EntityNameResolver               $entityNameResolver
      *
      * @throws InvalidConfigurationException
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
+        VirtualRelationProviderInterface $virtualRelationProvider,
         ManagerRegistry $doctrine,
         DatagridGuesser $datagridGuesser,
         EntityNameResolver $entityNameResolver
@@ -57,18 +52,11 @@ class DatagridConfigurationBuilder
         $this->converter = new DatagridConfigurationQueryConverter(
             $functionProvider,
             $virtualFieldProvider,
+            $virtualRelationProvider,
             $doctrine,
             $datagridGuesser,
             $entityNameResolver
         );
-    }
-
-    /**
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     */
-    public function setVirtualRelationProvider($virtualRelationProvider)
-    {
-        $this->converter->setVirtualRelationProvider($virtualRelationProvider);
     }
 
     /**

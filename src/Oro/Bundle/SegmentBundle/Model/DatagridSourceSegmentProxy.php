@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
@@ -11,18 +12,41 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
  * It replaces all existing filters by "segment" filter, all segment restrictions will be applied there.
  * It's only used when need to build segment's datagrid representation
  */
-class DatagridSourceSegmentProxy extends AbstractSegmentProxy
+class DatagridSourceSegmentProxy extends AbstractQueryDesigner
 {
-    /** @var EntityManager */
+    /** @var Segment */
+    private $segment;
+
+    /** @var EntityManagerInterface */
     private $em;
+
+    /** @var array|null */
+    private $preparedDefinition;
+
+    /**
+     * @param Segment                $segment
+     * @param EntityManagerInterface $em
+     */
+    public function __construct(Segment $segment, EntityManagerInterface $em)
+    {
+        $this->segment = $segment;
+        $this->em = $em;
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(Segment $segment, EntityManager $em)
+    public function getEntity()
     {
-        parent::__construct($segment);
-        $this->em = $em;
+        return $this->segment->getEntity();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEntity($entity)
+    {
+        $this->segment->setEntity($entity);
     }
 
     /**
@@ -66,5 +90,13 @@ class DatagridSourceSegmentProxy extends AbstractSegmentProxy
         }
 
         return $this->preparedDefinition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefinition($definition)
+    {
+        $this->segment->setDefinition($definition);
     }
 }

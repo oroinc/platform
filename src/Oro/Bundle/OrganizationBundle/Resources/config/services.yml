@@ -100,7 +100,12 @@ services:
     oro_organization.filter.business_unit:
         class: Oro\Bundle\OrganizationBundle\Filter\BusinessUnitChoiceFilter
         public: false
-        parent: 'oro_filter.choice_tree_filter'
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@router'
+            - '@event_dispatcher'
+            - '@doctrine'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-business-unit }
 

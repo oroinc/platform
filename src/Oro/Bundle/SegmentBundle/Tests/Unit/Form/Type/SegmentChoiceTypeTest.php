@@ -19,17 +19,17 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
     private $formType;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private $doctrine;
 
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
 
-        $this->formType = new SegmentChoiceType($this->registry, $this->aclHelper);
+        $this->formType = new SegmentChoiceType($this->doctrine, $this->aclHelper);
     }
 
     public function testConfigureOptions(): void
@@ -53,7 +53,7 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->with(Segment::class)
             ->willReturn($repo);
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(Segment::class)
             ->willReturn($manager);

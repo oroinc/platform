@@ -170,9 +170,8 @@ services:
         tags:
             - { name: oro_entity.exclusion_provider.api }
 
-    oro_workflow.provider.virtual_relation.workflow:
+    oro_workflow.virtual_relation_provider.workflow:
         class: 'Oro\Bundle\WorkflowBundle\Provider\WorkflowVirtualRelationProvider'
-        public: false
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.cache.entities_with_workflow'
@@ -491,6 +490,7 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@doctrine'
             - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow }
@@ -501,13 +501,18 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+            - '@doctrine'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow_step }
 
     oro_workflow.filter.workflow_translation:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
         public: false
-        parent: oro_workflow.filter.workflow
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@doctrine'
+            - '@oro_workflow.helper.translation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow_translation }
 

@@ -4,19 +4,18 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationQueryConverter;
-use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,20 +25,11 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $functionProvider;
 
-    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $virtualFieldProvider;
-
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var DatagridConfigurationQueryConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
-
-    /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
-    private $source;
 
     /** @var ReportDatagridConfigurationBuilder */
     private $builder;
@@ -49,14 +39,14 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
-        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->dateGroupingBuilder = $this->createMock(DatagridDateGroupingBuilder::class);
 
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
 
         $this->builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
-            $this->virtualFieldProvider,
+            $this->createMock(VirtualFieldProviderInterface::class),
+            $this->createMock(VirtualRelationProviderInterface::class),
             $this->doctrine,
             new DatagridGuesser([]),
             $entityNameResolver
