@@ -4,6 +4,8 @@ Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes i
 
 ## FROM 4.1.0 to 4.2.0
 
+The minimum required PHP version is 7.4.11.
+
 The File storage component was implement. Directories `var/attchment` and `var/import_export` are no longer used as storage
 and has been removed from the git source code.
 
