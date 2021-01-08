@@ -8,7 +8,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Util\ObfuscatedEmailTrait;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,8 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ResetController extends Controller
 {
-    use ObfuscatedEmailTrait;
-
     const SESSION_EMAIL = 'oro_user_reset_email';
 
     /**
@@ -40,6 +37,7 @@ class ResetController extends Controller
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
         }
         $email = $request->request->get('username');
+        $inputData = $email;
 
         $userManager = $this->getUserManager();
         /** @var User $user */
@@ -47,35 +45,36 @@ class ResetController extends Controller
 
         if (null !== $user && $user->isEnabled()) {
             $email = $user->getEmail();
+
             if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))
                 && !($request->get('frontend', false) && null === $user->getPasswordRequestedAt())
             ) {
-                $this->get('session')->getFlashBag()
-                    ->add('warn', 'oro.user.password.reset.ttl_already_requested.message');
+                $securityLogMessage = 'The password for this user has already been requested within the last 24 hours.';
+            } else {
+                try {
+                    $userManager->sendResetPasswordEmail($user);
+                } catch (\Exception $e) {
+                    $this->get('logger')->error(
+                        'Unable to sent the reset password email.',
+                        ['email' => $email, 'exception' => $e]
+                    );
+                    $this->get('session')->getFlashBag()
+                        ->add('warn', $this->get('translator')->trans('oro.email.handler.unable_to_send_email'));
 
-                return $this->redirect($this->generateUrl('oro_user_reset_request'));
+                    return $this->redirect($this->generateUrl('oro_user_reset_request'));
+                }
+
+                $securityLogMessage = 'Reset password email has been sent';
+                $userManager->updateUser($user);
             }
 
-            try {
-                $userManager->sendResetPasswordEmail($user);
-            } catch (\Exception $e) {
-                $this->get('logger')->error(
-                    'Unable to sent the reset password email.',
-                    ['email' => $email, 'exception' => $e]
-                );
-                $this->get('session')->getFlashBag()
-                    ->add('warn', $this->get('translator')->trans('oro.email.handler.unable_to_send_email'));
-
-                return $this->redirect($this->generateUrl('oro_user_reset_request'));
-            }
             $this->get('monolog.logger.oro_account_security')->notice(
-                'Reset password email has been sent',
+                $securityLogMessage,
                 $this->get('oro_user.provider.user_logging_info_provider')->getUserLoggingInfo($user)
             );
-            $userManager->updateUser($user);
         }
 
-        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($email));
+        $this->get('session')->set(static::SESSION_EMAIL, $inputData);
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
     }
@@ -121,8 +120,6 @@ class ResetController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $resetPasswordHandler = $this->get('oro_user.handler.reset_password_handler');
         $translator = $this->get('translator');
-
-        $session->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user->getEmail()));
 
         $resetPasswordSuccess = $resetPasswordHandler->resetPasswordAndNotify($user);
         $em->flush();
