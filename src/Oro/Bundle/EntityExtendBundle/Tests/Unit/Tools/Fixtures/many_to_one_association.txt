@@ -2,6 +2,12 @@ namespace Test;
 
 class Entity
 {
+    private function resetTestTargets()
+    {
+        $this->target_entity1_2ce134a6 = null;
+        $this->target_entity2_b5e8651c = null;
+    }
+
     /**
      * Checks if this entity can be associated with the given target entity type
      *
@@ -14,6 +20,18 @@ class Entity
         if ($className === 'Test\TargetEntity1') { return true; }
         if ($className === 'Test\TargetEntity2') { return true; }
         return false;
+    }
+
+    /**
+     * Gets the entity this entity is associated with
+     *
+     * @return object|null Any configurable entity
+     */
+    public function getTestTarget()
+    {
+        if (null !== $this->target_entity1_2ce134a6) { return $this->target_entity1_2ce134a6; }
+        if (null !== $this->target_entity2_b5e8651c) { return $this->target_entity2_b5e8651c; }
+        return null;
     }
 
     /**
@@ -30,43 +48,5 @@ class Entity
         if ($className === 'Test\TargetEntity1') { $this->resetTestTargets(); $this->target_entity1_2ce134a6 = $target; return $this; }
         if ($className === 'Test\TargetEntity2') { $this->resetTestTargets(); $this->target_entity2_b5e8651c = $target; return $this; }
         throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
-    }
-
-    /**
-     * Returns array with all associated entities
-     *
-     * @return array
-     * @deprecated since 2.0. Method "getTestTarget" should be used instead
-     */
-    public function getTestTargetEntities()
-    {
-        $associationEntities = [];
-        $entity = $this->target_entity1_2ce134a6;
-        if ($entity) {
-            $associationEntities[] = $entity;
-        }
-        $entity = $this->target_entity2_b5e8651c;
-        if ($entity) {
-            $associationEntities[] = $entity;
-        }
-        return $associationEntities;
-    }
-
-    /**
-     * Gets the entity this entity is associated with
-     *
-     * @return object|null Any configurable entity
-     */
-    public function getTestTarget()
-    {
-        if (null !== $this->target_entity1_2ce134a6) { return $this->target_entity1_2ce134a6; }
-        if (null !== $this->target_entity2_b5e8651c) { return $this->target_entity2_b5e8651c; }
-        return null;
-    }
-
-    private function resetTestTargets()
-    {
-        $this->target_entity1_2ce134a6 = null;
-        $this->target_entity2_b5e8651c = null;
     }
 }

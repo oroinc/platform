@@ -1,29 +1,30 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
+use Doctrine\Inflector\InflectorFactory;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClass;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ExtendEntityGeneratorExtension */
-    protected $extension;
+    protected ExtendEntityGeneratorExtension $extension;
 
     protected function setUp(): void
     {
-        $this->extension = new ExtendEntityGeneratorExtension();
+        $this->extension = new ExtendEntityGeneratorExtension(InflectorFactory::create()->build());
     }
 
     public function testSupports()
     {
-        $this->assertTrue(
-            $this->extension->supports([])
-        );
+        static::assertTrue($this->extension->supports([]));
     }
 
     public function testEmptyCustom()
@@ -46,7 +47,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
             'relation'  => [],
             'default'   => [],
             'addremove' => [],
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor'
+            'inherit'   => ParentClassWithConstructor::class
         ];
         $this->assertGeneration('empty_custom_with_inherit.txt', $schema);
     }
@@ -67,7 +68,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $schema = [
             'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClass',
+            'inherit'   => ParentClass::class,
             'property'  => [],
             'relation'  => [],
             'default'   => [],
@@ -80,7 +81,7 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $schema = [
             'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructor',
+            'inherit'   => ParentClassWithConstructor::class,
             'property'  => [],
             'relation'  => [],
             'default'   => [],
@@ -91,13 +92,9 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testExtendWithParentConstructorWithArgs()
     {
-        if (version_compare(phpversion(), '7.4.0', '>=')) {
-            $this->markTestSkipped('Skipped while "jms/cg" throwing php deprecation errors');
-        }
-
         $schema = [
             'type'      => 'Extend',
-            'inherit'   => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\Fixtures\ParentClassWithConstructorWithArgs',
+            'inherit'   => ParentClassWithConstructorWithArgs::class,
             'property'  => [],
             'relation'  => [],
             'default'   => [],
@@ -217,31 +214,17 @@ class ExtendEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertGeneration('collections_without_target.txt', $schema);
     }
 
-    /**
-     * @param string $expectedFile
-     * @param array  $schema
-     * @param bool   $dump
-     */
-    protected function assertGeneration($expectedFile, $schema, $dump = false)
+    protected function assertGeneration(string $expectedFile, array $schema): void
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
 
         $this->extension->generate($schema, $class);
-        $strategy  = new DefaultGeneratorStrategy();
-        $classBody = $strategy->generate($class);
-        if ($dump) {
-            print_r("\n" . $classBody . "\n");
-        }
-        $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
+        $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/' . $expectedFile);
 
-        /**
-         * Support different line endings.
-         */
-        $expectedBody = str_replace(PHP_EOL, "\n", $expectedBody);
-        $classBody = str_replace(PHP_EOL, "\n", $classBody);
-        $expectedBody = trim($expectedBody);
-        $classBody = trim($classBody);
+        // Support different line endings.
+        $expectedCode = \trim(\str_replace(PHP_EOL, "\n", $expectedCode));
+        $generatedCode = \trim(\str_replace(PHP_EOL, "\n", $class->print()));
 
-        $this->assertEquals($expectedBody, $classBody);
+        static::assertEquals($expectedCode, $generatedCode);
     }
 }

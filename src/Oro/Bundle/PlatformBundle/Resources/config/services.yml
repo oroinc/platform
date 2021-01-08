@@ -149,6 +149,9 @@ services:
     Doctrine\Persistence\ManagerRegistry:
         alias: 'doctrine'
 
+    Doctrine\Inflector\Inflector:
+        factory: [ !service { class: Doctrine\Inflector\Rules\English\InflectorFactory }, 'build' ]
+
     oro_platform.listener.maintenance_propagation:
         class: Oro\Bundle\PlatformBundle\EventListener\MaintenancePropagationListener
         tags:

@@ -358,6 +358,7 @@ services:
         class: Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension
         arguments:
             - [] # a map of default fallback fields
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 

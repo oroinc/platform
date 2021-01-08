@@ -517,25 +517,16 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEnti
 
 class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function getAssociationScope()
     {
         return 'activity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAssociationAttributeName()
     {
         return 'activities';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getAssociationKind()
     {
         return ActivityScope::ASSOCIATION_KIND;
@@ -546,30 +537,23 @@ class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfi
 ``` php
 namespace Oro\Bundle\ActivityBundle\Tools;
 
-use CG\Generator\PhpClass;
-
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 
 class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
-    /** @var ConfigProvider */
-    protected $groupingConfigProvider;
+    protected ConfigProvider $groupingConfigProvider;
 
-    /**
-     * @param ConfigProvider $groupingConfigProvider
-     */
     public function __construct(ConfigProvider $groupingConfigProvider)
     {
         $this->groupingConfigProvider = $groupingConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(array $schema)
+    public function supports(array $schema): bool
     {
         if (!$this->groupingConfigProvider->hasConfig($schema['class'])) {
             return false;
@@ -582,28 +566,19 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
             && in_array(ActivityScope::GROUP_ACTIVITY, $groups);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array $schema, ClassGenerator $class): void
     {
-        $class->addInterfaceName('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $class->addInterfaceName(ActivityInterface::class);
 
         parent::generate($schema, $class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationKind()
+    protected function getAssociationKind(): string
     {
         return ActivityScope::ASSOCIATION_KIND;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationType()
+    protected function getAssociationType(): string
     {
         return RelationType::MANY_TO_MANY;
     }
@@ -623,12 +598,8 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityExtension implements ExtendExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    protected $extendExtension;
+    protected ExtendExtension $extendExtension;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setExtendExtension(ExtendExtension $extendExtension)
     {
         $this->extendExtension = $extendExtension;

@@ -1,18 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Visitor;
 
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 
+/**
+ * Interface for layout loader visitors
+ */
 interface VisitorInterface
 {
-    /**
-     * @param VisitContext $visitContext
-     */
-    public function startVisit(VisitContext $visitContext);
+    public function startVisit(VisitContext $visitContext): void;
 
-    /**
-     * @param VisitContext $visitContext
-     */
-    public function endVisit(VisitContext $visitContext);
+    public function endVisit(VisitContext $visitContext): void;
 }
