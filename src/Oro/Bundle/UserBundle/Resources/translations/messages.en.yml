@@ -160,7 +160,6 @@ oro:
             password_generate.label:        Generate Password
             reset:
                 label: Reset
-                ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
             force_reset:
