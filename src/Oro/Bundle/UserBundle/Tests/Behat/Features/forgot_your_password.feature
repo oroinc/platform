@@ -12,7 +12,7 @@ Feature: Forgot your password
     And I fill form with:
       | Username or Email | nonexisting@example.com |
     When I confirm reset password
-    Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    Then I should see "If there is a user account associated with nonexisting@example.com you will receive an email with a link to reset your password."
     And email with Subject "Reset password" was not sent
 
   Scenario: Verify not existing username
@@ -30,7 +30,7 @@ Feature: Forgot your password
     And I fill form with:
       | Username or Email | admin@example.com |
     When I confirm reset password
-    Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    Then I should see "If there is a user account associated with admin@example.com you will receive an email with a link to reset your password."
     And email with Subject "Reset password" containing the following was sent:
       | To   | admin@example.com                                                     |
       | Body | We've received a request to reset the password for your user account. |
@@ -41,7 +41,7 @@ Feature: Forgot your password
     And I fill form with:
       | Username or Email | charlie |
     When I confirm reset password
-    Then I should see "If there is a user account associated with ...@example.com you will receive an email with a link to reset your password."
+    Then I should see "If there is a user account associated with charlie you will receive an email with a link to reset your password."
     And email with Subject "Reset password" containing the following was sent:
       | To   | charlie@example.com                                                   |
       | Body | We've received a request to reset the password for your user account. |
