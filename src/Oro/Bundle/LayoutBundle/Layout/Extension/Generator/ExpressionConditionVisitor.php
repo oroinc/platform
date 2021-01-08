@@ -1,71 +1,56 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension\Generator;
 
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\IsApplicableLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+/**
+ * Expression condition visitor used by \Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ExpressionGeneratorExtension
+ */
 class ExpressionConditionVisitor implements VisitorInterface
 {
-    /** @var ParsedExpression */
-    protected $expression;
+    protected ParsedExpression $expression;
 
-    /** @var  ExpressionLanguage */
-    protected $expressionLanguage;
+    protected ExpressionLanguage $expressionLanguage;
 
-    /**
-     * @param ParsedExpression $expression Compiled expression
-     * @param ExpressionLanguage $expressionLanguage
-     */
     public function __construct(ParsedExpression $expression, ExpressionLanguage $expressionLanguage)
     {
         $this->expression = $expression;
         $this->expressionLanguage = $expressionLanguage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function startVisit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext): void
     {
-        $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
-        $class->addInterfaceName('Oro\Component\Layout\IsApplicableLayoutUpdateInterface');
+        if (!\in_array(IsApplicableLayoutUpdateInterface::class, $class->getImplements())) {
+            $class->addImplement(IsApplicableLayoutUpdateInterface::class);
+        }
 
-        $setFactoryMethod = PhpMethod::create('isApplicable');
-        $setFactoryMethod->addParameter(
-            PhpParameter::create('context')
-                ->setType('\Oro\Component\Layout\ContextInterface')
-        );
-        $setFactoryMethod->setBody(
-            $writer
-                ->reset()
-                ->write(
-                    sprintf('return %s;', $this->expressionLanguage->compile($this->expression))
-                )
-                ->getContent()
-        );
-        $class->setMethod($setFactoryMethod);
+        $class->addMethod('isApplicable')
+            ->addBody(\sprintf('return %s;', $this->expressionLanguage->compile($this->expression)))
+            ->addParameter('context')->setType(ContextInterface::class);
 
-        $updateMethodBody = $visitContext->getUpdateMethodWriter()->getContent();
-        $visitContext->getUpdateMethodWriter()
-            ->reset()
-            ->writeln('if (!$this->isApplicable($item->getContext())) {')
-            ->indent()
-            ->writeln('return;')
-            ->outdent()
-            ->writeln('}')
-            ->write($updateMethodBody);
+        $oldUpdateMethodBody = $visitContext->getUpdateMethodBody();
+        $visitContext->setUpdateMethodBody(
+            <<<'CODE'
+if (!$this->isApplicable($item->getContext())) {
+    return;
+}
+CODE
+        );
+        $visitContext->appendToUpdateMethodBody($oldUpdateMethodBody);
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function endVisit(VisitContext $visitContext)
+    public function endVisit(VisitContext $visitContext): void
     {
     }
 }

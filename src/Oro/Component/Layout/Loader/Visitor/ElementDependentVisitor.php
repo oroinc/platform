@@ -1,44 +1,31 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Visitor;
 
-use CG\Generator\PhpMethod;
+use Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 
+/**
+ * This visitor adds getElement() getter. It is used by default for all elements.
+ */
 class ElementDependentVisitor implements VisitorInterface
 {
-    /** @var string */
-    protected $elementId;
+    protected string $elementId;
 
-    /**
-     * @param $elementId
-     */
-    public function __construct($elementId)
+    public function __construct(string $elementId)
     {
         $this->elementId = $elementId;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function startVisit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext): void
     {
-        $visitContext
-            ->getClass()
-            ->addInterfaceName('Oro\Component\Layout\Loader\Generator\ElementDependentLayoutUpdateInterface');
+        $visitContext->getClass()->addImplement(ElementDependentLayoutUpdateInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function endVisit(VisitContext $visitContext)
+    public function endVisit(VisitContext $visitContext): void
     {
-        $writer = $visitContext->createWriter();
-        $writer->writeln(sprintf('return \'%s\';', $this->elementId));
-
-        $method = PhpMethod::create('getElement');
-        $method->setBody($writer->getContent());
-
-        $visitContext->getClass()->setMethod($method);
+        $visitContext->getClass()
+            ->addMethod('getElement')->addBody(\sprintf('return \'%s\';', $this->elementId));
     }
 }

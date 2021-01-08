@@ -1,24 +1,25 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    const ASSOCIATION_KIND = 'test';
+    private const ASSOCIATION_KIND = 'test';
 
-    /** @var AbstractAssociationEntityGeneratorExtension|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAssociationEntityGeneratorExtension|MockObject */
     protected $extension;
 
     protected function setUp(): void
     {
         $this->extension = $this->getMockForAbstractClass(
-            'Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension',
+            AbstractAssociationEntityGeneratorExtension::class,
             [],
             '',
             true,
@@ -26,23 +27,18 @@ class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\
             true,
             ['getAssociationKind']
         );
-        $this->extension->expects($this->any())
-            ->method('getAssociationKind')
-            ->will($this->returnValue(self::ASSOCIATION_KIND));
+        $this->extension->method('getAssociationKind')->willReturn(self::ASSOCIATION_KIND);
     }
 
     /**
      * @dataProvider supportsProvider
      */
-    public function testSupports($schemas, $expected)
+    public function testSupports(array $schemas, bool $expected)
     {
-        $this->assertEquals(
-            $expected,
-            $this->extension->supports($schemas)
-        );
+        static::assertEquals($expected, $this->extension->supports($schemas));
     }
 
-    public function supportsProvider()
+    public function supportsProvider(): array
     {
         return [
             'supported' => [
@@ -170,13 +166,12 @@ class ManyToOneAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit\
             ],
         ];
 
-        $class = PhpClass::create('Test\Entity');
+
+        $class = new ClassGenerator('Test\Entity');
 
         $this->extension->generate($schema, $class);
-        $strategy     = new DefaultGeneratorStrategy();
-        $classBody    = $strategy->generate($class);
-        $expectedBody = file_get_contents(__DIR__ . '/../Fixtures/many_to_one_association.txt');
+        $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/many_to_one_association.txt');
 
-        $this->assertEquals(trim($expectedBody), $classBody);
+        static::assertEquals(\trim($expectedCode), \trim($class->print()));
     }
 }

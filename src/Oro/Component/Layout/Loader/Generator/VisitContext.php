@@ -1,45 +1,46 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator;
 
-use CG\Generator\PhpClass;
-use CG\Generator\Writer;
+use Oro\Component\PhpUtils\ClassGenerator;
 
+/**
+ * Class generation context provided to layout loader visitors.
+ */
 class VisitContext
 {
-    /** @var PhpClass */
-    protected $class;
+    protected ClassGenerator $class;
 
-    /** @var Writer */
-    protected $writer;
+    protected string $updateMethodBody = '';
 
-    public function __construct(PhpClass $class)
+    public function __construct(ClassGenerator $class)
     {
         $this->class  = $class;
-        $this->writer = $this->createWriter();
     }
 
-    /**
-     * @return PhpClass
-     */
-    public function getClass()
+    public function getClass(): ClassGenerator
     {
         return $this->class;
     }
 
     /**
-     * @return Writer
+     * Updates the existing update method by appending the provided code and returns the updated update method body.
      */
-    public function createWriter()
+    public function appendToUpdateMethodBody(string $code): string
     {
-        return new Writer();
+        $this->updateMethodBody .= "\n" . $code;
+
+        return $this->updateMethodBody;
     }
 
-    /**
-     * @return Writer
-     */
-    public function getUpdateMethodWriter()
+    public function getUpdateMethodBody(): string
     {
-        return $this->writer;
+        return $this->updateMethodBody;
+    }
+
+    public function setUpdateMethodBody(string $updateMethodBody): void
+    {
+        $this->updateMethodBody = $updateMethodBody;
     }
 }

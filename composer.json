@@ -113,7 +113,7 @@
         "symfony/polyfill-php70": "1.*",
         "box/spout": "2.7.*",
         "oomphinc/composer-installers-extender": "1.1.*",
-        "jms/cg": "1.2.*",
+        "nette/php-generator": "3.5.*",
         "brick/math": "0.8.*",
         "phpdocumentor/reflection-docblock": "4.3.*",
         "php-http/httplug-bundle": "1.15.2",
