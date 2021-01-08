@@ -73,7 +73,10 @@ class ControllersResetTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 200);
-        $this->assertContains('If there is a user account associated with ...@example.com', $result->getContent());
+        static::assertStringContainsString(
+            'If there is a user account associated with simple_user@example.com',
+            $result->getContent()
+        );
     }
 
     public function testSendEmailAction()
