@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Validation;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Form;
 
@@ -44,18 +45,16 @@ class ReportValidationTest extends WebTestCase
         $formValues['oro_report_form']['entity'] = 'Oro\Bundle\UserBundle\Entity\User';
         $formValues['oro_report_form']['name'] = 'test';
         $formValues['oro_report_form']['type'] = 'TABLE';
-        $formValues['oro_report_form']['definition'] = json_encode(
-            [
-                'columns' => [
-                    [
-                        'name' => 'username',
-                        'label' => 'Username',
-                        'func' => null,
-                        'sorting' => 'DESC',
-                    ],
+        $formValues['oro_report_form']['definition'] = QueryDefinitionUtil::encodeDefinition([
+            'columns' => [
+                [
+                    'name' => 'username',
+                    'label' => 'Username',
+                    'func' => null,
+                    'sorting' => 'DESC',
                 ],
-            ]
-        );
+            ],
+        ]);
 
         $this->client->followRedirects(true);
         $this->client->request($form->getMethod(), $form->getUri(), $formValues);

@@ -5,12 +5,13 @@ namespace Oro\Bundle\SegmentBundle\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
  * This class is used by DynamicSegmentQueryBuilder to convert a segment to an ORM query.
  */
-class RestrictionSegmentProxy extends AbstractQueryDesigner implements SegmentIdentityAwareInterface
+class DynamicSegmentQueryDesigner extends AbstractQueryDesigner implements SegmentIdentityAwareInterface
 {
     /** @var Segment */
     private $segment;
@@ -63,7 +64,7 @@ class RestrictionSegmentProxy extends AbstractQueryDesigner implements SegmentId
         if (null === $this->preparedDefinition) {
             $definition = $this->segment->getDefinition();
 
-            $decoded = json_decode($definition, true);
+            $decoded = QueryDefinitionUtil::decodeDefinition($definition);
             if (null === $decoded) {
                 throw new InvalidConfigurationException('Invalid definition given');
             }
@@ -77,7 +78,7 @@ class RestrictionSegmentProxy extends AbstractQueryDesigner implements SegmentId
 
             $decoded = array_merge_recursive($decoded, $required);
 
-            $this->preparedDefinition = json_encode($decoded);
+            $this->preparedDefinition = QueryDefinitionUtil::encodeDefinition($decoded);
         }
 
         return $this->preparedDefinition;

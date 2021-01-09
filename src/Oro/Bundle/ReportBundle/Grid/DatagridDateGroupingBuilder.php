@@ -10,6 +10,7 @@ use Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
 
@@ -72,7 +73,7 @@ class DatagridDateGroupingBuilder
             return;
         }
 
-        $reportDefinition = json_decode($report->getDefinition(), true);
+        $reportDefinition = QueryDefinitionUtil::decodeDefinition($report->getDefinition());
         if (!$this->isDateGroupingFilterRequired($reportDefinition)) {
             return;
         }
@@ -382,8 +383,8 @@ class DatagridDateGroupingBuilder
      */
     protected function isDateGroupingFilterRequired($definition)
     {
-        return (is_array($definition)
-            && array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)
+        return
+            array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)
             && array_key_exists(
                 DateGroupingType::FIELD_NAME_ID,
                 $definition[DateGroupingType::DATE_GROUPING_NAME]
@@ -391,8 +392,7 @@ class DatagridDateGroupingBuilder
             && array_key_exists(
                 DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID,
                 $definition[DateGroupingType::DATE_GROUPING_NAME]
-            )
-        );
+            );
     }
 
     /**
@@ -408,22 +408,24 @@ class DatagridDateGroupingBuilder
 
     /**
      * @param DatagridConfiguration $config
-     * @param  [] $joinIds
+     * @param string[]              $joinIds
+     *
      * @return string
+     *
      * @throws InvalidDatagridConfigException
      */
-    protected function getRealDateFieldTableAlias(DatagridConfiguration $config, $joinIds)
+    protected function getRealDateFieldTableAlias(DatagridConfiguration $config, array $joinIds): string
     {
-        $tableAliasKey = end($joinIds);
         $tableAliases = $config->offsetGet(static::SOURCE_KEY_NAME)['query_config']['table_aliases'];
-
-        if (!array_key_exists($tableAliasKey, $tableAliases)) {
-            throw new InvalidDatagridConfigException(
-                sprintf('The table alias for key %s must be defined!', $tableAliasKey)
-            );
+        $joinId = end($joinIds);
+        if (!\array_key_exists($joinId, $tableAliases)) {
+            throw new InvalidDatagridConfigException(sprintf(
+                'The table alias for the "%s" must be defined.',
+                $joinId
+            ));
         }
 
-        return $tableAliases[$tableAliasKey];
+        return $tableAliases[$joinId];
     }
 
     /**

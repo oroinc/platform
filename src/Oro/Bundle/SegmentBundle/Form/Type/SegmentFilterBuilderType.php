@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Form\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType as SegmentTypeEntity;
@@ -237,7 +238,7 @@ class SegmentFilterBuilderType extends AbstractType
      */
     private function setSegmentDefinition(Segment $segment, FormConfigInterface $config)
     {
-        $definition = json_decode($segment->getDefinition(), true);
+        $definition = QueryDefinitionUtil::decodeDefinition($segment->getDefinition());
         foreach ((array)$config->getOption('segment_columns') as $column) {
             // Check for column existence and skip adding if found
             if (isset($definition['columns']) && is_array($definition['columns'])) {
@@ -255,7 +256,7 @@ class SegmentFilterBuilderType extends AbstractType
                 'func' => null
             ];
         }
-        $segment->setDefinition(json_encode($definition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
     }
 
     /**

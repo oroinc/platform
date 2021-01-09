@@ -2,51 +2,75 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
 {
-    public function testEmpty()
+    public function testEntityNotSpecified()
     {
-        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The "columns" definition does not exist.');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The entity must be specified.');
 
-        $model = new QueryDesignerModel();
-        $model->setDefinition(json_encode([]));
+        $model = new QueryDesigner();
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition(['columns' => ['name' => 'column1']]));
         $builder = $this->createDatagridConfigurationBuilder($model);
         $builder->getConfiguration();
     }
 
-    public function testEmptyColumns()
+    public function testNullDefinition()
     {
-        $this->expectException(\Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition does not exist.');
+
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
+    }
+
+    public function testEmptyDefinition()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "columns" definition does not exist.');
+
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition([]));
+        $builder = $this->createDatagridConfigurationBuilder($model);
+        $builder->getConfiguration();
+    }
+
+    public function testEmptyColumnsInDefinition()
+    {
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "columns" definition must not be empty.');
 
-        $model = new QueryDesignerModel();
-        $model->setDefinition(json_encode(['columns' => []]));
+        $model = new QueryDesigner();
+        $model->setEntity('Acme\Entity\TestEntity');
+        $model->setDefinition(QueryDefinitionUtil::encodeDefinition(['columns' => []]));
         $builder = $this->createDatagridConfigurationBuilder($model);
         $builder->getConfiguration();
     }
 
     public function testNoFilters()
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => '']
             ]
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string']
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [
@@ -92,24 +116,22 @@ class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCas
 
     public function testNoJoins()
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => '']
             ],
             'filters' => []
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => ['column1' => 'string']
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'source'  => [

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\SegmentBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
@@ -12,7 +12,7 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
  * It replaces all existing filters by "segment" filter, all segment restrictions will be applied there.
  * It's only used when need to build segment's datagrid representation
  */
-class DatagridSourceSegmentProxy extends AbstractQueryDesigner
+class SegmentDatagridConfigurationQueryDesigner extends AbstractQueryDesigner
 {
     /** @var Segment */
     private $segment;
@@ -59,12 +59,7 @@ class DatagridSourceSegmentProxy extends AbstractQueryDesigner
         }
 
         if (null === $this->preparedDefinition) {
-            $definition = $this->segment->getDefinition();
-
-            $decoded = json_decode($definition, true);
-            if (null === $decoded) {
-                throw new InvalidConfigurationException('Invalid definition given');
-            }
+            $definition = QueryDefinitionUtil::decodeDefinition($this->segment->getDefinition());
 
             $classMetadata = $this->em->getClassMetadata($this->getEntity());
             $identifiers   = $classMetadata->getIdentifier();
@@ -73,7 +68,7 @@ class DatagridSourceSegmentProxy extends AbstractQueryDesigner
             $identifier = reset($identifiers);
 
             $this->preparedDefinition = array_merge(
-                $decoded,
+                $definition,
                 [
                     'filters' => [
                         [
@@ -86,7 +81,7 @@ class DatagridSourceSegmentProxy extends AbstractQueryDesigner
                     ]
                 ]
             );
-            $this->preparedDefinition = json_encode($this->preparedDefinition);
+            $this->preparedDefinition = QueryDefinitionUtil::encodeDefinition($this->preparedDefinition);
         }
 
         return $this->preparedDefinition;

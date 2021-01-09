@@ -4,7 +4,8 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\GridAwareQueryDesignerStub;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\DefinitionQueryValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -12,29 +13,19 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DefinitionQueryValidator
-     */
-    protected $validator;
+    /** @var DefinitionQueryValidator */
+    private $validator;
 
-    /**
-     * @var DefinitionQueryConstraint
-     */
-    protected $constraint;
+    /** @var DefinitionQueryConstraint */
+    private $constraint;
 
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $context;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
 
-    /**
-     * @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
     protected function setUp(): void
@@ -58,10 +49,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateEmptyQueryWithNonSupportedRootClass()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\NonSupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition('');
+        $query = new GridAwareQueryDesignerStub($entity, '');
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -84,10 +73,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateEmptyQueryWitSupportedRootClass()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition('[]');
+        $query = new GridAwareQueryDesignerStub($entity, '[]');
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -102,9 +89,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateNullQueryWitSupportedRootClass()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
+        $query = new GridAwareQueryDesignerStub($entity);
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -119,11 +105,10 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWitNonSupportedSimpleColumn()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition(json_encode(
-            [
+        $query = new GridAwareQueryDesignerStub(
+            $entity,
+            QueryDefinitionUtil::encodeDefinition([
                 'columns'          => [
                     ['name' => 'id'],
                     ['name' => 'name'],
@@ -137,8 +122,8 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
                 'grouping_columns' => [
                     ['name' => 'id']
                 ]
-            ]
-        ));
+            ])
+        );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -180,16 +165,15 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWitSupportedIdentifierColumn()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition(json_encode(
-            [
+        $query = new GridAwareQueryDesignerStub(
+            $entity,
+            QueryDefinitionUtil::encodeDefinition([
                 'columns' => [
                     ['name' => 'parent+Acme\ParentEntity::id|left']
                 ]
-            ]
-        ));
+            ])
+        );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -231,16 +215,15 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWitNonSupportedJoinIdentifierColumn()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition(json_encode(
-            [
+        $query = new GridAwareQueryDesignerStub(
+            $entity,
+            QueryDefinitionUtil::encodeDefinition([
                 'columns' => [
                     ['name' => 'parent+Acme\ParentNonSupportedEntity::id|left']
                 ]
-            ]
-        ));
+            ])
+        );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -284,16 +267,15 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWitNonSupportedRootColumnInIdentifierColumn()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition(json_encode(
-            [
+        $query = new GridAwareQueryDesignerStub(
+            $entity,
+            QueryDefinitionUtil::encodeDefinition([
                 'columns' => [
                     ['name' => 'parent+Acme\ParentEntity::id|left']
                 ]
-            ]
-        ));
+            ])
+        );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')
@@ -340,16 +322,15 @@ class DefinitionQueryValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWitNonSupportedJoinColumnInIdentifierColumn()
     {
-        $query = new QueryDesignerModel();
         $entity = 'Acme\SupportedEntity';
-        $query->setEntity($entity);
-        $query->setDefinition(json_encode(
-            [
+        $query = new GridAwareQueryDesignerStub(
+            $entity,
+            QueryDefinitionUtil::encodeDefinition([
                 'columns' => [
                     ['name' => 'parent+Acme\ParentEntity::non_supported|left']
                 ]
-            ]
-        ));
+            ])
+        );
 
         $this->entityConfigProvider->expects($this->once())
             ->method('hasConfig')

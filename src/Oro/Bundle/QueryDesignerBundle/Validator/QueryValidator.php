@@ -98,7 +98,6 @@ class QueryValidator extends ConstraintValidator
          * @see \Oro\Bundle\DataGridBundle\Datagrid\Datagrid::getAcceptedDatasource
          * @see \Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension::visitDatasource
          * @see \Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder::doBuildRestrictions
-         * @see \Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy::getDefinition
          */
         $this->processing[$gridName] = true;
         $context = $this->context;

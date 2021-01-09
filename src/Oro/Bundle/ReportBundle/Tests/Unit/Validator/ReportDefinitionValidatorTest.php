@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Validator;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator;
 use Symfony\Component\Validator\Constraint;
@@ -48,7 +49,7 @@ class ReportDefinitionValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->context->expects($this->never())->method('addViolation');
         $report = new Report();
-        $report->setDefinition(json_encode(['columns' => []]));
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition(['columns' => []]));
         $this->validator->validate($report, $this->constraint);
     }
 }

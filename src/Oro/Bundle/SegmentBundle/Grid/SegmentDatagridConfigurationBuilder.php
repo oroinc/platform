@@ -6,18 +6,22 @@ use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy;
+use Oro\Bundle\SegmentBundle\Model\SegmentDatagridConfigurationQueryDesigner;
 
+/**
+ * Builds a datagrid configuration based on a query definition created by the query designer for a segment.
+ */
 class SegmentDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
 {
     /**
-     * @param AbstractQueryDesigner $source
+     * {@inheritdoc}
      */
     public function setSource(AbstractQueryDesigner $source)
     {
-        $em = $this->doctrine->getManagerForClass($source->getEntity());
-
-        $this->source = new DatagridSourceSegmentProxy($source, $em);
+        $this->source = new SegmentDatagridConfigurationQueryDesigner(
+            $source,
+            $this->doctrineHelper->getEntityManagerForClass($source->getEntity())
+        );
     }
 
     /**

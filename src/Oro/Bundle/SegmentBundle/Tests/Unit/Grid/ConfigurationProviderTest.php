@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -11,19 +12,18 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Grid\ConfigurationProvider;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ConfigurationProviderTest extends SegmentDefinitionTestCase
 {
-    const TEST_GRID_NAME = 'test';
-
     /** @var ConfigurationProvider */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
+    private $doctrine;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     protected function setUp(): void
     {
@@ -32,33 +32,20 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
-
-        $entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
 
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $this->getVirtualRelationProvider(),
-            $this->doctrine,
+            new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
-            $entityNameResolver
+            $this->getEntityNameResolver()
         );
 
         $builder->setConfigManager($this->configManager);
 
-        $this->provider = new ConfigurationProvider(
-            $builder,
-            $this->doctrine
-        );
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->provider, $this->doctrine, $this->configManager);
+        $this->provider = new ConfigurationProvider($builder, $this->doctrine);
     }
 
     public function testIsApplicable()
@@ -69,22 +56,23 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
 
     public function testGetConfiguration()
     {
-        $metadata = new EntityMetadata('Oro\Bundle\UserBundle\Entity\User');
+        $metadata = new EntityMetadata(User::class);
         $this->configManager->expects($this->once())
             ->method('getEntityMetadata')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repository->expects($this->once())->method('find')->with(2)
-            ->will($this->returnValue($this->getSegment()));
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
+            ->method('find')
+            ->with(2)
+            ->willReturn($this->getSegment());
 
-        $this->doctrine->expects($this->once())->method('getRepository')->with('OroSegmentBundle:Segment')
-            ->will($this->returnValue($repository));
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with(Segment::class)
+            ->willReturn($repository);
 
-        $result = $this->provider->getConfiguration(Segment::GRID_PREFIX . '2');
-
-        $this->assertInstanceOf('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration', $result);
+        $this->provider->getConfiguration(Segment::GRID_PREFIX . '2');
     }
 
     /**
@@ -95,13 +83,16 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
      */
     public function testIsConfigurationValid($definition, $expectedResult)
     {
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repository->expects($this->once())->method('find')->with(2)
-            ->will($this->returnValue($this->getSegment($definition)));
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects($this->once())
+            ->method('find')
+            ->with(2)
+            ->willReturn($this->getSegment($definition));
 
-        $this->doctrine->expects($this->once())->method('getRepository')->with('OroSegmentBundle:Segment')
-            ->will($this->returnValue($repository));
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with(Segment::class)
+            ->willReturn($repository);
         $result = $this->provider->isConfigurationValid(Segment::GRID_PREFIX . '2');
         $this->assertEquals($expectedResult, $result);
     }
@@ -120,7 +111,7 @@ class ConfigurationProviderTest extends SegmentDefinitionTestCase
     public function testDoNotProcessInvalidSegmentGridName()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Segment id not found in "oro_segment_grid_" gridName.');
+        $this->expectExceptionMessage('The segment ID not found in the "oro_segment_grid_" grid name.');
 
         $this->provider->getConfiguration(Segment::GRID_PREFIX);
     }

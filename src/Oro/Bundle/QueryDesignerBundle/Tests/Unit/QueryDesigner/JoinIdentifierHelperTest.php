@@ -43,11 +43,19 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildColumnJoinIdentifierProvider
      */
-    public function testBuildColumnJoinIdentifier($columnName, $expected)
+    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, string $entityClass = null)
     {
         $this->assertEquals(
             $expected,
-            $this->helper->buildColumnJoinIdentifier($columnName)
+            $this->helper->buildColumnJoinIdentifier($columnName, $entityClass)
+        );
+    }
+
+    public function testBuildColumnJoinIdentifierWithDefaultParameters()
+    {
+        $this->assertEquals(
+            self::ROOT_ENTITY . '::column1',
+            $this->helper->buildColumnJoinIdentifier('column1')
         );
     }
 
@@ -220,8 +228,10 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     public function buildColumnJoinIdentifierProvider()
     {
         return [
-            ['column1', self::ROOT_ENTITY . '::column1'],
-            ['column1+Acme\E2::column2', self::ROOT_ENTITY . '::column1+Acme\E2::column2'],
+            [self::ROOT_ENTITY . '::column1', 'column1'],
+            [self::ROOT_ENTITY . '::column1+Acme\E2::column2', 'column1+Acme\E2::column2'],
+            ['Acme\TestEntity::column1', 'column1', 'Acme\TestEntity'],
+            ['Acme\TestEntity::column1+Acme\E2::column2', 'column1+Acme\E2::column2', 'Acme\TestEntity']
         ];
     }
 

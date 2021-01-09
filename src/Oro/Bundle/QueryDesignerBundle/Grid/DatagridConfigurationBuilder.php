@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
@@ -20,8 +20,8 @@ class DatagridConfigurationBuilder
     /** @var DatagridConfigurationQueryConverter */
     protected $converter;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var AbstractQueryDesigner */
     protected $source;
@@ -33,7 +33,7 @@ class DatagridConfigurationBuilder
      * @param FunctionProviderInterface        $functionProvider
      * @param VirtualFieldProviderInterface    $virtualFieldProvider
      * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param ManagerRegistry                  $doctrine
+     * @param DoctrineHelper                   $doctrineHelper
      * @param DatagridGuesser                  $datagridGuesser
      * @param EntityNameResolver               $entityNameResolver
      *
@@ -43,17 +43,17 @@ class DatagridConfigurationBuilder
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider,
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         DatagridGuesser $datagridGuesser,
         EntityNameResolver $entityNameResolver
     ) {
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
 
         $this->converter = new DatagridConfigurationQueryConverter(
             $functionProvider,
             $virtualFieldProvider,
             $virtualRelationProvider,
-            $doctrine,
+            $doctrineHelper,
             $datagridGuesser,
             $entityNameResolver
         );

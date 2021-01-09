@@ -10,7 +10,7 @@ use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
-use Oro\Bundle\ActivityListBundle\Filter\DatagridHelper;
+use Oro\Bundle\ActivityListBundle\Filter\RelatedActivityDatagridFactory;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Stub\Query;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -21,7 +21,6 @@ use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\Exception\UnexpectedTypeException;
-use Oro\Component\TestUtils\Mocks\ServiceLink;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
@@ -56,8 +55,8 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
     /** @var QueryDesignerManager|\PHPUnit\Framework\MockObject\MockObject */
     private $queryDesignerManager;
 
-    /** @var DatagridHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagridHelper;
+    /** @var RelatedActivityDatagridFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $relatedActivityDatagridFactory;
 
     /** @var ActivityListFilter */
     private $activityListFilter;
@@ -78,7 +77,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
         $this->entityRouterHelper = $this->createMock(EntityRoutingHelper::class);
         $this->queryDesignerManager = $this->createMock(QueryDesignerManager::class);
         $this->filterExecutionContext = $this->createMock(FilterExecutionContext::class);
-        $this->datagridHelper = $this->createMock(DatagridHelper::class);
+        $this->relatedActivityDatagridFactory = $this->createMock(RelatedActivityDatagridFactory::class);
 
         $this->entityRouterHelper->expects($this->any())
             ->method('resolveEntityClass')
@@ -94,7 +93,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
             $this->activityListFilterHelper,
             $this->entityRouterHelper,
             $this->queryDesignerManager,
-            new ServiceLink($this->datagridHelper)
+            $this->relatedActivityDatagridFactory
         );
     }
 

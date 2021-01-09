@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -440,7 +441,7 @@ class SegmentManagerTest extends WebTestCase
         $segment = new Segment();
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
         $segment->setEntity(User::class);
-        $segment->setDefinition(json_encode($segmentDefinition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($segmentDefinition));
 
         $repository = $this->getEntityRepository(User::class);
 
@@ -483,7 +484,7 @@ class SegmentManagerTest extends WebTestCase
         $segment = new Segment();
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
         $segment->setEntity(User::class);
-        $segment->setDefinition(json_encode($segmentDefinition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($segmentDefinition));
 
         $repository = $this->getEntityRepository(User::class);
 

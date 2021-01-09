@@ -5,13 +5,14 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Model;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Model\DatagridSourceSegmentProxy;
+use Oro\Bundle\SegmentBundle\Model\SegmentDatagridConfigurationQueryDesigner;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
-class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
+class SegmentDatagridConfigurationQueryDesignerTest extends SegmentDefinitionTestCase
 {
-    public function testProxyForValidDefinition()
+    public function testQueryDesignerForValidDefinition()
     {
         $segment = $this->getSegment([
             'columns' => [
@@ -37,7 +38,7 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
                 ]
             ]
         ]);
-        $expectedDefinition = json_encode([
+        $expectedDefinition = QueryDefinitionUtil::encodeDefinition([
             'columns' => [
                 [
                     'name'    => 'userName',
@@ -57,7 +58,7 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
                     ]
                 ]
             ]
-        ], JSON_THROW_ON_ERROR);
+        ]);
 
         $entityMetadata = $this->createMock(ClassMetadata::class);
         $entityMetadata->expects($this->any())
@@ -69,37 +70,30 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
             ->method('getClassMetadata')
             ->with(self::TEST_ENTITY)
             ->willReturn($entityMetadata);
-        $proxy = new DatagridSourceSegmentProxy($segment, $em);
 
-        $this->assertEquals($expectedDefinition, $proxy->getDefinition());
-        $this->assertEquals($proxy->getEntity(), $segment->getEntity());
+        $queryDesigner = new SegmentDatagridConfigurationQueryDesigner($segment, $em);
+
+        $this->assertEquals($expectedDefinition, $queryDesigner->getDefinition());
+        $this->assertEquals($segment->getEntity(), $queryDesigner->getEntity());
     }
 
-    public function testProxyForBadDefinition()
+    public function testQueryDesignerForInvalidDefinition()
     {
         $this->expectException(InvalidConfigurationException::class);
 
         $segment = $this->getSegment();
-        $segment->setDefinition(null);
-
-        $entityMetadata = $this->createMock(ClassMetadata::class);
-        $entityMetadata->expects($this->any())
-            ->method('getIdentifier')
-            ->willReturn([self::TEST_IDENTIFIER_NAME]);
+        $segment->setDefinition('invalid json');
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->any())
-            ->method('getClassMetadata')
-            ->with(self::TEST_ENTITY)
-            ->willReturn($entityMetadata);
-        $proxy = new DatagridSourceSegmentProxy($segment, $em);
 
-        $proxy->getDefinition();
+        $queryDesigner = new SegmentDatagridConfigurationQueryDesigner($segment, $em);
+
+        $queryDesigner->getDefinition();
     }
 
-    public function testProxyForNewSegment()
+    public function testQueryDesignerForNewSegment()
     {
-        $definition = json_encode($this->getDefaultDefinition());
+        $definition = QueryDefinitionUtil::encodeDefinition($this->getDefaultDefinition());
         $segment = new Segment();
         $segment->setEntity(self::TEST_ENTITY);
         $segment->setDefinition($definition);
@@ -108,9 +102,9 @@ class DatagridSourceSegmentProxyTest extends SegmentDefinitionTestCase
         $em->expects($this->never())
             ->method('getClassMetadata');
 
-        $proxy = new DatagridSourceSegmentProxy($segment, $em);
+        $queryDesigner = new SegmentDatagridConfigurationQueryDesigner($segment, $em);
 
-        $this->assertEquals($definition, $proxy->getDefinition());
-        $this->assertEquals($proxy->getEntity(), $segment->getEntity());
+        $this->assertEquals($definition, $queryDesigner->getDefinition());
+        $this->assertEquals($segment->getEntity(), $queryDesigner->getEntity());
     }
 }

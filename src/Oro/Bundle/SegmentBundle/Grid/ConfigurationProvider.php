@@ -7,10 +7,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
+use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
 /**
- * The provider for configuration of datagrids for segments.
+ * The provider for configuration of datagrids used to show segments.
  */
 class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
@@ -48,16 +49,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
      */
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
-        $id = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
+        $id = (int)substr($gridName, \strlen(Segment::GRID_PREFIX));
         if (!$id) {
-            throw new \RuntimeException(
-                sprintf('Segment id not found in "%s" gridName.', $gridName)
-            );
+            throw new \RuntimeException(sprintf('The segment ID not found in the "%s" grid name.', $gridName));
         }
 
         if (empty($this->configuration[$gridName])) {
-            $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
-            $segment = $segmentRepository->find($id);
+            $segment = $this->doctrine->getRepository(Segment::class)->find($id);
 
             $this->builder->setGridName($gridName);
             $this->builder->setSource($segment);
@@ -69,17 +67,17 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     }
 
     /**
-     * Check whether a segment grid ready for displaying
+     * Checks whether a segment grid ready for displaying.
      *
      * @param string $gridName
      *
      * @return bool
      */
-    public function isConfigurationValid($gridName)
+    public function isConfigurationValid(string $gridName): bool
     {
         try {
             $this->getConfiguration($gridName);
-        } catch (InvalidConfigurationException $invalidConfigEx) {
+        } catch (InvalidConfigurationException $e) {
             return false;
         }
 
@@ -89,7 +87,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     /**
      * {@inheritdoc}
      */
-    public function getBuilder()
+    public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;
     }

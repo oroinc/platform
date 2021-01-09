@@ -3,7 +3,8 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
 {
@@ -12,14 +13,14 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
      */
     public function testInvalidFiltersStructure($expectedExceptionMessage, $filters)
     {
-        $en         = 'Acme\Entity\TestEntity';
+        $en = 'Acme\Entity\TestEntity';
         $definition = [
             'columns' => [
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
             ],
             'filters' => $filters,
         ];
-        $doctrine   = $this->getDoctrine(
+        $doctrine = $this->getDoctrine(
             [
                 $en => [
                     'column1' => 'string',
@@ -27,9 +28,7 @@ class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
 
         try {
             $builder = $this->createDatagridConfigurationBuilder($model, $doctrine);

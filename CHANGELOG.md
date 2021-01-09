@@ -35,6 +35,12 @@ The current file describes significant changes in the code that may affect the u
   E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
   `{ name: oro_platform.console.global_options_provider, priority: -100 }`
 
+#### QueryDesignerBundle
+* The class `Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter` was refactored to decrease its complexity.
+  The state of all query converters was moved to "context" classes.
+  The base context class is `Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext`.
+  If you have own query converters, update them according to new architecture.
+
 #### SecurityBundle
 * The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
   was changed to correspond Symfony recommendations.

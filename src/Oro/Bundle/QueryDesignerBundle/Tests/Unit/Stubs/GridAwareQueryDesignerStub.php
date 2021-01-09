@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures;
+namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
-class QueryDesignerModel extends AbstractQueryDesigner implements GridQueryDesignerInterface
+class GridAwareQueryDesignerStub extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
     public const GRID_PREFIX = 'test_grid_';
 
@@ -14,6 +14,16 @@ class QueryDesignerModel extends AbstractQueryDesigner implements GridQueryDesig
 
     /** @var string */
     private $definition;
+
+    /**
+     * @param string|null $entity
+     * @param string|null $definition
+     */
+    public function __construct(string $entity = null, string $definition = null)
+    {
+        $this->entity = $entity;
+        $this->definition = $definition;
+    }
 
     public function getEntity()
     {
