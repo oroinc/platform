@@ -6,10 +6,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTestCase;
 use Oro\Bundle\SegmentBundle\Query\FilterProcessor;
 
-class FilterProcessorTest extends OrmQueryConverterTest
+class FilterProcessorTest extends OrmQueryConverterTestCase
 {
     public function testConvertQueryDesignerFilters()
     {
@@ -18,10 +18,10 @@ class FilterProcessorTest extends OrmQueryConverterTest
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
             $this->getVirtualRelationProvider(),
-            $this->getDoctrine(),
+            $this->getDoctrineHelper(),
             $restrictionBuilder
         );
-        $filters   = [
+        $filters = [
             'filters' => [
                 [
                     'columnName' => 'testColumn',

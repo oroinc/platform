@@ -3,10 +3,12 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
@@ -22,38 +24,27 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
  */
 class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_IDENTIFIER = 42;
+    private const TEST_IDENTIFIER = 42;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $registry;
+    private $registry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $classMetadata;
+    private $classMetadata;
 
     /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     protected function setUp(): void
     {
-        $this->registry      = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManager::class);
+        $this->classMetadata = $this->createMock(ClassMetadata::class);
 
         $this->doctrineHelper = new DoctrineHelper($this->registry);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->registry, $this->em, $this->classMetadata, $this->doctrineHelper);
     }
 
     public function testGetClassForEntity()
@@ -923,7 +914,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $entity      = new ItemStubProxy();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+        $repo = $this->createMock(EntityRepository::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -944,7 +935,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'ItemStubProxy';
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+        $repo = $this->createMock(EntityRepository::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -980,7 +971,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $class = 'ItemStub';
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+        $repo = $this->createMock(EntityRepository::class);
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')

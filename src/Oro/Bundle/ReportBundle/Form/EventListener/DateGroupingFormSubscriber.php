@@ -4,12 +4,16 @@ namespace Oro\Bundle\ReportBundle\Form\EventListener;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\Model\DateGrouping;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Handles the grouping by date fields on the report form.
+ */
 class DateGroupingFormSubscriber implements EventSubscriberInterface
 {
     /**
@@ -39,8 +43,8 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
         if (!$dateGroupingModel instanceof DateGrouping) {
             $dateGroupingModel = new DateGrouping();
         }
-        $definition = json_decode($data->getDefinition(), true);
-        if (!is_array($definition) || !array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)) {
+        $definition = QueryDefinitionUtil::decodeDefinition($data->getDefinition());
+        if (!array_key_exists(DateGroupingType::DATE_GROUPING_NAME, $definition)) {
             $dateGroupingModel->setUseDateGroupFilter(false);
         } else {
             $dateGroupingArray = $definition[DateGroupingType::DATE_GROUPING_NAME];
@@ -72,10 +76,7 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
 
         /** @var DateGrouping $dateGroupingModel */
         $dateGroupingModel = $form->get(ReportType::DATE_GROUPING_FORM_NAME)->getData();
-        $definition = json_decode($data->getDefinition(), true);
-        if (!is_array($definition)) {
-            $definition = [];
-        }
+        $definition = QueryDefinitionUtil::decodeDefinition($data->getDefinition());
 
         if (false === $dateGroupingModel->getUseDateGroupFilter()) {
             unset($definition[DateGroupingType::DATE_GROUPING_NAME]);
@@ -92,6 +93,6 @@ class DateGroupingFormSubscriber implements EventSubscriberInterface
                 $dateGroupingModel->getUseDateGroupFilter();
         }
 
-        $data->setDefinition(json_encode($definition));
+        $data->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
     }
 }

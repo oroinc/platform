@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
@@ -25,29 +25,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var DatagridConfiguration */
-    protected $config;
-
-    /** @var array */
-    protected $selectColumns;
-
-    /** @var array */
-    protected $groupingColumns;
-
-    /** @var array */
-    protected $from;
-
-    /** @var array */
-    protected $innerJoins;
-
-    /** @var array */
-    protected $leftJoins;
-
     /**
      * @param FunctionProviderInterface        $functionProvider
      * @param VirtualFieldProviderInterface    $virtualFieldProvider
      * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param ManagerRegistry                  $doctrine
+     * @param DoctrineHelper                   $doctrineHelper
      * @param DatagridGuesser                  $datagridGuesser
      * @param EntityNameResolver               $entityNameResolver
      */
@@ -55,11 +37,11 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider,
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         DatagridGuesser $datagridGuesser,
         EntityNameResolver $entityNameResolver
     ) {
-        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrine);
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrineHelper);
         $this->datagridGuesser = $datagridGuesser;
         $this->entityNameResolver = $entityNameResolver;
     }
@@ -77,72 +59,78 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $config = DatagridConfiguration::createNamed($gridName, []);
         $config->setDatasourceType(OrmDatasource::TYPE);
 
-        $this->config = $config;
+        $this->context()->setConfig($config);
         $this->doConvert($source);
 
         return $config;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function resetConvertState(): void
+    protected function createContext(): DatagridConfigurationQueryConverterContext
     {
-        parent::resetConvertState();
-        $this->config = null;
-        $this->selectColumns = null;
-        $this->groupingColumns = null;
-        $this->from = null;
-        $this->innerJoins = null;
-        $this->leftJoins = null;
+        return new DatagridConfigurationQueryConverterContext();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function saveTableAliases($tableAliases)
+    protected function context(): DatagridConfigurationQueryConverterContext
     {
-        $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::TABLE_ALIASES, $tableAliases);
+        return parent::context();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function saveColumnAliases($columnAliases)
+    protected function saveTableAliases(array $tableAliases): void
     {
-        $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::COLUMN_ALIASES, $columnAliases);
+        $this->context()->getConfig()->offsetSetByPath(
+            QueryDesignerQueryConfiguration::TABLE_ALIASES,
+            $tableAliases
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addSelectStatement()
+    protected function saveColumnAliases(array $columnAliases): void
+    {
+        $this->context()->getConfig()->offsetSetByPath(
+            QueryDesignerQueryConfiguration::COLUMN_ALIASES,
+            $columnAliases
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addSelectStatement(): void
     {
         parent::addSelectStatement();
-        $this->config->getOrmQuery()->setSelect($this->selectColumns);
+        $this->context()->getConfig()->getOrmQuery()->setSelect($this->context()->getSelectColumns());
     }
 
     /**
      * {@inheritdoc}
-
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function addSelectColumn(
-        $entityClassName,
-        $tableAlias,
-        $fieldName,
-        $columnExpr,
-        $columnAlias,
-        $columnLabel,
+        string $entityClass,
+        string $tableAlias,
+        string $fieldName,
+        string $columnExpr,
+        string $columnAlias,
+        string $columnLabel,
         $functionExpr,
-        $functionReturnType,
-        $isDistinct = false
-    ) {
+        ?string $functionReturnType,
+        bool $isDistinct
+    ): void {
         if ($isDistinct) {
             $columnExpr = 'DISTINCT ' . $columnExpr;
         }
 
-        if ($functionExpr !== null) {
+        if (null !== $functionExpr) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
                 $tableAlias,
@@ -153,14 +141,14 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         }
 
         $fieldType = $functionReturnType;
-        if ($fieldType === null) {
-            $fieldType = $this->getFieldType($entityClassName, $fieldName);
+        if (null === $fieldType) {
+            $fieldType = $this->getFieldType($entityClass, $fieldName);
         }
 
-        if (!$functionExpr && $fieldType === 'dictionary') {
+        if (!$functionExpr && 'dictionary' === $fieldType) {
             [$entityAlias] = explode('.', $columnExpr);
             $nameDql = $this->entityNameResolver->getNameDQL(
-                $this->getTargetEntityClass($entityClassName, $fieldName),
+                $this->getTargetEntityClass($entityClass, $fieldName),
                 $entityAlias
             );
             if ($nameDql) {
@@ -168,7 +156,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             }
         }
 
-        $this->selectColumns[] = sprintf('%s as %s', $functionExpr ?? $columnExpr, $columnAlias);
+        $this->context()->addSelectColumn(sprintf('%s as %s', $functionExpr ?? $columnExpr, $columnAlias));
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
@@ -179,17 +167,17 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
                 'data_name' => $columnAlias
             ],
             DatagridGuesser::FILTER    => [
-                'data_name'    => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnAlias),
+                'data_name'    => $this->getFilterByExpr($entityClass, $tableAlias, $fieldName, $columnAlias),
                 'translatable' => false
             ],
         ];
-        if ($functionExpr !== null) {
+        if (null !== $functionExpr) {
             $columnOptions[DatagridGuesser::FILTER][FilterUtility::BY_HAVING_KEY] = true;
         }
-        $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
-        $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);
+        $this->datagridGuesser->applyColumnGuesses($entityClass, $fieldName, $fieldType, $columnOptions);
+        $this->datagridGuesser->setColumnOptions($this->context()->getConfig(), $columnAlias, $columnOptions);
 
-        $this->config->offsetSetByPath(
+        $this->context()->getConfig()->offsetSetByPath(
             sprintf('[fields_acl][columns][%s][data_name]', $columnAlias),
             $columnExpr
         );
@@ -198,115 +186,111 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * Get target entity class for virtual field.
      *
-     * @param string $entityClassName
+     * @param string $entityClass
      * @param string $fieldName
      *
      * @return string
      */
-    protected function getTargetEntityClass($entityClassName, $fieldName)
+    protected function getTargetEntityClass(string $entityClass, string $fieldName): string
     {
-        if ($this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
-            $key = sprintf('%s::%s', $entityClassName, $fieldName);
-            if (isset($this->virtualColumnOptions[$key]['related_entity_name'])) {
-                return $this->virtualColumnOptions[$key]['related_entity_name'];
+        if ($this->isVirtualField($entityClass, $fieldName)) {
+            $columnJoinId = $this->buildColumnJoinIdentifier($fieldName, $entityClass);
+            if ($this->context()->hasVirtualColumnOption($columnJoinId, 'related_entity_name')) {
+                return $this->context()->getVirtualColumnOption($columnJoinId, 'related_entity_name');
             }
         }
-        return $entityClassName;
+
+        return $entityClass;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addFromStatements()
+    protected function addFromStatements(): void
     {
         parent::addFromStatements();
-        $this->config->getOrmQuery()->setFrom($this->from);
+        $this->context()->getConfig()->getOrmQuery()->setFrom($this->context()->getFrom());
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addFromStatement($entityClassName, $tableAlias)
+    protected function addFromStatement(string $entityClass, string $tableAlias): void
     {
-        $this->from[] = [
-            'table' => $entityClassName,
-            'alias' => $tableAlias
-        ];
+        $this->context()->addFrom($entityClass, $tableAlias);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatements()
+    protected function addJoinStatements(): void
     {
         parent::addJoinStatements();
-        if (!empty($this->innerJoins)) {
-            $this->config->getOrmQuery()->setInnerJoins($this->innerJoins);
+        $innerJoins = $this->context()->getInnerJoins();
+        if ($innerJoins) {
+            $this->context()->getConfig()->getOrmQuery()->setInnerJoins($innerJoins);
         }
-        if (!empty($this->leftJoins)) {
-            $this->config->getOrmQuery()->setLeftJoins($this->leftJoins);
+        $leftJoins = $this->context()->getLeftJoins();
+        if ($leftJoins) {
+            $this->context()->getConfig()->getOrmQuery()->setLeftJoins($leftJoins);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
-    {
-        $joinDefinition = [
-            'join'  => $join,
-            'alias' => $joinAlias
-        ];
-        if (!empty($joinConditionType)) {
-            $joinDefinition['conditionType'] = $joinConditionType;
-        }
-        if (!empty($joinCondition)) {
-            $joinDefinition['condition'] = $joinCondition;
-        }
-
+    protected function addJoinStatement(
+        ?string $joinType,
+        string $join,
+        string $joinAlias,
+        ?string $joinConditionType,
+        ?string $joinCondition
+    ): void {
         if (self::LEFT_JOIN === $joinType) {
-            $this->leftJoins[] = $joinDefinition;
+            $this->context()->addLeftJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         } else {
-            $this->innerJoins[] = $joinDefinition;
+            $this->context()->addInnerJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addWhereStatement()
+    protected function addWhereStatement(): void
     {
         parent::addWhereStatement();
-        if (!empty($this->filters)) {
-            $this->config->offsetSetByPath(QueryDesignerQueryConfiguration::FILTERS, $this->filters);
+        $filters = $this->context()->getFilters();
+        if ($filters) {
+            $this->context()->getConfig()->offsetSetByPath(QueryDesignerQueryConfiguration::FILTERS, $filters);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByStatement()
+    protected function addGroupByStatement(): void
     {
         parent::addGroupByStatement();
-        if (!empty($this->groupingColumns)) {
-            $this->config->getOrmQuery()->setGroupBy(implode(', ', $this->groupingColumns));
+        $groupingColumns = $this->context()->getGroupingColumns();
+        if ($groupingColumns) {
+            $this->context()->getConfig()->getOrmQuery()->setGroupBy(implode(', ', $groupingColumns));
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($columnAlias)
+    protected function addGroupByColumn(string $columnAlias): void
     {
-        $this->groupingColumns[] = $columnAlias;
+        $this->context()->addGroupingColumn($columnAlias);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addOrderByColumn($columnAlias, $columnSorting)
+    protected function addOrderByColumn(string $columnAlias, string $columnSorting): void
     {
-        $this->config->offsetSetByPath(
+        $this->context()->getConfig()->offsetSetByPath(
             sprintf('[sorters][default][%s]', $columnAlias),
             $columnSorting
         );

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFiltersValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -45,7 +46,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit\Framework\TestCase
 
         $value->expects($this->any())
             ->method('getDefinition')
-            ->will($this->returnValue(json_encode($definition)));
+            ->willReturn(QueryDefinitionUtil::encodeDefinition($definition));
 
         $this->context
             ->expects($this->once())
@@ -118,7 +119,7 @@ class NotBlankFiltersValidatorTest extends \PHPUnit\Framework\TestCase
 
         $value->expects($this->any())
             ->method('getDefinition')
-            ->will($this->returnValue(json_encode($definition)));
+            ->willReturn(QueryDefinitionUtil::encodeDefinition($definition));
 
         $this->context
             ->expects($this->never())

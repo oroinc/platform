@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 
 /**
@@ -14,9 +15,7 @@ use Oro\Bundle\ReportBundle\Entity\Report;
  */
 class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
     /**
@@ -50,9 +49,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
         }
 
         $entityAlias = null;
-        $doctrineMetadata = $this->doctrine->getManagerForClass($className)
-            ->getClassMetadata($className);
-        $identifiers = $doctrineMetadata->getIdentifier();
+        $identifiers = $this->doctrineHelper->getEntityMetadataForClass($className)->getIdentifier();
         $primaryKey = array_shift($identifiers);
         $entityAlias = $configuration->getOrmQuery()->findRootAlias($className);
 
@@ -94,7 +91,7 @@ class BaseReportConfigurationBuilder extends DatagridConfigurationBuilder
      */
     protected function isActionSupported($primaryKey)
     {
-        $definition = json_decode($this->source->getDefinition(), true);
+        $definition = QueryDefinitionUtil::decodeDefinition($this->source->getDefinition());
 
         if (!empty($definition['grouping_columns'])) {
             foreach ($definition['grouping_columns'] as $column) {

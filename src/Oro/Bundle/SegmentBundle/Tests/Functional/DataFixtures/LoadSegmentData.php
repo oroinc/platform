@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\Persistence\ObjectManager;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
@@ -338,7 +339,7 @@ class LoadSegmentData extends AbstractLoadSegmentData
             }
             unset($filter);
 
-            $segment->setDefinition(json_encode($definition));
+            $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
         }
         $manager->flush();
     }

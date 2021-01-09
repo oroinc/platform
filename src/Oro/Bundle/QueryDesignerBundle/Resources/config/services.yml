@@ -91,7 +91,7 @@ services:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.virtual_field_provider'
             - '@oro_entity.virtual_relation_provider'
-            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
             - '@oro_datagrid.datagrid.guesser'
             - '@oro_entity.entity_name_resolver'
 

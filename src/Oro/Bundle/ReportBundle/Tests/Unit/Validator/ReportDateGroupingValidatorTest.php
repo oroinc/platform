@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint;
 use Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator;
@@ -54,7 +55,9 @@ class ReportDateGroupingValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateScreamsIfNoGroupingAvailable()
     {
         $value = new Report();
-        $value->setDefinition(json_encode([DateGroupingType::DATE_GROUPING_NAME => []]));
+        $value->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => []
+        ]));
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with((new ReportDateGroupingConstraint())->groupByMandatoryMessage);
@@ -65,16 +68,12 @@ class ReportDateGroupingValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateScreamsIfNoFieldNameSet()
     {
         $value = new Report();
-        $value->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::USE_DATE_GROUPING_FILTER => true,
-                    ],
-                    'grouping_columns' => ['testGroup'],
-                ]
-            )
-        );
+        $value->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::USE_DATE_GROUPING_FILTER => true,
+            ],
+            'grouping_columns' => ['testGroup'],
+        ]));
         $this->context->expects($this->once())
             ->method('addViolation')
             ->with((new ReportDateGroupingConstraint())->dateFieldMandatoryMessage);

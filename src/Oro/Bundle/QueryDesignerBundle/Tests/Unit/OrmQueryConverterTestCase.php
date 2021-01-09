@@ -6,11 +6,13 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
-abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
+abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param array $config
@@ -112,6 +114,32 @@ abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @return EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject
+     */
+    protected function getEntityNameResolver(): EntityNameResolver
+    {
+        return $this->createMock(EntityNameResolver::class);
+    }
+
+    /**
+     * @param array $config            Example:
+     *                                 'Test\Entity1' => array
+     *                                 .    'column1'   => 'string',
+     *                                 .    'relation1' => ['nullable' => true],
+     *                                 'Test\Entity2' => array
+     *                                 .    'column1' => 'integer',
+     * @param array $identifiersConfig Example:
+     *                                 'Test\Entity1' => ['id'],
+     *                                 'Test\Entity2' => ['id'],
+     *
+     * @return DoctrineHelper
+     */
+    protected function getDoctrineHelper(array $config = [], array $identifiersConfig = []): DoctrineHelper
+    {
+        return new DoctrineHelper($this->getDoctrine($config, $identifiersConfig));
+    }
+
+    /**
      * @param array $config            Example:
      *                                 'Test\Entity1' => array
      *                                 .    'column1'   => 'string',
@@ -160,9 +188,10 @@ abstract class OrmQueryConverterTest extends \PHPUnit\Framework\TestCase
                 }
             }
 
-            $metadata = $this->getMockBuilder(ClassMetadata::class)
-                ->disableOriginalConstructor()
-                ->getMock();
+            $metadata = $this->createMock(ClassMetadata::class);
+            $metadata->expects(self::any())
+                ->method('getIdentifierFieldNames')
+                ->willReturn($identifiersConfig[$entity] ?? []);
             $metadata->expects(self::any())
                 ->method('getIdentifier')
                 ->willReturn($identifiersConfig[$entity] ?? []);

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -269,7 +270,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
         static::assertStringContainsString($segmentName, $submittedData->getName());
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -312,7 +316,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertNull($submittedData->getOwner());
         $this->assertNull($submittedData->getOrganization());
         static::assertStringContainsString($segmentName, $submittedData->getName());
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -350,7 +357,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $submittedData = $form->getData();
         static::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertInstanceOf(Segment::class, $submittedData);
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -363,7 +373,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'without columns' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',
@@ -399,7 +409,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'with columns' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',
@@ -443,7 +453,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'with custom name' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint;
 use Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -55,7 +56,7 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
         $value
             ->expects($this->any())
             ->method('getDefinition')
-            ->will($this->returnValue(json_encode($definition)));
+            ->willReturn(QueryDefinitionUtil::encodeDefinition($definition));
 
         if ($expected) {
             $this->translator

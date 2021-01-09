@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
 {
@@ -11,15 +12,15 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testVirtualColumns()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns' => [
                 ['name' => 'vc1', 'label' => 'lbl1'],
                 ['name' => 'vc2', 'label' => 'lbl2'],
             ],
             'filters' => []
         ];
-        $doctrine              = $this->getDoctrine();
+        $doctrine = $this->getDoctrine();
         $virtualColumnProvider = $this->getVirtualFieldProvider(
             [
                 [
@@ -61,11 +62,9 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'name'    => 'test_grid',
@@ -131,15 +130,15 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
      */
     public function testVirtualColumnsWithJoinsToDifferentTablesButTheSameTableAlias()
     {
-        $en                    = 'Acme\Entity\TestEntity';
-        $definition            = [
+        $en = 'Acme\Entity\TestEntity';
+        $definition = [
             'columns' => [
                 ['name' => 'vc1', 'label' => 'lbl1'],
                 ['name' => 'vc2', 'label' => 'lbl2'],
             ],
             'filters' => []
         ];
-        $doctrine              = $this->getDoctrine();
+        $doctrine = $this->getDoctrine();
         $virtualColumnProvider = $this->getVirtualFieldProvider(
             [
                 [
@@ -185,11 +184,9 @@ class SameEntityVirtualColumnsTest extends DatagridConfigurationBuilderTestCase
             ]
         );
 
-        $model = new QueryDesignerModel();
-        $model->setEntity($en);
-        $model->setDefinition(json_encode($definition));
+        $model = new QueryDesigner($en, QueryDefinitionUtil::encodeDefinition($definition));
         $builder = $this->createDatagridConfigurationBuilder($model, $doctrine, null, $virtualColumnProvider);
-        $result  = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
 
         $expected = [
             'name'    => 'test_grid',

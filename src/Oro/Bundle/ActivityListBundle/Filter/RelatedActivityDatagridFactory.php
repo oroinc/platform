@@ -2,46 +2,51 @@
 
 namespace Oro\Bundle\ActivityListBundle\Filter;
 
-use Oro\Bundle\ActivityListBundle\Model\ActivityListQueryDesigner;
+use Oro\Bundle\DataGridBundle\Datagrid\Builder as DatagridBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
-use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DatagridHelper
+/**
+ * The factory to create the "related-activity" datagrid used by
+ * {@see \Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter} to get ORM sub-query to filter data.
+ */
+class RelatedActivityDatagridFactory
 {
     /** @var DatagridConfigurationBuilder */
-    protected $datagridConfigurationBuilder;
+    private $datagridConfigurationBuilder;
 
-    /** @var ServiceLink */
-    protected $gridBuilderLink;
+    /** @var DatagridBuilder */
+    private $datagridBuilder;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /**
      * @param DatagridConfigurationBuilder $datagridConfigurationBuilder
-     * @param ServiceLink $gridBuilderLink
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param DatagridBuilder              $datagridBuilder
+     * @param EventDispatcherInterface     $eventDispatcher
      */
     public function __construct(
         DatagridConfigurationBuilder $datagridConfigurationBuilder,
-        ServiceLink $gridBuilderLink,
+        DatagridBuilder $datagridBuilder,
         EventDispatcherInterface $eventDispatcher
     ) {
         $this->datagridConfigurationBuilder = $datagridConfigurationBuilder;
-        $this->gridBuilderLink = $gridBuilderLink;
+        $this->datagridBuilder = $datagridBuilder;
         $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
-     * @param ActivityListQueryDesigner $source
+     * @param AbstractQueryDesigner $source
+     *
      * @return DatagridInterface
      */
-    public function createGrid(ActivityListQueryDesigner $source)
+    public function createGrid(AbstractQueryDesigner $source): DatagridInterface
     {
         $this->datagridConfigurationBuilder->setGridName('related-activity');
         $this->datagridConfigurationBuilder->setSource($source);
@@ -52,7 +57,7 @@ class DatagridHelper
         };
 
         $this->eventDispatcher->addListener(BuildBefore::NAME, $stopPropagationListener, 255);
-        $grid = $this->gridBuilderLink->getService()->build($config, new ParameterBag());
+        $grid = $this->datagridBuilder->build($config, new ParameterBag());
         $this->eventDispatcher->removeListener(BuildBefore::NAME, $stopPropagationListener);
 
         return $grid;
