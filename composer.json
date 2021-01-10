@@ -109,7 +109,7 @@
         "xemlock/htmlpurifier-html5": "0.1.10",
         "hwi/oauth-bundle": "1.1.*",
         "kriswallsmith/buzz": "1.0.*",
-        "piwik/device-detector": "3.10.*",
+        "matomo/device-detector": "~4.1.0",
         "symfony/polyfill-php70": "1.*",
         "box/spout": "2.7.*",
         "oomphinc/composer-installers-extender": "1.1.*",
