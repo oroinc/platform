@@ -9,7 +9,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
  */
 class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ROOT_ENTITY = 'Acme\RootEntity';
+    private const ROOT_ENTITY = 'Acme\RootEntity';
 
     /** @var JoinIdentifierHelper */
     private $helper;
@@ -43,11 +43,19 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildColumnJoinIdentifierProvider
      */
-    public function testBuildColumnJoinIdentifier($columnName, $expected)
+    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, string $entityClass = null)
     {
         $this->assertEquals(
             $expected,
-            $this->helper->buildColumnJoinIdentifier($columnName)
+            $this->helper->buildColumnJoinIdentifier($columnName, $entityClass)
+        );
+    }
+
+    public function testBuildColumnJoinIdentifierWithDefaultParameters()
+    {
+        $this->assertEquals(
+            self::ROOT_ENTITY . '::column1',
+            $this->helper->buildColumnJoinIdentifier('column1')
         );
     }
 
@@ -70,6 +78,28 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $expected,
             $this->helper->explodeJoinIdentifier($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider splitJoinIdentifierProvider
+     */
+    public function testSplitJoinIdentifier($joinId, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->splitJoinIdentifier($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider splitJoinIdentifierProvider
+     */
+    public function testMergeJoinIdentifier($expected, $parts)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->mergeJoinIdentifier($parts)
         );
     }
 
@@ -220,8 +250,10 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     public function buildColumnJoinIdentifierProvider()
     {
         return [
-            ['column1', self::ROOT_ENTITY . '::column1'],
-            ['column1+Acme\E2::column2', self::ROOT_ENTITY . '::column1+Acme\E2::column2'],
+            [self::ROOT_ENTITY . '::column1', 'column1'],
+            [self::ROOT_ENTITY . '::column1+Acme\E2::column2', 'column1+Acme\E2::column2'],
+            ['Acme\TestEntity::column1', 'column1', 'Acme\TestEntity'],
+            ['Acme\TestEntity::column1+Acme\E2::column2', 'column1+Acme\E2::column2', 'Acme\TestEntity']
         ];
     }
 
@@ -299,6 +331,33 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
                     'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition',
                     'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition+Acme\E3::column3'
                 ]
+            ],
+        ];
+    }
+
+    public function splitJoinIdentifierProvider()
+    {
+        return [
+            ['', ['']],
+            [
+                'Acme\E1::column1',
+                ['Acme\E1::column1']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2',
+                ['Acme\E1::column1', 'Acme\E2::column2']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::column2', 'Acme\E3::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2+Acme\E3::Acme\E31::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2', 'Acme\E3::Acme\E31::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2|left|WITH|condition', 'Acme\E3::column3']
             ],
         ];
     }

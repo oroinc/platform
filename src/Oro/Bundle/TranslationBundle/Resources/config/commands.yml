@@ -37,15 +37,6 @@ services:
         tags:
             - { name: console.command }
 
-    Oro\Bundle\TranslationBundle\Command\OroTranslationResetCommand:
-        arguments:
-            - '@translator.default'
-            - '@doctrine.orm.entity_manager'
-            - '@oro_translation.database_translation.loader'
-            - '%kernel.default_locale%'
-        tags:
-            - { name: console.command }
-
     Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand:
         arguments:
             - '@oro_translation.rebuild_translation_cache_processor'

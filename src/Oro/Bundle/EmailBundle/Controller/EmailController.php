@@ -534,7 +534,7 @@ class EmailController extends Controller
         $fileManager = $this->get('oro_attachment.file_manager');
         $content = $fileManager->getContent($path, false);
         if (null === $content) {
-            $imageBinary = $this->get('oro_attachment.provider.resized_image')->getResizedImage(
+            $imageBinary = $this->get('oro_attachment.provider.resized_image')->getResizedImageByContent(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
                     $attachment->getContent()->getContentTransferEncoding()

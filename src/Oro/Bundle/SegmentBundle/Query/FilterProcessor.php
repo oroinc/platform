@@ -5,7 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
@@ -13,13 +13,10 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFilterInterface
 {
-    /** @var string */
-    protected $rootEntityAlias;
-
     /**
      * {@inheritDoc}
      */
-    public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
+    public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions): void
     {
         $queryFilter = $widgetOptions->get('queryFilter', []);
         $filters = $queryFilter['definition']['filters'] ?? [];
@@ -41,77 +38,94 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
      *
      * @return QueryBuilder
      */
-    public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
-    {
+    public function process(
+        QueryBuilder $qb,
+        string $rootEntity,
+        array $filters,
+        string $rootEntityAlias
+    ): QueryBuilder {
         $filters = array_filter($filters);
         if (!$filters) {
             // nothing to do
             return $qb;
         }
 
-        $this->setRootEntity($rootEntity);
-        $this->rootEntityAlias = $rootEntityAlias;
-        $this->joinIdHelper = new JoinIdentifierHelper($this->getRootEntity());
-        $this->definition = ['filters' => $filters, 'columns' => []];
-        $this->joins = [];
-        $this->tableAliasesCount = 0;
-        $this->tableAliases = [];
-        $this->columnAliases = [];
-        $this->aliases = [];
-        $this->queryAliases = [];
-        $this->virtualColumnExpressions = [];
-        $this->virtualColumnOptions = [];
-        $this->virtualRelationsJoins = [];
-        $this->filters = [];
-        $this->currentFilterPath = '';
-        $this->qb = $qb;
-        try {
-            $this->buildQuery();
-        } finally {
-            $this->resetConvertState();
-        }
+        $source = new QueryDesigner(
+            $rootEntity,
+            $this->encodeDefinition(['filters' => $filters])
+        );
+
+        $this->context()->setRootEntityAlias($rootEntityAlias);
+        $this->doConvertToQueryBuilder($source, $qb);
 
         return $qb;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    protected function resetConvertState(): void
+    protected function createContext(): FilterProcessorContext
     {
-        parent::resetConvertState();
-        $this->rootEntityAlias = null;
-        $this->qb = null;
+        return new FilterProcessorContext();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function buildQuery()
+    protected function context(): FilterProcessorContext
     {
-        $this->prepareTableAliases();
-        $this->addJoinStatements();
-        $this->addWhereStatement();
+        return parent::context();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function prepareTableAliases()
+    protected function prepareTableAliases(): void
     {
         $this->addTableAliasForRootEntity();
-        if (isset($this->definition['filters'])) {
-            $this->addTableAliasesForFilters($this->definition['filters']);
+        $definition = $this->context()->getDefinition();
+        if (isset($definition['filters'])) {
+            $this->addTableAliasesForFilters($definition['filters']);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addTableAliasForRootEntity()
+    protected function addTableAliasForRootEntity(): void
     {
-        $joinId = self::ROOT_ALIAS_KEY;
-        $this->tableAliases[$joinId] = $this->rootEntityAlias;
-        $this->joins[$this->rootEntityAlias] = $joinId;
+        $this->context()->setRootTableAlias($this->context()->getRootEntityAlias());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function prepareColumnAliases(): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addSelectStatement(): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addFromStatements(): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addOrderByStatement(): void
+    {
+        // nothing to do
     }
 }

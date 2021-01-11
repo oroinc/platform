@@ -1,14 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions;
 
-use CG\Generator\PhpClass;
-use CG\Generator\PhpParameter;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
+use Oro\Component\PhpUtils\ClassGenerator;
 
 /**
  * Generates getters and setters for default fallback fields.
@@ -16,28 +16,25 @@ use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
 class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
 {
     /** @var array [class name => [singular field name => field name, ...], ...] */
-    private $fieldMap;
+    private array $fieldMap;
+
+    private Inflector $inflector;
 
     /**
      * @param array $fieldMap [class name => [singular field name => field name, ...], ...]
      */
-    public function __construct(array $fieldMap)
+    public function __construct(array $fieldMap, Inflector $inflector)
     {
         $this->fieldMap = $fieldMap;
+        $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(array $schema)
+    public function supports(array $schema): bool
     {
         return isset($schema['class'], $this->fieldMap[$schema['class']]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array $schema, ClassGenerator $class): void
     {
         if (!$this->supports($schema)) {
             return;
@@ -48,9 +45,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             return;
         }
 
-        $class->setParentClassName(ExtendFallback::class);
-        $class->addUseStatement(Localization::class);
-        $class->addUseStatement(LocalizedFallbackValue::class);
+        $class->setExtends(ExtendFallback::class);
 
         foreach ($fields as $singularName => $fieldName) {
             $this->generateGetter($singularName, $fieldName, $class);
@@ -60,98 +55,59 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     }
 
     /**
-     * Generate the code for getter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
+     * Generates code for a getter method
      */
-    protected function generateGetter($singularName, $fieldName, PhpClass $class)
+    protected function generateGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $getter = $this->getMethodName($singularName, 'get');
-        $methodBody = sprintf('return $this->getFallbackValue($this->%s, $localization);', $fieldName);
-
-        $localization = PhpParameter::create('localization')
-            ->setType(Localization::class)
-            ->setDefaultValue(null);
-
-        $method = $this->generateClassMethod($getter, $methodBody);
-        $method->setDocblock(
-            $this->generateDocblock(
-                ['Localization|null' =>'$localization'],
-                'LocalizedFallbackValue|null'
+        $class->addMethod($this->getMethodName($singularName, 'get'))
+            ->addBody(\sprintf('return $this->getFallbackValue($this->%s, $localization);', $fieldName))
+            ->addComment(
+                $this->generateDocblock(
+                    [\sprintf('\%s|null', Localization::class) =>'$localization'],
+                    \sprintf('\%s|null', LocalizedFallbackValue::class)
+                )
             )
-        );
-        $method->setParameters([$localization]);
-        $class->setMethod($method);
+            ->addParameter('localization')->setType(Localization::class)->setDefaultValue(null);
     }
 
     /**
-     * Generate the code for default getter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
+     * Generates code for the default getter method
      */
-    protected function generateDefaultGetter($singularName, $fieldName, PhpClass $class)
+    protected function generateDefaultGetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $defaultGetter = $this->getMethodName($singularName, 'getDefault');
-        $methodBody = sprintf('return $this->getDefaultFallbackValue($this->%s);', $fieldName);
-
-        $method = $this->generateClassMethod($defaultGetter, $methodBody);
-        $method->setDocblock($this->generateDocblock([], 'LocalizedFallbackValue|null'));
-        $class->setMethod($method);
+        $class->addMethod($this->getMethodName($singularName, 'getDefault'))
+            ->addBody(\sprintf('return $this->getDefaultFallbackValue($this->%s);', $fieldName))
+            ->addComment($this->generateDocblock([], \sprintf('\%s|null', LocalizedFallbackValue::class)));
     }
 
     /**
-     * Generate the code for default setter method
-     *
-     * @param string $singularName
-     * @param string $fieldName
-     * @param PhpClass $class
+     * Generates code for the default setter method
      */
-    protected function generateDefaultSetter($singularName, $fieldName, PhpClass $class)
+    protected function generateDefaultSetter(string $singularName, string $fieldName, ClassGenerator $class): void
     {
-        $defaultSetter = $this->getMethodName($singularName, 'setDefault');
-
-        $methodBody = sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName);
-
-        $method = $this->generateClassMethod($defaultSetter, $methodBody);
-        $method->setDocblock($this->generateDocblock(['string' =>  '$value'], '$this'));
-        $method->setParameters([PhpParameter::create('value')]);
-
-        $class->setMethod($method);
+        $class->addMethod($this->getMethodName($singularName, 'setDefault'))
+            ->addBody(\sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName))
+            ->addComment($this->generateDocblock(['string' =>  '$value'], '$this'))
+            ->addParameter('value');
     }
 
-    /**
-     * @param array $params
-     * @param string $return
-     * @return string
-     */
-    protected function generateDocblock(array $params, $return = null)
+    protected function generateDocblock(array $params, string $return = null): string
     {
-        $parts = ['/**'];
+        $parts = [];
 
         foreach ($params as $type => $param) {
-            $parts[] = sprintf(' * @param %s %s', $type, $param);
+            $parts[] = \sprintf('@param %s %s', $type, $param);
         }
 
         if ($return) {
-            $parts[] = sprintf(' * @return %s', $return);
+            $parts[] = \sprintf('@return %s', $return);
         }
 
-        $parts[] = ' */';
-
-        return implode("\n", $parts);
+        return \implode("\n", $parts);
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $prefix
-     * @return string
-     */
-    protected function getMethodName($fieldName, $prefix)
+    protected function getMethodName(string $fieldName, string $prefix): string
     {
-        return $prefix . ucfirst(Inflector::camelize($fieldName));
+        return $prefix . \ucfirst($this->inflector->camelize($fieldName));
     }
 }

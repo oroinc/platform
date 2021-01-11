@@ -1,44 +1,53 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Tools\GeneratorExtensions;
 
-use CG\Generator\PhpClass;
-use CG\Generator\PhpMethod;
-use CG\Generator\PhpParameter;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
+use Nette\PhpGenerator\Parameter;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Tools\GeneratorExtensions\DefaultFallbackGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 
 class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    private Inflector $inflector;
+
+    protected function setUp(): void
+    {
+        $this->inflector = InflectorFactory::create()->build();
+    }
+
     public function testSupports()
     {
         $extension = new DefaultFallbackGeneratorExtension([
             'testClass' => []
-        ]);
-        $this->assertTrue($extension->supports(['class' => 'testClass']));
+        ], $this->inflector);
+        static::assertTrue($extension->supports(['class' => 'testClass']));
     }
 
     public function testSupportsWithoutClass()
     {
-        $extension = new DefaultFallbackGeneratorExtension([]);
-        $this->assertFalse($extension->supports([]));
+        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
+        static::assertFalse($extension->supports([]));
     }
 
     public function testSupportsWithoutExtension()
     {
-        $extension = new DefaultFallbackGeneratorExtension([]);
-        $this->assertFalse($extension->supports(['class' => 'testClass']));
+        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
+        static::assertFalse($extension->supports(['class' => 'testClass']));
     }
 
     public function testMethodNotGenerated()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $class = PhpClass::create('Test\Entity');
+        $this->expectException(\Nette\InvalidArgumentException::class);
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
-        $extension = new DefaultFallbackGeneratorExtension([]);
+        $extension = new DefaultFallbackGeneratorExtension([], $this->inflector);
         $extension->generate($schema, $class);
 
         $class->getMethod('defaultTestGetter');
@@ -46,15 +55,15 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testMethodNotGeneratedIncompleteFields()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $class = PhpClass::create('Test\Entity');
+        $this->expectException(\TypeError::class);
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => ['testField']
-        ]);
+        ], $this->inflector);
         $extension->generate($schema, $class);
 
         $class->getMethod('getDefaultTestField');
@@ -62,68 +71,63 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGenerateWithoutFields()
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
         $clonedClass = clone $class;
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => []
-        ]);
+        ], $this->inflector);
         $extension->generate(['class' => 'Test\Entity'], $class);
 
-        $this->assertEquals($class, $clonedClass);
-        $this->assertEmpty($class->getMethods());
+        static::assertEquals($class, $clonedClass);
+        static::assertEmpty($class->getMethods());
     }
 
     public function testMethodGenerated()
     {
-        $class = PhpClass::create('Test\Entity');
+        $class = new ClassGenerator('Test\Entity');
         $schema = [
             'class' => 'Test\Entity'
         ];
 
         $extension = new DefaultFallbackGeneratorExtension([
             'Test\Entity' => ['name'=> 'names']
-        ]);
+        ], $this->inflector);
         $extension->generate($schema, $class);
 
         $this->assertMethod(
             $class,
             'getName',
-            'return $this->getFallbackValue($this->names, $localization);',
-            "/**\n * @param Localization|null \$localization\n * @return LocalizedFallbackValue|null\n */",
+            'return $this->getFallbackValue($this->names, $localization);' . "\n",
+            "@param \Oro\Bundle\LocaleBundle\Entity\Localization|null \$localization\n"
+            . "@return \Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue|null",
             [
-                $this->getParameter('localization', Localization::class, true),
+                'localization' => $this->getParameter('localization', Localization::class, true),
             ]
         );
 
         $this->assertMethod(
             $class,
             'getDefaultName',
-            'return $this->getDefaultFallbackValue($this->names);',
-            "/**\n * @return LocalizedFallbackValue|null\n */"
+            'return $this->getDefaultFallbackValue($this->names);' . "\n",
+            "@return \Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue|null"
         );
 
         $this->assertMethod(
             $class,
             'setDefaultName',
-            'return $this->setDefaultFallbackValue($this->names, $value);',
-            "/**\n * @param string \$value\n * @return \$this\n */",
+            'return $this->setDefaultFallbackValue($this->names, $value);' . "\n",
+            "@param string \$value\n@return \$this",
             [
-                $this->getParameter('value'),
+                'value' => $this->getParameter('value'),
             ]
         );
     }
 
-    /**
-     * @param string $name
-     * @param string|null $type
-     * @param bool|false $nullable
-     * @return PhpParameter
-     */
-    protected function getParameter($name, $type = null, $nullable = false)
+    protected function getParameter(string $name, ?string $type = null, bool $nullable = false): Parameter
     {
-        $parameter = PhpParameter::create($name)
-            ->setType($type);
+        $parameter = new Parameter($name);
+        $parameter->setType($type);
 
         if ($nullable) {
             $parameter->setDefaultValue(null);
@@ -132,22 +136,19 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
         return $parameter;
     }
 
-    /**
-     * @param PhpClass $class
-     * @param string $methodName
-     * @param string $methodBody
-     * @param string $docblock
-     * @param array $parameters
-     */
-    protected function assertMethod(PhpClass $class, $methodName, $methodBody, $docblock, array $parameters = [])
-    {
-        $this->assertTrue($class->hasMethod($methodName));
+    protected function assertMethod(
+        ClassGenerator $class,
+        string $methodName,
+        string $methodBody,
+        string $docblock,
+        array $parameters = []
+    ): void {
+        static::assertTrue($class->hasMethod($methodName));
 
-        /* @var $method PhpMethod */
         $method = $class->getMethod($methodName);
 
-        $this->assertEquals($methodBody, $method->getBody());
-        $this->assertEquals($docblock, $method->getDocblock());
-        $this->assertEquals($parameters, $method->getParameters());
+        static::assertEquals($methodBody, $method->getBody());
+        static::assertEquals($docblock, $method->getComment());
+        static::assertEquals($parameters, $method->getParameters());
     }
 }

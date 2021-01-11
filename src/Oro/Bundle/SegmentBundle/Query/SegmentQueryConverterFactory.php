@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
@@ -22,8 +22,8 @@ class SegmentQueryConverterFactory
     /** @var VirtualRelationProviderInterface */
     private $virtualRelationProvider;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
 
     /** @var RestrictionBuilderInterface */
     private $restrictionBuilder;
@@ -35,7 +35,7 @@ class SegmentQueryConverterFactory
      * @param FunctionProviderInterface        $functionProvider
      * @param VirtualFieldProviderInterface    $virtualFieldProvider
      * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param ManagerRegistry                  $doctrine
+     * @param DoctrineHelper                   $doctrineHelper
      * @param RestrictionBuilderInterface      $restrictionBuilder
      * @param SegmentQueryConverterState       $segmentQueryConverterState
      */
@@ -43,14 +43,14 @@ class SegmentQueryConverterFactory
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
         VirtualRelationProviderInterface $virtualRelationProvider,
-        ManagerRegistry $doctrine,
+        DoctrineHelper $doctrineHelper,
         RestrictionBuilderInterface $restrictionBuilder,
         SegmentQueryConverterState $segmentQueryConverterState
     ) {
         $this->functionProvider = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
         $this->virtualRelationProvider = $virtualRelationProvider;
-        $this->doctrine = $doctrine;
+        $this->doctrineHelper = $doctrineHelper;
         $this->restrictionBuilder = $restrictionBuilder;
         $this->segmentQueryConverterState = $segmentQueryConverterState;
     }
@@ -64,7 +64,7 @@ class SegmentQueryConverterFactory
             $this->functionProvider,
             $this->virtualFieldProvider,
             $this->virtualRelationProvider,
-            $this->doctrine,
+            $this->doctrineHelper,
             $this->restrictionBuilder,
             $this->segmentQueryConverterState
         );

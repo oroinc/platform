@@ -7,31 +7,23 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\Entity\Report;
 
 /**
- * Class ReportCacheCleanerListener
+ * Removes the report datagrid configuration from the cache when Report entity is updated.
  */
 class ReportCacheCleanerListener
 {
-    /**
-     * @var Cache
-     */
-    private $reportCacheManager;
+    /** @var Cache */
+    private $cache;
+
+    /** @var string */
+    private $prefixCacheKey;
 
     /**
-     * @var string
-     */
-    protected $prefixCacheKey;
-
-    /**
-     * ReportCacheCleanerListener constructor.
-     *
-     * @param Cache  $reportCacheManager
+     * @param Cache  $cache
      * @param string $prefixCacheKey
      */
-    public function __construct(
-        Cache $reportCacheManager,
-        $prefixCacheKey
-    ) {
-        $this->reportCacheManager = $reportCacheManager;
+    public function __construct(Cache $cache, string $prefixCacheKey)
+    {
+        $this->cache = $cache;
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
@@ -39,20 +31,11 @@ class ReportCacheCleanerListener
      * @param Report             $entity
      * @param LifecycleEventArgs $args
      */
-    public function postUpdate(Report $entity, LifecycleEventArgs $args)
+    public function postUpdate(Report $entity, LifecycleEventArgs $args): void
     {
-        $this->clearCache($entity);
-    }
-
-    /**
-     * @param Report $entity
-     */
-    protected function clearCache(Report $entity)
-    {
-        $key = $this->prefixCacheKey.'.'.$entity->getGridPrefix().$entity->getId();
-
-        if ($this->reportCacheManager->contains($key)) {
-            $this->reportCacheManager->delete($key);
+        $cacheKey = $this->prefixCacheKey . '.' . $entity->getGridPrefix() . $entity->getId();
+        if ($this->cache->contains($cacheKey)) {
+            $this->cache->delete($cacheKey);
         }
     }
 }

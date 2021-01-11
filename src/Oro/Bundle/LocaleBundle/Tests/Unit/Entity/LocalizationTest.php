@@ -136,19 +136,16 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($defaultTitle, $entity->getDefaultTitle());
     }
 
-    public function testGetDefaultTitleException()
+    public function testGetDefaultTitleWithDuplication()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('There must be only one localized fallback value for "default" localization.');
-
-        $titles = [$this->createLocalizedValue('test1', true), $this->createLocalizedValue('test2', true)];
         $entity = new Localization();
-
-        foreach ($titles as $title) {
+        $firstFallbackValue = $this->createLocalizedValue('test1', true, null, 'test1');
+        $duplicatedFallbackValue = $this->createLocalizedValue('test2', true, null, 'test2');
+        foreach ([$firstFallbackValue, $duplicatedFallbackValue] as $title) {
             $entity->addTitle($title);
         }
 
-        $entity->getDefaultTitle();
+        $this->assertEquals($firstFallbackValue, $entity->getDefaultTitle());
     }
 
     public function testSetDefaultTitle()
@@ -164,13 +161,19 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $value
-     * @param bool|false $default
-     * @param Localization $localization
+     * @param bool $default
+     * @param Localization|null $localization
+     * @param string $fallbackValue
+     *
      * @return LocalizedFallbackValue
      */
-    protected function createLocalizedValue($value, $default = false, Localization $localization = null)
-    {
-        $localized = (new LocalizedFallbackValue())->setString('some string');
+    protected function createLocalizedValue(
+        string $value,
+        bool $default = false,
+        Localization $localization = null,
+        string $fallbackValue = 'some string'
+    ): LocalizedFallbackValue {
+        $localized = (new LocalizedFallbackValue())->setString($fallbackValue);
 
         if (!$default) {
             if (!$localization) {

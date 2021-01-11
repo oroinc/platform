@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine\DoctrineHelper;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine;
 
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;

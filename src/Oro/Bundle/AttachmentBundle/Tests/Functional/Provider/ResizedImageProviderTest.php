@@ -72,7 +72,7 @@ class ResizedImageProviderTest extends WebTestCase
         $fileManager->deleteFile($fileName);
         try {
             $fileManager->writeToStorage($data, $fileName);
-            $resizedBinary = $this->getResizedImageProvider()->getResizedImage($fileName, $width, $height);
+            $resizedBinary = $this->getResizedImageProvider()->getResizedImageByPath($fileName, $width, $height);
         } finally {
             $fileManager->deleteFile($fileName);
         }
@@ -125,7 +125,7 @@ class ResizedImageProviderTest extends WebTestCase
         $this->changeProcessorsParameters();
 
         [$data, $width, $height] = $this->loadImage('original_attachment.jpg');
-        $resizedBinary = $this->getResizedImageProvider()->getResizedImage($data, $width, $height);
+        $resizedBinary = $this->getResizedImageProvider()->getResizedImageByContent($data, $width, $height);
         self::assertLessThan(strlen($data), strlen($resizedBinary->getContent()));
     }
 }
