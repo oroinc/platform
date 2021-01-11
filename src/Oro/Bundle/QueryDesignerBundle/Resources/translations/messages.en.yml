@@ -22,8 +22,10 @@ oro:
                 cancel:         Cancel
             grouping_columns:   Grouping Columns
             date_grouping:
-                field_name: Date grouping field
-                not_nullable_field: Not nullable field
+                date_field.label: Date field
+                use_date_grouping_filter.label: Enable grouping by date
+                use_skip_empty_periods.label: Allow to skip empty time periods
+
             column:             Column
             label:              Label
             function:           Function
@@ -48,6 +50,3 @@ oro:
                         If enabled, the conditions defined for the same entity within a condition group will be
                         applied together in the same sub-query. Using multiple condition groups or disabling this
                         option will result in multiple sub-queries.
-        validation:
-            grouping: "%columns% must appear in grouping."
-            query: Invalid query

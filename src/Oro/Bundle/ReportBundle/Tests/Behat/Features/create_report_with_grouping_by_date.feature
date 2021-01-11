@@ -19,11 +19,11 @@ Feature: Create Report with grouping by date
       | Email    |
     And I check "Enable grouping by date"
     And I save and close form
-    Then I should see "The date grouping filter requires configuring a grouping column" error message
+    Then I should see "The date grouping filter requires configuring a grouping column." error message
     When I add the following grouping columns:
       | Id |
     And I save and close form
-    Then I should see "Please select a field on which date grouping filter can be applied" error message
+    Then I should see "Specify a field on which date grouping filter can be applied." error message
     When I select "Created At" from date grouping field
     And I save and close form
     Then I should see "Report saved" flash message

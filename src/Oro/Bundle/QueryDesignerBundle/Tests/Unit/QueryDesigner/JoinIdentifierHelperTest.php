@@ -9,7 +9,7 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
  */
 class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ROOT_ENTITY = 'Acme\RootEntity';
+    private const ROOT_ENTITY = 'Acme\RootEntity';
 
     /** @var JoinIdentifierHelper */
     private $helper;
@@ -78,6 +78,28 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             $expected,
             $this->helper->explodeJoinIdentifier($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider splitJoinIdentifierProvider
+     */
+    public function testSplitJoinIdentifier($joinId, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->splitJoinIdentifier($joinId)
+        );
+    }
+
+    /**
+     * @dataProvider splitJoinIdentifierProvider
+     */
+    public function testMergeJoinIdentifier($expected, $parts)
+    {
+        $this->assertEquals(
+            $expected,
+            $this->helper->mergeJoinIdentifier($parts)
         );
     }
 
@@ -309,6 +331,33 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
                     'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition',
                     'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition+Acme\E3::column3'
                 ]
+            ],
+        ];
+    }
+
+    public function splitJoinIdentifierProvider()
+    {
+        return [
+            ['', ['']],
+            [
+                'Acme\E1::column1',
+                ['Acme\E1::column1']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2',
+                ['Acme\E1::column1', 'Acme\E2::column2']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::column2+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::column2', 'Acme\E3::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2+Acme\E3::Acme\E31::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2', 'Acme\E3::Acme\E31::column3']
+            ],
+            [
+                'Acme\E1::column1+Acme\E2::Acme\E21::column2|left|WITH|condition+Acme\E3::column3',
+                ['Acme\E1::column1', 'Acme\E2::Acme\E21::column2|left|WITH|condition', 'Acme\E3::column3']
             ],
         ];
     }

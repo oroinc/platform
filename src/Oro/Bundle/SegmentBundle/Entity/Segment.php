@@ -162,7 +162,7 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     /**
      * {@inheritdoc}
      */
-    public function getGridPrefix()
+    public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
     }

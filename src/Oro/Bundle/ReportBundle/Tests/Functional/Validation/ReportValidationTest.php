@@ -26,7 +26,7 @@ class ReportValidationTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $expectedErrorMessage = $this->getContainer()->get('translator.default')->trans(
-            'oro.report.definition.columns.mandatory',
+            'oro.query_designer.columns.not_empty',
             [],
             'validators'
         );
