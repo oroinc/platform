@@ -23,4 +23,4 @@ Feature: Create report validations
       | Entity      | User        |
       | Report Type | Table       |
     When I save and close form
-    Then I should see "You must specify at least one column for the report grid" error message
+    Then I should see "At least one column should be specified." error message

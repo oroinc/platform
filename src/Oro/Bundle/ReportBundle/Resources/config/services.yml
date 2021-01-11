@@ -103,21 +103,6 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_locale.settings'
 
-    oro_report.validator.report_definition_validator:
-        class: Oro\Bundle\ReportBundle\Validator\ReportDefinitionValidator
-        tags:
-            - { name: validator.constraint_validator, alias: oro_report.report_definition_validator }
-
-    oro_report.validator.report_column_duplicate_validator:
-        class: Oro\Bundle\ReportBundle\Validator\ReportColumnDuplicateValidator
-        tags:
-            - { name: validator.constraint_validator, alias: oro_report.report_column_duplicate_validator }
-
-    oro_report.validator.report_date_grouping_validator:
-        class: Oro\Bundle\ReportBundle\Validator\ReportDateGroupingValidator
-        tags:
-            - { name: validator.constraint_validator, alias: oro_report.report_date_grouping_validator }
-
     oro_report.datagrid.extension.empty_link_remover:
         class: Oro\Bundle\ReportBundle\Extension\Link\DateGroupingActionRemoverExtension
         arguments:

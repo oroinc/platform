@@ -842,7 +842,7 @@ abstract class AbstractQueryConverter
          * - `Root\Class::rootEntityField`
          * - `Class\Name::joinedEntityRelation`
          */
-        $columnJoinIds = explode('+', $joinId);
+        $columnJoinIds = $this->getJoinIdHelper()->splitJoinIdentifier($joinId);
 
         $tableAliases = $context->getTableAliases();
 
@@ -864,7 +864,7 @@ abstract class AbstractQueryConverter
                     str_replace($mainEntityJoinId, '', $context->getVirtualRelationJoin($columnJoinId)),
                     '+'
                 );
-                $relationColumnJoinIds = explode('+', $columnJoinId);
+                $relationColumnJoinIds = $this->getJoinIdHelper()->splitJoinIdentifier($columnJoinId);
                 $fullRelationColumnJoinId = $context->getRootJoinId();
                 foreach ($relationColumnJoinIds as $relationColumnJoinId) {
                     $mainEntityJoinId = trim($mainEntityJoinId . '+' . $relationColumnJoinId, '+');
@@ -963,7 +963,7 @@ abstract class AbstractQueryConverter
          * Join columnJoinIds back into path. All virtual relation joins replaced with joins according to query
          * definition
          */
-        return implode('+', array_filter($columnJoinIds));
+        return $this->getJoinIdHelper()->mergeJoinIdentifier(array_filter($columnJoinIds));
     }
 
     /**

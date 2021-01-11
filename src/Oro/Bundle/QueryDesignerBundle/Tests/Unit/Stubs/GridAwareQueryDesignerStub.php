@@ -45,7 +45,7 @@ class GridAwareQueryDesignerStub extends AbstractQueryDesigner implements GridQu
         $this->definition = $definition;
     }
 
-    public function getGridPrefix()
+    public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
     }

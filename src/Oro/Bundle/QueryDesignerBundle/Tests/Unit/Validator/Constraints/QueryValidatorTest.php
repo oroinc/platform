@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator;
+namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Validator\Constraints;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\QueryBuilder;
@@ -13,24 +13,18 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\BuilderAwareConfigurationProviderStub;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\GridAwareQueryDesignerStub;
-use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
-use Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\Query;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class QueryValidatorTest extends \PHPUnit\Framework\TestCase
+class QueryValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var QueryValidator */
-    private $validator;
-
-    /** @var QueryConstraint */
-    private $constraint;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configurationProvider;
 
@@ -40,55 +34,55 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    protected function setUp(): void
+    protected function createValidator(): QueryValidator
     {
         $this->configurationProvider = $this->createMock(ChainConfigurationProvider::class);
         $this->gridBuilder = $this->createMock(Builder::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->validator = new QueryValidator(
+        return new QueryValidator(
             new FilterExecutionContext(),
             $this->configurationProvider,
             $this->gridBuilder,
             $this->doctrineHelper,
-            $this->translator,
             false
         );
-
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->validator->initialize($this->context);
-
-        $this->constraint = new QueryConstraint();
-
-        $this->translator->expects(self::any())
-            ->method('trans')
-            ->with($this->constraint->message)
-            ->willReturn('Invalid query');
     }
 
-    public function testValidateNotMatchedQuery()
+    public function testUnsupportedConstraint(): void
     {
-        $this->context->expects(self::never())
-            ->method('addViolation');
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validator->validate(new GridAwareQueryDesignerStub(), $this->createMock(Constraint::class));
+    }
 
-        $this->validator->validate(new \stdClass(), $this->constraint);
+    public function testNullValueIsValid(): void
+    {
+        $this->validator->validate(null, new Query());
+        $this->assertNoViolation();
+    }
+
+    public function testUnsupportedValue(): void
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validator->validate(new \stdClass(), new Query());
+    }
+
+    public function testUnsupportedQueryDesignerValue(): void
+    {
+        $this->expectException(UnexpectedTypeException::class);
+        $this->validator->validate(new QueryDesigner(), new Query());
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $datasource
-     * @param bool                                     $useOrmDatasource
-     * @param \Exception                               $exception
-     * @param \Exception                               $configurationException
-     * @param int                                      $expectsCount
-     *
      * @dataProvider validateDataProvider
      */
-    public function testValidate($datasource, $useOrmDatasource, $exception, $configurationException, $expectsCount)
-    {
+    public function testValidate(
+        \PHPUnit\Framework\MockObject\MockObject $datasource,
+        bool $useOrmDatasource,
+        ?\Exception $exception,
+        ?\Exception $configurationException,
+        int $expectsCount
+    ): void {
         $value = new GridAwareQueryDesignerStub();
         $this->doctrineHelper->expects(self::any())
             ->method('getSingleEntityIdentifier')
@@ -126,7 +120,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getAcceptedDatasource')
             ->willReturnCallback(function () use ($datasource, $value) {
                 $this->validator->initialize($this->createMock(ExecutionContextInterface::class));
-                $this->validator->validate($value, $this->constraint);
+                $this->validator->validate($value, new Query());
 
                 return $datasource;
             });
@@ -150,21 +144,17 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
                 ->willReturn([]);
         }
 
+        $constraint = new Query();
+        $this->validator->validate($value, new Query());
         if ($exception || $configurationException) {
-            $this->context->expects(self::once())
-                ->method('addViolation');
+            $this->buildViolation($constraint->message)
+                ->assertRaised();
         } else {
-            $this->context->expects(self::never())
-                ->method('addViolation');
+            $this->assertNoViolation();
         }
-
-        $this->validator->validate($value, $this->constraint);
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
             [
@@ -212,7 +202,7 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testBuilderIsMissing()
+    public function testBuilderIsMissing(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
@@ -226,10 +216,10 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getProviders')
             ->willReturn([]);
 
-        $this->validator->validate($value, $this->constraint);
+        $this->validator->validate($value, new Query());
     }
 
-    public function testExistingEntityValidation()
+    public function testExistingEntityValidation(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A builder for the "test_grid_1" data grid is not found.');
@@ -248,10 +238,10 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getProviders')
             ->willReturn([$provider]);
 
-        $this->validator->validate($value, $this->constraint);
+        $this->validator->validate($value, new Query());
     }
 
-    public function testNewEntityValidation()
+    public function testNewEntityValidation(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessageMatches('/A builder for the "test_grid_.+" data grid is not found\./');
@@ -270,6 +260,6 @@ class QueryValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getProviders')
             ->willReturn([$provider]);
 
-        $this->validator->validate($value, $this->constraint);
+        $this->validator->validate($value, new Query());
     }
 }

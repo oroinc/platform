@@ -1,34 +1,46 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Validator;
+namespace Oro\Bundle\QueryDesignerBundle\Validator\Constraints;
 
 use Oro\Bundle\QueryDesignerBundle\Model\GroupNode;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class GroupNodeValidator extends ConstraintValidator
+/**
+ * Validates whether a group node does not contains both computed and uncomputed conditions.
+ */
+class GroupNodeConditionsValidator extends ConstraintValidator
 {
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        if ($value === null) {
+        if (!$constraint instanceof GroupNodeConditions) {
+            throw new UnexpectedTypeException($constraint, GroupNodeConditions::class);
+        }
+
+        if (null === $value) {
             return;
         }
 
+        if (!$value instanceof GroupNode) {
+            throw new UnexpectedTypeException($value, GroupNode::class);
+        }
+
         if (!$this->isValid($value)) {
-            $this->context->addViolation($constraint->mixedConditionsMessage);
+            $this->context->addViolation($constraint->message);
         }
     }
 
     /**
      * @param GroupNode $rootNode
      *
-     * @return boolean
+     * @return bool
      */
-    protected function isValid(GroupNode $rootNode)
+    private function isValid(GroupNode $rootNode): bool
     {
         if ($rootNode->getType() !== GroupNode::TYPE_MIXED) {
             return true;
@@ -45,7 +57,7 @@ class GroupNodeValidator extends ConstraintValidator
             $rootNode->getChildren()
         );
 
-        if (in_array(GroupNode::TYPE_MIXED, $types)) {
+        if (\in_array(GroupNode::TYPE_MIXED, $types)) {
             return false;
         }
 
@@ -56,6 +68,6 @@ class GroupNodeValidator extends ConstraintValidator
             $types
         );
 
-        return !in_array(GroupNode::TYPE_UNCOMPUTED, $computedTypes);
+        return !\in_array(GroupNode::TYPE_UNCOMPUTED, $computedTypes, true);
     }
 }

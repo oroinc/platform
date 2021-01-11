@@ -3,14 +3,14 @@ define(['underscore', 'orotranslation/js/translator', 'jquery'
     'use strict';
 
     const defaultParam = {
-        message: 'oro.query_designer.condition_builder.filters.not_blank'
+        message: 'oro.query_designer.condition_builder.filters.not_empty'
     };
 
     return [
-        'Oro\\Bundle\\QueryDesignerBundle\\Validator\\NotBlankFilters',
+        'Oro\\Bundle\\QueryDesignerBundle\\Validator\\Constraints\\NotEmptyFilters',
         function(value, element) {
             const data = {result: false};
-            $(element).trigger('query-designer:validate:not-blank-filters', data);
+            $(element).trigger('query-designer:validate:not-empty-filters', data);
             return data.result;
         },
         function(param) {

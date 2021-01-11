@@ -45,6 +45,8 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
  *      order.products|left|WITH|products.orderId = order AND products.active = true
  *          - represents "order -> products" join with custom condition and forces to use LEFT JOIN
  * The join identifier for the root table is empty string.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class JoinIdentifierHelper
 {
@@ -139,7 +141,7 @@ class JoinIdentifierHelper
     public function explodeJoinIdentifier($joinId)
     {
         $joinIds = [];
-        $items = explode('+', $joinId);
+        $items = $this->splitJoinIdentifier($joinId);
         foreach ($items as $item) {
             $joinIds[] = empty($joinIds)
                 ? $item
@@ -147,6 +149,30 @@ class JoinIdentifierHelper
         }
 
         return $joinIds;
+    }
+
+    /**
+     * Gets parts the the given join identifier consists
+     *
+     * @param string $joinId
+     *
+     * @return string[]
+     */
+    public function splitJoinIdentifier($joinId)
+    {
+        return explode('+', $joinId);
+    }
+
+    /**
+     * Gets parts the the given join identifier consists
+     *
+     * @param string[] $joinIds
+     *
+     * @return string
+     */
+    public function mergeJoinIdentifier($joinIds)
+    {
+        return implode('+', $joinIds);
     }
 
     /**

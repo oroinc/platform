@@ -17,10 +17,10 @@ class AttachmentImageContext extends AttachmentContext implements KernelAwareCon
     use PageObjectDictionary;
 
     /** @var int[] */
-    private $filesCount;
+    private $filesCount = [];
 
     /** @var string[] */
-    private $rememberedFilenames;
+    private $rememberedFilenames = [];
 
     /**
      * @param $entity

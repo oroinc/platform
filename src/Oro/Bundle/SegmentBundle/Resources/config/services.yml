@@ -132,13 +132,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_segment.validator.sorting_validator:
-        class: Oro\Bundle\SegmentBundle\Validator\SortingValidator
-        arguments:
-            - '@translator'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_segment.sorting_validator }
-
     oro_segment.layout.data_provider.segment:
         class: Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider
         arguments:

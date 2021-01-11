@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\QueryDesignerBundle\Validator;
+namespace Oro\Bundle\QueryDesignerBundle\Validator\Constraints;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -13,14 +13,13 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
-use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Validates that a query built via the query designer is correct and can be executed.
+ * Validates whether a datagrid query definition created by the query designer is correct and can be executed.
  */
 class QueryValidator extends ConstraintValidator
 {
@@ -36,9 +35,6 @@ class QueryValidator extends ConstraintValidator
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var TranslatorInterface */
-    private $translator;
-
     /** @var bool */
     private $isDebug;
 
@@ -50,7 +46,6 @@ class QueryValidator extends ConstraintValidator
      * @param ChainConfigurationProvider $configurationProvider
      * @param Builder                    $gridBuilder
      * @param DoctrineHelper             $doctrineHelper
-     * @param TranslatorInterface        $translator
      * @param bool                       $isDebug
      */
     public function __construct(
@@ -58,28 +53,35 @@ class QueryValidator extends ConstraintValidator
         ChainConfigurationProvider $configurationProvider,
         Builder $gridBuilder,
         DoctrineHelper $doctrineHelper,
-        TranslatorInterface $translator,
         bool $isDebug
     ) {
         $this->filterExecutionContext = $filterExecutionContext;
         $this->configurationProvider = $configurationProvider;
         $this->gridBuilder = $gridBuilder;
         $this->doctrineHelper = $doctrineHelper;
-        $this->translator = $translator;
         $this->isDebug = $isDebug;
     }
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        if (!$constraint instanceof QueryConstraint) {
-            throw new UnexpectedTypeException($constraint, QueryConstraint::class);
+        if (!$constraint instanceof Query) {
+            throw new UnexpectedTypeException($constraint, Query::class);
+        }
+
+        if (null === $value) {
+            return;
         }
 
         if (!$value instanceof AbstractQueryDesigner) {
-            return;
+            throw new UnexpectedTypeException($value, AbstractQueryDesigner::class);
+        }
+        if (!$value instanceof GridQueryDesignerInterface) {
+            throw new UnexpectedTypeException($value, GridQueryDesignerInterface::class);
         }
 
         $uniqueId = $this->doctrineHelper->getSingleEntityIdentifier($value, false) ?: uniqid('grid', true);
@@ -114,9 +116,7 @@ class QueryValidator extends ConstraintValidator
             }
             $dataSource->getResults();
         } catch (\Throwable $e) {
-            $context->addViolation(
-                $this->isDebug ? $e->getMessage() : $this->translator->trans($constraint->message)
-            );
+            $context->addViolation($this->isDebug ? $e->getMessage() : $constraint->message);
         } finally {
             unset($this->processing[$gridName]);
             $this->filterExecutionContext->disableValidation();

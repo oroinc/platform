@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\SegmentBundle\Validator\Constraints;
 
-use Oro\Bundle\SegmentBundle\Validator\SortingValidator;
 use Symfony\Component\Validator\Constraint;
 
-class Sorting extends Constraint
+/**
+ * This constraint is used to check whether a segment query definition created by the query designer
+ * has at least one column with exactly specified sorting when the records limit is specified.
+ */
+class NotEmptySorting extends Constraint
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     public $message = 'oro.segment.validation.sorting';
 
     /**
@@ -18,13 +19,5 @@ class Sorting extends Constraint
     public function getTargets()
     {
         return self::CLASS_CONSTRAINT;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validatedBy()
-    {
-        return SortingValidator::class;
     }
 }

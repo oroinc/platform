@@ -7,7 +7,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
-use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\NotEmptyFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
@@ -164,7 +164,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertGreaterThan(
             0,
             \array_reduce($actualOptions['constraints'], function ($carry, $item) {
-                return \is_a($item, NotBlankFilters::class) ? $carry + 1 : 0;
+                return \is_a($item, NotEmptyFilters::class) ? $carry + 1 : 0;
             })
         );
     }
@@ -207,7 +207,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'attr' => ['data-role' => 'query-designer-container']
                 ]
             ],
-            'add NotBlankFilters constraint if required option is true' => [
+            'add NotEmptyFilters constraint if required option is true' => [
                 'options' => [
                     'required' => true,
                     'segment_entity' => '\stdClass',
@@ -216,7 +216,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                 'expected' => [
                     'required' => true,
                     'segment_entity' => '\stdClass',
-                    'constraints' => [new Valid(), new NotBlankFilters()]
+                    'constraints' => [new Valid(), new NotEmptyFilters()]
                 ]
             ]
         ];

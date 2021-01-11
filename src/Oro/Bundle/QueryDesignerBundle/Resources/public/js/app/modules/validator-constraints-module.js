@@ -3,5 +3,5 @@ define(function(require) {
 
     const $ = require('jquery.validate');
 
-    $.validator.loadMethod('oroquerydesigner/js/validator/not-blank-filters');
+    $.validator.loadMethod('oroquerydesigner/js/validator/not-empty-filters');
 });
