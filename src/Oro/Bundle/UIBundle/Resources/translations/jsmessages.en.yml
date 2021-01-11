@@ -163,6 +163,10 @@ oro:
             show_less: 'Show less items'
         dropdown_option_aria_label: "More Actions"
         dropdown_main_btn_prefix: "Action"
+    htmlpurifier:
+        formatted_error_line: 'Line #{{ line }}: {{ message }}'
+        messages:
+            'AttrValidator: Attribute removed': '"{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"
