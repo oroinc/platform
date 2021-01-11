@@ -47,6 +47,9 @@ class FileManager
     /** @var string */
     private $protocol;
 
+    /** @var string */
+    private $readonlyProtocol;
+
     /**
      * @param string      $filesystemName The name of Gaufrette filesystem this manager works with
      * @param string|null $subDirectory   The name of a sub-directory if it is different than the filesystem name
@@ -97,6 +100,16 @@ class FileManager
     }
 
     /**
+     * Sets the name of the read-only protocol mapped to the Gaufrette stream wrapper.
+     *
+     * @param string $protocol
+     */
+    public function setReadonlyProtocol(string $protocol): void
+    {
+        $this->readonlyProtocol = $protocol;
+    }
+
+    /**
      * Gets the name of the protocol mapped to the Gaufrette stream wrapper.
      *
      * @return string
@@ -104,6 +117,16 @@ class FileManager
     public function getProtocol(): string
     {
         return $this->protocol;
+    }
+
+    /**
+     * Gets the name of the read-only protocol mapped to the Gaufrette stream wrapper.
+     *
+     * @return string
+     */
+    public function getReadonlyProtocol(): string
+    {
+        return $this->readonlyProtocol;
     }
 
     /**
@@ -135,6 +158,25 @@ class FileManager
         }
 
         return $this->protocol . '://' . $this->getFilePathWithoutProtocol($fileName);
+    }
+
+    /**
+     * Gets the full path to a file in the read-only Gaufrette file system.
+     * This path can be used in the native file functions that need a read-only access to a file.
+     *
+     * @param string $fileName
+     *
+     * @return string
+     *
+     * @throws ProtocolConfigurationException if the Gaufrette protocol is not configured
+     */
+    public function getReadonlyFilePath(string $fileName): string
+    {
+        if (!$this->readonlyProtocol) {
+            throw new ProtocolConfigurationException();
+        }
+
+        return $this->readonlyProtocol . '://' . $this->getFilePathWithoutProtocol($fileName);
     }
 
     /**

@@ -32,6 +32,8 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('controllers.yml');
@@ -39,6 +41,8 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
         }
+
+        $this->configureReadonlyProtocol($container, $config['stream_wrapper']['readonly_protocol']);
     }
 
     /**
@@ -62,6 +66,25 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
                 $container->prependExtensionConfig($name, $config);
             }
         }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string|null      $readonlyProtocol
+     */
+    private function configureReadonlyProtocol(ContainerBuilder $container, ?string $readonlyProtocol): void
+    {
+        if (!$container->hasParameter('knp_gaufrette.stream_wrapper.protocol')) {
+            return;
+        }
+
+        if (!$readonlyProtocol) {
+            $protocol = $container->getParameter('knp_gaufrette.stream_wrapper.protocol');
+            if ($protocol) {
+                $readonlyProtocol = $protocol . '-readonly';
+            }
+        }
+        $container->setParameter('oro_gaufrette.stream_wrapper.readonly_protocol', $readonlyProtocol ?? '');
     }
 
     /**

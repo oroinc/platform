@@ -10,17 +10,17 @@ class GaufretteProtocolValidator implements ProtocolValidatorInterface
     /** @var ProtocolValidatorInterface */
     private $innerValidator;
 
-    /** @var string */
-    private $gaufretteProtocol;
+    /** @var string[] */
+    private $gaufretteProtocols;
 
     /**
      * @param ProtocolValidatorInterface $innerValidator
-     * @param string                     $gaufretteProtocol
+     * @param string[]                   $gaufretteProtocols
      */
-    public function __construct(ProtocolValidatorInterface $innerValidator, string $gaufretteProtocol)
+    public function __construct(ProtocolValidatorInterface $innerValidator, array $gaufretteProtocols)
     {
         $this->innerValidator = $innerValidator;
-        $this->gaufretteProtocol = $gaufretteProtocol;
+        $this->gaufretteProtocols = array_filter($gaufretteProtocols);
     }
 
     /**
@@ -30,6 +30,6 @@ class GaufretteProtocolValidator implements ProtocolValidatorInterface
     {
         return
             $this->innerValidator->isSupportedProtocol($protocol)
-            || ($this->gaufretteProtocol && $this->gaufretteProtocol === $protocol);
+            || \in_array($protocol, $this->gaufretteProtocols, true);
     }
 }

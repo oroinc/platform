@@ -32,7 +32,9 @@ services:
         decorates: oro_attachment.protocol_validator
         arguments:
             - '@oro_attachment.protocol_validator.gaufrette.inner'
-            - "@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"
+            -
+                - "@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"
+                - "@=container.hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol') ? parameter('oro_gaufrette.stream_wrapper.readonly_protocol') : ''"
 
     oro_attachment.mime_type_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeTypeValidator
@@ -177,6 +179,8 @@ services:
         public: true
         arguments:
             - 'import_files'
+        calls:
+            - [ setProtocol, [ 'gaufrette-readonly' ]]
 
     oro_attachment.serializer.file_normalizer:
         class: Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer

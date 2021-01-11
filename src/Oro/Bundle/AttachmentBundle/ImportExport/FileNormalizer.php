@@ -96,7 +96,7 @@ class FileNormalizer implements DenormalizerInterface, NormalizerInterface
         $file->setUuid($uuid ?: UUIDGenerator::v4());
         if ($uri) {
             if ($this->isRelativePath($uri)) {
-                $uri = $this->fileManager->getFilePath($uri);
+                $uri = $this->fileManager->getReadonlyFilePath($uri);
             }
             // Sets SymfonyFile without checking path at constructor as anyway
             // the file must not be uploaded in normalizer, so it should pass through any file.

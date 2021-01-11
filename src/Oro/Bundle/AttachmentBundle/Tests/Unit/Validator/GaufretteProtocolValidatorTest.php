@@ -18,14 +18,19 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
     public function testIsSupportedProtocolForGaufretteProtocol()
     {
         $protocol = 'gaufrette';
+        $readonlyProtocol = 'gaufrette-readonly';
 
-        $this->innerValidator->expects(self::once())
+        $this->innerValidator->expects(self::exactly(2))
             ->method('isSupportedProtocol')
-            ->with($protocol)
+            ->withConsecutive(
+                [$protocol],
+                [$readonlyProtocol]
+            )
             ->willReturn(false);
 
-        $validator = new GaufretteProtocolValidator($this->innerValidator, 'gaufrette');
+        $validator = new GaufretteProtocolValidator($this->innerValidator, [$protocol, $readonlyProtocol]);
         self::assertTrue($validator->isSupportedProtocol($protocol));
+        self::assertTrue($validator->isSupportedProtocol($readonlyProtocol));
     }
 
     public function testIsSupportedProtocolForGaufretteProtocolWhenItIsNotConfigured()
@@ -37,7 +42,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($protocol)
             ->willReturn(false);
 
-        $validator = new GaufretteProtocolValidator($this->innerValidator, '');
+        $validator = new GaufretteProtocolValidator($this->innerValidator, ['', '']);
         self::assertFalse($validator->isSupportedProtocol($protocol));
     }
 
@@ -50,7 +55,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($protocol)
             ->willReturn(true);
 
-        $validator = new GaufretteProtocolValidator($this->innerValidator, 'gaufrette');
+        $validator = new GaufretteProtocolValidator($this->innerValidator, ['gaufrette', 'gaufrette-readonly']);
         self::assertTrue($validator->isSupportedProtocol($protocol));
     }
 
@@ -63,7 +68,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($protocol)
             ->willReturn(false);
 
-        $validator = new GaufretteProtocolValidator($this->innerValidator, 'gaufrette');
+        $validator = new GaufretteProtocolValidator($this->innerValidator, ['gaufrette', 'gaufrette-readonly']);
         self::assertFalse($validator->isSupportedProtocol($protocol));
     }
 }

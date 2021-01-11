@@ -127,7 +127,9 @@ The value "%s" is incorrect. There must be only one fallback value for localizat
 EOF;
                     $localization = $localization ? $localization->getName() : Localization::DEFAULT_LOCALIZATION;
                     // error_log is a temporary solution and should be removed in scope of BAP-20337
-                    error_log(sprintf($message, $value, $localization, get_class($value)).PHP_EOL);
+                    /** @noinspection ForgottenDebugOutputInspection */
+                    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+                    @error_log(sprintf($message, $value, $localization, get_class($value)).PHP_EOL);
                     break;
                 }
                 $result = $value;

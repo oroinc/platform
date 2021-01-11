@@ -27,8 +27,9 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_FILE_SYSTEM_NAME = 'testFileSystem';
-    private const TEST_PROTOCOL         = 'testProtocol';
+    private const TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
+    private const TEST_PROTOCOL          = 'testProtocol';
+    private const TEST_READONLY_PROTOCOL = 'testReadonlyProtocol';
 
     /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
     private $filesystem;
@@ -55,6 +56,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     {
         $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);
         $fileManager->setProtocol(self::TEST_PROTOCOL);
+        $fileManager->setReadonlyProtocol(self::TEST_READONLY_PROTOCOL);
         if ($useSubDirectory) {
             $fileManager->useSubDirectory(true);
         }
@@ -83,6 +85,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     ): FileManager {
         $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);
         $fileManager->setProtocol(self::TEST_PROTOCOL);
+        $fileManager->setReadonlyProtocol(self::TEST_READONLY_PROTOCOL);
         if ($useSubDirectory) {
             $fileManager->useSubDirectory(true);
         }
@@ -107,6 +110,13 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager = $this->getFileManager(true);
 
         self::assertEquals(self::TEST_PROTOCOL, $fileManager->getProtocol());
+    }
+
+    public function testGetReadonlyProtocol()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(self::TEST_READONLY_PROTOCOL, $fileManager->getReadonlyProtocol());
     }
 
     public function testGetSubDirectory()
@@ -193,7 +203,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFilePathWithCustomSubDirectory()
     {
         $fileManager = $this->getFileManager(true, 'testSubDir');
-        $fileManager->setProtocol(self::TEST_PROTOCOL);
 
         self::assertEquals(
             sprintf('%s://%s/%s/file.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
@@ -204,7 +213,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFilePathWithAutoConfiguredCustomSubDirectory()
     {
         $fileManager = $this->getFileManager(false, 'testSubDir');
-        $fileManager->setProtocol(self::TEST_PROTOCOL);
 
         self::assertEquals(
             sprintf('%s://%s/%s/file.txt', self::TEST_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
@@ -236,7 +244,95 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilePathWithoutProtocol()
+    public function testGetReadonlyFilePath()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(
+            sprintf(
+                '%s://%s/%s/file.txt',
+                self::TEST_READONLY_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
+            $fileManager->getReadonlyFilePath('file.txt')
+        );
+    }
+
+    public function testGetReadonlyFilePathForNotSubDirAwareManager()
+    {
+        $fileManager = $this->getFileManager(false);
+
+        self::assertEquals(
+            sprintf(
+                '%s://%s/file.txt',
+                self::TEST_READONLY_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
+            $fileManager->getReadonlyFilePath('file.txt')
+        );
+    }
+
+    public function testGetReadonlyFilePathWhenFileNameIsEmptyString()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(
+            sprintf(
+                '%s://%s/%s/',
+                self::TEST_READONLY_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
+            $fileManager->getReadonlyFilePath('')
+        );
+    }
+
+    public function testGetReadonlyFilePathWithCustomSubDirectory()
+    {
+        $fileManager = $this->getFileManager(true, 'testSubDir');
+
+        self::assertEquals(
+            sprintf('%s://%s/%s/file.txt', self::TEST_READONLY_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
+            $fileManager->getReadonlyFilePath('file.txt')
+        );
+    }
+
+    public function testGetReadonlyFilePathWithAutoConfiguredCustomSubDirectory()
+    {
+        $fileManager = $this->getFileManager(false, 'testSubDir');
+
+        self::assertEquals(
+            sprintf('%s://%s/%s/file.txt', self::TEST_READONLY_PROTOCOL, self::TEST_FILE_SYSTEM_NAME, 'testSubDir'),
+            $fileManager->getReadonlyFilePath('file.txt')
+        );
+    }
+
+    public function testGetReadonlyFilePathWhenProtocolIsNotConfigured()
+    {
+        $this->expectException(ProtocolConfigurationException::class);
+
+        $fileManager = $this->getFileManager(true);
+        $fileManager->setReadonlyProtocol('');
+        $fileManager->getReadonlyFilePath('file.txt');
+    }
+
+    public function testGetReadonlyFilePathWhenFileNameHaveLeadingSlash()
+    {
+        $fileManager = $this->getFileManager(true);
+
+        self::assertEquals(
+            sprintf(
+                '%s://%s/%s/path/file.txt',
+                self::TEST_READONLY_PROTOCOL,
+                self::TEST_FILE_SYSTEM_NAME,
+                self::TEST_FILE_SYSTEM_NAME
+            ),
+            $fileManager->getReadonlyFilePath('/path/file.txt')
+        );
+    }
+
+    public function testGetReadonlyFilePathWithoutProtocol()
     {
         $fileManager = $this->getFileManager(true);
 
