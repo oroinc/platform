@@ -39,18 +39,19 @@ define(function(require) {
             let content = '';
             const functions = [];
 
-            _.each(this.converters, function(item, name) {
-                if (this._matchApplicable(item.applicable, criteria)) {
-                    foundGroups.push({group_name: name, group_type: 'converters'});
-                }
-            }, this);
-
-            if (!convertersOnly && criteria) {
-                _.each(this.aggregates, function(item, name) {
+            if (criteria) {
+                _.each(this.converters, function(item, name) {
                     if (this._matchApplicable(item.applicable, criteria)) {
-                        foundGroups.push({group_name: name, group_type: 'aggregates'});
+                        foundGroups.push({group_name: name, group_type: 'converters'});
                     }
                 }, this);
+                if (!convertersOnly) {
+                    _.each(this.aggregates, function(item, name) {
+                        if (this._matchApplicable(item.applicable, criteria)) {
+                            foundGroups.push({group_name: name, group_type: 'aggregates'});
+                        }
+                    }, this);
+                }
             }
 
             if (!_.isEmpty(foundGroups)) {
