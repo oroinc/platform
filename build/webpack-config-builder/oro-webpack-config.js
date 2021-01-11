@@ -340,13 +340,7 @@ class ConfigBuilder {
                         resolvedPublicPath + '/js',
                         path.join(__dirname, '../node_modules'),
                     ],
-                    alias: {
-                        ...themeConfig.aliases,
-                        '../../../node_modules/spectrum-colorpicker/spectrum$': 'npmassets/spectrum-colorpicker/spectrum.css',
-                        '../../../node_modules/font-awesome/scss/font-awesome$': 'npmassets/font-awesome/scss/font-awesome.scss',
-                        '../../../node_modules/codemirror/lib/codemirror$': 'npmassets/codemirror/lib/codemirror.css',
-                        '../../../node_modules/codemirror/theme/hopscotch$': 'npmassets/codemirror/theme/hopscotch.css',
-                    },
+                    alias: themeConfig.aliases,
                     symlinks: false
                 };
                 let resolver = (resolver => {
