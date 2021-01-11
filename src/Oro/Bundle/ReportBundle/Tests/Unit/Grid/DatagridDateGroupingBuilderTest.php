@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tools\DateHelper;
 use Oro\Bundle\QueryDesignerBundle\Form\Type\DateGroupingType;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Exception\InvalidDatagridConfigException;
@@ -53,16 +54,18 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
 
-        $report->setDefinition(json_encode([DateGroupingType::DATE_GROUPING_NAME => []]));
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => []
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
 
-        $report->setDefinition(
-            json_encode([DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']])
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
-        $report->setDefinition(
-            json_encode([DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']])
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [DateGroupingType::FIELD_NAME_ID => 'ddd']
+        ]));
         $this->datagridDateGroupingBuilder->applyDateGroupingFilterIfRequired($this->config, $report);
     }
 
@@ -189,16 +192,12 @@ class DatagridDateGroupingBuilderTest extends \PHPUnit\Framework\TestCase
     protected function getPreconfiguredReport($fieldName = 'createdAt', $useSkipEmptyPeriods = true)
     {
         $report = new Report();
-        $report->setDefinition(
-            json_encode(
-                [
-                    DateGroupingType::DATE_GROUPING_NAME => [
-                        DateGroupingType::FIELD_NAME_ID => $fieldName,
-                        DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => $useSkipEmptyPeriods,
-                    ],
-                ]
-            )
-        );
+        $report->setDefinition(QueryDefinitionUtil::encodeDefinition([
+            DateGroupingType::DATE_GROUPING_NAME => [
+                DateGroupingType::FIELD_NAME_ID => $fieldName,
+                DateGroupingType::USE_SKIP_EMPTY_PERIODS_FILTER_ID => $useSkipEmptyPeriods,
+            ]
+        ]));
 
         return $report;
     }

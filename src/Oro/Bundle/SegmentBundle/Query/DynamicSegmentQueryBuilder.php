@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
-use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
+use Oro\Bundle\SegmentBundle\Model\DynamicSegmentQueryDesigner;
 
 /**
  * The query builder for dynamic segments.
@@ -45,7 +45,7 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     public function getQueryBuilder(Segment $segment): QueryBuilder
     {
         return $this->segmentQueryConverterFactory->createInstance()
-            ->convert(new RestrictionSegmentProxy(
+            ->convert(new DynamicSegmentQueryDesigner(
                 $segment,
                 $this->doctrine->getManagerForClass($segment->getEntity())
             ));

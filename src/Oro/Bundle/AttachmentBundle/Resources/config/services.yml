@@ -378,8 +378,7 @@ services:
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
             - '@oro_attachment.liip_imagine.binary.filter'
             - '@liip_imagine.filter.configuration'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
 
     oro_attachment.manager.image_resize:
         class: 'Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager'

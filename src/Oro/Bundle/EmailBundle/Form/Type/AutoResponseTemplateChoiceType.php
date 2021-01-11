@@ -59,9 +59,6 @@ class AutoResponseTemplateChoiceType extends AbstractType
     }
 
     /**
-     * @param FormView $view
-     * @param FormInterface $form
-     * @param array $options
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function buildView(FormView $view, FormInterface $form, array $options)

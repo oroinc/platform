@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 use Oro\Component\PhpUtils\ReflectionClassHelper;
 
@@ -12,39 +14,28 @@ use Oro\Component\PhpUtils\ReflectionClassHelper;
  */
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    const NODE_ACTIONS = 'actions';
+    public const NODE_ACTIONS = 'actions';
 
-    const PATH_ATTR = '__path';
+    public const PATH_ATTR = '__path';
 
     /** @var ConfigLayoutUpdateGeneratorExtensionInterface[] */
     protected $extensions = [];
 
-    /** @var ReflectionClassHelper */
-    protected $helper;
+    protected ?ReflectionClassHelper $helper = null;
 
-    /** @var ExpressionValidator */
-    private $expressionValidator;
+    private ExpressionValidator $expressionValidator;
 
-    /**
-     * @param ExpressionValidator $expressionValidator
-     */
     public function __construct(ExpressionValidator $expressionValidator)
     {
         $this->expressionValidator = $expressionValidator;
     }
 
-    /**
-     * @param ConfigLayoutUpdateGeneratorExtensionInterface $extension
-     */
     public function addExtension(ConfigLayoutUpdateGeneratorExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doGenerateBody(GeneratorData $data)
+    protected function doGenerateBody(GeneratorData $data): string
     {
         $body   = [];
         $source = $data->getSource();
@@ -58,34 +49,35 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             $this->normalizeActionName($actionName);
             $this->getHelper()->completeArguments($actionName, $arguments);
 
-            array_walk(
+            \array_walk(
                 $arguments,
-                function (&$arg) {
+                static function (&$arg) {
                     $arg = var_export($arg, true);
                 }
             );
-            $call[] = sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
-            $call[] = implode(', ', $arguments);
+            $call[] = \sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
+            $call[] = \implode(', ', $arguments);
             $call[] = ');';
 
-            $body[] = implode(' ', $call);
+            $body[] = \implode(' ', $call);
         }
 
-        return implode("\n", $body);
+        return \implode("\n", $body);
     }
 
     /**
      * Validates given resource data, checks that "actions" node exists and consist valid actions.
      *
-     * {@inheritdoc}
+     * @throws SyntaxException
+     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function validate(GeneratorData $data)
+    protected function validate(GeneratorData $data): void
     {
         $source = $data->getSource();
 
-        if (!(is_array($source) && isset($source[self::NODE_ACTIONS]) && is_array($source[self::NODE_ACTIONS]))) {
+        if (!(\is_array($source) && isset($source[self::NODE_ACTIONS]) && \is_array($source[self::NODE_ACTIONS]))) {
             throw new SyntaxException(sprintf('expected array with "%s" node', self::NODE_ACTIONS), $source);
         }
 
@@ -98,17 +90,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 $path = self::NODE_ACTIONS . '.' . $nodeNo;
             }
 
-            if (!is_array($actionDefinition)) {
+            if (!\is_array($actionDefinition)) {
                 throw new SyntaxException('expected array with action name as key', $actionDefinition, $path);
             }
 
-            $actionName = key($actionDefinition);
-            $arguments  = is_array($actionDefinition[$actionName])
+            $actionName = \key($actionDefinition);
+            $arguments  = \is_array($actionDefinition[$actionName])
                 ? $actionDefinition[$actionName] : [$actionDefinition[$actionName]];
 
-            if (strpos($actionName, '@') !== 0) {
+            if (0 !== \strpos($actionName, '@')) {
                 throw new SyntaxException(
-                    sprintf('action name should start with "@" symbol, current name "%s"', $actionName),
+                    \sprintf('action name should start with "@" symbol, current name "%s"', $actionName),
                     $actionDefinition,
                     $path
                 );
@@ -118,7 +110,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             if (!$this->getHelper()->hasMethod($actionName)) {
                 throw new SyntaxException(
-                    sprintf('unknown action "%s", should be one of LayoutManipulatorInterface\'s methods', $actionName),
+                    \sprintf('unknown action "%s", should be one of LayoutManipulatorInterface methods', $actionName),
                     $actionDefinition,
                     $path
                 );
@@ -132,23 +124,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $this->validateExpressionsRecursive($source);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
+    protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection): void
     {
         foreach ($this->extensions as $extension) {
             $extension->prepare($data, $visitorCollection);
         }
     }
 
-    /**
-     * @return ReflectionClassHelper
-     */
-    protected function getHelper()
+    protected function getHelper(): ReflectionClassHelper
     {
         if (null === $this->helper) {
-            $this->helper = new ReflectionClassHelper('Oro\Component\Layout\LayoutManipulatorInterface');
+            $this->helper = new ReflectionClassHelper(LayoutManipulatorInterface::class);
         }
 
         return $this->helper;
@@ -161,13 +147,9 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      */
     protected function normalizeActionName(&$actionName)
     {
-        $actionName = substr($actionName, 1);
+        $actionName = \substr($actionName, 1);
     }
 
-    /**
-     * @param array $source
-     * @param string|null $path
-     */
     private function validateExpressionsRecursive(array $source, ?string $path = null): void
     {
         if ($path) {
@@ -184,7 +166,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                 continue;
             }
 
-            if (\is_string($value) && $value[0] === '=') {
+            if (\is_string($value) && '=' === $value[0]) {
                 try {
                     $this->expressionValidator->validate(\substr($value, 1));
                 } catch (\Throwable $e) {

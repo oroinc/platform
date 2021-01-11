@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\NoteBundle\Provider;
 
@@ -12,6 +13,8 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DependencyInjection\ServiceLink;
 
 /**
@@ -23,24 +26,11 @@ class NoteActivityListProvider implements
     ActivityListDateProviderInterface,
     ActivityListUpdatedByProviderInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
+    protected ServiceLink $entityOwnerAccessorLink;
+    protected ActivityAssociationHelper $activityAssociationHelper;
+    protected CommentAssociationHelper $commentAssociationHelper;
 
-    /** @var ServiceLink */
-    protected $entityOwnerAccessorLink;
-
-    /** @var ActivityAssociationHelper */
-    protected $activityAssociationHelper;
-
-    /** @var CommentAssociationHelper */
-    protected $commentAssociationHelper;
-
-    /**
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ServiceLink               $entityOwnerAccessorLink
-     * @param ActivityAssociationHelper $activityAssociationHelper
-     * @param CommentAssociationHelper  $commentAssociationHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $entityOwnerAccessorLink,
@@ -53,9 +43,6 @@ class NoteActivityListProvider implements
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
@@ -65,10 +52,8 @@ class NoteActivityListProvider implements
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRoutes($activityEntity)
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    public function getRoutes($activityEntity): array
     {
         return [
             'itemView'   => 'oro_note_widget_info',
@@ -79,95 +64,73 @@ class NoteActivityListProvider implements
 
     /**
      * @param Note $entity
-     *
-     * {@inheritdoc}
      */
-    public function getSubject($entity)
+    public function getSubject($entity): string
     {
-        return $this->truncate(strip_tags($entity->getMessage()), 100);
+        return $this->truncate(\strip_tags((string)$entity->getMessage()), 100);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDescription($entity)
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    public function getDescription($entity): ?string
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Note $entity
      */
-    public function getOwner($entity)
+    public function getOwner($entity): ?User
     {
-        /** @var $entity Note */
         return $entity->getOwner();
     }
 
     /**
-     * {@inheritdoc}
+     * @param Note $entity
      */
-    public function getUpdatedBy($entity)
+    public function getUpdatedBy($entity): ?User
     {
-        /** @var $entity Note */
         return $entity->getUpdatedBy();
     }
 
     /**
-     * {@inheritdoc}
+     * @param Note $entity
      */
-    public function getCreatedAt($entity)
+    public function getCreatedAt($entity): ?\DateTime
     {
-        /** @var $entity Note */
         return $entity->getCreatedAt();
     }
 
     /**
-     * {@inheritdoc}
+     * @param Note $entity
      */
-    public function getUpdatedAt($entity)
+    public function getUpdatedAt($entity): ?\DateTime
     {
-        /** @var $entity Note */
         return $entity->getUpdatedAt();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getData(ActivityList $activityListEntity)
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    public function getData(ActivityList $activityListEntity): array
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrganization($activityEntity)
+    /** @param Note $activityEntity */
+    public function getOrganization($activityEntity): ?Organization
     {
-        /** @var $activityEntity Note */
         return $activityEntity->getOrganization();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTemplate()
+    public function getTemplate(): string
     {
         return 'OroNoteBundle:Note:js/activityItemTemplate.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplicable($entity)
+    public function isApplicable($entity): bool
     {
         if (\is_object($entity)) {
             return $entity instanceof Note;
@@ -176,26 +139,17 @@ class NoteActivityListProvider implements
         return $entity === Note::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTargetEntities($entity)
+    public function getTargetEntities($entity): array
     {
-        return $entity->getActivityTargetEntities();
+        return $entity->getActivityTargets();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isCommentsEnabled($entityClass)
+    public function isCommentsEnabled($entityClass): bool
     {
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getActivityOwners($entity, ActivityList $activityList)
+    public function getActivityOwners($entity, ActivityList $activityList): array
     {
         $organization = $this->getOrganization($entity);
         $owner = $this->entityOwnerAccessorLink->getService()->getOwner($entity);
@@ -211,21 +165,17 @@ class NoteActivityListProvider implements
         return [$activityOwner];
     }
 
-    /**
-     * @param string $string
-     * @param int $length
-     * @param string $etc
-     * @return string
-     */
-    protected function truncate($string, $length, $etc = '...')
+    protected function truncate(string $string, int $length, string $etc = '...'): string
     {
-        if (mb_strlen($string) <= $length) {
+        if (\mb_strlen($string) <= $length) {
             return $string;
-        } else {
-            $length -= min($length, mb_strlen($etc));
         }
-        $string = preg_replace('/\s+?(\S+)?$/u', '', mb_substr($string, 0, $length + 1));
 
-        return mb_substr($string, 0, $length) . $etc;
+        $length -= \min($length, \mb_strlen($etc));
+
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
+        $string = \preg_replace('/\s+?(\S+)?$/u', '', \mb_substr($string, 0, $length + 1));
+
+        return \mb_substr($string, 0, $length) . $etc;
     }
 }

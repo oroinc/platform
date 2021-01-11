@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
@@ -30,6 +32,12 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     /** @var FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $functionProvider;
 
+    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $virtualFieldProvider;
+
+    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $virtualRelationProvider;
+
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
@@ -40,7 +48,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     private $dateGroupingBuilder;
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    private $reportCacheManager;
+    private $cache;
 
     /** @var ReportDatagridConfigurationBuilder */
     private $builder;
@@ -48,16 +56,18 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     protected function setUp(): void
     {
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
-        $this->reportCacheManager = $this->createMock(Cache::class);
+        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
+        $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
+        $this->cache = $this->createMock(Cache::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->builder = new ReportDatagridConfigurationBuilder(
             $this->functionProvider,
-            $this->createMock(VirtualFieldProviderInterface::class),
-            $this->createMock(VirtualRelationProviderInterface::class),
-            $this->doctrine,
+            $this->virtualFieldProvider,
+            $this->virtualRelationProvider,
+            new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
             $entityNameResolver
         );
@@ -70,7 +80,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $this->target = new ReportDatagridConfigurationProvider(
             $this->builder,
             $this->doctrine,
-            $this->reportCacheManager,
+            $this->cache,
             'someKey'
         );
     }
@@ -82,24 +92,41 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $this->assertFalse($this->target->isApplicable('1_oro_report_table_1'));
     }
 
-    public function testIsReportValid()
+    public function testIsReportValidForInvalidConfiguration()
     {
-        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
-        $exception = new InvalidConfigurationException();
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn(false);
+        $repository = $this->createMock(EntityRepository::class);
         $this->doctrine->expects($this->once())
             ->method('getRepository')
-            ->willThrowException($exception);
-        $this->assertFalse($this->target->isReportValid(''));
+            ->with(Report::class)
+            ->willReturn($repository);
+        $repository->expects($this->once())
+            ->method('find')
+            ->with($this->identicalTo(1))
+            ->willThrowException(new InvalidConfigurationException());
+
+        $this->assertFalse($this->target->isReportValid(Report::GRID_PREFIX . '1'));
     }
 
     public function testGetConfigurationDoesNotAddActionIfNoRouteConfigured()
     {
         $gridName = Report::GRID_PREFIX . '1';
         $entity = Address::class;
+
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->with($entity, $this->anything())
+            ->willReturn(false);
+
         $this->prepareMetadata();
-        $report = $this->getReportEntity($entity, ['columns' => ['column' => ['name' => 'street']]]);
+
+        $report = $this->getReportEntity($entity, ['columns' => [['name' => 'street']]]);
         $this->prepareRepository($report);
-        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn(false);
 
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
@@ -111,13 +138,22 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $entity = Address::class;
 
         $definition = [
-            'columns'          => ['column' => ['name' => 'street']],
+            'columns'          => [
+                ['name' => 'street']
+            ],
             'grouping_columns' => [
                 ['name' => 'street']
             ]
         ];
 
-        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn(false);
+
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->with($entity, $this->anything())
+            ->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -148,7 +184,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
         $definition = [
             'columns' => [
-                'column' => [
+                [
                     'name' => 'street',
                     'func' => [
                         'name'       => 'Sum',
@@ -163,7 +199,14 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->method('getFunction')
             ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
 
-        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->with($entity, $this->anything())
+            ->willReturn(false);
+
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn(false);
 
         $metadata = $this->prepareMetadata();
 
@@ -198,7 +241,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $expectedViewRoute = 'oro_sample_view';
         $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
 
-        $this->reportCacheManager->expects(self::once())->method('fetch')->willReturn(false);
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn(false);
 
         $metadata = $this->prepareMetadata();
         $metadata->expects($this->once())
@@ -228,6 +273,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->method('getFunction')
             ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
 
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->with($entity, $this->anything())
+            ->willReturn(false);
+
         $report = $this->getReportEntity($entity, $definition);
         $this->prepareRepository($report);
         $this->configManager->expects($this->once())
@@ -253,7 +303,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $selectParts = $configuration->offsetGetByPath('[source][query][select]');
         $selectIdentifierExist = false;
         foreach ($selectParts as $selectPart) {
-            if (strpos($selectPart, ".{$expectedIdName}") !== -1) {
+            if (strpos($selectPart, '.' . $expectedIdName) !== -1) {
                 $selectIdentifierExist = true;
             }
         }
@@ -275,6 +325,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     public function testGetDataFromCache()
     {
         $gridName = Report::GRID_PREFIX . '1';
+
         $expectedIdName = 'test_id';
 
         $entity = Address::class;
@@ -310,6 +361,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->method('getFunction')
             ->willReturn(['name' => 'Sum', 'expr' => 'SUM($column)']);
 
+        $this->virtualFieldProvider->expects($this->any())
+            ->method('isVirtualField')
+            ->with($entity, $this->anything())
+            ->willReturn(false);
+
         $report = $this->getReportEntity($entity, $definition);
 
         $this->configManager->expects($this->once())
@@ -318,8 +374,9 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($entityMetadata);
 
         $expectedConfiguration = $this->buildConfiguration($gridName, $report);
-        $this->reportCacheManager->expects(self::once())
-            ->method('fetch')->willReturn($expectedConfiguration);
+        $this->cache->expects(self::once())
+            ->method('fetch')
+            ->willReturn($expectedConfiguration);
 
         $configuration = $this->target->getConfiguration($gridName);
 
@@ -345,13 +402,12 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      */
     private function prepareMetadata()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $metadata = $this->createMock(ClassMetadata::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturn($manager);
-
-        $metadata = $this->createMock(ClassMetadata::class);
-        $manager->expects($this->any())
+            ->willReturn($em);
+        $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
@@ -359,25 +415,20 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     }
 
     /**
-     * Returns created report mock
-     *
-     * @param string $className
+     * @param string $entityClass
      * @param array  $definition
      *
      * @return Report|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getReportEntity($className, array $definition)
+    private function getReportEntity(string $entityClass, array $definition): Report
     {
         $report = $this->createMock(Report::class);
-        $definition = json_encode($definition);
-
-        //only stub because of calls time depend on DatagridConfigurationBuilder realisation
         $report->expects($this->any())
             ->method('getDefinition')
-            ->willReturn($definition);
-        $report->expects($this->exactly(2))
+            ->willReturn(QueryDefinitionUtil::encodeDefinition($definition));
+        $report->expects($this->any())
             ->method('getEntity')
-            ->willReturn($className);
+            ->willReturn($entityClass);
 
         return $report;
     }
@@ -389,7 +440,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
      */
     private function prepareRepository(Report $report)
     {
-        $repository = $this->createMock(ObjectRepository::class);
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('find')
             ->willReturn($report);

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit;
 
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 
-class SegmentDefinitionTestCase extends OrmQueryConverterTest
+class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
 {
     protected const TEST_ENTITY          = 'AcmeBundle:UserEntity';
     protected const TEST_IDENTIFIER_NAME = 'id';
@@ -22,7 +23,7 @@ class SegmentDefinitionTestCase extends OrmQueryConverterTest
     {
         $segment = new Segment();
         $segment->setEntity($entity ?? self::TEST_ENTITY);
-        $segment->setDefinition(json_encode($definition ?? $this->getDefaultDefinition(), JSON_THROW_ON_ERROR));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition ?? $this->getDefaultDefinition()));
 
         $refProperty = new \ReflectionProperty(get_class($segment), 'id');
         $refProperty->setAccessible(true);

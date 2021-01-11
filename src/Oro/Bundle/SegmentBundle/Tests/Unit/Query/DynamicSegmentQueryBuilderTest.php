@@ -9,6 +9,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
@@ -225,7 +226,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 $manager,
                 $virtualFieldProvider,
                 $this->getVirtualRelationProvider(),
-                $doctrine,
+                new DoctrineHelper($doctrine),
                 new RestrictionBuilder($manager, $configManager, $filterExecutionContext),
                 new SegmentQueryConverterState(new VoidCache())
             ));

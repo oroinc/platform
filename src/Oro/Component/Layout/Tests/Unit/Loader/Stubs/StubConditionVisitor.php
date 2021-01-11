@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Stubs;
 
@@ -7,23 +8,13 @@ use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
 class StubConditionVisitor implements VisitorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function startVisit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext): void
     {
-        $visitContext->getUpdateMethodWriter()
-            ->writeln('if (true) {')
-            ->indent();
+        $visitContext->appendToUpdateMethodBody('if (true) {');
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function endVisit(VisitContext $visitContext)
+    public function endVisit(VisitContext $visitContext): void
     {
-        $visitContext->getUpdateMethodWriter()
-            ->outdent()
-            ->writeln('}');
+        $visitContext->appendToUpdateMethodBody('}');
     }
 }

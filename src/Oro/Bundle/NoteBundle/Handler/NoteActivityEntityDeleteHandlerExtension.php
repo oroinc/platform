@@ -44,7 +44,7 @@ class NoteActivityEntityDeleteHandlerExtension implements ActivityEntityDeleteHa
     {
         $this->innerExtension->assertDeleteGranted($entity, $targetEntity);
         if ($entity instanceof Note) {
-            $targetEntities = $entity->getActivityTargetEntities();
+            $targetEntities = $entity->getActivityTargets();
             if (count($targetEntities) === 1
                 && $this->isTargetRequestedForDelete(reset($targetEntities), $targetEntity)
             ) {

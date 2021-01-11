@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 
 class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
 {
@@ -25,9 +26,7 @@ class VirtualRelationsTest extends DatagridConfigurationBuilderTestCase
                 'Acme\Entity\TestEntity5' => [],
             ]
         );
-        $model = new QueryDesignerModel();
-        $model->setEntity($entity);
-        $model->setDefinition(json_encode(['columns' => $columns]));
+        $model = new QueryDesigner($entity, QueryDefinitionUtil::encodeDefinition(['columns' => $columns]));
 
         $builder = $this->createDatagridConfigurationBuilder(
             $model,

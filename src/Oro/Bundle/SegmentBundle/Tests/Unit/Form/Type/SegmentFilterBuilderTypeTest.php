@@ -6,7 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\QueryDesignerBundle\Validator\NotBlankFilters;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
+use Oro\Bundle\QueryDesignerBundle\Validator\Constraints\NotEmptyFilters;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentFilterBuilderType;
@@ -163,7 +164,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertGreaterThan(
             0,
             \array_reduce($actualOptions['constraints'], function ($carry, $item) {
-                return \is_a($item, NotBlankFilters::class) ? $carry + 1 : 0;
+                return \is_a($item, NotEmptyFilters::class) ? $carry + 1 : 0;
             })
         );
     }
@@ -206,7 +207,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                     'attr' => ['data-role' => 'query-designer-container']
                 ]
             ],
-            'add NotBlankFilters constraint if required option is true' => [
+            'add NotEmptyFilters constraint if required option is true' => [
                 'options' => [
                     'required' => true,
                     'segment_entity' => '\stdClass',
@@ -215,7 +216,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
                 'expected' => [
                     'required' => true,
                     'segment_entity' => '\stdClass',
-                    'constraints' => [new Valid(), new NotBlankFilters()]
+                    'constraints' => [new Valid(), new NotEmptyFilters()]
                 ]
             ]
         ];
@@ -269,7 +270,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertEquals($owner, $submittedData->getOwner());
         $this->assertEquals($organization, $submittedData->getOrganization());
         static::assertStringContainsString($segmentName, $submittedData->getName());
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -312,7 +316,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $this->assertNull($submittedData->getOwner());
         $this->assertNull($submittedData->getOrganization());
         static::assertStringContainsString($segmentName, $submittedData->getName());
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -350,7 +357,10 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
         $submittedData = $form->getData();
         static::assertStringContainsString($segmentName, $submittedData->getName());
         $this->assertInstanceOf(Segment::class, $submittedData);
-        $this->assertJsonStringEqualsJsonString(json_encode($expectedDefinition), $submittedData->getDefinition());
+        $this->assertJsonStringEqualsJsonString(
+            QueryDefinitionUtil::encodeDefinition($expectedDefinition),
+            $submittedData->getDefinition()
+        );
     }
 
     /**
@@ -363,7 +373,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'without columns' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',
@@ -399,7 +409,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'with columns' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',
@@ -443,7 +453,7 @@ class SegmentFilterBuilderTypeTest extends FormIntegrationTestCase
             'with custom name' => [
                 'data' => [
                     'entity' => '\stdClass',
-                    'definition' => json_encode([
+                    'definition' => QueryDefinitionUtil::encodeDefinition([
                         'filters' => [
                             [
                                 'columnName' => 'id',

@@ -70,14 +70,10 @@ oro:
         form:
             designer:               Designer
             chart_designer:         Chart Designer
-            date_grouping:          Date grouping
             columns:                Columns
             grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
-            use_skip_empty_periods.label:  Allow to skip empty time periods
-            use_date_grouping_filter.label: Enable grouping by date
-            date_grouping_field.label: Date field
             date_group_section.label: Grouping by date
 
         chart_options.label: Chart Options

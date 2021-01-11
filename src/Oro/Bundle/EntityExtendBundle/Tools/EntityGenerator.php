@@ -1,10 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use CG\Core\DefaultGeneratorStrategy;
-use CG\Generator\PhpClass;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -12,11 +12,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 class EntityGenerator
 {
-    /** @var string */
-    private $cacheDir;
+    private string $cacheDir;
 
-    /** @var string */
-    private $entityCacheDir;
+    private string $entityCacheDir;
 
     /** @var iterable|AbstractEntityGeneratorExtension[] */
     private $extensions;
@@ -31,22 +29,12 @@ class EntityGenerator
         $this->extensions = $extensions;
     }
 
-    /**
-     * Gets the cache directory
-     *
-     * @return string
-     */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         return $this->cacheDir;
     }
 
-    /**
-     * Sets the cache directory
-     *
-     * @param string $cacheDir
-     */
-    public function setCacheDir($cacheDir)
+    public function setCacheDir(string $cacheDir): void
     {
         $this->cacheDir = $cacheDir;
         $this->entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($cacheDir);
@@ -54,38 +42,33 @@ class EntityGenerator
 
     /**
      * Generates extended entities
-     *
-     * @param array $schemas
      */
-    public function generate(array $schemas)
+    public function generate(array $schemas): void
     {
         ExtendClassLoadingUtils::ensureDirExists($this->entityCacheDir);
 
         $aliases = [];
         foreach ($schemas as $schema) {
             $this->generateSchemaFiles($schema);
-            if ($schema['type'] === 'Extend') {
+            if ('Extend' === $schema['type']) {
                 $aliases[$schema['entity']] = $schema['parent'];
             }
         }
 
         // write PHP class aliases to the file
-        file_put_contents(
+        \file_put_contents(
             ExtendClassLoadingUtils::getAliasesPath($this->cacheDir),
-            serialize($aliases)
+            \serialize($aliases)
         );
     }
 
     /**
-     * Generate php and yml files for schema
-     *
-     * @param array $schema
+     * Generates php and yml files for schema
      */
-    public function generateSchemaFiles(array $schema)
+    public function generateSchemaFiles(array $schema): void
     {
-        // generate PHP code
-        $class = PhpClass::create($schema['entity']);
-        if ($schema['doctrine'][$schema['entity']]['type'] === 'mappedSuperclass') {
+        $class = new ClassGenerator($schema['entity']);
+        if ('mappedSuperclass' === $schema['doctrine'][$schema['entity']]['type']) {
             $class->setAbstract(true);
         }
 
@@ -98,12 +81,11 @@ class EntityGenerator
         $className = ExtendHelper::getShortClassName($schema['entity']);
 
         // write PHP class to the file
-        $strategy = new DefaultGeneratorStrategy();
         $fileName = $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php';
-        file_put_contents($fileName, "<?php\n\n" . $strategy->generate($class));
-        clearstatcache(true, $fileName);
+        \file_put_contents($fileName, "<?php\n\n" . $class->print());
+        \clearstatcache(true, $fileName);
         // write doctrine metadata in separate yaml file
-        file_put_contents(
+        \file_put_contents(
             $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.orm.yml',
             Yaml::dump($schema['doctrine'], 5)
         );

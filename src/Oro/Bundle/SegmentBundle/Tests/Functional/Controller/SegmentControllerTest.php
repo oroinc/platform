@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -29,36 +30,34 @@ class SegmentControllerTest extends WebTestCase
         $formValues['oro_segment_form']['entity'] = User::class;
         $formValues['oro_segment_form']['type'] = SegmentType::TYPE_STATIC;
         $formValues['oro_segment_form']['recordsLimit'] = 100;
-        $formValues['oro_segment_form']['definition'] = \json_encode(
-            [
-                'columns' => [
-                    [
-                        'name' => 'id',
-                        'label' => 'Id',
-                        'sorting' => 'DESC',
-                        'func' => null
-                    ],
-                    [
-                        'name' => 'firstName',
-                        'label' => 'First name',
-                        'sorting' => '',
-                        'func' => null
-                    ]
+        $formValues['oro_segment_form']['definition'] = QueryDefinitionUtil::encodeDefinition([
+            'columns' => [
+                [
+                    'name' => 'id',
+                    'label' => 'Id',
+                    'sorting' => 'DESC',
+                    'func' => null
                 ],
-                'filters' => [
-                    [
-                        'columnName' => 'firstName',
-                        'criterion' => [
-                            'filter' => 'string',
-                            'data' => [
-                                'value' => 'test',
-                                'type' => '1'
-                            ]
+                [
+                    'name' => 'firstName',
+                    'label' => 'First name',
+                    'sorting' => '',
+                    'func' => null
+                ]
+            ],
+            'filters' => [
+                [
+                    'columnName' => 'firstName',
+                    'criterion' => [
+                        'filter' => 'string',
+                        'data' => [
+                            'value' => 'test',
+                            'type' => '1'
                         ]
                     ]
                 ]
             ]
-        );
+        ]);
 
         $this->client->followRedirects();
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);

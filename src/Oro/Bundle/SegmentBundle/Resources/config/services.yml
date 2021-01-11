@@ -62,7 +62,7 @@ services:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.virtual_field_provider'
             - '@oro_entity.virtual_relation_provider'
-            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
             - '@oro_query_designer.query_designer.restriction_builder'
             - '@oro_segment.query.segment_query_converter_state'
 
@@ -72,7 +72,7 @@ services:
             - '@oro_query_designer.query_designer.manager'
             - '@oro_entity.virtual_field_provider'
             - '@oro_entity.virtual_relation_provider'
-            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
             - '@oro_query_designer.query_designer.restriction_builder'
         tags:
             - { name: oro_dashboard.widget_provider.filter }
@@ -131,13 +131,6 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-
-    oro_segment.validator.sorting_validator:
-        class: Oro\Bundle\SegmentBundle\Validator\SortingValidator
-        arguments:
-            - '@translator'
-        tags:
-            - { name: validator.constraint_validator, alias: oro_segment.sorting_validator }
 
     oro_segment.layout.data_provider.segment:
         class: Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider
