@@ -5,6 +5,7 @@ services:
         calls:
             - [setFilesystemMap, ['@knp_gaufrette.filesystem_map']]
             - [setProtocol, ["@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"]]
+            - [setReadonlyProtocol, ["@=container.hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol') ? parameter('oro_gaufrette.stream_wrapper.readonly_protocol') : ''"]]
 
     oro_gaufrette.listener.route_collection:
         class: Oro\Bundle\GaufretteBundle\EventListener\RouteCollectionListener
