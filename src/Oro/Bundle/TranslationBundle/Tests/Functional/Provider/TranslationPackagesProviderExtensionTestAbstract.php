@@ -2,13 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Provider;
 
-use Composer\Composer;
-use Composer\Installer\InstallationManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Provider\TranslationPackageProvider;
-use Oro\Bundle\TranslationBundle\Provider\TranslationPackagesProviderExtensionInterface;
-use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\ComposerInstallerStub;
-use Symfony\Component\Config\FileLocatorInterface;
 
 abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestCase
 {
@@ -18,8 +13,6 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
     protected function setUp(): void
     {
         $this->initClient();
-
-        $this->setUpComposer($this->getPackageName());
 
         $this->provider = $this->getContainer()->get('oro_translation.packages_provider.translation');
     }
@@ -31,7 +24,7 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
      */
     public function testGetInstalledPackages($packageName)
     {
-        $this->assertContains($packageName, $this->provider->getInstalledPackages());
+        static::markTestSkipped('This test is removed in BAP-20358');
     }
 
     /**
@@ -42,42 +35,7 @@ abstract class TranslationPackagesProviderExtensionTestAbstract extends WebTestC
      */
     public function testGetTranslationPackageProviderByPackageName($packageName, $fileToLocate)
     {
-        $extension = $this->provider->getTranslationPackageProviderByPackageName($packageName);
-
-        $this->assertInstanceOf(TranslationPackagesProviderExtensionInterface::class, $extension);
-        $this->assertContains($packageName, $extension->getPackageNames());
-
-        $fileLocator = $extension->getPackagePaths();
-        $this->assertInstanceOf(FileLocatorInterface::class, $fileLocator);
-        $this->assertIsString($fileLocator->locate($fileToLocate));
-    }
-
-    /**
-     * @param string $packageName
-     */
-    protected function setUpComposer(string $packageName)
-    {
-        $container = $this->getContainer();
-
-        $installer = new ComposerInstallerStub(
-            sprintf(
-                '%s/vendor/oro/%s',
-                rtrim(
-                    $container->getParameter('kernel.project_dir'),
-                    '/'
-                ),
-                $packageName
-            )
-        );
-
-        $installationManager = new InstallationManager();
-        $installationManager->addInstaller($installer);
-
-        $composer = new Composer();
-        $composer->setInstallationManager($installationManager);
-
-        $container->set('oro_distribution.composer.installation_manager.stub', $installationManager);
-        $container->set('oro_distribution.composer.stub', $composer);
+        static::markTestSkipped('This test is removed in BAP-20358');
     }
 
     /**

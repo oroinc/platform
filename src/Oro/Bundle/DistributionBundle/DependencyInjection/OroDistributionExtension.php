@@ -11,49 +11,30 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * This is the class that loads and manages your bundle configuration
- *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
 class OroDistributionExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
+    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
         $loader->load('services.yml');
 
-        if ($container->getParameter('kernel.environment') === 'test') {
-            $loader->load('services_test.yml');
-        }
-
-        $loader->load('commands.yml');
-
         $this->mergeTwigResources($container);
         $this->replaceTranslator($container);
-
-        if ($config = $this->processConfiguration(new Configuration(), $configs)) {
-            if (isset($config['entry_point'])) {
-                $container->setParameter('oro_distribution.entry_point', $config['entry_point']);
-            }
-            $container->setParameter('oro_distribution.composer_cache_home', $config['composer_cache_home']);
-        }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function mergeTwigResources(ContainerBuilder $container)
+    protected function mergeTwigResources(ContainerBuilder $container): void
     {
-        $data = array();
+        $data = [];
 
         $bundles = $container->getParameter('kernel.bundles');
         foreach ($bundles as $bundle) {
             $reflection = new \ReflectionClass($bundle);
             $file = dirname($reflection->getFileName()) . '/Resources/config/oro/twig.yml';
             if (is_file($file)) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $data = array_merge($data, Yaml::parse(file_get_contents(realpath($file)))['bundles']);
             }
         }
@@ -64,10 +45,7 @@ class OroDistributionExtension extends Extension
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
-    protected function replaceTranslator(ContainerBuilder $container)
+    protected function replaceTranslator(ContainerBuilder $container): void
     {
         $bundles = $container->getParameter('kernel.bundles');
         //Replace translator class only if not registered OroTranslationBundle
