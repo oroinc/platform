@@ -7,6 +7,9 @@ use Oro\Bundle\GaufretteBundle\DependencyInjection\Factory\LocalConfigurationFac
 use Oro\Bundle\GaufretteBundle\DependencyInjection\OroGaufretteExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendedContainerBuilder */
@@ -39,6 +42,38 @@ class OroGaufretteExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension = new OroGaufretteExtension();
         $this->extension->addConfigurationFactory(new LocalConfigurationFactory());
+    }
+
+    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsNotConfigured()
+    {
+        $this->extension->load([], $this->container);
+        self::assertFalse($this->container->hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol'));
+    }
+
+    public function testConfigureReadonlyGaufretteProtocolWhenGaufretteProtocolIsConfigured()
+    {
+        $this->container->setParameter('knp_gaufrette.stream_wrapper.protocol', 'gaufrette');
+        $this->extension->load([], $this->container);
+        self::assertEquals(
+            'gaufrette-readonly',
+            $this->container->getParameter('oro_gaufrette.stream_wrapper.readonly_protocol')
+        );
+    }
+
+    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndGaufretteProtocolIsNotConfigured()
+    {
+        $this->extension->load([['stream_wrapper' => ['readonly_protocol' => 'test-protocol']]], $this->container);
+        self::assertFalse($this->container->hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol'));
+    }
+
+    public function testConfigureReadonlyGaufretteProtocolWhenIsIsSetExplicitlyAndGaufretteProtocolIsConfigured()
+    {
+        $this->container->setParameter('knp_gaufrette.stream_wrapper.protocol', 'gaufrette');
+        $this->extension->load([['stream_wrapper' => ['readonly_protocol' => 'test-protocol']]], $this->container);
+        self::assertEquals(
+            'test-protocol',
+            $this->container->getParameter('oro_gaufrette.stream_wrapper.readonly_protocol')
+        );
     }
 
     public function testPrependWhenNoConfigParameters()

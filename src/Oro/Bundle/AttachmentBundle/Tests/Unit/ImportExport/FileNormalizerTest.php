@@ -126,7 +126,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedFile->setFile(new SymfonyFile($sampleUri, false));
 
         $this->fileManager->expects(self::never())
-            ->method('getFilePath');
+            ->method('getReadonlyFilePath');
 
         $file = $this->normalizer->denormalize(['uri' => $sampleUri], File::class);
         self::assertEquals($expectedFile->getFile(), $expectedFile->getFile());
@@ -142,7 +142,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedFile->setFile(new SymfonyFile('http://example.org/sample/url', false));
 
         $this->fileManager->expects(self::never())
-            ->method('getFilePath');
+            ->method('getReadonlyFilePath');
 
         $file = $this->normalizer->denormalize(
             ['uri' => 'http://example.org/sample/url', 'uuid' => $sampleUuid],
@@ -163,7 +163,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
         $expectedFile->setFile(new SymfonyFile($path, false));
 
         $this->fileManager->expects(self::never())
-            ->method('getFilePath');
+            ->method('getReadonlyFilePath');
 
         $file = $this->normalizer->denormalize(
             ['uri' => $path, 'uuid' => $sampleUuid],
@@ -178,14 +178,14 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $sampleUuid = 'sample-uuid';
         $path = 'some_file.php';
-        $expectedFilePath = 'gaufrette://import_files/some_file.php';
+        $expectedFilePath = 'gaufrette-readonly://import_files/some_file.php';
 
         $expectedFile = new File();
         $expectedFile->setUuid($sampleUuid);
         $expectedFile->setFile(new SymfonyFile($expectedFilePath, false));
 
         $this->fileManager->expects(self::once())
-            ->method('getFilePath')
+            ->method('getReadonlyFilePath')
             ->with($path)
             ->willReturn($expectedFilePath);
 
