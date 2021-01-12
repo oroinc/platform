@@ -4,6 +4,9 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 
+/**
+ * The filter by a percentage value or a percentage of monetary values.
+ */
 class PercentFilter extends NumberRangeFilter
 {
     /**
@@ -24,7 +27,6 @@ class PercentFilter extends NumberRangeFilter
     public function parseData($data)
     {
         $data = parent::parseData($data);
-
         if ($data) {
             $valueKeys = ['value', 'value_end'];
             foreach ($valueKeys as $key) {

@@ -8,6 +8,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by a workflow.
+ */
 class WorkflowFilter extends EntityFilter
 {
     /** @var WorkflowTranslationHelper */
@@ -24,7 +27,6 @@ class WorkflowFilter extends EntityFilter
         WorkflowTranslationHelper $translationHelper
     ) {
         parent::__construct($factory, $util);
-
         $this->translationHelper = $translationHelper;
     }
 

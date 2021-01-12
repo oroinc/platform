@@ -7,6 +7,10 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType;
 
+/**
+ * Provides a possibility to filter ORM entities by a many-to-many association
+ * that contains or not any target entities.
+ */
 class ManyToManyFilter extends AbstractFilter
 {
     /**
@@ -50,7 +54,7 @@ class ManyToManyFilter extends AbstractFilter
      */
     protected function getJoinIdentifier(OrmFilterDatasourceAdapter $ds)
     {
-        list($joinAlias, $class) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+        [$joinAlias, $class] = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
         $em = $ds->getQueryBuilder()->getEntityManager();
         $metadata = $em->getClassMetadata($class);
         $fieldNames = $metadata->getIdentifierFieldNames();

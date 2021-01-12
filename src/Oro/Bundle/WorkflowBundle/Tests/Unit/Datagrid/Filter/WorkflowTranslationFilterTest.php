@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid\Filter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\ExpressionBuilderInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -14,6 +15,9 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formFactory;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $translationHelper;
@@ -33,6 +37,7 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
     protected function setUp()
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
         $this->datasourceAdapter = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilderInterface::class);
@@ -42,6 +47,7 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
             new FilterUtility(),
             $this->translationHelper
         );
+        $this->filter->setDoctrine($this->doctrine);
     }
 
     /**
@@ -57,11 +63,11 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->init('test', []);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FORM_OPTIONS_KEY => [
+                FilterUtility::FORM_OPTIONS_KEY  => [
                     'field_options' => [
-                        'class' => WorkflowDefinition::class,
-                        'multiple' => false,
-                        'choice_label' => [$this->filter, 'getLabel'],
+                        'class'                => WorkflowDefinition::class,
+                        'multiple'             => false,
+                        'choice_label'         => [$this->filter, 'getLabel'],
                         'translatable_options' => false
                     ],
                 ],

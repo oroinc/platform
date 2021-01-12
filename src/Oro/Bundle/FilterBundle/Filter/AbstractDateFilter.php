@@ -5,7 +5,11 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
@@ -18,11 +22,20 @@ use Symfony\Component\Form\FormFactoryInterface;
  * should be used: "createdAt >= 2018-05-01 00:00:00 AND createdAt < 2018-05-02 00:00:00".
  * The expression like "createdAt >= 2018-05-01 00:00:00 AND createdAt <= 2018-05-01 23:59:59"
  * is incorrect and leads to loss of data created at the last second of the day.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractDateFilter extends AbstractFilter
+abstract class AbstractDateFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
+    public const DATE_FORMAT = 'yyyy-MM-dd';
+
     /** @var DateFilterUtility */
     protected $dateFilterUtility;
+
+    /** @var LocaleSettings */
+    protected $localeSettings;
+
+    /** @var DateFilterModifier */
+    protected $dateFilterModifier;
 
     /**
      * {@inheritdoc}
@@ -32,6 +45,14 @@ abstract class AbstractDateFilter extends AbstractFilter
         DateRangeFilterType::TYPE_NOT_EQUAL   => DateRangeFilterType::TYPE_EQUAL,
     ];
 
+    /** @var DateTimeToLocalizedStringTransformer */
+    private $valueTransformer;
+
+    /**
+     * @param FormFactoryInterface $factory
+     * @param FilterUtility        $util
+     * @param DateFilterUtility    $dateFilterUtility
+     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
@@ -39,6 +60,22 @@ abstract class AbstractDateFilter extends AbstractFilter
     ) {
         parent::__construct($factory, $util);
         $this->dateFilterUtility = $dateFilterUtility;
+    }
+
+    /**
+     * @param LocaleSettings $localeSettings
+     */
+    public function setLocaleSettings(LocaleSettings $localeSettings)
+    {
+        $this->localeSettings = $localeSettings;
+    }
+
+    /**
+     * @param DateFilterModifier $dateFilterModifier
+     */
+    public function setDateFilterModifier(DateFilterModifier $dateFilterModifier)
+    {
+        $this->dateFilterModifier = $dateFilterModifier;
     }
 
     /**
@@ -67,8 +104,8 @@ abstract class AbstractDateFilter extends AbstractFilter
         if ($data['type'] === DateRangeFilterType::TYPE_NOT_EQUAL &&
             $comparisonType === DateRangeFilterType::TYPE_EQUAL
         ) {
-            list($startDateParameterName, $endDateParameterName) = [$endDateParameterName, $startDateParameterName];
-            list($dateStartValue, $dateEndValue) = [$dateEndValue, $dateStartValue];
+            [$startDateParameterName, $endDateParameterName] = [$endDateParameterName, $startDateParameterName];
+            [$dateStartValue, $dateEndValue] = [$dateEndValue, $dateStartValue];
         }
 
         return $this->buildDependingOnType(
@@ -85,8 +122,45 @@ abstract class AbstractDateFilter extends AbstractFilter
     /**
      * {@inheritdoc}
      */
+    public function prepareData(array $data): array
+    {
+        $valueKeys = [];
+
+        // Makes a copy of submitted values.
+        // It is required to correct work of date interval filters, e.g. the "day without year" variable.
+        if (isset($data['value']['start'])) {
+            $data['value']['start_original'] = $data['value']['start'];
+            $valueKeys[] = 'start';
+        }
+        if (isset($data['value']['end'])) {
+            $data['value']['end_original'] = $data['value']['end'];
+            $valueKeys[] = 'end';
+        }
+
+        $timezone = $this->localeSettings->getTimeZone();
+        $data = $this->dateFilterModifier->modifyWithTimeZone($data, $valueKeys, true, $timezone);
+
+        $isValueNormalizationRequired = $this->isValueNormalizationRequired($data['part'] ?? null);
+        if (!empty($data['value']['start'])) {
+            $data['value']['start'] = $isValueNormalizationRequired
+                ? $this->normalizeValue($data['value']['start'])
+                : (int)$data['value']['start'];
+        }
+        if (!empty($data['value']['end'])) {
+            $data['value']['end'] = $isValueNormalizationRequired
+                ? $this->normalizeValue($data['value']['end'])
+                : (int)$data['value']['end'];
+        }
+
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function parseData($data)
     {
+        $data = parent::parseData($data);
         $this->validateFieldName();
 
         return $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data, $this->name);
@@ -350,5 +424,51 @@ abstract class AbstractDateFilter extends AbstractFilter
     protected function validateFieldName()
     {
         QueryBuilderUtil::checkField($this->get(FilterUtility::DATA_NAME_KEY));
+    }
+
+    /**
+     * @param string|null $valuePart
+     *
+     * @return bool
+     */
+    protected function isValueNormalizationRequired(?string $valuePart): bool
+    {
+        return
+            !$valuePart
+            || !\in_array(
+                $valuePart,
+                [
+                    DateModifierInterface::PART_MONTH,
+                    DateModifierInterface::PART_DOW,
+                    DateModifierInterface::PART_WEEK,
+                    DateModifierInterface::PART_DAY,
+                    DateModifierInterface::PART_QUARTER,
+                    DateModifierInterface::PART_DOY,
+                    DateModifierInterface::PART_YEAR
+                ],
+                true
+            );
+    }
+
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    protected function normalizeValue($value)
+    {
+        if (null === $this->valueTransformer) {
+            $timezone = $this->localeSettings->getTimeZone();
+            $this->valueTransformer = new DateTimeToLocalizedStringTransformer(
+                $timezone,
+                $timezone,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::GREGORIAN,
+                static::DATE_FORMAT
+            );
+        }
+
+        return $this->valueTransformer->reverseTransform((string)$value);
     }
 }

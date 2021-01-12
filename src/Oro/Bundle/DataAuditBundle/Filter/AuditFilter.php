@@ -9,17 +9,21 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * The filter for AuditField entity.
+ * The filter by a modification date of an auditable field.
  */
 class AuditFilter extends EntityFilter
 {
     const TYPE_CHANGED = 'changed';
     const TYPE_CHANGED_TO_VALUE = 'changed_to_value';
+
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
 
     /** @var QueryDesignerManager */
     protected $queryDesignerManager;
@@ -48,6 +52,14 @@ class AuditFilter extends EntityFilter
     ) {
         parent::__construct($factory, $util);
         $this->queryDesignerManager = $queryDesignerManager;
+    }
+
+    /**
+     * @param FilterExecutionContext $filterExecutionContext
+     */
+    public function setFilterExecutionContext(FilterExecutionContext $filterExecutionContext)
+    {
+        $this->filterExecutionContext = $filterExecutionContext;
     }
 
     /**
@@ -90,7 +102,7 @@ class AuditFilter extends EntityFilter
         $qb = $ds->getQueryBuilder();
 
         $fieldName = $this->getField($data['auditFilter']['columnName']);
-        list($objectAlias) = $qb->getRootAliases();
+        [$objectAlias] = $qb->getRootAliases();
         $objectClass = $this->getClass($data['auditFilter']['columnName'], $qb->getRootEntities());
         $metadata = $qb->getEntityManager()->getClassMetadata($objectClass);
 
@@ -184,13 +196,9 @@ class AuditFilter extends EntityFilter
             [FilterUtility::DATA_NAME_KEY => $field]
         );
 
-        $form = $filter->getForm();
-        if (!$form->isSubmitted()) {
-            $form->submit($data);
-        }
-
-        if ($form->isValid()) {
-            $filter->apply($ds, $form->getData());
+        $normalizedData = $this->filterExecutionContext->normalizedFilterData($filter, $data);
+        if (null !== $normalizedData) {
+            $filter->apply($ds, $normalizedData);
         }
     }
 
@@ -219,7 +227,7 @@ class AuditFilter extends EntityFilter
      */
     protected function getField($columnName)
     {
-        list(, $fieldName) = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
+        [, $fieldName] = explode('.', $this->get(FilterUtility::DATA_NAME_KEY));
         if (strpos($fieldName, '\\') === false) {
             return $fieldName;
         }

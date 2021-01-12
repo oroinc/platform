@@ -115,10 +115,17 @@ trait FallbackTrait
                 )
             ) {
                 if (null !== $result) {
-                    throw new \LogicException(sprintf(
-                        'There must be only one localized fallback value for "%s" localization.',
-                        $localization ? $localization->getName() : Localization::DEFAULT_LOCALIZATION
-                    ));
+                    // The application should not be thrown. Believe that the first fallback value is correct.
+                    // All other values are ignored and write error to log.
+                    $message = <<<EOF
+The value "%s" is incorrect. There must be only one fallback value for localization "%s" within the "%s" class.
+EOF;
+                    $localization = $localization ? $localization->getName() : Localization::DEFAULT_LOCALIZATION;
+                    // error_log is a temporary solution and should be removed in scope of BAP-20337
+                    /** @noinspection ForgottenDebugOutputInspection */
+                    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+                    @error_log(sprintf($message, $value, $localization, get_class($value)).PHP_EOL);
+                    break;
                 }
                 $result = $value;
             }

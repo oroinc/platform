@@ -10,9 +10,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Enum filter provides possibility to create filter form and build an expression by passed enum data
+ * The filter by an enum entity.
  */
-class EnumFilter extends BaseMultiChoiceFilter
+class EnumFilter extends BaseMultiChoiceFilter implements FilterPrepareDataInterface
 {
     const FILTER_TYPE_NAME = 'enum';
 
@@ -20,8 +20,6 @@ class EnumFilter extends BaseMultiChoiceFilter
     protected $dictionaryApiEntityManager;
 
     /**
-     * Constructor
-     *
      * @param FormFactoryInterface $factory
      * @param FilterUtility        $util
      */
@@ -74,6 +72,14 @@ class EnumFilter extends BaseMultiChoiceFilter
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
      * @param array $metadata
      *
      * @return string
@@ -93,7 +99,7 @@ class EnumFilter extends BaseMultiChoiceFilter
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 

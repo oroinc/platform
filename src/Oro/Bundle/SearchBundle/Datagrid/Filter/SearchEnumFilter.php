@@ -9,6 +9,9 @@ use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapte
 use Oro\Bundle\SearchBundle\Datagrid\Form\Type\SearchEnumFilterType;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
+/**
+ * The filter by an enum entity for a datasource based on a search index.
+ */
 class SearchEnumFilter extends EnumFilter
 {
     /**
@@ -31,6 +34,14 @@ class SearchEnumFilter extends EnumFilter
         }
 
         return $this->applyRestrictions($ds, $data);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**

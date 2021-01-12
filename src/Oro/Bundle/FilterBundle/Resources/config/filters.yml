@@ -81,6 +81,8 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: entity }
 
@@ -98,7 +100,11 @@ services:
     oro_filter.duplicate_filter:
         class: Oro\Bundle\FilterBundle\Filter\DuplicateFilter
         public: false
-        parent: oro_filter.boolean_filter
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        calls:
+            - [setTranslator, ['@translator']]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: duplicate }
 
@@ -116,6 +122,9 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
+        calls:
+            - [ setLocaleSettings, [ '@oro_locale.settings' ] ]
+            - [ setDateFilterModifier, [ '@oro_filter.utils.date_filter_modifier' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date }
 
@@ -126,6 +135,9 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_filter.date_filter_utility'
+        calls:
+            - [ setLocaleSettings, [ '@oro_locale.settings' ] ]
+            - [ setDateFilterModifier, [ '@oro_filter.utils.date_filter_modifier' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 

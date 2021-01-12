@@ -16,22 +16,14 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SearchNumberRangeFilter
-     */
+    /** @var SearchNumberRangeFilter */
     private $filter;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    protected function setUp(): void
     {
-        /* @var $formFactory FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
         $formFactory = $this->createMock(FormFactoryInterface::class);
-        /* @var $filterUtility FilterUtility|\PHPUnit\Framework\MockObject\MockObject */
-        $filterUtility = $this->createMock(FilterUtility::class);
 
-        $this->filter = new SearchNumberRangeFilter($formFactory, $filterUtility);
+        $this->filter = new SearchNumberRangeFilter($formFactory, new FilterUtility());
     }
 
     /**
@@ -55,9 +47,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
         $ds->expects($this->exactly(2))
             ->method('addRestriction')
@@ -83,11 +73,9 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
     {
         $fieldName = 'decimal.field';
 
-        $ds = $this->getMockBuilder(SearchFilterDatasourceAdapter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
 
-        $ds->expects($this->exactly(1))
+        $ds->expects($this->once())
             ->method('addRestriction')
             ->with(
                 new CompositeExpression(
@@ -118,5 +106,11 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
                 ]
             )
         );
+    }
+
+    public function testPrepareData()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->filter->prepareData([]);
     }
 }

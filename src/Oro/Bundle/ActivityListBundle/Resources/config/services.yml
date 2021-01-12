@@ -146,6 +146,9 @@ services:
             - "@oro_entity.routing_helper"
             - "@oro_query_designer.query_designer.manager"
             - "@oro_activity_list.filter.datagrid_helper.link"
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
+            - [ setFilterExecutionContext, [ '@oro_filter.execution_context' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }
 

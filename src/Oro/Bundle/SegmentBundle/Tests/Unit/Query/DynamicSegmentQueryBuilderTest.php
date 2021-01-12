@@ -10,6 +10,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
@@ -214,16 +215,19 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $doctrine = $doctrine ?? $this->getDoctrine();
 
         $segmentQueryConverterFactory = $this->createMock(SegmentQueryConverterFactory::class);
-        /** @var ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
+        $filterExecutionContext = new FilterExecutionContext();
+        $filterExecutionContext->enableValidation();
+        $restrictionBuilder = new RestrictionBuilder($manager, $configManager);
+        $restrictionBuilder->setFilterExecutionContext($filterExecutionContext);
         $segmentQueryConverterFactory->expects($this->once())
             ->method('createInstance')
             ->willReturn(new SegmentQueryConverter(
                 $manager,
                 $virtualFieldProvider,
                 $doctrine,
-                new RestrictionBuilder($manager, $configManager)
+                $restrictionBuilder
             ));
 
         $serviceLink = $this->createMock(ServiceLink::class);

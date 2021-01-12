@@ -170,4 +170,10 @@ class EnumFilterTest extends OrmTestCase
             ],
         ];
     }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
+    }
 }

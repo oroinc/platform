@@ -20,6 +20,9 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Provider\EntityNameProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 
+/**
+ * The filter by entities that are included in a segment.
+ */
 class SegmentFilter extends EntityFilter
 {
     /** @var ManagerRegistry */
@@ -38,8 +41,6 @@ class SegmentFilter extends EntityFilter
     protected $extendConfigProvider;
 
     /**
-     * Constructor
-     *
      * @param FormFactoryInterface $factory
      * @param FilterUtility        $util
      * @param ManagerRegistry      $doctrine
@@ -58,7 +59,7 @@ class SegmentFilter extends EntityFilter
         ConfigProvider $extendConfigProvider
     ) {
         parent::__construct($factory, $util);
-
+        $this->setDoctrine($doctrine);
         $this->doctrine = $doctrine;
         $this->segmentManager = $segmentManager;
         $this->entityNameProvider = $entityNameProvider;
@@ -89,12 +90,9 @@ class SegmentFilter extends EntityFilter
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
                 [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-            )
-            ) {
-                $classMetadata         = $this->doctrine
-                    ->getManagerForClass($className)
-                    ->getClassMetadata($className);
-                $identifiers           = $classMetadata->getIdentifier();
+            )) {
+                $classMetadata = $this->doctrine->getManagerForClass($className)->getClassMetadata($className);
+                $identifiers = $classMetadata->getIdentifier();
                 $entityIds[$className] = array_shift($identifiers);
             }
         }
@@ -177,6 +175,18 @@ class SegmentFilter extends EntityFilter
         $this->applyFilterToClause($ds, $expr);
 
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        if (isset($data['value'])) {
+            $data['value'] = $this->getEntity(Segment::class, $data['value'], true);
+        }
+
+        return $data;
     }
 
     /**

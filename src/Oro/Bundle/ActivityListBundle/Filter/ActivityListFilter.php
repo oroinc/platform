@@ -16,6 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\EntityFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager as QueryDesignerManager;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -23,12 +24,15 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Provides activity list filter by creating query builder based on values passed to filter form fields.
+ * The filter by an activity list.
  */
 class ActivityListFilter extends EntityFilter
 {
     const TYPE_HAS_ACTIVITY = 'hasActivity';
     const TYPE_HAS_NOT_ACTIVITY = 'hasNotActivity';
+
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
 
     /** @var ActivityListFilterHelper */
     protected $activityListFilterHelper;
@@ -81,6 +85,14 @@ class ActivityListFilter extends EntityFilter
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->queryDesignerManager = $queryDesignerManager;
         $this->datagridHelperLink = $datagridHelperLink;
+    }
+
+    /**
+     * @param FilterExecutionContext $filterExecutionContext
+     */
+    public function setFilterExecutionContext(FilterExecutionContext $filterExecutionContext)
+    {
+        $this->filterExecutionContext = $filterExecutionContext;
     }
 
     /**
@@ -339,13 +351,9 @@ class ActivityListFilter extends EntityFilter
             [FilterUtility::DATA_NAME_KEY => $field]
         );
 
-        $form = $filter->getForm();
-        if (!$form->isSubmitted()) {
-            $form->submit($data);
-        }
-
-        if ($form->isValid()) {
-            $filter->apply($ds, $form->getData());
+        $normalizedData = $this->filterExecutionContext->normalizedFilterData($filter, $data);
+        if (null !== $normalizedData) {
+            $filter->apply($ds, $normalizedData);
         }
     }
 
@@ -354,7 +362,7 @@ class ActivityListFilter extends EntityFilter
      */
     protected function getEntityAlias()
     {
-        list($alias) = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
+        [$alias] = explode('.', $this->getOr(FilterUtility::DATA_NAME_KEY));
         QueryBuilderUtil::checkIdentifier($alias);
 
         return $alias;

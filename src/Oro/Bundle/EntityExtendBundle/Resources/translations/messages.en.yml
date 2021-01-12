@@ -36,7 +36,7 @@ oro:
                 time:               Time
                 text:               Text
                 float:              Float
-                money:              Currency
+                money:              Money
                 percent:            Percent
                 duration:           Duration
                 oneToOne:           One to one

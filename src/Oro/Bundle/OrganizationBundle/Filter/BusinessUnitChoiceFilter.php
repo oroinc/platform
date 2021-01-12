@@ -6,6 +6,9 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\ChoiceTreeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
+/**
+ * The filter by business unit for User entity.
+ */
 class BusinessUnitChoiceFilter extends ChoiceTreeFilter
 {
     /**
@@ -18,8 +21,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
             return false;
         }
 
-        $type = $data['type'];
-        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
+        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != '')) {
             $parameterName = $ds->generateParameterName($this->getName());
 
             $qb2 = $this->registry->getManager()->getRepository('Oro\Bundle\UserBundle\Entity\User')
@@ -35,7 +37,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
                 $this->get(FilterUtility::DATA_NAME_KEY) . ' in (' . $qb2 . ')'
             );
 
-            if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if ($this->isValueRequired($data['type'])) {
                 $ds->setParameter($parameterName, $data['value']);
             }
         }
@@ -56,13 +58,12 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
 
         return $metadata;
     }
+
     /**
      * {@inheritDoc}
      */
     public function parseData($data)
     {
-        $data['value'] = explode(',', $data['value']);
-
-        return $data;
+        return parent::parseData($data);
     }
 }

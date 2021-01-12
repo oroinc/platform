@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -44,10 +45,8 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $this->formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrine->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->will($this->returnValue($this->em));
 
@@ -145,10 +144,6 @@ class MultiEnumFilterTest extends OrmTestCase
 
     /**
      * @dataProvider applyDataProvider
-     *
-     * @param array $values
-     * @param mixed $comparisonType
-     * @param string $expectedDQL
      */
     public function testApply(array $values, $comparisonType, string $expectedDQL)
     {
@@ -183,9 +178,6 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
-    /**
-     * @return array
-     */
     public function applyDataProvider(): array
     {
         return [
@@ -255,5 +247,11 @@ class MultiEnumFilterTest extends OrmTestCase
                     . ' WHERE filter_param1_rel IN(:param1))',
             ]
         ];
+    }
+
+    public function testPrepareData()
+    {
+        $data = [];
+        self::assertSame($data, $this->filter->prepareData($data));
     }
 }

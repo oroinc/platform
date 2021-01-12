@@ -7,7 +7,7 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 
 /**
- * The filter for "date" fields.
+ * The filter by a date value or a range of date values.
  */
 class DateRangeFilter extends AbstractDateFilter
 {

@@ -92,9 +92,12 @@ abstract class AbstractFilter implements FilterInterface
             return false;
         }
 
-        $notExpression = $this->getJoinOperator($data['type']);
+        $type = $data['type'];
+        $notExpression = $this->getJoinOperator($type);
         $useExists = empty($data['in_group']) && $this->findRelatedJoin($ds);
-        $type = ($notExpression && $useExists) ? $notExpression : $data['type'];
+        if ($notExpression && $useExists) {
+            $type = $notExpression;
+        }
         $comparisonExpr = $this->buildExpr($ds, $type, $this->getDataFieldName(), $data);
         if (!$comparisonExpr) {
             return true;
@@ -394,11 +397,31 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * @param mixed $data
      *
-     * @return array|bool
+     * @return mixed
      */
     protected function parseData($data)
     {
+        if (\is_array($data)) {
+            $data['type'] = \array_key_exists('type', $data)
+                ? $this->normalizeType($data['type'])
+                : null;
+        }
+
         return $data;
+    }
+
+    /**
+     * @param mixed $type
+     *
+     * @return mixed
+     */
+    protected function normalizeType($type)
+    {
+        if (!\is_int($type) && is_numeric($type)) {
+            $type = (int)$type;
+        }
+
+        return $type;
     }
 
     /**
@@ -582,5 +605,15 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $this->dataFieldName;
+    }
+
+    /**
+     * @param string|int|null $type
+     *
+     * @return bool
+     */
+    protected function isValueRequired($type): bool
+    {
+        return FilterUtility::TYPE_EMPTY !== $type && FilterUtility::TYPE_NOT_EMPTY !== $type;
     }
 }

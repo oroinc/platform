@@ -4,15 +4,16 @@ namespace Oro\Bundle\SearchBundle\Datagrid\Filter;
 
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterPrepareDataInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 /**
- * Basic number filter which supports multiple operators, for "search" datasource.
+ * The filter by a numeric value for a datasource based on a search index.
  */
-class SearchNumberFilter extends AbstractFilter
+class SearchNumberFilter extends AbstractFilter implements FilterPrepareDataInterface
 {
     /**
      * {@inheritdoc}
@@ -27,8 +28,17 @@ class SearchNumberFilter extends AbstractFilter
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function prepareData(array $data): array
+    {
+        throw new \BadMethodCallException('Not implemented');
+    }
+
+    /**
      * @param FilterDatasourceAdapterInterface $ds
-     * @param array $data
+     * @param array                            $data
+     *
      * @return bool
      */
     protected function applyRestrictions(FilterDatasourceAdapterInterface $ds, array $data)
@@ -37,49 +47,38 @@ class SearchNumberFilter extends AbstractFilter
         $builder = Criteria::expr();
         $fieldName = $this->getFieldName($data);
 
+        $result = true;
         switch ($data['type']) {
             case NumberFilterType::TYPE_GREATER_EQUAL:
                 $ds->addRestriction($builder->gte($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case NumberFilterType::TYPE_GREATER_THAN:
                 $ds->addRestriction($builder->gt($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case NumberFilterType::TYPE_EQUAL:
                 $ds->addRestriction($builder->eq($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case NumberFilterType::TYPE_NOT_EQUAL:
                 $ds->addRestriction($builder->neq($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case NumberFilterType::TYPE_LESS_EQUAL:
                 $ds->addRestriction($builder->lte($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case NumberFilterType::TYPE_LESS_THAN:
                 $ds->addRestriction($builder->lt($fieldName, $value), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case FilterUtility::TYPE_EMPTY:
                 $ds->addRestriction($builder->notExists($fieldName), FilterUtility::CONDITION_AND);
-
-                return true;
-
+                break;
             case FilterUtility::TYPE_NOT_EMPTY:
                 $ds->addRestriction($builder->exists($fieldName), FilterUtility::CONDITION_AND);
-
-                return true;
+                break;
+            default:
+                $result = false;
+                break;
         }
 
-        return false;
+        return $result;
     }
 
     /**

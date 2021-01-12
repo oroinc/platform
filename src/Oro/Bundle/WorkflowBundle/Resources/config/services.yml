@@ -492,6 +492,8 @@ services:
             - '@form.factory'
             - '@oro_filter.filter_utility'
             - '@oro_workflow.helper.translation'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow }
 
@@ -501,13 +503,20 @@ services:
         arguments:
             - '@form.factory'
             - '@oro_filter.filter_utility'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow_step }
 
     oro_workflow.filter.workflow_translation:
         class: 'Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowTranslationFilter'
         public: false
-        parent: oro_workflow.filter.workflow
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_workflow.helper.translation'
+        calls:
+            - [ setDoctrine, [ '@doctrine' ] ]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: workflow_translation }
 

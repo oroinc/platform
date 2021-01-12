@@ -8,9 +8,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
- * A filter that can be used on any grid to get entities by any related entity to original one.
+ * The filter by an entity that is marked as a dictionary.
  */
-class DictionaryFilter extends BaseMultiChoiceFilter
+class DictionaryFilter extends BaseMultiChoiceFilter implements FilterPrepareDataInterface
 {
     const FILTER_TYPE_NAME = 'dictionary';
 
@@ -35,10 +35,18 @@ class DictionaryFilter extends BaseMultiChoiceFilter
     /**
      * {@inheritDoc}
      */
+    public function prepareData(array $data): array
+    {
+        return $data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $parameterName = $ds->generateParameterName($this->getName());
-        if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+        if ($this->isValueRequired($comparisonType)) {
             $ds->setParameter($parameterName, $data['value']);
         }
 
@@ -89,7 +97,7 @@ class DictionaryFilter extends BaseMultiChoiceFilter
 
         try {
             $fieldName = $this->get(FilterUtility::DATA_NAME_KEY);
-            list($joinAlias) = explode('.', $fieldName);
+            [$joinAlias] = explode('.', $fieldName);
 
             $join = QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $joinAlias);
             if ($join && $this->isToOne($ds)) {

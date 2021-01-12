@@ -364,7 +364,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
                 'formattedValue' => '117:50:42',
             ],
             [
-                'value' => new \DateTime('11.09.2020 13:23:32'),
+                'value' => new \DateTime('11.09.2020 13:23:32', new \DateTimeZone('UTC')),
                 'formattedValue' => '444397:23:32',
             ],
         ];
