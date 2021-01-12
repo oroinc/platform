@@ -9,7 +9,7 @@ The current file describes significant changes in the code that may affect the u
 #### UIBundle
 
 * Moved layout themes build artefacts from `public/layout-build/{theme}` to `public/build/{theme}` folder.
-* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder. 
+* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder.
 * Changed the output path for the admin theme from `css/oro/oro.css` to `css/oro.css`.
 * Changed the output path for tinymce CSS entry points from `css/tinymce/*` to `to tinymce/*`.
 
@@ -30,11 +30,11 @@ The current file describes significant changes in the code that may affect the u
     +        - '~slick-carousel/slick/slick.scss'
     ```
     **\*.scss**
-    ```diff     
-     
+    ```diff
+
     - @import "npmassets/bootstrap/scss/variables";
     + @import "~bootstrap/scss/variables";
-    
+
     - @import "bundles/npmassets/bootstrap/scss/variables";
     + @import "~bootstrap/scss/variables";
     ```
@@ -48,7 +48,7 @@ The current file describes significant changes in the code that may affect the u
     ```
     **\*.js**
     ```diff
-    # ... 
+    # ...
     - import 'npmassets/focus-visible/dist/focus-visible';
     + import 'focus-visible/dist/focus-visible';
     # ...
@@ -64,21 +64,21 @@ The current file describes significant changes in the code that may affect the u
   );
   ```
   This way Webpack will copy `tinymce/plugins` folder into public directory `public/build/_static/_/node_modules/tinymce/plugins`.
-  
+
   Pay attention for the leading exclamation point, it says that all other loaders (e.g. css-loader) should be ignored for this context.
   If you nevertheless need to process all included css files by Webpack -- leading `!` has to be removed.
 * The "oomphinc/composer-installers-extender" composer package was removed. As a result, composer components are not copied automatically to the `public/bundles/components` directory.
   To copy files that are not handled by webpack automatically to the public folder, you can use approach with `require.context` described above.
 * The "resolve-url-loader" NPM dependency was removed. Now you should always specify the valid relative or absolute path in SCSS files explicitly. The absolute path must start with `~`:
     ```diff
-    # ... 
-    # The relative path works the same. You only might need to fix typos, 
+    # ...
+    # The relative path works the same. You only might need to fix typos,
     # as the resolve-url-loader ignored them because of the magic global search feature.
     background-image: url(../../img/glyphicons-halflings.png);
     # ...
     # The path without `~` is a relative path
     $icomoon-font-path: "fonts" !default;
-    # ... 
+    # ...
     # An absolute path should be prefixed with `~`
     - $icomoon-font-path: "fonts" !default;
     + $icomoon-font-path: "~bundles/orocms/fonts/grapsejs/fonts" !default;
@@ -188,14 +188,14 @@ The current file describes significant changes in the code that may affect the u
 * The `skip-origin` argument was removed from the `oro:entity-extend:update-config` CLI command.
 
 #### ImportExportBundle
-* The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic. 
+* The `unique_job_slug` MQ message parameter was removed for `oro.importexport.pre_import` topic.
 
 #### UIBundle
 * The `collectionField` TWIG macros was removed. Use the `form_row_collection` TWIG function instead.
   Before: `UI.collectionField(form.emails, 'oro.user.emails.label'|trans)`.
   After: `form_row_collection(form.emails)`.
   To change "add" button label use the `add_label` form option.
-* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library. 
+* Removed `cssVariablesManager.getVariables()` method as unused, and deleted dependency on the [jhildenbiddle/css-vars-ponyfill](https://github.com/jhildenbiddle/css-vars-ponyfill) library.
 
 ## 4.2.0-alpha.2 (2020-05-29)
 [Show detailed list of changes](incompatibilities-4-2-alpha-2.md)
@@ -2090,7 +2090,7 @@ provided service (usually that implements `Oro\Component\DependencyInjection\Ser
 #### ChainProcessor Component
 * Fixed an issue with invalid execution order of processors. The issue was that processors from different groups are intersected. During the fix the calculation of internal priorities of processors was changed, this may affect existing configuration of processors in case if you have common (not bound to any action) processors and ungrouped processors which should work with regular grouped processors.
     The previous priority rules:
-    
+
     | Processor type | Processor priority | Group priority |
     |----------------|--------------------|----------------|
     | initial common processors | from -255 to 255 |  |
@@ -2098,9 +2098,9 @@ provided service (usually that implements `Oro\Component\DependencyInjection\Ser
     | grouped processors | from -255 to 255 | from -254 to 252 |
     | final ungrouped processors | from -65535 to -65280 |  |
     | final common processors | from min int to -65536 |  |
-    
+
     The new priority rules:
-    
+
     | Processor type | Processor priority | Group priority |
     |----------------|--------------------|----------------|
     | initial common processors | greater than or equals to 0 |  |
@@ -2108,7 +2108,7 @@ provided service (usually that implements `Oro\Component\DependencyInjection\Ser
     | grouped processors | from -255 to 255 | from -255 to 255 |
     | final ungrouped processors | less than 0 |  |
     | final common processors | less than 0 |  |
-    
+
     So, the new rules means that:
         * common and ungrouped processors with the priority greater than or equals to 0 will be executed before grouped processors
         * common and ungrouped processors with the priority less than 0 will be executed after grouped processors
