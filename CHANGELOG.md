@@ -2,6 +2,15 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.1.12
+### Added
+
+#### SecurityBundle
+* Added `generate_uuid` action. The action generates UUID and puts the value to the specified attribute.
+
+#### WorkflowBundle
+* Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
+
 ## 4.1.10
 ### Added
 
