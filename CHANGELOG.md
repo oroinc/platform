@@ -4,6 +4,18 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.2.0
 
+### Added
+
+#### SecurityBundle
+* Added `generate_uuid` action. The action generates UUID and puts the value to the specified attribute.
+
+#### TranslationBundle
+* Added migration query `Oro\Bundle\TranslationBundle\Migration\DeleteTranslationsByDomainAndKeyPrefixQuery` that can be used to remove unused translations by domain and key prefix.
+
+#### WorkflowBundle
+* Added migration query `Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowAwareEntitiesQuery` that can be used to remove instances of entity created from the specified workflow.
+* Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
+
 ### Removed
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
