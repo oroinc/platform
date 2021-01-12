@@ -86,7 +86,7 @@
         "knplabs/knp-menu": "2.3.*",
         "knplabs/knp-menu-bundle": "2.2.*",
         "friendsofsymfony/rest-bundle": "2.7.*",
-        "friendsofsymfony/jsrouting-bundle": "2.2.*",
+        "friendsofsymfony/jsrouting-bundle": "2.7.*",
         "nelmio/api-doc-bundle": "2.13.3",
         "nelmio/security-bundle": "2.5.*",
         "ass/xmlsecurity": "1.1.1",

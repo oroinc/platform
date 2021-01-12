@@ -28,7 +28,7 @@
             "ext-mbstring": "*",
             "ext-mysql": "*",
             "ext-xml": "*",
-            "friendsofsymfony/jsrouting-bundle": "1.5.0",
+            "friendsofsymfony/jsrouting-bundle": "2.7.*",
             "friendsofsymfony/rest-bundle": "1.5.0-RC2",
             "incenteev/composer-parameter-handler": "2.1.0",
             "jms/serializer": "0.14.0",
