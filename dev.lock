@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e99bec08ee746530ea9964bdffe51446",
+    "content-hash": "9090f111f61226fcb4f1211d5a9ce24b",
     "packages": [
         {
             "name": "akeneo/batch-bundle",
@@ -2631,16 +2631,16 @@
         },
         {
             "name": "gos/pubsub-router-bundle",
-            "version": "v2.3.0",
+            "version": "v2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/GeniusesOfSymfony/PubSubRouterBundle.git",
-                "reference": "cc8710509d09d87519d5dd0f206e8e502546eadb"
+                "reference": "9fd8e79f78703f307de1509df4883d20e4642054"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/GeniusesOfSymfony/PubSubRouterBundle/zipball/cc8710509d09d87519d5dd0f206e8e502546eadb",
-                "reference": "cc8710509d09d87519d5dd0f206e8e502546eadb",
+                "url": "https://api.github.com/repos/GeniusesOfSymfony/PubSubRouterBundle/zipball/9fd8e79f78703f307de1509df4883d20e4642054",
+                "reference": "9fd8e79f78703f307de1509df4883d20e4642054",
                 "shasum": ""
             },
             "require": {
@@ -2648,13 +2648,13 @@
                 "symfony/config": "^4.4 || ^5.1",
                 "symfony/console": "^4.4 || ^5.1",
                 "symfony/dependency-injection": "^4.4 || ^5.1",
-                "symfony/framework-bundle": "^4.4 || ^5.1",
+                "symfony/deprecation-contracts": "^2.1",
                 "symfony/http-foundation": "^4.4 || ^5.1",
                 "symfony/http-kernel": "^4.4 || ^5.1",
+                "symfony/polyfill-php80": "^1.22",
                 "symfony/yaml": "^4.4 || ^5.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.16.4",
                 "matthiasnoback/symfony-dependency-injection-test": "^4.1.2",
                 "phpstan/extension-installer": "^1.0.5",
                 "phpstan/phpstan": "^0.12.50",
@@ -2694,7 +2694,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2020-11-02T23:47:06+00:00"
+            "time": "2021-01-13T03:18:41+00:00"
         },
         {
             "name": "gos/web-socket-bundle",
