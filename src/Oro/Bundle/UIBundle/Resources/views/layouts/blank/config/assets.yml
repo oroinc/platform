@@ -1,6 +1,6 @@
 styles:
     inputs:
-        - 'bundles/npmassets/overlayscrollbars/css/OverlayScrollbars.css'
+        - '~overlayscrollbars/css/OverlayScrollbars.css'
         - 'bundles/oroui/blank/scss/settings/global-settings.scss'
         - 'bundles/oroui/blank/scss/variables/base-config.scss'
         - 'bundles/oroui/blank/scss/variables/scrollbar-config.scss'

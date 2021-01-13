@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "npmassets/font-awesome/scss/_variables";
+@import "~font-awesome/scss/_variables";
 @import "../mixins/direction";
 @import "../colors";
 
@@ -325,7 +325,7 @@ $large-screen:                          1920px;
 // );
 
 // Bootstrap and its default variables
-@import "npmassets/bootstrap/scss/variables";
+@import "~bootstrap/scss/variables";
 
 // Remove unnecessary default theme colors
 // $theme-colors: map-remove($theme-colors, "info", "light", "dark");

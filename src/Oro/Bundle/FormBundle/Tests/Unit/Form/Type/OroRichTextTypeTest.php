@@ -193,8 +193,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css' => 'build/css/tinymce/wysiwyg-editor.css',
-                'skin_url' => 'build/css/tinymce',
+                'content_css' => 'build/admin/tinymce/wysiwyg-editor.css',
+                'skin_url' => 'build/admin/tinymce',
                 'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
                 'toolbar' => $toolbar,
                 'valid_elements' => '',
@@ -288,8 +288,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                     'fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
-                                'content_css' => 'subfolder/build/css/tinymce/wysiwyg-editor.css',
-                                'skin_url' => 'subfolder/build/css/tinymce'
+                                'content_css' => 'subfolder/build/admin/tinymce/wysiwyg-editor.css',
+                                'skin_url' => 'subfolder/build/admin/tinymce'
                             ]
                         )
                     ]

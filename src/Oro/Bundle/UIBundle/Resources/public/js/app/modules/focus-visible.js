@@ -1,1 +1,1 @@
-import 'npmassets/focus-visible/dist/focus-visible';
+import 'focus-visible/dist/focus-visible';

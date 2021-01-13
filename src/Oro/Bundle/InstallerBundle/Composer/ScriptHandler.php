@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Script handler for composer.
- * - installs npm assets, copies them to public directory
+ * - installs npm assets
  * - sets assets version in parameters.yml
  * - sets permission on app directories
  */
@@ -68,8 +68,6 @@ class ScriptHandler
             // Installs assets using lock file.
             self::npmCi($event->getIO(), $options['process-timeout'], $event->isDevMode());
         }
-
-        self::copyAssets('node_modules', $options['symfony-web-dir'] . '/bundles/npmassets');
     }
 
     /**
