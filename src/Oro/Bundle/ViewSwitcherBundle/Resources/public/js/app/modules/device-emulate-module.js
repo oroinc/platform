@@ -30,7 +30,7 @@ if (params['device-emulate'] && !window.frameElement) {
         new DeviceSwitcherView({
             _sourceElement: [elem],
             pageModel: pageModel,
-            switcherStyle: config.stylePath || '/layout-build/view-switcher/css/view-switcher.css',
+            switcherStyle: config.stylePath || '/build/view-switcher/css/view-switcher.css',
             updateUrlDeviceFragment: false
         });
     });

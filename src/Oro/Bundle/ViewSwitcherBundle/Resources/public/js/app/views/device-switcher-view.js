@@ -188,7 +188,7 @@ define(function(require, exports, module) {
                     if (iframe.document.querySelector('.mobile-version')) {
                         if (iframe.jQuery) {
                             this.loadScriptInFrame(
-                                '/bundles/npmassets/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
+                                '/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
                                 function(iframe) {
                                     iframe.jQuery('.mobile-version').first().niceScroll({
                                         cursorcolor: 'rgba(0, 0, 0, 0.5)',
@@ -201,7 +201,7 @@ define(function(require, exports, module) {
                         } else {
                             // In case when page has no other third-part libraries use OverlayScrollbars since it has no dependencies
                             this.loadScriptInFrame(
-                                '/bundles/npmassets/overlayscrollbars/js/OverlayScrollbars.js',
+                                '/overlayscrollbars/js/OverlayScrollbars.js',
                                 function(iframe, bodyElement) {
                                     new iframe.OverlayScrollbars(bodyElement, {
                                         className: 'os-theme-dark',

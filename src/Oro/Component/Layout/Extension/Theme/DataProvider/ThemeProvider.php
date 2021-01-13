@@ -64,7 +64,7 @@ class ThemeProvider
     {
         $assets = $this->getTheme($themeName)->getConfigByKey('assets');
         if ($assets && array_key_exists($sectionName, $assets) && array_key_exists('output', $assets[$sectionName])) {
-            return sprintf('layout-build/%s/%s', $themeName, $assets[$sectionName]['output']);
+            return sprintf('build/%s/%s', $themeName, $assets[$sectionName]['output']);
         }
 
         $parentTheme = $this->getTheme($themeName)->getParentTheme();

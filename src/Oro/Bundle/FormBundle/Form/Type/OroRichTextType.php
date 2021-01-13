@@ -119,7 +119,7 @@ class OroRichTextType extends AbstractType
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => $assetsBaseUrl . 'build/css/tinymce',
+            'skin_url'           => $assetsBaseUrl . 'build/admin/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements('default')),
             'menubar'            => false,
             'statusbar'          => false,
@@ -139,7 +139,7 @@ class OroRichTextType extends AbstractType
                 'module'  => 'oroui/js/app/components/view-component',
                 'options' => [
                     'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                    'content_css' => $assetsBaseUrl . 'build/css/tinymce/wysiwyg-editor.css'
+                    'content_css' => $assetsBaseUrl . 'build/admin/tinymce/wysiwyg-editor.css'
                 ]
             ],
         ];
