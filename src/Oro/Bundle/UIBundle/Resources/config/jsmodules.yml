@@ -1,58 +1,62 @@
+entry:
+    app:
+        - oroui/js/app
+        - oroui/js/app/services/app-ready-load-modules
 aliases:
-    Fuse$: npmassets/fuse.js/dist/fuse
-    asap$: npmassets/asap/asap
-    autolinker$: npmassets/autolinker/dist/Autolinker
-    backbone$: npmassets/backbone/backbone
+    Fuse$: fuse.js/dist/fuse
+    asap$: asap/asap
+    autolinker$: autolinker/dist/Autolinker
+    backbone$: backbone/backbone
     base64$: oroui/js/extend/base64
     bootstrap$: oroui/js/bootstrap
-    bootstrap-alert$: npmassets/bootstrap/js/dist/alert
-    bootstrap-collapse$: npmassets/bootstrap/js/dist/collapse
-    bootstrap-dropdown$: npmassets/bootstrap/js/dist/dropdown
-    bootstrap-modal$: npmassets/bootstrap/js/dist/modal
-    bootstrap-popover$: npmassets/bootstrap/js/dist/popover
-    bootstrap-scrollspy$: npmassets/bootstrap/js/dist/scrollspy
-    bootstrap-tab$: npmassets/bootstrap/js/dist/tab
-    bootstrap-tooltip$: npmassets/bootstrap/js/dist/tooltip
+    bootstrap-alert$: bootstrap/js/dist/alert
+    bootstrap-collapse$: bootstrap/js/dist/collapse
+    bootstrap-dropdown$: bootstrap/js/dist/dropdown
+    bootstrap-modal$: bootstrap/js/dist/modal
+    bootstrap-popover$: bootstrap/js/dist/popover
+    bootstrap-scrollspy$: bootstrap/js/dist/scrollspy
+    bootstrap-tab$: bootstrap/js/dist/tab
+    bootstrap-tooltip$: bootstrap/js/dist/tooltip
     bootstrap-typeahead$: oroui/lib/bootstrap/bootstrap-typeahead
-    bootstrap-util$: npmassets/bootstrap/js/dist/util
+    bootstrap-util$: bootstrap/js/dist/util
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
-    cryptojs/core$: npmassets/crypto-js/core
-    cryptojs/enc-base64$: npmassets/crypto-js/enc-base64
-    cryptojs/hmac$: npmassets/crypto-js/hmac
-    cryptojs/hmac-sha256$: npmassets/crypto-js/hmac-sha256
-    cryptojs/pbkdf2$: npmassets/crypto-js/pbkdf2
-    cryptojs/sha1$: npmassets/crypto-js/sha1
-    cryptojs/sha256$: npmassets/crypto-js/sha256
-    datepair$: npmassets/datepair.js/dist/datepair
+    cryptojs/core$: crypto-js/core
+    cryptojs/enc-base64$: crypto-js/enc-base64
+    cryptojs/hmac$: crypto-js/hmac
+    cryptojs/hmac-sha256$: crypto-js/hmac-sha256
+    cryptojs/pbkdf2$: crypto-js/pbkdf2
+    cryptojs/sha1$: crypto-js/sha1
+    cryptojs/sha256$: crypto-js/sha256
+    datepair$: datepair.js/dist/datepair
     extend-popper$: oroui/js/extend/popper
-    jquery$: npmassets/jquery/dist/jquery
-    jquery-ui: npmassets/jquery-ui/ui
-    jquery.cookie$: npmassets/jquery.cookie/jquery.cookie
-    jquery.form$: npmassets/jquery-form/src/jquery.form
-    jquery.jstree$: npmassets/jstree/dist/jstree
+    jquery$: jquery/dist/jquery
+    jquery-ui: jquery-ui/ui
+    jquery.cookie$: jquery.cookie/jquery.cookie
+    jquery.form$: jquery-form/src/jquery.form
+    jquery.jstree$: jstree/dist/jstree
     jquery.minicolors$: oroui/lib/minicolors/jquery.minicolors
-    jquery.mousewheel$: npmassets/jquery-mousewheel/jquery.mousewheel
-    jquery.multiselect$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect
-    jquery.multiselect.filter$: npmassets/jquery-ui-multiselect-widget/src/jquery.multiselect.filter
-    jquery.numeric$: npmassets/jquery-numeric/jquery.numeric
-    jquery.select2$: npmassets/@oroinc/select2/select2
+    jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
+    jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
+    jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
+    jquery.numeric$: jquery-numeric/jquery.numeric
+    jquery.select2$: '@oroinc/select2/select2'
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
-    jquery.timepicker$: npmassets/timepicker/jquery.timepicker
-    jquery.uniform$: npmassets/jquery.uniform/src/js/jquery.uniform
-    lightgallery$: npmassets/lightgallery/dist/js/lightgallery
+    jquery.timepicker$: timepicker/jquery.timepicker
+    jquery.uniform$: jquery.uniform/src/js/jquery.uniform
+    lightgallery$: lightgallery/dist/js/lightgallery
     lightgallery.print$: oroui/js/lightgallery/lg-print
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oro/buttons-widget$: oroui/js/widget/buttons-widget
     oro/page-widget$: oroui/js/widget/page-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
-    overlayScrollbars$: npmassets/overlayscrollbars/js/OverlayScrollbars
-    popper$: npmassets/popper.js/dist/umd/popper
-    scriptjs$: npmassets/scriptjs/dist/script
+    overlayScrollbars$: overlayscrollbars/js/OverlayScrollbars
+    popper$: popper.js/dist/umd/popper
+    scriptjs$: scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
-    underscore$: npmassets/underscore/underscore
-    whatwg-fetch$: npmassets/whatwg-fetch/fetch
+    underscore$: underscore/underscore
+    whatwg-fetch$: whatwg-fetch/fetch
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util

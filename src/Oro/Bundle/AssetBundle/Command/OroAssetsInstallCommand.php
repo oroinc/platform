@@ -61,7 +61,7 @@ HELP
             ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install', $assetsOptions)
-            ->runCommand('oro:assets:build', ['--npm-install'=> true]);
+            ->runCommand('oro:assets:build');
 
         return 0;
     }

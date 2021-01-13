@@ -1,11 +1,11 @@
 aliases:
-    jquery.validate$: npmassets/jquery-validation/dist/jquery.validate
-    jquery.validate-additional-methods$: npmassets/jquery-validation/dist/additional-methods
+    jquery.validate$: jquery-validation/dist/jquery.validate
+    jquery.validate-additional-methods$: jquery-validation/dist/additional-methods
     oro/autocomplete-component$: oroform/js/app/components/autocomplete-component
     oro/select2-autocomplete-component$: oroform/js/app/components/select2-autocomplete-component
     oro/select2-component$: oroform/js/app/components/select2-component
     oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
-    xregexp$: npmassets/xregexp/xregexp-all
+    xregexp$: xregexp/xregexp-all
 configs:
     oroform/js/extend/tinymce: {}
     oroform/js/extend/validate: {}

@@ -27,7 +27,7 @@ define(function(require) {
             isHtml: true,
             plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
             pluginsMap: {
-                bdesk_photo: 'bundles/oroform/lib/bdeskphoto/plugin.min.js'
+                bdesk_photo: 'build/_static/bundles/oroform/lib/bdeskphoto/plugin.min.js'
             },
             menubar: false,
             toolbar: ['undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist' +
