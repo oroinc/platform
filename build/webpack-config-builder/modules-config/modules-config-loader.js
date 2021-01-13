@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('file-system');
+const fs = require('fs');
 const merge = require('deepmerge');
 const yaml = require('js-yaml');
 
