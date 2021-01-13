@@ -69,6 +69,20 @@ The current file describes significant changes in the code that may affect the u
   If you nevertheless need to process all included css files by Webpack -- leading `!` has to be removed.
 * The "oomphinc/composer-installers-extender" composer package was removed. As a result, composer components are not copied automatically to the `public/bundles/components` directory.
   To copy files that are not handled by webpack automatically to the public folder, you can use approach with `require.context` described above.
+* The "resolve-url-loader" NPM dependency was removed. Now you should always specify the valid relative or absolute path in SCSS files explicitly. The absolute path must start with `~`:
+    ```diff
+    # ... 
+    # The relative path works the same. You only might need to fix typos, 
+    # as the resolve-url-loader ignored them because of the magic global search feature.
+    background-image: url(../../img/glyphicons-halflings.png);
+    # ...
+    # The path without `~` is a relative path
+    $icomoon-font-path: "fonts" !default;
+    # ... 
+    # An absolute path should be prefixed with `~`
+    - $icomoon-font-path: "fonts" !default;
+    + $icomoon-font-path: "~bundles/orocms/fonts/grapsejs/fonts" !default;
+    ```
 
 ### Removed
 
