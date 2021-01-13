@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection;
 
@@ -7,12 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 
 class OroActionExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var array
-     */
-    protected $extensionConfigs = [];
-
-    public function testLoad()
+    public function testLoad(): void
     {
         $this->loadExtension(new OroActionExtension());
         $expectedDefinitions = [

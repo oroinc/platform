@@ -12,7 +12,10 @@ use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class OroMessageQueueExtensionTest extends ExtensionTestCase
 {
@@ -614,5 +617,53 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'Oro\\Component\\MessageQueue\\Client\\Meta\\DestinationsCommand',
             'Oro\\Component\\MessageQueue\\Client\\CreateQueuesCommand',
         ];
+    }
+
+    /**
+     * Overrides parent method to skip mocking 'getDefinition' method as it is mocked differently in each test here.
+     */
+    protected function getContainerMock(): ContainerBuilder
+    {
+        $containerBuilder = $this->buildContainerMock();
+        $containerBuilder
+            ->method('setDefinition')
+            ->willReturnCallback(
+                function ($id, Definition $definition) {
+                    $this->actualDefinitions[$id] = $definition;
+                    return $definition;
+                }
+            );
+        $containerBuilder
+            ->method('setAlias')
+            ->willReturnCallback(
+                function ($alias, $id) {
+                    if (\is_string($id)) {
+                        $id = new Alias($id);
+                    } elseif (!$id instanceof Alias) {
+                        throw new InvalidArgumentException('$id must be a string, or an Alias object.');
+                    }
+
+                    $this->actualAliases[$alias] = $id;
+                }
+            );
+        $containerBuilder
+            ->method('setParameter')
+            ->willReturnCallback(
+                function ($name, $value) {
+                    $this->actualParameters[$name] = $value;
+                }
+            );
+        $containerBuilder
+            ->method('prependExtensionConfig')
+            ->willReturnCallback(
+                function ($name, array $config) {
+                    if (!isset($this->extensionConfigs[$name])) {
+                        $this->extensionConfigs[$name] = [];
+                    }
+                    \array_unshift($this->extensionConfigs[$name], $config);
+                }
+            );
+
+        return $containerBuilder;
     }
 }
