@@ -94,7 +94,7 @@
         "liip/imagine-bundle": "2.0.0",
         "laminas/laminas-mail": "^2.12.0",
         "dragonmantank/cron-expression": "3.0.*",
-        "gos/web-socket-bundle": "3.3.*",
+        "gos/web-socket-bundle": "3.6.*",
         "guzzlehttp/guzzle": "7.2.*",
         "lexik/maintenance-bundle": "2.1.5",
         "composer/composer": "1.* || 2.*",
