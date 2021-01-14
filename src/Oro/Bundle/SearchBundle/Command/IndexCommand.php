@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\SearchBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;

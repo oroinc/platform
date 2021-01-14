@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type\Stub;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Symfony\Component\Form\AbstractType;

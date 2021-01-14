@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Controller\Configuration\MailboxController;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;

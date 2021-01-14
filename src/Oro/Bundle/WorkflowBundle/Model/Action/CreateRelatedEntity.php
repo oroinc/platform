@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;

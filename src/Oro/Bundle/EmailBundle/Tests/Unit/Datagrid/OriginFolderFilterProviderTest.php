@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Datagrid\MailboxNameHelper;
 use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;

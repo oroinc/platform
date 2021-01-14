@@ -129,7 +129,7 @@ class ReverseSyncProcessorTest extends \PHPUnit\Framework\TestCase
      */
     protected function getReverseSyncProcessor($mockedMethods = null)
     {
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
 
         return $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor')
             ->setMethods($mockedMethods)

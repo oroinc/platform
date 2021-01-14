@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -27,7 +27,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
     }
 
     public function testConstructWithInvalidValueClass()
@@ -405,12 +405,12 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         array $localizations,
         $valueClass = LocalizedFallbackValue::class
     ) {
-        $valueRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $valueRepository = $this->createMock('Doctrine\Persistence\ObjectRepository');
         $valueRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($values)));
 
-        $localizationRepository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $localizationRepository = $this->createMock('Doctrine\Persistence\ObjectRepository');
         $localizationRepository->expects($this->any())
             ->method('find')
             ->will($this->returnValueMap($this->convertArrayToMap($localizations)));

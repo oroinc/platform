@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;

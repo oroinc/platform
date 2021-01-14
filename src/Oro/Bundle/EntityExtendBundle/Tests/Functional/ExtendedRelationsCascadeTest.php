@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**

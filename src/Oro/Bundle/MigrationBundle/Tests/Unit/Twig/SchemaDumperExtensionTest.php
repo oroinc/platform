@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Tools;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 

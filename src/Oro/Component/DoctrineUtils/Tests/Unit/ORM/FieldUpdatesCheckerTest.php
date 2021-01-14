@@ -3,9 +3,9 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\DoctrineUtils\ORM\FieldUpdatesChecker;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
 use Oro\Component\PropertyAccess\PropertyAccessor;

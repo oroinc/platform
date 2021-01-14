@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Component\MessageQueue\Tests\Unit\Transport\Dbal;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use PHPUnit\Framework\MockObject\MockObject;

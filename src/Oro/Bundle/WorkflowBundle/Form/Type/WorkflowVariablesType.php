@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\VariableGuesser;

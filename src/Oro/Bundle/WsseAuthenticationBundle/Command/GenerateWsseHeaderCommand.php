@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEntityForVariableProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;

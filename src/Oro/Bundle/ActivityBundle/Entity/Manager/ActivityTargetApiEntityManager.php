@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 

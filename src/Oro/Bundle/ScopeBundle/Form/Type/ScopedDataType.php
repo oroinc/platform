@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ScopeBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\FormScopeCriteriaResolver;
 use Symfony\Component\Form\AbstractType;

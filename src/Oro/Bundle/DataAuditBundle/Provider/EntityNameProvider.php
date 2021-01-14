@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 

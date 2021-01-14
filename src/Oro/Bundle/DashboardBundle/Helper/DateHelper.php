@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Helper;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;

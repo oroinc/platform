@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Job\Job;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;

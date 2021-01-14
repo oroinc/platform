@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Test\DataFixtures\Resolver;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver;
 

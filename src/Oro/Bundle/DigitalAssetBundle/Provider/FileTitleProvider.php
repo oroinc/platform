@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;

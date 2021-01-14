@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm\Configs;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
 
 class YamlProcessorTest extends \PHPUnit\Framework\TestCase
@@ -22,7 +22,7 @@ class YamlProcessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')

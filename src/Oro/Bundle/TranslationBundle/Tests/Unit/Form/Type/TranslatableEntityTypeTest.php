@@ -4,13 +4,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\EventManager;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
@@ -128,7 +128,7 @@ class TranslatableEntityTypeTest extends FormIntegrationTestCase
             ->method('getConfiguration')
             ->will($this->returnValue($this->ormConfiguration));
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->setMethods(array('getManager', 'getRepository'))
             ->getMockForAbstractClass();

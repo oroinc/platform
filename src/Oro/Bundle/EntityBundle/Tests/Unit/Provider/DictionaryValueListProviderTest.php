@@ -49,7 +49,7 @@ class DictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')

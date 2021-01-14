@@ -2,11 +2,11 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Action\FindEntities;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Exception\NotManageableEntityException;

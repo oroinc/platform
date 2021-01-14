@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;

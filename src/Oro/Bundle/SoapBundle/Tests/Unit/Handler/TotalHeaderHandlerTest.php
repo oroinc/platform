@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
@@ -12,6 +10,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;

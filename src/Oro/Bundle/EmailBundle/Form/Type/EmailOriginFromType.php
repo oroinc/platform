@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;

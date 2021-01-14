@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Handler\AsyncOperationDeleteHandler;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;

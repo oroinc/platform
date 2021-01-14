@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -10,6 +9,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 use Oro\Bundle\FormBundle\Tests\Unit\MockHelper;
 use Oro\Bundle\SearchBundle\Engine\Indexer;

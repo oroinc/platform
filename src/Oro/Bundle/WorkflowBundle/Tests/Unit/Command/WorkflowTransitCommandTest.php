@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;

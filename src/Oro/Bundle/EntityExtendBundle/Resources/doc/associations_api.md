@@ -127,7 +127,7 @@ As you can see, this method is pretty simple once we have the AssociationManager
 For the second step we will create the API entity manager that will use our association manager (in this case ActivityManager) for getting the list of target entities:
 
 ```php
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -386,7 +386,7 @@ Having the list of fields we can proceed to creating a query builder that will b
 For the next step we will create the API entity manager that will use our association manager (in this case ActivityManager) for getting the list of entities associated to the given target entity:
 
 ```php
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;

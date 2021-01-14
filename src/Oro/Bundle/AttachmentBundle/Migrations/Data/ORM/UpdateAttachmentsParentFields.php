@@ -3,10 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**

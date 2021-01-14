@@ -112,7 +112,7 @@ class SidebarController extends FOSRestController
     /**
      * Get entity Manager
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \Doctrine\Persistence\ObjectManager
      */
     protected function getManager()
     {

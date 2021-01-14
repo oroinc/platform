@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Symfony\Component\Form\FormInterface;

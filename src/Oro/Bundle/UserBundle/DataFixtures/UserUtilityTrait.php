@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\UserBundle\Entity\User;
 
 trait UserUtilityTrait

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\Event\LoadClassMetadataEventArgs;
 
 class DiscriminatorMapListener
 {

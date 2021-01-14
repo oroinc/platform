@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TagBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;

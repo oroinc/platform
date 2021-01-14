@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ExtendedRelationsTest extends WebTestCase

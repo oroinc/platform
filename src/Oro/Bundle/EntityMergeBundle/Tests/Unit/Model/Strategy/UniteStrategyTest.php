@@ -156,7 +156,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
     private function getStrategy(array $relatedEntities)
     {
         $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->getMockBuilder('Doctrine\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
             ->getMock();
 

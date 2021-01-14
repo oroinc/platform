@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\SearchBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;

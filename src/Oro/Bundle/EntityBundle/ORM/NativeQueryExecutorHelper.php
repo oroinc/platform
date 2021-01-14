@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\QueryException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 
 /**

@@ -19,7 +19,7 @@ class NotSqlKeywordValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->context = $this->createMock(ExecutionContextInterface::class);
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')

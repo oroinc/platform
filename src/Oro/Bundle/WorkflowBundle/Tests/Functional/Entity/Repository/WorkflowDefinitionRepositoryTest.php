@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item2;

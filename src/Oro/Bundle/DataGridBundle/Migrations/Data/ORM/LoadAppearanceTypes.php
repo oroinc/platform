@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Entity\AppearanceType;
 
 class LoadAppearanceTypes extends AbstractFixture

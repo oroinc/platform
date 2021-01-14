@@ -3,9 +3,9 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;

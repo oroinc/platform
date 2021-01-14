@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SyncBundle\Periodic;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\Persistence\ManagerRegistry;
 use Gos\Bundle\WebSocketBundle\Periodic\PeriodicInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;

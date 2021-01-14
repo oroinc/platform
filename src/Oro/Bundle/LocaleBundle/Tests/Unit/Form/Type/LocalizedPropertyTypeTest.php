@@ -24,7 +24,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
     protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
 
         parent::setUp();
     }

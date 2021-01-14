@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesserInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Metadata;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\Proxy;
+use Doctrine\Persistence\Proxy;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;

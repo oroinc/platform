@@ -4,9 +4,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 

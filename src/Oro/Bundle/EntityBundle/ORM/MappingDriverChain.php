@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain as BaseMappingDriverChain;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain as BaseMappingDriverChain;
 
 /**
  * Adds a memory cache for the result value of isTransient() method.

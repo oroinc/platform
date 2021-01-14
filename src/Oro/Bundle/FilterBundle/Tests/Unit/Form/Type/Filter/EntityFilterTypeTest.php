@@ -20,7 +20,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
     {
         $translator = $this->createMockTranslator();
 
-        $registry = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry', array(), '', false);
+        $registry = $this->getMockForAbstractClass('Doctrine\Persistence\ManagerRegistry', array(), '', false);
 
         $types = array(
             new FilterType($translator),

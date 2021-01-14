@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

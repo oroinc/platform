@@ -3,8 +3,8 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;

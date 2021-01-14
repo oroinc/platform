@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 
 class LoadSearchProductData extends AbstractFixture

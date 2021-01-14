@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 interface EventTriggerExtensionInterface
 {

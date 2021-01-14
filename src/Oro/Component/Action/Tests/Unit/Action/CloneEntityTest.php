@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Action\CloneEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
@@ -45,7 +45,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
     {
         $this->contextAccessor = new ContextAccessor();
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -91,7 +91,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $meta->expects($this->once())
             ->method('setIdentifierValues');
 
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->once())
@@ -194,7 +194,7 @@ class CloneEntityTest extends \PHPUnit\Framework\TestCase
         $meta->expects($this->once())
             ->method('setIdentifierValues');
 
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->once())

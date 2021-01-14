@@ -4,10 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 
 /**

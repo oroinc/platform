@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
@@ -247,7 +247,7 @@ class RegisterDynamicFilters extends RegisterFilters
             return null;
         }
 
-        list($filterConfig, $propertyPath) = $filterInfo;
+        [$filterConfig, $propertyPath] = $filterInfo;
 
         return $this->createFilter($filterConfig, $propertyPath, $context);
     }
@@ -269,7 +269,7 @@ class RegisterDynamicFilters extends RegisterFilters
             $fieldName = \array_pop($path);
             $associationInfo = $this->getAssociationInfo($path, $context, $metadata);
             if (null !== $associationInfo) {
-                list($filtersConfig, $associationPropertyPath) = $associationInfo;
+                [$filtersConfig, $associationPropertyPath] = $associationInfo;
             }
         } else {
             $fieldName = $propertyPath;

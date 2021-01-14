@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class LoadAdminOwnerEmailData extends LoadEmailData
 {
