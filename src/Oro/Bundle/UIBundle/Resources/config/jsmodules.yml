@@ -43,7 +43,7 @@ aliases:
     jquery.select2$: '@oroinc/select2/select2'
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
     jquery.timepicker$: timepicker/jquery.timepicker
-    jquery.uniform$: jquery.uniform/src/js/jquery.uniform
+    jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
     lightgallery$: lightgallery/dist/js/lightgallery
     lightgallery.print$: oroui/js/lightgallery/lg-print
     module-config$: oroui/js/app/services/module-config
