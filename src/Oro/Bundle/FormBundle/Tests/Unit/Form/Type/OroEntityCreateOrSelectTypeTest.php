@@ -81,7 +81,7 @@ class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
             ->with(self::TEST_ENTITY)
             ->will($this->returnValue($this->repository));
 
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->managerRegistry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->getMockForAbstractClass();
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')

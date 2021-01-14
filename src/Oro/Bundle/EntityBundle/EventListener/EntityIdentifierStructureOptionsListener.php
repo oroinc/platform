@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 
 /**

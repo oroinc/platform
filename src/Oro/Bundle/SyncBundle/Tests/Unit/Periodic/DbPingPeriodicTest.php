@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\Periodic;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Statement;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 

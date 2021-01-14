@@ -3,8 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Migrations\Data\Demo\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 

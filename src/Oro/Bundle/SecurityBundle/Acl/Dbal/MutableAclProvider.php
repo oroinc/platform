@@ -8,9 +8,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Dbal;
 
-use Doctrine\Common\PropertyChangedListener;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\Persistence\PropertyChangedListener;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\Entry;

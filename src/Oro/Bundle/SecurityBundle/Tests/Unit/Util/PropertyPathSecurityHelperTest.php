@@ -27,7 +27,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->authorizationChecker = $this
             ->createMock('Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface');
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->managerRegistry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
@@ -62,7 +62,7 @@ class PropertyPathSecurityHelperTest extends \PHPUnit\Framework\TestCase
 
         $propertyPath = 'user.address.city';
 
-        $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->managerRegistry->expects($this->any())

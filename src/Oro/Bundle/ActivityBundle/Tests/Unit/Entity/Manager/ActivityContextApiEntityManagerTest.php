@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Extend\Entity\EV_Api_Enum1 as TestEnum1;
 use Extend\Entity\EV_Api_Enum2 as TestEnum2;
 

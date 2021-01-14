@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Command\IndexCommand;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Symfony\Component\Console\Tester\CommandTester;

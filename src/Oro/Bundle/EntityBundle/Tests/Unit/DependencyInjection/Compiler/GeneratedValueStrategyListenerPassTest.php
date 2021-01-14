@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\CompilerPass;
+namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\GeneratedValueStrategyListenerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

@@ -36,7 +36,7 @@ class ConnectorContextMediatorTest extends \PHPUnit\Framework\TestCase
 
         $em->expects($this->any())->method('getRepository')->with('OroIntegrationBundle:Channel')
             ->will($this->returnValue($this->repo));
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($em));
         $link = new ServiceLink($container, $proxiedServiceID);

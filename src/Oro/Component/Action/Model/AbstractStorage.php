@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Model;
 
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\Proxy;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;

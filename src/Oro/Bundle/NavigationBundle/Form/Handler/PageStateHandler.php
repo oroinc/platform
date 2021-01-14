@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 use Symfony\Component\Form\FormInterface;

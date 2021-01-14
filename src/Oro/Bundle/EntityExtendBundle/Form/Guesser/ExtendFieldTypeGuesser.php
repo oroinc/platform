@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;

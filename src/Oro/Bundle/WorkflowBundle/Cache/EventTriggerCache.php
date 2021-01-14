@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
 
 /**

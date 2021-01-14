@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Component\Action\Action\FlushEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -31,7 +31,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->action = new FlushEntity($this->contextAccessor, $this->registry);

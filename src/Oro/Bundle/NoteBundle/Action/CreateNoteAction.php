@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Component\Action\Action\AbstractAction;

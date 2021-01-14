@@ -26,11 +26,11 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $manager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->doctrine = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $manager        = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->metadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')
+        $this->metadata = $this->getMockBuilder('Doctrine\Persistence\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
 

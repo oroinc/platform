@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WindowsBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WindowsBundle\Entity\Repository\WindowsStateRepository;
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;

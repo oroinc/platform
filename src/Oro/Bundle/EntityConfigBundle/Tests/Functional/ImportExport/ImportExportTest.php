@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\ImportExport;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;

@@ -95,6 +95,6 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
      */
     private function getUserEmailManager()
     {
-        return $this->doctrine->getEntityManagerForClass(EmailUser::class);
+        return $this->doctrine->getManagerForClass(EmailUser::class);
     }
 }

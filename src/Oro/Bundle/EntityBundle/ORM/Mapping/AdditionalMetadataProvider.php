@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityBundle\ORM\Mapping;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 
 class AdditionalMetadataProvider
 {

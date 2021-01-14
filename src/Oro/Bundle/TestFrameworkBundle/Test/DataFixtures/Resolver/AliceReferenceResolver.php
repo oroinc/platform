@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 

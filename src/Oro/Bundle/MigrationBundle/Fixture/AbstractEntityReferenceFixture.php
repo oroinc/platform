@@ -4,9 +4,9 @@ namespace Oro\Bundle\MigrationBundle\Fixture;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 
 abstract class AbstractEntityReferenceFixture extends AbstractFixture implements FixtureInterface
 {

@@ -2,6 +2,12 @@ services:
     _defaults:
         public: true
 
+    fidry_alice_data_fixtures.persistence.persister.doctrine.object_manager_persister:
+        class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Persister\ObjectManagerPersister
+        lazy: true
+        arguments:
+            - '@doctrine.orm.entity_manager'
+
     nelmio_alice.fixture_builder.expression_language.lexer.sub_patterns_lexer:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Lexer\SubPatternsLexer
         arguments:

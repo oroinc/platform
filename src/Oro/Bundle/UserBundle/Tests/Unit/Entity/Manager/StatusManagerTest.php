@@ -30,7 +30,7 @@ class StatusManagerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->repository = $this->createMock(
-            'Doctrine\Common\Persistence\ObjectRepository',
+            'Doctrine\Persistence\ObjectRepository',
             array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName')
         );
 

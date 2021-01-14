@@ -11,8 +11,8 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     private $fetchOneResult;
     private $platformMock;
     private $lastInsertId = 0;
-    private $inserts = array();
-    private $executeUpdates = array();
+    private $inserts = [];
+    private $executeStatements = [];
 
     public function __construct(array $params, $driver, $config = null, $eventManager = null)
     {
@@ -35,7 +35,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     /**
      * @override
      */
-    public function insert($tableName, array $data, array $types = array())
+    public function insert($tableName, array $data, array $types = [])
     {
         $this->inserts[$tableName][] = $data;
     }
@@ -43,9 +43,9 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     /**
      * @override
      */
-    public function executeUpdate($query, array $params = array(), array $types = array())
+    public function executeStatement($query, array $params = [], array $types = [])
     {
-        $this->executeUpdates[] = array('query' => $query, 'params' => $params, 'types' => $types);
+        $this->executeStatements[] = ['query' => $query, 'params' => $params, 'types' => $types];
     }
 
     /**
@@ -59,7 +59,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     /**
      * @override
      */
-    public function fetchColumn($statement, array $params = array(), $colnum = 0, array $types = array())
+    public function fetchColumn($statement, array $params = [], $colnum = 0, array $types = [])
     {
         return $this->fetchOneResult;
     }
@@ -72,6 +72,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
         if (is_string($input)) {
             return "'" . $input . "'";
         }
+
         return $input;
     }
 
@@ -97,14 +98,14 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
         return $this->inserts;
     }
 
-    public function getExecuteUpdates()
+    public function getExecuteStatements()
     {
-        return $this->executeUpdates;
+        return $this->executeStatements;
     }
 
     public function reset()
     {
-        $this->inserts = array();
+        $this->inserts = [];
         $this->lastInsertId = 0;
     }
 }

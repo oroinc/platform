@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Resolver;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EmailBundle\Provider\EmailAttributeProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailHolder;

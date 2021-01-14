@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Form\Type\ScopedDataType;
 use Oro\Component\Testing\Unit\EntityTrait;

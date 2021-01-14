@@ -54,7 +54,7 @@ services:
             - [setArrayCache, ['@oro_config.manager.array_cache']]
 
     oro_config.manager.array_cache:
-        parent: doctrine_cache.abstract.array
+        class: Doctrine\Common\Cache\ArrayCache
 
     Oro\Bundle\ConfigBundle\Config\ConfigManager:
         alias: oro_config.manager

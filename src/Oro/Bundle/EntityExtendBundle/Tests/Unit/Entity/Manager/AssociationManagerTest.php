@@ -59,7 +59,7 @@ class AssociationManagerTest extends OrmTestCase
         $this->aclHelper     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine            = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine            = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())

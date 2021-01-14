@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Symfony\Component\HttpKernel\KernelInterface;

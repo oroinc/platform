@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository;

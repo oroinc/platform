@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tools;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Inflector\Inflector;
 
 /**
  * Provides a set of static methods to build entity related translation keys.

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm\Configs;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter\YamlConverter;
 use Oro\Bundle\DataGridBundle\Exception\DatasourceException;
 

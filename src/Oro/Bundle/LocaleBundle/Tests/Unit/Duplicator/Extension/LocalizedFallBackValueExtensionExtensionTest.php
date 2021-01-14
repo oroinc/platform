@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Duplicator\Extension;
 
 use DeepCopy\Filter\Doctrine\DoctrineCollectionFilter;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;

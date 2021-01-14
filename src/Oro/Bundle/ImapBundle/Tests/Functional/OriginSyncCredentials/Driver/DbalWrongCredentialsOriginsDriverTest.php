@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\OriginSyncCredentials\Driver;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver\DbalWrongCredentialsOriginsDriver;
@@ -83,13 +84,14 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOrigins()
     {
+        /** @var Registry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $origin = new UserEmailOrigin();
         $origin->setMailboxName('test');
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($origin);
-        $em->flush($origin);
+        $em->flush();
 
         $doctrine->getConnection()->insert('oro_imap_wrong_creds_origin', ['origin_id'=> $origin->getId()]);
 
@@ -103,6 +105,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithPassedId()
     {
+        /** @var Registry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();
@@ -111,7 +114,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $systemOrigin = new UserEmailOrigin();
         $systemOrigin->setMailboxName('system');
 
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($userOrigin);
         $em->persist($systemOrigin);
         $em->flush();
@@ -125,6 +128,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithoutPassedId()
     {
+        /** @var Registry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();
@@ -133,7 +137,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
         $systemOrigin = new UserEmailOrigin();
         $systemOrigin->setMailboxName('system');
 
-        $em = $doctrine->getEntityManager();
+        $em = $doctrine->getManager();
         $em->persist($userOrigin);
         $em->persist($systemOrigin);
         $em->flush();

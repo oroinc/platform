@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 

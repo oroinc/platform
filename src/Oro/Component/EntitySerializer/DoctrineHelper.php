@@ -2,10 +2,10 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**

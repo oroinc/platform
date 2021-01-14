@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\MappingException;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AbstractConfigType;
 use Oro\Bundle\EntityConfigBundle\Form\Util\ConfigTypeHelper;

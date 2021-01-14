@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Mapping;
 
 use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 
 class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
@@ -17,14 +17,14 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->metadataFactory = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
+        $this->metadataFactory = $this->createMock('Doctrine\Persistence\Mapping\ClassMetadataFactory');
 
         $em = $this->createMock('Doctrine\ORM\EntityManagerInterface');
         $em->expects($this->any())
             ->method('getMetadataFactory')
             ->will($this->returnValue($this->metadataFactory));
 
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $registry->expects($this->any())
             ->method('getManager')
             ->will($this->returnValue($em));

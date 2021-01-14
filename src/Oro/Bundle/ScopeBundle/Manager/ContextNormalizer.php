@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ContextNormalizer
 {
