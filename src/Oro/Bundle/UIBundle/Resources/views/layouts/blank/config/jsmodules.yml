@@ -28,7 +28,7 @@ aliases:
     jquery.numeric$: npmassets/jquery-numeric/jquery.numeric
     jquery.select2$: npmassets/@oroinc/select2/select2
     jquery.timepicker$: npmassets/timepicker/jquery.timepicker
-    jquery.uniform$: npmassets/jquery.uniform/src/js/jquery.uniform
+    jquery.uniform$: npmassets/@oroinc/jquery.uniform/src/js/jquery.uniform
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
