@@ -23,10 +23,10 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
@@ -65,22 +65,22 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(
                 [
-                    new PreloadedExtension(
-                        [
-                            'oro_type_text_filter' => new TextFilterType($translator),
+                new PreloadedExtension(
+                    [
+                        'oro_type_text_filter'           => new TextFilterType($translator),
                             'oro_type_datetime_range_filter' =>
                                 new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                             'oro_type_date_range_filter' =>
                                 new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
-                            'oro_type_datetime_range' => new DateTimeRangeType(),
-                            'oro_type_date_range' => new DateRangeType($this->localeSettings),
-                            'oro_type_filter' => new FilterType($translator),
-                        ],
-                        []
-                    ),
-                    new CsrfExtension(
-                        $this->createMock(CsrfTokenManagerInterface::class)
-                    )
+                        'oro_type_datetime_range'        => new DateTimeRangeType(),
+                        'oro_type_date_range'            => new DateRangeType($this->localeSettings),
+                        'oro_type_filter'                => new FilterType($translator),
+                    ],
+                    []
+                ),
+                new CsrfExtension(
+                    $this->createMock(CsrfTokenManagerInterface::class)
+                )
                 ]
             )
             ->getFormFactory();
@@ -153,8 +153,8 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      *
-     * @param string $name A filter name
-     * @param array $params An additional parameters of a new filter
+     * @param string $name   A filter name
+     * @param array  $params An additional parameters of a new filter
      *
      * @return FilterInterface
      * @throws \Exception
