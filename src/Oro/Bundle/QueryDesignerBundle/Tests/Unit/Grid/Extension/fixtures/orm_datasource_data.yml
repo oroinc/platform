@@ -1,61 +1,61 @@
-'test with group and simple restrictions':
-    source:
-        source:
-            query_config:
-                filters:
-                    -
-                        column: user_name
-                        filter: string
-                        filterData:
-                            type: '2'
-                            value: test_user_name
-                        columnAlias: user_name
-                    - AND
-                    -
-                        -
-                            column: user_status
-                            filter: datetime
-                            filterData:
-                                type: '2'
-                                value:
-                                    start: '2013-11-20 10:30'
-                                    end: '2013-11-25 11:30'
-                        - AND
-                        -
-                            -
-                                -
-                                    column: address.country
-                                    filter: string
-                                    filterData:
-                                        type: '1'
-                                        value: test_address_country
-                                    columnAlias: address_country
-                                - OR
-                                -
-                                    column: address.city
-                                    filter: string
-                                    filterData:
-                                        type: '1'
-                                        value: test_address_city
-                            - OR
-                            -
-                                column: address.zip
-                                filter: string
-                                filterData:
-                                    type: '1'
-                                    value: address_zip
-    expected: >-
-        SELECT user.id, user.name as user_name, user.status as user_status
-        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
-            INNER JOIN user.address address
-            INNER JOIN user.shippingAddresses shippingAddresses
-        WHERE
-        user_name NOT LIKE :string1
-        AND (
-            (user_status < :datetime2 OR user_status >= :datetime3)
-            AND ((address.country LIKE :string4 OR address.city LIKE :string5) OR address.zip LIKE :string6)
-        )
-    enableGrouping: true
+#'test with group and simple restrictions':
+#    source:
+#        source:
+#            query_config:
+#                filters:
+#                    -
+#                        column: user_name
+#                        filter: string
+#                        filterData:
+#                            type: '2'
+#                            value: test_user_name
+#                        columnAlias: user_name
+#                    - AND
+#                    -
+#                        -
+#                            column: user_status
+#                            filter: datetime
+#                            filterData:
+#                                type: '2'
+#                                value:
+#                                    start: '2013-11-20 10:30'
+#                                    end: '2013-11-25 11:30'
+#                        - AND
+#                        -
+#                            -
+#                                -
+#                                    column: address.country
+#                                    filter: string
+#                                    filterData:
+#                                        type: '1'
+#                                        value: test_address_country
+#                                    columnAlias: address_country
+#                                - OR
+#                                -
+#                                    column: address.city
+#                                    filter: string
+#                                    filterData:
+#                                        type: '1'
+#                                        value: test_address_city
+#                            - OR
+#                            -
+#                                column: address.zip
+#                                filter: string
+#                                filterData:
+#                                    type: '1'
+#                                    value: address_zip
+#    expected: >-
+#        SELECT user.id, user.name as user_name, user.status as user_status
+#        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
+#            INNER JOIN user.address address
+#            INNER JOIN user.shippingAddresses shippingAddresses
+#        WHERE
+#        user_name NOT LIKE :_gpnpstring1
+#        AND (
+#            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
+#            AND ((address.country LIKE :_gpnpstring2 OR address.city LIKE :_gpnpstring3) OR address.zip LIKE :_gpnpstring4)
+#        )
+#    enableGrouping: true
 
 'test with to many relation and grouped conditions compatibility mode off':
     source:
@@ -111,29 +111,29 @@
             INNER JOIN user.address address
             INNER JOIN user.shippingAddresses shippingAddresses
         WHERE
-        user_name NOT LIKE :string1
+        user_name NOT LIKE :_gpnpstring1
         AND (
-            (user_status < :datetime2 OR user_status >= :datetime3)
+            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
             AND
                 (EXISTS(
-                    SELECT conditionsgroup15.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser conditionsgroup15
-                        INNER JOIN conditionsgroup15.address conditionsgroup16
-                        INNER JOIN conditionsgroup15.shippingAddresses conditionsgroup17
+                    SELECT _gpnpconditionsgroup4.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
+                        INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
+                        INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
                     WHERE (
                         (EXISTS(
-                                SELECT conditionsgroup18.id
-                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser conditionsgroup18
-                                    INNER JOIN conditionsgroup18.address conditionsgroup19
-                                    INNER JOIN conditionsgroup18.shippingAddresses conditionsgroup20
+                                SELECT _gpnpconditionsgroup4.id
+                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
+                                    INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
+                                    INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
                                 WHERE
-                                (conditionsgroup20.country LIKE :string4 OR conditionsgroup20.city LIKE :string5)
-                                AND conditionsgroup18.id = conditionsgroup15.id
+                                (_gpnpconditionsgroup6.country LIKE :_gpnpstring2 OR _gpnpconditionsgroup6.city LIKE :_gpnpstring3)
+                                AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
                             )
                         )
-                        OR conditionsgroup17.zip LIKE :string6
+                        OR _gpnpconditionsgroup6.zip LIKE :_gpnpstring4
                     )
-                    AND conditionsgroup15.id = user.id
+                    AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
                 )
             )
         )
@@ -186,41 +186,40 @@
                                     filterData:
                                         type: '1'
                                         value: address_zip
-
     expected: >-
         SELECT user.id, user.name as user_name, user.status as user_status
         FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
             INNER JOIN user.address address
             INNER JOIN user.shippingAddresses shippingAddresses
         WHERE
-        user_name NOT LIKE :string1
+        user_name NOT LIKE :_gpnpstring1
         AND (
-            (user_status < :datetime2 OR user_status >= :datetime3)
+            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
             AND (
-                (EXISTS(SELECT string25.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string25
-                        INNER JOIN string25.address string26
-                        INNER JOIN string25.shippingAddresses string27
+                (EXISTS(SELECT _gpnpstring3.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpstring3
+                        INNER JOIN _gpnpstring3.address _gpnpstring4
+                        INNER JOIN _gpnpstring3.shippingAddresses _gpnpstring5
                     WHERE
-                    string27.country LIKE :string4
-                    AND string25.id = user.id
+                    _gpnpstring5.country LIKE :_gpnpstring2
+                    AND _gpnpstring3.id = user.id
                 ))
                 OR
-                (EXISTS(SELECT string29.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string29
-                        INNER JOIN string29.address string30
-                        INNER JOIN string29.shippingAddresses string31
+                (EXISTS(SELECT _gpnpstring7.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpstring7
+                        INNER JOIN _gpnpstring7.address _gpnpstring8
+                        INNER JOIN _gpnpstring7.shippingAddresses _gpnpstring9
                     WHERE
-                    string31.city LIKE :string5 AND string29.id = user.id
+                    _gpnpstring9.city LIKE :_gpnpstring6 AND _gpnpstring7.id = user.id
                 ))
                 OR
-                (EXISTS(SELECT string33.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser string33
-                        INNER JOIN string33.address string34
-                        INNER JOIN string33.shippingAddresses string35
+                (EXISTS(SELECT _gpnpstring11.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpstring11
+                        INNER JOIN _gpnpstring11.address _gpnpstring12
+                        INNER JOIN _gpnpstring11.shippingAddresses _gpnpstring13
                     WHERE
-                    string35.zip LIKE :string6
-                    AND string33.id = user.id
+                    _gpnpstring13.zip LIKE :_gpnpstring10
+                    AND _gpnpstring11.id = user.id
                 ))
             )
         )
@@ -262,9 +261,8 @@
             INNER JOIN user.address address
             INNER JOIN user.shippingAddresses shippingAddresses
         WHERE
-        user_name NOT LIKE :string1
-        OR (user_status < :datetime2 OR user_status >= :datetime3 OR address.country LIKE :string4)
-
+        user_name NOT LIKE :_gpnpstring1
+        OR (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2 OR address.country LIKE :_gpnpstring2)
     enableGrouping: true
 
 'test with OR filters between simple and group conditions':
@@ -297,17 +295,15 @@
                                 type: '1'
                                 value: test_address_country
                             columnAlias: address_country
-
     expected: >-
         SELECT user.id, user.name as user_name, user.status as user_status
         FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
             INNER JOIN user.address address
             INNER JOIN user.shippingAddresses shippingAddresses
         WHERE
-        user_name NOT LIKE :string1
+        user_name NOT LIKE :_gpnpstring1
         OR (
-            (user_status < :datetime2 OR user_status >= :datetime3)
-            AND address.country LIKE :string4
+            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
+            AND address.country LIKE :_gpnpstring2
         )
-
     enableGrouping: true
