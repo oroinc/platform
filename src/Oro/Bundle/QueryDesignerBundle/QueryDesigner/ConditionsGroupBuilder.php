@@ -26,6 +26,7 @@ class ConditionsGroupBuilder
     ): void {
         $filters['in_group'] = true;
 
+        $computedFilterExpression = null;
         if ($this->hasRelationsInFilters($ds, $filters)) {
             $qb = $ds->getQueryBuilder();
             [$subDql, $boundParameters] = FilterOrmQueryUtil::getSubQueryExpressionWithParameters(
@@ -39,9 +40,15 @@ class ConditionsGroupBuilder
             $subQb = $this->createSubQueryBuilder($restrictionBuilder, $ds, $filters);
             $boundParameters = $subQb->getParameters();
             $filterExpression = (string)$subQb->getDQLPart('where');
+            $computedFilterExpression = (string)$subQb->getDQLPart('having');
         }
 
-        $ds->addRestriction($filterExpression, FilterUtility::CONDITION_AND, false);
+        if ($filterExpression) {
+            $ds->addRestriction($filterExpression, FilterUtility::CONDITION_AND);
+        }
+        if ($computedFilterExpression) {
+            $ds->addRestriction($computedFilterExpression, FilterUtility::CONDITION_AND, true);
+        }
         $this->applyParameters($ds, $boundParameters);
     }
 
