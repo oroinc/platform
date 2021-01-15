@@ -9,11 +9,12 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
 
 class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConsumerState */
-    private $consumerState;
+    private ConsumerState $consumerState;
 
-    /** @var ConsoleErrorHandler */
-    private $handler;
+    /** @var TestHandler|\PHPUnit\Framework\MockObject\MockObject  */
+    private TestHandler $innerHandler;
+
+    private ConsoleErrorHandler $handler;
 
     /**
      * {@inheritdoc}
@@ -21,15 +22,24 @@ class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
+        $this->innerHandler = $this->createMock(TestHandler::class);
 
-        $this->handler = new ConsoleErrorHandler($this->consumerState, new TestHandler(), Logger::CRITICAL);
+        $this->handler = new ConsoleErrorHandler($this->consumerState, $this->innerHandler, Logger::CRITICAL);
     }
 
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $this->assertFalse($this->handler->isHandling([]));
         $this->consumerState->startConsumption();
         $this->assertTrue($this->handler->isHandling(['level' => Logger::CRITICAL]));
         $this->assertFalse($this->handler->isHandling(['level' => Logger::DEBUG]));
+    }
+
+    public function testReset(): void
+    {
+        $this->innerHandler->expects(static::once())
+            ->method('reset');
+
+        $this->handler->reset();
     }
 }
