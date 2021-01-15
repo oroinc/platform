@@ -25,7 +25,6 @@
     "expose-loader": "^0.7.5",
     "extract-loader": "3.1.0",
     "file-loader": "^4.3.0",
-    "file-system": "2.2.2",
     "font-awesome": "4.7.0",
     "glob": "7.1.5",
     "happypack": "^5.0.1",

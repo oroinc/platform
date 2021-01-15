@@ -145,7 +145,7 @@
             "jquery-ui": "1.12.*",
             "backbone": "1.4.*",
             "underscore": "1.9.*",
-            "jquery.uniform": "4.3.*",
+            "@oroinc/jquery.uniform": "4.3.*",
             "overlayscrollbars": "1.6.*",
             "font-awesome": "4.7.*",
             "bootstrap": "4.3.1",

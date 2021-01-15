@@ -12,6 +12,7 @@ use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
@@ -19,15 +20,16 @@ use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\QueryDesignerBundle\Filter\ConditionsGroupFilter;
+use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Stubs\OrmDatasourceExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
@@ -69,6 +71,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                     new PreloadedExtension(
                         [
                             'oro_type_text_filter' => new TextFilterType($translator),
+                            'oro_type_number_filter' => new NumberFilterType($translator, $this->localeSettings),
                             'oro_type_datetime_range_filter' =>
                                 new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
                             'oro_type_date_range_filter' =>
@@ -163,7 +166,6 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      * @param array $params An additional parameters of a new filter
      *
      * @return FilterInterface
-     * @throws \Exception
      */
     public function createFilter($name, array $params = null)
     {
@@ -177,6 +179,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         switch ($name) {
             case 'string':
                 $filter = new StringFilter($this->formFactory, new FilterUtility());
+                break;
+            case 'number':
+                $filter = new NumberFilter($this->formFactory, new FilterUtility());
                 break;
             case 'datetime':
                 $compiler = $this->createMock(Compiler::class);

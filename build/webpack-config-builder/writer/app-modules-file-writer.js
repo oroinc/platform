@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('file-system');
+const fs = require('fs');
 
 class AppModulesFileWriter {
     /**
@@ -24,6 +24,7 @@ class AppModulesFileWriter {
         });
         content += '];\n';
         let filepath = path.resolve(this._publicPath + buildPath);
+        fs.mkdirSync(path.dirname(filepath), {recursive: true});
         fs.writeFileSync(filepath, content);
 
         return filepath;

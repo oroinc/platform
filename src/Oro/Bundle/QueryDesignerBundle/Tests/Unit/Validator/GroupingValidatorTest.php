@@ -104,9 +104,7 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
                         [
                             'name'    => 'columnName',
                             'label'   => 'columnLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ]
                     ],
@@ -119,9 +117,7 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
                         [
                             'name'    => 'columnName',
                             'label'   => 'columnLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ],
                         [
@@ -141,9 +137,7 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
                         [
                             'name'    => 'columnName',
                             'label'   => 'columnLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ],
                         [
@@ -176,25 +170,19 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
                         [
                             'name'    => 'columnName',
                             'label'   => 'columnLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ],
                         [
                             'name'    => 'columnName2',
                             'label'   => 'columnLabel2',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ],
                         [
                             'name'    => 'grouped',
                             'label'   => 'groupedLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ],
                         [
@@ -214,9 +202,7 @@ class GroupingValidatorTest extends \PHPUnit\Framework\TestCase
                         [
                             'name'    => 'grouped',
                             'label'   => 'groupedLabel',
-                            'func'    => [
-                                'type' => 'type'
-                            ],
+                            'func'    => ['type' => 'type', 'group_type' => 'aggregates'],
                             'sorting' => '',
                         ]
                     ],

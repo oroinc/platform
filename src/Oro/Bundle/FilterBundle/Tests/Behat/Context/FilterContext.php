@@ -17,14 +17,14 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
     use PageObjectDictionary;
 
     /**
-     * @Given I add the following filters:
+     * @Given /^(?:|I )add the following filters:$/
      *
      * @param TableNode $table
      */
     public function iAddTheFollowingFilters(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($filter, $column, $type, $value) = array_pad($row, 4, null);
+            [$filter, $column, $type, $value] = array_pad($row, 4, null);
             $this->addFilter($filter, $column, $type, $value);
             $this->waitForAjax();
         }

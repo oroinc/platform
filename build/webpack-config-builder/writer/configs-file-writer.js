@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('file-system');
+const fs = require('fs');
 
 class ConfigsFileWriter {
     /**
@@ -19,6 +19,7 @@ class ConfigsFileWriter {
     write(configs, output) {
         let buildPath = path.join(output, 'configs.json');
         let filepath = path.resolve(this._publicPath + buildPath);
+        fs.mkdirSync(path.dirname(filepath), {recursive: true});
         fs.writeFileSync(filepath, JSON.stringify(configs, null, 2));
         return filepath;
     }
