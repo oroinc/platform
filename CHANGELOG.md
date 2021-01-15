@@ -49,7 +49,7 @@ The current file describes significant changes in the code that may affect the u
 #### UIBundle
 
 * Moved layout themes build artefacts from `public/layout-build/{theme}` to `public/build/{theme}` folder.
-* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder. 
+* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder.
 * Changed the output path for the admin theme from `css/oro/oro.css` to `css/oro.css`.
 * Changed the output path for tinymce CSS entry points from `css/tinymce/*` to `to tinymce/*`.
 
@@ -104,7 +104,7 @@ The current file describes significant changes in the code that may affect the u
   );
   ```
   This way Webpack will copy `tinymce/plugins` folder into public directory `public/build/_static/_/node_modules/tinymce/plugins`.
-  
+
   Pay attention for the leading exclamation point, it says that all other loaders (e.g. css-loader) should be ignored for this context.
   If you nevertheless need to process all included css files by Webpack -- leading `!` has to be removed.
 * The "oomphinc/composer-installers-extender" composer package was removed. As a result, composer components are not copied automatically to the `public/bundles/components` directory.
@@ -145,7 +145,8 @@ The current file describes significant changes in the code that may affect the u
 * The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
   Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
 
-## 4.2.0-rc
+## 4.2.0-rc (2020-11-30)
+[Show detailed list of changes](incompatibilities-4-2-rc.md)
 
 ### Added
 
@@ -162,7 +163,11 @@ The current file describes significant changes in the code that may affect the u
 ### SyncBundle
 * Removed long-unused the `orosync/js/content/grid-builder` component from the layout updates.
 
-## 4.2.0-alpha.3
+## 4.2.0-beta (2020-09-28)
+[Show detailed list of changes](incompatibilities-4-2-beta.md)
+
+## 4.2.0-alpha.3 (2020-07-30)
+[Show detailed list of changes](incompatibilities-4-2-alpha-3.md)
 
 ### Changed
 
@@ -181,11 +186,14 @@ The current file describes significant changes in the code that may affect the u
 * The configuration option `oro_sso.domains` was renamed to `oro_google_integration.sso_domains`.
 * The service `oro_sso.oauth_provider` was renamed to `oro_sso.oauth_user_provider`.
 
-#### UIBundle
-* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
 
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
+
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
 
 ### Removed
 
