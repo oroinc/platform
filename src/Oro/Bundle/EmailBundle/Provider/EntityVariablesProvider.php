@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;

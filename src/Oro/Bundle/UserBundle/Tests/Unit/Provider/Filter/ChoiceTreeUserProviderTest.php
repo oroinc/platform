@@ -48,7 +48,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $manager->expects($this->once())
@@ -77,7 +77,7 @@ class ChoiceTreeUserProviderTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
 

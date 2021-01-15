@@ -18,7 +18,7 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->getMock();
         $this->condition = new HasActiveIntegration($this->registry);
     }

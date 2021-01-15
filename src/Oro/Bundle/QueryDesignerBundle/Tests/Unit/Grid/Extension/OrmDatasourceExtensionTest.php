@@ -12,6 +12,7 @@ use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
 use Oro\Bundle\FilterBundle\Form\EventListener\DateFilterSubscriber;
 use Oro\Bundle\FilterBundle\Form\Type\DateRangeType;
@@ -19,6 +20,7 @@ use Oro\Bundle\FilterBundle\Form\Type\DateTimeRangeType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateTimeRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
@@ -63,15 +65,24 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
 
         $this->formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions(
-                [
+            ->addExtensions([
                 new PreloadedExtension(
                     [
                         'oro_type_text_filter'           => new TextFilterType($translator),
-                            'oro_type_datetime_range_filter' =>
-                                new DateTimeRangeFilterType($translator, new DateModifierProvider(), $subscriber),
-                            'oro_type_date_range_filter' =>
-                                new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber),
+                        'oro_type_number_filter'         => new NumberFilterType(
+                            $translator,
+                            $this->localeSettings
+                        ),
+                        'oro_type_datetime_range_filter' => new DateTimeRangeFilterType(
+                            $translator,
+                            new DateModifierProvider(),
+                            $subscriber
+                        ),
+                        'oro_type_date_range_filter'     => new DateRangeFilterType(
+                            $translator,
+                            new DateModifierProvider(),
+                            $subscriber
+                        ),
                         'oro_type_datetime_range'        => new DateTimeRangeType(),
                         'oro_type_date_range'            => new DateRangeType($this->localeSettings),
                         'oro_type_filter'                => new FilterType($translator),
@@ -81,15 +92,14 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                 new CsrfExtension(
                     $this->createMock(CsrfTokenManagerInterface::class)
                 )
-                ]
-            )
+            ])
             ->getFormFactory();
     }
 
     /**
      * @dataProvider visitDatasourceProvider
      */
-    public function testVisitDatasource(array $source, string $expected, bool $enableGrouping = false)
+    public function testVisitDatasource(array $source, string $expected, bool $enableGrouping = false): void
     {
         $qb = new QueryBuilder($this->getTestEntityManager());
         $qb->select(['user.id', 'user.name as user_name', 'user.status as user_status'])
@@ -139,10 +149,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         $this->assertEquals($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function visitDatasourceProvider()
+    public function visitDatasourceProvider(): array
     {
         return Yaml::parse(
             file_get_contents(implode(DIRECTORY_SEPARATOR, [__DIR__, 'fixtures', 'orm_datasource_data.yml']))
@@ -157,9 +164,8 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      * @param array  $params An additional parameters of a new filter
      *
      * @return FilterInterface
-     * @throws \Exception
      */
-    public function createFilter($name, array $params = null)
+    private function createFilter(string $name, array $params = null): FilterInterface
     {
         $defaultParams = [
             'type' => $name
@@ -167,16 +173,20 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         if ($params !== null && !empty($params)) {
             $params = array_merge($defaultParams, $params);
         }
+        $util = new FilterUtility();
 
         switch ($name) {
             case 'string':
-                $filter = new StringFilter($this->formFactory, new FilterUtility());
+                $filter = new StringFilter($this->formFactory, $util);
+                break;
+            case 'number':
+                $filter = new NumberFilter($this->formFactory, $util);
                 break;
             case 'datetime':
                 $compiler = $this->createMock(Compiler::class);
                 $filter = new DateTimeRangeFilter(
                     $this->formFactory,
-                    new FilterUtility(),
+                    $util,
                     new DateFilterUtility($this->localeSettings, $compiler),
                     $this->localeSettings,
                     new DateFilterModifier($compiler)

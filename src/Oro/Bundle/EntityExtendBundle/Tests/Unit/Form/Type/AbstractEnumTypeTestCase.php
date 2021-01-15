@@ -28,7 +28,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->getMock();
 
         $this->doctrine = $this->getMockForAbstractClass(
-            'Doctrine\Common\Persistence\ManagerRegistry',
+            'Doctrine\Persistence\ManagerRegistry',
             [],
             '',
             true,

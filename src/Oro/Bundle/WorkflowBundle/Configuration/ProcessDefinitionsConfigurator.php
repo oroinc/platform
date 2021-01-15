@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;

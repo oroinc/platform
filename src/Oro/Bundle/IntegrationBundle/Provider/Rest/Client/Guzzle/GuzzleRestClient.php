@@ -131,7 +131,7 @@ class GuzzleRestClient implements RestClientInterface
         }
 
         $uri = new Uri($path);
-        $uri = Uri::withQueryValues($uri, $params);
+        $uri = Uri::withQueryValues($uri, array_map('rawurlencode', $params));
 
         return (string)$uri;
     }

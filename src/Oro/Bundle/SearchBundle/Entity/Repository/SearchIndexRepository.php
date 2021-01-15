@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Entity\Repository;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Engine\Orm\DBALPersisterInterface;
 use Oro\Bundle\SearchBundle\Entity\AbstractItem;

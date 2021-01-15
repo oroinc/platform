@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Environment;
 
 use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager as BaseNotificationManager;
 

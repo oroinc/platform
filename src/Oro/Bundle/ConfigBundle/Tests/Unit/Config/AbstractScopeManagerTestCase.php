@@ -4,8 +4,8 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\AbstractScopeManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Entity\Config;
@@ -96,7 +96,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
                 'fields' => [],
             ]);
 
-        list($created, $updated, $isNullValue) = $this->manager->getInfo('oro_user.level');
+        [$created, $updated, $isNullValue] = $this->manager->getInfo('oro_user.level');
 
         $this->assertEquals($this->cache->fetch($key), $this->getCachedConfig($config));
         $this->assertEquals($configValue1->getCreatedAt(), $created);

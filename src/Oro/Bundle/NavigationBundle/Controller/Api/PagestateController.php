@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -165,7 +165,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     /**
      * Get entity Manager
      *
-     * @return \Doctrine\Common\Persistence\ObjectManager
+     * @return \Doctrine\Persistence\ObjectManager
      */
     protected function getManager()
     {

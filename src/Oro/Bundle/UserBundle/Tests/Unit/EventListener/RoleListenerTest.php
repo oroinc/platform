@@ -88,7 +88,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
         $em = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+        $repository = $this->getMockBuilder('Doctrine\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
             ->getMock();
 

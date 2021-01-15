@@ -163,7 +163,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ;
         $doctrine
             ->expects($this->once())
-            ->method('getEntityManagerForClass')
+            ->method('getManagerForClass')
             ->with(EmailUser::class)
             ->will($this->returnValue($em))
         ;
@@ -218,7 +218,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ;
         $doctrine
             ->expects($this->once())
-            ->method('getEntityManagerForClass')
+            ->method('getManagerForClass')
             ->with(EmailUser::class)
             ->will($this->returnValue($em))
         ;

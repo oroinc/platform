@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WindowsBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
 use Oro\Bundle\WindowsBundle\Entity\Repository\AbstractWindowsStateRepository;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;

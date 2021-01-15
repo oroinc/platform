@@ -4,12 +4,52 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.2.0
 
+### Added
+
+#### SecurityBundle
+* Added `generate_uuid` action. The action generates UUID and puts the value to the specified attribute.
+
+#### TranslationBundle
+* Added migration query `Oro\Bundle\TranslationBundle\Migration\DeleteTranslationsByDomainAndKeyPrefixQuery` that can be used to remove unused translations by domain and key prefix.
+
+#### WorkflowBundle
+* Added migration query `Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowAwareEntitiesQuery` that can be used to remove instances of entity created from the specified workflow.
+* Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
+
 ### Changed
+
+#### AttachmentBundle
+* The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
+* The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
+
+#### EntityBundle
+* The service `oro_entity.virtual_field_provider.chain` was renamed to `oro_entity.virtual_field_provider`.
+* The service `oro_entity.virtual_relation_provider.chain` was renamed to `oro_entity.virtual_relation_provider`.
+
+#### PlatformBundle
+* The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
+  `{ name: oro_platform.console.global_options_provider, priority: -100 }`
+
+#### QueryDesignerBundle
+* The class `Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter` was refactored to decrease its complexity.
+  The state of all query converters was moved to "context" classes.
+  The base context class is `Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext`.
+  If you have own query converters, update them according to new architecture.
+
+#### SecurityBundle
+* The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
+  `{ name: oro.security.filter.acl_privilege, priority: -100 }`
 
 #### UIBundle
 
 * Moved layout themes build artefacts from `public/layout-build/{theme}` to `public/build/{theme}` folder.
-* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder. 
+* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder.
 * Changed the output path for the admin theme from `css/oro/oro.css` to `css/oro.css`.
 * Changed the output path for tinymce CSS entry points from `css/tinymce/*` to `to tinymce/*`.
 
@@ -64,7 +104,7 @@ The current file describes significant changes in the code that may affect the u
   );
   ```
   This way Webpack will copy `tinymce/plugins` folder into public directory `public/build/_static/_/node_modules/tinymce/plugins`.
-  
+
   Pay attention for the leading exclamation point, it says that all other loaders (e.g. css-loader) should be ignored for this context.
   If you nevertheless need to process all included css files by Webpack -- leading `!` has to be removed.
 * The "oomphinc/composer-installers-extender" composer package was removed. As a result, composer components are not copied automatically to the `public/bundles/components` directory.
@@ -84,6 +124,13 @@ The current file describes significant changes in the code that may affect the u
     + $icomoon-font-path: "~bundles/orocms/fonts/grapsejs/fonts" !default;
     ```
 
+#### UserBundle
+* The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
+  - the method `getPermissionCategories` was renamed to `getCategories`
+  - the method `getTabList` was renamed to `getTabIds`
+  - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
+    `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
+
 ### Removed
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
@@ -98,44 +145,8 @@ The current file describes significant changes in the code that may affect the u
 * The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
   Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
 
-### Changed
-
-#### AttachmentBundle
-* The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
-* The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
-
-#### EntityBundle
-* The service `oro_entity.virtual_field_provider.chain` was renamed to `oro_entity.virtual_field_provider`.
-* The service `oro_entity.virtual_relation_provider.chain` was renamed to `oro_entity.virtual_relation_provider`.
-
-#### PlatformBundle
-* The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
-  was changed to correspond Symfony recommendations.
-  If you have services with this tag, change the sign of the priority value for them.
-  E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
-  `{ name: oro_platform.console.global_options_provider, priority: -100 }`
-
-#### QueryDesignerBundle
-* The class `Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter` was refactored to decrease its complexity.
-  The state of all query converters was moved to "context" classes.
-  The base context class is `Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext`.
-  If you have own query converters, update them according to new architecture.
-
-#### SecurityBundle
-* The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
-  was changed to correspond Symfony recommendations.
-  If you have services with this tag, change the sign of the priority value for them.
-  E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
-  `{ name: oro.security.filter.acl_privilege, priority: -100 }`
-
-#### UserBundle
-* The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
-  - the method `getPermissionCategories` was renamed to `getCategories`
-  - the method `getTabList` was renamed to `getTabIds`
-  - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
-    `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
-
-## 4.2.0-rc
+## 4.2.0-rc (2020-11-30)
+[Show detailed list of changes](incompatibilities-4-2-rc.md)
 
 ### Added
 
@@ -152,7 +163,11 @@ The current file describes significant changes in the code that may affect the u
 ### SyncBundle
 * Removed long-unused the `orosync/js/content/grid-builder` component from the layout updates.
 
-## 4.2.0-alpha.3
+## 4.2.0-beta (2020-09-28)
+[Show detailed list of changes](incompatibilities-4-2-beta.md)
+
+## 4.2.0-alpha.3 (2020-07-30)
+[Show detailed list of changes](incompatibilities-4-2-alpha-3.md)
 
 ### Changed
 
@@ -171,11 +186,14 @@ The current file describes significant changes in the code that may affect the u
 * The configuration option `oro_sso.domains` was renamed to `oro_google_integration.sso_domains`.
 * The service `oro_sso.oauth_provider` was renamed to `oro_sso.oauth_user_provider`.
 
-#### UIBundle
-* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
+#### DataGridBundle
+* The maximum number of items can be deleted at once during mass delete process was decreased to 100.
 
 #### UserBundle
 * The name for `/api/authstatuses` REST API resource was changed to `/api/userauthstatuses`.
+
+#### UIBundle
+* Modules of `jquery-ui` library are now declared separately, and each of them has to be imported directly, if necessary (`jquery-ui/widget`, `jquery-ui/widgets/sortable` etc.)
 
 ### Removed
 

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer;
 use Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector;
 use Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector;

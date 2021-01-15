@@ -100,7 +100,7 @@ class EntityHierarchyProviderTest extends OrmTestCase
      */
     protected function getDoctrineMock($emMock = null, $isReturnManager = true)
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 

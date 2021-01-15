@@ -62,7 +62,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $classMetadata = $this->getMockBuilder('\Doctrine\Common\Persistence\Mapping\ClassMetadata')
+        $classMetadata = $this->getMockBuilder('\Doctrine\Persistence\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
         $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);

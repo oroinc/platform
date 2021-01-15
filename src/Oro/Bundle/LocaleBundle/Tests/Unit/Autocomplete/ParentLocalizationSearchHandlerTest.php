@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Autocomplete;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
@@ -258,7 +258,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_ENTITY_CLASS)
             ->willReturn($this->entityRepository);
 
-        $managerRegistry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $managerRegistry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $managerRegistry->expects($this->once())
             ->method('getManagerForClass')
             ->with(self::TEST_ENTITY_CLASS)

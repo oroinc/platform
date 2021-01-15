@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Tools;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use PHPUnit\Framework\MockObject\MockObject;
 

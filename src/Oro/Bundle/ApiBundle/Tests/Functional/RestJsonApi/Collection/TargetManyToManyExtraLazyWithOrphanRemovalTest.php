@@ -23,7 +23,7 @@ class TargetManyToManyExtraLazyWithOrphanRemovalTest extends AbstractTargetManyT
      */
     protected function isOrphanRemoval(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -40,15 +40,5 @@ class TargetManyToManyExtraLazyWithOrphanRemovalTest extends AbstractTargetManyT
     protected function getItems($entity): Collection
     {
         return $entity->getManyToManyExtraLazyWithOrphanRemovalParents();
-    }
-
-    public function testTryToUpdateWithRemoveItemFromCollectionAndHasValidationErrors()
-    {
-        $this->markTestSkipped('Remove this method in BAP-19905');
-    }
-
-    public function testTryToUpdateWithRemoveAllItemsFromCollectionAndHasValidationErrors()
-    {
-        $this->markTestSkipped('Remove this method in BAP-19905');
     }
 }

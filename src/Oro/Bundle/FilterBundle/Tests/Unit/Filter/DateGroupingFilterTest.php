@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;

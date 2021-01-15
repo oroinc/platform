@@ -75,7 +75,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
             ]
         ]);
 
-        $entityManager = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $entityManager = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -102,7 +102,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
     public function testBlockedFieldNameUpdate()
     {
         $this->expectException(\Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException::class);
-        $entityManager = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $entityManager = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $metadata = $this->getMetadata([

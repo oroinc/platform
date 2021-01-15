@@ -10,7 +10,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_COUNTRY_NAME = 'testCountry';
 
-    /** @var \Doctrine\Common\Persistence\ObjectManager */
+    /** @var \Doctrine\Persistence\ObjectManager */
     protected $om;
 
     /** @var \Symfony\Component\Form\FormFactoryInterface */
@@ -26,7 +26,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->om = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->om = $this->createMock('Doctrine\Persistence\ObjectManager');
         $this->formBuilder = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
 
         $this->subscriber = new AddressCountryAndRegionSubscriber($this->om, $this->formBuilder);
@@ -207,7 +207,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('hasRegions')
             ->will($this->returnValue(true));
 
-        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Persistence\ObjectRepository');
         $repository->expects($this->any())->method('find')->with(self::TEST_COUNTRY_NAME)
             ->will($this->returnValue($countryMock));
 
@@ -268,7 +268,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('hasRegions')
             ->will($this->returnValue(false));
 
-        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Persistence\ObjectRepository');
         $repository->expects($this->any())->method('find')->with(self::TEST_COUNTRY_NAME)
             ->will($this->returnValue($countryMock));
 

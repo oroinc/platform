@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\FileAwareEntityStub;
@@ -60,26 +60,15 @@ class EntityDeleteListenerTest extends \PHPUnit\Framework\TestCase
         $uow->addDeletion($entity3);
 
         $repository = $this->createMock(ObjectRepository::class);
-        $repository->expects($this->exactly(2))
+        $repository->expects($this->once())
             ->method('findBy')
-            ->willReturnMap(
+            ->with(
                 [
-                    [
-                        ['parentEntityClass' => FileAwareEntityStub::class, 'parentEntityId' => $entity1->getId()],
-                        null,
-                        null,
-                        null,
-                        [$entity1->getFile()]
-                    ],
-                    [
-                        ['parentEntityClass' => FileAwareEntityStub::class, 'parentEntityId' => $entity3->getId()],
-                        null,
-                        null,
-                        null,
-                        []
-                    ],
+                    'parentEntityClass' => FileAwareEntityStub::class,
+                    'parentEntityId' => [$entity1->getId(), $entity3->getId()]
                 ]
-            );
+            )
+            ->willReturn([$entity1->getFile()]);
 
         $manager = $this->createMock(EntityManagerInterface::class);
         $manager->expects($this->any())

@@ -86,13 +86,14 @@ define(function(require) {
             if (overrideOptionsByData) {
                 options = $.extend(options, $items.data());
             }
-
-            $items.not('[data-close="false"]').each(function(i, el) {
-                // append close link
-                let content = el.getAttribute('data-content');
-                content += '<i class="fa-close popover-close" aria-hidden="true"></i>';
-                el.setAttribute('data-content', content);
-            });
+            if (options.close !== false) {
+                $items.not('[data-close="false"]').each((i, el) => {
+                    // append close link
+                    let content = el.getAttribute('data-content');
+                    content += '<i class="fa-close popover-close" aria-hidden="true"></i>';
+                    el.setAttribute('data-content', content);
+                });
+            }
 
             const popoverConfig = _.omit(options, 'forceToShowTitle');
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

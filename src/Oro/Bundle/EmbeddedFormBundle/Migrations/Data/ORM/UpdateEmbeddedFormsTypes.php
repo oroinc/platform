@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;

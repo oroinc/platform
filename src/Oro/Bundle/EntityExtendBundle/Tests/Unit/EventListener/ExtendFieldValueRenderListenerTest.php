@@ -46,7 +46,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($this->extendProvider));
         $this->router = $this->createMock('Symfony\Component\Routing\Generator\UrlGeneratorInterface');
 
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 

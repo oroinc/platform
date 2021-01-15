@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
@@ -23,7 +23,7 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
     private const BATCH_SIZE = 200;
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {
@@ -48,7 +48,7 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     private function updateTitles(ObjectManager $manager): void
     {
@@ -80,7 +80,7 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     private function updateUrls(ObjectManager $manager): void
     {

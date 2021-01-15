@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tools;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 
 class DatabaseChecker
 {

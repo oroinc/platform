@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;

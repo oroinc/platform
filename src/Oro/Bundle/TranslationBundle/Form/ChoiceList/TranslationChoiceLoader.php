@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\ChoiceList;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Gedmo\Translatable\Hydrator\ORM\ObjectHydrator;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;

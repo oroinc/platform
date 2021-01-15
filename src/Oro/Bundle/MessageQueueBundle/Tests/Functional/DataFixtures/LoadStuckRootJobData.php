@@ -3,8 +3,8 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;

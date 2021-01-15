@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormInterface;

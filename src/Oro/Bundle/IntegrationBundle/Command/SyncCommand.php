@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;

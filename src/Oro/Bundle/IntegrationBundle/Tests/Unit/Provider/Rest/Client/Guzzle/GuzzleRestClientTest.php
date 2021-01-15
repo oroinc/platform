@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
@@ -64,8 +65,27 @@ class GuzzleRestClientTest extends TestCase
      */
     public function testPerformRequestWorks(string $method, array $args, array $expected)
     {
-        $response = $this->getMockBuilder(Response::class)->disableOriginalConstructor()->getMock();
-        $this->sourceClient->expects(static::once())->method('send')->willReturn($response);
+        $response = $this->createMock(Response::class);
+
+        $this->sourceClient->expects(static::once())
+            ->method('send')
+            ->with(
+                $this->callback(
+                    function (Request $request) use ($expected) {
+                        $this->assertEquals($expected['method'], strtolower($request->getMethod()));
+                        $this->assertEquals($expected['url'], $request->getUri());
+                        $this->assertEquals(
+                            $expected['headers'],
+                            array_diff_key($request->getHeaders(), ['Host' => null])
+                        );
+                        $this->assertEquals($expected['data'], (string) $request->getBody());
+
+                        return true;
+                    }
+                ),
+                $expected['options']
+            )
+            ->willReturn($response);
 
         $actual = call_user_func_array([$this->client, $method], $args);
 
@@ -78,6 +98,8 @@ class GuzzleRestClientTest extends TestCase
      */
     public function performRequestDataProvider()
     {
+        $date = new \DateTime('2021-01-10T12:26:04+05:00');
+
         return [
             'get simple' => [
                 'method' => 'get',
@@ -86,7 +108,7 @@ class GuzzleRestClientTest extends TestCase
                     'method' => 'get',
                     'url' => 'https://google.com/api',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -97,18 +119,21 @@ class GuzzleRestClientTest extends TestCase
                     'method' => 'get',
                     'url' => 'https://example.com/api/users',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
             'get with params' => [
                 'method' => 'get',
-                'args' => ['resource' => 'https://google.com/api?v=2', 'params' => ['foo' => 'bar']],
+                'args' => [
+                    'resource' => 'https://google.com/api?v=2',
+                    'params' => ['foo' => 'bar', 'date' => $date->format(\DateTime::ATOM)]
+                ],
                 'expected' => [
                     'method' => 'get',
-                    'url' => 'https://google.com/api?v=2&foo=bar',
+                    'url' => 'https://google.com/api?v=2&foo=bar&date=2021-01-10T12%3A26%3A04%2B05%3A00',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -120,7 +145,8 @@ class GuzzleRestClientTest extends TestCase
                 'expected' => [
                     'method' => 'get',
                     'url' => 'https://google.com/api',
-                    'headers' => ['Accept' => '*/*'], 'data' => null,
+                    'headers' => ['Accept' => ['*/*']],
+                    'data' => '',
                     'options' => ['default' => 'value'],
                 ]
             ],
@@ -134,7 +160,7 @@ class GuzzleRestClientTest extends TestCase
                     'method' => 'get',
                     'url' => 'https://google.com/api',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value', 'auth' => ['username', 'password']]
                 ]
             ],
@@ -159,7 +185,7 @@ class GuzzleRestClientTest extends TestCase
                 'expected' => [
                     'method' => 'post',
                     'url' => 'https://example.com/api/user',
-                    'headers' => ['Content-Type' => 'application/json'],
+                    'headers' => ['Content-Type' => ['application/json']],
                     'data' => '{"foo":"data"}',
                     'options' => ['default' => 'value']
                 ]
@@ -175,7 +201,7 @@ class GuzzleRestClientTest extends TestCase
                 'expected' => [
                     'method' => 'put',
                     'url' => 'https://example.com/api/user/1',
-                    'headers' => ['Content-Type' => 'text/html'],
+                    'headers' => ['Content-Type' => ['text/html']],
                     'data' => '{"foo":"data"}',
                     'options' => ['default' => 'value'],
                 ]
@@ -187,7 +213,7 @@ class GuzzleRestClientTest extends TestCase
                     'method' => 'delete',
                     'url' => 'https://example.com/api/user/1',
                     'headers' => [],
-                    'data' => null,
+                    'data' => '',
                     'options' => ['default' => 'value']
                 ]
             ],

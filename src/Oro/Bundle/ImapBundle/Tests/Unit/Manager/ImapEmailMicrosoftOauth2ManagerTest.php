@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Http\Client\Common\HttpMethodsClientInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;

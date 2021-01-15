@@ -326,12 +326,15 @@ define(function(require, exports, module) {
                 return true;
             }
 
-            const viewport = this._getScreenByTypes(this.viewport.type);
             const maxViewport = this._getScreenByTypes(maxScreenType);
 
-            return (_.isObject(viewport) && _.isObject(maxViewport))
-                ? viewport.max <= maxViewport.max
-                : false;
+            return this.viewport.allowTypes.some(screenType => {
+                const viewport = this._getScreenByTypes(screenType);
+
+                return (_.isObject(viewport) && _.isObject(maxViewport))
+                    ? viewport.max <= maxViewport.max
+                    : false;
+            });
         },
 
         /**
@@ -345,12 +348,15 @@ define(function(require, exports, module) {
                 return true;
             }
 
-            const viewport = this._getScreenByTypes(this.viewport.type);
             const minViewport = this._getScreenByTypes(minScreenType);
 
-            return (_.isObject(viewport) && _.isObject(minViewport))
-                ? viewport.max >= minViewport.max
-                : false;
+            return this.viewport.allowTypes.some(screenType => {
+                const viewport = this._getScreenByTypes(screenType);
+
+                return (_.isObject(viewport) && _.isObject(minViewport))
+                    ? viewport.max >= minViewport.max
+                    : false;
+            });
         },
 
         /**

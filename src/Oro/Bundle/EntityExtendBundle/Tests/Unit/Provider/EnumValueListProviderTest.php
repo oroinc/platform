@@ -39,7 +39,7 @@ class EnumValueListProviderTest extends \PHPUnit\Framework\TestCase
             ->with('extend')
             ->willReturn($this->extendConfigProvider);
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')

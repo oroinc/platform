@@ -16,26 +16,26 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
     use PageObjectDictionary;
 
     /**
-     * @When I add the following columns:
+     * @When /^(?:|I )add the following columns:$/
      *
      * @param TableNode $table
      */
     public function iAddTheFollowingColumns(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($column, $functionName, $label) = array_pad($row, 3, null);
+            [$column, $functionName, $label] = array_pad($row, 3, null);
             $this->addColumns(explode('->', $column), $functionName, $label);
         }
     }
 
     /**
-     * @When I add the following grouping columns:
+     * @When /^(?:|I )add the following grouping columns:$/
      *
      * @param TableNode $table
      */
     public function iAddTheFollowingGroupingColumns(TableNode $table)
     {
-        foreach ($table->getRows() as list($column)) {
+        foreach ($table->getRows() as [$column]) {
             $this->addGroupingColumns(explode('->', $column));
         }
     }

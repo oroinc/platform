@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Http\Firewall;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;

@@ -3,10 +3,10 @@
 namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -182,7 +182,7 @@ class EntityFieldManager
     /**
      * @param $entity
      *
-     * @return \Doctrine\Common\Persistence\Mapping\ClassMetadata
+     * @return \Doctrine\Persistence\Mapping\ClassMetadata
      */
     protected function getMetaData($entity)
     {

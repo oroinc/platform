@@ -36,7 +36,7 @@ To add new dashboard you need to create new data migration:
 
 namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface

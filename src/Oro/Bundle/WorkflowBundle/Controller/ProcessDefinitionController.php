@@ -54,7 +54,7 @@ class ProcessDefinitionController extends Controller
 
     /**
      * @param string $entityName
-     * @return \Doctrine\Common\Persistence\ObjectRepository
+     * @return \Doctrine\Persistence\ObjectRepository
      */
     protected function getRepository($entityName)
     {

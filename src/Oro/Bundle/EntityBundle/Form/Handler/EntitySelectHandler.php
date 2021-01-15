@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Form\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
 
 /**

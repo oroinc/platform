@@ -4,14 +4,14 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Performance\Acl\Fixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class LoadAclData extends AbstractFixture implements OrderedFixtureInterface
 {
     /**
      * Load ACL Resource
      *
-     * @param \Doctrine\Common\Persistence\ObjectManager $manager
+     * @param \Doctrine\Persistence\ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

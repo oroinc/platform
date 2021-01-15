@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
 use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;

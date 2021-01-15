@@ -56,7 +56,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('create')
             ->will($this->returnValue($this->knownEmailAddressChecker));
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrine->expects($this->any())

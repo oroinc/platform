@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\CronBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Filter\SchedulesByArgumentsFilterInterface;
@@ -24,7 +24,7 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $this->schedulesByArgumentsFilter = $this->createMock(SchedulesByArgumentsFilterInterface::class);
 
         $this->manager = new ScheduleManager(
@@ -167,14 +167,14 @@ class ScheduleManagerTest extends \PHPUnit\Framework\TestCase
         }
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectRepository $repository */
-        $repository = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
+        $repository = $this->createMock('Doctrine\Persistence\ObjectRepository');
         $repository->expects($this->once())
             ->method('findBy')
             ->with($findBy)
             ->willReturn($schedules);
 
         /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $em */
-        $em = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $em = $this->createMock('Doctrine\Persistence\ObjectManager');
         $em->expects($this->once())
             ->method('getRepository')
             ->with(self::CLASS_NAME)

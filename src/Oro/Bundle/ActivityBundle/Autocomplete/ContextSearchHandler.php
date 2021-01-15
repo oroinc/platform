@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;

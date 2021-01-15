@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Fixture;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Fixture\AbstractEnumFixture;
 
 class AbstractEnumFixtureTest extends \PHPUnit\Framework\TestCase
@@ -66,7 +66,7 @@ class AbstractEnumFixtureTest extends \PHPUnit\Framework\TestCase
             ->method('createEnumValue')
             ->with(self::VALUE_2, 2, false, self::ID_2);
 
-        $objectManagerMock = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManagerMock = $this->createMock('Doctrine\Persistence\ObjectManager');
         $objectManagerMock
             ->expects($this->any())
             ->method('getRepository')

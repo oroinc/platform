@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
