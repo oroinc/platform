@@ -1,61 +1,61 @@
-#'test with group and simple restrictions':
-#    source:
-#        source:
-#            query_config:
-#                filters:
-#                    -
-#                        column: user_name
-#                        filter: string
-#                        filterData:
-#                            type: '2'
-#                            value: test_user_name
-#                        columnAlias: user_name
-#                    - AND
-#                    -
-#                        -
-#                            column: user_status
-#                            filter: datetime
-#                            filterData:
-#                                type: '2'
-#                                value:
-#                                    start: '2013-11-20 10:30'
-#                                    end: '2013-11-25 11:30'
-#                        - AND
-#                        -
-#                            -
-#                                -
-#                                    column: address.country
-#                                    filter: string
-#                                    filterData:
-#                                        type: '1'
-#                                        value: test_address_country
-#                                    columnAlias: address_country
-#                                - OR
-#                                -
-#                                    column: address.city
-#                                    filter: string
-#                                    filterData:
-#                                        type: '1'
-#                                        value: test_address_city
-#                            - OR
-#                            -
-#                                column: address.zip
-#                                filter: string
-#                                filterData:
-#                                    type: '1'
-#                                    value: address_zip
-#    expected: >-
-#        SELECT user.id, user.name as user_name, user.status as user_status
-#        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
-#            INNER JOIN user.address address
-#            INNER JOIN user.shippingAddresses shippingAddresses
-#        WHERE
-#        user_name NOT LIKE :_gpnpstring1
-#        AND (
-#            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
-#            AND ((address.country LIKE :_gpnpstring2 OR address.city LIKE :_gpnpstring3) OR address.zip LIKE :_gpnpstring4)
-#        )
-#    enableGrouping: true
+'test with group and simple restrictions':
+    source:
+        source:
+            query_config:
+                filters:
+                    -
+                        column: user_name
+                        filter: string
+                        filterData:
+                            type: '2'
+                            value: test_user_name
+                        columnAlias: user_name
+                    - AND
+                    -
+                        -
+                            column: user_status
+                            filter: datetime
+                            filterData:
+                                type: '2'
+                                value:
+                                    start: '2013-11-20 10:30'
+                                    end: '2013-11-25 11:30'
+                        - AND
+                        -
+                            -
+                                -
+                                    column: address.country
+                                    filter: string
+                                    filterData:
+                                        type: '1'
+                                        value: test_address_country
+                                    columnAlias: address_country
+                                - OR
+                                -
+                                    column: address.city
+                                    filter: string
+                                    filterData:
+                                        type: '1'
+                                        value: test_address_city
+                            - OR
+                            -
+                                column: address.zip
+                                filter: string
+                                filterData:
+                                    type: '1'
+                                    value: address_zip
+    expected: >-
+        SELECT user.id, user.name as user_name, user.status as user_status
+        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
+            INNER JOIN user.address address
+            INNER JOIN user.shippingAddresses shippingAddresses
+        WHERE
+        user_name NOT LIKE :_gpnpstring1
+        AND (
+            (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
+            AND ((address.country LIKE :_gpnpstring2 OR address.city LIKE :_gpnpstring3) OR address.zip LIKE :_gpnpstring4)
+        )
+    enableGrouping: true
 
 'test with to many relation and grouped conditions compatibility mode off':
     source:
@@ -306,4 +306,113 @@
             (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
             AND address.country LIKE :_gpnpstring2
         )
+    enableGrouping: true
+
+'test without group and with computed restrictions':
+    source:
+        source:
+            query_config:
+                filters:
+                    -
+                        column: COUNT(user.name)
+                        filter: number
+                        filterData:
+                            type: '3'
+                            value: 1
+                            params:
+                                filter_by_having: true
+                        columnAlias: user_count
+                    - AND
+                    -
+                        column: SUM(user.id)
+                        filter: number
+                        filterData:
+                            type: '3'
+                            value: 1
+                            params:
+                                filter_by_having: true
+                        columnAlias: user_sum1
+    expected: >-
+        SELECT user.id, user.name as user_name, user.status as user_status
+        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
+            INNER JOIN user.address address
+            INNER JOIN user.shippingAddresses shippingAddresses
+        HAVING COUNT(user.name) = :_gpnpnumber1 AND SUM(user.id) = :_gpnpnumber2
+    enableGrouping: true
+
+'test with group and with computed restrictions':
+    source:
+        source:
+            query_config:
+                filters:
+                    -
+                        -
+                            -
+                                column: COUNT(user.name)
+                                filter: number
+                                filterData:
+                                    type: '3'
+                                    value: 1
+                                    params:
+                                        filter_by_having: true
+                                columnAlias: user_count
+                            - AND
+                            -
+                                column: SUM(user.id)
+                                filter: number
+                                filterData:
+                                    type: '3'
+                                    value: 1
+                                    params:
+                                        filter_by_having: true
+                                columnAlias: user_sum1
+    expected: >-
+        SELECT user.id, user.name as user_name, user.status as user_status
+        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
+            INNER JOIN user.address address
+            INNER JOIN user.shippingAddresses shippingAddresses
+        HAVING COUNT(user.name) = :_gpnpnumber1 AND SUM(user.id) = :_gpnpnumber2
+    enableGrouping: true
+
+'test with grouped computed restrictions and uncomputed restriction on root level':
+    source:
+        source:
+            query_config:
+                filters:
+                    -
+                        column: user.name
+                        filter: string
+                        filterData:
+                            type: '2'
+                            value: test_user_name
+                        columnAlias: user_name
+                    - AND
+                    -
+                        -
+                            -
+                                column: COUNT(user.name)
+                                filter: number
+                                filterData:
+                                    type: '3'
+                                    value: 1
+                                    params:
+                                        filter_by_having: true
+                                columnAlias: user_count
+                            - AND
+                            -
+                                column: SUM(user.id)
+                                filter: number
+                                filterData:
+                                    type: '3'
+                                    value: 1
+                                    params:
+                                        filter_by_having: true
+                                columnAlias: user_sum1
+    expected: >-
+        SELECT user.id, user.name as user_name, user.status as user_status
+        FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user
+            INNER JOIN user.address address
+            INNER JOIN user.shippingAddresses shippingAddresses
+        WHERE user.name NOT LIKE :_gpnpstring1
+        HAVING COUNT(user.name) = :_gpnpnumber1 AND SUM(user.id) = :_gpnpnumber2
     enableGrouping: true

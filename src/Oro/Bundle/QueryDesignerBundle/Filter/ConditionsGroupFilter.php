@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
 
@@ -46,6 +47,7 @@ class ConditionsGroupFilter extends AbstractFilter
         $filters = $data['filters'];
         $filters['in_group'] = true;
 
+        $computedFilterExpression = null;
         if ($this->hasRelationsInFilters($ds, $filters)) {
             $qb = $ds->getQueryBuilder();
             $fieldsExprs = $this->createConditionFieldExprs($qb);
@@ -55,9 +57,15 @@ class ConditionsGroupFilter extends AbstractFilter
             $subQb = $this->createSubQueryBuilder($ds, $filters);
             $boundParameters = $subQb->getParameters();
             $filterExpression = (string)$subQb->getDQLPart('where');
+            $computedFilterExpression = (string)$subQb->getDQLPart('having');
         }
 
-        $this->applyFilterToClause($ds, $filterExpression);
+        if ($filterExpression) {
+            $this->applyFilterToClause($ds, $filterExpression);
+        }
+        if ($computedFilterExpression) {
+            $ds->addRestriction($computedFilterExpression, FilterUtility::CONDITION_AND, true);
+        }
         $this->applyParameters($ds, $boundParameters);
     }
 
