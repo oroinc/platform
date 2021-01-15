@@ -79,6 +79,8 @@ trusted_data:
         Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
             getSelectFieldFromGroupBy: true
     safe_methods:
+        Oro\Bundle\FilterBundle\Filter\AbstractFilter:
+            getSubQueryExpressionWithParameters: true
         Oro\Bundle\FilterBundle\Filter\DateGroupingFilter:
             getSelectAlias: true
             getSelectClause: true
