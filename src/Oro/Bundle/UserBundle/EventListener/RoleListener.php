@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Component\DependencyInjection\ServiceLink;

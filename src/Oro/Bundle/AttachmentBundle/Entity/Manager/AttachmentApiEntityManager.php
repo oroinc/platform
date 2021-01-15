@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;

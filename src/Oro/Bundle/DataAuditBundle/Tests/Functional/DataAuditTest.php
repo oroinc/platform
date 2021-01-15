@@ -72,6 +72,10 @@ class DataAuditTest extends WebTestCase
             $typesToTest[$field->getType()] = true;
         }
 
+        // ascii_string is supported only for the SQL Server, so we should not test it. See:
+        // https://github.com/doctrine/dbal/blob/faf8ddd7e09e495d890a7579f842e5b6fc24aa4a/docs/en/reference/types.rst
+        unset($typesToTest['ascii_string']);
+
         $missingMethods = [];
         $typesToTest = array_keys($typesToTest);
         sort($typesToTest);

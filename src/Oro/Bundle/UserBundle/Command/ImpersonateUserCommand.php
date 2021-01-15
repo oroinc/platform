@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;

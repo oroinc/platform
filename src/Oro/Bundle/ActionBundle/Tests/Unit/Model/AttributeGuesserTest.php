@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\ActionBundle\Provider\DoctrineTypeMappingProvider;
@@ -39,7 +39,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->managerRegistry
-            = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
+            = $this->getMockForAbstractClass('Doctrine\Persistence\ManagerRegistry');
 
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -156,7 +156,7 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'TestEntity';
         $fieldName = 'field';
 
-        $metadata = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->createMock('Doctrine\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())->method('hasAssociation')->with($fieldName)
             ->will($this->returnValue(true));
         $metadata->expects($this->any())->method('getName')

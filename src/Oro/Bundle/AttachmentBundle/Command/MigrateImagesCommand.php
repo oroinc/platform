@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\AttachmentBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationServiceInterface;
 use Symfony\Component\Console\Command\Command;

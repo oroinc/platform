@@ -49,7 +49,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request = new Request();
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
-        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')

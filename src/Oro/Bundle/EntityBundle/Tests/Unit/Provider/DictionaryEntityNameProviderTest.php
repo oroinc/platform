@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Provider\DictionaryEntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\Provider\Fixtures\DictionaryEntity;
 use Oro\Bundle\EntityConfigBundle\Config\Config;

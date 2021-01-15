@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\FileAwareEntityStub;

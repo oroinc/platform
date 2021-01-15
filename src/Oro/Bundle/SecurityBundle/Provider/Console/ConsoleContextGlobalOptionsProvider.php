@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\SecurityBundle\Provider\Console;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\PlatformBundle\Provider\Console\AbstractGlobalOptionsProvider;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;

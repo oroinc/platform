@@ -37,7 +37,7 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_VERBOSE => 'minimal',
     ];
 
-    protected const BUILD_DIR = 'vendor/oro/platform/build/';
+    protected const BUILD_DIR = '.';
 
     protected static $defaultName = 'oro:assets:build';
 
@@ -202,7 +202,7 @@ HELP
             $io->text('Done');
         }
 
-        $nodeModulesDir = $kernel->getProjectDir().'/'.self::BUILD_DIR.'node_modules';
+        $nodeModulesDir = $kernel->getProjectDir() . DIRECTORY_SEPARATOR . 'node_modules';
         if (!file_exists($nodeModulesDir) || $input->getOption('npm-install')) {
             $output->writeln('<info>Installing npm dependencies.</info>');
             $this->npmInstall($output);
@@ -255,7 +255,7 @@ HELP
     protected function buildCommand(InputInterface $input, OutputInterface $output): array
     {
         if ($input->getOption('hot')) {
-            $command[] = self::BUILD_DIR.'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
+            $command[] = self::BUILD_DIR . '/node_modules/.bin/webpack-dev-server.js';
             $command[] = '--hot';
 
             $this->mapSslOptions($input, $command);
@@ -333,9 +333,14 @@ HELP
 
     protected function npmInstall(OutputInterface $output): void
     {
-        $command = [$this->npmPath, '--no-audit', 'install'];
-        $output->writeln($command);
-        $path = $this->getKernel()->getProjectDir().'/'.self::BUILD_DIR;
+        $path = $this->getKernel()->getProjectDir();
+        if (\file_exists($path . DIRECTORY_SEPARATOR . 'package-lock.json')) {
+            $logLevel = $output->isVerbose() ? 'info' : 'error';
+            $command = [$this->npmPath, 'ci', '--loglevel ' . $logLevel];
+        } else {
+            $command = [$this->npmPath, '--no-audit', 'install'];
+        }
+        $output->writeln(implode(' ', $command));
         $process = new Process($command, $path);
         $process->setTimeout($this->npmInstallTimeout);
 

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;

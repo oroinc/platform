@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\IdToEntityTransformer;
 use Oro\Bundle\UserBundle\Entity\User;
 

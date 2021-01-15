@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Engine\Orm;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;

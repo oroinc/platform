@@ -1,0 +1,6 @@
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+    {{ Asset.js_modules_config({
+        'oroui/js/app': {
+            publicPath: asset('build/admin/')|split('?', 2)[0],
+        }
+    }) }}

@@ -63,7 +63,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $meta = $this->createMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $meta = $this->createMock('Doctrine\Persistence\Mapping\ClassMetadata');
 
         $existing = (object)['$existing' => true];
         $removed  = (object)['$removed' => true];

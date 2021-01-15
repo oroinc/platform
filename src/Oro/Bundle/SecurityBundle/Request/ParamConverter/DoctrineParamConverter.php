@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Request\ParamConverter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authorization\RequestAuthorizationChecker;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\DoctrineParamConverter as BaseParamConverter;

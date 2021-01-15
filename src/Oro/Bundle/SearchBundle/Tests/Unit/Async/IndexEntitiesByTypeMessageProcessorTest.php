@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topics;

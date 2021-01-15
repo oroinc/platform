@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\NoteBundle\Action\CreateNoteAction;

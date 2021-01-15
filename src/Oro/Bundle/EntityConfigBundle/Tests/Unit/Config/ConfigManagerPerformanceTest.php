@@ -392,7 +392,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
      */
     protected function createConfigManager()
     {
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 

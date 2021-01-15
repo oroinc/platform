@@ -296,7 +296,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $registry->expects($this->any())->method('getManager')
             ->will($this->returnValue($this->em));
         $registry->expects($this->any())->method('getRepository')

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\IdToEntityTransformer;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\Form\AbstractType;

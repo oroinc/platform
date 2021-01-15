@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;

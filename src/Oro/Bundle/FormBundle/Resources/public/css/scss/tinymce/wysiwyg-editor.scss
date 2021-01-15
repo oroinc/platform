@@ -3,8 +3,8 @@
 @import "oroui/css/scss/variables";
 @import "oroui/css/scss/oro/variables";
 
-@import "npmassets/bootstrap/scss/reboot";
-@import "npmassets/bootstrap/scss/type";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
 
 body {
     padding: 8px;

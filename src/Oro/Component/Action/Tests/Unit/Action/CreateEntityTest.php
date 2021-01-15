@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Action\CreateEntity;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
@@ -30,7 +30,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
     {
         $this->contextAccessor = new ContextAccessor();
 
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -54,7 +54,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
      */
     public function testExecute(array $options)
     {
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->once())
@@ -141,7 +141,7 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Component\Action\Exception\ActionException::class);
         $this->expectExceptionMessage("Can't create entity stdClass. Test exception.");
 
-        $em = $this->getMockBuilder('\Doctrine\Common\Persistence\ObjectManager')
+        $em = $this->getMockBuilder('\Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $em->expects($this->once())

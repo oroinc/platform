@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Consumption\Extension;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\FilterCollection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Consumption\Extension\DraftableFilterExtension;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 use Oro\Component\MessageQueue\Consumption\Context;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Form\ChoiceList\TranslationChoiceLoader;
 use Oro\Bundle\TranslationBundle\Form\DataTransformer\CollectionToArrayTransformer;

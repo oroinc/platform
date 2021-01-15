@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Specification\Statistic;
 
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic;
 
 /**

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\MigrationBundle\Tools\SchemaDumper;
 use Symfony\Component\Console\Command\Command;

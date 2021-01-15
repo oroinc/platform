@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
@@ -46,7 +46,7 @@ class BusinessUnitHandlerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->manager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->manager = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();

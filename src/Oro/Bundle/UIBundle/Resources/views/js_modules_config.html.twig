@@ -9,7 +9,6 @@
         headerId: oro_hash_navigation_header(),
         userName: userName,
         root: app.request.getBaseURL() ~ '\/',
-        publicPath: asset('build/')|split('?', 2)[0],
         startRouteName: app.request.attributes.get('_master_request_route'),
         debug: app.debug ? true : false,
         skipRouting: '[data-nohash=true], .no-hash',

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriver;
 use Oro\Bundle\EntityBundle\ORM\MappingDriverChain;
 
 class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
@@ -18,7 +18,7 @@ class MappingDriverChainTest extends \PHPUnit\Framework\TestCase
     public function testTransientCache()
     {
         /** @var MappingDriver|\PHPUnit\Framework\MockObject\MockObject $mappingDriver */
-        $mappingDriver = $this->createMock('Doctrine\Common\Persistence\Mapping\Driver\MappingDriver');
+        $mappingDriver = $this->createMock('Doctrine\Persistence\Mapping\Driver\MappingDriver');
         $mappingDriver->expects($this->once())->method('isTransient')->willReturn(true);
 
         $this->chain->addDriver($mappingDriver, '\stdClass');

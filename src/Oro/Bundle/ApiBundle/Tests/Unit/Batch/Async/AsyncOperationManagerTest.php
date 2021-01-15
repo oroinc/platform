@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchError;

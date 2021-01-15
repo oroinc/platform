@@ -1,17 +1,21 @@
+entry:
+    app:
+        - oroui/js/app
+        - oroui/js/app/services/app-ready-load-modules
 aliases:
-    asap$: npmassets/asap/asap
-    backbone$: npmassets/backbone/backbone
+    asap$: asap/asap
+    backbone$: backbone/backbone
     bootstrap$: oroviewswitcher/js/bootstrap
-    bootstrap-alert$: npmassets/bootstrap/js/dist/alert
+    bootstrap-alert$: bootstrap/js/dist/alert
     chaplin$: oroui/lib/chaplin
-    cryptojs/sha256$: npmassets/crypto-js/sha256
-    jquery$: npmassets/jquery/dist/jquery
-    jquery-ui: npmassets/jquery-ui/ui
+    cryptojs/sha256$: crypto-js/sha256
+    jquery$: jquery/dist/jquery
+    jquery-ui: jquery-ui/ui
     module-config$: oroui/js/app/services/module-config
     oroui/js/app$: oroviewswitcher/js/app/views/demo/demo
     routing$: fosjsrouting/js/router
-    slick$: npmassets/slick-carousel/slick/slick
-    underscore$: npmassets/underscore/underscore
+    slick$: slick-carousel/slick/slick
+    underscore$: underscore/underscore
 app-modules: []
 configs:
     orotranslation/js/translator: {}

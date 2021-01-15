@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\Utils;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Utility\PersisterHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;

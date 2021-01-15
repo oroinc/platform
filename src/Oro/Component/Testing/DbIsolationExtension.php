@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Testing;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Testing\Doctrine\Events;
 use Symfony\Bundle\FrameworkBundle\Client;
 

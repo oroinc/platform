@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Common\Inflector\Inflector;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 
 class ConfigHelper

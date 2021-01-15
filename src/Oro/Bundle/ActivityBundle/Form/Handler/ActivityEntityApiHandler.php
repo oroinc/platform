@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Form\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\Guesser;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -80,7 +80,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $doctrineType = 'string';
         $formType = 'text';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->getMockForAbstractClass('Doctrine\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($this->isType('string'))
@@ -105,7 +105,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProperty';
         $associationClass = 'Test\Association\Class';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->getMockForAbstractClass('Doctrine\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($property)
@@ -134,7 +134,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProperty';
         $associationClass = 'Test\Association\Class';
 
-        $metadata = $this->getMockForAbstractClass('Doctrine\Common\Persistence\Mapping\ClassMetadata');
+        $metadata = $this->getMockForAbstractClass('Doctrine\Persistence\Mapping\ClassMetadata');
         $metadata->expects($this->any())
             ->method('hasAssociation')
             ->with($property)

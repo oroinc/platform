@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 
 class LoadWorkflowAwareEntityData extends AbstractFixture

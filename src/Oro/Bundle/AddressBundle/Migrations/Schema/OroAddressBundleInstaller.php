@@ -13,7 +13,7 @@ class OroAddressBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -91,7 +91,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
         $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'address_type_translation_idx', []);
@@ -124,7 +124,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('foreign_key', 'string', ['length' => 2]);
         $table->addColumn('content', 'string', ['length' => 255]);
         $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'country_translation_idx', []);
@@ -159,7 +159,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
         $table->addColumn('locale', 'string', ['length' => 8]);
-        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('object_class', 'string', ['length' => 191]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'region_translation_idx', []);

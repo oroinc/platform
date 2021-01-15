@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Handler;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\Handler\AddressHandler;
 use Symfony\Component\Form\FormInterface;

@@ -16,20 +16,6 @@ The current file describes significant changes in the code that may affect the u
 * Added migration query `Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowAwareEntitiesQuery` that can be used to remove instances of entity created from the specified workflow.
 * Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
 
-### Removed
-
-* Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
-
-### FilterBundle
-* The outdated filter `selectrow` was removed, as well as `Oro\Bundle\FilterBundle\Filter\SelectRowFilter`
-  and `Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType` classes.
-* The outdated filter `many-to-many` was removed, as well as `Oro\Bundle\FilterBundle\Filter\ManyToManyFilter`
-  and `Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType` classes.
-
-#### UserBundle
-* The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
-  Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
-
 ### Changed
 
 #### AttachmentBundle
@@ -60,12 +46,104 @@ The current file describes significant changes in the code that may affect the u
   E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
   `{ name: oro.security.filter.acl_privilege, priority: -100 }`
 
+#### UIBundle
+
+* Moved layout themes build artefacts from `public/layout-build/{theme}` to `public/build/{theme}` folder.
+* Moved admin theme build artefacts from `public/build` to `public/build/admin` folder. 
+* Changed the output path for the admin theme from `css/oro/oro.css` to `css/oro.css`.
+* Changed the output path for tinymce CSS entry points from `css/tinymce/*` to `to tinymce/*`.
+
+#### webpack-config-builder
+
+* All the JavaScript dev-dependencies, including webpack, karma, and eslint, are now managed on the application level. As a result, there is no need to install node modules in the `vendor/oro/platform/build` folder anymore. Now the application has only one node_modules folder - in the root directory. This allows application developers to take full control of the dev-dependencies in the project.
+* The `webpack-config-builder` module was moved to a separate package and now is published at npmjs.com as `oro-webpack-config-builder` package.
+  The package provides an integration of OroPlatform based applications with the Webpack.
+* The `public/bundles/npmassets` folder was deleted. This folder contained the full copy of the node_modules folder,
+  which is unnecessary with the webpack build. Now you have to reference node modules directly by their names.
+  - To migrate the scss code and configuration, replace the `npmassets/` and `bundles/nmpassets` prefixes with `~` for all the node modules paths:
+
+    **assets.yml**
+    ```diff
+    # ...
+        inputs:
+    -        - 'bundles/npmassets/slick-carousel/slick/slick.scss'
+    +        - '~slick-carousel/slick/slick.scss'
+    ```
+    **\*.scss**
+    ```diff     
+     
+    - @import "npmassets/bootstrap/scss/variables";
+    + @import "~bootstrap/scss/variables";
+    
+    - @import "bundles/npmassets/bootstrap/scss/variables";
+    + @import "~bootstrap/scss/variables";
+    ```
+  - To migrate the javascript code and configuration, drop `npmassets/` and `bundles/nmpassets` prefixes from the node module path.
+
+    **jsmodules.yml**
+    ```diff
+    # ...
+    - slick$: npmassets/slick-carousel/slick/slick
+    + slick$: slick-carousel/slick/slick
+    ```
+    **\*.js**
+    ```diff
+    # ... 
+    - import 'npmassets/focus-visible/dist/focus-visible';
+    + import 'focus-visible/dist/focus-visible';
+    # ...
+    - require('bundles/npmassets/Base64/base64');
+    + require('Base64/base64');
+    ```
+* To make an NPM library assets publicly available (e.g. some plugins of a library are have to be loaded dynamically in runtime) you can define in your module that an utilized library requires context:
+  ```js
+  require.context(
+    '!file-loader?name=[path][name].[ext]]&outputPath=../_static/&context=tinymce!tinymce/plugins',
+    true,
+    /.*/
+  );
+  ```
+  This way Webpack will copy `tinymce/plugins` folder into public directory `public/build/_static/_/node_modules/tinymce/plugins`.
+  
+  Pay attention for the leading exclamation point, it says that all other loaders (e.g. css-loader) should be ignored for this context.
+  If you nevertheless need to process all included css files by Webpack -- leading `!` has to be removed.
+* The "oomphinc/composer-installers-extender" composer package was removed. As a result, composer components are not copied automatically to the `public/bundles/components` directory.
+  To copy files that are not handled by webpack automatically to the public folder, you can use approach with `require.context` described above.
+* The "resolve-url-loader" NPM dependency was removed. Now you should always specify the valid relative or absolute path in SCSS files explicitly. The absolute path must start with `~`:
+    ```diff
+    # ... 
+    # The relative path works the same. You only might need to fix typos, 
+    # as the resolve-url-loader ignored them because of the magic global search feature.
+    background-image: url(../../img/glyphicons-halflings.png);
+    # ...
+    # The path without `~` is a relative path
+    $icomoon-font-path: "fonts" !default;
+    # ... 
+    # An absolute path should be prefixed with `~`
+    - $icomoon-font-path: "fonts" !default;
+    + $icomoon-font-path: "~bundles/orocms/fonts/grapsejs/fonts" !default;
+    ```
+
 #### UserBundle
 * The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
   - the method `getPermissionCategories` was renamed to `getCategories`
   - the method `getTabList` was renamed to `getTabIds`
   - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
     `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
+
+### Removed
+
+* Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
+
+### FilterBundle
+* The outdated filter `selectrow` was removed, as well as `Oro\Bundle\FilterBundle\Filter\SelectRowFilter`
+  and `Oro\Bundle\FilterBundle\Form\Type\Filter\SelectRowFilterType` classes.
+* The outdated filter `many-to-many` was removed, as well as `Oro\Bundle\FilterBundle\Filter\ManyToManyFilter`
+  and `Oro\Bundle\FilterBundle\Form\Type\Filter\ManyToManyFilterType` classes.
+
+#### UserBundle
+* The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
+  Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
 
 ## 4.2.0-rc
 

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
 use Doctrine\Common\Cache\ClearableCache;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 /**

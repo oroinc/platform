@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Symfony\Component\Form\AbstractType;

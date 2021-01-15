@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Field;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class FieldProvider extends EntityFieldProvider

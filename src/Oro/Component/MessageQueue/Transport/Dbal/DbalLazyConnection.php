@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\MessageQueue\Transport\Dbal;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * We need the lazy connection to avoid
