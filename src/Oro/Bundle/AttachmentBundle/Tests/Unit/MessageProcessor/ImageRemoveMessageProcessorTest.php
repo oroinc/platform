@@ -68,6 +68,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())
             ->method('removeImageWithVariants')
@@ -99,6 +100,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $exception = new \RuntimeException('Error');
         $this->imageRemovalManager->expects($this->once())
@@ -137,6 +139,7 @@ class ImageRemoveMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename($fileName);
         $file->setOriginalFilename($fileName);
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())->method('removeImageWithVariants')->with($file);
         $this->logger->expects($this->never())->method('warning');
