@@ -1,3 +1,4 @@
+@ticket-BAP-20368
 @fixture-OroUserBundle:AdditionalUsersFixture.yml
 
 Feature: Create Report with aggregation column filter
