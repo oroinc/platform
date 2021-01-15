@@ -5,6 +5,8 @@ namespace Oro\Bundle\InstallerBundle\Composer;
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Script\Event;
+use Exception;
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Yaml\Parser;
@@ -22,7 +24,7 @@ class ScriptHandler
      * Installs npm assets
      *
      * @param Event $event A instance
-     * @throws \Exception
+     * @throws Exception
      */
     public static function installAssets(Event $event): void
     {
@@ -37,15 +39,15 @@ class ScriptHandler
         if ($filesystem->exists('package.json')) {
             try {
                 $packageJsonContent = file_get_contents('package.json');
-            } catch (\Exception $exception) {
-                throw new \Exception('Can not read "package.json" file, ' .
-                    'make sure the user has permission to read it');
+            } catch (Exception $exception) {
+                throw new Exception('Can not read "package.json" file, ' .
+                    'make sure the user has permission to read it', 0, $exception);
             }
             try {
                 $packageJson = json_decode($packageJsonContent, false, 512, JSON_THROW_ON_ERROR);
-            } catch (\Exception $exception) {
-                throw new \Exception('Can not parse "package.json" file, ' .
-                    'make sure it has valid JSON structure');
+            } catch (Exception $exception) {
+                throw new Exception('Can not parse "package.json" file, ' .
+                    'make sure it has valid JSON structure', 0, $exception);
             }
             $packageJson->dependencies = $npmAssets;
         } else {
@@ -61,12 +63,13 @@ class ScriptHandler
         $filesystem
             ->dumpFile('package.json', json_encode($packageJson, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES) . "\n");
 
+        $isVerbose = $event->getIO()->isVerbose();
         if (!$filesystem->exists('package-lock.json')) {
             // Creates lock file, installs assets.
-            self::npmInstall($event->getIO(), $options['process-timeout'], $event->isDevMode());
+            self::npmInstall($event->getIO(), $options['process-timeout'], $isVerbose);
         } else {
             // Installs assets using lock file.
-            self::npmCi($event->getIO(), $options['process-timeout'], $event->isDevMode());
+            self::npmCi($event->getIO(), $options['process-timeout'], $isVerbose);
         }
     }
 
@@ -87,7 +90,7 @@ class ScriptHandler
      * Collects npm assets from extra.npm section of installed packages.
      *
      * @param Composer $composer
-     * @throws
+     * @throws Exception
      *
      * @return array
      */
@@ -111,7 +114,7 @@ class ScriptHandler
                 $conflictingPackages = array_diff_key(array_intersect_key($packageNpm, $npmAssets), $rootNpmAssets);
 
                 if (!empty($conflictingPackages)) {
-                    throw new \Exception('Where are some conflicting npm packages "' .
+                    throw new Exception('Where are some conflicting npm packages "' .
                         implode('", "', array_keys($conflictingPackages)) . '". To how resolve conflicts, see ' .
                         'https://doc.oroinc.com/master/frontend/javascript/composer-js-dependencies' .
                         '#resolving-conflicting-npm-dependencies/');
@@ -140,23 +143,16 @@ class ScriptHandler
         bool $verbose = false
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmInstallCmd = 'npm install --no-audit --save-exact --no-optional --loglevel ' . $logLevel;
+        $npmInstallCmd = ['npm', 'install', '--no-audit', '--save-exact', '--no-optional', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $npmInstallCmd, $timeout) !== 0) {
-            throw new \RuntimeException('Failed to generate package-lock.json');
+            throw new RuntimeException('Failed to generate package-lock.json');
         }
     }
 
-    /**
-     * @param IOInterface $inputOutput
-     * @param string $cmd
-     * @param int $timeout
-     *
-     * @return int
-     */
-    private static function runProcess(IOInterface $inputOutput, string $cmd, int $timeout): int
+    private static function runProcess(IOInterface $inputOutput, array $cmd, int $timeout): int
     {
-        $inputOutput->write($cmd);
+        $inputOutput->write(implode(' ', $cmd));
 
         $npmInstall = new Process($cmd, null, null, null, $timeout);
         $npmInstall->run(function ($outputType, string $data) use ($inputOutput) {
@@ -180,24 +176,10 @@ class ScriptHandler
     private static function npmCi(IOInterface $inputOutput, int $timeout = 60, bool $verbose = false): void
     {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmCiCmd = 'npm ci --loglevel ' . $logLevel;
+        $npmCiCmd = ['npm', 'ci', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $npmCiCmd, $timeout) !== 0) {
-            throw new \RuntimeException('Failed to install npm assets');
-        }
-    }
-
-    /**
-     * @param string $from
-     * @param string $to
-     */
-    private static function copyAssets(string $from, string $to): void
-    {
-        $filesystem = new Filesystem();
-
-        if ($filesystem->exists($from)) {
-            $filesystem->remove($to);
-            $filesystem->mirror($from, $to);
+            throw new RuntimeException('Failed to install npm assets');
         }
     }
 
@@ -257,23 +239,14 @@ class ScriptHandler
         }
     }
 
-    /**
-     * @param string $parametersFile
-     *
-     * @return array
-     */
-    protected static function loadParametersFile($parametersFile)
+    protected static function loadParametersFile(string $parametersFile): array
     {
         $yamlParser = new Parser();
 
         return $yamlParser->parse(file_get_contents($parametersFile));
     }
 
-    /**
-     * @param string $parametersFile
-     * @param array  $values
-     */
-    protected static function saveParametersFile($parametersFile, array $values)
+    protected static function saveParametersFile(string $parametersFile, array $values): void
     {
         file_put_contents(
             $parametersFile,
@@ -281,31 +254,17 @@ class ScriptHandler
         );
     }
 
-    /**
-     * @param array $options
-     *
-     * @return string
-     */
-    protected static function getParametersFile($options)
+    protected static function getParametersFile(array $options): string
     {
         return $options['incenteev-parameters']['file'] ?? 'config/parameters.yml';
     }
 
-    /**
-     * @param array $options
-     *
-     * @return string
-     */
-    protected static function getParametersKey($options)
+    protected static function getParametersKey(array $options): string
     {
         return $options['incenteev-parameters']['parameter-key'] ?? 'parameters';
     }
 
-    /**
-     * @param Event $event
-     * @return array
-     */
-    protected static function getOptions(Event $event)
+    protected static function getOptions(Event $event): array
     {
         $composer = $event->getComposer();
         $config = $composer->getConfig();
