@@ -47,7 +47,7 @@ define([
          *
          * @param {Object} options
          * @param {Backbone.Collection} options.collection
-         * @param {Array} [options.items]
+         * @param {Array} [options.items] page size values
          */
         initialize: function(options) {
             options = options || {};
@@ -57,7 +57,7 @@ define([
             }
 
             if (options.items) {
-                this.items = options.items;
+                this.items = this.preparePageSizes(options.items);
             }
 
             if (typeof this.template !== 'function' || options.template) {
@@ -84,6 +84,25 @@ define([
             this.enabled = false;
             this.render();
             return this;
+        },
+
+        /**
+         * Convert each page size value to integer value
+         *
+         * @param {array} items
+         * @returns {array}
+         */
+        preparePageSizes(items) {
+            return items.map(item => {
+                if (_.isObject(item)) {
+                    return {
+                        ...item,
+                        size: parseInt(item.size, 10)
+                    };
+                }
+
+                return parseInt(item, 10);
+            });
         },
 
         /**

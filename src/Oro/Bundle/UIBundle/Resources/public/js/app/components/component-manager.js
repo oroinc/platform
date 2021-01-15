@@ -96,15 +96,36 @@ define(function(require) {
             });
 
             const initOnEvent = event => {
+                const tempNS = _.uniqueId('.tempEventNS');
+                const {oppositeEventName} = event.data;
+                const $target = $(event.target);
                 const $container = $(event.currentTarget);
                 $container.removeAttr('data-page-component-init-on');
+                if (oppositeEventName) {
+                    // listen to opposite event, and once it occurs -- invalidate initial event
+                    $target.one(oppositeEventName + tempNS, () => event = null);
+                }
                 this.init(this.initOptions, $container)
-                    .done(() => $(event.target).trigger(event));
+                    .done(() => {
+                        $target.off(tempNS);
+                        if (event) { // re-trigger initial event if it's still valid after initialization
+                            $target.trigger(event);
+                        }
+                    });
             };
 
-            this.$el.on('click' + this.eventNamespace, '[data-page-component-init-on*="click"]', initOnEvent);
-            this.$el.on('mouseover' + this.eventNamespace, '[data-page-component-init-on*="mouseover"]', initOnEvent);
-            this.$el.on('focusin' + this.eventNamespace, '[data-page-component-init-on*="focusin"]', initOnEvent);
+            [
+                {event: 'click', opposite: null},
+                {event: 'mouseover', opposite: 'mouseout'},
+                {event: 'focusin', opposite: 'focusout'}
+            ].forEach(({event, opposite}) => {
+                this.$el.on(
+                    `${event}${this.eventNamespace}`,
+                    `[data-page-component-init-on*="${event}"]`,
+                    {oppositeEventName: opposite},
+                    initOnEvent
+                );
+            });
         },
 
         /**

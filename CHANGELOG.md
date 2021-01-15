@@ -4,7 +4,47 @@ The current file describes significant changes in the code that may affect the u
 
 ## 4.2.0
 
+### Added
+
+#### SecurityBundle
+* Added `generate_uuid` action. The action generates UUID and puts the value to the specified attribute.
+
+#### TranslationBundle
+* Added migration query `Oro\Bundle\TranslationBundle\Migration\DeleteTranslationsByDomainAndKeyPrefixQuery` that can be used to remove unused translations by domain and key prefix.
+
+#### WorkflowBundle
+* Added migration query `Oro\Bundle\WorkflowBundle\Migration\RemoveWorkflowAwareEntitiesQuery` that can be used to remove instances of entity created from the specified workflow.
+* Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
+
 ### Changed
+
+#### AttachmentBundle
+* The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
+* The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
+
+#### EntityBundle
+* The service `oro_entity.virtual_field_provider.chain` was renamed to `oro_entity.virtual_field_provider`.
+* The service `oro_entity.virtual_relation_provider.chain` was renamed to `oro_entity.virtual_relation_provider`.
+
+#### PlatformBundle
+* The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
+  `{ name: oro_platform.console.global_options_provider, priority: -100 }`
+
+#### QueryDesignerBundle
+* The class `Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter` was refactored to decrease its complexity.
+  The state of all query converters was moved to "context" classes.
+  The base context class is `Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext`.
+  If you have own query converters, update them according to new architecture.
+
+#### SecurityBundle
+* The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
+  was changed to correspond Symfony recommendations.
+  If you have services with this tag, change the sign of the priority value for them.
+  E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
+  `{ name: oro.security.filter.acl_privilege, priority: -100 }`
 
 #### UIBundle
 
@@ -84,6 +124,13 @@ The current file describes significant changes in the code that may affect the u
     + $icomoon-font-path: "~bundles/orocms/fonts/grapsejs/fonts" !default;
     ```
 
+#### UserBundle
+* The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
+  - the method `getPermissionCategories` was renamed to `getCategories`
+  - the method `getTabList` was renamed to `getTabIds`
+  - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
+    `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
+
 ### Removed
 
 * Package `twig/extensions` is abandoned by its maintainers and has been removed from Oro dependencies.
@@ -97,43 +144,6 @@ The current file describes significant changes in the code that may affect the u
 #### UserBundle
 * The `Oro\Bundle\UserBundle\Provider\PrivilegeCategoryProviderInterface` was removed.
   Use `Resources/config/oro/acl_categories.yml` files to configure ACL categories.
-
-### Changed
-
-#### AttachmentBundle
-* The service `oro_attachment.manager.media_cache_manager_registry` was renamed to `oro_attachment.media_cache_manager_registry`.
-* The service `oro_attachment.provider.attachment_file_name_provider` was renamed to `oro_attachment.provider.file_name`.
-
-#### EntityBundle
-* The service `oro_entity.virtual_field_provider.chain` was renamed to `oro_entity.virtual_field_provider`.
-* The service `oro_entity.virtual_relation_provider.chain` was renamed to `oro_entity.virtual_relation_provider`.
-
-#### PlatformBundle
-* The handling of `priority` attribute for `oro_platform.console.global_options_provider` DIC tag
-  was changed to correspond Symfony recommendations.
-  If you have services with this tag, change the sign of the priority value for them.
-  E.g. `{ name: oro_platform.console.global_options_provider, priority: 100 }` should be changed to
-  `{ name: oro_platform.console.global_options_provider, priority: -100 }`
-
-#### QueryDesignerBundle
-* The class `Oro\Bundle\QueryDesignerBundle\QueryDesigner\AbstractQueryConverter` was refactored to decrease its complexity.
-  The state of all query converters was moved to "context" classes.
-  The base context class is `Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryConverterContext`.
-  If you have own query converters, update them according to new architecture.
-
-#### SecurityBundle
-* The handling of `priority` attribute for `oro.security.filter.acl_privilege` DIC tag
-  was changed to correspond Symfony recommendations.
-  If you have services with this tag, change the sign of the priority value for them.
-  E.g. `{ name: oro.security.filter.acl_privilege, priority: 100 }` should be changed to
-  `{ name: oro.security.filter.acl_privilege, priority: -100 }`
-
-#### UserBundle
-* The following changes were done in the `Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider` class:
-  - the method `getPermissionCategories` was renamed to `getCategories`
-  - the method `getTabList` was renamed to `getTabIds`
-  - the following methods were removed `getAllCategories`, `getTabbedCategories`, `getCategory`,
-    `addProvider`, `getProviders`, `getProviderByName`, `hasProvider`
 
 ## 4.2.0-rc
 

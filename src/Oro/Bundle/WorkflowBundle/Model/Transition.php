@@ -375,16 +375,26 @@ class Transition
     public function transit(WorkflowItem $workflowItem, Collection $errors = null)
     {
         if ($this->isAllowed($workflowItem, $errors)) {
-            $stepTo = $this->getStepTo();
-            $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
-
-            if ($this->action) {
-                $this->action->execute($workflowItem);
-            }
+            $this->transitUnconditionally($workflowItem);
         } else {
             throw new ForbiddenTransitionException(
                 sprintf('Transition "%s" is not allowed.', $this->getName())
             );
+        }
+    }
+
+    /**
+     * Makes transition without checking for preconditions and conditions.
+     *
+     * @param WorkflowItem $workflowItem
+     */
+    public function transitUnconditionally(WorkflowItem $workflowItem): void
+    {
+        $stepTo = $this->getStepTo();
+        $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
+
+        if ($this->action) {
+            $this->action->execute($workflowItem);
         }
     }
 
