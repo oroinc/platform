@@ -124,10 +124,10 @@ oro:
                 label: 'Show Less'
             group_similar:
                 aria_label: 'Group similar items'
-                label: 'Group similar'
+                label: 'Group Similar'
             ungroup_similar:
                 aria_label: 'Show similar items separately'
-                label: 'Ungroup similar'
+                label: 'Ungroup Similar'
         not_number: Not a number
         inline_editing:
             message:
