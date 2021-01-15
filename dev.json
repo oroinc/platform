@@ -184,7 +184,7 @@
             "Base64": "1.0.*",
             "flotr2": "0.1.0",
             "bean": "1.0.6",
-            "jquery-validation": "1.16.0",
+            "jquery-validation": "1.19.3",
             "backgrid": "0.3.7",
             "numeral": "2.0.6",
             "jquery-form": "4.2.1",
