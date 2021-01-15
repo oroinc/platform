@@ -128,6 +128,7 @@ class ImageRemoveMessageProcessor implements MessageProcessorInterface, TopicSub
         $file->setFilename($filename);
         $file->setOriginalFilename($originalFileName);
         $file->setParentEntityClass($parentEntityClass);
+        $file->setExtension(pathinfo($filename)['extension']);
 
         return $file;
     }
