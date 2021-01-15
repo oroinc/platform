@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Log\ConsumerState;
 
 /**
  * Buffers all records until flush was not triggered and then pass them as batch.
- * Together with \Oro\Bundle\MessageQueueBundle\EventListener\ConsoleErrorListener
+ * Together with \Oro\Bundle\MessageQueueBundle\EventListener\ConsoleFatalErrorListener
  * write all logs on `console.error` event for the last queue message
  *
  * @property BaseBufferHandler $handler
@@ -52,5 +52,13 @@ class ConsoleErrorHandler extends HandlerWrapper
     public function clear()
     {
         $this->handler->clear();
+    }
+
+    public function reset()
+    {
+        // Clearing all buffered records because the BufferHandler flushes them to the output before resetting.
+        $this->clear();
+
+        return parent::reset();
     }
 }
