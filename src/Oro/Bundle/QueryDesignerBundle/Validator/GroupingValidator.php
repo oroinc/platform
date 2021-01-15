@@ -41,44 +41,46 @@ class GroupingValidator extends ConstraintValidator
         }
 
         $columns = $definition['columns'];
-
-        $aggregateColumns = array_filter(
-            $columns,
-            function (array $column) {
-                return !empty($column['func']);
-            }
-        );
-
-        if (empty($aggregateColumns)) {
+        if (empty($definition['columns'])) {
             return;
         }
 
-        $groupingColumns = [];
-        if (!empty($definition['grouping_columns'])) {
-            $groupingColumns = $definition['grouping_columns'];
+        $missedColumnLabelsToGroup = $this->getMissedColumnLabelsToGroup($definition);
+        if ($missedColumnLabelsToGroup) {
+            $this->context->addViolation($this->translator->trans(
+                $constraint->message,
+                ['%columns%' => implode(', ', $missedColumnLabelsToGroup)]
+            ));
         }
+    }
 
-        $groupingColumnNames = \array_column($groupingColumns, 'name');
-        $columnNames         = \array_column($columns, 'name');
-        $columnNamesToCheck  = array_diff(
-            $columnNames,
-            \array_column($aggregateColumns, 'name')
-        );
-        $columnsToGroup      = array_diff($columnNamesToCheck, $groupingColumnNames);
-
-        if (empty($columnsToGroup)) {
-            return;
-        }
-
-        $columnLabels = [];
-        foreach ($columns as $column) {
-            if (in_array($column['name'], $columnsToGroup)) {
-                $columnLabels[] = $column['label'];
+    /**
+     * @param array $definition
+     *
+     * @return string[]|null
+     */
+    private function getMissedColumnLabelsToGroup(array $definition): ?array
+    {
+        $aggregateColumnNames = [];
+        $notAggregateColumns = [];
+        foreach ($definition['columns'] as $column) {
+            if (!empty($column['func']) && 'aggregates' === $column['func']['group_type']) {
+                $aggregateColumnNames[] = $column['name'];
+            } else {
+                $notAggregateColumns[] = $column;
             }
         }
 
-        $this->context->addViolation(
-            $this->translator->trans($constraint->message, ['%columns%' => implode(', ', $columnLabels)])
-        );
+        $missedColumnLabelsToGroup = [];
+        if ($aggregateColumnNames) {
+            $groupingColumnNames = array_column($definition['grouping_columns'] ?? [], 'name');
+            foreach ($notAggregateColumns as $column) {
+                if (!\in_array($column['name'], $groupingColumnNames, true)) {
+                    $missedColumnLabelsToGroup[] = $column['label'];
+                }
+            }
+        }
+
+        return $missedColumnLabelsToGroup;
     }
 }
