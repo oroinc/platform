@@ -1,98 +1,46 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection;
 
+use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 use Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension;
-use Symfony\Component\DependencyInjection\Definition;
 
-class OroTranslationExtensionTest extends \PHPUnit\Framework\TestCase
+class OroTranslationExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var array
-     */
-    protected $expectedDefinitions = array(
-        'oro_translation.form.type.translatable_entity',
-        'oro_translation.form.type.select2_translatable_entity',
-        'oro_translation.controller',
-    );
-
-    /**
-     * @var array
-     */
-    protected $expectedParameters = array(
-        'translator.class',
-        'oro_translation.js_translation.domains',
-        'oro_translation.debug_translator'
-    );
-
-    /**
-     * @var array
-     */
-    protected $config = array(
-        'oro_translation' => array(
-            'js_translation' => array(
-                'domains' => array('validators'),
-                'debug' => false,
-            ),
-            'locales' => ['en'],
-            'default_required' => true,
-            'manager_registry' => 'doctrine',
-            'templating' => 'foo.html.twig'
-        )
-    );
-
-    public function testLoad()
+    public function testLoad(): void
     {
-        $actualDefinitions = array();
-        $actualParameters  = array();
+        $expectedDefinitions = [
+            'oro_translation.form.type.translatable_entity',
+            'oro_translation.form.type.select2_translatable_entity',
+            'oro_translation.controller',
+        ];
 
-        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('setDefinition', 'setParameter', 'getDefinition', 'getParameter'))
-            ->getMock();
-        $container->expects($this->any())
-            ->method('setDefinition')
-            ->will(
-                $this->returnCallback(
-                    function ($id, Definition $definition) use (&$actualDefinitions) {
-                        $actualDefinitions[$id] = $definition;
-                    }
-                )
-            );
-        $container->expects($this->any())
-            ->method('setParameter')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $value) use (&$actualParameters) {
-                        $actualParameters[$name] = $value;
-                    }
-                )
-            );
-        $container->expects($this->any())
-            ->method('getDefinition')
-            ->will(
-                $this->returnCallback(
-                    function ($name) use (&$actualDefinitions) {
-                        return $actualDefinitions[$name];
-                    }
-                )
-            );
+        $expectedParameters = [
+            'translator.class',
+            'oro_translation.js_translation.domains',
+            'oro_translation.js_translation.debug',
+            'oro_translation.debug_translator',
+            'oro_translation.locales',
+            'oro_translation.default_required',
+            'oro_translation.templating',
+        ];
 
-        $container->expects($this->any())
-            ->method('getParameter')
-            ->with('kernel.environment')
-            ->willReturn('prod');
+        $expectedConfigValues = [
+            'oro_translation' => [[
+                'settings' => [
+                    'resolved' => true,
+                    'installed_translation_meta' => [
+                        'value' => [],
+                        'scope' => 'app',
+                    ],
+                ],
+            ]],
+        ];
 
-        $extension = new OroTranslationExtension();
-        $extension->load($this->config, $container);
-
-        foreach ($this->expectedDefinitions as $serviceId) {
-            $this->assertArrayHasKey($serviceId, $actualDefinitions);
-            $this->assertNotNull($actualDefinitions[$serviceId]);
-        }
-
-        foreach ($this->expectedParameters as $parameterName) {
-            $this->assertArrayHasKey($parameterName, $actualParameters);
-            $this->assertNotNull($actualParameters[$parameterName]);
-        }
+        $this->loadExtension(new OroTranslationExtension());
+        $this->assertDefinitionsLoaded($expectedDefinitions);
+        $this->assertParametersLoaded($expectedParameters);
+        $this->assertExtensionConfigsLoaded(['oro_translation'], $expectedConfigValues);
     }
 }

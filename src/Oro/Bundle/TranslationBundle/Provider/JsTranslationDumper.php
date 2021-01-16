@@ -72,7 +72,7 @@ class JsTranslationDumper implements LoggerAwareInterface
     public function dumpTranslations($locales = [])
     {
         if (empty($locales)) {
-            $locales = array_keys($this->languageProvider->getAvailableLanguages());
+            $locales = $this->languageProvider->getAvailableLanguageCodes();
         }
 
         foreach ($locales as $locale) {
