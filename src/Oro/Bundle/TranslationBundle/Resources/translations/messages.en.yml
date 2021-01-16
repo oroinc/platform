@@ -52,6 +52,7 @@ oro.translation:
             up_to_date: 'Up to date'
             update_available: 'Update is available'
             install_available: 'Can be installed'
+            not_available: ''
         translation_completeness.label: 'Translation Completeness'
 
         message:

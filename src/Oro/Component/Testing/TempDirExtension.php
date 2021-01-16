@@ -72,19 +72,18 @@ trait TempDirExtension
     }
 
     /**
-     * Gets a temporary file.
-     *
-     * @param string $subDir
-     * @param string $prefix
+     * Generates a file path with a unique file name in a temporary directory and returns it.
+     * The file itself is not actually created. The temporary directory will be created though if it does not exist yet.
      *
      * @return string The full path of a file in the temporary directory
      */
-    protected function getTempFile(string $subDir, string $prefix = 'tmp'): string
+    protected function getTempFile(string $subDir, string $prefix = 'tmp', string $suffix = ''): string
     {
         return
             $this->getTempDir($subDir)
             . DIRECTORY_SEPARATOR
-            . str_replace('.', '', uniqid($prefix, true));
+            . str_replace('.', '', uniqid($prefix, true))
+            . $suffix;
     }
 
     /**

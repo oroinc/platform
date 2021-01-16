@@ -86,7 +86,7 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $availableLocales = array_keys($this->languageProvider->getAvailableLanguages());
+        $availableLocales = $this->languageProvider->getAvailableLanguageCodes();
 
         $locales = $input->getOption('languages') ?: $availableLocales;
 

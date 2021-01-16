@@ -23,7 +23,7 @@ services:
         arguments:
             - '@oro_translation.repository.language'
             - '@oro_locale.settings'
-            - '@oro_translation.statistic_provider'
+            - '@Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider'
             - '@translator'
         tags:
             - { name: form.type, alias: oro_translation_add_language }

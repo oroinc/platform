@@ -12,11 +12,18 @@ datagrids:
                     - language.updatedAt
                     - CONCAT_WS(' ', languageOwner.firstName, languageOwner.lastName) as ownerName
                     - languageOwner.id as owner
+                    - COUNT(translation) as translationCount
+                    - language.installedBuildDate
                 from:
                     - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
                     left:
                         - { join: language.owner, alias: languageOwner }
+                        -
+                            join: 'Oro\Bundle\TranslationBundle\Entity\Translation'
+                            alias: translation
+                            conditionType: WITH
+                            condition: 'translation.language = language'
         inline_editing:
             enable: true
             behaviour: enable_selected
@@ -43,8 +50,16 @@ datagrids:
                 type: twig
                 frontend_type: html
                 template: OroTranslationBundle:Language:Datagrid/enabled.html.twig
-            translationCompleteness: ~
-            translationStatus: ~
+            translationCompleteness:
+                 label: oro.translation.language.translation_completeness.label
+                 type: twig
+                 frontend_type: html
+                 template: OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig
+            translationStatus:
+                 label: oro.translation.language.translation_status.label
+                 type: twig
+                 frontend_type: html
+                 template: OroTranslationBundle:Language:Datagrid/translationStatus.html.twig
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime

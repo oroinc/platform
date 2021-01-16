@@ -427,3 +427,17 @@ services:
             - '@oro_config.manager'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_enabled_localization, acl_resource: oro_locale_localization_view }
+
+    Oro\Bundle\LocaleBundle\Action\CheckIfDefaultLanguageAction:
+        arguments:
+            - '@oro_action.expression.context_accessor'
+            - '@oro_config.global'
+        tags:
+            - { name: oro_action.action, alias: check_if_default_language }
+
+    Oro\Bundle\LocaleBundle\Action\IsDefaultLanguageCondition:
+        arguments:
+            - '@oro_config.global'
+            - '@doctrine'
+        tags:
+            - { name: oro_action.condition, alias: is_default_language }
