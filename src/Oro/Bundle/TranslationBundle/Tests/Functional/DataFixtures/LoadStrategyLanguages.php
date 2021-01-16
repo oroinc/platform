@@ -1,13 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 
 class LoadStrategyLanguages extends LoadLanguages
 {
-    /**
-     * @var array
-     */
-    protected $languages = [
+    public const LANGUAGES = [
         'lang1' => ['enabled' => false, 'user' => 'admin'],
         'lang2' => ['enabled' => false, 'user' => 'admin'],
         'lang3' => ['enabled' => false, 'user' => 'admin'],

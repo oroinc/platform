@@ -69,7 +69,7 @@ class JsTranslationDumpDemoDataListener
      */
     private function getRebuildLocales(): array
     {
-        $locales = array_keys($this->languageProvider->getAvailableLanguages());
+        $locales = $this->languageProvider->getAvailableLanguageCodes();
 
         $rebuildLocales = array_values(array_filter($locales, function (string $locale): bool {
             return !$this->jsTranslationDumper->isTranslationFileExist($locale);
