@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class StrategyEvent extends Event
 {

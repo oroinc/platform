@@ -195,11 +195,11 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(5))
             ->method('dispatch')
             ->withConsecutive(
-                [ConfigGetEvent::NAME, $loadEvent],
-                [ConfigGetEvent::NAME . '.' . $greetingKey, $loadEvent],
-                [ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey, $singleKeyBeforeEvent],
-                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
-                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+                [$loadEvent, ConfigGetEvent::NAME],
+                [$loadEvent, ConfigGetEvent::NAME . '.' . $greetingKey],
+                [$singleKeyBeforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey],
+                [$beforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE],
+                [$afterEvent, ConfigUpdateEvent::EVENT_NAME]
             );
 
         $this->manager->flush($scopeIdentifier);
@@ -278,16 +278,16 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(10))
             ->method('dispatch')
             ->withConsecutive(
-                [ConfigGetEvent::NAME, $greetingOldValueLoadEvent],
-                [ConfigGetEvent::NAME . '.' . $greetingKey, $greetingOldValueLoadEvent],
-                [ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey, $singleKeyGreetingEvent],
-                [ConfigGetEvent::NAME, $levelOldValueLoadEvent],
-                [ConfigGetEvent::NAME . '.' . $levelKey, $levelOldValueLoadEvent],
-                [ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $levelKey, $singleKeyLevelEvent],
-                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
-                [ConfigGetEvent::NAME, $levelNullValueLoadEvent],
-                [ConfigGetEvent::NAME  . '.' . $levelKey, $levelNullValueLoadEvent],
-                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+                [$greetingOldValueLoadEvent, ConfigGetEvent::NAME],
+                [$greetingOldValueLoadEvent, ConfigGetEvent::NAME . '.' . $greetingKey],
+                [$singleKeyGreetingEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $greetingKey],
+                [$levelOldValueLoadEvent, ConfigGetEvent::NAME],
+                [$levelOldValueLoadEvent, ConfigGetEvent::NAME . '.' . $levelKey],
+                [$singleKeyLevelEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE . '.' . $levelKey],
+                [$beforeEvent, ConfigSettingsUpdateEvent::BEFORE_SAVE],
+                [$levelNullValueLoadEvent, ConfigGetEvent::NAME],
+                [$levelNullValueLoadEvent, ConfigGetEvent::NAME  . '.' . $levelKey],
+                [$afterEvent, ConfigUpdateEvent::EVENT_NAME]
             );
 
         $this->manager->save($data, $scopeIdentifier);

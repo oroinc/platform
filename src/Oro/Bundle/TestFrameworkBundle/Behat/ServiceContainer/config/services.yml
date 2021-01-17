@@ -73,9 +73,14 @@ services:
             - '@oro_test.entity_supplement'
             - '@oro_test.alice_loader'
 
+    Doctrine\Inflector\Inflector:
+        factory: [ !service { class: Doctrine\Inflector\Rules\English\InflectorFactory }, 'build' ]
+
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
-        arguments: ['@oro_entity.entity_alias_resolver']
+        arguments:
+           - '@oro_entity.entity_alias_resolver'
+           - '@Doctrine\Inflector\Inflector'
 
     oro_test.entity_supplement:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement

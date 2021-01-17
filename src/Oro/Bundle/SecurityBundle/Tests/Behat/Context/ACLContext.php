@@ -7,7 +7,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid;
 use Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridFilterStringItem;
 use Oro\Bundle\NavigationBundle\Tests\Behat\Element\MainMenu;
@@ -31,6 +32,12 @@ class ACLContext extends OroFeatureContext implements
 
     /** @var OroMainContext */
     private $oroMainContext;
+    private Inflector $inflector;
+
+    public function __construct()
+    {
+        $this->inflector = (new InflectorFactory())->build();
+    }
 
     /**
      * @BeforeScenario
@@ -77,7 +84,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
         $singularizedEntities = array_map(function ($element) {
-            return trim(ucfirst(Inflector::singularize($element)));
+            return trim(ucfirst($this->inflector->singularize($element)));
         }, explode(',', $entity));
 
         $this->loginAsAdmin();
@@ -113,7 +120,7 @@ class ACLContext extends OroFeatureContext implements
 
         foreach ($table->getRows() as $row) {
             $action = $row[0];
-            $singularizedEntity = trim(ucfirst(Inflector::singularize($row[1])));
+            $singularizedEntity = trim(ucfirst($this->inflector->singularize($row[1])));
             $accessLevel = $row[2];
             $userRoleForm->setPermission($singularizedEntity, $action, $accessLevel);
         }
@@ -169,7 +176,7 @@ class ACLContext extends OroFeatureContext implements
         $this->getMink()->setDefaultSessionName('system_session');
         $this->getSession()->resizeWindow(1920, 1080, 'current');
 
-        $singularizedEntity = ucfirst(Inflector::singularize($entity));
+        $singularizedEntity = ucfirst($this->inflector->singularize($entity));
         $this->loginAsAdmin();
 
         $userRoleForm = $this->openRoleEditForm($role);

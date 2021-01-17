@@ -71,11 +71,11 @@ class ConfigListener
 
         if ($changedFeatures) {
             $event = new FeaturesChange($changedFeatures);
-            $this->eventDispatcher->dispatch(FeaturesChange::NAME, $event);
+            $this->eventDispatcher->dispatch($event, FeaturesChange::NAME);
             
             foreach ($changedFeatures as $featureName => $state) {
                 $event = new FeatureChange($featureName, $state);
-                $this->eventDispatcher->dispatch(FeatureChange::NAME . '.' . $featureName, $event);
+                $this->eventDispatcher->dispatch($event, FeatureChange::NAME . '.' . $featureName);
             }
         }
     }

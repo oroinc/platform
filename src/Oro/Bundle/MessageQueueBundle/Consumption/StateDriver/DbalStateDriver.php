@@ -100,7 +100,7 @@ class DbalStateDriver implements StateDriverInterface
         $querySQL = 'UPDATE oro_message_queue_state SET updated_at = :updatedAt'
             . ' WHERE id = :id AND updated_at < :dateWithGap';
 
-        $this->getConnection()->executeUpdate(
+        $this->getConnection()->executeStatement(
             $querySQL,
             ['updatedAt' => $date, 'id' => $this->key, 'dateWithGap' => $dateWithGap],
             ['updatedAt' => Types::DATETIME_MUTABLE, 'id' => Types::STRING, 'dateWithGap' => Types::DATETIME_MUTABLE]

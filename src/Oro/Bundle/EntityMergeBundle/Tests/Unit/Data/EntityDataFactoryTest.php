@@ -104,14 +104,14 @@ class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                MergeEvents::CREATE_ENTITY_DATA,
                 $this->callback(
                     function ($event) {
                         self::assertInstanceOf('Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent', $event);
                         self::assertInstanceOf('Oro\Bundle\EntityMergeBundle\Data\EntityData', $event->getEntityData());
                         return true;
                     }
-                )
+                ),
+                MergeEvents::CREATE_ENTITY_DATA
             );
 
         $result = $this->factory->createEntityData($this->entitiesClassName, $this->entities);

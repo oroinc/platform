@@ -336,10 +336,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private function processConfig(array $config = [])
     {
-        $tree = new TreeBuilder();
+        $tree = new TreeBuilder('oro_test');
         $extension = new OroTestFrameworkExtension();
-        $root = $tree->root('oro_test');
-        $extension->configure($root);
+        $extension->configure($tree->getRootNode());
 
         $processor = new Processor();
 

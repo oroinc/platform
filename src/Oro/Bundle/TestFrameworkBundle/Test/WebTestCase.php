@@ -536,7 +536,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $event = new DisableListenersForDataFixturesEvent();
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = self::getContainer()->get('event_dispatcher');
-        $eventDispatcher->dispatch(DisableListenersForDataFixturesEvent::NAME, $event);
+        $eventDispatcher->dispatch($event, DisableListenersForDataFixturesEvent::NAME);
 
         return array_merge(
             [

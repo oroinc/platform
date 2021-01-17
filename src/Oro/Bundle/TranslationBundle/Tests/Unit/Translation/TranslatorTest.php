@@ -602,10 +602,10 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                AfterCatalogueDump::NAME,
                 new AfterCatalogueDump(
                     new MessageCatalogue($expectedLocale, $expectedMessages)
-                )
+                ),
+                AfterCatalogueDump::NAME
             );
 
         return $eventDispatcher;

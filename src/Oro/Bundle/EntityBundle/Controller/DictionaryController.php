@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -10,7 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Entities controller.
  * @Route("/dictionary")
  */
-class DictionaryController extends Controller
+class DictionaryController extends AbstractController
 {
     /**
      * Get dictionary values by search query

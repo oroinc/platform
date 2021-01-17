@@ -74,6 +74,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.orm.entity_class_resolver'
             - '@oro_locale.helper.localization'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_datagrid.extension }
 

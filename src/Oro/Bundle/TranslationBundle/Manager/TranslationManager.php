@@ -266,8 +266,8 @@ class TranslationManager
     public function invalidateCache($locale = null)
     {
         $this->eventDispatcher->dispatch(
-            InvalidateTranslationCacheEvent::NAME,
-            new InvalidateTranslationCacheEvent($locale)
+            new InvalidateTranslationCacheEvent($locale),
+            InvalidateTranslationCacheEvent::NAME
         );
         $this->dbTranslationMetadataCache->updateTimestamp($locale);
     }

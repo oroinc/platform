@@ -127,8 +127,8 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
             $spoolItem->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE)
                 ->setMessage($emailMessage);
             $this->eventDispatcher->dispatch(
-                NotificationSentEvent::NAME,
-                new NotificationSentEvent($spoolItem, $result)
+                new NotificationSentEvent($spoolItem, $result),
+                NotificationSentEvent::NAME
             );
         }
 

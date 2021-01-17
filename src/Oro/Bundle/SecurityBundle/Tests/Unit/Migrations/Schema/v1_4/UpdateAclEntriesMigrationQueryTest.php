@@ -189,7 +189,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
                 $updateOrderAces
             );
         $this->connection->expects($this->exactly(21))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->withConsecutive(
                 // mask: service bit index - 0; permissions - 4 8 16 0 0 (in inverse order)
                 [self::UPDATE_QUERY, ['mask' => 16644, 'id' => 1000]],
@@ -267,7 +267,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
                 $aces
             );
         $this->connection->expects($this->never())
-            ->method('executeUpdate');
+            ->method('executeStatement');
 
         $this->aclCache->expects($this->never())
             ->method('clearCache');

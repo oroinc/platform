@@ -127,7 +127,7 @@ class Processor
         }
 
         $event = new EmailBodyAdded($emailUser->getEmail());
-        $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+        $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
 
         return $emailUser;
     }

@@ -639,16 +639,16 @@ class WorkflowManager implements LoggerAwareInterface
 
         if ((bool) $isActive !== $definition->isActive()) {
             $this->eventDispatcher->dispatch(
-                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
-                new WorkflowChangesEvent($definition)
+                new WorkflowChangesEvent($definition),
+                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION
             );
 
             $definition->setActive($isActive);
             $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
 
             $this->eventDispatcher->dispatch(
-                $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED,
-                new WorkflowChangesEvent($definition)
+                new WorkflowChangesEvent($definition),
+                $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED
             );
 
             return true;

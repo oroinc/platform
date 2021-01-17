@@ -62,8 +62,8 @@ class DirectMailer extends \Swift_Mailer
             /** @var EventDispatcherInterface $eventDispatcher */
             $eventDispatcher = $this->container->get('event_dispatcher');
             $event = $eventDispatcher->dispatch(
-                SendEmailTransport::NAME,
-                new SendEmailTransport($emailOrigin, $this->getTransport())
+                new SendEmailTransport($emailOrigin, $this->getTransport()),
+                SendEmailTransport::NAME
             );
             $this->smtpTransport = $event->getTransport();
 

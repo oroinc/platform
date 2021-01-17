@@ -200,7 +200,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
         foreach ($this->emailUsers as $emailUser) {
             $em->persist($emailUser);
 
-            $this->eventDispatcher->dispatch(EmailUserAdded::NAME, new EmailUserAdded($emailUser));
+            $this->eventDispatcher->dispatch(new EmailUserAdded($emailUser), EmailUserAdded::NAME);
         }
     }
 

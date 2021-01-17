@@ -29,7 +29,7 @@ class TicketControllerTest extends WebTestCase
         $event = new ClientConnectedEvent($connection);
         self::getContainer()
             ->get('event_dispatcher')
-            ->dispatch('gos_web_socket.client_connected', $event);
+            ->dispatch($event, 'gos_web_socket.client_connected');
 
         $user = self::getContainer()
             ->get('gos_web_socket.client.manipulator')

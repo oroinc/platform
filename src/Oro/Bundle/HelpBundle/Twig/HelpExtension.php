@@ -4,7 +4,7 @@ namespace Oro\Bundle\HelpBundle\Twig;
 
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

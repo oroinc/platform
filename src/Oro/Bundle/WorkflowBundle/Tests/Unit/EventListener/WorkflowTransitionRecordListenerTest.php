@@ -60,7 +60,7 @@ class WorkflowTransitionRecordListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(WorkflowEvents::NOTIFICATION_TRANSIT_EVENT, $expected);
+            ->with($expected, WorkflowEvents::NOTIFICATION_TRANSIT_EVENT);
 
         $this->listener->postPersist($transitionRecord, $this->args);
     }

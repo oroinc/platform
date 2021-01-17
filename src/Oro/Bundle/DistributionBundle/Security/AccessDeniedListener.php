@@ -38,7 +38,7 @@ class AccessDeniedListener
      */
     public function onAccessDeniedException(GetResponseForExceptionEvent $event)
     {
-        if ($event->getException() instanceof AccessDeniedHttpException) {
+        if ($event->getThrowable() instanceof AccessDeniedHttpException) {
             $this->session->invalidate();
             $this->session->set(Security::ACCESS_DENIED_ERROR, ['message' => 'You are not allowed']);
             $this->tokenStorage->setToken(null);

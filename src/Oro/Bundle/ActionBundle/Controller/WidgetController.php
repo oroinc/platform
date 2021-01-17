@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActionBundle\Controller;
 
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class WidgetController extends Controller
+class WidgetController extends AbstractController
 {
     const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
     const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';

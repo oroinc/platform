@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WriterErrorEvent extends Event
 {

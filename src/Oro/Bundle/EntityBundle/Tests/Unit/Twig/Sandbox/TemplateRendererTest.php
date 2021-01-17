@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity as TestSubEntity2;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity as TestSubEntity1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1 as TestMainEntity;
@@ -68,7 +69,8 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $this->renderer = new TemplateRendererStub(
             $this->environment,
             $this->configProvider,
-            $this->variablesProcessorRegistry
+            $this->variablesProcessorRegistry,
+            (new InflectorFactory())->build()
         );
     }
 

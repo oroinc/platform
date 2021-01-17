@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SoapBundle\Routing;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -15,6 +15,13 @@ use Symfony\Component\Routing\Route;
  */
 class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
 {
+    private Inflector $inflector;
+
+    public function __construct(Inflector $inflector)
+    {
+        $this->inflector = $inflector;
+    }
+
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -45,7 +52,7 @@ class OldOptionsRouteOptionsResolver implements RouteOptionsResolverInterface
             $pluralName = $entryPath;
             $singularName = $nameFromController;
         }
-        if ($pluralName === $singularName || $pluralName !== Inflector::pluralize($singularName)) {
+        if ($pluralName === $singularName || $pluralName !== $this->inflector->pluralize($singularName)) {
             return;
         }
 

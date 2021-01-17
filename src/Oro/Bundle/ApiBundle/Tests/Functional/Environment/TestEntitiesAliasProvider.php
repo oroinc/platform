@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 
@@ -21,7 +21,7 @@ class TestEntitiesAliasProvider implements EntityAliasProviderInterface
 
         return new EntityAlias(
             strtolower($name),
-            strtolower(Inflector::pluralize($name))
+            strtolower((new InflectorFactory())->build()->pluralize($name))
         );
     }
 }

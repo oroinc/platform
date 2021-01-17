@@ -315,7 +315,7 @@ abstract class AbstractScopeManager
         $this->cache->save($cacheKey, $settings);
 
         $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
     }
 
     /**
@@ -338,7 +338,7 @@ abstract class AbstractScopeManager
     protected function dispatchScopeIdChangeEvent()
     {
         $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
     }
 
     /**

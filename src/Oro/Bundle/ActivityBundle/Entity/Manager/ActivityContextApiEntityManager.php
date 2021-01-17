@@ -176,7 +176,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     {
         if ($this->eventDispatcher) {
             $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, PrepareContextTitleEvent::EVENT_NAME);
             $item = $event->getItem();
         }
 

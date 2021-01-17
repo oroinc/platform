@@ -67,7 +67,7 @@ class EmailConfigurationHandler
                 $this->getFormFieldValue(Config::KEY_SMTP_SETTINGS_PASS)
             );
 
-            $this->dispatcher->dispatch(SmtpSettingsSaved::NAME, new SmtpSettingsSaved($smtpSettings));
+            $this->dispatcher->dispatch(new SmtpSettingsSaved($smtpSettings), SmtpSettingsSaved::NAME);
         }
     }
 

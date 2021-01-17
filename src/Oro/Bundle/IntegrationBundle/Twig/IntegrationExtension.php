@@ -5,9 +5,9 @@ namespace Oro\Bundle\IntegrationBundle\Twig;
 use Oro\Bundle\IntegrationBundle\Event\LoadIntegrationThemesEvent;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -59,7 +59,7 @@ class IntegrationExtension extends AbstractExtension implements ServiceSubscribe
         }
 
         $event = new LoadIntegrationThemesEvent($view, $themes);
-        $eventDispatcher->dispatch(LoadIntegrationThemesEvent::NAME, $event);
+        $eventDispatcher->dispatch($event, LoadIntegrationThemesEvent::NAME);
 
         return $event->getThemes();
     }

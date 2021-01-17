@@ -116,8 +116,8 @@ class DbSpool extends \Swift_ConfigurableSpool
             $sentCount = $transport->send($email->getMessage(), $failedRecipients);
             $count += $sentCount;
             $this->eventDispatcher->dispatch(
-                NotificationSentEvent::NAME,
-                new NotificationSentEvent($email, $sentCount)
+                new NotificationSentEvent($email, $sentCount),
+                NotificationSentEvent::NAME
             );
             $em->remove($email);
             $em->flush($email);

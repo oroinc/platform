@@ -647,7 +647,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, CountQueryOptimizationEvent $event) use ($joinsToDelete) {
+                function (CountQueryOptimizationEvent $event, $eventName) use ($joinsToDelete) {
                     if (count($joinsToDelete)) {
                         foreach ($joinsToDelete as $deletedJoin) {
                             $event->removeJoinFromOptimizedQuery($deletedJoin);

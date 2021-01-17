@@ -116,7 +116,7 @@ class RemovePermissionGroupNames extends ParametrizedMigrationQuery
             $this->logQuery($logger, $sql, $params, $types);
 
             if (!$dryRun) {
-                $this->connection->executeUpdate($sql, $params, $types);
+                $this->connection->executeStatement($sql, $params, $types);
             }
         }
     }

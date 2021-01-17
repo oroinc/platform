@@ -141,7 +141,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $data = $updatesCount ? $this->getExpectedExecuteUpdateParams() : [];
 
         $this->connection->expects($this->exactly($updatesCount))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {
                     $index = array_search($params, $data, true);

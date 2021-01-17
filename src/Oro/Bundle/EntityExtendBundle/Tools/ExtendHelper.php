@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -20,6 +21,8 @@ class ExtendHelper
     const MAX_ENUM_SNAPSHOT_LENGTH = 500;
     const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
     const ENUM_SNAPSHOT_SUFFIX     = 'Snapshot';
+
+    private static ?Inflector $inflector = null;
 
     /**
      * @param string $type
@@ -78,7 +81,7 @@ class ExtendHelper
 
         return sprintf(
             '%s_%s',
-            Inflector::tableize(self::getShortClassName($targetEntityClassName)),
+            self::getInflector()->tableize(self::getShortClassName($targetEntityClassName)),
             $hash
         );
     }
@@ -207,15 +210,15 @@ class ExtendHelper
 
         $enumCode = sprintf(
             '%s_%s_%s',
-            Inflector::tableize($shortClassName),
-            Inflector::tableize($fieldName),
+            self::getInflector()->tableize($shortClassName),
+            self::getInflector()->tableize($fieldName),
             dechex(crc32($entityClassName . '::' . $fieldName))
         );
 
         if (null !== $maxEnumCodeSize && strlen($enumCode) > $maxEnumCodeSize) {
             $enumCode = sprintf(
                 '%s_%s',
-                Inflector::tableize($shortClassName),
+                self::getInflector()->tableize($shortClassName),
                 dechex(crc32($entityClassName . '::' . $fieldName))
             );
             if (strlen($enumCode) > $maxEnumCodeSize) {
@@ -529,5 +532,13 @@ class ExtendHelper
                 array_diff($oldVal, $newVal)
             )
         );
+    }
+
+    private static function getInflector(): Inflector
+    {
+        if (null === self::$inflector) {
+            self::$inflector = (new InflectorFactory())->build();
+        }
+        return self::$inflector;
     }
 }

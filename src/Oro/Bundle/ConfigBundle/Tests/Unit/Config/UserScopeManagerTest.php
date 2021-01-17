@@ -72,7 +72,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeId(456);
 

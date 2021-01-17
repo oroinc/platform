@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is triggered after create/update/delete of MenuUpdate in specified scope

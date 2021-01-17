@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,15 +16,13 @@ abstract class AbstractEntityClassNameProvider
 
     /** @var TranslatorInterface */
     protected $translator;
+    private Inflector $inflector;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param TranslatorInterface $translator
-     */
-    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
+    public function __construct(ConfigManager $configManager, TranslatorInterface $translator, Inflector $inflector)
     {
         $this->configManager = $configManager;
         $this->translator = $translator;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -64,7 +62,7 @@ abstract class AbstractEntityClassNameProvider
         if ($labelName) {
             $translated = $this->translator->trans($labelName, [], null, 'en');
             if ($translated && $translated !== $labelName) {
-                return $entityClassName . ' ' . ($isPlural ? Inflector::pluralize($translated) : $translated);
+                return $entityClassName . ' ' . ($isPlural ? $this->inflector->pluralize($translated) : $translated);
             }
         }
 

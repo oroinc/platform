@@ -94,16 +94,16 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     public function getResults()
     {
         $this->eventDispatcher->dispatch(
-            OrmResultBeforeQuery::NAME,
-            new OrmResultBeforeQuery($this->datagrid, $this->qb)
+            new OrmResultBeforeQuery($this->datagrid, $this->qb),
+            OrmResultBeforeQuery::NAME
         );
 
         $query = $this->qb->getQuery();
         $this->queryHintResolver->resolveHints($query, $this->queryHints ?? []);
 
         $this->eventDispatcher->dispatch(
-            OrmResultBefore::NAME,
-            new OrmResultBefore($this->datagrid, $query)
+            new OrmResultBefore($this->datagrid, $query),
+            OrmResultBefore::NAME
         );
 
         $rows = $this->queryExecutor->execute($this->datagrid, $query);
@@ -113,7 +113,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
         }
 
         $event = new OrmResultAfter($this->datagrid, $records, $query);
-        $this->eventDispatcher->dispatch(OrmResultAfter::NAME, $event);
+        $this->eventDispatcher->dispatch($event, OrmResultAfter::NAME);
 
         return $event->getRecords();
     }

@@ -76,7 +76,7 @@ class ConfigurationBuilder implements BuilderInterface
         }
 
         $event = new ConfigureMenuEvent($this->factory, $menu);
-        $this->eventDispatcher->dispatch(ConfigureMenuEvent::getEventName($alias), $event);
+        $this->eventDispatcher->dispatch($event, ConfigureMenuEvent::getEventName($alias));
     }
 
     /**

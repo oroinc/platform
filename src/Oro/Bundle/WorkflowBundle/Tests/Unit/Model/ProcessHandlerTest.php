@@ -74,7 +74,6 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    ProcessEvents::HANDLE_BEFORE,
                     static::callback(
                         function ($event) use ($processTrigger, $processData) {
                             static::assertInstanceOf(ProcessHandleEvent::class, $event);
@@ -83,10 +82,10 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
                             static::assertSame($processData, $event->getProcessData());
                             return true;
                         }
-                    )
+                    ),
+                    ProcessEvents::HANDLE_BEFORE
                 ],
                 [
-                    ProcessEvents::HANDLE_AFTER,
                     static::callback(
                         function ($event) use ($processTrigger, $processData, $process) {
                             static::assertInstanceOf(ProcessHandleEvent::class, $event);
@@ -95,7 +94,8 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
                             static::assertSame($processData, $event->getProcessData());
                             return true;
                         }
-                    )
+                    ),
+                    ProcessEvents::HANDLE_AFTER
                 ]
             );
 
@@ -144,7 +144,6 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(static::once())
             ->method('dispatch')
             ->with(
-                ProcessEvents::HANDLE_AFTER_FLUSH,
                 static::callback(
                     function ($event) use ($processTrigger, $processData) {
                         static::assertInstanceOf(ProcessHandleEvent::class, $event);
@@ -153,7 +152,8 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
                         static::assertSame($processData, $event->getProcessData());
                         return true;
                     }
-                )
+                ),
+                ProcessEvents::HANDLE_AFTER_FLUSH
             );
 
         $this->handler->finishTrigger($processTrigger, $processData);
@@ -171,7 +171,6 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(static::once())
             ->method('dispatch')
             ->with(
-                ProcessEvents::HANDLE_AFTER_FLUSH,
                 static::callback(
                     function ($event) use ($processTrigger, $processData) {
                         static::assertInstanceOf(ProcessHandleEvent::class, $event);
@@ -179,7 +178,8 @@ class ProcessHandlerTest extends \PHPUnit\Framework\TestCase
                         static::assertSame($processData, $event->getProcessData());
                         return true;
                     }
-                )
+                ),
+                ProcessEvents::HANDLE_AFTER_FLUSH
             );
 
         $this->handler->finishJob($processJob);

@@ -294,7 +294,7 @@ class CountQueryBuilderOptimizer
     {
         if (null !== $this->eventDispatcher) {
             $event = new CountQueryOptimizationEvent($this->context, $joinAliases);
-            $this->eventDispatcher->dispatch(CountQueryOptimizationEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, CountQueryOptimizationEvent::EVENT_NAME);
             $toRemoveAliases = $event->getRemovedOptimizedQueryJoinAliases();
             if (!empty($toRemoveAliases)) {
                 $toRemoveAliases = array_diff($toRemoveAliases, $requiredJoinAliases);

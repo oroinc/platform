@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Tests\Behat\Context;
 
 use Behat\Mink\Element\NodeElement;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
@@ -69,7 +69,8 @@ class AddressContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iDeleteAllAddresses($field)
     {
-        $collection = $this->elementFactory->createElement('OroForm')->findField(ucfirst(Inflector::pluralize($field)));
+        $collection = $this->elementFactory->createElement('OroForm')
+            ->findField(ucfirst((new InflectorFactory())->build()->pluralize($field)));
         self::assertNotNull($collection, sprintf('Can\'t find collection field with "%s" locator', $field));
 
         /** @var NodeElement $removeButton */

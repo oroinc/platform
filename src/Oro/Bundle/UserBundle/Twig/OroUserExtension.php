@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Twig;
 
 use Oro\Bundle\UserBundle\Provider\GenderProvider;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
@@ -27,11 +27,12 @@ class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
     public function testConfigureOptions()
     {
         $resolver = new OptionsResolver();
+        $inflector = (new InflectorFactory())->build();
 
         $resolver->setDefaults([
             'choices' => [
-                Inflector::tableize(StubEntity::class) => StubEntity::class,
-                Inflector::tableize(\stdClass::class) => \stdClass::class
+                $inflector->tableize(StubEntity::class) => StubEntity::class,
+                $inflector->tableize(\stdClass::class) => \stdClass::class
             ]
         ]);
 
@@ -51,7 +52,7 @@ class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             [
-                Inflector::tableize(StubEntity::class) => StubEntity::class,
+                $inflector->tableize(StubEntity::class) => StubEntity::class,
             ],
             $result['choices']
         );

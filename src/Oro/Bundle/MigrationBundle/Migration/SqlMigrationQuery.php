@@ -72,7 +72,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
     {
         foreach ($this->queries as $query) {
             $logger->info($query);
-            $this->connection->executeUpdate($query);
+            $this->connection->executeStatement($query);
         }
     }
 }

@@ -4,6 +4,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Twig\LayoutExtension
         arguments:
             - '@oro_platform.twig.service_locator'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: twig.extension }
 

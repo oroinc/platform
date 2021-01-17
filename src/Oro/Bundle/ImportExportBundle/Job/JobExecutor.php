@@ -441,8 +441,8 @@ class JobExecutor
     {
         if ($this->eventDispatcher && $this->eventDispatcher->hasListeners(Events::AFTER_JOB_EXECUTION)) {
             $this->eventDispatcher->dispatch(
-                Events::AFTER_JOB_EXECUTION,
-                new AfterJobExecutionEvent($jobExecution, $jobResult)
+                new AfterJobExecutionEvent($jobExecution, $jobResult),
+                Events::AFTER_JOB_EXECUTION
             );
         }
     }

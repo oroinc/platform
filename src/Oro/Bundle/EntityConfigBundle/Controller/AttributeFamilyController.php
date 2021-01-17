@@ -11,7 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Entity Attribute Family Controller
  * @Route("/attribute/family")
  */
-class AttributeFamilyController extends Controller
+class AttributeFamilyController extends AbstractController
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_family_create")

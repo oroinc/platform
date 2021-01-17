@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is dispatched before loading of data fixtures for functional tests

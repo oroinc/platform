@@ -145,7 +145,7 @@ class MergeRenderer
         }
 
         $event = new ValueRenderEvent($convertResult, $value, $metadata);
-        $this->eventDispatcher->dispatch(MergeEvents::BEFORE_VALUE_RENDER, $event);
+        $this->eventDispatcher->dispatch($event, MergeEvents::BEFORE_VALUE_RENDER);
         $convertResult = $event->getConvertedValue();
 
         return (string)$convertResult;

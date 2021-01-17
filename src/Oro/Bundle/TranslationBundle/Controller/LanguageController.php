@@ -5,7 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller as BaseController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**

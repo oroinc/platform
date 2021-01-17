@@ -101,7 +101,7 @@ class UpdateNotificationRuleWorkflowTransitionQuery extends ParametrizedMigratio
 
         $this->logQuery($logger, $query, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $this->connection->executeStatement($query, $params, $types);
         }
     }
 

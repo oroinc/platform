@@ -335,6 +335,7 @@ services:
             - '@oro_email.email_renderer_configuration'
             - '@oro_email.emailtemplate.variable_processor'
             - '@translator'
+            - '@Doctrine\Inflector\Inflector'
         calls:
             - [addSystemVariableDefaultFilter, ['userSignature', 'oro_html_sanitize']]
         lazy: true
@@ -393,6 +394,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_ui.formatter'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 

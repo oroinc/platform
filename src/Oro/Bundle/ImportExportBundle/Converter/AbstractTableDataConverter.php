@@ -148,7 +148,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     {
         $event = new FormatConversionEvent($record, $result);
         if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
-            $this->dispatcher->dispatch($eventName, $event);
+            $this->dispatcher->dispatch($event, $eventName);
         }
 
         return $event;

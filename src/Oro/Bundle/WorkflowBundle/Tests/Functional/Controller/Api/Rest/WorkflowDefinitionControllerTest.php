@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -169,7 +169,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
      */
     protected function prepareWorkflowName($name)
     {
-        return preg_replace('/\s+/', '_', trim(Inflector::tableize($name)));
+        return preg_replace('/\s+/', '_', trim((new InflectorFactory())->build()->tableize($name)));
     }
 
     /**

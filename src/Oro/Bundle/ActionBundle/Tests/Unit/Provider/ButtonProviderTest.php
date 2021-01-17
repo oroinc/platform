@@ -86,7 +86,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(OnButtonsMatched::NAME, new OnButtonsMatched(new ButtonsCollection()));
+            ->with(new OnButtonsMatched(new ButtonsCollection()), OnButtonsMatched::NAME);
 
         $buttonProvider = $this->getButtonProvider([$extension1, $extension2]);
         $buttonProvider->match($this->searchContext);

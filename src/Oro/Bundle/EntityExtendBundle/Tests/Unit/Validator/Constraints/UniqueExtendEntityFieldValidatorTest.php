@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -51,7 +52,12 @@ class UniqueExtendEntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $this->validator = new UniqueExtendEntityFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
+            new FieldNameValidationHelper(
+                $extendConfigProvider,
+                $eventDispatcher,
+                new NewEntitiesHelper(),
+                (new InflectorFactory())->build()
+            )
         );
     }
 

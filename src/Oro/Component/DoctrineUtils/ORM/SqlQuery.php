@@ -76,7 +76,7 @@ class SqlQuery extends AbstractQuery
 
         $sql = $this->qb->getSQL();
         if (preg_match('/\s*(UPDATE|DELETE|INSERT)\s+/i', $sql)) {
-            return $this->_em->getConnection()->executeUpdate($sql, $parameters, $types);
+            return $this->_em->getConnection()->executeStatement($sql, $parameters, $types);
         }
 
         return $this->_em->getConnection()->executeQuery($sql, $parameters, $types, $this->_queryCacheProfile);

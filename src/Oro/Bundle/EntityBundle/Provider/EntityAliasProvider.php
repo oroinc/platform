@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 
 class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassProviderInterface
 {
     /** @var EntityAliasConfigBag */
     protected $config;
+    private Inflector $inflector;
 
-    /**
-     * @param EntityAliasConfigBag $config
-     */
-    public function __construct(EntityAliasConfigBag $config)
+    public function __construct(EntityAliasConfigBag $config, Inflector $inflector)
     {
         $this->config = $config;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -46,7 +45,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface, EntityClassPr
 
         return new EntityAlias(
             strtolower($name),
-            strtolower(Inflector::pluralize($name))
+            strtolower($this->inflector->pluralize($name))
         );
     }
 

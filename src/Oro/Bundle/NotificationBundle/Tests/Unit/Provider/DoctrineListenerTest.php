@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\NotificationBundle\Provider\DoctrineListener;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -66,7 +67,7 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo($eventName), $this->isInstanceOf('Symfony\Component\EventDispatcher\Event'));
+            ->with($this->isInstanceOf(Event::class), $this->equalTo($eventName));
 
         $this->listener->$methodName($args);
     }

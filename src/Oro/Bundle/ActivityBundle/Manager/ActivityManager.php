@@ -147,7 +147,7 @@ class ActivityManager
 
             if ($this->eventDispatcher) {
                 $event = new ActivityEvent($activityEntity, $targetEntity);
-                $this->eventDispatcher->dispatch(Events::ADD_ACTIVITY, $event);
+                $this->eventDispatcher->dispatch($event, Events::ADD_ACTIVITY);
             }
 
             return true;
@@ -226,7 +226,7 @@ class ActivityManager
             $activityEntity->removeActivityTarget($targetEntity);
             if ($this->eventDispatcher) {
                 $event = new ActivityEvent($activityEntity, $targetEntity);
-                $this->eventDispatcher->dispatch(Events::REMOVE_ACTIVITY, $event);
+                $this->eventDispatcher->dispatch($event, Events::REMOVE_ACTIVITY);
             }
 
             return true;
