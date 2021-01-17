@@ -464,8 +464,8 @@ class Translator extends BaseTranslator
 
         if (!$isCacheReady && $this->isApplicationInstalled()) {
             $this->eventDispatcher->dispatch(
-                AfterCatalogueDump::NAME,
-                new AfterCatalogueDump($this->catalogues[$locale])
+                new AfterCatalogueDump($this->catalogues[$locale]),
+                AfterCatalogueDump::NAME
             );
         }
     }

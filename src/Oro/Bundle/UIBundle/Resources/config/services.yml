@@ -54,6 +54,7 @@ services:
         class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
             - '@Psr\Container\ContainerInterface'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: container.service_subscriber, id: 'templating' }
             - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }

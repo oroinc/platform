@@ -76,8 +76,8 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher->expects(static::exactly(2))
                 ->method('dispatch')
                 ->withConsecutive(
-                    [ExecuteActionEvents::HANDLE_BEFORE, new ExecuteActionEvent($context, $this->action)],
-                    [ExecuteActionEvents::HANDLE_AFTER, new ExecuteActionEvent($context, $this->action)]
+                    [new ExecuteActionEvent($context, $this->action), ExecuteActionEvents::HANDLE_BEFORE],
+                    [new ExecuteActionEvent($context, $this->action), ExecuteActionEvents::HANDLE_AFTER]
                 );
         } else {
             $this->action->expects(static::never())->method('executeAction');

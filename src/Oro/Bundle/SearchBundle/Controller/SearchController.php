@@ -85,7 +85,7 @@ class SearchController extends AbstractController
 
         $dispatcher = $this->get(EventDispatcherInterface::class);
         foreach ($searchResults->getElements() as $item) {
-            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }
 
         return new JsonResponse($searchResults->toSearchResultData());

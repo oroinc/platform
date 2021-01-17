@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Abstract controller for OAuth connection check controllers
  */
-abstract class AbstractVendorConnectionController extends Controller
+abstract class AbstractVendorConnectionController extends AbstractController
 {
     /**
      * @param Request $request

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Event;
 
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FieldDataEvent extends Event
 {

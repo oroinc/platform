@@ -92,10 +92,10 @@ class TemplateEmailNotificationAdapterTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(NotificationProcessRecipientsEvent::NAME, $event)
+            ->with($event, NotificationProcessRecipientsEvent::NAME)
             ->willReturnCallback(function (
-                $eventName,
-                NotificationProcessRecipientsEvent $event
+                NotificationProcessRecipientsEvent $event,
+                $eventName
             ) use ($transformedRecipients) {
                 $event->setRecipients($transformedRecipients);
             });

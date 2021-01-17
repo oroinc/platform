@@ -80,7 +80,7 @@ class EntityStructureDataProvider
 
             $event = new EntityStructureOptionsEvent();
             $event->setData($entityStructures);
-            $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, EntityStructureOptionsEvent::EVENT_NAME);
             $entityStructures = $event->getData();
 
             $this->cache->save($cacheKey, $entityStructures);
@@ -103,7 +103,7 @@ class EntityStructureDataProvider
 
         $event = new EntityStructureOptionsEvent();
         $event->setData([$model]);
-        $this->eventDispatcher->dispatch(EntityStructureOptionsEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, EntityStructureOptionsEvent::EVENT_NAME);
 
         return $model;
     }

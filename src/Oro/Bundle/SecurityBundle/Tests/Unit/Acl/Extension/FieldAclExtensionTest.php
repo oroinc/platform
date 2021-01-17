@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -132,7 +133,7 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor($this->doctrineHelper),
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, (new InflectorFactory())->build()),
             $this->metadataProvider,
             $this->createMock(TokenAccessorInterface::class)
         );

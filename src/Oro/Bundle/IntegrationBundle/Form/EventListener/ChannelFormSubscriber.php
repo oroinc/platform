@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Form\Type\IntegrationSettingsDynamicFormType;
@@ -21,20 +21,15 @@ class ChannelFormSubscriber implements EventSubscriberInterface
 
     /** @var SettingsProvider */
     protected $settingsProvider;
+    private Inflector $inflector;
 
-    /**
-     * @param TypesRegistry    $registry
-     * @param SettingsProvider $settingsProvider
-     */
-    public function __construct(TypesRegistry $registry, SettingsProvider $settingsProvider)
+    public function __construct(TypesRegistry $registry, SettingsProvider $settingsProvider, Inflector $inflector)
     {
         $this->registry         = $registry;
         $this->settingsProvider = $settingsProvider;
+        $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -280,7 +275,7 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             $fields = $settingsProvider->getFormSettings($formName, $type);
             if ($fields) {
                 $form->add(
-                    Inflector::camelize($formName),
+                    $this->inflector->camelize($formName),
                     IntegrationSettingsDynamicFormType::class,
                     ['fields' => $fields]
                 );

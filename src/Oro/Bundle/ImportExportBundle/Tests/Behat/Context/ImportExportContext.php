@@ -8,7 +8,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Gaufrette\File;
 use GuzzleHttp\Client;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
@@ -471,7 +471,7 @@ class ImportExportContext extends OroFeatureContext implements
     {
         $name = strtolower($entityName);
         $nameParts = explode(' ', $name);
-        $nameParts = array_map([new Inflector(), 'singularize'], $nameParts);
+        $nameParts = array_map([(new InflectorFactory())->build(), 'singularize'], $nameParts);
 
         return implode('', $nameParts);
     }

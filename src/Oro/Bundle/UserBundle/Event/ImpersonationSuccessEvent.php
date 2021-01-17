@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Event;
 
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Triggers on successful impersonation login

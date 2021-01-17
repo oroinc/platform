@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetConfigurationLoadEvent extends Event
 {

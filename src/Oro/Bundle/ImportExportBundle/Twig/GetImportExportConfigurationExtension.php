@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Twig;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationRegistryInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

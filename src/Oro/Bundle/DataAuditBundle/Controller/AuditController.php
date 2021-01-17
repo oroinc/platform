@@ -5,14 +5,14 @@ namespace Oro\Bundle\DataAuditBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Audits list and audit history actions
  */
-class AuditController extends Controller
+class AuditController extends AbstractController
 {
     /**
      * @Route(

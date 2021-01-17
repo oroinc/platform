@@ -82,10 +82,10 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                'oro_ui.scroll_data.before.' . $pageIdentifier,
-                $this->isInstanceOf(BeforeListRenderEvent::class)
+                $this->isInstanceOf(BeforeListRenderEvent::class),
+                'oro_ui.scroll_data.before.' . $pageIdentifier
             )->willReturnCallback(
-                function ($name, BeforeListRenderEvent $event) use ($data, $alteredData, $formView) {
+                function (BeforeListRenderEvent $event, $name) use ($data, $alteredData, $formView) {
                     $this->assertEquals($this->environment, $event->getEnvironment());
                     $this->assertEquals($data, $event->getScrollData());
                     $this->assertEquals($formView, $event->getFormView());
@@ -143,11 +143,11 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::BEFORE_UPDATE_FORM_RENDER,
-                $this->isInstanceOf(BeforeFormRenderEvent::class)
+                $this->isInstanceOf(BeforeFormRenderEvent::class),
+                Events::BEFORE_UPDATE_FORM_RENDER
             )
             ->willReturnCallback(
-                function ($eventName, BeforeFormRenderEvent $event) use ($formView, $formData, $entity) {
+                function (BeforeFormRenderEvent $event, $eventName) use ($formView, $formData, $entity) {
                     self::assertSame($formView, $event->getForm());
                     self::assertSame($formData, $event->getFormData());
                     self::assertSame($entity, $event->getEntity());
@@ -174,11 +174,11 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::BEFORE_UPDATE_FORM_RENDER,
-                $this->isInstanceOf(BeforeFormRenderEvent::class)
+                $this->isInstanceOf(BeforeFormRenderEvent::class),
+                Events::BEFORE_UPDATE_FORM_RENDER
             )
             ->willReturnCallback(
-                function ($eventName, BeforeFormRenderEvent $event) use ($formView, $formData) {
+                function (BeforeFormRenderEvent $event, $eventName) use ($formView, $formData) {
                     self::assertSame($formView, $event->getForm());
                     self::assertSame($formData, $event->getFormData());
                     self::assertNull($event->getEntity());

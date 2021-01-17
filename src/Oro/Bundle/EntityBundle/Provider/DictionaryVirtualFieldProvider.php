@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -39,23 +39,20 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
 
     /** @var array [class name => [field name, ...], ...] */
     private $dictionaries;
+    private Inflector $inflector;
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param ManagerRegistry     $doctrine
-     * @param TranslatorInterface $translator
-     * @param CacheProvider       $cache
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider $cache
+        CacheProvider $cache,
+        Inflector $inflector
     ) {
         $this->configManager = $configManager;
         $this->doctrine = $doctrine;
         $this->translator = $translator;
         $this->cache = $cache;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -155,7 +152,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                 $fieldNames = $this->dictionaries[$targetClass];
                 $combinedLabel = count($fieldNames) > 1;
                 foreach ($fieldNames as $fieldName) {
-                    $name = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
+                    $name = $this->inflector->tableize(sprintf('%s_%s', $associationName, $fieldName));
                     $result[$name] = [$targetClass, $associationName, $fieldName, $combinedLabel];
                 }
             }
@@ -184,7 +181,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                             $em,
                             $className,
                             $associationName,
-                            $combinedLabel ? $name : Inflector::tableize($associationName)
+                            $combinedLabel ? $name : $this->inflector->tableize($associationName)
                         ),
                         'return_type'         => 'dictionary',
                         'related_entity_name' => $targetClass

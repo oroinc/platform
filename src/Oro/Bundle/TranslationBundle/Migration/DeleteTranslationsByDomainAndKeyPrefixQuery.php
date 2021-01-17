@@ -44,6 +44,6 @@ class DeleteTranslationsByDomainAndKeyPrefixQuery extends ParametrizedMigrationQ
         );
 
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
     }
 }

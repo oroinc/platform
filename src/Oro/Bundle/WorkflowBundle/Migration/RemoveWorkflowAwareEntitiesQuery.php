@@ -44,7 +44,7 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
         $types = ['ids' => Connection::PARAM_INT_ARRAY];
 
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
     }
 
     private function getIds(LoggerInterface $logger): array

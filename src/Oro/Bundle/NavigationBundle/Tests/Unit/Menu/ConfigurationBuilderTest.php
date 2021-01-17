@@ -74,7 +74,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with('oro_menu.configure.navbar', new ConfigureMenuEvent($this->menuFactory, $menu));
+            ->with(new ConfigureMenuEvent($this->menuFactory, $menu), 'oro_menu.configure.navbar');
 
         $this->configurationBuilder->build($menu, [], 'navbar');
 

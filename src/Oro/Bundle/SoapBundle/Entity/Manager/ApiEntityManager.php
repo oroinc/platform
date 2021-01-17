@@ -311,7 +311,7 @@ class ApiEntityManager
     {
         // dispatch oro_api.request.find.after event
         $event = new FindAfter($entity);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        $this->eventDispatcher->dispatch($event, FindAfter::NAME);
     }
 
     /**
@@ -365,7 +365,7 @@ class ApiEntityManager
 
         // dispatch oro_api.request.get_list.before event
         $event = new GetListBefore($criteria, $this->class);
-        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $this->eventDispatcher->dispatch($event, GetListBefore::NAME);
         $criteria = $event->getCriteria();
 
         $criteria

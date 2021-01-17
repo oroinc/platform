@@ -67,7 +67,7 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $query->setConnection($this->connection);
 
         $this->connection->expects($this->never())
-            ->method('executeUpdate');
+            ->method('executeStatement');
 
         $query->addSql('INSERT INTO test_table (name) VALUES (\'name\')');
         $this->assertEquals(
@@ -93,13 +93,13 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $logger = new ArrayLogger();
 
         $this->connection->expects($this->at(0))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with('INSERT INTO test_table (name) VALUES (\'name\')');
         $this->connection->expects($this->at(1))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with('INSERT INTO test_table (name) VALUES (\'name\')');
         $this->connection->expects($this->at(2))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with('INSERT INTO test_table (test) VALUES (1)');
 
         $query->addSql('INSERT INTO test_table (name) VALUES (\'name\')');

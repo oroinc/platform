@@ -103,9 +103,9 @@ HELP
             $event = new InstallerEvent($this, $input, $output, $commandExecutor);
 
             try {
-                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+                $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
                 $this->loadDataStep($commandExecutor, $output);
-                $eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+                $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
                 $this->finalStep($commandExecutor, $output, $input, $input->getOption('skip-assets'));
             } catch (\Exception $exception) {

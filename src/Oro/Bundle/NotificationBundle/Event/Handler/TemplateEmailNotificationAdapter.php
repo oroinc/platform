@@ -116,7 +116,7 @@ class TemplateEmailNotificationAdapter implements TemplateEmailNotificationInter
         $this->removeDisabledUsers($recipients);
 
         $event = new NotificationProcessRecipientsEvent($this->entity, $recipients);
-        $this->eventDispatcher->dispatch(NotificationProcessRecipientsEvent::NAME, $event);
+        $this->eventDispatcher->dispatch($event, NotificationProcessRecipientsEvent::NAME);
 
         return $event->getRecipients();
     }

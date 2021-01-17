@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Event;
 
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event class for oro.import_export.before_get_ids event

@@ -56,7 +56,7 @@ class CheckboxTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->buildForm($builder, []);
 
         $event = new FormEvent($this->createMock(FormInterface::class), $data);
-        $eventDispatcher->dispatch(FormEvents::PRE_SUBMIT, $event);
+        $eventDispatcher->dispatch($event, FormEvents::PRE_SUBMIT);
         self::assertEquals($expected, $event->getData());
     }
 

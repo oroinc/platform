@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Datagrid\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -68,7 +69,8 @@ class LocalizedValueExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocalizedValueExtension(
             $this->doctrineHelper,
             $this->entityClassResolver,
-            $this->localizationHelper
+            $this->localizationHelper,
+            (new InflectorFactory())->build()
         );
         $this->extension->setParameters(new ParameterBag());
     }

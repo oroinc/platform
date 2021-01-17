@@ -55,8 +55,8 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
         }
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::NOTIFICATION_TRANSIT_EVENT,
-            $this->getNotificationEvent($transitionRecord)
+            $this->getNotificationEvent($transitionRecord),
+            WorkflowEvents::NOTIFICATION_TRANSIT_EVENT
         );
     }
 

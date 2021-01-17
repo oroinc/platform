@@ -116,7 +116,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->connection->expects(static::exactly(2))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->withConsecutive(
                 [
                     'UPDATE oro_entity_config SET data = :data WHERE class_name = :class_name',
@@ -228,7 +228,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->connection->expects(static::exactly(2))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->withConsecutive(
                 [
                     'UPDATE oro_entity_config SET data = :data WHERE class_name = :class_name',
@@ -311,7 +311,7 @@ class RemoveAssociationQueryTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->connection->expects(static::exactly(2))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->withConsecutive(
                 [
                     'UPDATE oro_entity_config SET data = :data WHERE class_name = :class_name',

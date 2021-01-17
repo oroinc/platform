@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Twig;
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 

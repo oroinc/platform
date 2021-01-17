@@ -118,7 +118,7 @@ class ActivityListManager
         $result = [];
 
         $event = new ActivityListPreQueryBuildEvent($entityClass, $entityId);
-        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ActivityListPreQueryBuildEvent::EVENT_NAME);
         $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
             $event->getTargetIds()
@@ -385,7 +385,7 @@ class ActivityListManager
             $entityClass,
             $this->doctrineHelper->getSingleEntityIdentifier($entity)
         );
-        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ActivityListPreQueryBuildEvent::EVENT_NAME);
         $entityIds = $event->getTargetIds();
         $qb = $this->getRepository()->createQueryBuilder('activity')
             ->leftJoin('activity.activityOwners', 'ao')

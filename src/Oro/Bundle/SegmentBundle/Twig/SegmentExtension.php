@@ -5,8 +5,8 @@ namespace Oro\Bundle\SegmentBundle\Twig;
 use Oro\Bundle\SegmentBundle\Event\ConditionBuilderOptionsLoadEvent;
 use Oro\Bundle\SegmentBundle\Event\WidgetOptionsLoadEvent;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -59,7 +59,7 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
         }
 
         $event = new WidgetOptionsLoadEvent($widgetOptions, $type);
-        $eventDispatcher->dispatch(WidgetOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch($event, WidgetOptionsLoadEvent::EVENT_NAME);
 
         return $event->getWidgetOptions();
     }
@@ -78,7 +78,7 @@ class SegmentExtension extends AbstractExtension implements ServiceSubscriberInt
         }
 
         $event = new ConditionBuilderOptionsLoadEvent($options);
-        $eventDispatcher->dispatch(ConditionBuilderOptionsLoadEvent::EVENT_NAME, $event);
+        $eventDispatcher->dispatch($event, ConditionBuilderOptionsLoadEvent::EVENT_NAME);
 
         return $event->getOptions();
     }

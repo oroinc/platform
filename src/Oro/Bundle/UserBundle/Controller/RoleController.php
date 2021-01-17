@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  * This controller covers CRUD functionality for Role entity.
  * @Route("/role")
  */
-class RoleController extends Controller
+class RoleController extends AbstractController
 {
     /**
      * @Acl(

@@ -49,7 +49,7 @@ class EventDispatchableRestClientFactory implements FactoryInterface
             $transportEntity
         );
 
-        $this->dispatcher->dispatch(ClientCreatedAfterEvent::NAME, $clientCreatedAfterEvent);
+        $this->dispatcher->dispatch($clientCreatedAfterEvent, ClientCreatedAfterEvent::NAME);
 
         return $clientCreatedAfterEvent->getClient();
     }

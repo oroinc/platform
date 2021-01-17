@@ -11,7 +11,7 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,7 +23,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 /**
  * Controller for IMAP configuration page
  */
-class ConnectionController extends Controller
+class ConnectionController extends AbstractController
 {
     /**
      * @var ImapEmailFolderManager

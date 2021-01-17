@@ -205,7 +205,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dispatcher = $this->createDispatcherMock();
         $dispatcher->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) {
+            ->willReturnCallback(function (NotificationSentEvent $event, $eventName) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals(0, $event->getSentCount());
             });
@@ -251,7 +251,7 @@ class SendMassEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dispatcher = $this->createDispatcherMock();
         $dispatcher->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) {
+            ->willReturnCallback(function (NotificationSentEvent $event, $eventName) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals(1, $event->getSentCount());
             });

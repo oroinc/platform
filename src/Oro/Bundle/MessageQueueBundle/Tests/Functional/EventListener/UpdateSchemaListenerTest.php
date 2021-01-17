@@ -95,7 +95,7 @@ class UpdateSchemaListenerTest extends WebTestCase
         $dispatcher = $this->getEventDispatcher();
 
         $event = $this->createMock(UpdateSchemaEvent::class);
-        $dispatcher->dispatch(UpdateSchemaEvent::NAME, $event);
+        $dispatcher->dispatch($event, UpdateSchemaEvent::NAME);
     }
 
     /**

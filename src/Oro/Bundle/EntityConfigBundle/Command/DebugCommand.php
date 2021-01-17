@@ -514,7 +514,7 @@ HELP
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -556,7 +556,7 @@ HELP
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -595,7 +595,7 @@ HELP
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -637,7 +637,7 @@ HELP
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']

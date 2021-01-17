@@ -109,7 +109,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) use ($spoolItem) {
+            ->willReturnCallback(function (NotificationSentEvent $event, $eventName) use ($spoolItem) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals($spoolItem, $event->getSpoolItem());
                 self::assertEquals(1, $event->getSentCount());

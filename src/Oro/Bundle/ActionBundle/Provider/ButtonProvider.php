@@ -52,7 +52,7 @@ class ButtonProvider
             $collection->consume($extension, $searchContext);
         }
 
-        $this->eventDispatcher->dispatch(OnButtonsMatched::NAME, new OnButtonsMatched($collection));
+        $this->eventDispatcher->dispatch(new OnButtonsMatched($collection), OnButtonsMatched::NAME);
 
         return $collection;
     }

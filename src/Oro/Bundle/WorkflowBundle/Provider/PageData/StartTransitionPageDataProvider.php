@@ -90,7 +90,7 @@ class StartTransitionPageDataProvider
     {
         $event = $this->createEvent($workflow, $transition, $entityId);
 
-        $this->eventDispatcher->dispatch(StartTransitionEvents::HANDLE_BEFORE_RENDER, $event);
+        $this->eventDispatcher->dispatch($event, StartTransitionEvents::HANDLE_BEFORE_RENDER);
 
         return $event;
     }

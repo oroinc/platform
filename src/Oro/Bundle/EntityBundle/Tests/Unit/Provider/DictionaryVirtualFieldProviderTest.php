@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
@@ -45,7 +46,8 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $doctrine,
             $translator,
-            $this->cache
+            $this->cache,
+            (new InflectorFactory())->build()
         );
     }
 

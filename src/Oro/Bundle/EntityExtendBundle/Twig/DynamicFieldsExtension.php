@@ -233,7 +233,7 @@ class DynamicFieldsExtension extends AbstractDynamicFieldsExtension
             $this->getPropertyAccessor()->getValue($entity, $fieldName),
             $fieldConfigId
         );
-        $this->getEventDispatcher()->dispatch(EntityExtendEvents::BEFORE_VALUE_RENDER, $event);
+        $this->getEventDispatcher()->dispatch($event, EntityExtendEvents::BEFORE_VALUE_RENDER);
         if (!$event->isFieldVisible()) {
             return [];
         }

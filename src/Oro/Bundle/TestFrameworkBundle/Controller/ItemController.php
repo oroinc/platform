@@ -4,14 +4,14 @@ namespace Oro\Bundle\TestFrameworkBundle\Controller;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The CRUD controller for Item entity.
  */
-class ItemController extends Controller
+class ItemController extends AbstractController
 {
     /**
      * @Route("/", name="oro_test_item_index")

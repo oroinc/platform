@@ -69,7 +69,7 @@ class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInte
             $connection->getTableName()
         );
 
-        $dbal->executeUpdate(
+        $dbal->executeStatement(
             $sql,
             [
                 'body' => [

@@ -4,8 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * ClientCreatedAfterEvent is an event which called when new client is created

@@ -81,7 +81,7 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
         $qb = $this->getQueryBuilder($options['filteredResultsGrid'], $options['filteredResultsGridParams']);
 
         $event = new ExportPreGetIds($qb, $options);
-        $this->eventDispatcher->dispatch(Events::BEFORE_EXPORT_GET_IDS, $event);
+        $this->eventDispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
         $identifier = $qb->getEntityManager()
             ->getClassMetadata($entityName)

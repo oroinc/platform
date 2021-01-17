@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ActivityEvent extends Event
 {

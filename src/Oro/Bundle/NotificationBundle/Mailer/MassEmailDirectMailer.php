@@ -49,8 +49,8 @@ class MassEmailDirectMailer extends \Swift_Mailer
             ->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE)
             ->setMessage($message);
         $this->eventDispatcher->dispatch(
-            NotificationSentEvent::NAME,
-            new NotificationSentEvent($spoolItem, $result)
+            new NotificationSentEvent($spoolItem, $result),
+            NotificationSentEvent::NAME
         );
 
         return $result;

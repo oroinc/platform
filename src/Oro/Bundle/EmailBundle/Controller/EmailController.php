@@ -24,7 +24,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +40,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EmailController extends Controller
+class EmailController extends AbstractController
 {
     /**
      * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection", methods={"POST"})

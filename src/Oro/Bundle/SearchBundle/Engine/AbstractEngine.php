@@ -79,7 +79,7 @@ abstract class AbstractEngine implements ExtendedEngineInterface
     public function getDocumentsCountGroupByEntityFQCN(Query $query): array
     {
         $event = new BeforeSearchEvent($query);
-        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, BeforeSearchEvent::EVENT_NAME);
         $query = $event->getQuery();
 
         return $this->doGetDocumentsCountGroupByEntityFQCN($query);
@@ -91,7 +91,7 @@ abstract class AbstractEngine implements ExtendedEngineInterface
     public function search(Query $query, array $context = [])
     {
         $event = new BeforeSearchEvent($query);
-        $this->eventDispatcher->dispatch(BeforeSearchEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, BeforeSearchEvent::EVENT_NAME);
         $query = $event->getQuery();
 
         // search must be performed as fast as possible and it might return lots of entities (10M and more)

@@ -214,7 +214,7 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
         // Test event dispatcher
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(MergeEvents::BUILD_METADATA, new EntityMetadataEvent($entityMetadata));
+            ->with(new EntityMetadataEvent($entityMetadata), MergeEvents::BUILD_METADATA);
 
         $this->assertEquals($entityMetadata, $this->metadataBuilder->createEntityMetadataByClass(self::CLASS_NAME));
     }

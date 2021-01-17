@@ -65,7 +65,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
         $dbalConnection = $this->createDBALConnection();
         $dbalConnection
             ->expects($this->once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'UPDATE  SET consumer_id=NULL, redelivered=:isRedelivered '.
                 'WHERE consumer_id IN (:consumerIds)',

@@ -4,7 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Event;
 
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class MigrationDataFixturesEvent extends Event
 {

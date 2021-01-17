@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event allow to change search mapping config before the first usage of this mapping config

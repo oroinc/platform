@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -67,7 +68,8 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
             $translator,
             $configManager,
             $this->doctrine,
-            $this->formatterManager
+            $this->formatterManager,
+            (new InflectorFactory())->build()
         );
     }
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Exception\UnexpectedTypeException;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigUpdateEvent extends Event
 {
