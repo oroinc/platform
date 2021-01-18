@@ -186,7 +186,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         );
 
         $event = new ExportPreGetIds($queryBuilder, $options);
-        $this->dispatcher->dispatch(Events::BEFORE_EXPORT_GET_IDS, $event);
+        $this->dispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
         $organization = isset($options['organization']) ? $options['organization'] : null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
@@ -268,7 +268,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
                 }
 
                 $event = new AfterEntityPageLoadedEvent($rows);
-                $this->dispatcher->dispatch(Events::AFTER_ENTITY_PAGE_LOADED, $event);
+                $this->dispatcher->dispatch($event, Events::AFTER_ENTITY_PAGE_LOADED);
 
                 return $event->getRows();
             });

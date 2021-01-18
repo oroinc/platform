@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 
 use Oro\Bundle\UserBundle\Entity\Status;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/status")
  */
-class StatusController extends Controller
+class StatusController extends AbstractController
 {
     /**
      * @Route("/", name="oro_user_status_list", defaults={"limit"=10})

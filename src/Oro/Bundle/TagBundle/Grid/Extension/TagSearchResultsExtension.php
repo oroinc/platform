@@ -89,7 +89,7 @@ class TagSearchResultsExtension extends AbstractExtension
             $entityClass = $item->getEntityName();
             $entityId    = $item->getRecordId();
             $entity      = $entities[$entityClass][$entityId];
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
+            $this->dispatcher->dispatch(new PrepareResultItemEvent($item, $entity), PrepareResultItemEvent::EVENT_NAME);
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }
 

@@ -117,14 +117,14 @@ SQL;
 
         $platform = $connection->getDatabasePlatform();
         if ($platform instanceof PostgreSqlPlatform) {
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 \sprintf(
                     'ALTER TABLE %s ALTER COLUMN %s TYPE text',
                     $tableName,
                     $fieldName
                 )
             );
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 \sprintf(
                     'COMMENT ON COLUMN %s.%s IS NULL',
                     $tableName,
@@ -134,7 +134,7 @@ SQL;
         }
 
         if ($platform instanceof MySqlPlatform) {
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 \sprintf(
                     'ALTER TABLE %s CHANGE %s %s text',
                     $tableName,

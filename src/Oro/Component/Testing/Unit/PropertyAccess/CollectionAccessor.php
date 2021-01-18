@@ -3,7 +3,8 @@
 namespace Oro\Component\Testing\Unit\PropertyAccess;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -34,6 +35,7 @@ class CollectionAccessor
      * @var string
      */
     protected $removeMethod;
+    private Inflector $inflector;
 
     /**
      * @param object $object
@@ -44,6 +46,7 @@ class CollectionAccessor
         $this->accessor     = PropertyAccess::createPropertyAccessor();
         $this->object       = $object;
         $this->propertyName = $propertyName;
+        $this->inflector = (new InflectorFactory())->build();
 
         $this->findAdderAndRemover();
     }
@@ -97,7 +100,7 @@ class CollectionAccessor
     {
         $reflClass = new \ReflectionClass($this->object);
 
-        $propertyName = Inflector::classify(Inflector::singularize($this->propertyName));
+        $propertyName = $this->inflector->classify($this->inflector->singularize($this->propertyName));
 
         $addMethod      = 'add' . $propertyName;
         $removeMethod   = 'remove' . $propertyName;

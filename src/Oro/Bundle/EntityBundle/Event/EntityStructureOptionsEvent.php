@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Event;
 
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is fired during building detailed information about entities.

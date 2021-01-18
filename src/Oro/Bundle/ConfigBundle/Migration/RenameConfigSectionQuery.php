@@ -78,7 +78,7 @@ class RenameConfigSectionQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query, $parameters, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $parameters, $types);
+            $this->connection->executeStatement($query, $parameters, $types);
         }
     }
 }

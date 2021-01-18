@@ -125,7 +125,7 @@ class GridViewsExtension extends AbstractExtension
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($gridName, $config, $gridViews);
-            $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, GridViewsLoadEvent::EVENT_NAME);
             $gridViews = $event->getGridViews();
         }
 

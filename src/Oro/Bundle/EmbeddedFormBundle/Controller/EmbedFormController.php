@@ -10,7 +10,7 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * Handles a form represents an embed entity.
  */
-class EmbedFormController extends Controller
+class EmbedFormController extends AbstractController
 {
     use RequestHandlerTrait;
 
@@ -66,11 +66,11 @@ class EmbedFormController extends Controller
             }
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
             $eventDispatcher = $this->get('event_dispatcher');
-            $eventDispatcher->dispatch(EmbeddedFormSubmitBeforeEvent::EVENT_NAME, $event);
+            $eventDispatcher->dispatch($event, EmbeddedFormSubmitBeforeEvent::EVENT_NAME);
             $this->submitPostPutRequest($form, $request);
 
             $event = new EmbeddedFormSubmitAfterEvent($data, $formEntity, $form);
-            $eventDispatcher->dispatch(EmbeddedFormSubmitAfterEvent::EVENT_NAME, $event);
+            $eventDispatcher->dispatch($event, EmbeddedFormSubmitAfterEvent::EVENT_NAME);
         }
 
         if ($form->isSubmitted() && $form->isValid()) {

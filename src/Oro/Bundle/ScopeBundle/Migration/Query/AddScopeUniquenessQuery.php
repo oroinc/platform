@@ -47,7 +47,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
 
         $this->logQuery($logger, $rowHashUpdateQuery);
         if (!$dryRun) {
-            $this->connection->executeUpdate($rowHashUpdateQuery);
+            $this->connection->executeStatement($rowHashUpdateQuery);
         }
     }
 
@@ -133,7 +133,7 @@ class AddScopeUniquenessQuery extends AbstractScopeQuery
 
         $this->logQuery($logger, $deleteSql, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($deleteSql, $params, $types);
+            $this->connection->executeStatement($deleteSql, $params, $types);
         }
     }
 

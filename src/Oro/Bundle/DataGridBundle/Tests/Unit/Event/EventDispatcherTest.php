@@ -8,6 +8,7 @@ use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridConfigEvent;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Stub\GridEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -48,7 +49,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         }
 
         $event = new GridEvent($gridMock);
-        $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, self::TEST_EVENT_NAME);
     }
 
     /**
@@ -89,7 +90,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
                 ->with($event, $eventName);
         }
 
-        $this->dispatcher->dispatch(self::TEST_EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, self::TEST_EVENT_NAME);
     }
     public function testDispatchException()
     {
@@ -97,7 +98,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage(
             'Unexpected event type. Expected instance of GridEventInterface or GridConfigurationEventInterface'
         );
-        $event = $this->getMockBuilder('Symfony\Component\EventDispatcher\Event')
+        $event = $this->getMockBuilder(Event::class)
             ->disableOriginalConstructor();
         $this->dispatcher->dispatch($event);
     }

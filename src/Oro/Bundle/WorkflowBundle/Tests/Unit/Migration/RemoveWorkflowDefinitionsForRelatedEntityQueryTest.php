@@ -34,7 +34,7 @@ class RemoveWorkflowDefinitionsForRelatedEntityQueryTest extends \PHPUnit\Framew
                 ['[entity] = ' . $entityClassName, []],
             );
         $connection->expects(static::once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'DELETE FROM oro_workflow_definition WHERE related_entity = :entity',
                 ['entity' => $entityClassName],

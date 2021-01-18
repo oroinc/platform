@@ -53,19 +53,19 @@ class MergerFieldsStepTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
-            ->with(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($fooField));
+            ->with(new FieldDataEvent($fooField), MergeEvents::BEFORE_MERGE_FIELD);
 
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($fooField));
+            ->with(new FieldDataEvent($fooField), MergeEvents::AFTER_MERGE_FIELD);
 
         $this->eventDispatcher->expects($this->at(2))
             ->method('dispatch')
-            ->with(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($barField));
+            ->with(new FieldDataEvent($barField), MergeEvents::BEFORE_MERGE_FIELD);
 
         $this->eventDispatcher->expects($this->at(3))
             ->method('dispatch')
-            ->with(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($barField));
+            ->with(new FieldDataEvent($barField), MergeEvents::AFTER_MERGE_FIELD);
 
         $this->step->run($data);
     }

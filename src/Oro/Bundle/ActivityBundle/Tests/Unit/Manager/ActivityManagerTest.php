@@ -257,7 +257,7 @@ class ActivityManagerTest extends OrmTestCase
             ->will($this->returnValue($activityEntity));
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::ADD_ACTIVITY);
+            ->with(static::anything(), Events::ADD_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->addActivityTarget($activityEntity, $targetEntity)
@@ -408,7 +408,7 @@ class ActivityManagerTest extends OrmTestCase
             ->will($this->returnValue($activityEntity));
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::REMOVE_ACTIVITY);
+            ->with(static::anything(), Events::REMOVE_ACTIVITY);
 
         $this->assertTrue(
             $this->manager->removeActivityTarget($activityEntity, $targetEntity)

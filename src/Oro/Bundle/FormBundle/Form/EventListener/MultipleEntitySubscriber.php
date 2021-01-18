@@ -4,8 +4,9 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -21,6 +22,7 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+    private Inflector $inflector;
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -28,6 +30,7 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->inflector = (new InflectorFactory())->build();
     }
 
     /**
@@ -167,6 +170,6 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
      */
     protected function getSetterName($mappedBy)
     {
-        return 'set' . Inflector::classify($mappedBy);
+        return 'set' . $this->inflector->classify($mappedBy);
     }
 }

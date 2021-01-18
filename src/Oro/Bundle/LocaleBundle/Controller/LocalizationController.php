@@ -8,14 +8,14 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * CRUD for localizations.
  */
-class LocalizationController extends Controller
+class LocalizationController extends AbstractController
 {
     /**
      * @Route("/view/{id}", name="oro_locale_localization_view", requirements={"id"="\d+"})

@@ -112,7 +112,7 @@ class ContextsSelectType extends AbstractType
             $item['title'] = $title;
             $item['targetId'] = $target->getId();
             $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->dispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $this->dispatcher->dispatch($event, PrepareContextTitleEvent::EVENT_NAME);
             $item = $event->getItem();
 
             $result[] = json_encode($this->getResult($item['title'], $target));

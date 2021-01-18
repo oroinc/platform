@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

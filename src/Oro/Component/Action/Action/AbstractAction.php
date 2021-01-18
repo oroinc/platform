@@ -57,16 +57,16 @@ abstract class AbstractAction implements ActionInterface, EventDispatcherAwareAc
         if ($this->isAllowed($context)) {
             // dispatch oro_action.action.handle_before event
             $this->eventDispatcher->dispatch(
-                ExecuteActionEvents::HANDLE_BEFORE,
-                new ExecuteActionEvent($context, $this)
+                new ExecuteActionEvent($context, $this),
+                ExecuteActionEvents::HANDLE_BEFORE
             );
 
             $this->executeAction($context);
 
             // dispatch oro_action.action.handle_after event
             $this->eventDispatcher->dispatch(
-                ExecuteActionEvents::HANDLE_AFTER,
-                new ExecuteActionEvent($context, $this)
+                new ExecuteActionEvent($context, $this),
+                ExecuteActionEvents::HANDLE_AFTER
             );
         }
     }

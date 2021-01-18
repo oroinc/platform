@@ -105,8 +105,8 @@ class EntityExtendUpdateProcessor
     {
         try {
             $this->dispatcher->dispatch(
-                UpdateSchemaEvent::NAME,
-                new UpdateSchemaEvent($this->commandExecutor, $this->logger)
+                new UpdateSchemaEvent($this->commandExecutor, $this->logger),
+                UpdateSchemaEvent::NAME
             );
         } catch (\Throwable $e) {
             throw new \RuntimeException(

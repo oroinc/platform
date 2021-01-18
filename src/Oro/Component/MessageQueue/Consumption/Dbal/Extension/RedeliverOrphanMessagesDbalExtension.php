@@ -147,7 +147,7 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 
         /** @var Connection $dbal */
         $dbal = $connection->getDBALConnection();
-        $dbal->executeUpdate(
+        $dbal->executeStatement(
             $sql,
             [
                 'isRedelivered' => true,

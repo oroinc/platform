@@ -464,7 +464,6 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->expects($this->at(1))->method('dispatch')
             ->with(
-                PrepareEntityMapEvent::EVENT_NAME,
                 $this->callback(
                     function ($event) {
                         /** @var PrepareEntityMapEvent $event */
@@ -477,7 +476,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                PrepareEntityMapEvent::EVENT_NAME
             );
 
         $mapping = $this->mapper->mapObject($product);

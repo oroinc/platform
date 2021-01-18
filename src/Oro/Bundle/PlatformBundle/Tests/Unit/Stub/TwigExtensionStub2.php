@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Stub;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 
 class TwigExtensionStub2 extends AbstractExtension implements ServiceSubscriberInterface

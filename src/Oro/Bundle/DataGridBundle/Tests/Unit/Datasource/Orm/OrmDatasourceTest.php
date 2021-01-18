@@ -188,14 +188,14 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME, new OrmResultBeforeQuery($datagrid, $qb));
+            ->with(new OrmResultBeforeQuery($datagrid, $qb), OrmResultBeforeQuery::NAME);
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(OrmResultBefore::NAME, new OrmResultBefore($datagrid, $query));
+            ->with(new OrmResultBefore($datagrid, $query), OrmResultBefore::NAME);
         $this->eventDispatcher->expects($this->at(2))
             ->method('dispatch')
-            ->with(OrmResultAfter::NAME, new OrmResultAfter($datagrid, $records, $query))
-            ->willReturnCallback(function ($name, OrmResultAfter $event) use ($recordsAfterEvent) {
+            ->with(new OrmResultAfter($datagrid, $records, $query), OrmResultAfter::NAME)
+            ->willReturnCallback(function (OrmResultAfter $event, $name) use ($recordsAfterEvent) {
                 $event->setRecords($recordsAfterEvent);
             });
 

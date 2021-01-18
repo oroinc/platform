@@ -104,10 +104,10 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(GridViewsLoadEvent::EVENT_NAME)
+            ->with(static::anything(), GridViewsLoadEvent::EVENT_NAME)
             ->will(
                 $this->returnCallback(
-                    function ($eventName, GridViewsLoadEvent $event) use ($views) {
+                    function (GridViewsLoadEvent $event, $eventName) use ($views) {
                         $event->setGridViews($views);
 
                         return $event;

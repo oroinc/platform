@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -60,7 +61,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
                 ['twig.loader.native_filesystem', $this->loader]
             ]);
 
-        $this->listener = new TemplateListener($container);
+        $this->listener = new TemplateListener($container, (new InflectorFactory())->build());
     }
 
     /**

@@ -108,7 +108,7 @@ class MigrationsLoader
 
         // process "pre" migrations
         $preEvent = new PreMigrationEvent($this->connection);
-        $this->eventDispatcher->dispatch(MigrationEvents::PRE_UP, $preEvent);
+        $this->eventDispatcher->dispatch($preEvent, MigrationEvents::PRE_UP);
         $preMigrations = $preEvent->getMigrations();
         foreach ($preMigrations as $migration) {
             $result[] = new MigrationState($migration);
@@ -127,7 +127,7 @@ class MigrationsLoader
 
         // process "post" migrations
         $postEvent = new PostMigrationEvent($this->connection);
-        $this->eventDispatcher->dispatch(MigrationEvents::POST_UP, $postEvent);
+        $this->eventDispatcher->dispatch($postEvent, MigrationEvents::POST_UP);
         $postMigrations = $postEvent->getMigrations();
         foreach ($postMigrations as $migration) {
             $result[] = new MigrationState($migration);

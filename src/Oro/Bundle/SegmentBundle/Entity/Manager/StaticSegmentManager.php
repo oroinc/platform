@@ -286,7 +286,7 @@ class StaticSegmentManager
         }
 
         if ($insertValues) {
-            $this->em->getConnection()->executeUpdate(
+            $this->em->getConnection()->executeStatement(
                 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) VALUES'
                 . implode(',', $insertValues),
                 $values,

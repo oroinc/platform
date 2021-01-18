@@ -56,7 +56,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
     {
         $event = $this->eventFactory->create($channel);
 
-        $this->dispatcher->dispatch($event->getName(), $event);
+        $this->dispatcher->dispatch($event, $event->getName());
 
         if (!$this->handleEventErrors($event)) {
             return false;

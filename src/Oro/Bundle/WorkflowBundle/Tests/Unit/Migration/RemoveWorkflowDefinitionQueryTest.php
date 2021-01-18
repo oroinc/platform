@@ -34,7 +34,7 @@ class RemoveWorkflowDefinitionQueryTest extends \PHPUnit\Framework\TestCase
                 ['[workflow_name] = ' . $workflowName, []],
             );
         $connection->expects(static::once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'DELETE FROM oro_workflow_definition WHERE name = :workflow_name',
                 ['workflow_name' => $workflowName],

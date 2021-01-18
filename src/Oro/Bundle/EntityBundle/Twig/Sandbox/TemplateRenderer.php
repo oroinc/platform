@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -39,16 +39,13 @@ abstract class TemplateRenderer
 
     /** @var EntityDataAccessor */
     private $entityDataAccessor;
+    private Inflector $inflector;
 
-    /**
-     * @param TwigEnvironment         $environment
-     * @param ConfigProvider            $configProvider
-     * @param VariableProcessorRegistry $variableProcessors
-     */
     public function __construct(
         TwigEnvironment $environment,
         ConfigProvider $configProvider,
-        VariableProcessorRegistry $variableProcessors
+        VariableProcessorRegistry $variableProcessors,
+        Inflector $inflector
     ) {
         $this->environment = $environment;
         $this->configProvider = $configProvider;
@@ -58,6 +55,7 @@ abstract class TemplateRenderer
             $variableProcessors,
             $this->entityDataAccessor
         );
+        $this->inflector = $inflector;
     }
 
     /**
@@ -256,7 +254,7 @@ abstract class TemplateRenderer
                 if (\strpos($variablePath, self::ENTITY_PREFIX) === 0) {
                     $lastSeparatorPos = \strrpos($variablePath, self::PATH_SEPARATOR);
                     $result = $formatExtension->getSafeFormatExpression(
-                        \lcfirst(Inflector::classify(\substr($variablePath, $lastSeparatorPos + 1))),
+                        \lcfirst($this->inflector->classify(\substr($variablePath, $lastSeparatorPos + 1))),
                         $variable,
                         $this->getFinalVariable(\substr($variablePath, 0, $lastSeparatorPos), $data),
                         $errorMessage

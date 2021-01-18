@@ -92,7 +92,7 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
         if ($logger) {
             $this->logQuery($logger, $query, $parameters);
         }
-        $this->connection->executeUpdate($query, $parameters);
+        $this->connection->executeStatement($query, $parameters);
     }
 
     /**

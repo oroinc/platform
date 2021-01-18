@@ -13,12 +13,12 @@ use Oro\Bundle\UIBundle\Twig\Parser\PlaceholderTokenParser;
 use Oro\Bundle\UIBundle\View\ScrollData;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\AbstractExtension;
 use Twig\Template;
@@ -223,7 +223,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         FormView $formView = null
     ) {
         $event = new BeforeListRenderEvent($environment, new ScrollData($data), $entity, $formView);
-        $this->getEventDispatcher()->dispatch('oro_ui.scroll_data.before.' . $pageIdentifier, $event);
+        $this->getEventDispatcher()->dispatch($event, 'oro_ui.scroll_data.before.' . $pageIdentifier);
 
         return $event->getScrollData()->getData();
     }
@@ -256,7 +256,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     public function processForm(TwigEnvironment $environment, array $data, FormView $form, $entity = null)
     {
         $event = new BeforeFormRenderEvent($form, $data, $environment, $entity);
-        $this->getEventDispatcher()->dispatch(Events::BEFORE_UPDATE_FORM_RENDER, $event);
+        $this->getEventDispatcher()->dispatch($event, Events::BEFORE_UPDATE_FORM_RENDER);
 
         return $event->getFormData();
     }
@@ -316,7 +316,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
     public function processView(TwigEnvironment $environment, array $data, $entity)
     {
         $event = new BeforeViewRenderEvent($environment, $data, $entity);
-        $this->getEventDispatcher()->dispatch(Events::BEFORE_VIEW_RENDER, $event);
+        $this->getEventDispatcher()->dispatch($event, Events::BEFORE_VIEW_RENDER);
 
         return $event->getData();
     }

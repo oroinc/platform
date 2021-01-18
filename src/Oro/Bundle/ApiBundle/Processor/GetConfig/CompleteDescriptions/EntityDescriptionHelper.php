@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -43,22 +43,16 @@ class EntityDescriptionHelper implements ResetInterface
 
     /** @var array [association name => humanized association name, ...] */
     private $humanizedAssociationNames = [];
+    private Inflector $inflector;
 
-    /**
-     * @param EntityDescriptionProvider   $entityDocProvider
-     * @param TranslatorInterface         $translator
-     * @param ResourceDocProvider         $resourceDocProvider
-     * @param ResourceDocParserProvider   $resourceDocParserProvider
-     * @param DescriptionProcessor        $descriptionProcessor
-     * @param IdentifierDescriptionHelper $identifierDescriptionHelper
-     */
     public function __construct(
         EntityDescriptionProvider $entityDocProvider,
         TranslatorInterface $translator,
         ResourceDocProvider $resourceDocProvider,
         ResourceDocParserProvider $resourceDocParserProvider,
         DescriptionProcessor $descriptionProcessor,
-        IdentifierDescriptionHelper $identifierDescriptionHelper
+        IdentifierDescriptionHelper $identifierDescriptionHelper,
+        Inflector $inflector
     ) {
         $this->entityDocProvider = $entityDocProvider;
         $this->translator = $translator;
@@ -66,6 +60,7 @@ class EntityDescriptionHelper implements ResetInterface
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->descriptionProcessor = $descriptionProcessor;
         $this->identifierDescriptionHelper = $identifierDescriptionHelper;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -372,7 +367,7 @@ class EntityDescriptionHelper implements ResetInterface
             // convert "SomeClassName" to "Some Class Name".
             $entityDescription = preg_replace('~(?<=\\w)([A-Z])~', ' $1', $shortEntityClass);
             if ($isCollection) {
-                $entityDescription = Inflector::pluralize($entityDescription);
+                $entityDescription = $this->inflector->pluralize($entityDescription);
             }
         }
         if ($isCollection) {

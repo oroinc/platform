@@ -33,6 +33,6 @@ class RemoveWorkflowDefinitionQuery extends ParametrizedMigrationQuery
         $params = ['workflow_name' => $this->workflowName];
         $types = ['workflow_name' => Types::STRING];
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
     }
 }

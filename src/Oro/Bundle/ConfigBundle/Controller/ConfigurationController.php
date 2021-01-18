@@ -4,14 +4,14 @@ namespace Oro\Bundle\ConfigBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Controller for system config functionality
  */
-class ConfigurationController extends Controller
+class ConfigurationController extends AbstractController
 {
     /**
      * @Route(

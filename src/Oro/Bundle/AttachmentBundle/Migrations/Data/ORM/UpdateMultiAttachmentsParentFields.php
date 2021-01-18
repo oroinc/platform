@@ -33,7 +33,7 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
 
         $queries = $this->getQueries($manager, $connection->getDatabasePlatform() instanceof MySqlPlatform);
         foreach ($queries as $query) {
-            $connection->executeUpdate($query);
+            $connection->executeStatement($query);
         }
     }
 

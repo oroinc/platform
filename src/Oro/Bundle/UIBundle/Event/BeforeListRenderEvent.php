@@ -3,8 +3,8 @@
 namespace Oro\Bundle\UIBundle\Event;
 
 use Oro\Bundle\UIBundle\View\ScrollData;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
 /**

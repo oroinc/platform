@@ -91,7 +91,7 @@ class MigrateTranslationDataQuery extends ParametrizedMigrationQuery
         foreach ($queries as $query) {
             $this->logQuery($logger, $query[0], $query[1], $query[2]);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query[0], $query[1], $query[2]);
+                $this->connection->executeStatement($query[0], $query[1], $query[2]);
             }
         }
     }

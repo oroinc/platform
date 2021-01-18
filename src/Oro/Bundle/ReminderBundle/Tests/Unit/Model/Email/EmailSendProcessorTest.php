@@ -99,8 +99,8 @@ class EmailSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->withConsecutive(
-                [ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND, $barEvent],
-                [ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND, $fooEvent]
+                [$barEvent, ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND],
+                [$fooEvent, ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND]
             );
 
         $this->processor->push($fooReminder);

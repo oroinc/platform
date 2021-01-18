@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\EventListener\Metadata;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityMergeBundle\EventListener\Metadata\EntityConfigHelper;
 
 class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
@@ -30,7 +31,11 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->extendConfigProvider = $this->createConfigProvider();
 
-        $this->helper = new EntityConfigHelper($this->configManager, $this->extendConfigProvider);
+        $this->helper = new EntityConfigHelper(
+            $this->configManager,
+            $this->extendConfigProvider,
+            (new InflectorFactory())->build()
+        );
     }
 
     public function testGetConfigForExtendField()

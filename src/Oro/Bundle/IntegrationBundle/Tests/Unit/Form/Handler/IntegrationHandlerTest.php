@@ -162,15 +162,14 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
             $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
                 ->method('dispatch')
                 ->with(
-                    $this->equalTo(DefaultOwnerSetEvent::NAME),
-                    $this->isInstanceOf(DefaultOwnerSetEvent::class)
+                    $this->isInstanceOf(DefaultOwnerSetEvent::class),
+                    $this->equalTo(DefaultOwnerSetEvent::NAME)
                 );
         }
         if ($expectIntegrationUpdateEvent) {
             $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
                 ->method('dispatch')
                 ->with(
-                    $this->equalTo(IntegrationUpdateEvent::NAME),
                     $this->callback(
                         function ($event) use ($entity, $existingIntegration) {
                             $this->assertInstanceOf(IntegrationUpdateEvent::class, $event);
@@ -180,7 +179,8 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 
                             return true;
                         }
-                    )
+                    ),
+                    $this->equalTo(IntegrationUpdateEvent::NAME)
                 );
         } elseif (!$expectOwnerSetEvent) {
             $this->eventDispatcher->expects($this->never())->method('dispatch');

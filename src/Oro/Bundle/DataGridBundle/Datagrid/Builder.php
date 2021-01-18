@@ -81,7 +81,7 @@ class Builder implements MemoryCacheProviderAwareInterface
          * should be refactored in BAP-6826
          */
         $event = new PreBuild($config, $parameters);
-        $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
+        $this->eventDispatcher->dispatch($event, PreBuild::NAME);
 
         $class = $config->offsetGetByPath(DatagridConfiguration::BASE_DATAGRID_CLASS_PATH, $this->baseDatagridClass);
         $name  = $config->getName();
@@ -94,7 +94,7 @@ class Builder implements MemoryCacheProviderAwareInterface
         $datagrid->setScope($config->offsetGetOr('scope'));
 
         $event = new BuildBefore($datagrid, $config);
-        $this->eventDispatcher->dispatch(BuildBefore::NAME, $event);
+        $this->eventDispatcher->dispatch($event, BuildBefore::NAME);
 
         $acceptor = $this->createAcceptor($config, $parameters);
         $datagrid->setAcceptor($acceptor);
@@ -103,7 +103,7 @@ class Builder implements MemoryCacheProviderAwareInterface
         $this->buildDataSource($datagrid, $config);
 
         $event = new BuildAfter($datagrid);
-        $this->eventDispatcher->dispatch(BuildAfter::NAME, $event);
+        $this->eventDispatcher->dispatch($event, BuildAfter::NAME);
 
         return $datagrid;
     }

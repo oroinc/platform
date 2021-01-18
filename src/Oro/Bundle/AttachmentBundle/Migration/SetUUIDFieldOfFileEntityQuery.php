@@ -79,7 +79,7 @@ class SetUUIDFieldOfFileEntityQuery extends ParametrizedMigrationQuery
 
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
 
             $start += self::BATCH_SIZE;

@@ -290,7 +290,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $newScopeId = $entityId ?: $this->manager->getScopeId();
         $this->dispatcher->expects($this->exactly($newScopeId ? 1 : 0))
             ->method('dispatch')
-            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeIdFromEntity($entity);
         $this->assertEquals($newScopeId, $this->manager->getScopeId());
@@ -302,7 +302,7 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $oldScopeId = $this->manager->getScopeId();
         $this->dispatcher->expects($this->exactly(0))
             ->method('dispatch')
-            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeIdFromEntity($entity);
         $this->assertEquals($oldScopeId, $this->manager->getScopeId());

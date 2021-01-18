@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
@@ -62,7 +63,8 @@ class ExtendEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasProvider = new ExtendEntityAliasProvider(
             new EntityAliasConfigBag($configProvider),
             $this->configManager,
-            $this->duplicateResolver
+            $this->duplicateResolver,
+            (new InflectorFactory())->build()
         );
     }
 

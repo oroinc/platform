@@ -232,8 +232,8 @@ abstract class AbstractAjaxMenuController extends AbstractController
     protected function dispatchMenuUpdateScopeChangeEvent($menuName, array $context)
     {
         $this->get(EventDispatcherInterface::class)->dispatch(
-            MenuUpdateChangeEvent::NAME,
-            new MenuUpdateChangeEvent($menuName, $context)
+            new MenuUpdateChangeEvent($menuName, $context),
+            MenuUpdateChangeEvent::NAME
         );
     }
 

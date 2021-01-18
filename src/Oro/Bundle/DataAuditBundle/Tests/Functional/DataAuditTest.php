@@ -3,8 +3,8 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AbstractAuditProcessor;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Async\AuditChangedEntitiesExtensionTrait;
@@ -80,7 +80,7 @@ class DataAuditTest extends WebTestCase
         $typesToTest = array_keys($typesToTest);
         sort($typesToTest);
         foreach ($typesToTest as $type) {
-            $methodName = 'test'.ucfirst(Inflector::camelize(Inflector::ucwords($type, '_-')));
+            $methodName = 'test'.ucfirst((new InflectorFactory())->build()->camelize(\ucwords($type, '_-')));
             if (method_exists($this, $methodName)) {
                 continue;
             }

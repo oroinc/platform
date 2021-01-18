@@ -6,14 +6,14 @@ use Oro\Bundle\NotificationBundle\Entity\MassNotification;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The controller for MassNotification entity.
  * @Route("/massnotification")
  */
-class MassNotificationController extends Controller
+class MassNotificationController extends AbstractController
 {
     /**
      * @Route(

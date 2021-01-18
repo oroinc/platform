@@ -5,7 +5,8 @@ namespace Oro\Bundle\FormBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\ConfigBundle\Tests\Behat\Element\SystemConfigForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\OroForm;
 use Oro\Bundle\FormBundle\Tests\Behat\Element\Select;
@@ -26,6 +27,13 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
     use PageObjectDictionary;
+
+    private Inflector $inflector;
+
+    public function __construct()
+    {
+        $this->inflector = (new InflectorFactory())->build();
+    }
 
     /**
      * Fill form with data
@@ -175,7 +183,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function setFieldWithValueAsPrimary($field, $value)
     {
         /** @var CollectionField $collection */
-        $collection = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($field)));
+        $collection = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($field)));
         $collection->setFieldAsPrimary($value);
     }
 
@@ -260,7 +268,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function iFillInFieldSet($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
+        $fieldSet = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($fieldSetLabel)));
         $fieldSet->fill($table);
     }
 
@@ -335,7 +343,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function addNewFieldSetWith($fieldSetLabel, TableNode $table)
     {
         /** @var Form $fieldSet */
-        $fieldSet = $this->createOroForm()->findField(ucfirst(Inflector::pluralize($fieldSetLabel)));
+        $fieldSet = $this->createOroForm()->findField(ucfirst($this->inflector->pluralize($fieldSetLabel)));
         $fieldSet->clickLink('Add');
         $this->waitForAjax();
         $form = $fieldSet->getLastSet();

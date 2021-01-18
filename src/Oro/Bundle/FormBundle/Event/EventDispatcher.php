@@ -3,22 +3,24 @@
 namespace Oro\Bundle\FormBundle\Event;
 
 use Oro\Bundle\FormBundle\Event\FormHandler\FormAwareInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcher extends ImmutableEventDispatcher
 {
     /**
-     * @param string $eventName
-     * @param Event|null $event
+     * @param Event $event
+     * @param string|null $eventName
      * @return Event|null
      */
-    public function dispatch($eventName, Event $event = null)
+    public function dispatch($event/*, string $eventName = null*/)
     {
-        parent::dispatch($eventName, $event);
+        $eventName = 1 < \func_num_args() ? func_get_arg(1) : null;
+
+        parent::dispatch($event, $eventName);
 
         if ($event instanceof FormAwareInterface) {
-            parent::dispatch($eventName . '.' . $event->getForm()->getName(), $event);
+            parent::dispatch($event, $eventName . '.' . $event->getForm()->getName());
         }
 
         return $event;

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ValueRenderEvent extends Event
 {

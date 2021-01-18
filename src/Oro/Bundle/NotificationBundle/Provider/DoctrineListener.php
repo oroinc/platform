@@ -88,6 +88,6 @@ class DoctrineListener implements OptionalListenerInterface
      */
     private function dispatch($eventName, $entity)
     {
-        $this->eventDispatcher->dispatch($eventName, new NotificationEvent($entity));
+        $this->eventDispatcher->dispatch(new NotificationEvent($entity), $eventName);
     }
 }

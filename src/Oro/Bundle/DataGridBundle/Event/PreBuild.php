@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class PreBuild

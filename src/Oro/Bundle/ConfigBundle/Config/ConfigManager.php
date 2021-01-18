@@ -280,7 +280,7 @@ class ConfigManager
 
         $changeSet = new ConfigChangeSet($this->buildChangeSet($updated, $removed, $oldValues));
         $event = new ConfigUpdateEvent($changeSet, $this->scope, $this->getScopeId());
-        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ConfigUpdateEvent::EVENT_NAME);
 
         return $changeSet;
     }
@@ -293,7 +293,7 @@ class ConfigManager
     protected function dispatchConfigSettingsUpdateEvent($eventName, array $settings)
     {
         $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
         return $event->getSettings();
     }
 
@@ -346,7 +346,7 @@ class ConfigManager
         }
 
         $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch(ConfigSettingsUpdateEvent::FORM_PRESET, $event);
+        $this->eventDispatcher->dispatch($event, ConfigSettingsUpdateEvent::FORM_PRESET);
 
         return $event->getSettings();
     }
@@ -456,8 +456,8 @@ class ConfigManager
         }
 
         $event = new ConfigGetEvent($this, $name, $value, $full, $scopeId);
-        $this->eventDispatcher->dispatch(ConfigGetEvent::NAME, $event);
-        $this->eventDispatcher->dispatch(sprintf('%s.%s', ConfigGetEvent::NAME, $name), $event);
+        $this->eventDispatcher->dispatch($event, ConfigGetEvent::NAME);
+        $this->eventDispatcher->dispatch($event, sprintf('%s.%s', ConfigGetEvent::NAME, $name));
 
         $value = $event->getValue();
 

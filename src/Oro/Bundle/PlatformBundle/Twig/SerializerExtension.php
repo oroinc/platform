@@ -6,7 +6,7 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Twig\SerializerExtension as BaseSerializerExtension;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Serializer helper twig extension

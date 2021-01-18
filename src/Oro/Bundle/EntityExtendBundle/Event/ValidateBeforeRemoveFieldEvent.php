@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Event;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ValidateBeforeRemoveFieldEvent extends Event
 {

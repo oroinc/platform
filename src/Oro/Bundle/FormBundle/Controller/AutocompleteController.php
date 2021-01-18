@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Controller;
 
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ConstraintViolation;
  *
  * @Route("/autocomplete")
  */
-class AutocompleteController extends Controller
+class AutocompleteController extends AbstractController
 {
     /**
      * @param Request $request

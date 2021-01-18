@@ -143,10 +143,10 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
-            ->with(FeaturesChange::NAME, new FeaturesChange(['feature2' => true]));
+            ->with(new FeaturesChange(['feature2' => true]), FeaturesChange::NAME);
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
-            ->with(FeatureChange::NAME . '.feature2', new FeatureChange('feature2', true));
+            ->with(new FeatureChange('feature2', true), FeatureChange::NAME . '.feature2');
 
         $this->configListener->onUpdateAfter();
     }

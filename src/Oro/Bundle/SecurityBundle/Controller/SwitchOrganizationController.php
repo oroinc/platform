@@ -82,7 +82,7 @@ class SwitchOrganizationController
         }
 
         $event = new OrganizationSwitchBefore($user, $token->getOrganization(), $organization);
-        $this->eventDispatcher->dispatch(OrganizationSwitchBefore::NAME, $event);
+        $this->eventDispatcher->dispatch($event, OrganizationSwitchBefore::NAME);
         $organization = $event->getOrganizationToSwitch();
         if (!$user->isBelongToOrganization($organization, true)) {
             throw $this->createOrganizationAccessDeniedException($organization);
@@ -90,8 +90,8 @@ class SwitchOrganizationController
 
         $token->setOrganization($organization);
         $this->eventDispatcher->dispatch(
-            OrganizationSwitchAfter::NAME,
-            new OrganizationSwitchAfter($user, $organization)
+            new OrganizationSwitchAfter($user, $organization),
+            OrganizationSwitchAfter::NAME
         );
 
         if ('html' !== $request->getRequestFormat()) {

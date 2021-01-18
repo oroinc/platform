@@ -89,7 +89,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         $this->extension->buildForm($builder, $options);
         $dispatcher = $form->getConfig()->getEventDispatcher();
         $event = new FormEvent($form, $data);
-        $dispatcher->dispatch(FormEvents::POST_SET_DATA, $event);
+        $dispatcher->dispatch($event, FormEvents::POST_SET_DATA);
 
         foreach ($fields as $field) {
             $this->assertEquals(

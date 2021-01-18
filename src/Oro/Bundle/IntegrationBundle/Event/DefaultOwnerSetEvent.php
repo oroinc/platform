@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is dispatched default owner set for existing integration instance.

@@ -7,14 +7,14 @@ use Knp\Menu\Iterator\RecursiveItemIterator;
 use Knp\Menu\MenuItem;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @Route("/shortcut")
  */
-class ShortcutController extends Controller
+class ShortcutController extends AbstractController
 {
     protected $uris = array();
 

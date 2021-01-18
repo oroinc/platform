@@ -4,8 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Twig;
 
 use Oro\Bundle\TranslationBundle\Helper\TranslationsDatagridRouteHelper;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

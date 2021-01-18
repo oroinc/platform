@@ -44,15 +44,15 @@ class EntityMergerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
-                MergeEvents::BEFORE_MERGE_ENTITY,
-                new EntityDataEvent($data)
+                new EntityDataEvent($data),
+                MergeEvents::BEFORE_MERGE_ENTITY
             );
 
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
             ->with(
-                MergeEvents::AFTER_MERGE_ENTITY,
-                new EntityDataEvent($data)
+                new EntityDataEvent($data),
+                MergeEvents::AFTER_MERGE_ENTITY
             );
 
         $this->merger->merge($data);

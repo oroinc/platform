@@ -8,8 +8,8 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

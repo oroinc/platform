@@ -106,8 +106,8 @@ class DatagridExportIdFetcher implements ContextAwareInterface
         $name = $qb->getEntityManager()->getClassMetadata($qb->getRootEntities()[0])->getSingleIdentifierFieldName();
 
         $this->eventDispatcher->dispatch(
-            OrmResultBeforeQuery::NAME,
-            new OrmResultBeforeQuery($this->grid, $qb)
+            new OrmResultBeforeQuery($this->grid, $qb),
+            OrmResultBeforeQuery::NAME
         );
 
         if (!empty($qb->getDQLPart('groupBy')) || !empty($qb->getDQLPart('having'))) {

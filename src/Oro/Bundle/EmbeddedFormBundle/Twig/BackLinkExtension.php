@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmbeddedFormBundle\Twig;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -54,7 +55,11 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
-        $this->entityNameProvider = new EntityNameProvider($this->doctrine, $this->extendConfigProvider);
+        $this->entityNameProvider = new EntityNameProvider(
+            $this->doctrine,
+            $this->extendConfigProvider,
+            (new InflectorFactory())->build()
+        );
     }
 
     public function testGetNameForUnsupportedFormat()

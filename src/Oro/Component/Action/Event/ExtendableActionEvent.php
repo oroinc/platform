@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Action\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ExtendableActionEvent extends Event
 {

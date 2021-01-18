@@ -10,8 +10,8 @@ class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtendConfigurationTree()
     {
-        $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('testNode');
+        $treeBuilder = new TreeBuilder('testNode');
+        $node = $treeBuilder->getRootNode();
 
         $extension = new FeatureConfigurationExtension();
         $extension->extendConfigurationTree($node->children());

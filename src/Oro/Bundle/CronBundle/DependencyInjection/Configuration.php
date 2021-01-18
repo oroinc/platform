@@ -12,12 +12,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $builder = new TreeBuilder();
-
-        $builder
-            ->root('oro_cron')
-        ;
-
-        return $builder;
+        return new TreeBuilder('oro_cron');
     }
 }

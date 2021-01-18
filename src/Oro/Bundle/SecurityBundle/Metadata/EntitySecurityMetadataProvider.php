@@ -315,7 +315,7 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             }
 
             $event = new LoadFieldsMetadata($className, $fields);
-            $this->eventDispatcher->dispatch(LoadFieldsMetadata::NAME, $event);
+            $this->eventDispatcher->dispatch($event, LoadFieldsMetadata::NAME);
             $fields = $event->getFields();
         }
 

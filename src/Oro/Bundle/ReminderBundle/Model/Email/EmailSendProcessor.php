@@ -83,8 +83,8 @@ class EmailSendProcessor implements SendProcessorInterface
     {
         $event = new SendReminderEmailEvent($reminder);
         $this->eventDispatcher->dispatch(
-            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
-            $event
+            $event,
+            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND
         );
         $this->emailNotification->setReminder($reminder);
 

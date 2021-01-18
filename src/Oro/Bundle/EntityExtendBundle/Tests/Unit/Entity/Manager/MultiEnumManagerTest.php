@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -33,7 +34,7 @@ class MultiEnumManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->manager = new MultiEnumManager();
+        $this->manager = new MultiEnumManager((new InflectorFactory())->build());
     }
 
     /**

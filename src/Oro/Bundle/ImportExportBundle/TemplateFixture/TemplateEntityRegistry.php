@@ -134,7 +134,7 @@ class TemplateEntityRegistry
 
             if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_TEMPLATE_FIXTURES)) {
                 $event = new LoadTemplateFixturesEvent($this->entities);
-                $this->dispatcher->dispatch(Events::AFTER_LOAD_TEMPLATE_FIXTURES, $event);
+                $this->dispatcher->dispatch($event, Events::AFTER_LOAD_TEMPLATE_FIXTURES);
                 $this->entities = $event->getEntities();
             }
         }

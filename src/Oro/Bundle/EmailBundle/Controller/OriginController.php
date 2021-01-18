@@ -3,14 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/emailorigin")
  */
-class OriginController extends Controller
+class OriginController extends AbstractController
 {
     /**
      * Get list of origins

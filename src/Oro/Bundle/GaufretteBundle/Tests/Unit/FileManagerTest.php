@@ -3,8 +3,6 @@
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
 use Gaufrette\Adapter;
-use Gaufrette\Adapter\InMemory;
-use Gaufrette\Adapter\Local;
 use Gaufrette\Exception\FileNotFound;
 use Gaufrette\File;
 use Gaufrette\Filesystem;
@@ -66,40 +64,6 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->with(self::TEST_FILE_SYSTEM_NAME)
             ->willReturn($this->filesystem);
-        $fileManager->setFilesystemMap($filesystemMap);
-
-        return $fileManager;
-    }
-
-    /**
-     * @param Adapter     $filesystemAdapter
-     * @param bool        $useSubDirectory
-     * @param string|null $subDirectory
-     *
-     * @return FileManager
-     */
-    private function getFileManagerWithCustomAdapter(
-        Adapter $filesystemAdapter,
-        bool $useSubDirectory,
-        string $subDirectory = null
-    ): FileManager {
-        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);
-        $fileManager->setProtocol(self::TEST_PROTOCOL);
-        $fileManager->setReadonlyProtocol(self::TEST_READONLY_PROTOCOL);
-        if ($useSubDirectory) {
-            $fileManager->useSubDirectory(true);
-        }
-
-        $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects(self::any())
-            ->method('getAdapter')
-            ->willReturn($filesystemAdapter);
-
-        $filesystemMap = $this->createMock(FilesystemMap::class);
-        $filesystemMap->expects(self::once())
-            ->method('get')
-            ->with(self::TEST_FILE_SYSTEM_NAME)
-            ->willReturn($filesystem);
         $fileManager->setFilesystemMap($filesystemMap);
 
         return $fileManager;
@@ -362,38 +326,19 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAdapterDescriptionForLocalAdapter()
+    public function testGetAdapterDescription()
     {
-        $adapter = new Local('/path/to/files');
-
-        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, true);
-
-        self::assertEquals('/path/to/files/testFileSystem', $fileManager->getAdapterDescription());
-    }
-
-    public function testGetAdapterDescriptionForLocalAdapterAndForNotSubDirAwareManager()
-    {
-        $adapter = new Local('/path/to/files');
-
-        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, false);
-
-        self::assertEquals('/path/to/files', $fileManager->getAdapterDescription());
-    }
-
-    public function testGetAdapterDescriptionForLocalAdapterAndWithCustomSubDirectory()
-    {
-        $adapter = new Local('/path/to/files');
-
-        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, false, 'testSubDir');
-
-        self::assertEquals('/path/to/files/testSubDir', $fileManager->getAdapterDescription());
-    }
-
-    public function testGetAdapterDescriptionForNonLocalAdapter()
-    {
-        $adapter = new InMemory();
-
-        $fileManager = $this->getFileManagerWithCustomAdapter($adapter, true);
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::once())
+            ->method('getAdapter')
+            ->willReturn(new Adapter\InMemory());
+        $filesystemMap = $this->createMock(FilesystemMap::class);
+        $filesystemMap->expects(self::once())
+            ->method('get')
+            ->with(self::TEST_FILE_SYSTEM_NAME)
+            ->willReturn($filesystem);
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME);
+        $fileManager->setFilesystemMap($filesystemMap);
 
         self::assertEquals('InMemory', $fileManager->getAdapterDescription());
     }

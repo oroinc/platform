@@ -78,7 +78,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(ImpersonationSuccessEvent::EVENT_NAME, new ImpersonationSuccessEvent($impersonation));
+            ->with(new ImpersonationSuccessEvent($impersonation), ImpersonationSuccessEvent::EVENT_NAME);
 
         $request = new Request([ImpersonationAuthenticator::TOKEN_PARAMETER => $impersonation->getToken()]);
         $request->server->set('REMOTE_ADDR', $ip = '1.2.3.4');

@@ -64,6 +64,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())
             ->method('removeFiles')
@@ -92,6 +93,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $exception = new \RuntimeException('Error');
         $this->imageRemovalManager->expects($this->once())
@@ -128,6 +130,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setFilename($fileName);
         $file->setOriginalFilename($fileName);
         $file->setParentEntityClass(ProductImage::class);
+        $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())
             ->method('removeFiles')

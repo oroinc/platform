@@ -71,7 +71,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
 
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
 
@@ -99,7 +99,7 @@ class UpdateIntegrationChannelSettingFieldsValue extends ParametrizedMigrationQu
 
         $this->logQuery($logger, $updateSql);
         if (!$dryRun) {
-            $this->connection->executeUpdate($updateSql);
+            $this->connection->executeStatement($updateSql);
         }
     }
 

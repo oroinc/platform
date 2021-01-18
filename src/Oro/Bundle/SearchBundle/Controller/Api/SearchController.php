@@ -44,7 +44,7 @@ class SearchController extends FOSRestController
 
         $dispatcher = $this->get('event_dispatcher');
         foreach ($searchResults->getElements() as $item) {
-            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }
 
         return $this->handleView(

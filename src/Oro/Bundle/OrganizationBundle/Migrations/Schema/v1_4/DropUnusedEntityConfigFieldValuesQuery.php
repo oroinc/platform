@@ -59,8 +59,8 @@ DQL;
         $this->logQuery($logger, $indexSql, $indexParams);
         $this->logQuery($logger, $fieldsSql, $fieldParams);
         if (!$dryRun) {
-            $this->connection->executeUpdate($indexSql, $indexParams);
-            $this->connection->executeUpdate($fieldsSql, $fieldParams);
+            $this->connection->executeStatement($indexSql, $indexParams);
+            $this->connection->executeStatement($fieldsSql, $fieldParams);
         }
     }
 }

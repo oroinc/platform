@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\ORM;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Mapping\Builder\AssociationBuilder;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -25,19 +25,16 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
+    private Inflector $inflector;
 
-    /**
-     * RelationMetadataBuilder constructor.
-     *
-     * @param ConfigManager $configManager
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     */
     public function __construct(
         ConfigManager $configManager,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        Inflector $inflector
     ) {
         $this->configManager = $configManager;
         $this->nameGenerator = $nameGenerator;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -416,7 +413,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
      */
     private function setFetchOption(AssociationBuilder $builder, string $fetch)
     {
-        $method = Inflector::camelize('fetch_' . $fetch);
+        $method = $this->inflector->camelize('fetch_' . $fetch);
 
         if (method_exists($builder, $method)) {
             $builder->$method();

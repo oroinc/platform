@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Helper;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
@@ -34,7 +35,11 @@ class EntityConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->config = $this->createMock(ConfigInterface::class);
 
-        $this->helper = new EntityConfigHelper($this->configProvider, $this->groupProvider);
+        $this->helper = new EntityConfigHelper(
+            $this->configProvider,
+            $this->groupProvider,
+            (new InflectorFactory())->build()
+        );
     }
 
     /**

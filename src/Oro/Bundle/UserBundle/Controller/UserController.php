@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * This controller covers CRUD functionality for User entity.
  * Also includes user profile management functionality.
  */
-class UserController extends Controller
+class UserController extends AbstractController
 {
     /**
      * @Route("/view/{id}", name="oro_user_view", requirements={"id"="\d+"})

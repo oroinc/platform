@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AfterEntityPageLoadedEvent extends Event
 {

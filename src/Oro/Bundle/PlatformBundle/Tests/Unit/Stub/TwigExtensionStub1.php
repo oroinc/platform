@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Stub;
 
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 

@@ -63,7 +63,7 @@ class RemoveAuditDuplicatesQuery extends ParametrizedMigrationQuery
                 $sql = 'UPDATE oro_audit_field SET audit_id = ? WHERE audit_id = ?';
                 $this->logQuery($logger, $sql);
                 if (!$dryRun) {
-                    $this->connection->executeUpdate($sql, [$rowToCollect['id'], $row['id']]);
+                    $this->connection->executeStatement($sql, [$rowToCollect['id'], $row['id']]);
                 }
                 $idsToRemove[] = $row['id'];
             }

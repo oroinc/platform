@@ -220,14 +220,14 @@ HELP
         try {
             $this->prepareStep($input, $output);
 
-            $this->eventDispatcher->dispatch(InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION, $event);
+            $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
 
             if (!$skipAssets) {
                 $this->startBuildAssetsProcess($input);
             }
 
             $this->loadDataStep($commandExecutor, $output);
-            $this->eventDispatcher->dispatch(InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION, $event);
+            $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
             $this->finalStep($commandExecutor, $output, $input, $skipAssets);
 

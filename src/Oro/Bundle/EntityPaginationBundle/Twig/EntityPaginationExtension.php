@@ -6,8 +6,8 @@ use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

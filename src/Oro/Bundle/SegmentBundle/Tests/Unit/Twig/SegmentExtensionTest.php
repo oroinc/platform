@@ -63,8 +63,8 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(WidgetOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnCallback(function ($eventName, $event) use ($eventOptions) {
+            ->with(static::anything(), WidgetOptionsLoadEvent::EVENT_NAME)
+            ->will($this->returnCallback(function ($event, $eventName) use ($eventOptions) {
                 $event->setWidgetOptions($eventOptions);
             }));
 
@@ -83,8 +83,8 @@ class SegmentExtensionTest extends \PHPUnit\Framework\TestCase
         $eventOptions = ['eventOpt1' => 'eventVal1'];
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ConditionBuilderOptionsLoadEvent::EVENT_NAME)
-            ->will($this->returnCallback(function ($eventName, $event) use ($eventOptions) {
+            ->with(static::anything(), ConditionBuilderOptionsLoadEvent::EVENT_NAME)
+            ->will($this->returnCallback(function ($event, $eventName) use ($eventOptions) {
                 $event->setOptions($eventOptions);
             }));
 

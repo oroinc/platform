@@ -161,7 +161,7 @@ abstract class AbstractCleanupMarketingMigrationQuery extends ParametrizedMigrat
         $this->logQuery($logger, $query, $parameters);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate(
+            $this->connection->executeStatement(
                 $query,
                 $parameters,
                 ['className' => Types::STRING]

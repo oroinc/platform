@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
@@ -69,6 +71,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
+    private Inflector $inflector;
 
     protected function setUp(): void
     {
@@ -98,7 +101,9 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getTree')
             ->will($this->returnValue($this->tree));
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
+        $this->inflector = (new InflectorFactory())->build();
+
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
         $this->decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             new ObjectIdAccessor($this->doctrineHelper),
@@ -349,7 +354,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getMaxAccessLevel')
             ->willReturn(AccessLevel::GLOBAL_LEVEL);
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
 
         $extension = TestHelper::get($this)->createEntityAclExtension(
             $metadataProvider,
@@ -373,7 +378,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(InvalidAclMaskException::class);
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider);
+        $entityOwnerAccessor = new EntityOwnerAccessor($this->metadataProvider, $this->inflector);
 
         $metadataProvider = $this->createMock(OwnershipMetadataProvider::class);
         $metadataProvider->expects($this->any())
@@ -498,7 +503,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, $this->inflector),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
@@ -1317,7 +1322,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
             $entityClassResolverMock,
             $entityMetadataProvider,
             $this->metadataProvider,
-            new EntityOwnerAccessor($this->metadataProvider),
+            new EntityOwnerAccessor($this->metadataProvider, $this->inflector),
             $this->decisionMaker,
             $this->permissionManager,
             $this->groupProvider,
