@@ -5,6 +5,11 @@ parameters:
     oro_sync.websocket_ping.interval: 50
 
 services:
+    oro_sync.manager.topic_manager:
+        class: Oro\Bundle\SyncBundle\Manager\TopicManager
+        parent: gos_web_socket.wamp.topic_manager
+        decorates: gos_web_socket.wamp.topic_manager
+
     oro_sync.periodic.db_ping:
         class: Oro\Bundle\SyncBundle\Periodic\DbPingPeriodic
         arguments:
