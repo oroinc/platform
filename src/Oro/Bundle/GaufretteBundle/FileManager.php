@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\GaufretteBundle;
 
-use Gaufrette\Adapter\Local;
 use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Exception;
 use Gaufrette\Exception\FileNotFound;
@@ -12,9 +11,9 @@ use Gaufrette\Stream;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
-use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
@@ -204,27 +203,24 @@ class FileManager
     public function getAdapterDescription(): string
     {
         $adapter = $this->filesystem->getAdapter();
-        $reflection = new \ReflectionClass($adapter);
 
-        if ($adapter instanceof Local) {
-            $directoryProperty = ReflectionUtil::getProperty($reflection, 'directory');
-            if (null === $directoryProperty) {
-                throw new \LogicException(sprintf(
-                    'The class "%s" does not have "directory" property.',
-                    get_class($adapter)
-                ));
-            }
-            $directoryProperty->setAccessible(true);
-            $directory = $directoryProperty->getValue($adapter);
+        if ($adapter instanceof LocalAdapter) {
+            $directory = $adapter->getDirectory();
             $subDirectory = $this->getSubDirectory();
             if ($subDirectory) {
-                $directory .= '/' . $subDirectory;
+                $directory .= DIRECTORY_SEPARATOR . $subDirectory;
             }
 
             return $directory;
         }
 
-        return $reflection->getShortName();
+        $className = \get_class($adapter);
+        $lastSeparatorPos = strrpos($className, '\\');
+        if (false !== $lastSeparatorPos) {
+            $className = substr($className, $lastSeparatorPos + 1);
+        }
+
+        return $className;
     }
 
     /**
@@ -260,11 +256,7 @@ class FileManager
      */
     public function findFiles(string $prefix = ''): array
     {
-        $fileNames = $this->filesystem->listKeys($this->getFileNameWithSubDirectory($prefix));
-        if (!empty($fileNames) && \array_key_exists('keys', $fileNames)) {
-            $fileNames = $fileNames['keys'];
-        }
-
+        $fileNames = $this->listKeys($this->getFileNameWithSubDirectory($prefix))['keys'];
         if ($fileNames && $this->getSubDirectory()) {
             $fileNamesWithoutSubDirectory = [];
             foreach ($fileNames as $fileName) {
@@ -406,41 +398,23 @@ class FileManager
      * @param string $prefix
      *
      * @throws \RuntimeException if any file cannot be deleted
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function deleteAllFiles(string $prefix = ''): void
     {
-        $hasTailingDirectorySeparator = self::endsWith($prefix, self::DIRECTORY_SEPARATOR);
+        $hasTailingDirectorySeparator = self::endsWithDirectorySeparator($prefix);
         if ($hasTailingDirectorySeparator) {
             $prefix = rtrim($prefix, self::DIRECTORY_SEPARATOR) . self::DIRECTORY_SEPARATOR;
         }
         $realDirName = $this->getFileNameWithSubDirectory($prefix);
-        $listResult = $this->filesystem->listKeys($realDirName);
-        if (empty($listResult)) {
+        $listResult = $this->listKeys($realDirName);
+        if (empty($listResult['keys']) && empty($listResult['dirs'])) {
             return;
         }
 
-        $fileNames = [];
-        $dirNames = [];
-        $isSimpleList = true;
-        if (\array_key_exists('keys', $listResult)) {
-            $fileNames = $listResult['keys'];
-            $isSimpleList = false;
-        }
-        if (\array_key_exists('dirs', $listResult)) {
-            $dirNames = $listResult['dirs'];
-            $isSimpleList = false;
-        }
-        if ($isSimpleList) {
-            $fileNames = $listResult;
-        }
-
-        foreach ($fileNames as $fileName) {
+        foreach ($listResult['keys'] as $fileName) {
             $this->filesystem->delete($fileName);
         }
-        foreach ($dirNames as $dirName) {
+        foreach ($listResult['dirs'] as $dirName) {
             $this->deleteDirectory($dirName);
         }
         if ($hasTailingDirectorySeparator) {
@@ -697,6 +671,28 @@ class FileManager
     }
 
     /**
+     * @param string $prefix
+     *
+     * @return array ['keys' => [file key, ...], 'dirs' => [dir key, ...]]
+     */
+    private function listKeys(string $prefix): array
+    {
+        $result = $this->filesystem->listKeys($prefix);
+        $hasDirs = \array_key_exists('dirs', $result);
+        if (\array_key_exists('keys', $result)) {
+            if (!$hasDirs) {
+                $result['dirs'] = [];
+            }
+        } elseif ($hasDirs) {
+            $result['keys'] = [];
+        } else {
+            $result = ['keys' => $result, 'dirs' => []];
+        }
+
+        return $result;
+    }
+
+    /**
      * Checks if the given directory does not contain any files and sub-directories.
      *
      * @param string $realDirName
@@ -705,14 +701,9 @@ class FileManager
      */
     private function isDirectoryEmpty(string $realDirName): bool
     {
-        $listResult = $this->filesystem->listKeys($realDirName . self::DIRECTORY_SEPARATOR);
-        if (empty($listResult)) {
-            return true;
-        }
+        $listResult = $this->listKeys($realDirName . self::DIRECTORY_SEPARATOR);
 
-        return \array_key_exists('keys', $listResult) || \array_key_exists('dirs', $listResult)
-            ? empty($listResult['keys']) && empty($listResult['dirs'])
-            : false;
+        return empty($listResult['keys']) && empty($listResult['dirs']);
     }
 
     /**
@@ -776,13 +767,12 @@ class FileManager
     }
 
     /**
-     * @param string $haystack
-     * @param string $needle
+     * @param string $path
      *
      * @return bool
      */
-    private static function endsWith(string $haystack, string $needle): bool
+    private static function endsWithDirectorySeparator(string $path): bool
     {
-        return substr($haystack, -\strlen($needle)) === $needle;
+        return substr($path, -\strlen(self::DIRECTORY_SEPARATOR)) === self::DIRECTORY_SEPARATOR;
     }
 }
