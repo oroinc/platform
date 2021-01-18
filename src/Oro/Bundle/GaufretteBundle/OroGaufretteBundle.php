@@ -3,6 +3,7 @@
 namespace Oro\Bundle\GaufretteBundle;
 
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\ConfigureGaufretteFileManagersPass;
+use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\ConfigureLocalAdapterPass;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\SetGaufretteFilesystemsLazyPass;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Factory\LocalConfigurationFactory;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\OroGaufretteExtension;
@@ -24,6 +25,7 @@ class OroGaufretteBundle extends Bundle
 
         $container->addCompilerPass(new ConfigureGaufretteFileManagersPass());
         $container->addCompilerPass(new SetGaufretteFilesystemsLazyPass());
+        $container->addCompilerPass(new ConfigureLocalAdapterPass());
 
         /** @var OroGaufretteExtension $extension */
         $extension = $container->getExtension('oro_gaufrette');

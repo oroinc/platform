@@ -68,7 +68,7 @@ class LocalFileManagerTest extends WebTestCase
     /**
      * @param string $prefix
      *
-     * @return array
+     * @return string[]
      */
     private function fileManagerFindFiles(string $prefix = ''): array
     {
@@ -76,6 +76,11 @@ class LocalFileManagerTest extends WebTestCase
         sort($files);
 
         return $files;
+    }
+
+    public function testGetAdapterDescription()
+    {
+        self::assertEquals($this->directory, $this->fileManager->getAdapterDescription());
     }
 
     public function testFindFilesForEmptyStorage()
@@ -225,10 +230,7 @@ class LocalFileManagerTest extends WebTestCase
 
         $this->fileManager->deleteFile('dir1/file2.txt');
 
-        self::assertSame(
-            ['dir1_file.txt', 'file1.txt'],
-            $this->getFiles()
-        );
+        self::assertSame(['dir1_file.txt', 'file1.txt'], $this->getFiles());
     }
 
     public function testDeleteFileFromSubDirAndThereAreOtherFiles()
