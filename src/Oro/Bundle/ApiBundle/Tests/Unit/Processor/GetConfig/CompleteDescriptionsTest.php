@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
@@ -110,7 +111,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 $this->resourceDocProvider,
                 $resourceDocParserProvider,
                 $descriptionProcessor,
-                $identifierDescriptionHelper
+                $identifierDescriptionHelper,
+                (new InflectorFactory())->build()
             ),
             new FieldsDescriptionHelper(
                 $this->entityDocProvider,

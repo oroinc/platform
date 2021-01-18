@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -43,7 +44,8 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->validationHelper = new FieldNameValidationHelper(
             $this->extendConfigProvider,
             $this->eventDispatcher,
-            new NewEntitiesHelper()
+            new NewEntitiesHelper(),
+            (new InflectorFactory())->build()
         );
     }
 
@@ -90,7 +92,7 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
         $event = new ValidateBeforeRemoveFieldEvent($fieldConfigModel);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ValidateBeforeRemoveFieldEvent::NAME, $event);
+            ->with($event, ValidateBeforeRemoveFieldEvent::NAME);
 
         $result = $this->validationHelper->getRemoveFieldValidationErrors($fieldConfigModel);
 
@@ -104,9 +106,9 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ValidateBeforeRemoveFieldEvent::NAME, $validationEvent)
+            ->with($validationEvent, ValidateBeforeRemoveFieldEvent::NAME)
             ->willReturnCallback(
-                function ($eventName, ValidateBeforeRemoveFieldEvent $event) {
+                function (ValidateBeforeRemoveFieldEvent $event, $eventName) {
                     $event->addValidationMessage(self::REMOVE_ERROR_MESSAGE);
                 }
             );

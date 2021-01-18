@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 
 class FieldAccessor
 {
+    private static ?Inflector $inflector = null;
+
     /**
      * Gets the value of the field of the entity
      *
@@ -15,7 +18,7 @@ class FieldAccessor
      */
     public static function getValue($entity, $fieldName)
     {
-        return $entity->{'get' . Inflector::classify($fieldName)}();
+        return $entity->{'get' . self::getInflector()->classify($fieldName)}();
     }
 
     /**
@@ -27,7 +30,7 @@ class FieldAccessor
      */
     public static function setValue($entity, $fieldName, $value)
     {
-        $entity->{'set' . Inflector::classify($fieldName)}($value);
+        $entity->{'set' . self::getInflector()->classify($fieldName)}($value);
     }
 
     /**
@@ -39,7 +42,7 @@ class FieldAccessor
      */
     public static function addValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'add' . Inflector::classify($fieldName)}($relatedEntity);
+        $entity->{'add' . self::getInflector()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -51,7 +54,7 @@ class FieldAccessor
      */
     public static function removeValue($entity, $fieldName, $relatedEntity)
     {
-        $entity->{'remove' . Inflector::classify($fieldName)}($relatedEntity);
+        $entity->{'remove' . self::getInflector()->classify($fieldName)}($relatedEntity);
     }
 
     /**
@@ -63,6 +66,14 @@ class FieldAccessor
      */
     public static function hasGetter($entity, $fieldName)
     {
-        return method_exists($entity, 'get' . Inflector::classify($fieldName));
+        return method_exists($entity, 'get' . self::getInflector()->classify($fieldName));
+    }
+
+    private static function getInflector(): Inflector
+    {
+        if (null === self::$inflector) {
+            self::$inflector = (new InflectorFactory())->build();
+        }
+        return self::$inflector;
     }
 }

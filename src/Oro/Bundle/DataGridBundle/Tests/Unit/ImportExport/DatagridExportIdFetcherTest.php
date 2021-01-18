@@ -179,7 +179,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
+            ->with(static::anything(), OrmResultBeforeQuery::NAME);
 
         $executeFunc = function (Query $query) {
             return $query->getArrayResult();
@@ -324,7 +324,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
+            ->with(static::anything(), OrmResultBeforeQuery::NAME);
 
         $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
@@ -391,7 +391,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
+            ->with(static::anything(), OrmResultBeforeQuery::NAME);
 
         $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
@@ -459,7 +459,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
+            ->with(static::anything(), OrmResultBeforeQuery::NAME);
 
         $fetcher = new DatagridExportIdFetcher($gridManagerLink, $eventDispatcher, $this->createQueryExecutorMock());
         $fetcher->setImportExportContext($context);
@@ -520,7 +520,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(OrmResultBeforeQuery::NAME);
+            ->with(static::anything(), OrmResultBeforeQuery::NAME);
 
         $executeFunc = function (Query $query) {
             return $query->getArrayResult();

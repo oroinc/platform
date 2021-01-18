@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Translation\MessageCatalogueInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event that fires after each messages catalogue was dumped to cache.

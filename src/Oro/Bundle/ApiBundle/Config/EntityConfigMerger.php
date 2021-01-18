@@ -82,7 +82,7 @@ class EntityConfigMerger
      */
     private function createConfigurationTree()
     {
-        $configTreeBuilder = new TreeBuilder();
+        $configTreeBuilder = new TreeBuilder('root');
         $configuration = new EntityConfiguration(
             $this->getConfigurationSectionName(),
             $this->getConfigurationSection(),
@@ -90,7 +90,7 @@ class EntityConfigMerger
             $this->configExtensionRegistry->getMaxNestingLevel()
         );
         $configuration->configure(
-            $configTreeBuilder->root('root')->children()
+            $configTreeBuilder->getRootNode()->children()
         );
 
         return $configTreeBuilder->buildTree();

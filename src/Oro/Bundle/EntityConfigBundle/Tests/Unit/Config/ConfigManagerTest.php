@@ -1004,8 +1004,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::CREATE_ENTITY,
-                new EntityConfigEvent(self::ENTITY_CLASS, $this->configManager)
+                new EntityConfigEvent(self::ENTITY_CLASS, $this->configManager),
+                Events::CREATE_ENTITY
             );
 
         $config = $this->getConfig(
@@ -1206,8 +1206,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::CREATE_FIELD,
-                new FieldConfigEvent(self::ENTITY_CLASS, 'id', $this->configManager)
+                new FieldConfigEvent(self::ENTITY_CLASS, 'id', $this->configManager),
+                Events::CREATE_FIELD
             );
 
         $config = $this->getConfig(
@@ -1378,7 +1378,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::UPDATE_ENTITY);
+            ->with(static::anything(), Events::UPDATE_ENTITY);
 
         $expectedConfig = $this->getConfig(
             $configId,
@@ -1514,7 +1514,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(Events::UPDATE_ENTITY);
+            ->with(static::anything(), Events::UPDATE_ENTITY);
         $extendConfig = $this->getConfig(new EntityConfigId('extend', self::ENTITY_CLASS));
         $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendConfigProvider = $this->createMock(ConfigProvider::class);

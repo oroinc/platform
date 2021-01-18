@@ -118,7 +118,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->will(
                 $this->returnCallback(
-                    function ($eventName, WriterErrorEvent $event) use ($couldBeSkipped) {
+                    function (WriterErrorEvent $event, $eventName) use ($couldBeSkipped) {
                         $event->setCouldBeSkipped($couldBeSkipped);
                     }
                 )

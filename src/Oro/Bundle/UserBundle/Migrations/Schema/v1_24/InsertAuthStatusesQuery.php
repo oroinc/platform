@@ -78,7 +78,7 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
         foreach ($statuses as $status) {
             $this->logQuery($logger, $sql, $status, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($sql, $status, $types);
+                $this->connection->executeStatement($sql, $status, $types);
             }
         }
 
@@ -90,7 +90,7 @@ class InsertAuthStatusesQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql, $defaultStatus, $types);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate($sql, $defaultStatus, $defaultStatusType);
+            $this->connection->executeStatement($sql, $defaultStatus, $defaultStatusType);
         }
     }
 }

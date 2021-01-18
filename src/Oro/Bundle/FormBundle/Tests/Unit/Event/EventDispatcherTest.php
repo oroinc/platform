@@ -4,9 +4,9 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Event;
 
 use Oro\Bundle\FormBundle\Event\EventDispatcher;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
@@ -35,7 +35,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with($event, $eventName);
 
-        $this->immutableDispatcher->dispatch($eventName, $event);
+        $this->immutableDispatcher->dispatch($event, $eventName);
     }
 
     public function testDispatchFormEvent()
@@ -58,6 +58,6 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->with($event, $eventName . '.form_name');
 
-        $this->immutableDispatcher->dispatch($eventName, $event);
+        $this->immutableDispatcher->dispatch($event, $eventName);
     }
 }

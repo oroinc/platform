@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tools;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
 
 class ConfigHelper
@@ -77,9 +77,10 @@ class ConfigHelper
 
         $parts = EntityLabelBuilder::explodeClassName($className);
 
-        $propertyName = Inflector::tableize($scope) . '_' . $propertyName;
+        $inflector = (new InflectorFactory())->build();
+        $propertyName = $inflector->tableize($scope) . '_' . $propertyName;
         if ($fieldName) {
-            $parts[] = Inflector::tableize($fieldName);
+            $parts[] = $inflector->tableize($fieldName);
             $parts[] = $propertyName;
         } else {
             $parts[] = 'entity_' . $propertyName;

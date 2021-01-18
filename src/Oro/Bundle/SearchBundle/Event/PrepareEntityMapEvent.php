@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PrepareEntityMapEvent extends Event
 {

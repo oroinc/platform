@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Event;
 
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class WidgetItemsLoadDataEvent extends Event
 {

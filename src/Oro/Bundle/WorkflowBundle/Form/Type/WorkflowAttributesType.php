@@ -251,7 +251,7 @@ class WorkflowAttributesType extends AbstractType
         $attributeOptions = $this->prepareAttributeOptions($attribute, $attributeOptions, $options);
 
         $event = new TransitionsAttributeEvent($attribute, $attributeOptions, $options);
-        $this->dispatcher->dispatch(TransitionsAttributeEvent::BEFORE_ADD, $event);
+        $this->dispatcher->dispatch($event, TransitionsAttributeEvent::BEFORE_ADD);
         $attributeOptions = $event->getAttributeOptions();
 
         $builder->add($attribute->getName(), $attributeOptions['form_type'], $attributeOptions['options']);

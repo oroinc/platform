@@ -5,7 +5,7 @@ namespace Oro\Bundle\UIBundle\Twig;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 use Oro\Bundle\UIBundle\Provider\UrlWithoutFrontControllerProvider;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

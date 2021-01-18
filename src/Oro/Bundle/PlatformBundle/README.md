@@ -16,11 +16,11 @@ OroPlatformBundle provides adjustments to the Symfony framework that enable you 
 To use maintenance mode functionality bundle provides `oro_platform.maintenance` service.
 
 ``` php
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\Routing\Annotation\Route;
 
-class AcmeController extends Controller
+class AcmeController extends AbstractController
 {
     public function indexAction()
     {

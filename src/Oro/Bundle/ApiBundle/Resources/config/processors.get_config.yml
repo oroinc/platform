@@ -105,6 +105,7 @@ services:
             - '@oro_api.complete_descriptions.resource_doc_parser_provider'
             - '@oro_api.complete_descriptions.description_processor'
             - '@oro_api.complete_descriptions_helper.identifier'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_api.complete_descriptions_helper.fields:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper

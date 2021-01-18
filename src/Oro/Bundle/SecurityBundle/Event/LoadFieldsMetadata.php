@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Event;
 
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @see \Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider

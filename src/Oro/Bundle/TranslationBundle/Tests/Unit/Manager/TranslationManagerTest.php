@@ -266,7 +266,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(InvalidateTranslationCacheEvent::NAME, new InvalidateTranslationCacheEvent($with));
+            ->with(new InvalidateTranslationCacheEvent($with), InvalidateTranslationCacheEvent::NAME);
         $this->dbTranslationMetadataCache->expects($this->once())->method('updateTimestamp')->with($with);
         $manager = $this->getTranslationManager();
         $manager->invalidateCache($with);

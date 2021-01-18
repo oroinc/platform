@@ -123,7 +123,7 @@ class SearchAdvancedController extends FOSRestController
 
         $dispatcher = $this->container->get('event_dispatcher');
         foreach ($result->getElements() as $item) {
-            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+            $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
         }
 
         return $this->handleView(

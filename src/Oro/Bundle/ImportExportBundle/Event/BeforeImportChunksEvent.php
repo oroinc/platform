@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event is dispatched in the PreImportMessageProcessorAbstract before the jobs for the import chunks are created

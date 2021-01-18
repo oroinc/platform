@@ -71,6 +71,6 @@ class DeleteTranslationKeysQuery extends ParametrizedMigrationQuery
         );
 
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
     }
 }

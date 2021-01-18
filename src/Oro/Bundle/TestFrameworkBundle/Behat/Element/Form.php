@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 
 /**
  * Form element implementation
@@ -277,7 +277,7 @@ class Form extends Element
             $classes = preg_split('/\s+/', (string)$sndParent->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
 
             if (in_array('control-group-collection', $classes, true)) {
-                $elementName = Inflector::singularize(trim($label->getText())).'Collection';
+                $elementName = (new InflectorFactory())->build()->singularize(trim($label->getText())).'Collection';
                 $elementName = $this->elementFactory->hasElement($elementName) ? $elementName : 'CollectionField';
 
                 return $this->elementFactory->wrapElement($elementName, $sndParent);

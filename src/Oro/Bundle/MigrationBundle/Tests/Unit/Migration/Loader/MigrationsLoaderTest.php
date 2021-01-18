@@ -69,7 +69,7 @@ class MigrationsLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->will(
                 $this->returnCallback(
-                    function ($eventName, $event) use (&$installed) {
+                    function ($event, $eventName) use (&$installed) {
                         if ($eventName === MigrationEvents::PRE_UP) {
                             if (null !== $installed) {
                                 foreach ($installed as $val) {

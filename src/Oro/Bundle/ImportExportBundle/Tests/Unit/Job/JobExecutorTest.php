@@ -171,7 +171,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $dispatcher->expects(self::once())
             ->method('dispatch')
-            ->with(Events::AFTER_JOB_EXECUTION, self::isInstanceOf(AfterJobExecutionEvent::class));
+            ->with(self::isInstanceOf(AfterJobExecutionEvent::class), Events::AFTER_JOB_EXECUTION);
 
         $this->executor->setEventDispatcher($dispatcher);
 

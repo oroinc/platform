@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
 use Oro\Bundle\EmailBundle\Model\EmailTemplate as EmailTemplateModel;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
@@ -63,7 +64,8 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
             $environment,
             $this->configProvider,
             $this->variablesProcessorRegistry,
-            $this->translation
+            $this->translation,
+            (new InflectorFactory())->build()
         );
     }
 

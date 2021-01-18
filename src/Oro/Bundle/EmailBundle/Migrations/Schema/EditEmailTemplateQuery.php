@@ -63,7 +63,7 @@ class EditEmailTemplateQuery extends ParametrizedMigrationQuery
 
         $this->logQuery($logger, $query, $params, $types);
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $this->connection->executeStatement($query, $params, $types);
         }
 
         try {
@@ -73,7 +73,7 @@ class EditEmailTemplateQuery extends ParametrizedMigrationQuery
             $this->logQuery($logger, $query, $params, $types);
 
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         } catch (\Exception $e) {
             // When we not have tabele `oro_email_template_localized`
@@ -86,7 +86,7 @@ class EditEmailTemplateQuery extends ParametrizedMigrationQuery
 
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
         }
     }

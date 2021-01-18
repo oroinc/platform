@@ -77,7 +77,7 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, ExtendableConditionEvent $event) {
+                function (ExtendableConditionEvent $event, $eventName) {
                     $event->addError('First error');
                     $event->addError('Second error');
                 }

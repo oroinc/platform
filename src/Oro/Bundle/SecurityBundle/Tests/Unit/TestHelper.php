@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -110,7 +111,7 @@ class TestHelper
             $metadataProvider = new OwnershipMetadataProviderStub($this->testCase);
         }
         if ($entityOwnerAccessor === null) {
-            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
+            $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build());
         }
         if ($ownerTree === null) {
             $ownerTree = new OwnerTree();
@@ -128,7 +129,7 @@ class TestHelper
             $decisionMaker = new EntityOwnershipDecisionMaker(
                 $treeProviderMock,
                 $idAccessor,
-                new EntityOwnerAccessor($metadataProvider),
+                new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build()),
                 $metadataProvider,
                 $this->testCase->getMockBuilder(TokenAccessorInterface::class)->getMock()
             );
@@ -227,7 +228,7 @@ class TestHelper
             ->method('getTree')
             ->will($this->testCase->returnValue($ownerTree));
 
-        $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider);
+        $entityOwnerAccessor = new EntityOwnerAccessor($metadataProvider, (new InflectorFactory())->build());
 
         if (!$decisionMaker) {
             $decisionMaker = new EntityOwnershipDecisionMaker(

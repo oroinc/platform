@@ -48,6 +48,6 @@ class EmailCacheManager
             $this->emailBodySynchronizer->syncOneEmailBody($email, true);
         }
 
-        $this->eventDispatcher->dispatch(EmailBodyLoaded::NAME, new EmailBodyLoaded($email));
+        $this->eventDispatcher->dispatch(new EmailBodyLoaded($email), EmailBodyLoaded::NAME);
     }
 }

@@ -356,8 +356,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     {
         if ($this->eventDispatcher) {
             $this->eventDispatcher->dispatch(
-                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
-                new BeforeImportChunksEvent($body)
+                new BeforeImportChunksEvent($body),
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS
             );
         }
     }

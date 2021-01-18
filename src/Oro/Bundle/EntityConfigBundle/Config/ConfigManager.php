@@ -559,8 +559,8 @@ class ConfigManager
         }
 
         $this->eventDispatcher->dispatch(
-            Events::POST_FLUSH,
-            new Event\PostFlushConfigEvent($models, $this)
+            new Event\PostFlushConfigEvent($models, $this),
+            Events::POST_FLUSH
         );
 
         if (!empty($models)) {
@@ -590,8 +590,8 @@ class ConfigManager
         /** @var ConfigInterface[] $configs */
         foreach ($groupedConfigs as $modelKey => $configs) {
             $this->eventDispatcher->dispatch(
-                Events::PRE_FLUSH,
-                new Event\PreFlushConfigEvent($configs, $this)
+                new Event\PreFlushConfigEvent($configs, $this),
+                Events::PRE_FLUSH
             );
             foreach ($configs as $scope => $config) {
                 $configId = $config->getId();
@@ -821,8 +821,8 @@ class ConfigManager
                 }
 
                 $this->eventDispatcher->dispatch(
-                    Events::CREATE_ENTITY,
-                    new Event\EntityConfigEvent($className, $this)
+                    new Event\EntityConfigEvent($className, $this),
+                    Events::CREATE_ENTITY
                 );
             }
         }
@@ -879,8 +879,8 @@ class ConfigManager
             }
 
             $this->eventDispatcher->dispatch(
-                Events::CREATE_FIELD,
-                new Event\FieldConfigEvent($className, $fieldName, $this)
+                new Event\FieldConfigEvent($className, $fieldName, $this),
+                Events::CREATE_FIELD
             );
         }
 
@@ -914,8 +914,8 @@ class ConfigManager
         }
 
         $this->eventDispatcher->dispatch(
-            Events::UPDATE_ENTITY,
-            new Event\EntityConfigEvent($className, $this)
+            new Event\EntityConfigEvent($className, $this),
+            Events::UPDATE_ENTITY
         );
     }
 
@@ -953,8 +953,8 @@ class ConfigManager
         }
 
         $this->eventDispatcher->dispatch(
-            Events::UPDATE_FIELD,
-            new Event\FieldConfigEvent($className, $fieldName, $this)
+            new Event\FieldConfigEvent($className, $fieldName, $this),
+            Events::UPDATE_FIELD
         );
     }
 
@@ -972,8 +972,8 @@ class ConfigManager
         $result = $this->modelManager->changeFieldName($className, $fieldName, $newFieldName);
         if ($result) {
             $this->eventDispatcher->dispatch(
-                Events::RENAME_FIELD,
-                new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this)
+                new Event\RenameFieldEvent($className, $fieldName, $newFieldName, $this),
+                Events::RENAME_FIELD
             );
             $providers = $this->getProviders();
             foreach ($providers as $scope => $provider) {

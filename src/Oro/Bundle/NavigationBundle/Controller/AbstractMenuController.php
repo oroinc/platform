@@ -14,7 +14,7 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * The base class for menu related controllers.
  */
-abstract class AbstractMenuController extends Controller
+abstract class AbstractMenuController extends AbstractController
 {
     /**
      * @param array $context
@@ -324,8 +324,8 @@ abstract class AbstractMenuController extends Controller
     protected function dispatchMenuUpdateChangeEvent($menuName, array $context)
     {
         $this->get('event_dispatcher')->dispatch(
-            MenuUpdateChangeEvent::NAME,
-            new MenuUpdateChangeEvent($menuName, $context)
+            new MenuUpdateChangeEvent($menuName, $context),
+            MenuUpdateChangeEvent::NAME
         );
     }
 

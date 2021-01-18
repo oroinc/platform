@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Testing\Unit\Form\Extension\Stub;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\BaseValidatorExtension;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,5 +45,10 @@ class FormTypeValidatorExtensionStub extends BaseValidatorExtension
         );
 
         $resolver->setNormalizer('constraints', $constraintsNormalizer);
+    }
+
+    public static function getExtendedTypes(): iterable
+    {
+        return [FormType::class];
     }
 }

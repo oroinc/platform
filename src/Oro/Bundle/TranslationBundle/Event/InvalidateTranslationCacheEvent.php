@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event that fires during clearing the translation cache

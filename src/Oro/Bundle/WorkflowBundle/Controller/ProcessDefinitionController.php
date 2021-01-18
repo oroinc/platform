@@ -6,13 +6,13 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/processdefinition")
  */
-class ProcessDefinitionController extends Controller
+class ProcessDefinitionController extends AbstractController
 {
     /**
      * @Route(name="oro_process_definition_index")

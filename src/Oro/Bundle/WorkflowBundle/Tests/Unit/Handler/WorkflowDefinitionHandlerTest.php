@@ -75,8 +75,8 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
         $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_CREATE;
         $afterEvent = WorkflowEvents::WORKFLOW_AFTER_CREATE;
 
-        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
-        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($changes, $beforeEvent);
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($changes, $afterEvent);
 
         $this->handler->createWorkflowDefinition($newDefinition);
     }
@@ -94,8 +94,8 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
         $beforeEvent = WorkflowEvents::WORKFLOW_BEFORE_UPDATE;
         $afterEvent = WorkflowEvents::WORKFLOW_AFTER_UPDATE;
 
-        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($beforeEvent, $changes);
-        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($afterEvent, $changes);
+        $this->eventDispatcher->expects($this->at(0))->method('dispatch')->with($changes, $beforeEvent);
+        $this->eventDispatcher->expects($this->at(1))->method('dispatch')->with($changes, $afterEvent);
 
         $this->handler->updateWorkflowDefinition($existingDefinition, $newDefinition);
     }
@@ -119,7 +119,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher
             ->expects($this->exactly((int)$expected))
             ->method('dispatch')
-            ->with(WorkflowEvents::WORKFLOW_AFTER_DELETE, $this->equalTo(new WorkflowChangesEvent($definition)));
+            ->with($this->equalTo(new WorkflowChangesEvent($definition)), WorkflowEvents::WORKFLOW_AFTER_DELETE);
 
         $this->assertEquals($expected, $this->handler->deleteWorkflowDefinition($definition));
     }

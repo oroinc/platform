@@ -98,7 +98,7 @@ class MailboxHandler implements FormAwareInterface
         $this->getEntityManager()->flush();
 
         if ($this->dispatcher->hasListeners(MailboxSaved::NAME)) {
-            $this->dispatcher->dispatch(MailboxSaved::NAME, new MailboxSaved($mailbox));
+            $this->dispatcher->dispatch(new MailboxSaved($mailbox), MailboxSaved::NAME);
         }
     }
 

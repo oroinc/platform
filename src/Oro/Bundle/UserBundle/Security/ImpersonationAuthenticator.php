@@ -110,7 +110,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         $token->setAttribute('IMPERSONATION', $impersonation->getId());
 
         $event = new ImpersonationSuccessEvent($impersonation);
-        $this->eventDispatcher->dispatch(ImpersonationSuccessEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ImpersonationSuccessEvent::EVENT_NAME);
 
         $impersonation->setLoginAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $impersonation->setIpAddress($request->getClientIp());

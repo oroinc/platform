@@ -49,7 +49,7 @@ class MassEmailDirectMailerTest extends \PHPUnit\Framework\TestCase
             ->setMessage($message);
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(NotificationSentEvent::NAME, new NotificationSentEvent($spoolItem, $sent));
+            ->with(new NotificationSentEvent($spoolItem, $sent), NotificationSentEvent::NAME);
 
         self::assertEquals($sent, $this->mailer->send($message, $failedRecipients));
     }

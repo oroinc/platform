@@ -406,7 +406,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects(static::once())
             ->method('dispatch')
-            ->with(Events::BEFORE_EXPORT_GET_IDS, new ExportPreGetIds($queryBuilder, $options));
+            ->with(new ExportPreGetIds($queryBuilder, $options), Events::BEFORE_EXPORT_GET_IDS);
 
         $this->reader->setDispatcher($dispatcher);
 

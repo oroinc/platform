@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -53,7 +53,7 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
     public function testIntegrationSettings($fieldName)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
-        $referenceGetter = Inflector::camelize('get_' . $fieldName . '_reference');
+        $referenceGetter = (new InflectorFactory())->build()->camelize('get_' . $fieldName . '_reference');
         $this->assertTrue(method_exists($this->entity, $referenceGetter));
 
         $value = $accessor->getValue($this->entity, $fieldName);

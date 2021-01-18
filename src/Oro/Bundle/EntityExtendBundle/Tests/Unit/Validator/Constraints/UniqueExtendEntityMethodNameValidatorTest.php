@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
@@ -56,7 +57,8 @@ class UniqueExtendEntityMethodNameValidatorTest extends ConstraintValidatorTestC
             new FieldNameValidationHelper(
                 new ConfigProviderMock($configManager, 'extend'),
                 $eventDispatcher,
-                new NewEntitiesHelper()
+                new NewEntitiesHelper(),
+                (new InflectorFactory())->build()
             ),
             $this->classMethodNameChecker,
             $this->fieldTypeHelper

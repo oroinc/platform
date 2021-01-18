@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class representing event data for `oro_datagrid.grid_views_load` event

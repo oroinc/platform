@@ -67,7 +67,7 @@ class RemoveNoteConfigurationScopeQuery extends ParametrizedMigrationQuery
             $this->logQuery($logger, $sql, $parameters);
 
             if (!$dryRun) {
-                $this->connection->executeUpdate($sql, $parameters);
+                $this->connection->executeStatement($sql, $parameters);
             }
         }
     }

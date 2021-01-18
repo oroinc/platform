@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigGetEvent extends Event
 {

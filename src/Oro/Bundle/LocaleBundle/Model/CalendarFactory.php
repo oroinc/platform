@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Model;
 
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
  * Calendar factory.

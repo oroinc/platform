@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * by access to Organization entity which is not even always available.
  * @see \Oro\Bundle\EmailBundle\EventListener\MailboxAuthorizationListener
  */
-class MailboxController extends Controller
+class MailboxController extends AbstractController
 {
     const ACTIVE_GROUP    = 'platform';
     const ACTIVE_SUBGROUP = 'email_configuration';

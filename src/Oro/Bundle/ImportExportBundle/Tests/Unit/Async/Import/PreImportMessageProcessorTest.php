@@ -573,7 +573,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
                 $this->callback(function (BeforeImportChunksEvent $eventData) use ($messageData) {
                     $body = $eventData->getBody();
 
@@ -587,7 +586,8 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame($messageData['options']['batch_number'], $body['options']['batch_number']);
 
                     return true;
-                })
+                }),
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS
             );
 
         $message = $this->createMessageMock();

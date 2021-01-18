@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -25,20 +25,18 @@ class FieldNameValidationHelper
 
     /** @var NewEntitiesHelper */
     protected $newEntitiesHelper;
+    private Inflector $inflector;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param NewEntitiesHelper $newEntitiesHelper
-     */
     public function __construct(
         ConfigProvider $extendConfigProvider,
         EventDispatcherInterface $eventDispatcher,
-        NewEntitiesHelper $newEntitiesHelper
+        NewEntitiesHelper $newEntitiesHelper,
+        Inflector $inflector
     ) {
         $this->extendConfigProvider = $extendConfigProvider;
         $this->eventDispatcher = $eventDispatcher;
         $this->newEntitiesHelper = $newEntitiesHelper;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -87,7 +85,7 @@ class FieldNameValidationHelper
     public function getRemoveFieldValidationErrors(FieldConfigModel $field): array
     {
         $event = new ValidateBeforeRemoveFieldEvent($field);
-        $this->eventDispatcher->dispatch(ValidateBeforeRemoveFieldEvent::NAME, $event);
+        $this->eventDispatcher->dispatch($event, ValidateBeforeRemoveFieldEvent::NAME);
 
         return $event->getValidationMessages();
     }
@@ -205,6 +203,6 @@ class FieldNameValidationHelper
      */
     public function normalizeFieldName($fieldName)
     {
-        return strtolower(Inflector::classify($fieldName));
+        return strtolower($this->inflector->classify($fieldName));
     }
 }

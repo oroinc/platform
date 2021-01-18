@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LoadIntegrationThemesEvent extends Event
 {

@@ -1023,13 +1023,13 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION
             );
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_ACTIVATED,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_ACTIVATED
             );
 
         $this->assertTrue(
@@ -1091,13 +1091,13 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION
             );
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_DEACTIVATED,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_DEACTIVATED
             );
 
         $this->startedWorkflowsBag->addWorkflowEntity($workflowName, new \stdClass());

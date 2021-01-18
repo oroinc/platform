@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -134,8 +133,7 @@ abstract class ExtensionTestCase extends \PHPUnit\Framework\TestCase
                 $class = $this->actualDefinitions[$definitionId]->getClass() ?? $definitionId;
 
                 // All controllers must be registered as public
-                if (is_subclass_of($class, AbstractController::class)
-                    || is_subclass_of($class, Controller::class)) {
+                if (is_subclass_of($class, AbstractController::class)) {
                     $this->assertServiceIsPublic(
                         $serviceId,
                         sprintf('Definition for "%s" must be public because it is Controller.', $serviceId)

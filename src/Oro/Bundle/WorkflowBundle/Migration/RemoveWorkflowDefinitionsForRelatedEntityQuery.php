@@ -33,6 +33,6 @@ class RemoveWorkflowDefinitionsForRelatedEntityQuery extends ParametrizedMigrati
         $params = ['entity' => $this->entityClassName];
         $types = ['entity' => Types::STRING];
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @Route("/group")
  */
-class GroupController extends Controller
+class GroupController extends AbstractController
 {
     /**
      * Create group form

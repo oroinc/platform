@@ -95,7 +95,7 @@ class RenameConfigArrayKeyQuery extends ParametrizedMigrationQuery
             if ($originalValue !== $convertedValue) {
                 $updateParameters = ['array_value' => $convertedValue, 'id' => $row['id']];
                 $this->logQuery($logger, $updateQuery, $updateParameters, $updateQueryTypes);
-                $this->connection->executeUpdate($updateQuery, $updateParameters, $updateQueryTypes);
+                $this->connection->executeStatement($updateQuery, $updateParameters, $updateQueryTypes);
             }
         }
     }

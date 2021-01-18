@@ -43,8 +43,8 @@ class EntityConfigListener
 
         $preSetRequireUpdateEvent = new PreSetRequireUpdateEvent($event->getConfigs(), $configManager);
         $this->eventDispatcher->dispatch(
-            Events::PRE_SET_REQUIRE_UPDATE,
-            $preSetRequireUpdateEvent
+            $preSetRequireUpdateEvent,
+            Events::PRE_SET_REQUIRE_UPDATE
         );
 
         // synchronize field state with entity state, when custom field state changed

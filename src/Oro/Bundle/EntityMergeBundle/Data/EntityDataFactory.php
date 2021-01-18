@@ -52,8 +52,8 @@ class EntityDataFactory
         $data = new EntityData($entityMetadata, $entities);
 
         $this->eventDispatcher->dispatch(
-            MergeEvents::CREATE_ENTITY_DATA,
-            new EntityDataEvent($data)
+            new EntityDataEvent($data),
+            MergeEvents::CREATE_ENTITY_DATA
         );
 
         return $data;

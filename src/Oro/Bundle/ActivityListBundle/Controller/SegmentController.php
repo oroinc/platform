@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Controller;
 
 use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,7 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @Route("/activity-list/segment")
  */
-class SegmentController extends Controller
+class SegmentController extends AbstractController
 {
     /**
      * @Route("/activity-condition")
@@ -46,7 +46,7 @@ class SegmentController extends Controller
         }
 
         $event = new ActivityConditionOptionsLoadEvent($conditionOptions['activityConditionOptions']);
-        $dispatcher->dispatch(ActivityConditionOptionsLoadEvent::EVENT_NAME, $event);
+        $dispatcher->dispatch($event, ActivityConditionOptionsLoadEvent::EVENT_NAME);
 
         return [
             'activityConditionOptions' => $event->getOptions(),

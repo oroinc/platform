@@ -43,10 +43,10 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(self::at(0))
             ->method('dispatch')
             ->with(
-                MigrationEvents::DATA_FIXTURES_PRE_LOAD,
-                self::isInstanceOf(MigrationDataFixturesEvent::class)
+                self::isInstanceOf(MigrationDataFixturesEvent::class),
+                MigrationEvents::DATA_FIXTURES_PRE_LOAD
             )
-            ->willReturnCallback(function ($eventName, MigrationDataFixturesEvent $event) {
+            ->willReturnCallback(function (MigrationDataFixturesEvent $event, $eventName) {
                 self::assertSame($this->em, $event->getObjectManager());
                 self::assertEquals('test', $event->getFixturesType());
                 $event->log('pre load');
@@ -54,10 +54,10 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects(self::at(1))
             ->method('dispatch')
             ->with(
-                MigrationEvents::DATA_FIXTURES_POST_LOAD,
-                self::isInstanceOf(MigrationDataFixturesEvent::class)
+                self::isInstanceOf(MigrationDataFixturesEvent::class),
+                MigrationEvents::DATA_FIXTURES_POST_LOAD
             )
-            ->willReturnCallback(function ($eventName, MigrationDataFixturesEvent $event) {
+            ->willReturnCallback(function (MigrationDataFixturesEvent $event, $eventName) {
                 self::assertSame($this->em, $event->getObjectManager());
                 self::assertEquals('test', $event->getFixturesType());
                 $event->log('post load');

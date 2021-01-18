@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfiguration;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
@@ -37,7 +38,8 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->entityAliasProvider  = new EntityAliasProvider(
-            new EntityAliasConfigBag($configProvider)
+            new EntityAliasConfigBag($configProvider),
+            (new InflectorFactory())->build()
         );
     }
 
