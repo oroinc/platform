@@ -56,7 +56,12 @@
         'indexLabel':  'oro.user.entity_plural_label'|trans,
         'entityTitle': fullname,
     } %}
-    {% set avatar = oro_configured_image_url(entity, 'avatar') %}
+
+    {% if entity.avatar %}
+        {% set avatar = filtered_image_url(entity.avatar, 'avatar_med') %}
+    {% else %}
+        {% set avatar = oro_configured_image_url(entity, 'avatar') %}
+    {% endif %}
     {{ parent() }}
 {% endblock pageHeader %}
 
