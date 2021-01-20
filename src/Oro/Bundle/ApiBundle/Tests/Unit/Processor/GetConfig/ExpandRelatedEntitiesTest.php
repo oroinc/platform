@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ExpandRelatedEntities;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -56,16 +57,13 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAlreadyProcessedConfig()
+    public function testProcessWhenConfigAlreadyCompleted()
     {
-        $config = [
-            'exclusion_policy' => 'all'
-        ];
-
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
 
-        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setProcessed(CompleteDefinition::OPERATION_NAME);
+        $this->context->setResult($this->createConfigObject([]));
         $this->processor->process($this->context);
     }
 

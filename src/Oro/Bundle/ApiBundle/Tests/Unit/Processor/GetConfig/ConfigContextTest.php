@@ -85,15 +85,39 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
     public function testRequestedExclusionPolicy()
     {
         self::assertNull($this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->has('requested_exclusion_policy'));
+        self::assertNull($this->context->get('requested_exclusion_policy'));
 
         $this->context->setRequestedExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_NONE);
-        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
+        self::assertSame(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->has('requested_exclusion_policy'));
+        self::assertSame(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->get('requested_exclusion_policy'));
 
         $this->context->setRequestedExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_ALL);
-        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
+        self::assertSame(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->has('requested_exclusion_policy'));
+        self::assertSame(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->get('requested_exclusion_policy'));
+
+        $this->context->setRequestedExclusionPolicy('');
+        self::assertNull($this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->has('requested_exclusion_policy'));
+        self::assertNull($this->context->get('requested_exclusion_policy'));
 
         $this->context->setRequestedExclusionPolicy(null);
         self::assertNull($this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->has('requested_exclusion_policy'));
+        self::assertNull($this->context->get('requested_exclusion_policy'));
+    }
+
+    public function testExplicitlyConfiguredFieldNames()
+    {
+        self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
+
+        $this->context->setExplicitlyConfiguredFieldNames(['field1', 'field2']);
+        self::assertSame(['field1', 'field2'], $this->context->getExplicitlyConfiguredFieldNames());
+
+        $this->context->setExplicitlyConfiguredFieldNames([]);
+        self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
     }
 
     public function testExtras()

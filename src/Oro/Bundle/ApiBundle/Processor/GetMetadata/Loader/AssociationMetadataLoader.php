@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -28,7 +29,6 @@ class AssociationMetadataLoader
      * @param EntityMetadata         $entityMetadata
      * @param EntityDefinitionConfig $config
      * @param MetadataContext        $context
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function completeAssociationMetadata(
         EntityMetadata $entityMetadata,
@@ -42,26 +42,24 @@ class AssociationMetadataLoader
                 continue;
             }
             $field = $config->getField($associationName);
-            if (null === $field || !$field->hasTargetEntity()) {
-                // a configuration of an association fields does not exist
+            if (null === $field) {
+                continue;
+            }
+            $targetConfig = $field->getTargetEntity();
+            if (null === $targetConfig) {
+                continue;
+            }
+            $targetClass = $field->getTargetClass();
+            if (!$targetClass) {
                 continue;
             }
 
-            $targetClass = $field->getTargetClass();
-            if ($targetClass && $association->getTargetClassName() !== $targetClass) {
-                $acceptableTargetClassNames = $association->getAcceptableTargetClassNames();
-                $i = \array_search($association->getTargetClassName(), $acceptableTargetClassNames, true);
-                if (false !== $i) {
-                    $acceptableTargetClassNames[$i] = $targetClass;
-                    $association->setAcceptableTargetClassNames($acceptableTargetClassNames);
-                }
-                $association->setTargetClassName($targetClass);
-            }
+            $this->updateAssociationTargetClass($association, $targetClass);
             $targetMetadata = $this->metadataProvider->getMetadata(
                 $targetClass,
                 $context->getVersion(),
                 $context->getRequestType(),
-                $field->getTargetEntity(),
+                $targetConfig,
                 $context->getExtras(),
                 $context->getWithExcludedProperties()
             );
@@ -75,15 +73,32 @@ class AssociationMetadataLoader
     }
 
     /**
+     * @param AssociationMetadata $association
+     * @param string              $targetClass
+     */
+    private function updateAssociationTargetClass(AssociationMetadata $association, string $targetClass): void
+    {
+        if ($association->getTargetClassName() !== $targetClass) {
+            $acceptableTargetClassNames = $association->getAcceptableTargetClassNames();
+            $i = array_search($association->getTargetClassName(), $acceptableTargetClassNames, true);
+            if (false !== $i) {
+                $acceptableTargetClassNames[$i] = $targetClass;
+                $association->setAcceptableTargetClassNames($acceptableTargetClassNames);
+            }
+            $association->setTargetClassName($targetClass);
+        }
+    }
+
+    /**
      * @param EntityMetadata $targetMetadata
      *
      * @return string
      */
-    private function getAssociationDataType(EntityMetadata $targetMetadata)
+    private function getAssociationDataType(EntityMetadata $targetMetadata): string
     {
         $dataType = null;
         $idFieldNames = $targetMetadata->getIdentifierFieldNames();
-        if (\count($idFieldNames) === 1) {
+        if (count($idFieldNames) === 1) {
             $idField = $targetMetadata->getProperty(reset($idFieldNames));
             if (null !== $idField) {
                 $dataType = $idField->getDataType();

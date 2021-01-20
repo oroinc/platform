@@ -33,6 +33,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteDefinition implements ProcessorInterface
 {
+    public const OPERATION_NAME = 'complete_definition';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -64,21 +66,21 @@ class CompleteDefinition implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $definition = $context->getResult();
-        $context->setRequestedExclusionPolicy($definition->getExclusionPolicy());
-        if ($definition->isExcludeAll()) {
+        if ($context->isProcessed(self::OPERATION_NAME)) {
             // already processed
             return;
         }
 
-        $entityClass = $context->getClassName();
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+        $definition = $context->getResult();
+        if ($this->doctrineHelper->isManageableEntityClass($context->getClassName())) {
             $this->entityDefinitionHelper->completeDefinition($definition, $context);
         } else {
             $this->objectDefinitionHelper->completeDefinition($definition, $context);
         }
 
-        // mark the entity configuration as processed
+        // mark the entity configuration as completed
         $definition->setExcludeAll();
+        // mark the complete definition operation as processed
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

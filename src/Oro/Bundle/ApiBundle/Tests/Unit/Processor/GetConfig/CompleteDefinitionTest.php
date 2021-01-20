@@ -36,11 +36,10 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAlreadyProcessedConfig()
+    public function testProcessWhenConfigAlreadyCompleted()
     {
-        $config = [
-            'exclusion_policy' => 'all'
-        ];
+        $definition = new EntityDefinitionConfig();
+        $definition->setExcludeNone();
 
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
@@ -49,10 +48,12 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->objectDefinitionHelper->expects(self::never())
             ->method('completeDefinition');
 
-        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setProcessed(CompleteDefinition::OPERATION_NAME);
+        $this->context->setResult($definition);
         $this->processor->process($this->context);
 
-        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_ALL, $this->context->getRequestedExclusionPolicy());
+        self::assertTrue($this->context->isProcessed(CompleteDefinition::OPERATION_NAME));
+        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $definition->getExclusionPolicy());
     }
 
     public function testProcessForManageableEntity()
@@ -72,8 +73,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->context->setResult($definition);
         $this->processor->process($this->context);
 
+        self::assertTrue($this->context->isProcessed(CompleteDefinition::OPERATION_NAME));
         self::assertTrue($definition->isExcludeAll());
-        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
     }
 
     public function testProcessForNotManageableEntity()
@@ -94,7 +95,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         $this->context->setResult($definition);
         $this->processor->process($this->context);
 
+        self::assertTrue($this->context->isProcessed(CompleteDefinition::OPERATION_NAME));
         self::assertTrue($definition->isExcludeAll());
-        self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $this->context->getRequestedExclusionPolicy());
     }
 }
