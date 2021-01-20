@@ -26,8 +26,8 @@ class ImportLayoutUpdateVisitorTest extends \PHPUnit\Framework\TestCase
             <<<'CODE'
 class ImportedLayoutUpdate implements Oro\Component\Layout\LayoutUpdateImportInterface, Oro\Component\Layout\IsApplicableLayoutUpdateInterface
 {
-    private $import;
-    private $parentLayoutUpdate;
+    private $import = null;
+    private $parentLayoutUpdate = null;
 
     public function isApplicable(Oro\Component\Layout\ContextInterface $context)
     {

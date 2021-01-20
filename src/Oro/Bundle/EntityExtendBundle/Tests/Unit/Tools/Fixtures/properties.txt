@@ -2,7 +2,7 @@ namespace Test;
 
 class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    protected $field1;
+    protected $field1 = null;
     protected $field_2 = true;
 
     public function __construct()
