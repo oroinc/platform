@@ -126,3 +126,17 @@ entity_config:
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable
+                use_in_export:
+                    options:
+                        value_type: boolean
+                        default_value: false
+                    form:
+                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        options:
+                            choices:
+                                No: 0
+                                Yes: 1
+                            placeholder: false
+                            block: attribute
+                            label: oro.entity_config.entity_config.attribute.field.items.use_in_export.label
+                            tooltip: oro.entity_config.entity_config.attribute.field.items.use_in_export.tooltip

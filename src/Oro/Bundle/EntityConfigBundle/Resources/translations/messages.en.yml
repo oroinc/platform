@@ -95,6 +95,9 @@ oro:
                     filter_by:
                         label: Filter by
                         tooltip: 'This field defines the type of filtering to be applied to the attribute. It will be applied only to fields that have string representation in the search index.'
+                    use_in_export:
+                        label: Can Be Exported
+                        tooltip: If enabled this field values will be present in product export file.
 
         field_config:
             entity_plural_label: Fields
