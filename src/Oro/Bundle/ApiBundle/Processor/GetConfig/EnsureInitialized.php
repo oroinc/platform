@@ -37,6 +37,9 @@ class EnsureInitialized implements ProcessorInterface
                 $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load([])
             );
         }
+        $definition = $context->getResult();
+        $context->setRequestedExclusionPolicy($definition->getExclusionPolicy());
+        $context->setExplicitlyConfiguredFieldNames(array_keys($definition->getFields()));
 
         $extras = $context->getExtras();
         if ($context->hasExtra(SortersConfigExtra::NAME) && !$context->getResult()->isSortingEnabled()) {
