@@ -541,8 +541,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     ): LogicException {
         throw new LogicException(sprintf(
             'The "%s" processor has the "%s" tag attribute with a value that is not valid'
-            . ' for the "%s" action. The value of this attribute must be'
-            . ' %s delimited be "%s".',
+            . ' for the "%s" action. The value of this attribute must be %s delimited be "%s".',
             $processorId,
             $attributeName,
             $action,
