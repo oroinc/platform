@@ -126,8 +126,7 @@ class NestedAssociationMetadataHelper
         $targetField = $targetConfig->getField($targetFieldName);
         if (null === $targetField) {
             throw new RuntimeException(sprintf(
-                'The "%s" field should be configured for the nested association.'
-                . ' Parent Field: %s::%s.',
+                'The "%s" field should be configured for the nested association. Parent Field: %s::%s.',
                 $targetFieldName,
                 $parentClassName,
                 $parentFieldName
@@ -135,8 +134,7 @@ class NestedAssociationMetadataHelper
         }
         if (!$targetField->hasPropertyPath()) {
             throw new RuntimeException(sprintf(
-                'A property path should be configured for the "%s" field.'
-                . ' Parent Field: %s::%s.',
+                'A property path should be configured for the "%s" field. Parent Field: %s::%s.',
                 $targetFieldName,
                 $parentClassName,
                 $parentFieldName
@@ -144,8 +142,7 @@ class NestedAssociationMetadataHelper
         }
         if ($targetField->hasTargetEntity()) {
             throw new RuntimeException(sprintf(
-                'The "%s" field should not be an association.'
-                . ' Parent Field: %s::%s.',
+                'The "%s" field should not be an association. Parent Field: %s::%s.',
                 $targetFieldName,
                 $parentClassName,
                 $parentFieldName

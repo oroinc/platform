@@ -111,6 +111,29 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(DataType::INTEGER, $association->getDataType());
     }
 
+    public function testAssociationWithoutFieldTargetClass()
+    {
+        $config = new EntityDefinitionConfig();
+        $config->addField('association')->createAndSetTargetEntity();
+
+        $entityMetadata = new EntityMetadata();
+        $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
+        $association->setDataType(DataType::INTEGER);
+        $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
+
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        $this->associationMetadataLoader->completeAssociationMetadata(
+            $entityMetadata,
+            $config,
+            $this->context
+        );
+
+        self::assertEquals(DataType::INTEGER, $association->getDataType());
+        self::assertNull($association->getTargetMetadata());
+    }
+
     public function testAssociationWhenTargetMetadataNotFound()
     {
         $config = new EntityDefinitionConfig();
