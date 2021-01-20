@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
 /**
  * The execution context for processors for "get_config" action.
- * @method EntityDefinitionConfig|null getResult()
+ * @method EntityDefinitionConfig getResult()
  */
 class ConfigContext extends ApiContext
 {
@@ -43,6 +43,9 @@ class ConfigContext extends ApiContext
     /** @var ConfigExtraInterface[] */
     protected $extras = [];
 
+    /** @var string[]|null */
+    private $explicitlyConfiguredFieldNames;
+
     /**
      * {@inheritdoc}
      */
@@ -50,6 +53,7 @@ class ConfigContext extends ApiContext
     {
         parent::initialize();
         $this->set(self::EXTRA, []);
+        $this->set(self::REQUESTED_EXCLUSION_POLICY, null);
     }
 
     /**
@@ -193,11 +197,27 @@ class ConfigContext extends ApiContext
      */
     public function setRequestedExclusionPolicy($exclusionPolicy)
     {
-        if ($exclusionPolicy) {
-            $this->set(self::REQUESTED_EXCLUSION_POLICY, $exclusionPolicy);
-        } else {
-            $this->remove(self::REQUESTED_EXCLUSION_POLICY);
-        }
+        $this->set(self::REQUESTED_EXCLUSION_POLICY, $exclusionPolicy ?: null);
+    }
+
+    /**
+     * Gets the names of fields that were configured explicitly in "Resources/config/oro/api.yml".
+     *
+     * @return string[]
+     */
+    public function getExplicitlyConfiguredFieldNames(): array
+    {
+        return $this->explicitlyConfiguredFieldNames ?? [];
+    }
+
+    /**
+     * Sets the names of fields that were configured explicitly in "Resources/config/oro/api.yml".
+     *
+     * @param string[] $fieldNames
+     */
+    public function setExplicitlyConfiguredFieldNames(array $fieldNames): void
+    {
+        $this->explicitlyConfiguredFieldNames = $fieldNames;
     }
 
     /**

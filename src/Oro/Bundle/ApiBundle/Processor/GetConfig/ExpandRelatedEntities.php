@@ -62,13 +62,13 @@ class ExpandRelatedEntities implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $definition = $context->getResult();
-        if ($definition->isExcludeAll()) {
-            // already processed
+        if ($context->isProcessed(CompleteDefinition::OPERATION_NAME)) {
+            // this processor must be executed before the entity configuration is completed
             return;
         }
 
         $entityClass = $context->getClassName();
+        $definition = $context->getResult();
         if (!$definition->isInclusionEnabled()) {
             throw new NotSupportedConfigOperationException($entityClass, ExpandRelatedEntitiesConfigExtra::NAME);
         }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -21,8 +20,7 @@ class AddMetaProperties implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        /** @var EntityDefinitionConfig $config */
-        $config = $context->getResult();
+        $definition = $context->getResult();
         /** @var MetaPropertiesConfigExtra $configExtra */
         $configExtra = $context->getExtra(MetaPropertiesConfigExtra::NAME);
         $names = $configExtra->getMetaPropertyNames();
@@ -32,11 +30,11 @@ class AddMetaProperties implements ProcessorInterface
                 continue;
             }
             $metaPropertyName = ConfigUtil::buildMetaPropertyName($name);
-            if ($config->hasField($metaPropertyName)) {
+            if ($definition->hasField($metaPropertyName)) {
                 continue;
             }
 
-            $field = $config->addField($metaPropertyName);
+            $field = $definition->addField($metaPropertyName);
             $field->setMetaProperty(true);
             $field->setDataType($dataType);
             $field->setMetaPropertyResultName($name);

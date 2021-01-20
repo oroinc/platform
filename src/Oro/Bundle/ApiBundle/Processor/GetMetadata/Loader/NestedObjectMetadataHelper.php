@@ -58,8 +58,7 @@ class NestedObjectMetadataHelper
             if (!$inheritData) {
                 throw new RuntimeException(sprintf(
                     'The "data_class" form option should be specified for the nested object'
-                    . ' when the "inherit_data" form option is not specified.'
-                    . ' Field: %s::%s.',
+                    . ' when the "inherit_data" form option is not specified. Field: %s::%s.',
                     $entityClass,
                     $fieldName
                 ));
