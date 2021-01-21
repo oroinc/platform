@@ -27,6 +27,7 @@
     <% } else { %>
         <div class="filter-box dropdown-mode" <%= attributes %> >
             <div class="filter-container">
+                <div class="filter-items"></div>
                 <% if (obj.enableMultiselectWidget) { %>
                 <select data-action="add-filter-select"
                         data-skip-input-widgets
@@ -39,7 +40,6 @@
                     <% }); %>
                 </select>
                 <% } %>
-                <div class="filter-items"></div>
                 <div class="filter-items-hint">
                     <button type="button"
                             class="reset-filter-button"
