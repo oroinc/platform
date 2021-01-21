@@ -6,6 +6,7 @@ define(function(require) {
     const loadModules = require('oroui/js/app/services/load-modules');
     const tools = {};
     const iOS = /(iPad|iPhone)/.test(navigator.userAgent);
+    const iPadOS = !!(navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
     const edge = /(Edge\/)/.test(navigator.userAgent);
     const ie11 = /(Trident\/)/.test(navigator.userAgent);
 
@@ -247,7 +248,7 @@ define(function(require) {
          * Are we currently on iOS device
          */
         isIOS: function() {
-            return iOS;
+            return iOS || iPadOS;
         },
 
         /**
