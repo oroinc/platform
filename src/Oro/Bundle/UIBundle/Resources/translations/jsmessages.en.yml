@@ -166,7 +166,8 @@ oro:
     htmlpurifier:
         formatted_error_line: 'Line #{{ line }}: {{ message }}'
         messages:
-            'AttrValidator: Attribute removed': '"{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
+            'AttrValidator: Attribute removed': 'The "{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
+            reserved_id: 'The "id" attribute values that start with "{{ id }}" are reserved, please use a different ID.'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"
