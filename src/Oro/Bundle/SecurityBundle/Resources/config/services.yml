@@ -436,6 +436,13 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
+    oro_security.roles_change_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener
+        calls:
+            - [ 'addSupportedClass', [ 'Oro\Bundle\UserBundle\Entity\User'] ]
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
     oro_security.token.factory.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
         public: true
