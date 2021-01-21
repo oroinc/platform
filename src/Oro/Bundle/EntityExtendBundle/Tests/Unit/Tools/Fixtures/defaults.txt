@@ -2,8 +2,8 @@ namespace Test;
 
 class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
 {
-    protected $default_rel1;
-    protected $default_rel_2;
+    protected $default_rel1 = null;
+    protected $default_rel_2 = null;
 
     public function __construct()
     {

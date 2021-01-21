@@ -4,7 +4,7 @@ Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes i
 
 ## FROM 4.1.0 to 4.2.0
 
-The minimum required PHP version is 7.4.11.
+The minimum required PHP version is 7.4.14.
 
 ### Directory structure and filesystem changes
 

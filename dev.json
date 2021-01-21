@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "php": "~7.4.11",
+        "php": "~7.4.14",
         "ext-dom": "*",
         "ext-gd": "*",
         "ext-intl": "*",
@@ -113,7 +113,7 @@
         "box/spout": "2.7.*",
         "nette/php-generator": "3.5.*",
         "brick/math": "0.8.*",
-        "phpdocumentor/reflection-docblock": "4.3.*",
+        "phpdocumentor/reflection-docblock": "5.2.*",
         "php-http/httplug-bundle": "~1.20.0",
         "salsify/json-streaming-parser": "8.2.*",
         "myclabs/deep-copy": "1.10.*",
