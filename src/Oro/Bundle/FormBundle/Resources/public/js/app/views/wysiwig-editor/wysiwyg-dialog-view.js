@@ -61,9 +61,9 @@ define(function(require) {
             const content = this.getDialogContainer();
             const widgetContent = this.$el.closest('.widget-content')[0] || content.children().first().get(0);
             const editorHeight = this.getEditorView().getHeight();
-            const style = getComputedStyle(content[0]);
+            const style = getComputedStyle(widgetContent);
             const availableHeight = editorHeight +
-                content[0].offsetHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom) +
+                content[0].offsetHeight - parseFloat(style.marginTop) - parseFloat(style.marginBottom) +
                 -widgetContent.offsetHeight;
             return Math.floor(Math.max(availableHeight, this.minimalWysiwygEditorHeight));
         },

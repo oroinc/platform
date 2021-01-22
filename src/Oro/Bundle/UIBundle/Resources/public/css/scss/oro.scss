@@ -283,14 +283,6 @@ footer {
     @include clearfix();
 }
 
-.mce-tinymce {
-    width: $field-width;
-
-    .ui-dialog & {
-        max-width: $field-width;
-    }
-}
-
 textarea {
     height: 150px;
     resize: vertical;
