@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
@@ -440,16 +441,40 @@ class ConfigurationLoader
             $items,
             true,
             function ($item) {
+                $result = 0;
                 $expression = $item[1];
-                if (!$expression) {
-                    return 0;
+                if ($expression) {
+                    $result = 100;
+                    $aspects = explode('&', $expression);
+                    foreach ($aspects as $aspect) {
+                        $result += $this->getRequestTypeAspectRank($aspect);
+                    }
                 }
 
-                return substr_count($expression, '&') + 1;
+                return $result;
             }
         );
 
         return $items;
+    }
+
+    /**
+     * @param string $aspect
+     *
+     * @return int
+     */
+    private function getRequestTypeAspectRank(string $aspect): int
+    {
+        $rank = 8;
+        if (strncmp($aspect, '!', 1) === 0) {
+            $aspect = substr($aspect, 1);
+            $rank /= 2;
+        }
+        if (RequestType::REST === $aspect || RequestType::JSON_API === $aspect) {
+            $rank /= 2;
+        }
+
+        return $rank;
     }
 
     /**
