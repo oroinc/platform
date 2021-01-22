@@ -73,7 +73,7 @@ class PdoMysql extends BaseDriver
         $condition = $searchCondition['condition'];
 
         $words = array_filter(
-            explode(' ', $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
+            explode(Query::DELIMITER, $this->filterTextFieldValue($searchCondition['fieldName'], $fieldValue)),
             'strlen'
         );
 
