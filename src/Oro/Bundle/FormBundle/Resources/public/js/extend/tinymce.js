@@ -1,7 +1,7 @@
 const _ = require('underscore');
 const tinyMCE = require('tinymce');
 require.context(
-    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/skins',
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/icons',
     true,
     /.*/
 );
@@ -11,12 +11,12 @@ require.context(
     /.*/
 );
 require.context(
-    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/themes',
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/skins',
     true,
     /.*/
 );
 require.context(
-    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=!oroform/lib/bdeskphoto',
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static/&context=tinymce!tinymce/themes',
     true,
     /.*/
 );

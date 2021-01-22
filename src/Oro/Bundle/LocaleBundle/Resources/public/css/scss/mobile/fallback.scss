@@ -3,10 +3,6 @@
 .fallback-container {
     width: $fallback-width;
 
-    .mce-tinymce {
-        width: $fallback-mce-tinymce-width !important;
-    }
-
     .fallback-status {
         line-height: $fallback-item-use-fallback-status-line-height;
         height: $fallback-item-use-fallback-status-height;
