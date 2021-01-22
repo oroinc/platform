@@ -41,7 +41,7 @@
     }
 }
 
-.mce-tinymce {
+.tox-tinymce {
     &.disabled {
         button {
             opacity: $mce-tinymce-opacity;
@@ -68,9 +68,8 @@
         border-bottom: $fallback-item-border;
     }
 
-    .mce-tinymce {
-        &:not(.mce-fullscreen) {
-            width: $fallback-item-mce-tinymce-width;
+    .tox-tinymce {
+        &:not(.tox-fullscreen) {
             max-width: $fallback-item-mce-tinymce-max-width;
         }
     }

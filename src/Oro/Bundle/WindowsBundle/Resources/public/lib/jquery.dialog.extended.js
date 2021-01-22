@@ -62,7 +62,7 @@ define(function (require) {
         options: $.extend($.ui.dialog.options, config),
 
         _allowInteraction: function(e) {
-            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .mce-window, ' +
+            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .tox-dialog, ' +
                 '.dropdown-menu, .ui-multiselect-menu').length;
         },
 

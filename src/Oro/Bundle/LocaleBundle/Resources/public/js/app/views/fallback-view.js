@@ -130,7 +130,7 @@ define(function(require) {
                 .change(_.bind(this.cloneValueToChildrenEvent, this))
                 .keyup(_.bind(this.cloneValueToChildrenEvent, this));
 
-            this.$el.find(this.options.selectors.itemValue).find('.mce-tinymce').each(function() {
+            this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
                 tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                     .on('change', function() {
                         $(this.targetElm).change();
@@ -291,7 +291,7 @@ define(function(require) {
             const $$elementContainer = $element.closest(this.options.selectors.itemValue);
 
             let editor;
-            if ($$elementContainer.find('.mce-tinymce').length > 0) {
+            if ($$elementContainer.find('.tox-tinymce').length > 0) {
                 editor = tinyMCE.get($$elementContainer.find('textarea').attr('id'));
             }
 
