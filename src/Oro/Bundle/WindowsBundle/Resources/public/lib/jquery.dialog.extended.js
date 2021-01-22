@@ -57,7 +57,7 @@ define(function (require) {
         }),
 
         _allowInteraction: function(e) {
-            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .mce-window, ' +
+            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .tox-dialog, ' +
                 '.dropdown-menu, .ui-multiselect-menu').length;
         },
 

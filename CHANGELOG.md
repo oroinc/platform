@@ -11,6 +11,21 @@ The current file describes significant changes in the code that may affect the u
 #### WorkflowBundle
 * Added method `Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transitUnconditionally()`. The method transits a workflow item without checking for preconditions and conditions.
 
+### Changed
+
+#### FormBundle
+* Upgraded TinyMCE library to version 5.6.0, see [migration guide](https://www.tiny.cloud/blog/how-to-migrate-from-tinymce-4-to-tinymce-5/)
+  * Removed the `bdesk_photo` plugin, use the standard `image` plugin and the toolbar button instead.
+  * Major UX changes:
+    * the default skin of editor 5.6.0
+    * popups "add link" and "add image" are not oro-themed
+    * fullscreen mode is actual full screen, without the page container limit like previously
+    * changed UX for adding embedded image
+  * Minor UX changes:
+    * editor's width is 100% by default
+    * status bar is turned on by default (to allow to resize the editor vertically)
+    * the element path is mostly turned off by default. It is turned on only in places where the status bar was enabled before
+
 ## 4.1.10
 ### Added
 

@@ -16,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Provides WYSIWYG editor functionality. WYSIWYG editor can be disabled from System Configuration.
+ * @see https://www.tiny.cloud/docs/configure/editor-appearance/
  */
 class OroRichTextType extends AbstractType
 {
@@ -44,14 +45,14 @@ class OroRichTextType extends AbstractType
      * @var array
      */
     public static $toolbars = [
-        self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
+        self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist | link image | fullscreen'],
         self::TOOLBAR_DEFAULT => [
-            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
-            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
+            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ],
         self::TOOLBAR_LARGE => [
-            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist' .
-            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
+            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' .
+            '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ],
     ];
 
@@ -59,7 +60,7 @@ class OroRichTextType extends AbstractType
      * @var array
      */
     public static $defaultPlugins = [
-        'textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'
+        'code', 'link', 'fullscreen', 'paste', 'lists', 'image', 'advlist'
     ];
 
     /**
@@ -119,10 +120,10 @@ class OroRichTextType extends AbstractType
         $defaultWysiwygOptions = [
             'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
-            'skin_url'           => $assetsBaseUrl . 'build/css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements('default')),
             'menubar'            => false,
-            'statusbar'          => false,
+            'elementpath'        => false,
+            'branding'           => false,
             'relative_urls'      => false,
             'remove_script_host' => false,
             'convert_urls'       => true,

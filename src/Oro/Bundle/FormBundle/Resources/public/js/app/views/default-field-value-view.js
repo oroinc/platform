@@ -106,7 +106,7 @@ define(function(require) {
             $textareas.each(function(i, el) {
                 const editor = tinyMCE.get(el.id);
                 if (editor) {
-                    editor.setMode($(el).prop('disabled') ? 'readonly' : 'code');
+                    editor.setMode($(el).prop('disabled') ? 'readonly' : 'design');
                 }
             });
         }
