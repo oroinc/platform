@@ -115,7 +115,7 @@ define(function(require) {
         bindEvents: function() {
             const self = this;
 
-            this.$el.find(this.options.selectors.itemValue).find('.mce-tinymce').each(function() {
+            this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
                 tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
                     .on('change', function() {
                         $(this.targetElm).change();

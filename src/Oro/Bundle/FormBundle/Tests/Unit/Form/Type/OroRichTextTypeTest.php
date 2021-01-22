@@ -156,8 +156,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider()
     {
         $toolbar = [
-            'undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist ' .
-            '| alignleft aligncenter alignright alignjustify | link | bdesk_photo | fullscreen'
+            'undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist ' .
+            '| alignleft aligncenter alignright alignjustify | link image | fullscreen'
         ];
         $elements = [
             '@[style|class]',
@@ -194,12 +194,12 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'build/css/tinymce/wysiwyg-editor.css',
-                'skin_url' => 'build/css/tinymce',
-                'plugins' => ['textcolor', 'code', 'link', 'bdesk_photo', 'fullscreen', 'paste', 'lists', 'advlist'],
+                'plugins' => ['code', 'link', 'fullscreen', 'paste', 'lists', 'image', 'advlist'],
                 'toolbar' => $toolbar,
                 'valid_elements' => '',
                 'menubar' => false,
-                'statusbar' => false,
+                'branding' => false,
+                'elementpath' => false,
                 'relative_urls' => false,
                 'remove_script_host' => false,
                 'convert_urls' => true,
@@ -239,9 +239,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'wysiwyg_options' => [
                 [
                     'wysiwyg_options' => [
-                        'plugins' => ['textcolor'],
+                        'plugins' => ['link'],
                         'menubar' => true,
-                        'statusbar' => false,
+                        'branding' => false,
+                        'elementpath' => false,
                         'toolbar_type' => OroRichTextType::TOOLBAR_SMALL
                     ]
                 ],
@@ -252,11 +253,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                         'data-page-component-options' => array_merge(
                             $defaultAttrs['data-page-component-options'],
                             [
-                                'plugins' => ['textcolor'],
+                                'plugins' => ['link'],
                                 'menubar' => true,
                                 'toolbar' => [
-                                    'undo redo | bold italic underline | bullist numlist link | bdesk_photo | ' .
-                                    'fullscreen'
+                                    'undo redo | bold italic underline | bullist numlist | link image | fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
                             ]
@@ -268,9 +268,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'wysiwyg_options with subfolder' => [
                 [
                     'wysiwyg_options' => [
-                        'plugins' => ['textcolor'],
+                        'plugins' => ['link'],
                         'menubar' => true,
-                        'statusbar' => false,
+                        'branding' => false,
+                        'elementpath' => false,
                         'toolbar_type' => OroRichTextType::TOOLBAR_SMALL
                     ]
                 ],
@@ -281,15 +282,13 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                         'data-page-component-options' => array_merge(
                             $defaultAttrs['data-page-component-options'],
                             [
-                                'plugins' => ['textcolor'],
+                                'plugins' => ['link'],
                                 'menubar' => true,
                                 'toolbar' => [
-                                    'undo redo | bold italic underline | bullist numlist link | bdesk_photo | ' .
-                                    'fullscreen'
+                                    'undo redo | bold italic underline | bullist numlist | link image | fullscreen'
                                 ],
                                 'valid_elements' => implode(',', $elements),
                                 'content_css' => 'subfolder/build/css/tinymce/wysiwyg-editor.css',
-                                'skin_url' => 'subfolder/build/css/tinymce'
                             ]
                         )
                     ]
