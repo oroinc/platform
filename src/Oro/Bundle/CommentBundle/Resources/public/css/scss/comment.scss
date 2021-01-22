@@ -162,9 +162,8 @@
 
 .ui-dialog {
     .comment-form {
-        textarea,
-        .mce-tinymce {
-            max-width: 100%;
+        .comment-message-label{
+            width: 100%
         }
     }
 }

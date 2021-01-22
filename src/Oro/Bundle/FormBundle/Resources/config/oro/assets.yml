@@ -2,10 +2,6 @@ css:
     inputs:
         - 'bundles/oroform/css/scss/main.scss'
 
-css_tinymce_skin:
-    inputs:
-        - 'bundles/oroform/css/scss/tinymce/skin.scss'
-    output: tinymce/skin.min.css
 
 css_tinymce_content:
     inputs:
