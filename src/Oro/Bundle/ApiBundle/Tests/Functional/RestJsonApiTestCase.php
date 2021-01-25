@@ -16,6 +16,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
+    protected const JSON_API_MEDIA_TYPE   = 'application/vnd.api+json';
     protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
     /**
@@ -46,6 +47,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
     {
@@ -90,12 +92,19 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             unset($parameters['filters']);
         }
 
+        $server['HTTP_ACCEPT'] = self::JSON_API_MEDIA_TYPE;
+        if ('POST' === $method || 'PATCH' === $method || 'DELETE' === $method) {
+            $server['CONTENT_TYPE'] = self::JSON_API_CONTENT_TYPE;
+        } elseif (isset($server['CONTENT_TYPE'])) {
+            unset($server['CONTENT_TYPE']);
+        }
+
         $this->client->request(
             $method,
             $uri,
             $parameters,
             [],
-            array_replace($server, ['CONTENT_TYPE' => self::JSON_API_CONTENT_TYPE]),
+            $server,
             $content
         );
 

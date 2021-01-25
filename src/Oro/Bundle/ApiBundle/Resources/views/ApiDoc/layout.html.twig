@@ -502,14 +502,6 @@
                     // set default bodyFormat
                     var bodyFormat = $('#body_format').val() || '{{ defaultBodyFormat }}';
 
-                    if(!('Content-type' in headers)) {
-                        if (bodyFormat == 'form') {
-                            headers['Content-type'] = 'application/x-www-form-urlencoded';
-                        } else {
-                            headers['Content-type'] = 'application/json';
-                        }
-                    }
-
                     var hasFileTypes = false;
                     $('.parameters .tuple_type', $(this)).each(function() {
                         if ($(this).val() == 'file') {
@@ -607,6 +599,15 @@
 
                     });
 
+                    // set default content type
+                    if(!('Content-Type' in headers) && -1 !== $.inArray(method, ['POST', 'PATCH', 'PUT', 'DELETE'])) {
+                        if ('form' === bodyFormat) {
+                            headers['Content-Type'] = 'application/x-www-form-urlencoded';
+                        } else {
+                            headers['Content-Type'] = 'application/json';
+                        }
+                    }
+
                     // fix parameters in URL
                     for (var key in $.extend({}, params)) {
                         if (url.indexOf('{' + key + '}') !== -1) {
@@ -700,7 +701,7 @@
                         ajaxOptions.data = formData;
                         ajaxOptions.processData = false;
                         ajaxOptions.contentType = false;
-                        delete(headers['Content-type']);
+                        delete(headers['Content-Type']);
                     }
 
                     // and trigger the API call
