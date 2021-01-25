@@ -32,7 +32,7 @@ define(function(require) {
             menubar: false,
             toolbar: ['undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' +
             '| alignleft aligncenter alignright alignjustify | image'],
-            toolbar_mode: 'wrap',
+            toolbar_mode: 'sliding',
             elementpath: false,
             branding: false,
             browser_spellcheck: true,
@@ -149,9 +149,14 @@ define(function(require) {
                 }
             }
             this._deferredRender();
-            const options = _.omit(this.options, 'skin_url');
+            const options = this.options;
             if ($(this.$el).prop('disabled') || $(this.$el).prop('readonly')) {
                 options.readonly = true;
+            }
+
+            if (options.toolbar_mode && _.isArray(options.toolbar)) {
+                // The toolbar modes are not available when using multiple toolbars or the toolbar(n) option.
+                options.toolbar = options.toolbar.join(' | ');
             }
 
             _.each(this.options.pluginsMap, function(url, name) {
