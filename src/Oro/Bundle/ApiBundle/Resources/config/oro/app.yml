@@ -86,11 +86,35 @@ oro_api:
             label: 'JSON:API'
             default: true
             headers:
-                Content-Type: application/vnd.api+json
+                Accept: application/vnd.api+json
+                Content-Type:
+                    -
+                        value: application/vnd.api+json
+                        actions:
+                            - create
+                            - update
+                            - update_list
+                            - delete
+                            - delete_list
+                            - add_subresource
+                            - update_subresource
+                            - delete_subresource
+                            - add_relationship
+                            - update_relationship
+                            - delete_relationship
                 X-Include:
                     -
                         value: noHateoas
-                        actions: [get, get_list, create, update, get_relationship, get_subresource, add_subresource, update_subresource, delete_subresource]
+                        actions:
+                            - get
+                            - get_list
+                            - create
+                            - update
+                            - get_relationship
+                            - get_subresource
+                            - add_subresource
+                            - update_subresource
+                            - delete_subresource
                     -
                         value: totalCount
                         actions: [get_list, delete_list, get_relationship, get_subresource]

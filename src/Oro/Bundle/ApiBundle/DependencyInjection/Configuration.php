@@ -216,7 +216,10 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('headers')
                             ->info('Headers that should be sent with requests from the sandbox.')
                             ->example([
-                                'Content-Type' => 'application/vnd.api+json',
+                                'Accept'       => 'application/vnd.api+json',
+                                'Content-Type' => [
+                                    ['value' => 'application/vnd.api+json', 'actions' => ['create', 'update']]
+                                ],
                                 'X-Include'    => [
                                     ['value' => 'totalCount', 'actions' => ['get_list', 'delete_list']],
                                     ['value' => 'deletedCount', 'actions' => ['delete_list']]
