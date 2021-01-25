@@ -14,7 +14,7 @@ oro_api:
         test_new_rest_api:
             label: Test API without default api.yml
             headers:
-                Content-Type: application/vnd.api+json
+                Accept: application/vnd.api+json
                 X-Test-Request-Type: test_new
             request_type: ['rest', 'json_api', 'test_new']
         test_override_rest_api:
