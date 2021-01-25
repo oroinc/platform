@@ -122,3 +122,9 @@ oro_behat_extension:
 
     TypeaheadSuggestionsDropdown:
       selector: '.typeahead.dropdown-menu'
+
+    Tooltip:
+      selector: '.tooltip'
+
+    TooltipInner:
+      selector: '.tooltip-inner'
