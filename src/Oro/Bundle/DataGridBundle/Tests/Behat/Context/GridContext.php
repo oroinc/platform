@@ -875,6 +875,50 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
     //@codingStandardsIgnoreStart
     /**
+     * Set range price value in grid filter
+     * Example: When I set range filter "Price" as min value "12.45" and max value "25.66" use "item" unit
+     * Example: And set range filter "Price" as min value "12.45" and max value "25.66" use "item" unit
+     *
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as max value "(?P<maxValue>[\w\s\,\.\_\%]+)"$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" and max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" and max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param string $filterName
+     * @param string $minValue
+     * @param string $maxValue
+     * @param string $unitType
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    public function setPriceRangeFilter(
+        $filterName,
+        string $minValue = '',
+        string $maxValue = '',
+        string $unitType = '',
+        string $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        /** @var GridFilterPriceItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterPriceItem', $filterName, $strictly === 'strictly');
+
+        $filterItem->open();
+        if (!empty($unitType)) {
+            $filterItem->selectRadioUnitType($unitType);
+        }
+
+        $filterItem->setFilterValue($minValue);
+        $filterItem->setSecondFilterValue($maxValue);
+
+        $filterItem->submit();
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
      * Set string value in grid filter
      * Example: When I set filter First Name as contains "Adi"
      * Example: And set filter Name as is equal to "User"
