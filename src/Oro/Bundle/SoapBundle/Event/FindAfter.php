@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SoapBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FindAfter extends Event
 {

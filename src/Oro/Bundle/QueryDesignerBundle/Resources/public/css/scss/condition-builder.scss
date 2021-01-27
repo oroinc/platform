@@ -227,6 +227,7 @@
         max-width: $condition-builder-condition-item-select2-container-max-width;
         min-width: $condition-builder-condition-item-select2-container-min-width;
         min-height: $condition-builder-condition-item-select2-container--min-height;
+        height: auto;
         vertical-align: initial;
         display: block;
 
@@ -268,7 +269,7 @@
                 font-size: 0;
             }
         }
-        
+
         .select2-input {
             margin-top: 0;
         }
@@ -385,12 +386,4 @@
 
 .deleted-field {
     color: $error-text;
-}
-
-#oro_report-designer .form-horizontal {
-    .query-designer-grouping-form {
-        .control-group {
-            float: none;
-        }
-    }
 }

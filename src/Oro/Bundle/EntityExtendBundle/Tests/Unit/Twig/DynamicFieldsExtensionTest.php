@@ -134,14 +134,14 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
             });
 
@@ -171,14 +171,14 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
             });
 
@@ -212,12 +212,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -250,12 +250,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -476,14 +476,14 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldVisibility(false);
             });
 
@@ -521,14 +521,14 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             )
-            ->willReturnCallback(function ($eventName, ValueRenderEvent $event) {
+            ->willReturnCallback(function (ValueRenderEvent $event, $eventName) {
                 $event->setFieldViewValue('new value');
             });
 
@@ -572,12 +572,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -626,12 +626,12 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(
-                EntityExtendEvents::BEFORE_VALUE_RENDER,
                 new ValueRenderEvent(
                     $entity,
                     $entity->getName(),
                     new FieldConfigId('extend', $entityClass, $fieldName, $fieldType)
-                )
+                ),
+                EntityExtendEvents::BEFORE_VALUE_RENDER
             );
 
         self::assertSame(
@@ -697,7 +697,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(static::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [
@@ -767,7 +767,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
         $this->dispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(EntityExtendEvents::BEFORE_VALUE_RENDER);
+            ->with(static::anything(), EntityExtendEvents::BEFORE_VALUE_RENDER);
 
         self::assertSame(
             [

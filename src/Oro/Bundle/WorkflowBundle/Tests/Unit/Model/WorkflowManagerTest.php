@@ -719,6 +719,48 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotEmpty($workflowItem->getUpdated());
     }
 
+    public function testTransitUnconditionally(): void
+    {
+        $transition = 'test_transition';
+        $workflowName = 'test_workflow';
+
+        $workflowItem = new WorkflowItem();
+        $workflowItem->setWorkflowName($workflowName);
+
+        $workflow = $this->createWorkflow($workflowName);
+        $workflow->expects($this->once())
+            ->method('transitUnconditionally')
+            ->with($workflowItem, $transition);
+
+        $this->workflowRegistry->expects($this->once())
+            ->method('getWorkflow')
+            ->with($workflowName)
+            ->willReturn($workflow);
+
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->willReturnCallback(
+                function ($message, array $context) use ($workflow, $workflowItem, $transition) {
+                    $this->assertEquals('Workflow transition is complete', $message);
+                    $this->assertArrayHasKey('workflow', $context);
+                    $this->assertEquals($workflow, $context['workflow']);
+                    $this->assertArrayHasKey('workflowItem', $context);
+                    $this->assertEquals($workflowItem, $context['workflowItem']);
+                    $this->assertArrayHasKey('transition', $context);
+                    $this->assertEquals($transition, $context['transition']);
+                }
+            );
+
+        $entityManager = $this->getTransactionScopedEntityManager(WorkflowItem::class);
+
+        $entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->assertEmpty($workflowItem->getUpdated());
+        $this->workflowManager->transitUnconditionally($workflowItem, $transition);
+        $this->assertNotEmpty($workflowItem->getUpdated());
+    }
+
     public function testTransitIfAllowed(): void
     {
         $transition = 'test_transition';
@@ -729,7 +771,7 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createWorkflow($workflowName);
         $workflow->expects($this->once())
-            ->method('transit')
+            ->method('transitUnconditionally')
             ->with($workflowItem, $transition);
         $workflow->expects($this->once())
             ->method('isTransitionAllowed')->with($workflowItem, $transition)->willReturn(true);
@@ -981,13 +1023,13 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION
             );
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_ACTIVATED,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_ACTIVATED
             );
 
         $this->assertTrue(
@@ -1049,13 +1091,13 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION
             );
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')->with(
-                WorkflowEvents::WORKFLOW_DEACTIVATED,
-                new WorkflowChangesEvent($workflowDefinition)
+                new WorkflowChangesEvent($workflowDefinition),
+                WorkflowEvents::WORKFLOW_DEACTIVATED
             );
 
         $this->startedWorkflowsBag->addWorkflowEntity($workflowName, new \stdClass());
@@ -1198,7 +1240,8 @@ class WorkflowManagerTest extends \PHPUnit\Framework\TestCase
                     'getDefinition',
                     'getName',
                     'getStepManager',
-                    'transit'
+                    'transit',
+                    'transitUnconditionally',
                 ]
             )
             ->getMock();

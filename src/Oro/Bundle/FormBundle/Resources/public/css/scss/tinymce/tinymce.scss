@@ -1,0 +1,14 @@
+/* @theme: admin.oro; */
+
+.tox-tinymce {
+  max-width: 100%;
+  border-radius: $input-field-border-radius !important;
+  border: $input-border-width solid $input-border-color !important;
+}
+
+.narrow-text-field {
+  .tox-tinymce:not(.tox-fullscreen) {
+    width: $field-width !important;
+    min-height: 300px;
+  }
+}

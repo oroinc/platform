@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity as TestSubEntity2;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity as TestSubEntity1;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\TestEntity1 as TestMainEntity;
@@ -68,7 +69,8 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $this->renderer = new TemplateRendererStub(
             $this->environment,
             $this->configProvider,
-            $this->variablesProcessorRegistry
+            $this->variablesProcessorRegistry,
+            (new InflectorFactory())->build()
         );
     }
 
@@ -178,6 +180,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($template)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, $templateParams);
@@ -224,6 +227,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -268,6 +272,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -321,6 +326,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -370,6 +376,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -424,6 +431,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -473,6 +481,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -529,6 +538,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -581,6 +591,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -638,6 +649,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -690,6 +702,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -797,6 +810,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -904,6 +918,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -957,6 +972,74 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
+            ->willReturn($templateWrapper);
+
+        $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
+        self::assertSame($expectedRenderedResult, $result);
+    }
+
+    public function testRenderTemplateForComputedFieldWithDotInNameWithinComplexTemplateAndMultipleArrayParameters()
+    {
+        $template = 'Entity #{{ entity.id }} has been edited ' .
+            '{% if transitionUser is defined and transitionUser is not empty %}by {{ transitionUser.firstName }}' .
+            '{% endif %} on {{ transitionRecord.transitionDate|oro_format_date_by_entity(entity) }} ' .
+            '(<a href="{{ entity.url.view }}">view online</a>). ' .
+            '<a href="{{ website_path("oro_sale_quote_frontend_view", { "id": entity.id, ' .
+            '"parameter": entity.parameter }, { "website": entity.website }) }}">link</a>';
+
+        $expectedRenderedResult = 'Entity #{% if entity.id is defined %}{{ _entity_var("id", entity.id, entity) }}' .
+            '{% else %}{{ "variable_not_found_message" }}{% endif %} has been edited ' .
+            '{% if transitionUser is defined and transitionUser is not empty %}by {{ transitionUser.firstName }}' .
+            '{% endif %} on {{ transitionRecord.transitionDate|oro_format_date_by_entity(entity) }} ' .
+            '(<a href="{% if computed.entity__url_view is defined %}' .
+            '{{ _entity_var("urlView", computed.entity__url_view, entity) }}' .
+            '{% else %}{{ "variable_not_found_message" }}{% endif %}">view online</a>). ' .
+            '<a href="{{ website_path("oro_sale_quote_frontend_view", { "id": entity.id, ' .
+            '"parameter": entity.parameter }, { "website": computed.entity__website }) }}">link</a>';
+
+        $entity = new TestMainEntity();
+        $computedValue = 'testVal';
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn([
+                'properties'         => [],
+                'methods'            => [get_class($entity) => ['getField1']],
+                'accessors'          => [get_class($entity) => ['field1' => 'getField1']],
+                'default_formatters' => []
+            ]);
+        $this->expectVariables([
+            get_class($entity) => [
+                'url.view' => [
+                    'processor' => 'computedField_processor'
+                ],
+                'website' => [
+                    'processor' => 'computedField_processor'
+                ],
+            ]
+        ]);
+
+        $this->variablesProcessorRegistry->expects(self::exactly(2))
+            ->method('has')
+            ->with('computedField_processor')
+            ->willReturn(true);
+        $computedFieldProcessor = $this->createMock(VariableProcessorInterface::class);
+        $this->variablesProcessorRegistry->expects(self::exactly(2))
+            ->method('get')
+            ->with('computedField_processor')
+            ->willReturn($computedFieldProcessor);
+        $computedFieldProcessor->expects(self::exactly(2))
+            ->method('process')
+            ->willReturnCallback(function ($variable, $definition, TemplateData $data) use ($computedValue) {
+                $data->setComputedVariable($variable, $computedValue);
+            });
+
+        $templateStub = new TestTemplateStub($this->environment, '', $expectedRenderedResult);
+        $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
+        $this->environment->expects(self::once())
+            ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -1010,6 +1093,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -1066,6 +1150,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);
@@ -1122,6 +1207,7 @@ class TemplateRendererTest extends \PHPUnit\Framework\TestCase
         $templateWrapper = new TemplateWrapper($this->environment, $templateStub);
         $this->environment->expects(self::once())
             ->method('createTemplate')
+            ->with($expectedRenderedResult)
             ->willReturn($templateWrapper);
 
         $result = $this->renderer->renderTemplate($template, ['entity' => $entity]);

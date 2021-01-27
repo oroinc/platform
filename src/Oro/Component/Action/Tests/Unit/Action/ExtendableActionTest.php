@@ -91,9 +91,9 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects(static::exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [ExecuteActionEvents::HANDLE_BEFORE, static::anything()],
-                [$eventWithListeners, $event],
-                [ExecuteActionEvents::HANDLE_AFTER, static::anything()]
+                [static::anything(), ExecuteActionEvents::HANDLE_BEFORE],
+                [$event, $eventWithListeners],
+                [static::anything(), ExecuteActionEvents::HANDLE_AFTER]
             );
 
         $this->action->initialize(['events' => [$eventWithoutListeners, $eventWithListeners]]);

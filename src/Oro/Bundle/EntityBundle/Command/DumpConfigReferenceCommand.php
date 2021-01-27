@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityBundle\Command;
 
@@ -10,25 +11,31 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to show the structure of "Resources/config/oro/entity.yml".
+ * Dumps the reference structure for Resources/config/oro/entity.yml.
  */
 class DumpConfigReferenceCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:entity:config:dump-reference';
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Dumps the structure of "Resources/config/oro/entity.yml".');
+            ->setDescription('Dumps the reference structure for Resources/config/oro/entity.yml.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command dumps the reference structure
+for <comment>Resources/config/oro/entity.yml</comment> files.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output = new SymfonyStyle($input, $output);

@@ -1,3 +1,6 @@
+_liip_imagine:
+    resource: "@LiipImagineBundle/Resources/config/routing.yaml"
+
 oro_attachment_bundle:
     resource:     "@OroAttachmentBundle/Controller"
     type:         annotation

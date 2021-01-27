@@ -72,9 +72,6 @@ services:
             - "@oro_entity.routing_helper"
             - "@oro_security.token_accessor"
 
-    Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider:
-        alias: oro_activity_list.provider.chain
-
     oro_activity_list.provider.email_recipients:
         class: Oro\Bundle\ActivityListBundle\Provider\EmailRecipientsProvider
         arguments:
@@ -125,14 +122,9 @@ services:
     oro_activity_list.filter.helper:
         class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
         arguments:
-            - "@oro_filter.datetime_range_filter"
-            - "@oro_filter.choice_filter"
+            - "@oro_filter.extension.orm_filter_bag"
             - "@oro_entity.routing_helper"
             - "@oro_activity_list.provider.chain"
-
-    oro_activity_list.datagrid.builder.link:
-        tags:
-            - { name: oro_service_link,  service: oro_datagrid.datagrid.builder }
 
     oro_activity_list.filter.activity_list:
         class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter
@@ -140,24 +132,23 @@ services:
         arguments:
             - "@form.factory"
             - "@oro_filter.filter_utility"
+            - '@doctrine'
+            - "@oro_filter.execution_context"
             - "@oro_activity.association_helper"
             - "@oro_activity_list.provider.chain"
             - "@oro_activity_list.filter.helper"
             - "@oro_entity.routing_helper"
             - "@oro_query_designer.query_designer.manager"
-            - "@oro_activity_list.filter.datagrid_helper.link"
+            - "@oro_activity_list.filter.related_activity_datagrid_factory"
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: activityList }
 
-    oro_activity_list.filter.datagrid_helper.link:
-        tags:
-            - { name: oro_service_link,  service: oro_activity_list.filter.datagrid_helper }
-
-    oro_activity_list.filter.datagrid_helper:
-        class: Oro\Bundle\ActivityListBundle\Filter\DatagridHelper
+    oro_activity_list.filter.related_activity_datagrid_factory:
+        class: Oro\Bundle\ActivityListBundle\Filter\RelatedActivityDatagridFactory
+        lazy: true
         arguments:
             - "@oro_query_designer.grid.datagrid_configuration_builder"
-            - "@oro_activity_list.datagrid.builder.link"
+            - "@oro_datagrid.datagrid.builder"
             - "@event_dispatcher"
 
     oro_activity_list.helper.activity_inheritance_targets:

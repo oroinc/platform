@@ -77,6 +77,13 @@ services:
             - '@oro_email.email.owner.provider.storage'
             - '@oro_email.email.address.manager'
 
+    oro_email.email.address.association_metadata_listener:
+        class: Oro\Bundle\EmailBundle\EventListener\EmailAddressAssociationMetadataListener
+        arguments:
+            - '@oro_email.email.address.manager'
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+
     oro_email.email.model.builder.helper:
         class: Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
         arguments:
@@ -328,6 +335,7 @@ services:
             - '@oro_email.email_renderer_configuration'
             - '@oro_email.emailtemplate.variable_processor'
             - '@translator'
+            - '@Doctrine\Inflector\Inflector'
         calls:
             - [addSystemVariableDefaultFilter, ['userSignature', 'oro_html_sanitize']]
         lazy: true
@@ -386,6 +394,7 @@ services:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@oro_ui.formatter'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_email.emailtemplate.variable_provider, scope: entity }
 
@@ -793,7 +802,7 @@ services:
         public: true
         arguments:
             - '@oro_attachment.file_manager'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@router'
             - '@oro_attachment.validator.file_config_validator'
             - '@oro_attachment.association_helper'
@@ -824,7 +833,7 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider
         arguments:
             - '@oro_email.email.thread.provider'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_attachment.provider.attachment'
             - '@oro_email.email_attachment_transformer'
 

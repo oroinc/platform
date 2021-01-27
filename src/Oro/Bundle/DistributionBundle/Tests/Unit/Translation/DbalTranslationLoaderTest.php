@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Translation;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader;
 use Symfony\Component\Translation\MessageCatalogue;
 

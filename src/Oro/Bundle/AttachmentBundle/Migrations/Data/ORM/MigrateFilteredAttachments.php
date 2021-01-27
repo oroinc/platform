@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationServiceInterface;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;

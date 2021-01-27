@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
@@ -61,7 +61,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $entityManager = $this->createMock(EntityManager::class);
         $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
-        $entityManager->expects($this->any())->method('getRepository')->willReturn($entityRepository);
+        $managerRegistry->expects($this->any())->method('getRepository')->willReturn($entityRepository);
 
         /** @var DatabasePersister|\PHPUnit\Framework\MockObject\MockObject $databasePersister */
         $databasePersister = $this->createMock(DatabasePersister::class);
@@ -113,8 +113,8 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['locale1', 'currentLocale']);
 
         $this->command->run($this->input, $this->output);
 
@@ -144,8 +144,8 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['locale1', 'currentLocale']);
 
         $this->translator->expects($this->exactly(2))->method('rebuildCache');
 

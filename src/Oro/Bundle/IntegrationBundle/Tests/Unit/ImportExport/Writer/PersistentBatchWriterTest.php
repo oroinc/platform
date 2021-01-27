@@ -32,7 +32,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry        = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry        = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->contextRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
         $this->logger          = $this->createMock('Psr\Log\LoggerInterface');
@@ -118,7 +118,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->will(
                 $this->returnCallback(
-                    function ($eventName, WriterErrorEvent $event) use ($couldBeSkipped) {
+                    function (WriterErrorEvent $event, $eventName) use ($couldBeSkipped) {
                         $event->setCouldBeSkipped($couldBeSkipped);
                     }
                 )

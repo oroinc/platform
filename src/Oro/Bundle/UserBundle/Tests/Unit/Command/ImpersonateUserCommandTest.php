@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\UserBundle\Command\ImpersonateUserCommand;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -121,7 +121,7 @@ class ImpersonateUserCommandTest extends TestCase
             $userStub->method('isEnabled')
                 ->willReturn($userEnabled ?? true);
             $userStub->method('getAuthStatus')
-                ->willReturn(new StubEnumValue(
+                ->willReturn(new TestEnumValue(
                     $authStatusId ?? UserManager::STATUS_ACTIVE,
                     $authStatusId ?? UserManager::STATUS_ACTIVE
                 ));

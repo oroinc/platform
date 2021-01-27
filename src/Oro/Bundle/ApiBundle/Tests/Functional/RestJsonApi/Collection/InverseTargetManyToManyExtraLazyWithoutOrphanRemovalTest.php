@@ -41,14 +41,4 @@ class InverseTargetManyToManyExtraLazyWithoutOrphanRemovalTest extends AbstractT
     {
         return $entity->getInverseManyToManyExtraLazyWithoutOrphanRemovalParents();
     }
-
-    public function testTryToUpdateWithRemoveItemFromCollectionAndHasValidationErrors()
-    {
-        $this->markTestSkipped('Remove this method in BAP-19905');
-    }
-
-    public function testTryToUpdateWithRemoveAllItemsFromCollectionAndHasValidationErrors()
-    {
-        $this->markTestSkipped('Remove this method in BAP-19905');
-    }
 }

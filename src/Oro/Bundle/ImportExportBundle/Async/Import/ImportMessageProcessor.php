@@ -192,7 +192,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
 
         $fileName = str_replace('.', '', uniqid('import')) .'.json';
 
-        $fileManager->getFileSystem()->write($fileName, $errorAsJson);
+        $fileManager->writeToStorage($errorAsJson, $fileName);
 
         return $fileName;
     }

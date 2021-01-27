@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace  Oro\Bundle\NotificationBundle\Command;
 
@@ -12,25 +13,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Sends maintenance mass notification to a configured group of email or to enabled users if no emails were configured.
- *
- * @package Oro\Bundle\NotificationBundle\Command
+ * Sends an email notification to the application users.
  */
 class MassNotificationCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:maintenance-notification';
 
-    /** @var MassNotificationSender */
-    private $massNotificationSender;
+    private MassNotificationSender $massNotificationSender;
+    private LoggerInterface $logger;
 
-    /** @var LoggerInterface */
-    private $logger;
-
-    /**
-     * @param MassNotificationSender $massNotificationSender
-     * @param LoggerInterface $logger
-     */
     public function __construct(MassNotificationSender $massNotificationSender, LoggerInterface $logger)
     {
         $this->massNotificationSender = $massNotificationSender;
@@ -38,56 +30,53 @@ class MassNotificationCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * Console command configuration
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Send mass notifications to all active application users ' .
-                'or to the emails specified in the Recipients list under ' .
-                'Maintenance Notification configuration settings'
+            ->addOption('subject', null, InputOption::VALUE_OPTIONAL, 'Override the default subject')
+            ->addOption('message', null, InputOption::VALUE_OPTIONAL, 'Notification message to send')
+            ->addOption('file', null, InputOption::VALUE_OPTIONAL, 'Path to the text file with message.')
+            ->addOption('sender_name', null, InputOption::VALUE_OPTIONAL, 'Notification sender name')
+            ->addOption('sender_email', null, InputOption::VALUE_OPTIONAL, 'Notification sender email')
+            ->setDescription('Sends an email notification to the application users.')
+            ->setHelp(
+            // @codingStandardsIgnoreStart
+            <<<'HELP'
+The <info>%command.name%</info> command sends an email notification to the recipients listed in 
+<comment>System Configuration > General Setup > Email Configuration > Maintenance Notifications > Recipients</comment>.
+If the recipient list in the system configuration is left empty, the notification will be sent
+<options=bold>to all active application users</>.
+
+  <info>php %command.full_name%</info>
+
+The text of the message can be provide either as the value of the <info>--message</info> option
+or it can be read from a text file specified in the <info>--file</info> option:
+
+  <info>php %command.full_name% --message=<message-text></info>
+  <info>php %command.full_name% --file=<path-to-text-file></info>
+
+The <info>--subject</info> option can be used to override the default subject
+provided by the configured email template:
+
+  <info>php %command.full_name% --message=<message> --subject=<subject></info>
+
+The <info>--sender_name</info> and <info>--sender_email</info> options can be used to override
+the default name and email address of the sender:
+
+  <info>php %command.full_name% --message=<message> --sender_name=<name> --sender_email=<email></info>
+
+HELP
             )
-            ->addOption(
-                'subject',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Subject of notification email. If emtpy, subject from the configured template is used'
-            )
-            ->addOption(
-                'message',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification message to send'
-            )
-            ->addOption(
-                'file',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Path to the text file with message.'
-            )
-            ->addOption(
-                'sender_name',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification sender name'
-            )
-            ->addOption(
-                'sender_email',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Notification sender email'
-            );
+            // @codingStandardsIgnoreEnd
+            ->addUsage('--message=<message-text>')
+            ->addUsage('--file=<path-to-text-file>')
+            ->addUsage('--message=<message> --subject=<subject>')
+            ->addUsage('--message=<message> --sender_name=<name> --sender_email=<email>')
+        ;
     }
 
-    /**
-     * Runs command
-     *
-     * @param  InputInterface  $input
-     * @param  OutputInterface $output
-     * @return void
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $subject     = $input->getOption('subject');

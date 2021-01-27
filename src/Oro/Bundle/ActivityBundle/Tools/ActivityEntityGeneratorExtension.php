@@ -1,30 +1,29 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActivityBundle\Tools;
 
-use CG\Generator\PhpClass;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
+use Oro\Component\PhpUtils\ClassGenerator;
 
+/**
+ * Generates PHP code for ActivityScope::ASSOCIATION_KIND many-to-many association.
+ */
 class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
 {
-    /** @var ConfigProvider */
-    protected $groupingConfigProvider;
+    protected ConfigProvider $groupingConfigProvider;
 
-    /**
-     * @param ConfigProvider $groupingConfigProvider
-     */
     public function __construct(ConfigProvider $groupingConfigProvider)
     {
         $this->groupingConfigProvider = $groupingConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(array $schema)
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    public function supports(array $schema): bool
     {
         if (!$this->groupingConfigProvider->hasConfig($schema['class'])) {
             return false;
@@ -34,31 +33,24 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
 
         return
             !empty($groups)
-            && in_array(ActivityScope::GROUP_ACTIVITY, $groups);
+            && \in_array(ActivityScope::GROUP_ACTIVITY, $groups);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generate(array $schema, PhpClass $class)
+    public function generate(array $schema, ClassGenerator $class): void
     {
-        $class->addInterfaceName('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+        $class->addImplement(ActivityInterface::class);
 
         parent::generate($schema, $class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationKind()
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function getAssociationKind(): ?string
     {
         return ActivityScope::ASSOCIATION_KIND;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAssociationType()
+    /** @noinspection PhpMissingParentCallCommonInspection */
+    protected function getAssociationType(): string
     {
         return RelationType::MANY_TO_MANY;
     }

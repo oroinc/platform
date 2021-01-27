@@ -215,7 +215,7 @@ class WidgetConfigs
 
         if ($this->eventDispatcher->hasListeners(WidgetItemsLoadDataEvent::EVENT_NAME)) {
             $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, $widgetOptions);
-            $this->eventDispatcher->dispatch(WidgetItemsLoadDataEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, WidgetItemsLoadDataEvent::EVENT_NAME);
             $items = $event->getItems();
         }
 

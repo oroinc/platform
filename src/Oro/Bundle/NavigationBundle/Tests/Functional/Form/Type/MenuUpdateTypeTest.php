@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Type\Stub\OroIconTypeStub;

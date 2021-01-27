@@ -2,47 +2,47 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
 /**
  * Provides a base functionality to convert a query definition created by the query designer to an ORM query.
  */
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var ClassMetadataInfo[] */
-    protected $classMetadataLocalCache;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /**
-     * @param FunctionProviderInterface     $functionProvider
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     * @param ManagerRegistry               $doctrine
+     * @param FunctionProviderInterface        $functionProvider
+     * @param VirtualFieldProviderInterface    $virtualFieldProvider
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     * @param DoctrineHelper                   $doctrineHelper
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
-        ManagerRegistry $doctrine
+        VirtualRelationProviderInterface $virtualRelationProvider,
+        DoctrineHelper $doctrineHelper
     ) {
-        parent::__construct($functionProvider, $virtualFieldProvider);
-        $this->doctrine = $doctrine;
+        parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider);
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getJoinType($joinId)
+    protected function getJoinType(string $joinId): ?string
     {
         $joinType = parent::getJoinType($joinId);
 
         if ($joinType === null) {
-            $entityClassName = $this->getEntityClassName($joinId);
-            if (!empty($entityClassName)) {
+            $entityClass = $this->getEntityClass($joinId);
+            if ($entityClass) {
                 $fieldName = $this->getFieldName($joinId);
-                $metadata = $this->getClassMetadata($entityClassName);
+                $metadata = $this->getClassMetadata($entityClass);
                 $associationMapping = $metadata->getAssociationMapping($fieldName);
                 $nullable = true;
                 if (isset($associationMapping['joinColumns'])) {
@@ -61,11 +61,11 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function getFieldType($className, $fieldName)
+    protected function getFieldType(string $entityClass, string $fieldName): ?string
     {
-        $result = parent::getFieldType($className, $fieldName);
+        $result = parent::getFieldType($entityClass, $fieldName);
         if (null === $result) {
-            $result = $this->getClassMetadata($className)->getTypeOfField($fieldName);
+            $result = $this->getClassMetadata($entityClass)->getTypeOfField($fieldName);
         }
 
         return $result;
@@ -74,14 +74,18 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias, $entityClassName)
-    {
-        $metaData = $this->getClassMetadata($entityClassName);
+    protected function getUnidirectionalJoinCondition(
+        string $joinTableAlias,
+        string $joinFieldName,
+        string $joinAlias,
+        string $entityClass
+    ): string {
+        $metadata = $this->getClassMetadata($entityClass);
 
         // In the case of virtual fields, metadata may not have an association mapping
-        if ($metaData->hasAssociation($joinFieldName)) {
-            $associationMapping = $metaData->getAssociationMapping($joinFieldName);
-            if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
+        if ($metadata->hasAssociation($joinFieldName)) {
+            $associationMapping = $metadata->getAssociationMapping($joinFieldName);
+            if ($associationMapping['type'] & ClassMetadata::TO_MANY) {
                 return sprintf('%s MEMBER OF %s.%s', $joinTableAlias, $joinAlias, $joinFieldName);
             }
         }
@@ -90,23 +94,12 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     }
 
     /**
-     * Returns a metadata for the given entity
+     * @param string $entityClass
      *
-     * @param string $className
-     *
-     * @return ClassMetadataInfo
+     * @return ClassMetadata
      */
-    protected function getClassMetadata($className)
+    private function getClassMetadata(string $entityClass): ClassMetadata
     {
-        if (isset($this->classMetadataLocalCache[$className])) {
-            return $this->classMetadataLocalCache[$className];
-        }
-
-        $classMetadata = $this->doctrine
-            ->getManagerForClass($className)
-            ->getClassMetadata($className);
-        $this->classMetadataLocalCache[$className] = $classMetadata;
-
-        return $classMetadata;
+        return $this->doctrineHelper->getEntityMetadataForClass($entityClass);
     }
 }

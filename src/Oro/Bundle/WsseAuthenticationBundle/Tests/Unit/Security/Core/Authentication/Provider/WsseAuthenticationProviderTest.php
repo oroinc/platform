@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security\Core\Authentication\Provider;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\UserApi;
@@ -10,7 +11,6 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactory;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue;
 use Symfony\Component\Cache\Simple\ArrayCache;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -90,7 +90,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $advancedUser->addOrganization($organization);
         $advancedUser->addApiKey($userApiKey);
         $advancedUser->setEnabled(true);
-        $advancedUser->setAuthStatus(new StubEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
+        $advancedUser->setAuthStatus(new TestEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
         $role = $this->createMock(Role::class);
         $advancedUser->setRoles([$role]);
         $userApiKey->setUser($advancedUser);
@@ -159,8 +159,8 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $userApiKey->setApiKey(self::TEST_API_KEY);
         $userApiKey->setOrganization($disabledOrganization);
 
-        $activeAuthStatus = new StubEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE);
-        $lockedAuthStatus = new StubEnumValue('locked', 'locked');
+        $activeAuthStatus = new TestEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE);
+        $lockedAuthStatus = new TestEnumValue('locked', 'locked');
 
         $user = new User();
         $user->addOrganization($disabledOrganization);

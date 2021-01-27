@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
+/**
+ * The default implementation of a service to get human-readable names in English of entity classes.
+ */
 class EntityClassNameProvider extends AbstractEntityClassNameProvider implements EntityClassNameProviderInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassName($entityClass)
+    public function getEntityClassName(string $entityClass): ?string
     {
         return $this->getName($entityClass);
     }
@@ -15,7 +18,7 @@ class EntityClassNameProvider extends AbstractEntityClassNameProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassPluralName($entityClass)
+    public function getEntityClassPluralName(string $entityClass): ?string
     {
         return $this->getName($entityClass, true);
     }

@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
+
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
@@ -17,31 +19,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Runs synchronization for integration
+ * Schedules synchronization for integrations.
  */
 class SyncCommand extends Command implements CronCommandInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:integration:sync';
 
-    /** @var JobProcessor */
-    private $jobProcessor;
+    private JobProcessor $jobProcessor;
+    private TranslatorInterface $translator;
+    private GenuineSyncScheduler $syncScheduler;
+    private ObjectManager $entityManager;
 
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var GenuineSyncScheduler */
-    private $syncScheduler;
-
-    /** @var ObjectManager */
-    private $entityManager;
-
-    /**
-     * @param JobProcessor $jobProcessor
-     * @param TranslatorInterface $translator
-     * @param GenuineSyncScheduler $syncScheduler
-     * @param ObjectManager $objectManager
-     */
     public function __construct(
         JobProcessor $jobProcessor,
         TranslatorInterface $translator,
@@ -55,17 +44,11 @@ class SyncCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '*/5 * * * *';
     }
 
-    /**
-     * @return bool
-     */
     public function isActive()
     {
         /** @var ChannelRepository $integrationRepository */
@@ -84,36 +67,47 @@ class SyncCommand extends Command implements CronCommandInterface
         return ($count > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->addOption(
-                'integration',
-                'i',
-                InputOption::VALUE_OPTIONAL,
-                'If option exists sync will be performed for given integration id'
-            )
-            ->addOption(
-                'connector',
-                'con',
-                InputOption::VALUE_OPTIONAL,
-                'If option exists sync will be performed for given connector name'
-            )
             ->addArgument(
                 'connector-parameters',
                 InputArgument::OPTIONAL | InputArgument::IS_ARRAY,
-                'Additional connector parameters array. Format - parameterKey=parameterValue',
+                'Connector parameters',
                 []
             )
-            ->setDescription('Runs synchronization for integration');
+            ->addOption('integration', 'i', InputOption::VALUE_OPTIONAL, 'Integration ID')
+            ->addOption('connector', 'con', InputOption::VALUE_OPTIONAL, 'Connector name')
+            ->setDescription('Schedules synchronization for integrations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command schedules synchronization for all active integrations.
+This command only schedules the job by adding a message to the message queue, so ensure
+that the message consumer processes (<info>oro:message-queue:consume</info>) are running
+or the scheduled synchronization(s) will not be performed otherwise.
+
+  <info>php %command.full_name%</info>
+
+Any additional integration connector parameters can be passed as arguments
+using <comment>name=value</comment> format:
+
+  <info>php %command.full_name% --integration=<ID> param1=value1 param2=value2 paramN=valueN</info>
+
+The <info>--connector</info> option can be used to limit the scope of synchronization to
+a specific connector within an integration (all connectors are processed otherwise):
+
+  <info>php %command.full_name% --integration=<ID> --connector=<connector-name></info>
+
+HELP
+            )
+            ->addUsage('--integration=<ID>')
+            ->addUsage('--integration=<ID> param1=value1 param2=value2 paramN=valueN')
+            ->addUsage('--connector=<connector-name>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Started integration sync scheduling');
@@ -166,12 +160,11 @@ class SyncCommand extends Command implements CronCommandInterface
     /**
      * Get connector additional parameters array from the input
      *
-     * @param InputInterface $input
-     *
      * @return array key - parameter name, value - parameter value
+     *
      * @throws \LogicException
      */
-    protected function getConnectorParameters(InputInterface $input)
+    protected function getConnectorParameters(InputInterface $input): array
     {
         $result = [];
         $connectorParameters = $input->getArgument('connector-parameters');

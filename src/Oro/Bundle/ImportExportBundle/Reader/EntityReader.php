@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -186,7 +186,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
         );
 
         $event = new ExportPreGetIds($queryBuilder, $options);
-        $this->dispatcher->dispatch(Events::BEFORE_EXPORT_GET_IDS, $event);
+        $this->dispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
 
         $organization = isset($options['organization']) ? $options['organization'] : null;
         $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
@@ -268,7 +268,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
                 }
 
                 $event = new AfterEntityPageLoadedEvent($rows);
-                $this->dispatcher->dispatch(Events::AFTER_ENTITY_PAGE_LOADED, $event);
+                $this->dispatcher->dispatch($event, Events::AFTER_ENTITY_PAGE_LOADED);
 
                 return $event->getRows();
             });

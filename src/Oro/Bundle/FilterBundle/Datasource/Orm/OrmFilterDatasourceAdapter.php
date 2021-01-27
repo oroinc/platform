@@ -10,30 +10,22 @@ use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
- * Represents an adapter to ORM data source
+ * The adapter to an ORM data source.
  */
 class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
 {
-    private const GENERATED_PARAMETERS_PREFIX = '_gpnp'; // Generated Parameter Name Prefix
+    private const GENERATED_PARAMETERS_PREFIX = '_gpnp';
 
-    /**
-     * @var QueryBuilder
-     */
+    /** @var QueryBuilder */
     protected $qb;
 
-    /**
-     * @var QueryBuilderTools
-     */
+    /** @var QueryBuilderTools */
     protected $qbTools;
 
-    /**
-     * @var OrmExpressionBuilder
-     */
+    /** @var OrmExpressionBuilder */
     private $expressionBuilder;
 
-    /**
-     * @var array
-     */
+    /** @var string[] */
     private $parameterNames = [];
 
     /**
@@ -43,8 +35,6 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     {
         $this->qb = $qb;
         $this->qbTools = new QueryBuilderTools($this->qb->getDQLPart('select'));
-
-        $this->expressionBuilder = null;
     }
 
     /**
@@ -105,7 +95,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      */
     public function expr()
     {
-        if ($this->expressionBuilder === null) {
+        if (null === $this->expressionBuilder) {
             $this->expressionBuilder = new OrmExpressionBuilder($this->qb->expr());
         }
 
@@ -139,7 +129,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Get parameter name unique for the query.
+     * Generates an unique parameter name for a query.
      *
      * @param string $filterName
      * @param array $usedParameterNames
@@ -167,7 +157,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Returns a QueryBuilder object used to modify this data source
+     * Returns a QueryBuilder object used to modify this data source.
      *
      * @return QueryBuilder
      */
@@ -177,7 +167,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     }
 
     /**
-     * Creates new instance of QueryBuilder object
+     * Creates new instance of QueryBuilder object.
      *
      * @return QueryBuilder
      */

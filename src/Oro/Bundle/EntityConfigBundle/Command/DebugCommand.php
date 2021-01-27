@@ -1,11 +1,12 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityConfigBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -29,16 +30,9 @@ class DebugCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:entity-config:debug';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param ConfigManager $configManager
-     */
     public function __construct(ManagerRegistry $registry, ConfigManager $configManager)
     {
         parent::__construct();
@@ -47,70 +41,89 @@ class DebugCommand extends Command
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->addArgument('entity', InputArgument::OPTIONAL, 'The entity class name')
-            ->addArgument('field', InputArgument::OPTIONAL, 'The field name')
-            ->addOption(
-                'cache',
-                null,
-                InputOption::VALUE_NONE,
-                'Show configuration values from a cache. By default values are loaded from a database'
-            )
-            ->addOption(
-                'scope',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute scope'
-            )
-            ->addOption(
-                'attr',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute name'
-            )
-            ->addOption(
-                'val',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The attribute value'
-            )
-            ->addOption(
-                'list',
-                'l',
-                InputOption::VALUE_NONE,
-                'Show the list of configurable entities or fields'
-            )
-            ->addOption(
-                'set',
-                null,
-                InputOption::VALUE_NONE,
-                'Sets an attribute value of configurable entities or fields'
-            )
-            ->addOption(
-                'remove',
-                null,
-                InputOption::VALUE_NONE,
-                'Removes an attribute/scope from configurable entities or fields'
-            )
+            ->addArgument('entity', InputArgument::OPTIONAL, 'Entity class name')
+            ->addArgument('field', InputArgument::OPTIONAL, 'Field name')
+            ->addOption('cache', null, InputOption::VALUE_NONE, 'Load configuration from cache (instead of database)')
+            ->addOption('scope', null, InputOption::VALUE_REQUIRED, 'Attribute scope')
+            ->addOption('attr', null, InputOption::VALUE_REQUIRED, 'Attribute name')
+            ->addOption('val', null, InputOption::VALUE_REQUIRED, 'Attribute value')
+            ->addOption('list', 'l', InputOption::VALUE_NONE, 'List the configurable entities or fields')
+            ->addOption('set', null, InputOption::VALUE_NONE, 'Set an attribute value')
+            ->addOption('remove', null, InputOption::VALUE_NONE, 'Remove an attribute/scope')
             ->addOption(
                 'ref-non-configurable',
                 null,
                 InputOption::VALUE_NONE,
-                'Show all fields that are references to non configurable entities'
+                'Show fields that are references to non-configurable entities'
             )
-            ->setDescription('Displays entity configuration.');
+            ->setDescription('Displays entity configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays entity configuration.
+
+  <info>php %command.full_name%</info>
+
+The entity class name and field name can be provided as arguments
+to see only the related configuration:
+
+  <info>php %command.full_name% <entity-class></info>
+  <info>php %command.full_name% <entity-class> <field-name></info>
+
+The <info>--list</info> option can be used to see a list of the configurable entities,
+or a list of fields of a specific entity:
+
+  <info>php %command.full_name% --list</info>
+  <info>php %command.full_name% --list <entity-class></info>
+
+The <info>--ref-non-configurable</info> option can be used to show the fields that are
+references to non-configurable entities:
+
+  <info>php %command.full_name% --ref-non-configurable <entity-class></info>
+
+The <info>--cache</info> option can be used to load the entity configuration from cache
+(instead of from the database):
+
+  <info>php %command.full_name% --cache --scope=<attribute-scope></info>
+
+The <info>--scope</info> and <info>--attr</info> options can be used to load or apply the changes
+to the specified attribute scope and attribute:
+
+  <info>php %command.full_name% --scope=<attribute-scope></info>
+  <info>php %command.full_name% --attr=<attribute-name></info>
+
+The <info>--set</info> and <info>--val</info> options can be used to update an attribute value:
+
+  <info>php %command.full_name% --attr=<attribute-name> --set --val=<value></info>
+
+The <info>--remove</info> option can be used to remove an attribute scope or an attribute:
+
+  <info>php %command.full_name% --remove --scope=<attribute-scope></info>
+  <info>php %command.full_name% --remove --attr=<attribute-name></info>
+
+HELP
+            )
+            ->addUsage('<entity-class>')
+            ->addUsage('<entity-class> <field-name>')
+            ->addUsage('--list')
+            ->addUsage('--list <entity-class>')
+            ->addUsage('--ref-non-configurable <entity-class>')
+            ->addUsage('--cache --scope=<scope>')
+            ->addUsage('--scope=<attribute-scope>')
+            ->addUsage('--attr=<attribute-name>')
+            ->addUsage('--set --attr=<attribute-name> --val=<value>')
+            ->addUsage('--remove --scope=<attribute-scope>')
+            ->addUsage('--remove --attr=<attribute-name>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -196,10 +209,7 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    protected function dumpEntityList(OutputInterface $output)
+    protected function dumpEntityList(OutputInterface $output): void
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
@@ -212,11 +222,7 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $scope
-     */
-    protected function dumpEntityListFromCache(OutputInterface $output, $scope)
+    protected function dumpEntityListFromCache(OutputInterface $output, string $scope): void
     {
         /** @var EntityConfigId[] $ids */
         $ids = $this->configManager->getIds($scope, null, true);
@@ -241,11 +247,7 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     */
-    protected function dumpFieldList(OutputInterface $output, $className)
+    protected function dumpFieldList(OutputInterface $output, string $className): void
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
@@ -263,12 +265,7 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     */
-    protected function dumpFieldListFromCache(OutputInterface $output, $className, $scope)
+    protected function dumpFieldListFromCache(OutputInterface $output, string $className, string $scope): void
     {
         /** @var FieldConfigId[] $ids */
         $ids = $this->configManager->getIds($scope, $className, true);
@@ -296,11 +293,7 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string|null     $className
-     */
-    protected function dumpNonConfigRef(OutputInterface $output, $className = null)
+    protected function dumpNonConfigRef(OutputInterface $output, ?string $className = null): void
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
@@ -364,14 +357,12 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpEntityConfig(OutputInterface $output, $className, $scope = null, $attrName = null)
-    {
+    protected function dumpEntityConfig(
+        OutputInterface $output,
+        string $className,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -391,14 +382,12 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpEntityConfigFromCache(OutputInterface $output, $className, $scope, $attrName = null)
-    {
+    protected function dumpEntityConfigFromCache(
+        OutputInterface $output,
+        string $className,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var ConfigProvider $cp */
         $cp = $this->configManager->getProvider($scope);
 
@@ -413,15 +402,13 @@ class DebugCommand extends Command
         $this->dumpConfig($output, $config, $attrName);
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpFieldConfig(OutputInterface $output, $className, $fieldName, $scope = null, $attrName = null)
-    {
+    protected function dumpFieldConfig(
+        OutputInterface $output,
+        string $className,
+        string $fieldName,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -445,20 +432,13 @@ class DebugCommand extends Command
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function dumpFieldConfigFromCache(
         OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName = null
-    ) {
+        string $className,
+        string $fieldName,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var ConfigProvider $cp */
         $cp = $this->configManager->getProvider($scope);
 
@@ -475,14 +455,12 @@ class DebugCommand extends Command
         $this->dumpConfig($output, $config, $attrName);
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array           $data
-     * @param string|null     $scope
-     * @param string|null     $attrName
-     */
-    protected function dumpData(OutputInterface $output, array $data, $scope = null, $attrName = null)
-    {
+    protected function dumpData(
+        OutputInterface $output,
+        array $data,
+        ?string $scope = null,
+        ?string $attrName = null
+    ): void {
         $res = $data;
         if (!empty($scope)) {
             if (isset($data[$scope])) {
@@ -497,12 +475,7 @@ class DebugCommand extends Command
         $output->writeln($this->convertArrayToString($res));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param ConfigInterface $config
-     * @param string|null     $attrName
-     */
-    protected function dumpConfig(OutputInterface $output, ConfigInterface $config, $attrName = null)
+    protected function dumpConfig(OutputInterface $output, ConfigInterface $config, ?string $attrName = null): void
     {
         $data = $config->all();
         $res  = [$config->getId()->getScope() => $data];
@@ -512,18 +485,12 @@ class DebugCommand extends Command
         $output->writeln($this->convertArrayToString($res));
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function removeEntityConfigScopeOrAttribute(
         OutputInterface $output,
-        $className,
-        $scope,
-        $attrName = null
-    ) {
+        string $className,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -547,7 +514,7 @@ class DebugCommand extends Command
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -557,20 +524,13 @@ class DebugCommand extends Command
         $this->clearConfigCache();
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string|null     $attrName
-     */
     protected function removeFieldConfigScopeOrAttribute(
         OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName = null
-    ) {
+        string $className,
+        string $fieldName,
+        string $scope,
+        ?string $attrName = null
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -596,7 +556,7 @@ class DebugCommand extends Command
                 unset($data[$scope][$attrName]);
             }
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -607,19 +567,15 @@ class DebugCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $scope
-     * @param string          $attrName
-     * @param mixed           $attrVal
+     * @param mixed $attrVal
      */
     protected function setEntityConfigValue(
         OutputInterface $output,
-        $className,
-        $scope,
-        $attrName,
+        string $className,
+        string $scope,
+        string $attrName,
         $attrVal
-    ) {
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -639,7 +595,7 @@ class DebugCommand extends Command
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']
@@ -650,21 +606,16 @@ class DebugCommand extends Command
     }
 
     /**
-     * @param OutputInterface $output
-     * @param string          $className
-     * @param string          $fieldName
-     * @param string          $scope
-     * @param string          $attrName
-     * @param mixed           $attrVal
+     * @param mixed $attrVal
      */
     protected function setFieldConfigValue(
         OutputInterface $output,
-        $className,
-        $fieldName,
-        $scope,
-        $attrName,
+        string $className,
+        string $fieldName,
+        string $scope,
+        string $attrName,
         $attrVal
-    ) {
+    ): void {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(EntityConfigModel::class);
 
@@ -686,7 +637,7 @@ class DebugCommand extends Command
             $data                    = $connection->convertToPHPValue($row['data'], 'array');
             $data[$scope][$attrName] = $this->getTypedVal($attrVal);
 
-            $connection->executeUpdate(
+            $connection->executeStatement(
                 'UPDATE oro_entity_config_field SET data = :data WHERE id = :id',
                 ['data' => $data, 'id' => $row['id']],
                 ['data' => 'array', 'id' => 'integer']

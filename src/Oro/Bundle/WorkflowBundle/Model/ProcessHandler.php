@@ -54,8 +54,8 @@ class ProcessHandler
     public function handleTrigger(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $this->eventDispatcher->dispatch(
-            ProcessEvents::HANDLE_BEFORE,
-            new ProcessHandleEvent($processTrigger, $processData)
+            new ProcessHandleEvent($processTrigger, $processData),
+            ProcessEvents::HANDLE_BEFORE
         );
 
         $process = $this->getProcess($processTrigger);
@@ -64,8 +64,8 @@ class ProcessHandler
         $this->logger->debug('Process executed', $processTrigger, $processData);
 
         $this->eventDispatcher->dispatch(
-            ProcessEvents::HANDLE_AFTER,
-            new ProcessHandleEvent($processTrigger, $processData)
+            new ProcessHandleEvent($processTrigger, $processData),
+            ProcessEvents::HANDLE_AFTER
         );
     }
 
@@ -84,8 +84,8 @@ class ProcessHandler
     public function finishTrigger(ProcessTrigger $processTrigger, ProcessData $processData)
     {
         $this->eventDispatcher->dispatch(
-            ProcessEvents::HANDLE_AFTER_FLUSH,
-            new ProcessHandleEvent($processTrigger, $processData)
+            new ProcessHandleEvent($processTrigger, $processData),
+            ProcessEvents::HANDLE_AFTER_FLUSH
         );
     }
 

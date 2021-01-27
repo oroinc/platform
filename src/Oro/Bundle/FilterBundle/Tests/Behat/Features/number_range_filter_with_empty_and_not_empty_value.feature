@@ -12,8 +12,8 @@ Feature: Number range filter with empty and not empty value
     And click View User in grid
     And I click on "Create Field"
     And I fill form with:
-      | Field name    | Test1   |
-      | Type          | Currency |
+      | Field name | Test1 |
+      | Type       | Money |
     And I click "Continue"
     And fill form with:
       | Show grid filter | Yes |

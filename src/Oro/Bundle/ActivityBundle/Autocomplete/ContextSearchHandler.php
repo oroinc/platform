@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityBundle\Autocomplete;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -171,7 +171,7 @@ class ContextSearchHandler implements ConverterInterface
      */
     public function convertItem($item)
     {
-        $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+        $this->dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
 
         /** @var Item $item */
         $text      = $item->getRecordTitle();
@@ -340,7 +340,7 @@ class ContextSearchHandler implements ConverterInterface
         }
         /** dispatch oro_activity.search_aliases event */
         $event = new SearchAliasesEvent($aliases, $targetEntityClasses);
-        $this->dispatcher->dispatch(SearchAliasesEvent::EVENT_NAME, $event);
+        $this->dispatcher->dispatch($event, SearchAliasesEvent::EVENT_NAME);
         $aliases = $event->getAliases();
 
         return $aliases;

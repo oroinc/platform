@@ -4,7 +4,7 @@ namespace Oro\Bundle\BatchBundle\Event;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryOptimizationContext;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Represents the event that is dispatched by CountQueryBuilderOptimizer after the query optimization is finished.

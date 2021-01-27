@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Fixture;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class LoadExtendedRelationsData extends AbstractFixture
 {
@@ -27,34 +27,34 @@ class LoadExtendedRelationsData extends AbstractFixture
         $owningEntity->setBiM2OTarget($targetEntity1);
 
         // unidirectional many-to-many
-        $owningEntity->addUniM2MTargets($targetEntity1);
-        $owningEntity->addUniM2MTargets($targetEntity2);
+        $owningEntity->addUniM2MTarget($targetEntity1);
+        $owningEntity->addUniM2MTarget($targetEntity2);
         $owningEntity->setDefaultUniM2MTargets($targetEntity2);
         // unidirectional many-to-many without default
-        $owningEntity->addUniM2MNDTargets($targetEntity1);
-        $owningEntity->addUniM2MNDTargets($targetEntity2);
+        $owningEntity->addUniM2MNDTarget($targetEntity1);
+        $owningEntity->addUniM2MNDTarget($targetEntity2);
         // bidirectional many-to-many
-        $owningEntity->addBiM2MTargets($targetEntity1);
-        $owningEntity->addBiM2MTargets($targetEntity2);
+        $owningEntity->addBiM2MTarget($targetEntity1);
+        $owningEntity->addBiM2MTarget($targetEntity2);
         $owningEntity->setDefaultBiM2MTargets($targetEntity2);
         // bidirectional many-to-many without default
-        $owningEntity->addBiM2MNDTargets($targetEntity1);
-        $owningEntity->addBiM2MNDTargets($targetEntity2);
+        $owningEntity->addBiM2MNDTarget($targetEntity1);
+        $owningEntity->addBiM2MNDTarget($targetEntity2);
 
         // unidirectional one-to-many
-        $owningEntity->addUniO2MTargets($targetEntity1);
-        $owningEntity->addUniO2MTargets($targetEntity2);
+        $owningEntity->addUniO2MTarget($targetEntity1);
+        $owningEntity->addUniO2MTarget($targetEntity2);
         $owningEntity->setDefaultUniO2MTargets($targetEntity2);
         // unidirectional one-to-many without default
-        $owningEntity->addUniO2MNDTargets($targetEntity1);
-        $owningEntity->addUniO2MNDTargets($targetEntity2);
+        $owningEntity->addUniO2MNDTarget($targetEntity1);
+        $owningEntity->addUniO2MNDTarget($targetEntity2);
         // bidirectional one-to-many
-        $owningEntity->addBiO2MTargets($targetEntity1);
-        $owningEntity->addBiO2MTargets($targetEntity2);
+        $owningEntity->addBiO2MTarget($targetEntity1);
+        $owningEntity->addBiO2MTarget($targetEntity2);
         $owningEntity->setDefaultBiO2MTargets($targetEntity2);
         // bidirectional one-to-many without default
-        $owningEntity->addBiO2MNDTargets($targetEntity1);
-        $owningEntity->addBiO2MNDTargets($targetEntity2);
+        $owningEntity->addBiO2MNDTarget($targetEntity1);
+        $owningEntity->addBiO2MNDTarget($targetEntity2);
 
         $manager->persist($owningEntity);
         $manager->persist($targetEntity1);

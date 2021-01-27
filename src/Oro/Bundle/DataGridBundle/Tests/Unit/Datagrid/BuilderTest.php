@@ -83,7 +83,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
             list($name, $eventType) = $eventDetails;
             $this->eventDispatcher->expects($this->at($at))->method('dispatch')
                 ->with(
-                    $this->equalTo($name),
                     $this->callback(
                         function ($event) use ($eventType, $resultFQCN) {
                             $this->assertInstanceOf($eventType, $event);
@@ -93,7 +92,8 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
                             return true;
                         }
-                    )
+                    ),
+                    $this->equalTo($name)
                 );
         }
 

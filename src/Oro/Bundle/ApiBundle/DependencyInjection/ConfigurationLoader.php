@@ -11,11 +11,13 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasLoader;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolver;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Oro\Component\PhpUtils\ArrayUtil;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -69,13 +71,13 @@ class ConfigurationLoader
         $entityOverrideProvidersConfig = [];
         $configCacheStatesConfig = [];
         foreach ($config['config_files'] as $configKey => $fileConfig) {
-            list(
+            [
                 $configBagServiceId,
                 $entityAliasResolverServiceId,
                 $exclusionProviderServiceId,
                 $entityOverrideProviderServiceId,
                 $configCacheStateServiceId
-                ) = $this->configureApi($configKey, $fileConfig['file_name']);
+                ] = $this->configureApi($configKey, $fileConfig['file_name']);
             $requestTypeExpression = $this->getRequestTypeExpression($fileConfig);
 
             $configBagsConfig[] = [$configBagServiceId, $requestTypeExpression];
@@ -246,8 +248,7 @@ class ConfigurationLoader
             ->setArguments([
                 $configKey,
                 '%kernel.debug%',
-                new Reference('oro_api.config_cache_factory'),
-                new Reference('oro_api.config_cache_warmer')
+                new Reference('oro_api.config_cache_factory')
             ])
             ->setPublic(false);
 
@@ -346,11 +347,12 @@ class ConfigurationLoader
         $loaderServiceId = 'oro_api.entity_alias_loader.' . $configKey;
         $this->container
             ->register($loaderServiceId, EntityAliasLoader::class)
-            ->setArguments([new Reference($entityOverrideProviderServiceId)])
-            ->setPublic(false)
-            ->setLazy(true)
-            ->addMethodCall('addEntityAliasProvider', [new Reference($providerServiceId)])
-            ->addMethodCall('addEntityClassProvider', [new Reference($providerServiceId)]);
+            ->setArguments([
+                new IteratorArgument([new Reference($providerServiceId)]),
+                new IteratorArgument([new Reference($providerServiceId)]),
+                new Reference($entityOverrideProviderServiceId)
+            ])
+            ->setPublic(false);
 
         $entityAliasResolverServiceId = 'oro_api.entity_alias_resolver.' . $configKey;
         $entityAliasResolverDef = $this->container
@@ -440,16 +442,40 @@ class ConfigurationLoader
             $items,
             true,
             function ($item) {
+                $result = 0;
                 $expression = $item[1];
-                if (!$expression) {
-                    return 0;
+                if ($expression) {
+                    $result = 100;
+                    $aspects = explode('&', $expression);
+                    foreach ($aspects as $aspect) {
+                        $result += $this->getRequestTypeAspectRank($aspect);
+                    }
                 }
 
-                return substr_count($expression, '&') + 1;
+                return $result;
             }
         );
 
         return $items;
+    }
+
+    /**
+     * @param string $aspect
+     *
+     * @return int
+     */
+    private function getRequestTypeAspectRank(string $aspect): int
+    {
+        $rank = 8;
+        if (strncmp($aspect, '!', 1) === 0) {
+            $aspect = substr($aspect, 1);
+            $rank /= 2;
+        }
+        if (RequestType::REST === $aspect || RequestType::JSON_API === $aspect) {
+            $rank /= 2;
+        }
+
+        return $rank;
     }
 
     /**

@@ -52,11 +52,11 @@ layout:
                 layout_js_modules_config:
                     blockType: js_modules_config
                     options:
-                        publicPath: '="layout-build/" ~ context["theme"] ~ "/"'
+                        publicPath: '="build/" ~ context["theme"] ~ "/"'
                 layout_js_build_scripts:
                     blockType: js_build
                     options:
-                        src: '="layout-build/" ~ context["theme"] ~ "/app.js"'
+                        src: '="build/" ~ context["theme"] ~ "/app.js"'
                 skip_to_content:
                     blockType: container
             tree:

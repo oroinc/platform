@@ -1,13 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
@@ -18,27 +19,20 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to clean up old integration status records
+ * Deletes old integration status records.
  */
 class CleanupCommand extends Command implements CronCommandInterface
 {
-    const BATCH_SIZE = 100;
-    const FAILED_STATUSES_INTERVAL = '1 month';
-    const DEFAULT_COMPLETED_STATUSES_INTERVAL =  '1 week';
+    public const BATCH_SIZE = 100;
+    public const FAILED_STATUSES_INTERVAL = '1 month';
+    public const DEFAULT_COMPLETED_STATUSES_INTERVAL =  '1 week';
 
     /** @var string */
     protected static $defaultName = 'oro:cron:integration:cleanup';
 
-    /** var ManagerRegistry **/
-    private $registry;
+    private ManagerRegistry $registry;
+    private NativeQueryExecutorHelper $nativeQueryExecutorHelper;
 
-    /** @var NativeQueryExecutorHelper */
-    private $nativeQueryExecutorHelper;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param NativeQueryExecutorHelper $nativeQueryExecutorHelper
-     */
     public function __construct(ManagerRegistry $registry, NativeQueryExecutorHelper $nativeQueryExecutorHelper)
     {
         parent::__construct();
@@ -47,17 +41,11 @@ class CleanupCommand extends Command implements CronCommandInterface
         $this->nativeQueryExecutorHelper = $nativeQueryExecutorHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 1 * * *';
     }
 
-    /**
-     * @return bool
-     */
     public function isActive()
     {
         $completedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -75,25 +63,39 @@ class CleanupCommand extends Command implements CronCommandInterface
         return ($count>0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Clean up integration statuses history')
             ->addOption(
                 'interval',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Time interval to keep the integration statuses records. Example "2 weeks"',
+                'Time interval to keep the batch records (e.g. "2 weeks")',
                 self::DEFAULT_COMPLETED_STATUSES_INTERVAL
-            );
+            )
+            ->setDescription('Deletes old integration status records.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command deletes completed integration status records
+that are older than 1 week and failed status records that are older than 1 month.
+
+  <info>php %command.full_name%</info>
+
+The <info>--interval</info> option can change the default completed integration status records time period
+for cleanup. Any notation that can be parsed by <comment>\DateInterval::createFromDateString()</comment>
+is accepted (see <comment>https://php.net/manual/dateinterval.createfromdatestring.php</comment>):
+
+  <info>php %command.full_name% --interval=<interval></info>
+  <info>php %command.full_name% --interval="2 weeks"</info>
+
+HELP
+            )
+            ->addUsage('--interval=<interval>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $interval = $input->getOption('interval');
@@ -124,13 +126,9 @@ class CleanupCommand extends Command implements CronCommandInterface
     /**
      * Delete records using iterator
      *
-     * @param BufferedIdentityQueryResultIterator $iterator
-     *
-     * @param string                      $className Entity FQCN
-     *
      * @throws \Exception
      */
-    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, $className)
+    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, string $entityFQCN): void
     {
         $iteration = 0;
 
@@ -140,19 +138,15 @@ class CleanupCommand extends Command implements CronCommandInterface
 
             $iteration++;
             if ($iteration % self::BATCH_SIZE == 0) {
-                $this->processDeletion($ids, $className);
+                $this->processDeletion($ids, $entityFQCN);
             }
         }
         if ($iteration % self::BATCH_SIZE > 0) {
-            $this->processDeletion($ids, $className);
+            $this->processDeletion($ids, $entityFQCN);
         }
     }
 
-    /**
-     * @param array $ids
-     * @param string $className
-     */
-    protected function processDeletion($ids, $className)
+    protected function processDeletion(array $ids, string $className): void
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass($className);
@@ -165,14 +159,10 @@ class CleanupCommand extends Command implements CronCommandInterface
             ->execute();
     }
 
-    /**
-     * @param \DateTime $completedInterval
-     * @param \DateTime $failedInterval
-     *
-     * @return QueryBuilder
-     */
-    protected function getOldIntegrationStatusesQueryBuilder($completedInterval, $failedInterval)
-    {
+    protected function getOldIntegrationStatusesQueryBuilder(
+        \DateTime $completedInterval,
+        \DateTime $failedInterval
+    ): QueryBuilder {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(Status::class);
 
@@ -209,10 +199,8 @@ class CleanupCommand extends Command implements CronCommandInterface
 
     /**
      * Exclude last connector status by date
-     *
-     * @return array
      */
-    protected function prepareExcludes()
+    protected function prepareExcludes(): array
     {
         /** @var EntityManager $em */
         $em = $this->registry->getManagerForClass(Status::class);

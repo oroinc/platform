@@ -13,7 +13,7 @@ class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
         $testId        = 111;
 
         $em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $filter   = new IdentifierToReferenceFilter($registry, $testClassName);
 
         $registry->expects($this->once())->method('getManagerForClass')->with($testClassName)->willReturn($em);
@@ -30,8 +30,8 @@ class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
         $testFieldValue = 'john_doe';
 
         $em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
-        $repo     = $this->createMock('Doctrine\Common\Persistence\ObjectRepository');
-        $registry = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $repo     = $this->createMock('Doctrine\Persistence\ObjectRepository');
+        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
         $filter   = new IdentifierToReferenceFilter($registry, $testClassName, $testFieldName);
 
         $registry->expects($this->once())->method('getManagerForClass')->with($testClassName)->willReturn($em);

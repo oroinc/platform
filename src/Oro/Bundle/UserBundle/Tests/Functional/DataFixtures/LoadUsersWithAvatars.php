@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures\LoadInvalidFileFixture;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -63,6 +63,7 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
         $file = new File();
         $file->setFile(new SymfonyFile(__DIR__ . '/files/empty.jpg'));
         $file->setOriginalFilename('empty.jpg');
+        $file->setFilename('empty.jpg');
         $manager->persist($file);
 
         $this->setReference(sprintf('user_%d_avatar', $userNumber), $file);

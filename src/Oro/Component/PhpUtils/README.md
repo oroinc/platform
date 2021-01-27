@@ -12,6 +12,10 @@ Provides a set of useful functions to work with PHP arrays.
 - **isAssoc** - Checks whether the array is associative or sequential.
 - **sortBy** - Sorts an array by specified property using the stable sorting algorithm. See http://en.wikipedia.org/wiki/Sorting_algorithm#Stability.
 
+## ClassGenerator
+
+Namespace-aware wrapper over \Nette\ClassType
+
 ## ReflectionClassHelper class
 
 **Description:**

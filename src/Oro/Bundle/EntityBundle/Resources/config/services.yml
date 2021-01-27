@@ -156,8 +156,8 @@ services:
             - '%oro_entity.hidden_fields%'
         calls:
             - [setEntityProvider, ['@oro_entity.entity_provider']]
-            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider.chain']]
-            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
+            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
+            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider']]
             - [setExclusionProvider, ['@oro_entity.exclusion_provider']]
 
     oro_entity.exclusion_provider:
@@ -173,15 +173,14 @@ services:
             - { name: oro_entity.exclusion_provider.default }
             - { name: oro_entity.exclusion_provider.api, priority: 50 }
 
-    oro_entity.virtual_field_provider.chain:
+    oro_entity.virtual_field_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
         arguments:
             - [] # providers
             - '@oro_entity_config.provider.extend'
 
-    oro_entity.virtual_field_provider:
+    oro_entity.virtual_field_provider.config:
         class: Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
-        public: false
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
             - '@oro_entity.entity_configuration.provider'
@@ -196,25 +195,24 @@ services:
 
     oro_entity.virtual_field_provider.dictionary:
         class: Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
-        public: false
         arguments:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
             - '@translator'
             - '@oro_entity.virtual_field_provider.cache.dictionary'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
             - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: clearCache }
 
     oro_entity.virtual_field_provider.enum:
         class: Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
-        public: false
         arguments:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
-    oro_entity.virtual_relation_provider.chain:
+    oro_entity.virtual_relation_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
         arguments:
             - [] # providers
@@ -222,7 +220,6 @@ services:
 
     oro_entity.virtual_relation_provider.config:
         class: Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
-        public: false
         arguments:
             - '@oro_entity.entity_hierarchy_provider.all'
             - '@oro_entity.entity_configuration.provider'
@@ -335,7 +332,9 @@ services:
     oro_entity.entity_alias_loader:
         class: Oro\Bundle\EntityBundle\Provider\EntityAliasLoader
         public: false
-        lazy: true
+        arguments:
+            - !tagged_iterator oro_entity.class_provider
+            - !tagged_iterator oro_entity.alias_provider
 
     oro_entity.entity_alias_duplicate_resolver:
         class: Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver
@@ -363,6 +362,7 @@ services:
         public: false
         arguments:
             - '@oro_entity.entity_alias_config_bag'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.alias_provider, priority: -100 }
             - { name: oro_entity.class_provider }
@@ -393,6 +393,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_entity_config.provider.extend'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }
 
@@ -412,12 +413,15 @@ services:
         arguments:
             - '@doctrine'
             - '@translator'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
 
     oro_entity.entity_class_name_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider
         public: false
+        arguments:
+            - !tagged_iterator oro_entity.class_name_provider
 
     oro_entity.entity_class_name_provider.default:
         class: Oro\Bundle\EntityBundle\Provider\EntityClassNameProvider
@@ -425,6 +429,7 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@translator'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.class_name_provider, priority: -100 }
 
@@ -527,7 +532,7 @@ services:
     oro_entity.helper.relation_helper:
         class: 'Oro\Bundle\EntityBundle\Helper\RelationHelper'
         arguments:
-            - '@oro_entity.virtual_relation_provider.chain'
+            - '@oro_entity.virtual_relation_provider'
 
     oro_entity.entity_reference_to_string_transformer:
         class: Oro\Bundle\EntityBundle\Form\DataTransformer\EntityReferenceToStringTransformer
@@ -612,7 +617,7 @@ services:
     oro_entity.listener.structure_options.virtual:
         class: 'Oro\Bundle\EntityBundle\EventListener\EntityVirtualStructureOptionsListener'
         arguments:
-            - '@oro_entity.virtual_field_provider.chain'
+            - '@oro_entity.virtual_field_provider'
         tags:
             - { name: kernel.event_listener, event: oro_entity.structure.options, method: onOptionsRequest }
 

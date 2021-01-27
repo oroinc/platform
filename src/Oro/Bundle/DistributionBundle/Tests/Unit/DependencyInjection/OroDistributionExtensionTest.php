@@ -59,15 +59,7 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $parameters = [
             'oro_distribution.composer_json' => '%kernel.project_dir%/composer.json',
-            'oro_distribution.package_manager.system_paths' => [
-                'vendor',
-                'public/bundles',
-                'public/js',
-                'public/css',
-                'composer.json',
-            ],
             'twig.form.resources' => [],
-            'oro_distribution.composer_cache_home' => '%kernel.project_dir%/var/cache/composer'
         ];
 
         yield 'with OroTranslationBundle' => [

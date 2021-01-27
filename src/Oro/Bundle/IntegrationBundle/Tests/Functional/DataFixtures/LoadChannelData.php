@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;

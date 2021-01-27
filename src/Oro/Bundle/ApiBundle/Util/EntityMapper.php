@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Persistence\Proxy;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;

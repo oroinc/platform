@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\GridViews;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -125,7 +125,7 @@ class GridViewsExtension extends AbstractExtension
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
             $event = new GridViewsLoadEvent($gridName, $config, $gridViews);
-            $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, GridViewsLoadEvent::EVENT_NAME);
             $gridViews = $event->getGridViews();
         }
 

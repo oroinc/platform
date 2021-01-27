@@ -23,6 +23,8 @@ placeholders:
             items:
                 ui_js_modules_config:
                     order: 10
+                ui_js_modules_config_public_path:
+                    order: 20
         application:
             items:
                 assets_js:
@@ -35,9 +37,6 @@ placeholders:
             items:
                 update_buttons:
                     order: 200
-        before_body_end:
-            items:
-                debug_toolbar_view: ~
         url_actions:
             items:
                 oro_ui_url_copy_action_button:
@@ -54,6 +53,8 @@ placeholders:
             template: OroUIBundle:Form:buttons.html.twig
         ui_js_modules_config:
             template: OroUIBundle::js_modules_config.html.twig
+        ui_js_modules_config_public_path:
+            template: OroUIBundle::js_modules_config_public_path.html.twig
         assets_js:
             template: OroUIBundle:Assets:oro_js.html.twig
         view_buttons:
@@ -64,8 +65,6 @@ placeholders:
             template: OroUIBundle::buttons.html.twig
             applicable: "@oro_ui.widget_provider.update_actions->supports($entity$)"
             data: "@oro_ui.widget_provider.update_actions->getWidgets($entity$)"
-        debug_toolbar_view:
-            template: OroUIBundle::debug_toolbar_view.html.twig
         oro_ui_url_copy_action_button:
             template: OroUIBundle::copy_button.html.twig
         assets_css:

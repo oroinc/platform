@@ -151,7 +151,7 @@ class Report extends ExtendReport implements GridQueryDesignerInterface
     /**
      * {@inheritdoc}
      */
-    public function getGridPrefix()
+    public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
     }

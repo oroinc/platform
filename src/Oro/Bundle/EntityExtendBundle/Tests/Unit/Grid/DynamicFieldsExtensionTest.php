@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\SelectedFields\SelectedFieldsProviderInterface;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
@@ -604,6 +605,59 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 ],
             ],
         ];
+    }
+
+    public function testProcessConfigsToOneEntityFallbackValue()
+    {
+        $fieldType = 'manyToOne';
+
+        $this->setExpectationForGetFields(
+            self::ENTITY_CLASS,
+            self::FIELD_NAME,
+            $fieldType,
+            [
+                'target_field' => 'name',
+                'target_entity' => EntityFieldFallbackValue::class
+            ]
+        );
+
+        $config = $this->getDatagridConfiguration(['source' => ['query' => ['groupBy' => 'o.someField']]]);
+        $initialConfig = $config->toArray();
+        $this->getExtension()->processConfigs($config);
+        $this->assertEquals(
+            array_merge(
+                $initialConfig,
+                [
+                    'columns' => [
+                        self::FIELD_NAME => [
+                            'label' => 'label',
+                            'frontend_type' => 'html',
+                            'type' => 'twig',
+                            'renderable' => true,
+                            'required' => false,
+                            'template' => 'OroEntityBundle:Datagrid:Property/entityFallbackValue.html.twig',
+                            'context' => [
+                                'fieldName' => 'testField',
+                                'entityClassName' => 'Test\Entity'
+                            ]
+                        ],
+                    ],
+                    'sorters' => [
+                        'columns' => [],
+                    ],
+                    'filters' => [
+                        'columns' => [],
+                    ],
+                    'source' => [
+                        'query' => [
+                            'from' => [['table' => self::ENTITY_CLASS, 'alias' => 'o']],
+                            'groupBy' => 'o.someField'
+                        ],
+                    ]
+                ]
+            ),
+            $config->toArray()
+        );
     }
 
     /**

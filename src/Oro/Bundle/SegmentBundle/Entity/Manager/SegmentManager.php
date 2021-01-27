@@ -2,18 +2,20 @@
 
 namespace Oro\Bundle\SegmentBundle\Entity\Manager;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryBuilderRegistry;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -21,67 +23,51 @@ use Psr\Log\LoggerInterface;
  */
 class SegmentManager
 {
-    const PER_PAGE = 20;
+    public const PER_PAGE = 20;
 
-    /** @var EntityManager */
-    private $em;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var SegmentQueryBuilderRegistry */
-    private $builderRegistry;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private $queryBuilderRegistry;
 
     /** @var SubQueryLimitHelper */
-    private $subqueryLimitHelper;
-
-    /** @var Cache */
-    private $cache;
+    private $subQueryLimitHelper;
 
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param EntityManager $em
-     * @param SegmentQueryBuilderRegistry $builderRegistry
-     * @param SubQueryLimitHelper $subQueryLimitHelper
-     * @param Cache $cache
-     * @param AclHelper $aclHelper
-     */
-    public function __construct(
-        EntityManager $em,
-        SegmentQueryBuilderRegistry $builderRegistry,
-        SubQueryLimitHelper $subQueryLimitHelper,
-        Cache $cache,
-        AclHelper $aclHelper
-    ) {
-        $this->em = $em;
-        $this->builderRegistry = $builderRegistry;
-        $this->subqueryLimitHelper = $subQueryLimitHelper;
-        $this->cache = $cache;
-        $this->aclHelper = $aclHelper;
-    }
+    /** @var LoggerInterface */
+    private $logger;
 
     /**
-     * @param LoggerInterface $logger
+     * @param ManagerRegistry             $doctrine
+     * @param SegmentQueryBuilderRegistry $queryBuilderRegistry
+     * @param SubQueryLimitHelper         $subQueryLimitHelper
+     * @param AclHelper                   $aclHelper
+     * @param LoggerInterface             $logger
      */
-    public function setLogger(LoggerInterface $logger)
-    {
+    public function __construct(
+        ManagerRegistry $doctrine,
+        SegmentQueryBuilderRegistry $queryBuilderRegistry,
+        SubQueryLimitHelper $subQueryLimitHelper,
+        AclHelper $aclHelper,
+        LoggerInterface $logger
+    ) {
+        $this->doctrine = $doctrine;
+        $this->queryBuilderRegistry = $queryBuilderRegistry;
+        $this->subQueryLimitHelper = $subQueryLimitHelper;
+        $this->aclHelper = $aclHelper;
         $this->logger = $logger;
     }
 
     /**
-     * Get segment types choice list
-     *
-     * @return array [
-     *  key   => segment type name
-     *  value => segment type label
-     * ]
+     * @return array [segment type name => segment type label, ...]
      */
-    public function getSegmentTypeChoices()
+    public function getSegmentTypeChoices(): array
     {
         $result = [];
-        $types = $this->em->getRepository(SegmentType::class)->findAll();
+        $types = $this->getEntityRepository(SegmentType::class)->findAll();
         foreach ($types as $type) {
             $result[$type->getLabel()] = $type->getName();
         }
@@ -90,49 +76,53 @@ class SegmentManager
     }
 
     /**
-     * @param string $entityName
-     * @param string $term
-     * @param integer $page optional
-     * @param null $skippedSegment
+     * @param string      $entityName
+     * @param string|null $term
+     * @param int         $page
+     * @param int|null    $skippedSegmentId
      *
      * @return array
      */
-    public function getSegmentByEntityName($entityName, $term, $page = 1, $skippedSegment = null)
-    {
-        $queryBuilder = $this->em->getRepository(Segment::class)
+    public function getSegmentByEntityName(
+        string $entityName,
+        ?string $term,
+        int $page = 1,
+        int $skippedSegmentId = null
+    ): array {
+        $queryBuilder = $this->getEntityRepository(Segment::class)
             ->createQueryBuilder('segment')
             ->where('segment.entity = :entity')
             ->setParameter('entity', $entityName);
 
-        if (!empty($term)) {
+        if ($term) {
             $queryBuilder
                 ->andWhere('LOWER(segment.name) LIKE :segmentName')
                 ->setParameter('segmentName', sprintf('%%%s%%', strtolower($term)));
         }
 
-        if (!empty($skippedSegment)) {
+        if (null !== $skippedSegmentId) {
             $queryBuilder
-                ->andWhere('segment.id <> :skippedSegment')
-                ->setParameter('skippedSegment', $skippedSegment);
+                ->andWhere('segment.id <> :skippedSegmentId')
+                ->setParameter('skippedSegmentId', $skippedSegmentId);
         }
 
         $queryBuilder
-            ->setFirstResult($this->getOffset($page))
+            ->setFirstResult(QueryBuilderUtil::getPageOffset($page, static::PER_PAGE))
             ->setMaxResults(self::PER_PAGE + 1)
             ->orderBy('segment.name', 'ASC');
         $segments = $this->aclHelper->apply($queryBuilder)->getResult();
 
         $result = [
             'results' => [],
-            'more' => count($segments) > self::PER_PAGE
+            'more'    => count($segments) > self::PER_PAGE
         ];
         array_splice($segments, self::PER_PAGE);
         /** @var Segment $segment */
         foreach ($segments as $segment) {
             $result['results'][] = [
-                'id' => 'segment_' . $segment->getId(),
+                'id'   => 'segment_' . $segment->getId(),
                 'text' => $segment->getName(),
-                'type' => 'segment',
+                'type' => 'segment'
             ];
         }
 
@@ -144,35 +134,24 @@ class SegmentManager
      *
      * @return Segment|null
      */
-    public function findById($segmentId)
+    public function findById(int $segmentId): ?Segment
     {
-        return $this->em->getRepository(Segment::class)->find($segmentId);
+        return $this->getEntityRepository(Segment::class)->find($segmentId);
     }
 
     /**
      * @param Segment $segment
+     *
      * @return QueryBuilder|null
      */
-    public function getSegmentQueryBuilder(Segment $segment)
+    public function getSegmentQueryBuilder(Segment $segment): ?QueryBuilder
     {
-        $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
-            return clone $this->cache->fetch($cacheKey);
-        }
-
-        $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
-        if ($segmentQueryBuilder) {
+        $segmentQueryBuilder = $this->queryBuilderRegistry->getQueryBuilder($segment->getType()->getName());
+        if (null !== $segmentQueryBuilder) {
             try {
-                $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-                $this->cache->save($cacheKey, clone $queryBuilder);
-
-                return $queryBuilder;
+                return $segmentQueryBuilder->getQueryBuilder($segment);
             } catch (InvalidConfigurationException $e) {
-                if ($this->logger) {
-                    $this->logger->error($e->getMessage(), ['exception' => $e]);
-                }
-
-                return null;
+                $this->logger->error($e->getMessage(), ['exception' => $e]);
             }
         }
 
@@ -181,14 +160,12 @@ class SegmentManager
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param Segment $segment
-     * @throws \LogicException
+     * @param Segment      $segment
      */
-    public function filterBySegment(QueryBuilder $queryBuilder, Segment $segment)
+    public function filterBySegment(QueryBuilder $queryBuilder, Segment $segment): void
     {
         $segmentQueryBuilder = $this->getSegmentQueryBuilder($segment);
-
-        if (!$segmentQueryBuilder) {
+        if (null === $segmentQueryBuilder) {
             return;
         }
 
@@ -199,7 +176,8 @@ class SegmentManager
         $queryBuilderRootAlias = reset($queryBuilderRootAliases);
 
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC
-            && $this->getQueryBuilderFrom($queryBuilder) !== $this->getQueryBuilderFrom($segmentQueryBuilder)) {
+            && $this->getFromPart($queryBuilder) !== $this->getFromPart($segmentQueryBuilder)
+        ) {
             throw new \LogicException(
                 'Query Builder "FROM" part should be the same as Segment Query Builder "FROM" part'
             );
@@ -226,79 +204,35 @@ class SegmentManager
      *
      * @return QueryBuilder|null
      */
-    public function getEntityQueryBuilder(Segment $segment)
+    public function getEntityQueryBuilder(Segment $segment): ?QueryBuilder
     {
         $entityClass = $segment->getEntity();
-        $repository = $this->em->getRepository($entityClass);
+        $repository = $this->getEntityRepository($entityClass);
         $identifier = $this->getIdentifierFieldName($entityClass);
         $alias = 'u';
         $qb = $repository->createQueryBuilder($alias);
 
         $subQuery = $this->getFilterSubQuery($segment, $qb);
-        if ($subQuery === null) {
+        if (null === $subQuery) {
             return null;
         }
 
-        $qb = $this->applyOrderByParts($segment, $qb, $alias);
+        $this->applyOrderByPart($segment, $qb, $alias);
 
         return $qb->where($qb->expr()->in($alias . '.' . $identifier, $subQuery));
     }
 
     /**
-     * Applies sorting to QueryBuilder from DynamicSegmentQueryBuilder
-     * @param Segment $segment
-     * @param QueryBuilder $qb
-     * @param string $alias
-     * @return QueryBuilder
-     */
-    private function applyOrderByParts(Segment $segment, QueryBuilder $qb, $alias)
-    {
-        $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
-            $segmentQb = clone $this->cache->fetch($cacheKey);
-        } else {
-            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder(SegmentType::TYPE_DYNAMIC);
-            $segmentQb = $segmentQueryBuilder->getQueryBuilder($segment);
-            $this->cache->save($cacheKey, clone $segmentQb);
-        }
-
-        $orderBy = $segmentQb->getDQLPart('orderBy');
-        $aliasToReplace = current($segmentQb->getRootAliases());
-
-        /** @var OrderBy $obj */
-        foreach ($orderBy as $obj) {
-            foreach ($obj->getParts() as $part) {
-                $part = str_replace($aliasToReplace, $alias, $part);
-                $qb->add('orderBy', $part, true);
-            }
-        }
-
-        return $qb;
-    }
-
-    /**
-     * @param Segment $segment
+     * @param Segment      $segment
      * @param QueryBuilder $externalQueryBuilder
      *
-     * @return string|array|null
+     * @return string|null
      */
-    public function getFilterSubQuery(Segment $segment, QueryBuilder $externalQueryBuilder)
+    public function getFilterSubQuery(Segment $segment, QueryBuilder $externalQueryBuilder): ?string
     {
-        $queryBuilder = null;
-        $cacheKey = $this->getQBCacheKey($segment);
-        if ($this->cache->contains($cacheKey)) {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = clone $this->cache->fetch($cacheKey);
-        }
-
-        if (!$queryBuilder) {
-            $segmentQueryBuilder = $this->builderRegistry->getQueryBuilder($segment->getType()->getName());
-            if ($segmentQueryBuilder === null) {
-                return null;
-            }
-
-            $queryBuilder = $segmentQueryBuilder->getQueryBuilder($segment);
-            $this->cache->save($cacheKey, clone $queryBuilder);
+        $queryBuilder = $this->getSegmentQueryBuilder($segment);
+        if (null === $queryBuilder) {
+            return null;
         }
 
         if ($segment->isDynamic()) {
@@ -309,7 +243,7 @@ class SegmentManager
             $queryBuilder->select($tableIdentifier);
 
             if ($segment->getRecordsLimit()) {
-                $queryBuilder = $this->subqueryLimitHelper->setLimit(
+                $queryBuilder = $this->subQueryLimitHelper->setLimit(
                     $queryBuilder,
                     $segment->getRecordsLimit(),
                     $identifier
@@ -325,33 +259,38 @@ class SegmentManager
     }
 
     /**
-     * Get offset by page.
-     *
-     * @param int $page
-     * @return int
+     * @param Segment      $segment
+     * @param QueryBuilder $qb
+     * @param string       $alias
      */
-    protected function getOffset($page)
+    private function applyOrderByPart(Segment $segment, QueryBuilder $qb, string $alias): void
     {
-        if ($page > 1) {
-            return ($page - 1) * self::PER_PAGE;
+        $segmentQb = $this->getSegmentQueryBuilder($segment);
+        if (null === $segmentQb) {
+            return;
         }
 
-        return 0;
+        /** @var OrderBy[] $orderBy */
+        $orderBy = $segmentQb->getDQLPart('orderBy');
+        $aliasToReplace = current($segmentQb->getRootAliases());
+        foreach ($orderBy as $obj) {
+            foreach ($obj->getParts() as $part) {
+                $part = str_replace($aliasToReplace, $alias, $part);
+                $qb->add('orderBy', $part, true);
+            }
+        }
     }
 
     /**
-     * Return Query Builder `FROM` part
-     *
      * @param QueryBuilder $queryBuilder
+     *
      * @return string|null
      */
-    private function getQueryBuilderFrom(QueryBuilder $queryBuilder)
+    private function getFromPart(QueryBuilder $queryBuilder): ?string
     {
         $from = $queryBuilder->getDQLPart('from');
-
-        if (is_array($from)) {
+        if (\is_array($from)) {
             $from = reset($from);
-
             if ($from instanceof From) {
                 return $from->getFrom();
             }
@@ -361,33 +300,42 @@ class SegmentManager
     }
 
     /**
-     * @param string $className
+     * @param string $entityClass
+     *
      * @return string
      */
-    private function getIdentifierFieldName($className)
+    private function getIdentifierFieldName(string $entityClass): string
     {
-        $metadata = $this->em->getClassMetadata($className);
-
-        return $metadata->getSingleIdentifierFieldName();
+        return $this->getEntityManager($entityClass)
+            ->getClassMetadata($entityClass)
+            ->getSingleIdentifierFieldName();
     }
 
     /**
-     * @param Segment $segment
-     * @return string
+     * @param string $entityClass
+     *
+     * @return EntityManagerInterface
      */
-    private function getQBCacheKey(Segment $segment)
+    private function getEntityManager(string $entityClass): EntityManagerInterface
     {
-        if ($segment->getId()) {
-            return sprintf('%s:%s', 'qb', $segment->getId());
-        }
+        return $this->doctrine->getManagerForClass($entityClass);
+    }
 
-        return sprintf('%s:%s:%s', 'qb', $segment->getEntity(), $segment->getDefinition());
+    /**
+     * @param string $entityClass
+     *
+     * @return EntityRepository
+     */
+    private function getEntityRepository(string $entityClass): EntityRepository
+    {
+        return $this->doctrine->getRepository($entityClass);
     }
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param Segment $segment
+     * @param Segment      $segment
      * @param QueryBuilder $externalQueryBuilder
+     *
      * @return string
      */
     private function bindSegmentParametersToQueryBuilder(

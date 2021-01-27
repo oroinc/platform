@@ -38,7 +38,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     public function execute(array $fixtures, $fixturesType)
     {
         $event = new MigrationDataFixturesEvent($this->em, $fixturesType, $this->logger);
-        $this->eventDispatcher->dispatch(MigrationEvents::DATA_FIXTURES_PRE_LOAD, $event);
+        $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_PRE_LOAD);
 
         $executor = new ORMExecutor($this->em);
         if (null !== $this->logger) {
@@ -46,7 +46,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
         }
         $executor->execute($fixtures, true);
 
-        $this->eventDispatcher->dispatch(MigrationEvents::DATA_FIXTURES_POST_LOAD, $event);
+        $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_POST_LOAD);
     }
 
     /**

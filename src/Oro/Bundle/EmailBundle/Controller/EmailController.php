@@ -24,7 +24,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +40,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class EmailController extends Controller
+class EmailController extends AbstractController
 {
     /**
      * @Route("/check-smtp-connection", name="oro_email_check_smtp_connection", methods={"POST"})
@@ -361,7 +361,7 @@ class EmailController extends Controller
             $request->get('targetActivityClass'),
             $request->get('targetActivityId'),
             $request->get('_wid'),
-            $this->get('oro_filter.datetime_range_filter')->getMetadata()
+            $this->get('oro_filter.extension.orm_filter_bag')->getFilter('datetime')->getMetadata()
         );
 
         return ['results' => $results];
@@ -534,7 +534,7 @@ class EmailController extends Controller
         $fileManager = $this->get('oro_attachment.file_manager');
         $content = $fileManager->getContent($path, false);
         if (null === $content) {
-            $imageBinary = $this->get('oro_attachment.provider.resized_image')->getResizedImage(
+            $imageBinary = $this->get('oro_attachment.provider.resized_image')->getResizedImageByContent(
                 ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
                     $attachment->getContent()->getContentTransferEncoding()

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
@@ -311,7 +311,7 @@ class ApiEntityManager
     {
         // dispatch oro_api.request.find.after event
         $event = new FindAfter($entity);
-        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+        $this->eventDispatcher->dispatch($event, FindAfter::NAME);
     }
 
     /**
@@ -365,7 +365,7 @@ class ApiEntityManager
 
         // dispatch oro_api.request.get_list.before event
         $event = new GetListBefore($criteria, $this->class);
-        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $this->eventDispatcher->dispatch($event, GetListBefore::NAME);
         $criteria = $event->getCriteria();
 
         $criteria

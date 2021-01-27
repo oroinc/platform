@@ -222,4 +222,19 @@ class OrganizationRepository extends EntityRepository
 
         return array_column($qb->getQuery()->getArrayResult(), 'id');
     }
+
+    /**
+     * @return int
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function getEnabledOrganizationCount(): int
+    {
+        $qb = $this->createQueryBuilder('organization');
+        $qb
+            ->select('COUNT(organization.id)')
+            ->where('organization.enabled = true');
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

@@ -1,0 +1,21 @@
+acl_categories:
+    category1:
+        label: category1.label
+        tab: true
+        priority: 10
+    category2:
+        label: category2.label
+        tab: true
+        priority: 20
+    category3:
+        label: category3.label
+        tab: true
+        priority: 30
+    category4:
+        label: category4.label
+        tab: true
+        priority: 25
+    category5:
+        label: category5.label
+        tab: true
+        priority: 40

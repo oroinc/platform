@@ -90,7 +90,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     public function testDeleteSecurityIdentity(SecurityIdentityInterface $sid, $parameters)
     {
         $this->connection->expects($this->once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'DELETE FROM acl_security_identities WHERE identifier = ? AND username = ?',
                 $parameters,
@@ -105,7 +105,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     public function testUpdateSecurityIdentity(SecurityIdentityInterface $sid, $oldName, $parameters)
     {
         $this->connection->expects($this->once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'UPDATE acl_security_identities SET identifier = ? WHERE identifier = ? AND username = ?',
                 $parameters,
@@ -183,7 +183,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('deleteAcl')
             ->with($this->identicalTo($oid));
         $this->connection->expects($this->once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'DELETE FROM acl_classes WHERE class_type = ?',
                 ['Test\Class'],
@@ -218,7 +218,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             ->method('deleteAcl')
             ->with($this->identicalTo($oid));
         $this->connection->expects($this->once())
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->willThrowException(new \Exception('some exception'));
         $this->connection->expects($this->once())
             ->method('rollBack');

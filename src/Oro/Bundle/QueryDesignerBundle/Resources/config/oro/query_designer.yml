@@ -55,10 +55,6 @@ query_designer:
                 class: ''
             init_module: oroquerydesigner/js/enum-filter-initialized
             query_type: [all]
-        manyToMany:
-            type: many-to-many
-            applicable: [{type: manyToMany}]
-            query_type: [all]
         dictionary:
             applicable: [{type: dictionary}]
             type:       dictionary

@@ -110,7 +110,7 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
     {
         $fileName = str_replace('.', '', uniqid('export', true)) . '.json';
 
-        $this->fileManager->getFileSystem()->write($fileName, json_encode($errors));
+        $this->fileManager->writeToStorage(json_encode($errors), $fileName);
 
         return $fileName;
     }

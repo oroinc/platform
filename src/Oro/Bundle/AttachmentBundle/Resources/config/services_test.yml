@@ -1,0 +1,16 @@
+services:
+    oro_attachment.tests.api.skipped_entity_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
+        decorates: oro_api.tests.skipped_entity_provider
+        arguments:
+            - '@oro_attachment.tests.api.skipped_entity_provider.inner'
+        calls:
+            - [ addSkippedEntity, [ 'Oro\Bundle\AttachmentBundle\Entity\File', [ 'create' ] ] ]
+
+    oro_attachment.tests.media_cache_manager_registry:
+        alias: oro_attachment.media_cache_manager_registry
+        public: true
+
+    oro_attachment.tests.provider.image_file_names:
+        alias: oro_attachment.provider.image_file_names
+        public: true

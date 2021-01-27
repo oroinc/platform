@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\IntegrationBundle\Authentication\Token\IntegrationTokenAwareTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\LoggerStrategyAwareInterface;
@@ -31,7 +31,7 @@ class SyncIntegrationProcessor implements MessageProcessorInterface, ContainerAw
      * @var ManagerRegistry
      */
     private $doctrine;
-    
+
     /**
      * @var SyncProcessorRegistry
      */

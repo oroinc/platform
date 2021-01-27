@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -26,11 +27,11 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doctrine = $this->createMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $manager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->doctrine = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $manager        = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->metadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')
+        $this->metadata = $this->getMockBuilder('Doctrine\Persistence\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -54,7 +55,11 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $this->extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
-        $this->entityNameProvider = new EntityNameProvider($this->doctrine, $this->extendConfigProvider);
+        $this->entityNameProvider = new EntityNameProvider(
+            $this->doctrine,
+            $this->extendConfigProvider,
+            (new InflectorFactory())->build()
+        );
     }
 
     public function testGetNameForUnsupportedFormat()

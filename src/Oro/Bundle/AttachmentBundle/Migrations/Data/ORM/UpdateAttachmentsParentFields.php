@@ -3,10 +3,10 @@
 namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 
 /**
@@ -28,7 +28,7 @@ class UpdateAttachmentsParentFields extends AbstractFixture
 
         $queries = $this->getQueries($manager, $connection->getDatabasePlatform() instanceof MySqlPlatform);
         foreach ($queries as $query) {
-            $connection->executeUpdate($query);
+            $connection->executeStatement($query);
         }
     }
 

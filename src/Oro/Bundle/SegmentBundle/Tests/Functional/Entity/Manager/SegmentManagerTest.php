@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -13,18 +15,40 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SegmentManagerTest extends WebTestCase
 {
+    private const SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY =
+        'SELECT t0_.id AS id_0, t0_.id AS id_1'
+        . ' FROM test_workflow_aware_entity t0_'
+        . ' WHERE t0_.id > ?'
+        . ' AND t0_.id IN ('
+        . 'SELECT t1_.id FROM test_workflow_aware_entity t1_ WHERE t1_.id > ?)';
+
+    private const SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY =
+        'SELECT t0_.id AS id_0, t0_.id AS id_1'
+        . ' FROM test_workflow_aware_entity t0_'
+        . ' WHERE t0_.id > ?'
+        . ' AND (t0_.id IN ('
+        . 'SELECT t1_.id FROM test_workflow_aware_entity t1_ WHERE t1_.id > ? AND t1_.id IN ('
+        . 'SELECT t2_.id FROM test_workflow_aware_entity t2_ WHERE t2_.id > ?)))'
+        . ' AND t0_.id IN ('
+        . 'SELECT t3_.id FROM test_workflow_aware_entity t3_ WHERE t3_.id > ?)'
+        . ' AND t0_.id IN ('
+        . 'SELECT t4_.id FROM test_workflow_aware_entity t4_ WHERE t4_.id > ?)'
+        . ' AND (t0_.id IN ('
+        . 'SELECT t5_.id FROM test_workflow_aware_entity t5_ WHERE t5_.id > ? AND t5_.id IN ('
+        . 'SELECT t6_.id FROM test_workflow_aware_entity t6_ WHERE t6_.id > ?)))'
+        . ' AND t0_.id IN ('
+        . 'SELECT t7_.id FROM test_workflow_aware_entity t7_ WHERE t7_.id > ?)';
+
     /** @var SegmentManager */
     private $manager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -34,22 +58,111 @@ class SegmentManagerTest extends WebTestCase
         ]);
 
         $this->manager = self::getContainer()->get('oro_segment.segment_manager');
+        $this->clearSegmentQueryConverterCache();
     }
 
     protected function tearDown(): void
     {
-        self::getContainer()->get('oro_segment.segment_manager.cache')->flushAll();
-        parent::tearDown();
+        if ($this->getFilterExecutionContext()->isValidationEnabled()) {
+            $this->getFilterExecutionContext()->disableValidation();
+        }
+        $this->clearSegmentQueryConverterCache();
+    }
+
+    private function clearSegmentQueryConverterCache(): void
+    {
+        $this->getSegmentQueryConverterCache()->deleteAll();
+    }
+
+    private function clearSegmentQueryConverterCacheStats(): void
+    {
+        $cache = $this->getSegmentQueryConverterCache();
+        // unfortunately the reflection is only way to reset the cache stats
+        $hitsCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'hitsCount');
+        $hitsCountProperty->setAccessible(true);
+        $hitsCountProperty->setValue($cache, 0);
+        $missesCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'missesCount');
+        $missesCountProperty->setAccessible(true);
+        $missesCountProperty->setValue($cache, 0);
+    }
+
+    private function getSegmentQueryConverterCache(): ArrayCache
+    {
+        $cache = self::getContainer()->get('oro_segment.query.segment_query_cache');
+        self::assertInstanceOf(ArrayCache::class, $cache, 'These tests can work only with ArrayCache.');
+
+        return $cache;
+    }
+
+    private function getEntityRepository(string $entityClass): EntityRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository($entityClass);
+    }
+
+    private function getFilterExecutionContext(): FilterExecutionContext
+    {
+        return self::getContainer()->get('oro_filter.execution_context');
+    }
+
+    private function enableFilterValidation(bool $enable): void
+    {
+        if ($enable) {
+            $this->getFilterExecutionContext()->enableValidation();
+        }
+    }
+
+    private function getSegment(string $reference): Segment
+    {
+        return $this->getReference($reference);
+    }
+
+    private function assertGetSegmentQueryBuilder(
+        Segment $segment,
+        string $expectedSql = null,
+        array $firstTryCacheStats = null,
+        array $secondTryCacheStats = null
+    ): void {
+        $this->clearSegmentQueryConverterCacheStats();
+        $qb = $this->manager->getSegmentQueryBuilder($segment);
+        $sql = $qb->getQuery()->getSQL();
+        if ($expectedSql) {
+            self::assertEquals($expectedSql, $sql, 'SQL - First Try');
+        }
+        if ($firstTryCacheStats) {
+            self::assertEquals(
+                $firstTryCacheStats,
+                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $firstTryCacheStats),
+                'Cache Stats - First Try'
+            );
+        }
+
+        // do get the segment query builder one more time to ensure that it returns the same query
+        $this->clearSegmentQueryConverterCacheStats();
+        $qb = $this->manager->getSegmentQueryBuilder($segment);
+        self::assertEquals($sql, $qb->getQuery()->getSQL(), 'SQL - Second Try');
+        if ($secondTryCacheStats) {
+            self::assertEquals(
+                $secondTryCacheStats,
+                array_intersect_key($this->getSegmentQueryConverterCache()->getStats(), $secondTryCacheStats),
+                'Cache Stats - Second Try'
+            );
+        }
+    }
+
+    public function filterExecutionContextDataProvider(): array
+    {
+        return [
+            ['enableFilterValidation' => false],
+            ['enableFilterValidation' => true]
+        ];
     }
 
     public function testGetSegmentTypeChoices()
     {
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        /** @var Segment $staticSegment */
-        $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
+        $staticSegment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
 
-        $this->assertEquals([
+        self::assertEquals([
             $dynamicSegment->getType()->getLabel() => $dynamicSegment->getType()->getName(),
             $staticSegment->getType()->getLabel() => $staticSegment->getType()->getName(),
         ], $this->manager->getSegmentTypeChoices());
@@ -57,43 +170,56 @@ class SegmentManagerTest extends WebTestCase
 
     public function testGetSegmentByEntityNameAndCheckOrder()
     {
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        /** @var Segment $dynamicSegment */
-        $dynamicSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
-        /** @var Segment $staticSegment */
-        $staticSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
-        /** @var Segment $staticSegmentWithFilter */
-        $staticSegmentWithFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
-        /** @var Segment $staticSegmentWithSegmentFilter */
-        $staticSegmentWithSegmentFilter = $this->getReference(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
+        $dynamicSegmentWithFilter = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $staticSegment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
+        $staticSegmentWithFilter = $this->getSegment(LoadSegmentData::SEGMENT_STATIC_WITH_FILTER_AND_SORTING);
+        $staticSegmentWithSegmentFilter = $this->getSegment(LoadSegmentData::SEGMENT_STATIC_WITH_SEGMENT_FILTER);
+        $segmentWithFilter1 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER1);
+        $segmentWithFilter2 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER);
+        $segmentWithFilter3 = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS);
 
-        $this->assertEquals(
+        self::assertEqualsCanonicalizing(
             [
                 'results' => [
                     [
-                        'id'   => 'segment_' . $dynamicSegment->getId(),
+                        'id' => 'segment_' . $dynamicSegment->getId(),
                         'text' => $dynamicSegment->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $dynamicSegmentWithFilter->getId(),
+                        'id' => 'segment_' . $dynamicSegmentWithFilter->getId(),
                         'text' => $dynamicSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegment->getId(),
+                        'id' => 'segment_' . $staticSegment->getId(),
                         'text' => $staticSegment->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegmentWithFilter->getId(),
+                        'id' => 'segment_' . $staticSegmentWithFilter->getId(),
                         'text' => $staticSegmentWithFilter->getName(),
                         'type' => 'segment',
                     ],
                     [
-                        'id'   => 'segment_' . $staticSegmentWithSegmentFilter->getId(),
+                        'id' => 'segment_' . $staticSegmentWithSegmentFilter->getId(),
                         'text' => $staticSegmentWithSegmentFilter->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter1->getId(),
+                        'text' => $segmentWithFilter1->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter2->getId(),
+                        'text' => $segmentWithFilter2->getName(),
+                        'type' => 'segment',
+                    ],
+                    [
+                        'id' => 'segment_' . $segmentWithFilter3->getId(),
+                        'text' => $segmentWithFilter3->getName(),
                         'type' => 'segment',
                     ]
                 ],
@@ -110,9 +236,8 @@ class SegmentManagerTest extends WebTestCase
      */
     public function testGetSegmentByEntityNameWithCaseSensitiveTerm(string $segmentName): void
     {
-        /** @var Segment $dynamicSegment */
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
-        $this->assertEquals(
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        self::assertEquals(
             [
                 'results' => [
                     [
@@ -147,52 +272,46 @@ class SegmentManagerTest extends WebTestCase
 
     public function testFindById()
     {
-        /** @var Segment $segment */
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        $this->assertEquals($segment, $this->manager->findById($segment->getId()));
+        $segment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
+        self::assertEquals($segment, $this->manager->findById($segment->getId()));
     }
 
     public function testGetEntityQueryBuilder()
     {
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
-        $this->assertCount(50, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
+        self::assertCount(50, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
     }
 
     public function testGetEntityQueryBuilderWithSorting()
     {
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
-        $this->assertCount(0, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        self::assertCount(0, $this->manager->getEntityQueryBuilder($dynamicSegment)->getQuery()->getResult());
     }
 
     public function testGetFilterSubQueryDynamic()
     {
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(WorkflowAwareEntity::class);
+        $repository = $this->getEntityRepository(WorkflowAwareEntity::class);
 
         $qb = $repository->createQueryBuilder('w');
 
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
         $result = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
-        static::assertStringContainsString('FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity', $result);
+        self::assertStringContainsString(
+            'FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
+            $result
+        );
     }
 
     public function testGetFilterSubQueryDynamicWithLimit()
     {
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(WorkflowAwareEntity::class);
+        $repository = $this->getEntityRepository(WorkflowAwareEntity::class);
 
         $qb = $repository->createQueryBuilder('w');
 
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC);
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC);
         $dynamicSegment->setRecordsLimit(10);
         $dqlQuery = $this->manager->getFilterSubQuery($dynamicSegment, $qb);
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'id FROM Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
             $dqlQuery
         );
@@ -204,31 +323,106 @@ class SegmentManagerTest extends WebTestCase
 
         $entities = $mainQb->getQuery()->getArrayResult();
 
-        $this->assertCount(10, $entities);
+        self::assertCount(10, $entities);
     }
 
     public function testGetFilterSubQueryStatic()
     {
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(WorkflowAwareEntity::class);
+        $repository = $this->getEntityRepository(WorkflowAwareEntity::class);
 
         $qb = $repository->createQueryBuilder('w');
 
-        /** @var Segment $dynamicSegment */
-        $dynamicSegment = $this->getReference(LoadSegmentData::SEGMENT_STATIC);
-        static::assertStringContainsString(
+        $dynamicSegment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
+        self::assertStringContainsString(
             'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $this->manager->getFilterSubQuery($dynamicSegment, $qb)
         );
     }
 
-    public function testGetSegmentQueryBuilder()
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilder(bool $enableFilterValidation)
     {
-        $segment = $this->getReference(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER);
+        $this->enableFilterValidation($enableFilterValidation);
 
-        $qb = $this->manager->getSegmentQueryBuilder($segment);
-        $this->assertInstanceOf(QueryBuilder::class, $qb);
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER)
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithSegmentFilter(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithDuplicateSegmentFilters(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithSegmentAndWithDuplicateFilter(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+    }
+
+    /**
+     * @dataProvider filterExecutionContextDataProvider
+     */
+    public function testGetSegmentQueryBuilderForSegmentWithDuplicateAndWithSegmentFilter(bool $enableFilterValidation)
+    {
+        $this->enableFilterValidation($enableFilterValidation);
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS),
+            self::SEGMENT_DYNAMIC_WITH_DUPLICATED_SEGMENT_FILTERS_SQL_QUERY,
+            ['hits' => 0, 'misses' => 1],
+            ['hits' => 1, 'misses' => 0]
+        );
+
+        $this->assertGetSegmentQueryBuilder(
+            $this->getSegment(LoadSegmentData::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER),
+            self::SEGMENT_DYNAMIC_WITH_FILTER2_AND_SEGMENT_FILTER_SQL_QUERY,
+            ['hits' => 1, 'misses' => 0],
+            ['hits' => 1, 'misses' => 0]
+        );
     }
 
     public function testGetSegmentQueryBuilderNotExistingType()
@@ -237,7 +431,7 @@ class SegmentManagerTest extends WebTestCase
         $segment->setType(new SegmentType('NotExistingType'));
 
         $result = $this->manager->getSegmentQueryBuilder($segment);
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
     public function testFilterBySegmentWrongDefinition()
@@ -247,11 +441,9 @@ class SegmentManagerTest extends WebTestCase
         $segment = new Segment();
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
         $segment->setEntity(User::class);
-        $segment->setDefinition(json_encode($segmentDefinition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($segmentDefinition));
 
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(User::class);
+        $repository = $this->getEntityRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
         $qb->addOrderBy($qb->expr()->asc('u.id'));
@@ -260,7 +452,7 @@ class SegmentManagerTest extends WebTestCase
 
         $result = $qb->getQuery()->getResult();
 
-        $this->assertEquals($resultBeforeFilter, $result);
+        self::assertEquals($resultBeforeFilter, $result);
     }
 
     public function testFilterBySegment()
@@ -275,7 +467,7 @@ class SegmentManagerTest extends WebTestCase
                     'func' => null
                 ]
             ],
-            'filters' =>[
+            'filters' => [
                 [
                     'columnName' => 'firstName',
                     'criterion' => [
@@ -292,11 +484,9 @@ class SegmentManagerTest extends WebTestCase
         $segment = new Segment();
         $segment->setType(new SegmentType(SegmentType::TYPE_DYNAMIC));
         $segment->setEntity(User::class);
-        $segment->setDefinition(json_encode($segmentDefinition));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($segmentDefinition));
 
-        $registry = $this->getContainer()->get('doctrine');
-        /** @var EntityRepository $repository */
-        $repository = $registry->getRepository(User::class);
+        $repository = $this->getEntityRepository(User::class);
 
         $qb = $repository->createQueryBuilder('u');
         $qb->addOrderBy($qb->expr()->asc('u.id'));
@@ -304,7 +494,7 @@ class SegmentManagerTest extends WebTestCase
 
         $result = $qb->getQuery()->getResult();
 
-        $this->assertCount(1, $result);
-        $this->assertEquals($filteredUserFirstName, reset($result)->getFirstName());
+        self::assertCount(1, $result);
+        self::assertEquals($filteredUserFirstName, reset($result)->getFirstName());
     }
 }

@@ -6,14 +6,12 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Component\DoctrineUtils\ORM\DqlUtil;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 
 /**
- * Abstract filter class contains common filters functionality
+ * The base class for filters.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractFilter implements FilterInterface
@@ -45,21 +43,17 @@ abstract class AbstractFilter implements FilterInterface
     /** @var array */
     protected $joinOperators = [];
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $dataFieldName;
 
     /**
-     * Constructor
-     *
      * @param FormFactoryInterface $factory
      * @param FilterUtility        $util
      */
     public function __construct(FormFactoryInterface $factory, FilterUtility $util)
     {
         $this->formFactory = $factory;
-        $this->util        = $util;
+        $this->util = $util;
     }
 
     /**
@@ -92,9 +86,12 @@ abstract class AbstractFilter implements FilterInterface
             return false;
         }
 
-        $notExpression = $this->getJoinOperator($data['type']);
+        $type = $data['type'];
+        $notExpression = $this->getJoinOperator($type);
         $useExists = empty($data['in_group']) && $this->findRelatedJoin($ds);
-        $type = ($notExpression && $useExists) ? $notExpression : $data['type'];
+        if ($notExpression && $useExists) {
+            $type = $notExpression;
+        }
         $comparisonExpr = $this->buildExpr($ds, $type, $this->getDataFieldName(), $data);
         if (!$comparisonExpr) {
             return true;
@@ -157,10 +154,10 @@ abstract class AbstractFilter implements FilterInterface
         $typeView = $formView->children['type'];
 
         $defaultMetadata = [
-            'name'                     => $this->getName(),
+            'name'    => $this->getName(),
             // use filter name if label not set
-            'label'                    => ucfirst($this->name),
-            'choices'                  => $typeView->vars['choices'],
+            'label'   => ucfirst($this->name),
+            'choices' => $typeView->vars['choices'],
         ];
 
         $metadata = array_diff_key(
@@ -219,14 +216,15 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * Returns form type associated to this filter
      *
-     * @return mixed
+     * @return string
      */
     abstract protected function getFormType();
 
     /**
      * @param OrmFilterDatasourceAdapter $ds
-     * @param $fieldExpr
-     * @param string|array|null $filter
+     * @param string                     $fieldExpr
+     * @param string|array|null          $filter
+     *
      * @return array
      */
     protected function getSubQueryExpressionWithParameters(
@@ -234,30 +232,18 @@ abstract class AbstractFilter implements FilterInterface
         $fieldExpr,
         $filter
     ): array {
-        $subQb = $this->createSubQueryBuilder($ds, $filter);
-        $groupBy = implode(', ', $this->getSelectFieldFromGroupBy($ds->getQueryBuilder()));
-        $subQb
-            ->resetDQLPart('orderBy')
-            ->select($fieldExpr)
-            ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
-
-        if ($groupBy) {
-            // replace aliases from SELECT by expressions, since SELECT clause is changed, add current field
-            $subQb->groupBy(sprintf('%s, %s', $groupBy, $fieldExpr));
-        }
-        [$dql, $replacements] = $this->createDQLWithReplacedAliases($ds, $subQb);
-        [$fieldAlias, $field] = explode('.', $fieldExpr);
-        $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
-        $oldExpr = sprintf('%1$s = %1$s', $replacedFieldExpr);
-        $newExpr = sprintf('%s = %s', $replacedFieldExpr, $fieldExpr);
-        $dql = strtr($dql, [$oldExpr => $newExpr]);
-
-        return [$dql, $subQb->getParameters()];
+        return FilterOrmQueryUtil::getSubQueryExpressionWithParameters(
+            $ds,
+            $this->createSubQueryBuilder($ds, $filter),
+            $fieldExpr,
+            $this->getName()
+        );
     }
 
     /**
      * @param OrmFilterDatasourceAdapter $ds
-     * @param mixed|null $filter
+     * @param mixed|null                 $filter
+     *
      * @return QueryBuilder
      */
     protected function createSubQueryBuilder(OrmFilterDatasourceAdapter $ds, $filter = null): QueryBuilder
@@ -272,7 +258,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Apply filter expression to having or where clause depending on configuration
+     * Applies a filter expression to having or where clause depending on configuration.
      *
      * @param FilterDatasourceAdapterInterface $ds
      * @param mixed                            $expression
@@ -291,26 +277,21 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Get param or throws exception
+     * @param string|null $paramName
      *
-     * @param string $paramName
-     *
-     * @throws \LogicException
      * @return mixed
      */
     protected function get($paramName = null)
     {
-        $value = $this->params;
-
-        if ($paramName !== null) {
-            if (!isset($this->params[$paramName])) {
-                throw new \LogicException(sprintf('Trying to access not existing parameter: "%s"', $paramName));
-            }
-
-            $value = $this->params[$paramName];
+        if (null === $paramName) {
+            return $this->params;
         }
 
-        return $value;
+        if (!isset($this->params[$paramName])) {
+            throw new \LogicException(sprintf('Trying to access not existing parameter: "%s"', $paramName));
+        }
+
+        return $this->params[$paramName];
     }
 
     /**
@@ -324,39 +305,31 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
-     * Get param if exists or default value
-     *
-     * @param string $paramName
-     * @param null   $default
+     * @param string|null $paramName
+     * @param mixed       $default
      *
      * @return mixed
      */
     protected function getOr($paramName = null, $default = null)
     {
-        if ($paramName !== null) {
-            return isset($this->params[$paramName]) ? $this->params[$paramName] : $default;
+        if (null === $paramName) {
+            return $this->params;
         }
 
-        return $this->params;
+        return $this->params[$paramName] ?? $default;
     }
 
     /**
-     * Process mapping params
-     *
      * @param array $params
      *
      * @return array
      */
     protected function mapParams($params)
     {
-        $keys     = [];
+        $keys = [];
         $paramMap = $this->util->getParamMap();
         foreach (array_keys($params) as $key) {
-            if (isset($paramMap[$key])) {
-                $keys[] = $paramMap[$key];
-            } else {
-                $keys[] = $key;
-            }
+            $keys[] = $paramMap[$key] ?? $key;
         }
 
         return array_combine($keys, array_values($params));
@@ -394,11 +367,31 @@ abstract class AbstractFilter implements FilterInterface
     /**
      * @param mixed $data
      *
-     * @return array|bool
+     * @return mixed
      */
     protected function parseData($data)
     {
+        if (\is_array($data)) {
+            $data['type'] = \array_key_exists('type', $data)
+                ? $this->normalizeType($data['type'])
+                : null;
+        }
+
         return $data;
+    }
+
+    /**
+     * @param mixed $type
+     *
+     * @return mixed
+     */
+    protected function normalizeType($type)
+    {
+        if (!\is_int($type) && is_numeric($type)) {
+            $type = (int)$type;
+        }
+
+        return $type;
     }
 
     /**
@@ -408,31 +401,18 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function getJoinOperator($operator)
     {
-        return isset($this->joinOperators[$operator]) ? $this->joinOperators[$operator] : null;
+        return $this->joinOperators[$operator] ?? null;
     }
 
     /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param QueryBuilder $qb
+     * @param OrmFilterDatasourceAdapter $ds
+     * @param QueryBuilder               $qb
      *
-     * @return [$dql, $replacedAliases]
+     * @return array [DQL, replaced aliases]
      */
-    protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
+    protected function createDqlWithReplacedAliases(OrmFilterDatasourceAdapter $ds, QueryBuilder $qb)
     {
-        $replacements = array_map(
-            function ($alias) use ($ds) {
-                return [
-                    $alias,
-                    $ds->generateParameterName($this->getName()),
-                ];
-            },
-            DqlUtil::getAliases($qb->getDQL())
-        );
-
-        return [
-            DqlUtil::replaceAliases($qb->getDQL(), $replacements),
-            array_combine(array_column($replacements, 0), array_column($replacements, 1))
-        ];
+        return FilterOrmQueryUtil::createDqlWithReplacedAliases($ds, $qb, $this->getName());
     }
 
     /**
@@ -442,23 +422,11 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
-        return $this->findRelatedJoinByColumn($ds, $this->getOr(FilterUtility::DATA_NAME_KEY));
-    }
-
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param string $column
-     * @return Expr\Join|null
-     */
-    protected function findRelatedJoinByColumn(FilterDatasourceAdapterInterface $ds, $column)
-    {
-        if (!$ds instanceof OrmFilterDatasourceAdapter || $this->isToOneColumn($ds, $column)) {
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
             return null;
         }
 
-        [$alias] = explode('.', $column);
-
-        return QueryBuilderUtil::findJoinByAlias($ds->getQueryBuilder(), $alias);
+        return FilterOrmQueryUtil::findRelatedJoinByColumn($ds, $this->getOr(FilterUtility::DATA_NAME_KEY));
     }
 
     /**
@@ -468,62 +436,7 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function createConditionFieldExprs(QueryBuilder $qb)
     {
-        $entities = $qb->getRootEntities();
-        $idField = $qb
-            ->getEntityManager()
-            ->getClassMetadata(reset($entities))
-            ->getSingleIdentifierFieldName();
-
-        $rootAliases = $qb->getRootAliases();
-
-        return [sprintf('%s.%s', reset($rootAliases), $idField)];
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     *
-     * @return array
-     */
-    protected function getSelectFieldFromGroupBy(QueryBuilder $qb)
-    {
-        $groupBy = $qb->getDQLPart('groupBy');
-
-        $expressions = [];
-        foreach ($groupBy as $groupByPart) {
-            foreach ($groupByPart->getParts() as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
-            }
-        }
-
-        $fields = [];
-        foreach ($expressions as $expression) {
-            $fields[] = QueryBuilderUtil::getSelectExprByAlias($qb, $expression) ?: $expression;
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $groupByPart
-     *
-     * @return array
-     */
-    protected function getSelectFieldFromGroupByPart(QueryBuilder $qb, $groupByPart)
-    {
-        $expressions = [];
-        if (strpos($groupByPart, ',') !== false) {
-            $groupByParts = explode(',', $groupByPart);
-            foreach ($groupByParts as $part) {
-                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($qb, $part));
-            }
-        } else {
-            $trimmedGroupByPart = trim($groupByPart);
-            $expr = QueryBuilderUtil::getSelectExprByAlias($qb, $groupByPart);
-            $expressions[] = $expr ?: $trimmedGroupByPart;
-        }
-
-        return $expressions;
+        return [FilterOrmQueryUtil::getSingleIdentifierFieldExpr($qb)];
     }
 
     /**
@@ -533,23 +446,11 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function isToOne(FilterDatasourceAdapterInterface $ds): bool
     {
-        return $this->isToOneColumn($ds, $this->getDataFieldName());
-    }
-
-    /**
-     * @param FilterDatasourceAdapterInterface $ds
-     * @param string $column
-     * @return bool
-     */
-    protected function isToOneColumn(FilterDatasourceAdapterInterface $ds, $column): bool
-    {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
             return false;
         }
 
-        [$joinAlias] = explode('.', $column);
-
-        return QueryBuilderUtil::isToOne($ds->getQueryBuilder(), $joinAlias);
+        return FilterOrmQueryUtil::isToOneColumn($ds, $this->getDataFieldName());
     }
 
     /**
@@ -559,17 +460,16 @@ abstract class AbstractFilter implements FilterInterface
      */
     protected function convertData($data)
     {
-        if ($this->has(FilterUtility::VALUE_CONVERSION_KEY)) {
-            if (($callback = $this->get(FilterUtility::VALUE_CONVERSION_KEY)) && is_callable($callback)) {
-                return call_user_func($callback, $data);
-            } else {
-                throw new \BadFunctionCallException(
-                    sprintf('\'%s\' is not callable', json_encode($callback))
-                );
-            }
+        if (!$this->has(FilterUtility::VALUE_CONVERSION_KEY)) {
+            return $data;
         }
 
-        return $data;
+        $callback = $this->get(FilterUtility::VALUE_CONVERSION_KEY);
+        if ($callback && is_callable($callback)) {
+            return call_user_func($callback, $data);
+        }
+
+        throw new \BadFunctionCallException(sprintf('"%s" is not callable', json_encode($callback)));
     }
 
     /**
@@ -582,5 +482,15 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return $this->dataFieldName;
+    }
+
+    /**
+     * @param string|int|null $type
+     *
+     * @return bool
+     */
+    protected function isValueRequired($type): bool
+    {
+        return FilterUtility::TYPE_EMPTY !== $type && FilterUtility::TYPE_NOT_EMPTY !== $type;
     }
 }

@@ -70,7 +70,7 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
                 continue;
             }
 
-            $this->eventDispatcher->dispatch($eventName, $event);
+            $this->eventDispatcher->dispatch($event, $eventName);
         }
 
         if ($event->hasErrors()) {

@@ -65,8 +65,8 @@ class MetadataBuilder
         $this->addUnmappedDynamicFields($result, $classMetadata);
 
         $this->eventDispatcher->dispatch(
-            MergeEvents::BUILD_METADATA,
-            new EntityMetadataEvent($result)
+            new EntityMetadataEvent($result),
+            MergeEvents::BUILD_METADATA
         );
 
         return $result;

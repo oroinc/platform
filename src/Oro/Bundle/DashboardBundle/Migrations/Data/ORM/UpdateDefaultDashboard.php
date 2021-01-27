@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 class UpdateDefaultDashboard extends AbstractDashboardFixture implements DependentFixtureInterface
 {

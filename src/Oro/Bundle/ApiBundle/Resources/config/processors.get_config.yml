@@ -105,6 +105,7 @@ services:
             - '@oro_api.complete_descriptions.resource_doc_parser_provider'
             - '@oro_api.complete_descriptions.description_processor'
             - '@oro_api.complete_descriptions_helper.identifier'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_api.complete_descriptions_helper.fields:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper
@@ -194,6 +195,11 @@ services:
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
+
+    oro_api.get_config.update_field_exclusions:
+        class: Oro\Bundle\ApiBundle\Processor\GetConfig\UpdateFieldExclusions
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', requested_exclusion_policy: all, priority: -70 }
 
     oro_api.get_config.complete_filters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters

@@ -67,14 +67,14 @@ abstract class AbstractLoaderTest extends \PHPUnit\Framework\TestCase
         $this->kernel->expects($this->once())->method('getBundles')->willReturn([$bundle, $bundle]);
 
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with(
-            $this->isType('string'),
             $this->callback(
                 function (RouteCollectionEvent $event) use ($expected) {
                     $this->assertEquals($expected, $event->getCollection()->all());
 
                     return true;
                 }
-            )
+            ),
+            $this->isType('string')
         );
 
         $this->assertEquals($expected, $this->getLoader()->load('file', 'type')->all());

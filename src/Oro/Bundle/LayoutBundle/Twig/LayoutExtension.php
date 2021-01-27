@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Templating\TextHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\InitRuntimeInterface;
@@ -60,13 +60,12 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
 
     /** @var ContainerInterface */
     private $container;
+    private Inflector $inflector;
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Inflector $inflector)
     {
         $this->container = $container;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -148,7 +147,7 @@ class LayoutExtension extends AbstractExtension implements InitRuntimeInterface,
             new TwigFilter('block_text', [$this, 'processText']),
             // Merge additional context to BlockView
             new TwigFilter('merge_context', [$this, 'mergeContext']),
-            new TwigFilter('pluralize', [Inflector::class, 'pluralize']),
+            new TwigFilter('pluralize', [$this->inflector, 'pluralize']),
         ];
     }
 

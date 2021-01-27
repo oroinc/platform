@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\GridViews;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -104,10 +104,10 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with(GridViewsLoadEvent::EVENT_NAME)
+            ->with(static::anything(), GridViewsLoadEvent::EVENT_NAME)
             ->will(
                 $this->returnCallback(
-                    function ($eventName, GridViewsLoadEvent $event) use ($views) {
+                    function (GridViewsLoadEvent $event, $eventName) use ($views) {
                         $event->setGridViews($views);
 
                         return $event;

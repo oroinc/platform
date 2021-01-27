@@ -115,14 +115,14 @@ class UniqueJobHandler
     private function runMySqlPlatformJobs(Connection $connection, Job $job): void
     {
         $query = QueryBuilderUtil::sprintf('INSERT IGNORE INTO %s(name) VALUES(:name);', $this->uniqueTableName);
-        $isUnique = $connection->executeUpdate($query, ['name' => $job->getOwnerId()], ['name' => 'string']);
+        $isUnique = $connection->executeStatement($query, ['name' => $job->getOwnerId()], ['name' => 'string']);
         $this->throwException($job, !$isUnique);
 
         if (!$job->isUnique()) {
             return;
         }
 
-        $isUnique = $connection->executeUpdate($query, ['name' => $job->getName()], ['name' => 'string']);
+        $isUnique = $connection->executeStatement($query, ['name' => $job->getName()], ['name' => 'string']);
         $this->throwException($job, !$isUnique);
     }
 

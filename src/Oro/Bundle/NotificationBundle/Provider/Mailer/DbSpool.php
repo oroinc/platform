@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider\Mailer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
 use Oro\Bundle\NotificationBundle\Event\NotificationSentEvent;
@@ -116,8 +116,8 @@ class DbSpool extends \Swift_ConfigurableSpool
             $sentCount = $transport->send($email->getMessage(), $failedRecipients);
             $count += $sentCount;
             $this->eventDispatcher->dispatch(
-                NotificationSentEvent::NAME,
-                new NotificationSentEvent($email, $sentCount)
+                new NotificationSentEvent($email, $sentCount),
+                NotificationSentEvent::NAME
             );
             $em->remove($email);
             $em->flush($email);

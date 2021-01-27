@@ -42,6 +42,7 @@ services:
         arguments:
             - '@oro_integration.manager.types_registry'
             - '@oro_integration.provider.settings_provider'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_integration.form.subscriber.default_owner_subscriber:
         class: Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber

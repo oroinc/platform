@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ORM;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -37,7 +38,8 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->builder = new RelationMetadataBuilder(
             $this->configManager,
-            $this->nameGenerator
+            $this->nameGenerator,
+            (new InflectorFactory())->build()
         );
     }
 

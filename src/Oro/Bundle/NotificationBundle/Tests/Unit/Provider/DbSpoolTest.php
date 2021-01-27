@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository;
 use Oro\Bundle\NotificationBundle\Entity\SpoolItem;
@@ -109,7 +109,7 @@ class DbSpoolTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
-            ->willReturnCallback(function ($eventName, NotificationSentEvent $event) use ($spoolItem) {
+            ->willReturnCallback(function (NotificationSentEvent $event, $eventName) use ($spoolItem) {
                 self::assertEquals(NotificationSentEvent::NAME, $eventName);
                 self::assertEquals($spoolItem, $event->getSpoolItem());
                 self::assertEquals(1, $event->getSentCount());

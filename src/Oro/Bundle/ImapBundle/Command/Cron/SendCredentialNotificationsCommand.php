@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
@@ -10,23 +11,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Cron command that runs processing the invalid email origins that was failed during sync.
+ * Sends notifications if email origin sync failed due to invalid credentials.
  */
 class SendCredentialNotificationsCommand extends Command implements CronCommandInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:imap-credential-notifications';
 
-    /** @var FeatureChecker */
-    private $featureChecker;
+    private FeatureChecker $featureChecker;
+    private SyncCredentialsIssueManager $syncCredentialsIssueManager;
 
-    /** @var SyncCredentialsIssueManager */
-    private $syncCredentialsIssueManager;
-
-    /**
-     * @param FeatureChecker $featureChecker
-     * @param SyncCredentialsIssueManager $syncCredentialsIssueManager
-     */
     public function __construct(
         FeatureChecker $featureChecker,
         SyncCredentialsIssueManager $syncCredentialsIssueManager
@@ -37,33 +31,36 @@ class SendCredentialNotificationsCommand extends Command implements CronCommandI
         $this->syncCredentialsIssueManager = $syncCredentialsIssueManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '0 4 * * *';
     }
 
-    /**
-     * @return bool
-     */
     public function isActive()
     {
         return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Send wrong email credentials notifications');
+            ->setDescription('Sends notifications if email origin sync failed due to invalid credentials.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command sends notifications
+if email origin sync failed due to invalid credentials.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

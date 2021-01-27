@@ -48,16 +48,11 @@ operations:
         order: 10
         button_options:
             icon: fa-close
-        preactions:
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isDefaultLanguage
-                method_parameters: [$.data]
-                attribute: $.isDefaultLanguage
         preconditions:
             '@and':
                 - '@not_equal': [$code, 'en']
-                - '@equal': [$.isDefaultLanguage, false]
+                - '@not':
+                    - '@is_default_language': $.data
                 - '@equal': [$enabled, true]
         actions:
             - '@run_action_group':
@@ -116,11 +111,9 @@ operations:
         preconditions:
             '@acl': oro_importexport_import
         preactions:
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isDefaultLanguage
-                method_parameters: [$.data]
-                attribute: $.isDefaultLanguage
+            - '@check_if_default_language':
+                language: $.data
+                result: $.isDefaultLanguage
             - '@trans':
                 attribute: $.entityLabel
                 id: 'oro.translation.language.entity_label'
@@ -176,11 +169,9 @@ operations:
                 label: 'Language code'
                 type: string
         form_init:
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: getLanguageStatistic
-                method_parameters: [$code]
-                attribute: $.stat
+            - '@get_language_translation_metrics':
+                language: $code
+                result: $.stat
         form_options:
             attribute_fields:
                 language_code:
@@ -195,17 +186,10 @@ operations:
                 method: formatLocale
                 method_parameters: [$code]
                 attribute: $.languageName
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isDefaultLanguage
-                method_parameters: [$.data]
-                attribute: $.isDefaultLanguage
         actions:
-            - '@call_service_method':
-                service: oro_translation.provider.external_translations
-                method: updateTranslations
-                method_parameters: [$.data]
-                attribute: $.installed
+            - '@download_update_language_translation':
+                language: $.data
+                result: $.installed
             - '@tree':
                 conditions:
                     '@equal': [$.installed, true]
@@ -224,7 +208,8 @@ operations:
                         type: 'error'
             - '@refresh_grid':
                 conditions:
-                    '@equal': [$.isDefaultLanguage, false]
+                    '@not':
+                        - '@is_default_language': $.data
                 parameters:
                     - oro-translation-language-grid
 
@@ -242,13 +227,8 @@ operations:
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.installed']
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.install']
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isAvailableInstallTranslates
-                method_parameters: [$.data]
-                attribute: $.isAvailableInstall
         preconditions:
-            '@equal': [$.isAvailableInstall, true]
+            '@is_language_translation_install_available': $.data
 
     oro_translation_language_update:
         extends: oro_translation_language_load_base
@@ -264,13 +244,8 @@ operations:
         preactions:
             - '@assign_value': [$.successMessage, 'oro.translation.language.message.updated']
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
-            - '@call_service_method':
-                service: oro_translation.helper.language
-                method: isAvailableUpdateTranslates
-                method_parameters: [$.data]
-                attribute: $.isAvailableUpdate
         preconditions:
-            '@equal': [$.isAvailableUpdate, true]
+            '@is_language_translation_update_available': $.data
 
     oro_translation_rebuild_cache:
         label: oro.translation.action.rebuild_cache.label
@@ -282,23 +257,19 @@ operations:
             class: btn-danger icons-holder-text
         acl_resource: oro_translation_language_translate
         actions:
-            - '@call_service_method':
-                service: oro_translation.provider.translation_domain
-                method: clearCache
-            - '@call_service_method':
-                service: translator.default
-                method: rebuildCache
-            - '@call_service_method':
-                service: oro_platform.command_executor
-                method: runCommand
-                method_parameters: ['oro:translation:dump']
-            - '@call_service_method':
-                service: oro_ui.dynamic_asset_version_manager
-                method: updateAssetVersion
-                method_parameters: ['translations']
+            - '@rebuild_translation_cache':
+                attribute: $.result
             - '@flash_message':
+                conditions:
+                    '@equal': ['$.result[successful]', true]
                 message: oro.translation.translation.message.rebuild_cache
-                type: 'success'
+                type: success
+            - '@flash_message':
+                  conditions:
+                      '@equal': ['$.result[successful]', false]
+                  message: '$.result[message]'
+                  translate: false
+                  type: error
 
     oro_translation_translation_reset:
         label: oro.translation.action.reset.hint

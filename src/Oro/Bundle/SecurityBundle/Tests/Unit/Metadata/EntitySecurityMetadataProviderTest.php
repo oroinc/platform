@@ -189,8 +189,8 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(LoadFieldsMetadata::NAME, $this->isInstanceOf(LoadFieldsMetadata::class))
-            ->willReturnCallback(function ($eventName, LoadFieldsMetadata $event) {
+            ->with($this->isInstanceOf(LoadFieldsMetadata::class), LoadFieldsMetadata::NAME)
+            ->willReturnCallback(function (LoadFieldsMetadata $event, $eventName) {
                 $fields = $event->getFields();
                 $lastNameField = $fields['lastName'];
                 $fields['lastName'] = new FieldSecurityMetadata(

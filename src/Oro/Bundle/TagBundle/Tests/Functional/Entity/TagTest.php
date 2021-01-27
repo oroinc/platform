@@ -18,7 +18,7 @@ class TagTest extends WebTestCase
 
     public function testAddTaggingNotFetchAllTaggingCollection()
     {
-        $entityManager = static::getContainer()->get('doctrine')->getEntityManagerForClass(TestActivity::class);
+        $entityManager = static::getContainer()->get('doctrine')->getManagerForClass(TestActivity::class);
 
         $entityManager->getUnitOfWork()->clear();
         $this->assertEmpty($entityManager->getUnitOfWork()->getIdentityMap());

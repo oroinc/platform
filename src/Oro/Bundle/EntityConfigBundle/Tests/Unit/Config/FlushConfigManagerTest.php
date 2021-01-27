@@ -156,20 +156,20 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->at(0))
             ->method('dispatch')
             ->with(
-                Events::PRE_FLUSH,
                 new PreFlushConfigEvent(
                     ['entity' => $entityConfig, 'test' => $testConfig],
                     $this->configManager
-                )
+                ),
+                Events::PRE_FLUSH
             );
         $this->eventDispatcher->expects($this->at(1))
             ->method('dispatch')
             ->with(
-                Events::PRE_FLUSH,
                 new PreFlushConfigEvent(
                     ['entity' => $entityFieldConfig, 'test' => $testFieldConfig],
                     $this->configManager
-                )
+                ),
+                Events::PRE_FLUSH
             );
 
         $this->configCache->expects($this->once())
@@ -278,8 +278,8 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventDispatcher->expects(self::at(0))
             ->method('dispatch')
-            ->with(Events::PRE_FLUSH, new PreFlushConfigEvent($configs, $this->configManager))
-            ->willReturnCallback(function (string $eventName, PreFlushConfigEvent $event) use ($testConfig) {
+            ->with(new PreFlushConfigEvent($configs, $this->configManager), Events::PRE_FLUSH)
+            ->willReturnCallback(function (PreFlushConfigEvent $event, string $eventName) use ($testConfig) {
                 $configManager = $event->getConfigManager();
                 $configManager->persist($testConfig);
                 $configManager->calculateConfigChangeSet($testConfig);

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
@@ -24,20 +25,9 @@ class CreateUserCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:user:create';
 
-    /**
-     * @var UserManager
-     */
-    protected $userManager;
+    protected UserManager $userManager;
+    protected EntityManagerInterface $entityManager;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
-
-    /**
-     * @param UserManager $userManager
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(UserManager $userManager, EntityManagerInterface $entityManager)
     {
         $this->userManager = $userManager;
@@ -45,32 +35,48 @@ class CreateUserCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Create user.')
-            ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'User role')
-            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'User business unit (required)')
-            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'User name (required)')
-            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email (required)')
-            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
-            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password (required)')
+            ->addOption('user-role', null, InputOption::VALUE_REQUIRED, 'Role')
+            ->addOption('user-business-unit', null, InputOption::VALUE_REQUIRED, 'Business unit')
+            ->addOption('user-name', null, InputOption::VALUE_REQUIRED, 'Username')
+            ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'Email')
+            ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'First name')
+            ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'Last name')
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'Password')
             ->addOption(
                 'user-organizations',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-                'User organizations'
+                'Organizations'
             )
+            ->setDescription('Creates a user.')
+            // @codingStandardsIgnoreStart
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command creates a user.
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id></info>
+
+The <info>--user-name</info>, <info>--user-email</info>, <info>--user-password</info> and <info>--user-business-unit</info> options are required and should be used to specify the username, email and password for the new user and the business unit in which the user should be created:
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id></info>
+
+The <info>--user-firstname</info>, <info>--user-lastname</info> and <info>--user-role</info> options can be used to provide additional details:
+
+  <info>php %command.full_name% --user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role></info>
+
+HELP
+            )
+            ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id>')
+            ->addUsage('--user-name=<username> --user-email=<email> --user-password=<password> --user-business-unit=<business-unit-id> --user-firstname=<firstname> --user-lastname=<lastname> --user-role=<role>')
+            // @codingStandardsIgnoreEnd
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var User $user */
@@ -91,11 +97,9 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function checkRequiredOptions($options)
+    protected function checkRequiredOptions(array $options): self
     {
         $requiredOptions = [
             'user-business-unit',
@@ -114,11 +118,9 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @param User  $user
-     * @param array $options
      * @throws InvalidArgumentException
      */
-    protected function updateUser(User $user, $options)
+    protected function updateUser(User $user, array $options): void
     {
         if (!empty($options['user-name'])) {
             $user->setUsername($options['user-name']);
@@ -138,12 +140,9 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setRole(User $user, $options)
+    protected function setRole(User $user, array $options): self
     {
         $roleName = null;
         if (!empty($options['user-role'])) {
@@ -167,12 +166,9 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setBusinessUnit(User $user, $options)
+    protected function setBusinessUnit(User $user, array $options): self
     {
         if (!empty($options['user-business-unit'])) {
             $businessUnit = $this->entityManager
@@ -194,12 +190,9 @@ class CreateUserCommand extends Command
     }
 
     /**
-     * @param User $user
-     * @param array $options
      * @throws InvalidArgumentException
-     * @return $this
      */
-    protected function setOrganizations(User $user, $options)
+    protected function setOrganizations(User $user, array $options): self
     {
         if (!empty($options['user-organizations'])) {
             foreach ($options['user-organizations'] as $organizationName) {
@@ -219,13 +212,7 @@ class CreateUserCommand extends Command
         return $this;
     }
 
-    /**
-     * @param User $user
-     * @param array $options
-     * @throws InvalidArgumentException
-     * @return $this
-     */
-    protected function setProperties(User $user, $options)
+    protected function setProperties(User $user, array $options): self
     {
         $properties = ['email', 'firstname', 'lastname'];
         foreach ($properties as $property) {

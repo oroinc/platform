@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Model\Email;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Event\ReminderEvents;
@@ -83,8 +83,8 @@ class EmailSendProcessor implements SendProcessorInterface
     {
         $event = new SendReminderEmailEvent($reminder);
         $this->eventDispatcher->dispatch(
-            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND,
-            $event
+            $event,
+            ReminderEvents::BEFORE_REMINDER_EMAIL_NOTIFICATION_SEND
         );
         $this->emailNotification->setReminder($reminder);
 

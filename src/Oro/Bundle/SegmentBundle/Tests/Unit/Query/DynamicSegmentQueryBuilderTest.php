@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
+use Doctrine\Common\Cache\VoidCache;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\StringFilter;
@@ -21,8 +24,8 @@ use Oro\Bundle\SegmentBundle\Entity\SegmentType;
 use Oro\Bundle\SegmentBundle\Query\DynamicSegmentQueryBuilder;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
+use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
-use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -88,14 +91,16 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $counter = 0;
         $result = preg_replace_callback(
             '/(:[a-z]+)(\d+)/',
-            function ($matches) use (&$counter) {
+            static function ($matches) use (&$counter) {
                 return $matches[1] . (++$counter);
             },
             $result
         );
-        $result = preg_replace('/(ts)(\d+)/', 't1', $result);
+
         $this->assertSame(
-            'SELECT t1.userName, t1.id FROM AcmeBundle:UserEntity t1 WHERE t1.email LIKE :_gpnpstring1',
+            'SELECT t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.userName, t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.id ' .
+            'FROM AcmeBundle:UserEntity t1_0d251dec2c395afb3e7cd2d87ee40bbc_1 ' .
+            'WHERE t1_0d251dec2c395afb3e7cd2d87ee40bbc_1.email LIKE :_gpnpstring1',
             $result
         );
     }
@@ -103,7 +108,6 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     public function testBuildExtended()
     {
         $segment = $this->getSegment(
-            false,
             [
                 'columns'          => [
                     [
@@ -212,24 +216,22 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $doctrine = $doctrine ?? $this->getDoctrine();
 
         $segmentQueryConverterFactory = $this->createMock(SegmentQueryConverterFactory::class);
-        /** @var ConfigManager $configManager */
         $configManager = $this->createMock(ConfigManager::class);
 
+        $filterExecutionContext = new FilterExecutionContext();
+        $filterExecutionContext->enableValidation();
         $segmentQueryConverterFactory->expects($this->once())
             ->method('createInstance')
             ->willReturn(new SegmentQueryConverter(
                 $manager,
                 $virtualFieldProvider,
-                $doctrine,
-                new RestrictionBuilder($manager, $configManager)
+                $this->getVirtualRelationProvider(),
+                new DoctrineHelper($doctrine),
+                new RestrictionBuilder($manager, $configManager, $filterExecutionContext),
+                new SegmentQueryConverterState(new VoidCache())
             ));
 
-        $serviceLink = $this->createMock(ServiceLink::class);
-        $serviceLink->expects($this->once())
-            ->method('getService')
-            ->willReturn($segmentQueryConverterFactory);
-
-        return new DynamicSegmentQueryBuilder($serviceLink, $doctrine);
+        return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);
     }
 
 

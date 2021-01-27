@@ -2,10 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * JobProcessor is a main class responsible for processing jobs, shifting it's responsibilities to other classes
@@ -366,7 +365,7 @@ class JobProcessor
     }
 
     /**
-     * @return JobRepositoryInterface|ObjectRepository
+     * @return JobRepositoryInterface
      */
     private function getJobRepository(): JobRepositoryInterface
     {

@@ -53,7 +53,7 @@ class SqlQueryBuilder
     /**
      * Executes this query using the bound parameters and their types.
      *
-     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
+     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeStatement}
      * for insert, update and delete statements.
      *
      * @return \Doctrine\DBAL\Driver\Statement|int
@@ -68,7 +68,7 @@ class SqlQueryBuilder
             );
         }
 
-        return $this->connection->executeUpdate(
+        return $this->connection->executeStatement(
             $this->getSQL(),
             $this->getParameters(),
             $this->getParameterTypes()

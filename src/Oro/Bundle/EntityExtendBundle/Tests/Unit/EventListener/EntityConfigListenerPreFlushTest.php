@@ -77,10 +77,10 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::PRE_SET_REQUIRE_UPDATE,
-                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager)
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager),
+                Events::PRE_SET_REQUIRE_UPDATE
             )
-            ->willReturnCallback(function (string $eventName, PreSetRequireUpdateEvent $event) {
+            ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
                 $event->setUpdateRequired(true);
             });
 
@@ -118,10 +118,10 @@ class EntityConfigListenerPreFlushTest extends EntityConfigListenerTestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::PRE_SET_REQUIRE_UPDATE,
-                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager)
+                new PreSetRequireUpdateEvent($event->getConfigs(), $this->configManager),
+                Events::PRE_SET_REQUIRE_UPDATE
             )
-            ->willReturnCallback(function (string $eventName, PreSetRequireUpdateEvent $event) {
+            ->willReturnCallback(function (PreSetRequireUpdateEvent $event, string $eventName) {
                 $event->setUpdateRequired(false);
             });
 

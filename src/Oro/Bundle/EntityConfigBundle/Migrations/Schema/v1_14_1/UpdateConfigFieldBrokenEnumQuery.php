@@ -68,7 +68,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
             $params = ['data' => $data, 'id' => $field['id']];
             $this->logQuery($logger, $query, $params, $types);
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $params, $types);
+                $this->connection->executeStatement($query, $params, $types);
             }
 
             $entityIds[] = $field['entity_id'];
@@ -99,7 +99,7 @@ class UpdateConfigFieldBrokenEnumQuery extends ParametrizedMigrationQuery
             $updateParams = ['data' => $data, 'id' => $row['id']];
             $this->logQuery($logger, $updateQuery, $updateParams, $updateTypes);
             if (!$dryRun) {
-                $this->connection->executeUpdate($updateQuery, $updateParams, $updateTypes);
+                $this->connection->executeStatement($updateQuery, $updateParams, $updateTypes);
             }
         }
     }

@@ -1,0 +1,19 @@
+knp_gaufrette:
+    adapters:
+        test_local:
+            local:
+                directory: '%oro_gaufrette.tests.test_local_adapter_directory%'
+
+    filesystems:
+        test_local:
+            adapter: test_local
+            alias: test_local_filesystem
+        test_public:
+            adapter: public
+            alias: test_public_filesystem
+        test_not_public:
+            adapter: public
+            alias: test_not_public_filesystem
+        test_private:
+            adapter: private
+            alias: test_private_filesystem

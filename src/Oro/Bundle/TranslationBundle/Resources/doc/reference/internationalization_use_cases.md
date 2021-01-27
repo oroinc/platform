@@ -44,9 +44,9 @@ or in the `php` code:
 
 namespace Oro\Bundle\AcmeBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class AcmeController extends Controller
+class AcmeController extends AbstractController
 {
     /**
      * @return array

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
@@ -77,7 +78,12 @@ class DefaultRelationFieldValidatorTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->validator = new DefaultRelationFieldValidator(
-            new FieldNameValidationHelper($extendConfigProvider, $eventDispatcher, new NewEntitiesHelper())
+            new FieldNameValidationHelper(
+                $extendConfigProvider,
+                $eventDispatcher,
+                new NewEntitiesHelper(),
+                (new InflectorFactory())->build()
+            )
         );
     }
 

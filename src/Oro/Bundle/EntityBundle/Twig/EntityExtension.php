@@ -3,13 +3,14 @@
 namespace Oro\Bundle\EntityBundle\Twig;
 
 use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -36,6 +37,14 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @return DoctrineHelper
+     */
+    protected function getDoctrineHelper()
+    {
+        return $this->container->get(DoctrineHelper::class);
     }
 
     /**
@@ -89,6 +98,8 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('oro_class_alias', [$this, 'getClassAlias']),
             new TwigFunction('oro_action_params', [$this, 'getActionParams']),
             new TwigFunction('oro_entity_fallback_value', [$this, 'getFallbackValue']),
+            new TwigFunction('oro_entity_fallback_type', [$this, 'getFallbackType']),
+            new TwigFunction('oro_entity_reference', [$this, 'getEntityReference']),
         ];
     }
 
@@ -202,6 +213,28 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
     }
 
     /**
+     * @param object $object
+     * @param string $objectFieldName
+     *
+     * @return string
+     */
+    public function getFallbackType($object, $objectFieldName)
+    {
+        return $this->getEntityFallbackResolver()->getType($object, $objectFieldName);
+    }
+
+    /**
+     * @param string $entityClass
+     * @param mixed  $entityId
+     *
+     * @return object
+     */
+    public function getEntityReference($entityClass, $entityId)
+    {
+        return $this->getDoctrineHelper()->getEntityReference($entityClass, $entityId);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getName()
@@ -220,6 +253,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
             EntityNameResolver::class,
             EntityAliasResolver::class,
             EntityFallbackResolver::class,
+            DoctrineHelper::class
         ];
     }
 }

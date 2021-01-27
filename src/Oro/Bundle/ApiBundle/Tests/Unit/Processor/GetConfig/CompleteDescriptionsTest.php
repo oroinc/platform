@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
@@ -25,8 +26,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Component\Testing\Unit\Entity\Stub\StubEnumValue as EnumEntity;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -110,7 +111,8 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 $this->resourceDocProvider,
                 $resourceDocParserProvider,
                 $descriptionProcessor,
-                $identifierDescriptionHelper
+                $identifierDescriptionHelper,
+                (new InflectorFactory())->build()
             ),
             new FieldsDescriptionHelper(
                 $this->entityDocProvider,
@@ -871,7 +873,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->context->setClassName(EnumEntity::class);
+        $this->context->setClassName(TestEnumValue::class);
         $this->context->setTargetAction('get_list');
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

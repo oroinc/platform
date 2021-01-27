@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -26,15 +26,13 @@ class EntityNameProvider implements EntityNameProviderInterface
 
     /** @var ConfigProvider  */
     protected $configProvider;
+    private Inflector $inflector;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param ConfigProvider  $configProvider
-     */
-    public function __construct(ManagerRegistry $doctrine, ConfigProvider $configProvider)
+    public function __construct(ManagerRegistry $doctrine, ConfigProvider $configProvider, Inflector $inflector)
     {
         $this->doctrine = $doctrine;
         $this->configProvider = $configProvider;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -208,7 +206,7 @@ class EntityNameProvider implements EntityNameProviderInterface
      */
     protected function getFieldValue($entity, $fieldName)
     {
-        $getterName = 'get' . Inflector::classify($fieldName);
+        $getterName = 'get' . $this->inflector->classify($fieldName);
 
         if (method_exists($entity, $getterName)) {
             return $entity->{$getterName}();

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererInterface;
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
@@ -34,7 +35,7 @@ class LayoutExtensionTest extends \PHPUnit\Framework\TestCase
             ->add('oro_layout.text.helper', $this->textHelper)
             ->getContainer($this);
 
-        $this->extension = new LayoutExtension($container);
+        $this->extension = new LayoutExtension($container, (new InflectorFactory())->build());
     }
 
     public function testInitRuntime()

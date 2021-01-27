@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -36,6 +37,9 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /** @var DatagridStateProviderInterface */
     protected $filtersStateProvider;
 
+    /** @var FilterExecutionContext */
+    protected $filterExecutionContext;
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -43,17 +47,20 @@ abstract class AbstractFilterExtension extends AbstractExtension
      * @param RawConfigurationProvider       $configurationProvider
      * @param FilterBagInterface             $filterBag
      * @param DatagridStateProviderInterface $filtersStateProvider
+     * @param FilterExecutionContext         $filterExecutionContext
      * @param TranslatorInterface            $translator
      */
     public function __construct(
         RawConfigurationProvider $configurationProvider,
         FilterBagInterface $filterBag,
         DatagridStateProviderInterface $filtersStateProvider,
+        FilterExecutionContext $filterExecutionContext,
         TranslatorInterface $translator
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->filterBag = $filterBag;
         $this->filtersStateProvider = $filtersStateProvider;
+        $this->filterExecutionContext = $filterExecutionContext;
         $this->translator = $translator;
     }
 

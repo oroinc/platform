@@ -209,7 +209,7 @@ services:
             - [setDriversClasses, ['%oro_search.drivers%']]
         lazy: true
 
-    oro_search.async.message_processor.index_entity:
+    oro_search.async.index_entity_processor:
         class: Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor
         arguments:
             - '@oro_search.search.engine.indexer'
@@ -218,7 +218,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_search.async.message_processor.index_entities_by_id:
+    oro_search.async.index_entities_by_id_processor:
         class: Oro\Bundle\SearchBundle\Async\IndexEntitiesByIdMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
@@ -229,7 +229,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_search.async.message_processor.index_entities_by_type:
+    oro_search.async.index_entities_by_type_processor:
         class: Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor
         arguments:
             - '@doctrine'
@@ -239,7 +239,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_search.async.message_processor.index_entities_by_range:
+    oro_search.async.index_entities_by_range_processor:
         class: Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor
         arguments:
             - '@doctrine'
@@ -249,7 +249,7 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
-    oro_search.async.message_processor.reindex_entity:
+    oro_search.async.reindex_entity_processor:
         class: Oro\Bundle\SearchBundle\Async\ReindexEntityMessageProcessor
         arguments:
             - '@oro_search.search.engine.indexer'
@@ -273,6 +273,7 @@ services:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_search.extension.search_filter_bag'
             - '@oro_filter.provider.state.filters'
+            - '@oro_filter.execution_context'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }

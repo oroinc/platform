@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ReminderBundle\Tests\Unit;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ReminderBundle\Command\SendRemindersCommand;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;

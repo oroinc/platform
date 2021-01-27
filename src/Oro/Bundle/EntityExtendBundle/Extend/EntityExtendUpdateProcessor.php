@@ -71,6 +71,7 @@ class EntityExtendUpdateProcessor
             $this->executeCommand('oro:entity-extend:cache:warmup');
             $this->executeCommand('oro:entity-extend:update-schema');
             $this->executeCommand('oro:entity-config:cache:warmup');
+            $this->executeCommand('validator:cache:clear');
             $this->executeCommand('router:cache:clear');
             $this->executeCommand('fos:js-routing:dump');
             $this->dispatchUpdateSchemaEvent();
@@ -104,8 +105,8 @@ class EntityExtendUpdateProcessor
     {
         try {
             $this->dispatcher->dispatch(
-                UpdateSchemaEvent::NAME,
-                new UpdateSchemaEvent($this->commandExecutor, $this->logger)
+                new UpdateSchemaEvent($this->commandExecutor, $this->logger),
+                UpdateSchemaEvent::NAME
             );
         } catch (\Throwable $e) {
             throw new \RuntimeException(

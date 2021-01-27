@@ -3,9 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -33,7 +33,7 @@ class UpdateMultiAttachmentsParentFields extends AbstractFixture implements Cont
 
         $queries = $this->getQueries($manager, $connection->getDatabasePlatform() instanceof MySqlPlatform);
         foreach ($queries as $query) {
-            $connection->executeUpdate($query);
+            $connection->executeStatement($query);
         }
     }
 

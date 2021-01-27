@@ -11,6 +11,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
+use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
+use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRecordGroupException;
 use Oro\Bundle\WorkflowBundle\Model\Tools\StartedWorkflowsBag;
@@ -348,28 +350,43 @@ class WorkflowManager implements LoggerAwareInterface
      * @param WorkflowItem $workflowItem
      * @param string|Transition $transition
      * @param Collection|null $errors
+     * @throws ForbiddenTransitionException
+     * @throws InvalidTransitionException
+     * @throws WorkflowException
      */
     public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
     {
-        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
+        /** @var Workflow $workflow */
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName(), true);
 
         $this->transitWorkflow($workflow, $workflowItem, $transition, $errors);
     }
 
     /**
-     * @param Workflow     $workflow
+     * @param Workflow $workflow
      * @param WorkflowItem $workflowItem
-     * @param string       $transition
+     * @param string|Transition $transition
+     * @param Collection|null $errors
+     * @param boolean $checkIsAllowed
+     * @throws ForbiddenTransitionException
+     * @throws InvalidTransitionException
+     * @throws WorkflowException
+     * @throws \Exception
      */
     private function transitWorkflow(
         Workflow $workflow,
         WorkflowItem $workflowItem,
         $transition,
-        Collection $errors = null
+        Collection $errors = null,
+        bool $checkIsAllowed = true
     ): void {
         $this->inTransaction(
-            function (EntityManager $em) use ($workflow, $workflowItem, $transition, $errors) {
-                $workflow->transit($workflowItem, $transition, $errors);
+            function (EntityManager $em) use ($workflow, $workflowItem, $transition, $errors, $checkIsAllowed) {
+                if ($checkIsAllowed) {
+                    $workflow->transit($workflowItem, $transition, $errors);
+                } else {
+                    $workflow->transitUnconditionally($workflowItem, $transition);
+                }
                 $workflowItem->setUpdated(); // transition might not change workflow item
                 $em->flush();
 
@@ -389,23 +406,50 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     /**
-     * Tries to transit workflow and checks weather given transition is allowed.
+     * Tries to transit workflow and checks whether the given transition is allowed.
      * Returns true on success - false otherwise.
+     *
      * @param WorkflowItem $workflowItem
-     * @param string       $transition
+     * @param string|Transition $transition
      * @return bool
+     * @throws \Exception
      */
     public function transitIfAllowed(WorkflowItem $workflowItem, $transition)
     {
-        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
+        /** @var Workflow $workflow */
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName(), true);
 
         if (!$workflow->isTransitionAllowed($workflowItem, $transition)) {
             return false;
         }
 
-        $this->transitWorkflow($workflow, $workflowItem, $transition);
+        $this->transitWorkflow($workflow, $workflowItem, $transition, null, false);
 
         return true;
+    }
+
+    /**
+     * Transits a workflow item without checking for preconditions and conditions.
+     * Returns true on success - false otherwise.
+     *
+     * @param WorkflowItem $workflowItem
+     * @param string|Transition $transition
+     * @return bool
+     * @throws \Exception
+     */
+    public function transitUnconditionally(WorkflowItem $workflowItem, $transition): bool
+    {
+        /** @var Workflow $workflow */
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName(), true);
+
+        try {
+            $this->transitWorkflow($workflow, $workflowItem, $transition, null, false);
+
+            return true;
+        } catch (InvalidTransitionException $exception) {
+            // Transition is not valid, do nothing.
+            return false;
+        }
     }
 
     /**
@@ -459,7 +503,7 @@ class WorkflowManager implements LoggerAwareInterface
         $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
         $em->beginTransaction();
         try {
-            $result = call_user_func($callable, $em);
+            $result = $callable($em);
             $em->commit();
 
             return $result;
@@ -595,16 +639,16 @@ class WorkflowManager implements LoggerAwareInterface
 
         if ((bool) $isActive !== $definition->isActive()) {
             $this->eventDispatcher->dispatch(
-                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION,
-                new WorkflowChangesEvent($definition)
+                new WorkflowChangesEvent($definition),
+                $isActive ? WorkflowEvents::WORKFLOW_BEFORE_ACTIVATION : WorkflowEvents::WORKFLOW_BEFORE_DEACTIVATION
             );
 
             $definition->setActive($isActive);
             $this->doctrineHelper->getEntityManager(WorkflowDefinition::class)->flush($definition);
 
             $this->eventDispatcher->dispatch(
-                $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED,
-                new WorkflowChangesEvent($definition)
+                new WorkflowChangesEvent($definition),
+                $isActive ? WorkflowEvents::WORKFLOW_ACTIVATED : WorkflowEvents::WORKFLOW_DEACTIVATED
             );
 
             return true;

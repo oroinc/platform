@@ -1,9 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LocaleBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Language;
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Intl\Locales;
 
 /**
- * Replaces "en" language and "en" formatting code in the default localization.
+ * Replaces default localization parameters during installation.
  *
  * Example:
  *  `oro:install --language=de --formatting-code=de_DE`
@@ -23,66 +24,64 @@ use Symfony\Component\Intl\Locales;
  */
 class UpdateLocalizationCommand extends Command
 {
-    public const OPTION_FORMATTING_CODE = 'formatting-code';
-    public const OPTION_LANGUAGE = 'language';
-
     /** @var string */
     protected static $defaultName = 'oro:localization:update';
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $description = <<<EOD
-This is a hidden command for internal use only (it's called from the installer).
-Do not run it directly!
-
-It replaces "en" in "Language" and "Formatting code" options of the default
-localization with the new values passed as optional "language" and
-"formatting-code" options to `oro:install` command.
-It will also create a new language entity for the "language" option value,
-if such language does not exist yet.
-EOD;
-
         $this
-            ->setHidden(true)
-            ->setDescription($description)
             ->addOption(
-                self::OPTION_FORMATTING_CODE,
+                'formatting-code',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Formatting code',
                 Translator::DEFAULT_LOCALE
             )
             ->addOption(
-                self::OPTION_LANGUAGE,
+                'language',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Language',
+                'Language code',
                 Translator::DEFAULT_LOCALE
-            );
+            )
+            ->setHidden(true)
+            ->setDescription('Replaces default localization parameters during installation.')
+            ->setHelp(
+                // @codingStandardsIgnoreStart
+                <<<'HELP'
+The <info>%command.name%</info> command replaces "<comment>en</comment>" in "<comment>Language</comment>" and "<comment>Formatting code</comment>"
+options of the default localization with the new values passed as <info>--language</info>
+and <info>--formatting-code</info> options to <info>oro:install</info> command. It will also create a new
+language entity for the <info>--language</info> option value if such language doesn't exist yet.
+
+  <info>php %command.full_name% --formatting-code=<formatting-code> --language=<language></info>
+
+<error>This is an internal command. Please do not run it manually.</error>
+
+HELP
+            // @codingStandardsIgnoreEnd
+            )
+            ->addUsage('--formatting-code=<formatting-code> --language=<language>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $languageCode = (string)$input->getOption(self::OPTION_LANGUAGE);
-        $formattingCode = (string)$input->getOption(self::OPTION_FORMATTING_CODE);
+        $languageCode = (string)$input->getOption('language');
+        $formattingCode = (string)$input->getOption('formatting-code');
 
         if ($languageCode === Translator::DEFAULT_LOCALE && $formattingCode === Translator::DEFAULT_LOCALE) {
             return;
@@ -111,11 +110,6 @@ EOD;
         }
     }
 
-    /**
-     * @param Language $defaultLanguage
-     * @param string $languageCode
-     * @return Language
-     */
     private function createLanguage(Language $defaultLanguage, string $languageCode): Language
     {
         /** @var EntityManager $em */
@@ -133,11 +127,6 @@ EOD;
         return $language;
     }
 
-    /**
-     * @param Localization $localization
-     * @param Language $language
-     * @param string $formattingCode
-     */
     private function updateLocalization(Localization $localization, Language $language, string $formattingCode): void
     {
         $title = Locales::getName($formattingCode, $language->getCode());
@@ -150,11 +139,6 @@ EOD;
         $this->getManager(Localization::class)->flush();
     }
 
-    /**
-     * @param string $className
-     *
-     * @return EntityManager
-     */
     private function getManager(string $className): EntityManager
     {
         return $this->doctrine->getManagerForClass($className);

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
@@ -10,30 +11,32 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * The CLI command to run PHP script files in scope application container.
+ * Runs OroScript files in the application scope.
  */
 class RunScriptsCommand extends ContainerAwareCommand
 {
     /** @var string */
     protected static $defaultName = 'oro:platform:run-script';
 
-    /**
-     * @inheritdoc
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Run PHP script files in scope application container.')
-            ->addArgument(
-                'script',
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-                'Script files'
-            );
+            ->addArgument('script', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Script files')
+            ->setDescription('Runs OroScript files in the application scope.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command runs OroScript files while providing them with
+the container and command runner instance references.
+
+  <info>php %command.full_name% <script1> <script2> <scriptN></info>
+
+HELP
+            )
+        ;
     }
 
-    /**
-     * @inheritdoc
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $commandExecutor = new CommandExecutor(

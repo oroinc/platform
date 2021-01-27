@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMInvalidArgumentException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
@@ -42,15 +42,15 @@ class WorkflowDefinitionHandler
         WorkflowDefinitionCloner::mergeDefinition($existingDefinition, $newDefinition);
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_BEFORE_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition),
+            WorkflowEvents::WORKFLOW_BEFORE_UPDATE
         );
 
         $this->process($existingDefinition);
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_AFTER_UPDATE,
-            new WorkflowChangesEvent($existingDefinition, $originalDefinition)
+            new WorkflowChangesEvent($existingDefinition, $originalDefinition),
+            WorkflowEvents::WORKFLOW_AFTER_UPDATE
         );
     }
 
@@ -61,15 +61,15 @@ class WorkflowDefinitionHandler
     public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
     {
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_BEFORE_CREATE,
-            new WorkflowChangesEvent($workflowDefinition)
+            new WorkflowChangesEvent($workflowDefinition),
+            WorkflowEvents::WORKFLOW_BEFORE_CREATE
         );
 
         $this->process($workflowDefinition);
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_AFTER_CREATE,
-            new WorkflowChangesEvent($workflowDefinition)
+            new WorkflowChangesEvent($workflowDefinition),
+            WorkflowEvents::WORKFLOW_AFTER_CREATE
         );
     }
 
@@ -90,8 +90,8 @@ class WorkflowDefinitionHandler
         $em->flush();
 
         $this->eventDispatcher->dispatch(
-            WorkflowEvents::WORKFLOW_AFTER_DELETE,
-            new WorkflowChangesEvent($workflowDefinition)
+            new WorkflowChangesEvent($workflowDefinition),
+            WorkflowEvents::WORKFLOW_AFTER_DELETE
         );
 
         return true;

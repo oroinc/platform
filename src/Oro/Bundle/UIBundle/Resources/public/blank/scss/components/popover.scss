@@ -8,6 +8,12 @@
             color: $popover-body-light-color;
         }
     }
+
+    &--no-title {
+        .popover-header {
+            display: none;
+        }
+    }
 }
 .popover-header:empty {
     display: none;

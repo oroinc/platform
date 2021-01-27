@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Context\Context;
@@ -356,8 +356,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     {
         if ($this->eventDispatcher) {
             $this->eventDispatcher->dispatch(
-                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
-                new BeforeImportChunksEvent($body)
+                new BeforeImportChunksEvent($body),
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS
             );
         }
     }

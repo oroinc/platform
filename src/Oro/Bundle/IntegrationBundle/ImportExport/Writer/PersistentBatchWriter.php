@@ -6,8 +6,8 @@ use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Step\StepExecutionRestoreInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
@@ -90,7 +90,7 @@ class PersistentBatchWriter implements
             $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
 
             $event = new WriterErrorEvent($items, $jobName, $exception);
-            $this->eventDispatcher->dispatch(WriterErrorEvent::NAME, $event);
+            $this->eventDispatcher->dispatch($event, WriterErrorEvent::NAME);
 
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
@@ -110,7 +110,7 @@ class PersistentBatchWriter implements
             }
         }
 
-        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($em));
+        $this->eventDispatcher->dispatch(new WriterAfterFlushEvent($em), WriterAfterFlushEvent::NAME);
     }
 
     /**

@@ -14,6 +14,7 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
             - '@oro_entity_extend.db_id_name_generator'
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity_extend.entity_metadata_builder, priority: 10 }
 
@@ -38,3 +39,5 @@ services:
 
     oro_entity_extend.manager.multi_enum_entity:
         class: Oro\Bundle\EntityExtendBundle\Entity\Manager\MultiEnumManager
+        arguments:
+            - '@Doctrine\Inflector\Inflector'

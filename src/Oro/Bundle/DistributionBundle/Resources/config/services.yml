@@ -1,20 +1,5 @@
-imports:
-    - { resource: controllers.yml }
-
 parameters:
     oro_distribution.composer_json:                           '%kernel.project_dir%/composer.json'
-
-    #
-    # BAP-10865: Hide "Package Manager" from menu
-    #
-    #oro_distribution.entry_point:                             ~
-
-    oro_distribution.package_manager.system_paths:
-        - vendor
-        - public/bundles
-        - public/js
-        - public/css
-        - composer.json
 
 services:
     oro_distribution.routing_loader:
@@ -51,42 +36,9 @@ services:
         arguments:
             - !tagged_iterator routing.options_resolver
 
-    oro_distribution.package_manager:
-        class: Oro\Bundle\DistributionBundle\Manager\PackageManager
-        public: true
-        arguments:
-          - '@oro_distribution.composer'
-          - '@oro_distribution.composer.installer'
-          - '@oro_distribution.composer.io'
-          - '@oro_distribution.script_runner'
-          - '@oro_platform.maintenance'
-          - '@logger'
-          - '%oro_distribution.composer_json%'
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
-        lazy: true
-
-    oro_distribution.script_runner:
-        class: Oro\Bundle\DistributionBundle\Script\Runner
-        public: false
-        arguments:
-            - '@oro_distribution.composer.installation_manager'
-            - '@logger'
-            - '%kernel.project_dir%'
-            - '%kernel.environment%'
-        tags:
-            - { name: monolog.logger, channel: oro_distribution }
-
     oro_distribution.composer.io:
         class: Composer\IO\BufferIO
         public: false
-        lazy: true
-
-    oro_distribution.composer.installer:
-        class: Composer\Installer
-        public: false
-        factory: ['Composer\Installer', create]
-        arguments: ['@oro_distribution.composer.io', '@oro_distribution.composer']
         lazy: true
 
     oro_distribution.composer:
@@ -106,36 +58,6 @@ services:
         public: true
         arguments:
           - '%oro_distribution.composer_json%'
-    #
-    # BAP-10865: Hide "Package Manager" from menu
-    #
-    #oro_distribution.listener.navigation_listener:
-    #    class: Oro\Bundle\DistributionBundle\EventListener\NavigationListener
-    #    arguments:
-    #        - '@security.authorization_checker'
-    #        - '@security.token_storage'
-    #        - '%oro_distribution.entry_point%'
-    #    tags:
-    #        - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
-    #    calls:
-    #        - [setRequest, ["@?request"]]
-
-    oro_distribution.form.type.composer_config:
-        class: Oro\Bundle\DistributionBundle\Form\Type\Composer\ConfigType
-        tags:
-            - { name: form.type, alias: oro_composer_config }
-
-    oro_distribution.form.type.composer_repository:
-        class: Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType
-        tags:
-            - { name: form.type, alias: oro_composer_repository }
-
-    oro_distribution.locale_listener:
-        class: Oro\Bundle\DistributionBundle\EventListener\LocaleListener
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: kernel.event_subscriber }
 
     oro_distribution.database_translation.loader:
         class: Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader

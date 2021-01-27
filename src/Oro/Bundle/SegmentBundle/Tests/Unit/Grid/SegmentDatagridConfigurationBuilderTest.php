@@ -4,7 +4,8 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\ColumnOptionsGuesserMock;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\SegmentBundle\Grid\SegmentDatagridConfigurationBuilder;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
 
@@ -12,48 +13,37 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
 {
     const TEST_GRID_NAME = 'test';
 
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    protected function setUp(): void
-    {
-        $this->entityNameResolver = $this->getMockBuilder(EntityNameResolver::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-    }
-
     public function testConfiguration()
     {
-        $segment       = $this->getSegment();
-        $doctrine      = $this->getDoctrine(
+        $segment = $this->getSegment();
+        $doctrineHelper = $this->getDoctrineHelper(
             [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
-        $entityMetadata            = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()->getMock();
+        $entityMetadata = $this->createMock(EntityMetadata::class);
         $entityMetadata->routeView = 'route';
 
         $configManager->expects($this->once())
             ->method('getEntityMetadata')
             ->with($segment->getEntity())
-            ->will($this->returnValue($entityMetadata));
+            ->willReturn($entityMetadata);
 
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
+            $this->getVirtualRelationProvider(),
+            $doctrineHelper,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
-            $this->entityNameResolver
+            $this->getEntityNameResolver()
         );
 
         $builder->setGridName(self::TEST_GRID_NAME);
         $builder->setSource($segment);
         $builder->setConfigManager($configManager);
 
-        $result   = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition('route');
 
         $this->assertEquals($expected, $result);
@@ -65,27 +55,27 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
      */
     public function testNoRouteConfiguration()
     {
-        $segment       = $this->getSegment();
-        $doctrine      = $this->getDoctrine(
+        $segment = $this->getSegment();
+        $doctrineHelper = $this->getDoctrineHelper(
             [self::TEST_ENTITY => ['userName' => 'string']],
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()->getMock();
+        $configManager = $this->createMock(ConfigManager::class);
 
         $builder = new SegmentDatagridConfigurationBuilder(
             $this->getFunctionProvider(),
             $this->getVirtualFieldProvider(),
-            $doctrine,
+            $this->getVirtualRelationProvider(),
+            $doctrineHelper,
             new DatagridGuesser([new ColumnOptionsGuesserMock()]),
-            $this->entityNameResolver
+            $this->getEntityNameResolver()
         );
 
         $builder->setConfigManager($configManager);
         $builder->setGridName(self::TEST_GRID_NAME);
         $builder->setSource($segment);
 
-        $result   = $builder->getConfiguration()->toArray();
+        $result = $builder->getConfiguration()->toArray();
         $expected = $this->getExpectedDefinition();
 
         $this->assertEquals($expected, $result);
@@ -127,7 +117,7 @@ class SegmentDatagridConfigurationBuilderTest extends SegmentDefinitionTestCase
         ];
 
         if (!empty($route)) {
-            $definition                              = array_merge(
+            $definition = array_merge(
                 $definition,
                 [
                     'properties' => [

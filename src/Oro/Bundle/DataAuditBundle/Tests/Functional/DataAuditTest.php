@@ -3,14 +3,13 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AbstractAuditProcessor;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Async\AuditChangedEntitiesExtensionTrait;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
-use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\StubEntityClassNameProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
@@ -42,8 +41,6 @@ class DataAuditTest extends WebTestCase
             $this->findAdmin()->getRoles()
         );
         $this->getContainer()->get('security.token_storage')->setToken($token);
-        $this->getContainer()->get('oro_entity.entity_class_name_provider')
-            ->addProvider(new StubEntityClassNameProvider());
     }
 
     public function testCoverage()
@@ -75,11 +72,15 @@ class DataAuditTest extends WebTestCase
             $typesToTest[$field->getType()] = true;
         }
 
+        // ascii_string is supported only for the SQL Server, so we should not test it. See:
+        // https://github.com/doctrine/dbal/blob/faf8ddd7e09e495d890a7579f842e5b6fc24aa4a/docs/en/reference/types.rst
+        unset($typesToTest['ascii_string']);
+
         $missingMethods = [];
         $typesToTest = array_keys($typesToTest);
         sort($typesToTest);
         foreach ($typesToTest as $type) {
-            $methodName = 'test'.ucfirst(Inflector::camelize(Inflector::ucwords($type, '_-')));
+            $methodName = 'test'.ucfirst((new InflectorFactory())->build()->camelize(\ucwords($type, '_-')));
             if (method_exists($this, $methodName)) {
                 continue;
             }

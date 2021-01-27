@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Manager;
 
-use Gaufrette\Adapter\MetadataSupporter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\File\TemporaryFile;
@@ -23,8 +22,8 @@ class FileManager extends GaufretteFileManager
     private $protocolValidator;
 
     /**
+     * @param string                     $filesystemName
      * @param ProtocolValidatorInterface $protocolValidator
-     * @param string $filesystemName
      */
     public function __construct(string $filesystemName, ProtocolValidatorInterface $protocolValidator)
     {
@@ -40,7 +39,7 @@ class FileManager extends GaufretteFileManager
      *
      * @return string|null
      */
-    public function getContent($file, $throwException = true)
+    public function getContent($file, bool $throwException = true): ?string
     {
         if ($file instanceof File) {
             $file = $file->getFilename();
@@ -60,7 +59,7 @@ class FileManager extends GaufretteFileManager
      * @throws ProtocolNotSupportedException When the given file path is not supported
      * @throws IOException                   When the given file cannot be copied to a temporary folder
      */
-    public function createFileEntity($path)
+    public function createFileEntity(string $path): File
     {
         $file = new File();
 
@@ -126,17 +125,18 @@ class FileManager extends GaufretteFileManager
      *
      * @param File $file
      *
-     * @return File
+     * @return File|null
      */
-    public function cloneFileEntity(File $file)
+    public function cloneFileEntity(File $file): ?File
     {
+        $symfonyFile = $this->getFileFromFileEntity($file, false);
+        if (!$symfonyFile) {
+            return null;
+        }
+
         $fileCopy = clone $file;
         $fileCopy->setFilename(null);
-
-        $symfonyFile = $this->getFileFromFileEntity($file, false);
-        if ($symfonyFile) {
-            $fileCopy->setFile($symfonyFile);
-        }
+        $fileCopy->setFile($symfonyFile);
 
         return $fileCopy;
     }
@@ -162,14 +162,14 @@ class FileManager extends GaufretteFileManager
      *
      * @param File $entity
      */
-    public function preUpload(File $entity)
+    public function preUpload(File $entity): void
     {
         if ($entity->isEmptyFile()) {
             $entity->setOriginalFilename(null);
             $entity->setMimeType(null);
             $entity->setFileSize(null);
             $entity->setExtension(null);
-            $entity->setFilename(null);
+            $entity->setFilename($entity->getUuid());
         }
 
         $file = $entity->getFile();
@@ -184,7 +184,7 @@ class FileManager extends GaufretteFileManager
             }
             $entity->setFileSize($file->getSize());
             $fileName = $this->generateFileName($entity->getExtension());
-            while ($this->filesystem->has($fileName)) {
+            while ($this->hasFile($fileName)) {
                 $fileName = $this->generateFileName($entity->getExtension());
             }
             $entity->setFilename($fileName);
@@ -196,18 +196,12 @@ class FileManager extends GaufretteFileManager
      *
      * @param File $entity
      */
-    public function upload(File $entity)
+    public function upload(File $entity): void
     {
         $file = $entity->getFile();
         if (null !== $file && $file->isFile()) {
             $this->writeFileToStorage($file->getPathname(), $entity->getFilename());
-            $fsAdapter = $this->filesystem->getAdapter();
-            if ($fsAdapter instanceof MetadataSupporter) {
-                $fsAdapter->setMetadata(
-                    $entity->getFilename(),
-                    ['contentType' => $entity->getMimeType()]
-                );
-            }
+            $this->setFileMetadata($entity->getFilename(), ['contentType' => $entity->getMimeType()]);
         }
     }
 }

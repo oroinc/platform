@@ -51,6 +51,10 @@
         &::-webkit-inner-spin-button {
             display: none;
         }
+
+        &::-webkit-calendar-picker-indicator {
+            display: none;
+        }
     }
 
     &[type="date"],

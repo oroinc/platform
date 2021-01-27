@@ -1,7 +1,8 @@
 /* @theme: blank; */
 
-@import 'npmassets/font-awesome/scss/variables';
+@import '~font-awesome/scss/variables';
 
+$font-icon-offset-end: 3px !default;
 $font-icon-button-s: 11px;
 $font-icon-button-m: 16px;
 $base-font-icon-button: 18px;

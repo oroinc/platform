@@ -286,7 +286,7 @@ Example:
 namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
@@ -322,7 +322,7 @@ If a fixture need to know the last loaded version, it must implement [LoadedFixt
 namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\RequestVersionFixtureInterface;
@@ -376,7 +376,7 @@ Example:
 namespace Acme\DemoBundle\Migrations\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
 

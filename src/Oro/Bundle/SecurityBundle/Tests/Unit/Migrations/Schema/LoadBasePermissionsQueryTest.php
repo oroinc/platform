@@ -58,7 +58,7 @@ class LoadBasePermissionsQueryTest extends \PHPUnit\Framework\TestCase
             ->willReturn([['name' => 'ASSIGN']]);
 
         $this->connection->expects($this->exactly($countCalls))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->willReturnCallback(
                 function ($query, array $params = [], array $types = []) use (&$data) {
                     $index = array_search($params, $data, true);

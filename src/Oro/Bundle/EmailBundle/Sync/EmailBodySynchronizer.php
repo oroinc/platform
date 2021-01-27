@@ -74,7 +74,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                         list($bodyLoaded, $emailBodyChanged) = $this->loadBody($email, $forceSync, $origin, $folder);
                         if ($emailBodyChanged) {
                             $event = new EmailBodyAdded($email);
-                            $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
+                            $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
                             break 2;
                         }
                     }

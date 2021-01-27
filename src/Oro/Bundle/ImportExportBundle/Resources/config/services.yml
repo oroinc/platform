@@ -1,7 +1,6 @@
 parameters:
     oro_importexport.import.size_of_batch: 100
     oro_importexport.export.size_of_batch: 5000
-    oro_importexport.importexport_dir: import_export
 
 services:
     oro_importexport.template_fixture.entity_registry:
@@ -61,7 +60,7 @@ services:
         public: false
 
     Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer:
-        alias: 'oro_importexport.async.import_export_result_summarizer'
+        alias: oro_importexport.async.import_export_result_summarizer
 
     oro_importexport.writer.writer_chain:
         class: Oro\Bundle\ImportExportBundle\Writer\WriterChain
@@ -69,32 +68,37 @@ services:
     oro_importexport.reader.reader_chain:
         class: Oro\Bundle\ImportExportBundle\Reader\ReaderChain
 
+    oro_importexport.file_manager:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'importexport'
+
     oro_importexport.file.file_manager:
         class: Oro\Bundle\ImportExportBundle\File\FileManager
         public: true
         arguments:
-          - '@knp_gaufrette.filesystem_map'
+            - '@oro_importexport.file_manager'
 
     Oro\Bundle\ImportExportBundle\File\FileManager:
-        alias: 'oro_importexport.file.file_manager'
+        alias: oro_importexport.file.file_manager
 
     oro_importexport.file.batch_file_manager.abstract:
         class: Oro\Bundle\ImportExportBundle\File\BatchFileManager
         abstract: true
         arguments:
-          - '@oro_importexport.file.file_manager'
+            - '@oro_importexport.file.file_manager'
 
     oro_importexport.file.batch_file_manager.import:
         parent: oro_importexport.file.batch_file_manager.abstract
         public: false
         arguments:
-          - '%oro_importexport.import.size_of_batch%'
+            - '%oro_importexport.import.size_of_batch%'
 
     oro_importexport.file.batch_file_manager.export:
         parent: oro_importexport.file.batch_file_manager.abstract
         public: false
         arguments:
-          - '%oro_importexport.export.size_of_batch%'
+            - '%oro_importexport.export.size_of_batch%'
 
     oro_importexport.job.context.aggregator_registry:
         class: Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry
@@ -132,7 +136,7 @@ services:
             - { name: twig.extension }
 
     Oro\Bundle\ImportExportBundle\Twig\GetImportExportConfigurationExtension:
-        alias: 'oro_importexport.twig_extension.get_import_export_configuration'
+        alias: oro_importexport.twig_extension.get_import_export_configuration
 
     oro_importexport.twig_extension.basename:
         class: Oro\Bundle\ImportExportBundle\Twig\BasenameTwigExtension

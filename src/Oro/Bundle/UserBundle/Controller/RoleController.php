@@ -5,11 +5,10 @@ namespace Oro\Bundle\UserBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
-use Oro\Bundle\UserBundle\Model\PrivilegeCategory;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
@@ -17,7 +16,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  * This controller covers CRUD functionality for Role entity.
  * @Route("/role")
  */
-class RoleController extends Controller
+class RoleController extends AbstractController
 {
     /**
      * @Acl(
@@ -54,11 +53,11 @@ class RoleController extends Controller
             'entity' => $role,
             'entity_class' => ClassUtils::getRealClass($role),
             'tabsOptions' => [
-                'data' => $this->getTabListOptions()
+                'data' => $this->getRolePrivilegeCategoryProvider()->getTabs()
             ],
             'capabilitySetOptions' => [
                 'data' => $this->getRolePrivilegeCapabilityProvider()->getCapabilities($role),
-                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabList(),
+                'tabIds' => $this->getRolePrivilegeCategoryProvider()->getTabIds(),
                 'readonly' => true
             ],
             'allow_delete' =>
@@ -117,8 +116,6 @@ class RoleController extends Controller
      */
     protected function update(Role $role)
     {
-        $categoryProvider = $this->get('oro_user.provider.role_privilege_category_provider');
-
         /** @var AclRoleHandler $aclRoleHandler */
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
         $aclRoleHandler->createForm($role);
@@ -138,7 +135,7 @@ class RoleController extends Controller
         }
 
         $form = $aclRoleHandler->createView();
-        $tabs = $categoryProvider->getTabs();
+        $tabs = $this->getRolePrivilegeCategoryProvider()->getTabs();
 
         return [
             'entity' => $role,
@@ -146,8 +143,7 @@ class RoleController extends Controller
             'tabsOptions' => [
                 'data' => $tabs
             ],
-            'capabilitySetOptions' =>
-                $this->get('oro_user.provider.role_privilege_capability_provider')->getCapabilitySetOptions($role),
+            'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()->getCapabilitySetOptions($role),
             'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
             'allow_delete' =>
                 $role->getId() &&
@@ -171,21 +167,5 @@ class RoleController extends Controller
     protected function getRolePrivilegeCapabilityProvider()
     {
         return $this->get('oro_user.provider.role_privilege_capability_provider');
-    }
-
-    /**
-     * @return array
-     */
-    protected function getTabListOptions()
-    {
-        return array_map(
-            function (PrivilegeCategory $tab) {
-                return [
-                    'id' => $tab->getId(),
-                    'label' => $this->get('translator')->trans($tab->getLabel())
-                ];
-            },
-            $this->getRolePrivilegeCategoryProvider()->getTabbedCategories()
-        );
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityNotFoundException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionTriggerHandlerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;

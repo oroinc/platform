@@ -2,9 +2,11 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a set of helper methods to work with manageable ORM entities.
@@ -128,19 +130,11 @@ class DoctrineHelper
      *
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws QueryException if the given query builder does not have a root alias or has more than one root aliases
      */
     public function getRootAlias(QueryBuilder $qb)
     {
-        $aliases = $qb->getRootAliases();
-        if (count($aliases) !== 1) {
-            throw new \RuntimeException(
-                'Cannot get root alias. A query builder has '
-                . (count($aliases) === 0 ? 'no root entity.' : 'more than one root entity.')
-            );
-        }
-
-        return $aliases[0];
+        return QueryBuilderUtil::getSingleRootAlias($qb);
     }
 
     /**
@@ -150,19 +144,11 @@ class DoctrineHelper
      *
      * @return string
      *
-     * @throws \RuntimeException
+     * @throws QueryException if the given query builder does not have a root entity or has more than one root entities
      */
     public function getRootEntityClass(QueryBuilder $qb)
     {
-        $entities = $qb->getRootEntities();
-        if (count($entities) !== 1) {
-            throw new \RuntimeException(
-                'Cannot get root entity class. A query builder has '
-                . (count($entities) === 0 ? 'no root entity.' : 'more than one root entity.')
-            );
-        }
-
-        return $this->resolveEntityClass($entities[0]);
+        return $this->resolveEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));
     }
 
     /**

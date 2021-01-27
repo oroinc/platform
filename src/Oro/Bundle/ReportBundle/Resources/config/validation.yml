@@ -3,15 +3,16 @@ Oro\Bundle\ReportBundle\Entity\Report:
         - PreQueryValidate
         - Report
     constraints:
-        - Oro\Bundle\ReportBundle\Validator\Constraints\ReportDefinitionConstraint:
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\NotEmptyColumns:
             groups: [PreQueryValidate]
-        - Oro\Bundle\ReportBundle\Validator\Constraints\ReportColumnDuplicateConstraint:
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\NoColumnDuplicates:
             groups: [PreQueryValidate]
-        - Oro\Bundle\ReportBundle\Validator\Constraints\ReportDateGroupingConstraint:
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingColumns:
             groups: [PreQueryValidate]
-        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryConstraint: ~
-        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DefinitionQueryConstraint: ~
-        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\GroupingConstraint: ~
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\DateGrouping:
+            groups: [PreQueryValidate]
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\QueryDefinition: ~
+        - Oro\Bundle\QueryDesignerBundle\Validator\Constraints\Query: ~
     properties:
         name:
             - NotBlank:     ~

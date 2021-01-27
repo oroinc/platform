@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
@@ -31,17 +31,16 @@ class DeletedAttributeRelationListener
      * @var array
      */
     protected $deletedAttributes = [];
+    private Inflector $inflector;
 
-    /**
-     * @param MessageProducerInterface $messageProducer
-     * @param DeletedAttributeProviderInterface $deletedAttributeProvider
-     */
     public function __construct(
         MessageProducerInterface $messageProducer,
-        DeletedAttributeProviderInterface $deletedAttributeProvider
+        DeletedAttributeProviderInterface $deletedAttributeProvider,
+        Inflector $inflector
     ) {
         $this->messageProducer = $messageProducer;
         $this->deletedAttributeProvider = $deletedAttributeProvider;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -73,7 +72,7 @@ class DeletedAttributeRelationListener
         foreach ($this->deletedAttributes as $attributeFamilyId => $attributeIds) {
             $attributes = $this->deletedAttributeProvider->getAttributesByIds($attributeIds);
             foreach ($attributes as &$attribute) {
-                $attribute = Inflector::camelize($attribute->getFieldName());
+                $attribute = $this->inflector->camelize($attribute->getFieldName());
             }
             
             $this->deletedAttributes[$attributeFamilyId] = $attributes;

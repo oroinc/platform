@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\FunctionalController;
 
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -28,47 +29,45 @@ class ReportControllerTest extends WebTestCase
         $formValues['oro_report_form']['description'] = self::TEST_REPORT . ' description';
         $formValues['oro_report_form']['entity'] = User::class;
         $formValues['oro_report_form']['type'] = ReportType::TYPE_TABLE;
-        $formValues['oro_report_form']['definition'] = \json_encode(
-            [
-                'columns' => [
-                    [
-                        'name' => 'id',
-                        'label' => 'Id',
-                        'func' => [
-                            'name' => 'Count',
-                            'group_type' => 'aggregates',
-                            'group_name' => 'number',
-                            'return_type' => 'integer'
-                        ],
-                        'sorting' => ''
+        $formValues['oro_report_form']['definition'] = QueryDefinitionUtil::encodeDefinition([
+            'columns' => [
+                [
+                    'name' => 'id',
+                    'label' => 'Id',
+                    'func' => [
+                        'name' => 'Count',
+                        'group_type' => 'aggregates',
+                        'group_name' => 'number',
+                        'return_type' => 'integer'
                     ],
-                    [
-                        'name' => 'firstName',
-                        'label' => 'First name',
-                        'func' => '',
-                        'sorting' => ''
-                    ]
+                    'sorting' => ''
                 ],
-                'grouping_columns' => [
-                    [
-                        'name' => 'firstName',
-                        'temp-validation-name-3050' => ''
-                    ]
-                ],
-                'filters' => [
-                    [
-                        'columnName' => 'username',
-                        'criterion' => [
-                            'filter' => 'string',
-                            'data' => [
-                                'value' => 'test',
-                                'type' => '1'
-                            ]
+                [
+                    'name' => 'firstName',
+                    'label' => 'First name',
+                    'func' => '',
+                    'sorting' => ''
+                ]
+            ],
+            'grouping_columns' => [
+                [
+                    'name' => 'firstName',
+                    'temp-validation-name-3050' => ''
+                ]
+            ],
+            'filters' => [
+                [
+                    'columnName' => 'username',
+                    'criterion' => [
+                        'filter' => 'string',
+                        'data' => [
+                            'value' => 'test',
+                            'type' => '1'
                         ]
                     ]
                 ]
             ]
-        );
+        ]);
 
         $this->client->followRedirects();
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);

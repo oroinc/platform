@@ -42,6 +42,7 @@ Microsecond: Microsecond
 "Attach file:": "Attach file:"
 "Upload": "Upload"
 "Choose File": "Choose File"
+"Clear": "Clear"
 "Searching...": "Searching..."
 "No matches found": "No matches found"
 "Loading more results...": "Loading more results..."
@@ -162,6 +163,11 @@ oro:
             show_less: 'Show less items'
         dropdown_option_aria_label: "More Actions"
         dropdown_main_btn_prefix: "Action"
+    htmlpurifier:
+        formatted_error_line: 'Line #{{ line }}: {{ message }}'
+        messages:
+            'AttrValidator: Attribute removed': 'The "{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
+            reserved_id: 'The "id" attribute values that start with "{{ id }}" are reserved, please use a different ID.'
 articles: "a|an|the|some|every|any|no"
 abbreviate_ignore_list: "a|an|the|of|at|per|in|on"
 postpositions: "ago|apart|aside|away|hence|through"

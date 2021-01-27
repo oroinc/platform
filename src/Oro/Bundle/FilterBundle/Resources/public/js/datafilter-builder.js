@@ -113,13 +113,8 @@ define(function(require, exports, module) {
         combineOptions: function() {
             const filters = {};
             const modules = this.modules;
-            const collection = this.collection;
             _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
-                    // @TODO pass collection only for specific filters
-                    if (options.type === 'selectrow') {
-                        options.collection = collection;
-                    }
                     if (options.lazy) {
                         options.loader = methods.createFilterLoader.call(this, options);
                     }

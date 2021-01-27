@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Filter\DateGroupingFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
@@ -12,35 +12,24 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
-    /**
-     * @var FilterUtility|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $filterUtility;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $registry;
-
-    /**
-     * @var DateGroupingFilter
-     */
+    /** @var DateGroupingFilter */
     private $filter;
 
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $this->filterUtility = $this->createMock(FilterUtility::class);
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
         $this->filter = new DateGroupingFilter(
             $this->formFactory,
-            $this->filterUtility,
-            $this->registry
+            new FilterUtility(),
+            $this->doctrine
         );
     }
 

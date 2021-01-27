@@ -97,8 +97,8 @@ class EmailApiHandler extends ApiFormHandler
 
         if ($entity->getBody()) {
             $this->eventDispatcher->dispatch(
-                EmailBodyAdded::NAME,
-                new EmailBodyAdded($entity->getEntity())
+                new EmailBodyAdded($entity->getEntity()),
+                EmailBodyAdded::NAME
             );
         }
 

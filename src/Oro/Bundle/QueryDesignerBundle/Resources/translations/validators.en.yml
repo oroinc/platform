@@ -2,10 +2,22 @@ oro:
     query_designer:
         condition_builder:
             condition_item:
-                not_blank: "This condition should not be blank."
+                not_blank: This condition should not be blank.
             conditions_group:
-                not_blank: "This group should not be blank."
+                not_blank: This group should not be blank.
             filters:
-                not_blank: "Filters should not be blank."
-        not_accessible_class: "Class '%className%' is not accessible"
-        not_accessible_class_column: "Column '%columnName%' of '%className%' is not accessible"
+                not_empty: The filters should not be empty.
+        entity:
+            not_accessible: The class %className% is not accessible.
+        columns:
+            not_empty: At least one column should be specified.
+            duplicates: You are trying to add several copies of column(s) %duplicates%. Only one copy of the column may be added. Review the list of columns to remove duplicates.
+            not_accessible: The column %columnName% of %className% is not accessible.
+        grouping:
+            column_exists: The column(s) %columns% must be added to the "Grouping" section.
+        date_grouping:
+            group_by:
+                not_blank: The date grouping filter requires configuring a grouping column. Specify a unique column (ex. id) from the main entity in the "Grouping" section.
+            date_field:
+                not_blank: Specify a field on which date grouping filter can be applied.
+        invalid_query: Invalid query.

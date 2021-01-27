@@ -28,7 +28,7 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $repository = $this
-            ->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->getMockBuilder('Doctrine\Persistence\ObjectRepository')
             ->disableOriginalConstructor()
             ->getMock();
 

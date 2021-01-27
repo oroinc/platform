@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\UserBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
@@ -18,36 +19,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Generates one-time impersonation link for a given user.
+ * Generates one-time link to impersonate a user.
  */
 class ImpersonateUserCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:user:impersonate';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private Router $router;
+    private ConfigManager $configManager;
+    private UserManager $userManager;
+    private DateTimeFormatterInterface $dateTimeFormatter;
 
-    /** @var Router */
-    private $router;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var UserManager */
-    private $userManager;
-
-    /** @var DateTimeFormatterInterface */
-    private $dateTimeFormatter;
-
-    /**
-     * ImpersonateUserCommand constructor.
-     * @param ManagerRegistry $registry
-     * @param Router $router
-     * @param ConfigManager $configManager
-     * @param UserManager $userManager
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     */
     public function __construct(
         ManagerRegistry $registry,
         Router $router,
@@ -64,27 +48,28 @@ class ImpersonateUserCommand extends Command
         $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription('Generates one-time link to impersonate a given user.')
             ->addArgument('username', InputArgument::REQUIRED, 'Username of the impersonated user')
             ->addOption(
                 'lifetime',
                 't',
                 InputOption::VALUE_REQUIRED,
-                'Token lifetime (number of seconds or strtotime format)',
+                'Token lifetime (seconds or strtotime format)',
                 '1 day'
             )
-            ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'The route of the generated URL', 'oro_default')
+            ->addOption('route', 'r', InputOption::VALUE_REQUIRED, 'Route of the generated URL', 'oro_default')
             ->addOption(
                 'silent',
                 'S',
                 InputOption::VALUE_NONE,
                 'Do not send email notification to the impersonated user'
             )
+            ->setDescription('Generates one-time link to impersonate a user.')
             ->setHelp(
-                <<<'EOF'
+                <<<'HELP'
 The <info>%command.name%</info> command generates a one-time impersonation link for a given user:
 
   <info>%command.full_name% <username></info>
@@ -103,14 +88,17 @@ Specify a custom target URL route via the <info>--route</info> option:
 
   <info>%command.full_name% --route=oro_user_profile_view <username></info>
 
-EOF
+HELP
             )
+            ->addUsage('--lifetime=<seconds> <username>')
+            ->addUsage('--lifetime="15 minutes" <username>')
+            ->addUsage('--lifetime="2 hours" <username>')
+            ->addUsage('--route=<route> <username>')
+            ->addUsage('--silent <username>')
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
@@ -164,20 +152,17 @@ EOF
         } catch (\Exception $e) {
             $io->error($e->getMessage());
 
-            return $e->getCode() ? $e->getCode() : 1;
+            return $e->getCode() ?: 1;
         }
 
         return 0;
     }
 
-    /**
-     * @param  User   $user
-     * @param  string $lifetime
-     * @param  bool   $notify Enable email notification to impersonated user
-     * @return Impersonation
-     */
-    protected function createImpersonation(User $user, $lifetime, $notify)
-    {
+    protected function createImpersonation(
+        User $user,
+        string $lifetime,
+        bool $notifyImpersonatedUserByEmail
+    ): Impersonation {
         $manager = $this->registry->getManagerForClass(Impersonation::class);
 
         if (is_numeric($lifetime)) {
@@ -187,7 +172,7 @@ EOF
         $impersonation = new Impersonation();
         $impersonation->setUser($user);
         $impersonation->getExpireAt()->add(\DateInterval::createFromDateString($lifetime));
-        $impersonation->setNotify($notify);
+        $impersonation->setNotify($notifyImpersonatedUserByEmail);
 
         $manager->persist($impersonation);
         $manager->flush();
@@ -195,12 +180,7 @@ EOF
         return $impersonation;
     }
 
-    /**
-     * @param  string $route
-     * @param  string $token
-     * @return string
-     */
-    protected function generateUrl($route, $token)
+    protected function generateUrl(string $route, string $token): string
     {
         $applicationUrl = $this->configManager->get('oro_ui.application_url');
 

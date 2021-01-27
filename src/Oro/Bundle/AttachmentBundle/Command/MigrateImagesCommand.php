@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\AttachmentBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Migration\FilteredAttachmentMigrationServiceInterface;
 use Symfony\Component\Console\Command\Command;
@@ -10,35 +11,18 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Migrate filtered images folder structure to new one
+ * Migrates filtered attachments to the new directory structure.
  */
 class MigrateImagesCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** * @var string */
     protected static $defaultName = 'oro:attachment:migrate-directory-structure';
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
+    private ManagerRegistry $registry;
+    private FilteredAttachmentMigrationServiceInterface $migrationService;
 
-    /**
-     * @var FilteredAttachmentMigrationServiceInterface
-     */
-    private $migrationService;
+    private string $prefix;
 
-    /**
-     * @var string
-     */
-    private $prefix;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param FilteredAttachmentMigrationServiceInterface $migrationService
-     * @param string $prefix
-     */
     public function __construct(
         ManagerRegistry $registry,
         FilteredAttachmentMigrationServiceInterface $migrationService,
@@ -51,17 +35,27 @@ class MigrateImagesCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Migrate filtered attachments to new directory structure');
+            ->setDescription('Migrates filtered attachments to the new directory structure.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command migrates filtered attachments
+to the new directory structure to improve performance and support large number
+of files in the filesystem.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

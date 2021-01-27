@@ -98,13 +98,13 @@ abstract class RemoveAssociationQuery extends ParametrizedMigrationQuery impleme
         $params = ['data' => $sourceEntityData, 'class_name' => $this->sourceEntityClass];
         $types = ['data' => Types::ARRAY, 'class_name' => Types::STRING];
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
 
         $sql = 'DELETE FROM oro_entity_config_field WHERE entity_id = :entity_id AND field_name = :field_name';
         $params = ['entity_id' => $sourceEntityRow['id'], 'field_name' => $fieldName];
         $types = ['entity_id' => Types::INTEGER, 'field_name' => Types::STRING];
         $this->logQuery($logger, $sql, $params, $types);
-        $this->connection->executeUpdate($sql, $params, $types);
+        $this->connection->executeStatement($sql, $params, $types);
 
         if ($this->dropRelationColumnsAndTables) {
             $this->dropRelationshipColumnsAndTables($fieldName, $logger);

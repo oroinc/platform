@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 /**
- * Represents a result of {@see \Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandler::updateSchema}.
+ * Represents a result of {@see \Oro\Bundle\EntityExtendBundle\Extend\EntityExtendUpdateHandlerInterface::update}.
  */
 final class EntityExtendUpdateResult
 {
@@ -11,16 +11,16 @@ final class EntityExtendUpdateResult
     private $successful;
 
     /** @var string|null */
-    private $failedMessage;
+    private $failureMessage;
 
     /**
      * @param bool        $successful
-     * @param string|null $failedMessage
+     * @param string|null $failureMessage
      */
-    public function __construct(bool $successful, string $failedMessage = null)
+    public function __construct(bool $successful, string $failureMessage = null)
     {
         $this->successful = $successful;
-        $this->failedMessage = $failedMessage;
+        $this->failureMessage = $failureMessage;
     }
 
 
@@ -39,8 +39,8 @@ final class EntityExtendUpdateResult
      *
      * @return string|null
      */
-    public function getFailedMessage(): ?string
+    public function getFailureMessage(): ?string
     {
-        return $this->failedMessage;
+        return $this->failureMessage;
     }
 }

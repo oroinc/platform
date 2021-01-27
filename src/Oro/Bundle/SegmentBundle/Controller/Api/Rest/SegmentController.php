@@ -52,16 +52,19 @@ class SegmentController extends RestController implements ClassResourceInterface
     {
         $entityName = $this->get('oro_entity.routing_helper')
             ->resolveEntityClass($request->get('entityName'));
-        $page = $request->query->get('page', 1);
+        $page = (int)$request->query->get('page', 1);
         $term = $request->query->get('term');
-        $currentSegment = $request->query->get('currentSegment', null);
-        $statusCode = Response::HTTP_OK;
+        $currentSegmentId = $request->query->get('currentSegment');
+        if (null !== $currentSegmentId) {
+            $currentSegmentId = (int)$currentSegmentId;
+        }
 
         /** @var SegmentManager $provider */
         $manager = $this->get('oro_segment.segment_manager');
 
+        $statusCode = Response::HTTP_OK;
         try {
-            $result = $manager->getSegmentByEntityName($entityName, $term, (int)$page, $currentSegment);
+            $result = $manager->getSegmentByEntityName($entityName, $term, $page, $currentSegmentId);
         } catch (InvalidEntityException $ex) {
             $statusCode = Response::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];

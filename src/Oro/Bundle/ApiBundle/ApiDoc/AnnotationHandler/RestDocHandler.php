@@ -19,17 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 
 /**
- * Populates ApiDoc annotation based on the configuration of API resource.
+ * Fills ApiDoc annotation based on the configuration of API resource.
  */
 class RestDocHandler implements HandlerInterface
 {
     private const ID_PLACEHOLDER = '{id}';
-
-    private const SUCCESS_STATUS_CODES_WITH_CONTENT = [
-        Response::HTTP_OK,
-        Response::HTTP_CREATED,
-        Response::HTTP_ACCEPTED
-    ];
 
     /** @var string The group of routes that should be processed by this handler */
     private $routeGroup;
@@ -82,7 +76,7 @@ class RestDocHandler implements HandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
+    public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method): void
     {
         if ($route->getOption(RestRouteOptionsResolver::GROUP_OPTION) !== $this->routeGroup
             || $this->docViewDetector->getRequestType()->isEmpty()
@@ -111,7 +105,12 @@ class RestDocHandler implements HandlerInterface
 
             if (ApiAction::UPDATE_LIST === $action) {
                 $context = $this->contextProvider->getContext($action, AsyncOperation::class, null, $route);
-                $this->setOutput($annotation, $action, $context->getConfig(), $context->getMetadata());
+                $this->setOutput(
+                    $annotation,
+                    $action,
+                    $this->contextProvider->getConfig($context),
+                    $this->contextProvider->getMetadata($context)
+                );
             } else {
                 $metadata = $context->getMetadata();
                 if (null !== $metadata) {
@@ -134,9 +133,9 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    private function hasAttribute(Route $route, $placeholder)
+    private function hasAttribute(Route $route, string $placeholder): bool
     {
-        return false !== \strpos($route->getPath(), $placeholder);
+        return false !== strpos($route->getPath(), $placeholder);
     }
 
     /**
@@ -144,7 +143,7 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string
      */
-    private function getEntityClass($entityType)
+    private function getEntityClass(string $entityType): string
     {
         return ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
@@ -168,7 +167,7 @@ class RestDocHandler implements HandlerInterface
         EntityDefinitionConfig $config,
         EntityMetadata $metadata,
         ?string $associationName
-    ) {
+    ): void {
         $entityConfig = $config;
         $entityMetadata = $metadata;
         if ($associationName && $context instanceof SubresourceContext) {
@@ -189,7 +188,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $description = $config->getDescription();
         if ($description) {
@@ -201,7 +200,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    private function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setDocumentation(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $documentation = $config->getDocumentation();
         if ($documentation) {
@@ -217,10 +216,10 @@ class RestDocHandler implements HandlerInterface
      */
     private function setInputMetadata(
         ApiDoc $annotation,
-        $action,
+        string $action,
         EntityDefinitionConfig $config,
         EntityMetadata $metadata
-    ) {
+    ): void {
         if ($this->isActionWithInput($action)) {
             ApiDocAnnotationUtil::setInput(
                 $annotation,
@@ -239,12 +238,12 @@ class RestDocHandler implements HandlerInterface
      */
     private function setOutputMetadata(
         ApiDoc $annotation,
-        $entityClass,
-        $action,
+        string $entityClass,
+        string $action,
         EntityDefinitionConfig $config,
         EntityMetadata $metadata,
-        $associationName = null
-    ) {
+        string $associationName = null
+    ): void {
         if ($this->isActionWithOutput($action, $annotation)) {
             if ($metadata->hasIdentifierFields()) {
                 // check if output format should be taken from another action type. In this case
@@ -273,10 +272,10 @@ class RestDocHandler implements HandlerInterface
      */
     private function setOutput(
         ApiDoc $annotation,
-        $action,
+        string $action,
         EntityDefinitionConfig $config,
         EntityMetadata $metadata
-    ) {
+    ): void {
         ApiDocAnnotationUtil::setOutput(
             $annotation,
             $this->getDirectionValue($action, 'output', $config, $metadata)
@@ -291,8 +290,12 @@ class RestDocHandler implements HandlerInterface
      *
      * @return array
      */
-    private function getDirectionValue($action, $direction, EntityDefinitionConfig $config, EntityMetadata $metadata)
-    {
+    private function getDirectionValue(
+        string $action,
+        string $direction,
+        EntityDefinitionConfig $config,
+        EntityMetadata $metadata
+    ): array {
         return [
             'class'   => '',
             'options' => [
@@ -311,7 +314,7 @@ class RestDocHandler implements HandlerInterface
      * @param ApiDoc                 $annotation
      * @param EntityDefinitionConfig $config
      */
-    private function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config)
+    private function setStatusCodes(ApiDoc $annotation, EntityDefinitionConfig $config): void
     {
         $statusCodes = $config->getStatusCodes();
         if (null !== $statusCodes) {
@@ -326,22 +329,17 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    private function isActionWithInput($action)
+    private function isActionWithInput(string $action): bool
     {
-        return \in_array(
-            $action,
-            [
-                ApiAction::CREATE,
-                ApiAction::UPDATE,
-                ApiAction::UPDATE_SUBRESOURCE,
-                ApiAction::ADD_SUBRESOURCE,
-                ApiAction::DELETE_SUBRESOURCE,
-                ApiAction::UPDATE_RELATIONSHIP,
-                ApiAction::ADD_RELATIONSHIP,
-                ApiAction::DELETE_RELATIONSHIP
-            ],
-            true
-        );
+        return
+            ApiAction::CREATE === $action
+            || ApiAction::UPDATE === $action
+            || ApiAction::UPDATE_SUBRESOURCE === $action
+            || ApiAction::ADD_SUBRESOURCE === $action
+            || ApiAction::DELETE_SUBRESOURCE === $action
+            || ApiAction::UPDATE_RELATIONSHIP === $action
+            || ApiAction::ADD_RELATIONSHIP === $action
+            || ApiAction::DELETE_RELATIONSHIP === $action;
     }
 
     /**
@@ -353,13 +351,13 @@ class RestDocHandler implements HandlerInterface
      *
      * @return bool
      */
-    private function isActionWithOutput($action, ApiDoc $annotation)
+    private function isActionWithOutput(string $action, ApiDoc $annotation): bool
     {
         $result = false;
         if (ApiAction::OPTIONS !== $action) {
             $statusCodes = ApiDocAnnotationUtil::getStatusCodes($annotation);
             foreach ($statusCodes as $statusCode => $description) {
-                if (\in_array($statusCode, self::SUCCESS_STATUS_CODES_WITH_CONTENT, true)) {
+                if ($this->isSuccessStatusCodeWithContent($statusCode)) {
                     $result = true;
                     break;
                 }
@@ -370,15 +368,28 @@ class RestDocHandler implements HandlerInterface
     }
 
     /**
+     * @param int $statusCode
+     *
+     * @return bool
+     */
+    private function isSuccessStatusCodeWithContent(int $statusCode): bool
+    {
+        return
+            Response::HTTP_OK === $statusCode
+            || Response::HTTP_CREATED === $statusCode
+            || Response::HTTP_ACCEPTED === $statusCode;
+    }
+
+    /**
      * Returns action name that should be used to format output data.
      *
      * @param string $action
      *
      * @return string
      */
-    private function getOutputAction($action)
+    private function getOutputAction(string $action): string
     {
-        if (\in_array($action, [ApiAction::CREATE, ApiAction::UPDATE], true)) {
+        if (ApiAction::CREATE === $action || ApiAction::UPDATE === $action) {
             return ApiAction::GET;
         }
 

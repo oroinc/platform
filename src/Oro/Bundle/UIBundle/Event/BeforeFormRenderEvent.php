@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormView;
+use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
 /**

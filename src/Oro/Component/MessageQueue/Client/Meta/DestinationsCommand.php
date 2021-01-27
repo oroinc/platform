@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
@@ -9,19 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * A command shows all available destinations and some information about them.
+ * Lists available message queue destinations.
  */
 class DestinationsCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:message-queue:destinations';
 
-    /** @var DestinationMetaRegistry */
-    private $destinationMetaRegistry;
+    private DestinationMetaRegistry $destinationMetaRegistry;
 
-    /**
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     */
     public function __construct(DestinationMetaRegistry $destinationMetaRegistry)
     {
         $this->destinationMetaRegistry = $destinationMetaRegistry;
@@ -29,16 +26,25 @@ class DestinationsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('A command shows all available destinations and some information about them.');
+        $this
+            ->setDescription('Lists available message queue destinations.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command lists available message queue destinations.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Translation;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;

@@ -2,6 +2,21 @@ This file includes only the most important items that should be addressed before
 
 Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes in the code that may affect the upgrade of some customizations.
 
+## FROM 4.1.0 to 4.2.0
+
+The minimum required PHP version is 7.4.14.
+
+### Directory structure and filesystem changes
+
+The `var/attachment` and `var/import_export` directories are no longer used for storing files and have been removed from the default directory structure.
+
+All files from these directories must be moved to the new locations:
+- from `var/attachment/protected_mediacache` to `var/data/protected_mediacache`;
+- from `var/attachment` to `var/data/attachments`;
+- from `var/import_export` to `var/data/importexport`.
+
+Files for standard import should be placed into `var/data/import_files` instead of `var/import_export/files`.
+
 ## FROM 4.1.0-rc to 4.1.0
 
 * The feature toggle for WEB API was implemented. After upgrade, the API feature will be disabled.

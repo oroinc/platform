@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 

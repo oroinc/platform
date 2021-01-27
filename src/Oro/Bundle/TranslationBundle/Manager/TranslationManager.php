@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\TranslationBundle\Manager;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
@@ -266,8 +266,8 @@ class TranslationManager
     public function invalidateCache($locale = null)
     {
         $this->eventDispatcher->dispatch(
-            InvalidateTranslationCacheEvent::NAME,
-            new InvalidateTranslationCacheEvent($locale)
+            new InvalidateTranslationCacheEvent($locale),
+            InvalidateTranslationCacheEvent::NAME
         );
         $this->dbTranslationMetadataCache->updateTimestamp($locale);
     }

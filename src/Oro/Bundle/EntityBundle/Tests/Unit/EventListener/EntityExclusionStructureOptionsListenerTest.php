@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\EventListener\EntityExclusionStructureOptionsListener;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;

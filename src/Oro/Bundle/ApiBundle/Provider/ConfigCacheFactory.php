@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Oro\Component\Config\Cache\ConfigCache as Cache;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
-use Symfony\Component\Config\ConfigCacheInterface;
 
 /**
  * The factory to create an object is used to store API configuration cache.
@@ -16,6 +14,9 @@ class ConfigCacheFactory
 
     /** @var bool */
     private $debug;
+
+    /** @var ConfigCacheWarmer */
+    private $configCacheWarmer;
 
     /** @var ConfigCacheStateInterface[]|null */
     private $dependencies;
@@ -31,15 +32,25 @@ class ConfigCacheFactory
     }
 
     /**
+     * @param ConfigCacheWarmer $configCacheWarmer
+     */
+    public function setConfigCacheWarmer(ConfigCacheWarmer $configCacheWarmer): void
+    {
+        $this->configCacheWarmer = $configCacheWarmer;
+    }
+
+    /**
      * @param string $configKey
      *
-     * @return ConfigCacheInterface
+     * @return ConfigCacheFile
      */
-    public function getCache(string $configKey): ConfigCacheInterface
+    public function getCache(string $configKey): ConfigCacheFile
     {
-        $cache = new Cache(
+        $cache = new ConfigCacheFile(
             sprintf('%s/%s.php', $this->cacheDir, $configKey),
-            $this->debug
+            $this->debug,
+            $configKey,
+            $this->configCacheWarmer
         );
         if ($this->dependencies) {
             foreach ($this->dependencies as $dependency) {

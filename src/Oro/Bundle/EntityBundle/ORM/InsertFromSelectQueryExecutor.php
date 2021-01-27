@@ -21,6 +21,6 @@ class InsertFromSelectQueryExecutor extends AbstractInsertQueryExecutor
         $sql = sprintf('insert into %s (%s) %s', $insertToTableName, implode(', ', $columns), $selectQuery->getSQL());
         list($params, $types) = $this->helper->processParameterMappings($selectQuery);
         // No possibility to use createNativeQuery with rsm http://www.doctrine-project.org/jira/browse/DDC-962
-        return $this->helper->getManager($className)->getConnection()->executeUpdate($sql, $params, $types);
+        return $this->helper->getManager($className)->getConnection()->executeStatement($sql, $params, $types);
     }
 }

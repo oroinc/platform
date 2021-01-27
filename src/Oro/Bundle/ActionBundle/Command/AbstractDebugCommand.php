@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ActionBundle\Command;
 
@@ -11,20 +12,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Abstract class for get debug info from factories
+ * Base class for OroActionBundle debug commands that retrieve the debug info from factories.
  */
 abstract class AbstractDebugCommand extends Command
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
+    private FactoryWithTypesInterface $factory;
 
-    /** @var FactoryWithTypesInterface */
-    private $factory;
-
-    /**
-     * @param ContainerInterface|null $container
-     * @param FactoryWithTypesInterface|null $factory
-     */
     public function __construct(ContainerInterface $container, FactoryWithTypesInterface $factory)
     {
         parent::__construct();
@@ -33,9 +27,7 @@ abstract class AbstractDebugCommand extends Command
         $this->factory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument($this->getArgumentName());
@@ -43,13 +35,7 @@ abstract class AbstractDebugCommand extends Command
         return $name ? $this->outputItem($name, $output) : $this->outputAllItems($output);
     }
 
-    /**
-     * @param string $name
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    protected function outputItem($name, OutputInterface $output)
+    protected function outputItem(string $name, OutputInterface $output): int
     {
         if (!$this->factory->isTypeExists($name)) {
             $output->writeln(sprintf('<error>Type "%s" is not found</error>', $name));
@@ -81,12 +67,7 @@ abstract class AbstractDebugCommand extends Command
         return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    protected function outputAllItems(OutputInterface $output)
+    protected function outputAllItems(OutputInterface $output): int
     {
         $types = $this->factory->getTypes();
 
@@ -109,20 +90,13 @@ abstract class AbstractDebugCommand extends Command
         return 0;
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param \TypeError|\ErrorException $e
-     * @param string $type
-     */
-    private function printErrorServiceLoadException(OutputInterface $output, $e, $type)
+    private function printErrorServiceLoadException(OutputInterface $output, \Throwable $e, string $type): void
     {
         $output->writeln(sprintf('<error>Can not load Service "%s": %s</error>', $type, $e->getMessage()));
     }
 
     /**
      * Get name of input argument
-     *
-     * @return string
      */
     abstract protected function getArgumentName(): string;
 }

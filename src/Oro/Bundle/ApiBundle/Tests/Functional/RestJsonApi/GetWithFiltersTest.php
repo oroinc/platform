@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 /**
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -18,11 +17,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
     {
         parent::setUp();
 
-        $this->loadFixtures([
-            LoadOrganization::class,
-            LoadBusinessUnit::class,
-            '@OroApiBundle/Tests/Functional/DataFixtures/filters.yml'
-        ]);
+        $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/filters.yml']);
     }
 
     public function testTotalCount()
@@ -381,14 +376,12 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    [
-                        'type' => $entityType,
-                        'id'   => '<toString(@TestEmployee3->id)>'
-                    ]
+                    ['type' => $entityType, 'id' => '<toString(@TestEmployee3->id)>']
                 ]
             ],
             $response
         );
+        self::assertResponseCount(1, $response);
     }
 
     public function testDefaultPagination()
@@ -498,12 +491,168 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         self::assertResponseCount(21, $response);
     }
 
-    public function testPaginationWithNegativePageSize()
+    public function testPaginationWithUnlimitedPageSize()
     {
-        $entityType = $this->getEntityType(TestEmployee::class);
+        $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->cget(
             ['entity' => $entityType],
-            ['page' => ['size' => -1]],
+            ['page' => ['size' => -1]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment11->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment12->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment13->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment14->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment15->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment16->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment17->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment18->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment19->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment20->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment21->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(21, $response);
+    }
+
+    public function testPaginationWithUnlimitedPageSizeAndWithPageNumber()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => -1, 'number' => 2]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment11->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment12->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment13->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment14->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment15->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment16->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment17->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment18->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment19->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment20->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment21->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(21, $response);
+    }
+
+    public function testPaginationWithPageSizeLessThanMaxResults()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'max_results' => 5
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 4]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(4, $response);
+    }
+
+    public function testPaginationWithPageSizeEqualsToMaxResults()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'max_results' => 5
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 5]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(5, $response);
+    }
+
+    public function testPaginationWithPageSizeGreaterThanMaxResults()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'max_results' => 5
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => 6]],
             [],
             false
         );
@@ -511,7 +660,77 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected unsigned integer value. Given "-1".',
+                'detail' => 'The value should be less than or equals to 5.',
+                'source' => ['parameter' => 'page[size]']
+            ],
+            $response
+        );
+    }
+
+    public function testPaginationWithUnlimitedMaxResultsAndPageSize()
+    {
+        $this->appendEntityConfig(
+            TestDepartment::class,
+            [
+                'actions' => [
+                    'get_list' => [
+                        'max_results' => -1
+                    ]
+                ]
+            ]
+        );
+
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => -1]]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment1->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment2->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment3->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment4->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment5->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment6->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment7->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment8->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment9->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment10->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment11->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment12->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment13->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment14->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment15->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment16->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment17->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment18->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment19->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment20->id)>'],
+                    ['type' => $entityType, 'id' => '<toString(@TestDepartment21->id)>']
+                ]
+            ],
+            $response
+        );
+        self::assertResponseCount(21, $response);
+    }
+
+    public function testPaginationWithNegativePageSize()
+    {
+        $entityType = $this->getEntityType(TestEmployee::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['page' => ['size' => -2]],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'filter constraint',
+                'detail' => 'The value should be greater than or equals to -1.',
                 'source' => ['parameter' => 'page[size]']
             ],
             $response
@@ -531,7 +750,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'Expected unsigned integer value. Given "str".',
+                'detail' => 'Expected integer value. Given "str".',
                 'source' => ['parameter' => 'page[size]']
             ],
             $response
@@ -587,6 +806,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         );
 
         $this->assertResponseContains(['data' => []], $response);
+        self::assertResponseCount(0, $response);
     }
 
     public function testPaginationWithZeroPageNumber()
@@ -602,7 +822,7 @@ class GetWithFiltersTest extends RestJsonApiTestCase
         $this->assertResponseValidationError(
             [
                 'title'  => 'filter constraint',
-                'detail' => 'The value should should be greater than or equals to 1.',
+                'detail' => 'The value should be greater than or equals to 1.',
                 'source' => ['parameter' => 'page[number]']
             ],
             $response

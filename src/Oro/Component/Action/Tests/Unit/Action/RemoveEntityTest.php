@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\RemoveEntity;
 use Oro\Component\Action\Exception\InvalidParameterException;

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
@@ -19,20 +20,14 @@ class EmailRenderer extends TemplateRenderer
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param Environment $environment
-     * @param TemplateRendererConfigProviderInterface $configProvider
-     * @param VariableProcessorRegistry $variableProcessors
-     * @param EmailTemplateContentProvider $contentProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         Environment $environment,
         TemplateRendererConfigProviderInterface $configProvider,
         VariableProcessorRegistry $variableProcessors,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        Inflector $inflector
     ) {
-        parent::__construct($environment, $configProvider, $variableProcessors);
+        parent::__construct($environment, $configProvider, $variableProcessors, $inflector);
         $this->translator = $translator;
     }
 

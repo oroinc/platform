@@ -189,6 +189,7 @@ services:
     oro_security.filter.configurable_permission_filter:
         class: Oro\Bundle\SecurityBundle\Filter\AclPrivilegeConfigurableFilter
         arguments:
+            - !tagged_iterator oro.security.filter.acl_privilege
             - '@oro_security.acl.configurable_permission_provider'
 
     oro_security.acl.security_identity_to_string_converter:
@@ -819,3 +820,10 @@ services:
         class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
         decorates: twig.exception_listener
         parent: twig.exception_listener
+
+    oro_security.action.generate_uuid:
+        class: 'Oro\Bundle\SecurityBundle\Action\GenerateUuidAction'
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: generate_uuid }

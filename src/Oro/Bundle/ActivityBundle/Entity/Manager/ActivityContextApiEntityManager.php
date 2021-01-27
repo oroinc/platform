@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
@@ -176,7 +176,7 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     {
         if ($this->eventDispatcher) {
             $event = new PrepareContextTitleEvent($item, $targetClass);
-            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, PrepareContextTitleEvent::EVENT_NAME);
             $item = $event->getItem();
         }
 

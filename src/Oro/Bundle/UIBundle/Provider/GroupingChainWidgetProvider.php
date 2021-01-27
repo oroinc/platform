@@ -71,7 +71,7 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
 
         if ($this->eventDispatcher) {
             $beforeGroupingChainWidgetEvent = new BeforeGroupingChainWidgetEvent($this->pageType, $widgets, $object);
-            $this->eventDispatcher->dispatch(Events::BEFORE_GROUPING_CHAIN_WIDGET, $beforeGroupingChainWidgetEvent);
+            $this->eventDispatcher->dispatch($beforeGroupingChainWidgetEvent, Events::BEFORE_GROUPING_CHAIN_WIDGET);
             $widgets = $beforeGroupingChainWidgetEvent->getWidgets();
         }
 

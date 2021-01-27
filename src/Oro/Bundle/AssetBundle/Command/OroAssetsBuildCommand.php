@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\AssetBundle\Command;
 
@@ -14,14 +15,11 @@ use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Process\Process;
 
 /**
- * Run bin/webpack to build assets.
- * @SuppressWarnings(PHPMD)
+ * Runs webpack to build assets.
  */
 class OroAssetsBuildCommand extends Command
 {
-    /**
-     * @see https://webpack.js.org/configuration/stats/#stats
-     */
+    /** @see https://webpack.js.org/configuration/stats/#stats */
     protected const WEBPACK_VERBOSITY_MAP = [
         OutputInterface::VERBOSITY_QUIET => 'none',
         OutputInterface::VERBOSITY_NORMAL => false,
@@ -30,9 +28,7 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_DEBUG => 'verbose',
     ];
 
-    /**
-     * @see https://webpack.js.org/configuration/dev-server/#devserverstats-
-     */
+    /** @see https://webpack.js.org/configuration/dev-server/#devserverstats- */
     protected const WEBPACK_DEV_SERVER_VERBOSITY_MAP = [
         OutputInterface::VERBOSITY_QUIET => 'none',
         OutputInterface::VERBOSITY_NORMAL => false,
@@ -41,36 +37,19 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_VERBOSE => 'minimal',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    protected const BUILD_DIR = '.';
+
     protected static $defaultName = 'oro:assets:build';
 
-    protected const BUILD_DIR = 'vendor/oro/platform/build/';
+    private NodeProcessFactory $nodeProcessFactory;
+    private AssetConfigCache $cache;
 
-    /**
-     * @var NodeProcessFactory
-     */
-    private $nodeProcessFactory;
+    private string $npmPath;
 
-    /**
-     * @var AssetConfigCache
-     */
-    private $cache;
-
-    /**
-     * @var string
-     */
-    private $npmPath;
-
-    /**
-     * @var int|float|null
-     */
+    /** @var int|float|null */
     private $buildTimeout;
 
-    /**
-     * @var int|float|null
-     */
+    /** @var int|float|null */
     private $npmInstallTimeout;
 
     /**
@@ -97,126 +76,121 @@ class OroAssetsBuildCommand extends Command
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function configure()
     {
         $this
-            ->setDescription(
-                <<<DESCRIPTION
-The command runs webpack to build assets.
+            ->addArgument('theme', InputArgument::OPTIONAL, 'Theme name')
+            ->addOption('watch', 'w', InputOption::VALUE_NONE, 'Continue to watch for changes after initial build')
+            ->addOption('hot', null, InputOption::VALUE_NONE, 'Turn on hot module replacement')
+            ->addOption('key', null, InputOption::VALUE_REQUIRED, 'SSL certificate key PEM file path')
+            ->addOption('cert', null, InputOption::VALUE_REQUIRED, 'SSL certificate PEM file path')
+            ->addOption('cacert', null, InputOption::VALUE_REQUIRED, 'SSL certificate cacert PEM file path')
+            ->addOption('pfx', null, InputOption::VALUE_REQUIRED, 'Path to SSL certificate .pfx file')
+            ->addOption('pfxPassphrase', null, InputOption::VALUE_REQUIRED, 'Passphrase to the .pfx file')
+            ->addOption('force-warmup', 'f', InputOption::VALUE_NONE, 'Warm up the asset-config.json cache')
+            ->addOption('npm-install', 'i', InputOption::VALUE_NONE, 'Reinstall npm dependencies')
+            ->addOption('skip-css', null, InputOption::VALUE_NONE, 'Skip build of CSS assets')
+            ->addOption('skip-js', null, InputOption::VALUE_NONE, 'Skip build of JS assets')
+            ->addOption('skip-babel', null, InputOption::VALUE_NONE, 'Skip transpiling code with Babel')
+            ->addOption('skip-sourcemap', null, InputOption::VALUE_NONE, 'Skip building source maps')
+            ->addOption('analyze', null, InputOption::VALUE_NONE, 'Run BundleAnalyzerPlugin')
+        ;
+        $this
+            ->setDescription('Runs webpack to build assets.')
+            ->setHelp(
+                // @codingStandardsIgnoreStart
+                <<<'HELP'
+The <info>%command.name%</info> command runs bin/webpack to build the web assets in all themes.
 
-In <comment>dev</comment> environment command builds assets without minification and with source-maps. 
-In <comment>prod</comment> environment assets are minified and do not include source-maps.
- 
-<info>Note:</info> When using the <comment>watch</comment> mode after changing the assets configuration at 
-<comment>assets.yml</comment> files, it is required to restart the command, otherwise it will not detect the changes. 
-DESCRIPTION
-            )
-            ->addArgument(
-                'theme',
-                InputArgument::OPTIONAL,
-                'Theme name to build. When not provided, all available themes are built.'
-            )
-            ->addOption(
-                'hot',
-                null,
-                InputOption::VALUE_NONE,
-                'Turn on hot module replacement. It allows all styles to be updated at runtime 
-                without the need for a full refresh.'
-            )
-            ->addOption(
-                'key',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SSL Certificate key PEM file path. Used only with hot module replacement.'
-            )
-            ->addOption(
-                'cert',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SSL Certificate cert PEM file path. Used only with hot module replacement.'
-            )
-            ->addOption(
-                'cacert',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SSL Certificate cacert PEM file path. Used only with hot module replacement.'
-            )
-            ->addOption(
-                'pfx',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'When used via the CLI, a path to an SSL .pfx file. '.
-                'If used in options, it should be the bytestream of the .pfx file. '.
-                'Used only with hot module replacement.'
-            )
-            ->addOption(
-                'pfxPassphrase',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'The passphrase to a SSL PFX file. Used only with hot module replacement.'
-            )
-            ->addOption(
-                'force-warmup',
-                'f',
-                InputOption::VALUE_NONE,
-                'Warm up the asset-config.json cache.'
-            )
-            ->addOption(
-                'watch',
-                'w',
-                InputOption::VALUE_NONE,
-                'Turn on watch mode. This means that after the initial build, 
-                webpack continues to watch the changes in any of the resolved files.'
-            )
-            ->addOption(
-                'npm-install',
-                'i',
-                InputOption::VALUE_NONE,
-                'Reinstall npm dependencies to vendor/oro/platform/build folder, to be used by webpack.'.
-                'Required when "node_modules" folder is corrupted.'
-            )
-            ->addOption(
-                'skip-css',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip build of CSS assets.'
-            )
-            ->addOption(
-                'skip-js',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip build of JS assets.'
-            )
-            ->addOption(
-                'skip-babel',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip transpiling code with babel.'
-            )
-            ->addOption(
-                'skip-sourcemap',
-                null,
-                InputOption::VALUE_NONE,
-                'Skip building source map.'
-            )
-            ->addOption(
-                'analyze',
-                null,
-                InputOption::VALUE_NONE,
-                'Run BundleAnalyzerPlugin'
-            )
-            ->addUsage('admin.oro --watch')
-            ->addUsage('blank -w')
-            ->addUsage('blank --hot')
+  <info>php %command.full_name%</info>
+
+The assets can be build only for a specific theme if its name is provided as an argument:
+
+  <info>php %command.full_name% <theme-name></info>
+  <info>php %command.full_name% default</info>
+  <info>php %command.full_name% blank</info>
+  <info>php %command.full_name% admin.oro</info>
+
+With <info>--env=dev</info> the assets are built without minification and with source-maps,
+while with <info>--env=prod</info> the assets are minified and do not include source-maps:
+
+  <info>php %command.full_name% --env=dev</info>
+  <info>php %command.full_name% --env=prod</info>
+
+The <info>--watch</info> (<info>-w</info>) option can be used to continuously monitor all resolved files
+and rebuild the necessary assets automatically when any changes are detected:
+
+  <info>php %command.full_name% --watch</info>
+  <info>php %command.full_name% -w</info>
+
+<comment>Note:</comment> When using the <info>--watch</info> option you should restart the command after
+you modify the assets configuration in <comment>assets.yml</comment> files, or it will not
+be able to detect the changes otherwise.
+
+The <info>--hot</info> option turns on the hot module replacement feature. It allows all styles
+to be updated at runtime without the need for a full page refresh:
+
+  <info>php %command.full_name% --hot</info>
+
+The <info>--key</info>, <info>--cert</info>, <info>--cacert</info>, <info>--pfx</info> and <info>--pfxPassphrase</info> options can be used
+with <info>--hot</info> option to allow the hot module replacement to work over HTTPS:
+
+  <info>php %command.full_name% --hot --key=<path> --cert=<path> --cacert=<path> --pfx=<path> --pfxPassphrase=<passphrase></info>
+
+The <info>--force-warmup</info> option can be used to warm up the <comment>asset-config.json</comment> cache:
+
+  <info>php %command.full_name% --force-warmup</info>
+
+The <info>--npm-install</info> option can be used to reinstall npm dependencies
+in <comment>vendor/oro/platform/build</comment> folder. It may be required when
+<comment>node_modules</comment> contents become corrupted:
+
+  <info>php %command.full_name% --npm-install</info>
+
+The <info>--skip-css</info>, <info>--skip-js</info>, <info>--skip-babel</info> and <info>--skip-sourcemap</info> options allow to
+skip building CSS and JavaScript files, skip transpiling Javascript with Babel
+and skip building sourcemaps respectively:
+
+  <info>php %command.full_name% --skip-css</info>
+  <info>php %command.full_name% --skip-js</info>
+  <info>php %command.full_name% --skip-babel</info>
+  <info>php %command.full_name% --skip-sourcemap</info>
+
+The <info>--analyze</info> option can be used to run BundleAnalyzerPlugin:
+
+  <info>php %command.full_name% --analyze</info>
+
+HELP
+                // @codingStandardsIgnoreEnd
+            );
+        $this
+            ->addUsage('<theme-name>')
             ->addUsage('default')
-            ->addUsage('-i');
+            ->addUsage('blank')
+            ->addUsage('admin.oro')
+            ->addUsage('--env=dev')
+            ->addUsage('--env=prod')
+            ->addUsage('--watch')
+            ->addUsage('--watch admin.oro')
+            ->addUsage('-w')
+            ->addUsage('-w blank')
+            ->addUsage('--hot')
+            ->addUsage('--hot blank')
+            ->addUsage('--hot --key=<path> --cert=<path> --cacert=<path> --pfx=<path> --pfxPassphrase=<passphrase>')
+            ->addUsage('--force-warmup')
+            ->addUsage('--npm-install')
+            ->addUsage('--skip-css')
+            ->addUsage('--skip-js')
+            ->addUsage('--skip-babel')
+            ->addUsage('--skip-sourcemap')
+            ->addUsage('--analyze')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $kernel = $this->getKernel();
@@ -228,7 +202,7 @@ DESCRIPTION
             $io->text('Done');
         }
 
-        $nodeModulesDir = $kernel->getProjectDir().'/'.self::BUILD_DIR.'node_modules';
+        $nodeModulesDir = $kernel->getProjectDir() . DIRECTORY_SEPARATOR . 'node_modules';
         if (!file_exists($nodeModulesDir) || $input->getOption('npm-install')) {
             $output->writeln('<info>Installing npm dependencies.</info>');
             $this->npmInstall($output);
@@ -241,10 +215,7 @@ DESCRIPTION
         }
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
+    /** @SuppressWarnings(PHPMD.UnusedLocalVariable) */
     protected function buildAssets(InputInterface $input, OutputInterface $output): void
     {
         $buildTimeout = $this->buildTimeout;
@@ -278,14 +249,13 @@ DESCRIPTION
     }
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     * @return array
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function buildCommand(InputInterface $input, OutputInterface $output): array
     {
         if ($input->getOption('hot')) {
-            $command[] = self::BUILD_DIR.'node_modules/webpack-dev-server/bin/webpack-dev-server.js';
+            $command[] = self::BUILD_DIR . '/node_modules/.bin/webpack-dev-server.js';
             $command[] = '--hot';
 
             $this->mapSslOptions($input, $command);
@@ -334,10 +304,6 @@ DESCRIPTION
         return $command;
     }
 
-    /**
-     * @param InputInterface $input
-     * @param array          $command
-     */
     protected function mapSslOptions(InputInterface $input, array &$command): void
     {
         foreach (['key', 'cert', 'cacert', 'pfx', 'pfxPassphrase'] as $optionName) {
@@ -350,8 +316,6 @@ DESCRIPTION
 
     /**
      * Handle exit signals, to make them processed by NodeJs
-     *
-     * @param Process $process
      */
     protected function handleSignals(Process $process): void
     {
@@ -362,19 +326,21 @@ DESCRIPTION
             $process->signal(SIGKILL);
             exit();
         };
-        pcntl_async_signals(true);
-        pcntl_signal(SIGINT, $killNodeProcess);
-        pcntl_signal(SIGTERM, $killNodeProcess);
+        \pcntl_async_signals(true);
+        \pcntl_signal(SIGINT, $killNodeProcess);
+        \pcntl_signal(SIGTERM, $killNodeProcess);
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     protected function npmInstall(OutputInterface $output): void
     {
-        $command = [$this->npmPath, '--no-audit', 'install'];
-        $output->writeln($command);
-        $path = $this->getKernel()->getProjectDir().'/'.self::BUILD_DIR;
+        $path = $this->getKernel()->getProjectDir();
+        if (\file_exists($path . DIRECTORY_SEPARATOR . 'package-lock.json')) {
+            $logLevel = $output->isVerbose() ? 'info' : 'error';
+            $command = [$this->npmPath, 'ci', '--loglevel ' . $logLevel];
+        } else {
+            $command = [$this->npmPath, '--no-audit', 'install'];
+        }
+        $output->writeln(implode(' ', $command));
         $process = new Process($command, $path);
         $process->setTimeout($this->npmInstallTimeout);
 
@@ -387,9 +353,6 @@ DESCRIPTION
         }
     }
 
-    /**
-     * @return Kernel
-     */
     private function getKernel(): Kernel
     {
         return $this->getApplication()->getKernel();

@@ -410,7 +410,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         /** @var ClassMetadata $metadata */
         $metadata = $this->entityManager->getClassMetadata($entityName);
         $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
-        $connection->executeUpdate($query);
+        $connection->executeStatement($query);
     }
 
     /**

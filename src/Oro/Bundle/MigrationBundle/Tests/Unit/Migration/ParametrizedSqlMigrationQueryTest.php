@@ -46,7 +46,7 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $query->setConnection($this->connection);
 
         $this->connection->expects($this->never())
-            ->method('executeUpdate');
+            ->method('executeStatement');
 
         $this->addSqls($query);
 
@@ -64,33 +64,33 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $logger = new ArrayLogger();
 
         $this->connection->expects($this->at(0))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'INSERT INTO test_table (name) VALUES (\'name\')'
             );
         $this->connection->expects($this->at(1))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'INSERT INTO test_table (name) VALUES (?1)',
                 ['test']
             );
         // expects $this->connection->getDatabasePlatform at(2)
         $this->connection->expects($this->at(3))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'INSERT INTO test_table (name) VALUES (?1)',
                 ['test'],
                 ['string']
             );
         $this->connection->expects($this->at(4))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'INSERT INTO test_table (name) VALUES (:name)',
                 ['name' => 'test']
             );
         // expects $this->connection->getDatabasePlatform at(5)
         $this->connection->expects($this->at(6))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'INSERT INTO test_table (name) VALUES (:name)',
                 ['name' => 'test'],
@@ -99,7 +99,7 @@ class ParametrizedSqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
         // expects $this->connection->getDatabasePlatform at(7)
         // expects $this->connection->getDatabasePlatform at(8)
         $this->connection->expects($this->at(9))
-            ->method('executeUpdate')
+            ->method('executeStatement')
             ->with(
                 'UPDATE test_table SET values = ?1 WHERE id = ?2',
                 [[1, 2, 3], 1],

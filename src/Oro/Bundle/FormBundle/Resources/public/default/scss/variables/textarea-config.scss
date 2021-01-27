@@ -1,8 +1,8 @@
 /* @theme: default; */
 
-$textarea-padding: 11px;
-$textarea-padding--m: 10px 9px;
-$textarea-padding--s: 8px 9px;
+$textarea-padding: 9px 11px 8px;
+$textarea-padding--m: 8px 9px 7px;
+$textarea-padding--s: 5px 9px 4px;
 
 // Hover
 $textarea-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),

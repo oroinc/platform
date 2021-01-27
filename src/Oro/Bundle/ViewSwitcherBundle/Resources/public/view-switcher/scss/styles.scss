@@ -1,12 +1,12 @@
 /* @theme: view-switcher; */
 
-@import "npmassets/font-awesome/scss/_variables";
+@import "~font-awesome/scss/_variables";
 @import "oroui/css/scss/variables";
 @import "oroui/css/scss/oro/variables/loading-bar";
 @import "oroui/css/scss/oro/loading/loading-bar";
 
 @import "variables/variables-config";
-@import "bundles/npmassets/font-awesome/scss/font-awesome.scss";
+@import "~font-awesome/scss/font-awesome.scss";
 @import "oroui/css/scss/mixins";
 
 @import "view-switcher";

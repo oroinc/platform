@@ -47,7 +47,7 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
         }
 
         $event = new RouteCollectionEvent($routes);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         return $event->getCollection();
     }

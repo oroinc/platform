@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Consumption\StateDriver;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Consumption\StateDriverInterface;
 use Psr\Log\LoggerInterface;
 
@@ -100,7 +100,7 @@ class DbalStateDriver implements StateDriverInterface
         $querySQL = 'UPDATE oro_message_queue_state SET updated_at = :updatedAt'
             . ' WHERE id = :id AND updated_at < :dateWithGap';
 
-        $this->getConnection()->executeUpdate(
+        $this->getConnection()->executeStatement(
             $querySQL,
             ['updatedAt' => $date, 'id' => $this->key, 'dateWithGap' => $dateWithGap],
             ['updatedAt' => Types::DATETIME_MUTABLE, 'id' => Types::STRING, 'dateWithGap' => Types::DATETIME_MUTABLE]

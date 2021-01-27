@@ -24,15 +24,15 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RolePrivilegeCategoryProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $categoryProvider;
 
-    /** @var RolePrivilegeCapabilityProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var RolePrivilegeCapabilityProvider */
     private $capabilityProvider;
 
     protected function setUp(): void
     {
-        /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator */
         $translator = $this->createMock(TranslatorInterface::class);
         $this->aclRoleHandler = $this->createMock(AclRoleHandler::class);
         $this->categoryProvider = $this->createMock(RolePrivilegeCategoryProvider::class);
+
         $this->capabilityProvider = new RolePrivilegeCapabilityProvider(
             $translator,
             $this->categoryProvider,
@@ -49,12 +49,10 @@ class RolePrivilegeCapabilityProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetCapabilities(array $categories, array $privileges, array $expected)
     {
-        /** @var AbstractRole||\PHPUnit\Framework\MockObject\MockObject $role */
         $role = $this->createMock(AbstractRole::class);
 
-        $this->categoryProvider
-            ->expects($this->once())
-            ->method('getPermissionCategories')
+        $this->categoryProvider->expects($this->once())
+            ->method('getCategories')
             ->willReturn($categories);
 
         $this->aclRoleHandler->expects($this->once())

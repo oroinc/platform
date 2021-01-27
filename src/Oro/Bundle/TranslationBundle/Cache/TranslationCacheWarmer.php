@@ -4,8 +4,8 @@ namespace Oro\Bundle\TranslationBundle\Cache;
 
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class TranslationCacheWarmer implements CacheWarmerInterface, ServiceSubscriberInterface
 {

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
@@ -72,7 +72,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
+            ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
         $this->manager->setScopeId(456);
 

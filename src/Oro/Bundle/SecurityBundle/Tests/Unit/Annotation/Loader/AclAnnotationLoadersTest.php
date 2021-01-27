@@ -63,7 +63,9 @@ class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
         $resourcesContainer = new ResourcesContainer();
         $configLoader = new AclConfigLoader();
         $configLoader->load($storage, $resourcesContainer);
-        $annotationLoader = new AclAnnotationLoader($controllerClassProvider, new AnnotationReader());
+        $annotationReader = new AnnotationReader();
+        $annotationReader::addGlobalIgnoredName('required');
+        $annotationLoader = new AclAnnotationLoader($controllerClassProvider, $annotationReader);
         $annotationLoader->load($storage, $resourcesContainer);
 
         self::assertFalse($storage->isKnownClass(Controller\ClassWOAnnotation::class));

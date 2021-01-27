@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Event;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class IntegrationUpdateEvent extends Event
 {

@@ -1,8 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -12,23 +13,16 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Execute transition of workflow
+ * Transitions a workflow item.
  */
 class WorkflowTransitCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:workflow:transit';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private WorkflowManager $workflowManager;
 
-    /** @var WorkflowManager */
-    private $workflowManager;
-
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param WorkflowManager $workflowManager
-     */
     public function __construct(ManagerRegistry $managerRegistry, WorkflowManager $workflowManager)
     {
         parent::__construct();
@@ -37,29 +31,26 @@ class WorkflowTransitCommand extends Command
         $this->workflowManager = $workflowManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
-        $this->setDescription('Execute transition of workflow')
-            ->addOption(
-                'workflow-item',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Identifier of WorkflowItem'
+        $this
+            ->addOption('transition', null, InputOption::VALUE_REQUIRED, 'Transition name')
+            ->addOption('workflow-item', null, InputOption::VALUE_REQUIRED, 'WorkflowItem ID')
+            ->setDescription('Transitions a workflow item.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command executes a transition on a workflow item:
+
+  <info>php %command.full_name% --transition=<transition> --workflow-item=<ID></info>
+
+HELP
             )
-            ->addOption(
-                'transition',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Name of Transition'
-            );
+            ->addUsage('--transition=<transition> --workflow-item=<ID>')
+        ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $workflowItemId = $input->getOption('workflow-item');

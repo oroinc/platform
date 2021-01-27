@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Provider;
 
-use Gaufrette\Adapter\Local;
-use Gaufrette\File;
-use Gaufrette\Filesystem;
-use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
+use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Configurator\AttachmentSettingsTrait;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpKernel\Config\FileLocator;
 
 /**
  * @dbIsolationPerTest
@@ -22,40 +19,77 @@ class ResizedImageProviderTest extends WebTestCase
 {
     use AttachmentSettingsTrait;
 
-    /** @var ConfigManager */
-    private $configManager;
-
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->configManager = $this->getContainer()->get('oro_config.global');
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    private function getConfigManager(): ConfigManager
+    {
+        return self::getContainer()->get('oro_config.global');
+    }
+
+    /**
+     * @return FileManager
+     */
+    private function getFileManager(): FileManager
+    {
+        return self::getContainer()->get('oro_attachment.file_manager');
+    }
+
+    /**
+     * @return ResizedImageProviderInterface
+     */
+    private function getResizedImageProvider(): ResizedImageProviderInterface
+    {
+        return self::getContainer()->get('oro_attachment.provider.resized_image');
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return array
+     */
+    private function loadImage(string $fileName): array
+    {
+        $data = file_get_contents(__DIR__ . '/files/' . $fileName);
+        [$width, $height] = getimagesizefromstring($data);
+
+        return [$data, $width, $height];
     }
 
     /**
      * @param string $fileName
      */
-    public function assertImageSizeShrink(string $fileName): void
+    private function assertImageSizeShrink(string $fileName): void
     {
-        $attachment = $this->getAttachment($fileName);
-        [$width, $height] = getimagesizefromstring($attachment->getContent());
+        [$data, $width, $height] = $this->loadImage($fileName);
 
-        /** @var ResizedImageProvider $resizedImageProvider */
-        $resizedImageProvider = $this->getContainer()->get('oro_attachment.provider.resized_image');
-        $resizedBinary = $resizedImageProvider->getResizedImage($attachment->getContent(), $width, $height);
+        $fileManager = $this->getFileManager();
+        $fileManager->deleteFile($fileName);
+        try {
+            $fileManager->writeToStorage($data, $fileName);
+            $resizedBinary = $this->getResizedImageProvider()->getResizedImageByPath($fileName, $width, $height);
+        } finally {
+            $fileManager->deleteFile($fileName);
+        }
 
-        $this->assertLessThan(strlen($attachment->getContent()), strlen($resizedBinary->getContent()));
+        self::assertLessThan(strlen($data), strlen($resizedBinary->getContent()));
     }
 
     /**
      * @param string $fileName
-     * @param int $quality
+     * @param int    $quality
      *
      * @dataProvider pngDataProvider
      */
     public function testGetPNG(string $fileName, int $quality): void
     {
         $this->changeProcessorsParameters(85, $quality);
-        $this->configManager->flush();
+        $this->getConfigManager()->flush();
         $this->assertImageSizeShrink($fileName);
     }
 
@@ -65,18 +99,18 @@ class ResizedImageProviderTest extends WebTestCase
     public function pngDataProvider(): array
     {
         return [
-            'PNG attachment RGBA' => [
+            'PNG attachment RGBA'     => [
                 'fileName' => 'original_attachment_rgba.png',
-                'quality' => 90
+                'quality'  => 90
             ],
-            'PNG attachment RGB' => [
+            'PNG attachment RGB'      => [
                 'fileName' => 'original_attachment_rgb.png',
-                'quality' => 50
+                'quality'  => 50
             ],
             'PNG attachment colormap' => [
                 'fileName' => 'original_attachment_colormap.png',
-                'quality' => 1
-            ],
+                'quality'  => 1
+            ]
         ];
     }
 
@@ -86,18 +120,12 @@ class ResizedImageProviderTest extends WebTestCase
         $this->assertImageSizeShrink('original_attachment.jpg');
     }
 
-    /**
-     * @param string $fileName
-     *
-     * @return File
-     */
-    private function getAttachment(string $fileName): File
+    public function testResizedImageByFileContent(): void
     {
-        /** @var FileLocator $fileLocator */
-        $fileLocator = $this->getContainer()->get('file_locator');
-        $attachments = $fileLocator->locate('@OroAttachmentBundle/Tests/Functional/Provider/files/');
-        $filesystem = new Filesystem(new Local($attachments, false, 0600));
+        $this->changeProcessorsParameters();
 
-        return $filesystem->get($fileName);
+        [$data, $width, $height] = $this->loadImage('original_attachment.jpg');
+        $resizedBinary = $this->getResizedImageProvider()->getResizedImageByContent($data, $width, $height);
+        self::assertLessThan(strlen($data), strlen($resizedBinary->getContent()));
     }
 }

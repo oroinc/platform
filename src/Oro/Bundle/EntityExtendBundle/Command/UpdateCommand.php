@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
@@ -12,25 +13,19 @@ use Symfony\Component\Console\Helper\TableStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * The CLI command to update the database schema and all related caches to reflect changes made in extended entities.
+ * Applies extend entity changes to the database schema.
  */
 class UpdateCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:entity-extend:update';
 
-    /** @var EntityExtendUpdateProcessor */
-    private $entityExtendUpdateProcessor;
+    private EntityExtendUpdateProcessor $entityExtendUpdateProcessor;
+    private ConfigManager $configManager;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /**
-     * @param EntityExtendUpdateProcessor $entityExtendUpdateProcessor
-     * @param ConfigManager               $configManager
-     */
     public function __construct(
         EntityExtendUpdateProcessor $entityExtendUpdateProcessor,
         ConfigManager $configManager
@@ -40,52 +35,60 @@ class UpdateCommand extends Command
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->setDescription(
-                'Updates the database schema and all related caches to reflect changes made in extended entities.'
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Display changes without applying them')
+            ->setDescription('Applies extend entity changes to the database schema.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command applies extend entity changes
+to the database schema and updates all related caches.
+
+  <info>php %command.full_name%</info>
+
+The <info>--dry-run</info> option can be used to print the changes without applying them:
+
+  <info>php %command.full_name% --dry-run</info>
+
+HELP
             )
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Shows changes without applying them.');
+            ->addUsage('--dry-run')
+        ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         if ($input->getOption('dry-run')) {
-            $this->showChanges($output);
+            $this->showChanges($io);
 
             return 0;
         }
 
-        return $this->applyChanges($output);
+        return $this->applyChanges($io);
     }
 
-    /**
-     * @param OutputInterface $output
-     */
-    private function showChanges(OutputInterface $output): void
+    private function showChanges(SymfonyStyle $io): void
     {
         $changes = $this->getChanges();
         if (!$changes) {
-            $output->writeln('<info>There are no any changes.</info>');
+            $io->success('There are no any changes.');
 
             return;
         }
 
-        $output->writeln('The following entities have changes:');
+        $io->text('The following entities have changes:');
         foreach ($changes as $entityClass => [$entityState, $fields]) {
-            $output->writeln('');
-            $output->writeln(sprintf('%s    <comment>%s</comment>', $entityClass, $entityState));
-            $output->writeln(str_repeat('-', strlen($entityClass) + strlen($entityState) + 4));
+            $io->newLine();
+            $io->text(sprintf('%s    <comment>%s</comment>', $entityClass, $entityState));
+            $io->text(str_repeat('-', strlen($entityClass) + strlen($entityState) + 4));
             if ($fields) {
-                $output->writeln('Fields:');
-                $fieldTable = new Table($output);
+                $io->text('Fields:');
+                $fieldTable = new Table($io);
                 $fieldTable->setStyle(
                     (new TableStyle())
                         ->setHorizontalBorderChars('')
@@ -99,8 +102,8 @@ class UpdateCommand extends Command
             }
         }
 
-        $output->writeln('');
-        $output->writeln('To apply the changes run this command without <comment>--dry-run</comment> option.');
+        $io->newLine();
+        $io->text('To apply the changes run this command without <comment>--dry-run</comment> option.');
     }
 
     /**
@@ -129,11 +132,6 @@ class UpdateCommand extends Command
         return $changes;
     }
 
-    /**
-     * @param ConfigInterface $config
-     *
-     * @return bool
-     */
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
         return
@@ -142,22 +140,17 @@ class UpdateCommand extends Command
             && !$config->is('is_deleted');
     }
 
-    /**
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    private function applyChanges(OutputInterface $output): int
+    private function applyChanges(SymfonyStyle $io): int
     {
-        $output->writeln('<comment>Updating the database schema and all entity extend related caches ...</comment>');
+        $io->text('Updating the database schema and all entity extend related caches ...');
 
         if (!$this->entityExtendUpdateProcessor->processUpdate()) {
-            $output->writeln('<error>The update failed.</error>');
+            $io->error('The update failed.');
 
             return 1;
         }
 
-        $output->writeln('<info>The update complete.</info>');
+        $io->success('The update complete.');
 
         return 0;
     }

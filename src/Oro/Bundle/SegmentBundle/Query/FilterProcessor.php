@@ -5,20 +5,18 @@ namespace Oro\Bundle\SegmentBundle\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Filter\WidgetProviderFilterInterface;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
+use Oro\Bundle\QueryDesignerBundle\Model\QueryDesigner;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Provides a functionality to apply a segment filters to a widget query.
  */
 class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFilterInterface
 {
-    /** @var string */
-    protected $rootEntityAlias;
-
     /**
      * {@inheritDoc}
      */
-    public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
+    public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions): void
     {
         $queryFilter = $widgetOptions->get('queryFilter', []);
         $filters = $queryFilter['definition']['filters'] ?? [];
@@ -27,7 +25,7 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
         if (!$rootEntity) {
             return;
         }
-        $rootEntityAlias = $this->getRootAlias($queryBuilder);
+        $rootEntityAlias = QueryBuilderUtil::getSingleRootAlias($queryBuilder);
 
         $this->process($queryBuilder, $rootEntity, $filters, $rootEntityAlias);
     }
@@ -40,92 +38,94 @@ class FilterProcessor extends SegmentQueryConverter implements WidgetProviderFil
      *
      * @return QueryBuilder
      */
-    public function process(QueryBuilder $qb, $rootEntity, array $filters, $rootEntityAlias)
-    {
+    public function process(
+        QueryBuilder $qb,
+        string $rootEntity,
+        array $filters,
+        string $rootEntityAlias
+    ): QueryBuilder {
         $filters = array_filter($filters);
         if (!$filters) {
             // nothing to do
             return $qb;
         }
-        $this->setRootEntity($rootEntity);
-        $this->rootEntityAlias = $rootEntityAlias;
-        $this->definition['filters'] = $filters;
-        $this->definition['columns'] = [];
-        $this->qb = $qb;
-        $this->joinIdHelper = new JoinIdentifierHelper($this->getRootEntity());
-        $this->joins = [];
-        $this->tableAliases = [];
-        $this->columnAliases = [];
-        $this->virtualColumnExpressions = [];
-        $this->virtualColumnOptions = [];
-        $this->filters = [];
-        $this->currentFilterPath = '';
-        try {
-            $this->buildQuery();
-        } finally {
-            $this->virtualColumnOptions = null;
-            $this->virtualColumnExpressions = null;
-            $this->columnAliases = null;
-            $this->tableAliases = null;
-            $this->joins = null;
-            $this->joinIdHelper = null;
-        }
 
-        return $this->qb;
+        $source = new QueryDesigner(
+            $rootEntity,
+            $this->encodeDefinition(['filters' => $filters])
+        );
+
+        $this->context()->setRootEntityAlias($rootEntityAlias);
+        $this->doConvertToQueryBuilder($source, $qb);
+
+        return $qb;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function buildQuery()
+    protected function createContext(): FilterProcessorContext
     {
-        $this->prepareTableAliases();
-        $this->addJoinStatements();
-        $this->addWhereStatement();
+        return new FilterProcessorContext();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function prepareTableAliases()
+    protected function context(): FilterProcessorContext
+    {
+        return parent::context();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function prepareTableAliases(): void
     {
         $this->addTableAliasForRootEntity();
-        if (isset($this->definition['filters'])) {
-            $this->addTableAliasesForFilters($this->definition['filters']);
+        $definition = $this->context()->getDefinition();
+        if (isset($definition['filters'])) {
+            $this->addTableAliasesForFilters($definition['filters']);
         }
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addTableAliasForRootEntity()
+    protected function addTableAliasForRootEntity(): void
     {
-        $joinId = self::ROOT_ALIAS_KEY;
-        $this->tableAliases[$joinId] = $this->rootEntityAlias;
-        $this->joins[$this->rootEntityAlias] = $joinId;
+        $this->context()->setRootTableAlias($this->context()->getRootEntityAlias());
     }
 
     /**
-     * @param QueryBuilder $qb
-     *
-     * @return string
-     *
-     * @throws \RuntimeException
+     * {@inheritdoc}
      */
-    public function getRootAlias(QueryBuilder $qb)
+    protected function prepareColumnAliases(): void
     {
-        $aliases = $qb->getRootAliases();
-        if (count($aliases) !== 1) {
-            if (count($aliases) === 0) {
-                throw new \RuntimeException(
-                    'Cannot get root alias. A query builder has no root entity.'
-                );
-            }
-            throw new \RuntimeException(
-                'Cannot get root alias. A query builder has more than one root entity.'
-            );
-        }
+        // nothing to do
+    }
 
-        return $aliases[0];
+    /**
+     * {@inheritdoc}
+     */
+    protected function addSelectStatement(): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addFromStatements(): void
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addOrderByStatement(): void
+    {
+        // nothing to do
     }
 }

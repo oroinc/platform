@@ -25,18 +25,15 @@ define(function(require) {
             if (data && data.columnName && data.func) {
                 const column = this._getColumnByNameAndFunc(data.columnName, data.func);
                 if (column) {
-                    this.$('.' + this.options.choiceInputClass).data('data', {
-                        id: column.get('name'),
-                        text: column.get('label')
-                    });
+                    this.$('.' + this.options.choiceInputClass).data('data', this._buildColumnDataItem(column));
                 }
             }
             _.extend(this.options.fieldChoice, {
                 select2ResultsCallback: this.fieldChoiceResultsCallback.bind(this),
                 applicableConditionsCallback: this.applicableConditionsCallback.bind(this)
             });
-            const select2Opts = this.options.fieldChoice.select2;
 
+            const select2Opts = this.options.fieldChoice.select2;
             if (select2Opts) {
                 const templateString = select2Opts.formatSelectionTemplate ||
                     $(select2Opts.formatSelectionTemplateSelector).text();
@@ -59,12 +56,18 @@ define(function(require) {
 
             this.listenTo(this.options.columnsCollection, {
                 'remove': function(model) {
-                    if (model.get('label') === this._getColumnLabel()) {
+                    const name = this._getColumnName();
+                    const funcName = this._getColumnFuncName();
+                    const func = model.get('func');
+                    if (model.get('name') === name && func && func.name === funcName) {
                         this._onRelatedColumnRemoved();
                     }
                 },
                 'change:func change:label': function(model) {
-                    if (model.previous('label') === this._getColumnLabel()) {
+                    const name = this._getColumnName();
+                    const funcName = this._getColumnFuncName();
+                    const func = model.previous('func');
+                    if (model.previous('name') === name && func && func.name === funcName) {
                         this._onRelatedColumnRemoved();
                     }
                 }
@@ -101,19 +104,16 @@ define(function(require) {
         fieldChoiceResultsCallback: function() {
             return _.map(
                 this._getAggregatedColumns(),
-                function(model) {
-                    return {
-                        id: model.get('name'),
-                        text: model.get('label')
-                    };
-                }
+                _.bind(function(model) {
+                    return this._buildColumnDataItem(model);
+                }, this)
             );
         },
 
         _getAggregatedColumns: function() {
             return _.filter(
                 this.options.columnsCollection.models,
-                _.compose(_.negate(_.isEmpty), _.property('func'), _.property('attributes'))
+                _.compose(_.matcher({group_type: 'aggregates'}), _.property('func'), _.property('attributes'))
             );
         },
 
@@ -125,12 +125,30 @@ define(function(require) {
             return value;
         },
 
-        _getColumnLabel: function() {
-            return _.result(this.subview('choice-input').getData(), 'text');
+        _buildColumnDataItem: function(model) {
+            const func = model.get('func');
+            return {
+                id: model.get('name'),
+                text: model.get('label'),
+                func: (func && func.name ? func.name : null)
+            };
+        },
+
+        _getColumnName: function() {
+            return _.result(this.subview('choice-input').getData(), 'id');
+        },
+
+        _getColumnFuncName: function() {
+            return _.result(this.subview('choice-input').getData(), 'func');
         },
 
         _getCurrentFunc: function() {
-            const column = this.options.columnsCollection.findWhere({label: this._getColumnLabel()});
+            const name = this._getColumnName();
+            const funcName = this._getColumnFuncName();
+            const column = _.find(this.options.columnsCollection.where({name: name}), function(column) {
+                const func = column.get('func');
+                return func && func.name === funcName;
+            });
             if (_.isEmpty(column)) {
                 return;
             }
@@ -144,7 +162,8 @@ define(function(require) {
             }
 
             return _.find(this.options.columnsCollection.where({name: name}), function(column) {
-                return column.get('func') && column.get('func').name === func.name;
+                const func = column.get('func');
+                return func && func.name === func.name;
             });
         },
 

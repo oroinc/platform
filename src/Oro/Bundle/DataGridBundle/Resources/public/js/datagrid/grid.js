@@ -1052,7 +1052,8 @@ define(function(require) {
          */
         render: function() {
             this.$el.html(this.template({
-                tableTagName: this.themeOptions.tagName || 'table'
+                tableTagName: this.themeOptions.tagName || 'table',
+                tableClassName: this.themeOptions.tableClassName || ''
             }));
             this.$grid = this.$(this.selectors.grid);
 

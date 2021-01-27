@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\UIBundle\EventListener;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
-use Symfony\Component\DependencyInjection\ServiceSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Loader\FilesystemLoader;
 
 /**
@@ -26,13 +26,12 @@ class TemplateListener implements ServiceSubscriberInterface
 
     /** @var EngineInterface */
     private $templating;
+    private Inflector $inflector;
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Inflector $inflector)
     {
         $this->container = $container;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -108,7 +107,7 @@ class TemplateListener implements ServiceSubscriberInterface
             return;
         }
 
-        $legacyController = Inflector::classify($controller);
+        $legacyController = $this->inflector->classify($controller);
         if ($legacyController === $controller) {
             return;
         }
@@ -146,7 +145,7 @@ class TemplateListener implements ServiceSubscriberInterface
     private function resolveActionName(string $name): string
     {
         return preg_match('/^(?<view>[^\/\.]+)(\.[a-z]+.[a-z]+)?$/', $name, $parsed)
-            ? str_replace($parsed['view'], Inflector::camelize($parsed['view']), $name)
+            ? str_replace($parsed['view'], $this->inflector->camelize($parsed['view']), $name)
             : $name;
     }
 

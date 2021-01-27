@@ -1,43 +1,35 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Loader\Generator\Extension;
 
-use CG\Generator\PhpMethod;
+use Oro\Component\Layout\ImportsAwareLayoutUpdateInterface;
 use Oro\Component\Layout\Loader\Generator\VisitContext;
 use Oro\Component\Layout\Loader\Visitor\VisitorInterface;
 
+/**
+ * This visitor is used by \Oro\Component\Layout\Loader\Generator\Extension\ImportsLayoutUpdateExtension.
+ */
 class ImportsAwareLayoutUpdateVisitor implements VisitorInterface
 {
-    /**
-     * @var array
-     */
-    protected $imports;
+    protected array $imports;
 
-    /**
-     * @param $imports
-     */
-    public function __construct($imports)
+    public function __construct(array $imports)
     {
         $this->imports = $imports;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function startVisit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext): void
     {
-        $writer = $visitContext->createWriter();
         $class = $visitContext->getClass();
-        $class->addInterfaceName('Oro\Component\Layout\ImportsAwareLayoutUpdateInterface');
-        $setFactoryMethod = PhpMethod::create('getImports');
-        $setFactoryMethod->setBody($writer->write('return '.var_export($this->imports, true).';')->getContent());
-        $class->setMethod($setFactoryMethod);
+        $class->addImplement(ImportsAwareLayoutUpdateInterface::class);
+        $class->addMethod('getImports')->addBody('return '.var_export($this->imports, true).';');
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function endVisit(VisitContext $visitContext)
+    public function endVisit(VisitContext $visitContext): void
     {
     }
 }

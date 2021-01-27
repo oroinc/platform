@@ -6,6 +6,16 @@ parameters:
     oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
 
 services:
+    # provide default implementations for PSR-17 based on laminas/laminas-diactoros
+    Psr\Http\Message\ServerRequestFactoryInterface:
+        class: Laminas\Diactoros\ServerRequestFactory
+    Psr\Http\Message\StreamFactoryInterface:
+        class: Laminas\Diactoros\StreamFactory
+    Psr\Http\Message\UploadedFileFactoryInterface:
+        class: Laminas\Diactoros\UploadedFileFactory
+    Psr\Http\Message\ResponseFactoryInterface:
+        class: Laminas\Diactoros\ResponseFactory
+
     jms_serializer.twig_extension.serializer:
         class: Oro\Bundle\PlatformBundle\Twig\SerializerExtension
         arguments:
@@ -109,6 +119,8 @@ services:
 
     oro_platform.provider.console.global_options_provider_registry:
         class: Oro\Bundle\PlatformBundle\Provider\Console\GlobalOptionsProviderRegistry
+        arguments:
+            - !tagged_iterator oro_platform.console.global_options_provider
 
     oro_platform.provider.console.optional_listeners_global_options_provider:
         class: Oro\Bundle\PlatformBundle\Provider\Console\OptionalListenersGlobalOptionsProvider
@@ -146,6 +158,9 @@ services:
 
     Doctrine\Persistence\ManagerRegistry:
         alias: 'doctrine'
+
+    Doctrine\Inflector\Inflector:
+        factory: [ !service { class: Doctrine\Inflector\Rules\English\InflectorFactory }, 'build' ]
 
     oro_platform.listener.maintenance_propagation:
         class: Oro\Bundle\PlatformBundle\EventListener\MaintenancePropagationListener

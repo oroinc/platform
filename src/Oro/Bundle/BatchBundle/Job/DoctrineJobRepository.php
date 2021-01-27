@@ -5,8 +5,8 @@ namespace Oro\Bundle\BatchBundle\Job;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BaseRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Handle case when job executed inside another job and performs EntityManger::clear

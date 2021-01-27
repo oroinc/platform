@@ -52,7 +52,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
                 $dispatcher = $this->get('event_dispatcher');
                 foreach ($searchResult->getElements() as $item) {
-                    $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+                    $dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
                 }
 
                 $result       = $this->getPreparedItems($searchResult->toArray());

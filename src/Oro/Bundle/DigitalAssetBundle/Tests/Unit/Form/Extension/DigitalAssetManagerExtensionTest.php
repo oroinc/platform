@@ -11,7 +11,7 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface
 use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
-use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProvider;
+use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProviderInterface;
 use Oro\Bundle\DigitalAssetBundle\Reflector\FileReflector;
 use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\Entity\EntityWithMultiFile;
 use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\EventSubscriberStub;
@@ -50,7 +50,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassNameHelper;
 
-    /** @var PreviewMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $previewMetadataProvider;
 
     /** @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
@@ -74,7 +74,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
 
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
         $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
-        $this->previewMetadataProvider = $this->createMock(PreviewMetadataProvider::class);
+        $this->previewMetadataProvider = $this->createMock(PreviewMetadataProviderInterface::class);
         $this->digitalAssetToIdTransformer = $this->createMock(EntityToIdTransformer::class);
         $this->fileReflector = $this->createMock(FileReflector::class);
 

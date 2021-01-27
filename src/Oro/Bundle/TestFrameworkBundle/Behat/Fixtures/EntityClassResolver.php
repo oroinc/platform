@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class EntityClassResolver
@@ -11,14 +11,12 @@ class EntityClassResolver
      * @var EntityAliasResolver
      */
     protected $aliasResolver;
+    private Inflector $inflector;
 
-    /**
-     * EntityClassResolver constructor.
-     * @param EntityAliasResolver $aliasResolver
-     */
-    public function __construct(EntityAliasResolver $aliasResolver)
+    public function __construct(EntityAliasResolver $aliasResolver, Inflector $inflector)
     {
         $this->aliasResolver = $aliasResolver;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -38,7 +36,7 @@ class EntityClassResolver
     {
         $name = strtolower($entityName);
         $nameParts = explode(' ', $name);
-        $nameParts = array_map([new Inflector, 'singularize'], $nameParts);
+        $nameParts = array_map([$this->inflector, 'singularize'], $nameParts);
 
         return implode('', $nameParts);
     }

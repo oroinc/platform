@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
@@ -6,11 +7,12 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
+use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigLayoutUpdateGenerator */
-    protected $generator;
+    protected ConfigLayoutUpdateGenerator $generator;
 
     protected function setUp(): void
     {
@@ -27,17 +29,15 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     {
         $source = ['actions' => []];
 
-        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|\PHPUnit\Framework\MockObject\MockObject $extension */
-        $extension = $this->createMock(
-            'Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface'
-        );
+        /** @var ConfigLayoutUpdateGeneratorExtensionInterface|MockObject $extension */
+        $extension = $this->createMock(ConfigLayoutUpdateGeneratorExtensionInterface::class);
         $this->generator->addExtension($extension);
 
-        $extension->expects($this->once())
+        $extension->expects(static::once())
             ->method('prepare')
             ->with(
                 new GeneratorData($source),
-                $this->isInstanceOf('Oro\Component\Layout\Loader\Visitor\VisitorCollection')
+                static::isInstanceOf(VisitorCollection::class)
             );
 
         $this->generator->generate('testClassName', new GeneratorData($source));
@@ -45,13 +45,10 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resourceDataProvider
-     *
-     * @param mixed $data
-     * @param bool  $exception
      */
-    public function testShouldValidateData($data, $exception = false)
+    public function testShouldValidateData($data, ?string $exception = null)
     {
-        if (false !== $exception) {
+        if (null !== $exception) {
             $this->expectException(\Oro\Component\Layout\Exception\SyntaxException::class);
             $this->expectExceptionMessage($exception);
         }
@@ -59,10 +56,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
         $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
-    /**
-     * @return array
-     */
-    public function resourceDataProvider()
+    public function resourceDataProvider(): array
     {
         return [
             'invalid data'                                                   => [
@@ -80,7 +74,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 '$exception' => 'Syntax error: unknown action "addSuperPuper", '
-                    . 'should be one of LayoutManipulatorInterface\'s methods at "actions.0"'
+                    . 'should be one of LayoutManipulatorInterface methods at "actions.0"'
             ],
             'should contains array with action definition in actions'        => [
                 '$data'      => [
@@ -111,24 +105,24 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
     // @codingStandardsIgnoreStart
     public function testGenerate()
     {
-        $this->assertSame(
-            <<<CLASS
+        static::assertSame(
+            <<<'CODE'
 <?php
 
 /**
  * Filename: testfilename.yml
  */
-
-class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
+    public function updateLayout(Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator, Oro\Component\Layout\LayoutItemInterface $item)
     {
-        \$layoutManipulator->add( 'root', NULL, 'root' );
-        \$layoutManipulator->add( 'header', 'root', 'header' );
-        \$layoutManipulator->addAlias( 'header', 'header_alias' );
+        $layoutManipulator->add( 'root', NULL, 'root' );
+        $layoutManipulator->add( 'header', 'root', 'header' );
+        $layoutManipulator->addAlias( 'header', 'header_alias' );
     }
 }
-CLASS
+
+CODE
             ,
             $this->generator->generate(
                 'testClassName',

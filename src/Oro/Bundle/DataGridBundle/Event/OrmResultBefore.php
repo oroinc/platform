@@ -5,7 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Event;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ResultBefore

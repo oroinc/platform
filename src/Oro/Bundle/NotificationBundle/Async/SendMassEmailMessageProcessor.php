@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Async;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
@@ -19,6 +19,7 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Swift_Message;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -81,20 +82,21 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        $data = array_merge([
-            'sender'      => null,
-            'fromName'    => null,
-            'toEmail'     => null,
-            'subject'     => null,
-            'body'        => null,
-            'contentType' => null,
-            'template'    => null
-        ], $data);
+        $data = array_merge(
+            [
+                'sender'      => null,
+                'fromName'    => null,
+                'toEmail'     => null,
+                'subject'     => null,
+                'body'        => null,
+                'contentType' => null,
+                'template'    => null
+            ],
+            JSON::decode($message->getBody())
+        );
 
         if (empty($data['body'])
-            || !isset($data['fromEmail'], $data['toEmail'])
+            || !isset($data['sender'], $data['toEmail'])
             || (isset($data['template']) && !is_array($data['body']))
         ) {
             $this->logger->critical('Got invalid message');
@@ -107,14 +109,11 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
             $result = $this->templateEmailMessageSender->sendTranslatedMessage($data, $failedRecipients);
         } else {
             if (isset($data['template'])) {
-                list($data['subject'], $data['body']) = $this->renderTemplate($data['template'], $data['body']);
+                [$data['subject'], $data['body']] = $this->renderTemplate($data['template'], $data['body']);
             }
 
-            $emailMessage = new \Swift_Message(
-                $data['subject'],
-                $data['body'],
-                $data['contentType']
-            );
+            $emailMessage = new Swift_Message($data['subject'], $data['body'], $data['contentType']);
+
             $sender = From::fromArray($data['sender']);
             $sender->populate($emailMessage);
             $emailMessage->setTo($data['toEmail']);
@@ -125,12 +124,11 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
             $result = $this->mailer->send($emailMessage);
 
             $spoolItem = new SpoolItem();
-            $spoolItem
-                ->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE)
+            $spoolItem->setLogType(MassNotificationSender::NOTIFICATION_LOG_TYPE)
                 ->setMessage($emailMessage);
             $this->eventDispatcher->dispatch(
-                NotificationSentEvent::NAME,
-                new NotificationSentEvent($spoolItem, $result)
+                new NotificationSentEvent($spoolItem, $result),
+                NotificationSentEvent::NAME
             );
         }
 
@@ -169,7 +167,7 @@ class SendMassEmailMessageProcessor implements MessageProcessorInterface, TopicS
         $emailTemplate = $this->managerRegistry
             ->getManagerForClass(EmailTemplate::class)
             ->getRepository(EmailTemplate::class)
-            ->findOneBy($templateName);
+            ->findByName($templateName);
 
         if (!$emailTemplate instanceof EmailTemplateInterface) {
             throw new \RuntimeException(sprintf('EmailTemplate not found by name "%s"', $templateName));

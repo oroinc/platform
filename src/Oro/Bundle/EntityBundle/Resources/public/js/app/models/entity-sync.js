@@ -15,7 +15,9 @@ define(function(require) {
 
     const sync = function(method, model, options) {
         options.type = methodMap[method];
-        options.contentType = 'application/vnd.api+json';
+        if ('POST' === options.type || 'PATCH' === options.type) {
+            options.contentType = 'application/vnd.api+json';
+        }
 
         const urlParams = _.clone(options.urlParams) || {};
 
@@ -23,7 +25,7 @@ define(function(require) {
             urlParams.include = options.include.join();
         }
 
-        // @todo add filter by fields
+        // "fields" filter is not implemented yet
 
         if (!options.url) {
             try {
@@ -34,6 +36,7 @@ define(function(require) {
         }
 
         options.beforeSend = function(xhr) {
+            xhr.setRequestHeader('Accept', 'application/vnd.api+json');
             // do not request HATEOAS links
             xhr.setRequestHeader('X-Include', 'noHateoas');
         };

@@ -33,7 +33,6 @@ class PersistentConnection extends Connection
         }
         if ($this->hasPersistentConnection()) {
             $this->_conn = $this->getPersistentConnection();
-            $this->setConnected(true);
         } else {
             parent::connect();
 
@@ -121,20 +120,6 @@ class PersistentConnection extends Connection
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());
         parent::$method();
         $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
-    }
-
-    /**
-     * @param bool $connected
-     */
-    protected function setConnected($connected)
-    {
-        static $rp = null;
-        if (false == $rp) {
-            $rp = new \ReflectionProperty('Doctrine\DBAL\Connection', 'isConnected');
-            $rp->setAccessible(true);
-        }
-
-        $rp->setValue($this, $connected);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceTreeFilterType;
@@ -10,11 +9,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * The filter by extendable list of values.
+ */
 class ChoiceTreeFilter extends AbstractFilter
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /** @var RouterInterface */
     protected $router;
 
@@ -22,23 +21,18 @@ class ChoiceTreeFilter extends AbstractFilter
     protected $eventDispatcher;
 
     /**
-     * ChoiceTreeFilter constructor.
-     *
-     * @param FormFactoryInterface $factory
-     * @param FilterUtility $util
-     * @param ManagerRegistry $registry
-     * @param RouterInterface $router
+     * @param FormFactoryInterface     $factory
+     * @param FilterUtility            $util
+     * @param RouterInterface          $router
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,
-        ManagerRegistry $registry,
         RouterInterface $router,
         EventDispatcherInterface $eventDispatcher
     ) {
         parent::__construct($factory, $util);
-        $this->registry = $registry;
         $this->router = $router;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -59,12 +53,11 @@ class ChoiceTreeFilter extends AbstractFilter
         $metadata = parent::getMetadata();
 
         $entities = [];
-
         if ($this->getOr('className') && $this->state) {
             $data = $this->parseData($this->state);
 
             $event = new ChoiceTreeFilterLoadDataEvent($this->getOr('className'), $data['value']);
-            $this->eventDispatcher->dispatch(ChoiceTreeFilterLoadDataEvent::EVENT_NAME, $event);
+            $this->eventDispatcher->dispatch($event, ChoiceTreeFilterLoadDataEvent::EVENT_NAME);
             $entities = $event->getData();
         }
 
@@ -82,10 +75,10 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
-        if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
+        if (count($data['value']) > 1 || (isset($data['value'][0]) && '' != $data['value'][0])) {
             $parameterName = $ds->generateParameterName($this->getName());
 
-            if (!in_array($comparisonType, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
+            if ($this->isValueRequired($comparisonType)) {
                 $ds->setParameter($parameterName, $data['value']);
             }
 
@@ -94,13 +87,21 @@ class ChoiceTreeFilter extends AbstractFilter
     }
 
     /**
-     * @param array $data
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    public function parseData($data)
+    public function prepareData(array $data): array
     {
+        return $data;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseData($data)
+    {
+        $data = parent::parseData($data);
         $data['value'] = explode(',', $data['value']);
+
         return $data;
     }
 
@@ -109,8 +110,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getAutocompleteAlias()
     {
-        return $this->getOr('autocomplete_alias') ?
-            $this->getOr('autocomplete_alias') : false;
+        return $this->getOr('autocomplete_alias') ?: false;
     }
 
     /**
@@ -118,10 +118,7 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getAutocompleteUrl()
     {
-        $routeName = $this->getOr('autocomplete_url') ?
-            $this->getOr('autocomplete_url') : 'oro_form_autocomplete_search';
-
-        return $this->router->generate($routeName);
+        return $this->router->generate($this->getOr('autocomplete_url') ?: 'oro_form_autocomplete_search');
     }
 
     /**
@@ -129,7 +126,6 @@ class ChoiceTreeFilter extends AbstractFilter
      */
     protected function getRenderedPropertyName()
     {
-        return $this->getOr('renderedPropertyName') ?
-            $this->getOr('renderedPropertyName') : false;
+        return $this->getOr('renderedPropertyName') ?: false;
     }
 }

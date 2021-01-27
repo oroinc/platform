@@ -17,7 +17,7 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassName($entityClass)
+    public function getEntityClassName(string $entityClass): ?string
     {
         return $this->getEnumName($entityClass);
     }
@@ -25,7 +25,7 @@ class EnumEntityClassNameProvider extends AbstractEntityClassNameProvider implem
     /**
      * {@inheritdoc}
      */
-    public function getEntityClassPluralName($entityClass)
+    public function getEntityClassPluralName(string $entityClass): ?string
     {
         return $this->getEnumName($entityClass, true);
     }

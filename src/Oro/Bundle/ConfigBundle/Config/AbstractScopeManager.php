@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Config;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -121,7 +121,7 @@ abstract class AbstractScopeManager
     protected function getCachedSetting($entityId, $name, $skipChanges = false)
     {
         $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
-        list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+        [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
         $settings = $this->cache->fetch($cacheKey);
         if (false === $settings) {
@@ -189,7 +189,7 @@ abstract class AbstractScopeManager
         if (array_key_exists($entityId, $this->changedSettings)) {
             return $this->changedSettings[$entityId];
         }
-        
+
         return [];
     }
 
@@ -238,13 +238,13 @@ abstract class AbstractScopeManager
             $config->setScopedEntity($entity)->setRecordId($entityId);
         }
 
-        list($updated, $removed) = $this->calculateChangeSet($settings, $entityId);
+        [$updated, $removed] = $this->calculateChangeSet($settings, $entityId);
         foreach ($removed as $name) {
-            list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+            [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
             $config->removeValue($section, $key);
         }
         foreach ($updated as $name => $value) {
-            list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
+            [$section, $key] = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
             $configValue = $config->getOrCreateValue($section, $key);
             $configValue->setValue($value);
@@ -315,7 +315,7 @@ abstract class AbstractScopeManager
         $this->cache->save($cacheKey, $settings);
 
         $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
     }
 
     /**
@@ -338,7 +338,7 @@ abstract class AbstractScopeManager
     protected function dispatchScopeIdChangeEvent()
     {
         $event = new ConfigManagerScopeIdUpdateEvent();
-        $this->eventDispatcher->dispatch(ConfigManagerScopeIdUpdateEvent::EVENT_NAME, $event);
+        $this->eventDispatcher->dispatch($event, ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
     }
 
     /**

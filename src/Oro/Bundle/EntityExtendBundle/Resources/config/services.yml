@@ -84,6 +84,8 @@ services:
 
     oro_entity_extend.entity_generator.extension:
         class: Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\ExtendEntityGeneratorExtension
+        arguments:
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity_extend.entity_generator_extension, priority: 255 }
 
@@ -276,6 +278,7 @@ services:
             - '@oro_entity_config.provider.extend'
             - '@event_dispatcher'
             - '@oro_importexport.strategy.new_entities_helper'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_entity_extend.migration.cleanup_marketing_entity_config.post_up.listener:
         class: Oro\Bundle\EntityExtendBundle\EventListener\CleanupMarketingPostUpMigrationListener
@@ -519,6 +522,7 @@ services:
             - "@oro_entity.entity_alias_config_bag"
             - "@oro_entity_config.config_manager"
             - "@oro_entity.entity_alias_duplicate_resolver"
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.alias_provider, priority: -90 }
 
@@ -528,6 +532,7 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
             - "@translator"
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: oro_entity.class_name_provider, priority: -110 }
 
@@ -601,8 +606,8 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Cache\CacheWarmerAggregate
         public: true
         arguments:
-            - ~ # link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
-            - ~ # link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\CacheWarmerPass
+            - ~ # a link to "cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass
+            - ~ # a link to "oro_entity_extend.cache_warmer" service; injected by Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\WarmerPass
             - '@oro_entity.database_checker.state_manager'
 
     oro_entity_extend.cache_warmer:

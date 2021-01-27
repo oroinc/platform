@@ -133,13 +133,13 @@ class ChannelHandler
         $this->em->flush();
 
         if (!$isNewEntity && null === $userOwner) {
-            $this->eventDispatcher->dispatch(DefaultOwnerSetEvent::NAME, new DefaultOwnerSetEvent($entity));
+            $this->eventDispatcher->dispatch(new DefaultOwnerSetEvent($entity), DefaultOwnerSetEvent::NAME);
         }
 
         if (!$isNewEntity && $oldState) {
             $this->eventDispatcher->dispatch(
-                IntegrationUpdateEvent::NAME,
-                new IntegrationUpdateEvent($entity, $oldState)
+                new IntegrationUpdateEvent($entity, $oldState),
+                IntegrationUpdateEvent::NAME
             );
         }
     }

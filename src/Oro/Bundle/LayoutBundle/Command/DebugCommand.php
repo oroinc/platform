@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\LayoutBundle\Command;
 
@@ -19,46 +20,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Command to get info about layout default context, registered context configurators, block types and data providers.
+ * Displays layout configuration.
  */
 class DebugCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected static $defaultName = 'oro:debug:layout';
 
-    /**
-     * @var LayoutManager
-     */
-    private $layoutManager;
+    private LayoutManager $layoutManager;
+    private array $blockTypes;
+    private array $dataProviders;
+    private MethodPhpDocExtractor $methodPhpDocExtractor;
+    private ?LayoutRegistry $layoutRegistry = null;
 
-    /**
-     * @var array
-     */
-    private $blockTypes;
-
-    /**
-     * @var array
-     */
-    private $dataProviders;
-
-    /**
-     * @var MethodPhpDocExtractor
-     */
-    private $methodPhpDocExtractor;
-
-    /**
-     * @var LayoutRegistry
-     */
-    private $layoutRegistry;
-
-    /**
-     * @param LayoutManager         $layoutManager
-     * @param MethodPhpDocExtractor $methodPhpDocExtractor
-     * @param array                 $blockTypes
-     * @param array                 $dataProviders
-     */
     public function __construct(
         LayoutManager $layoutManager,
         MethodPhpDocExtractor $methodPhpDocExtractor,
@@ -73,37 +47,39 @@ class DebugCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     public function configure()
     {
         $this
-            ->addOption(
-                'type',
-                't',
-                InputOption::VALUE_REQUIRED,
-                'Show the configuration of the layout block type'
+            ->addOption('type', 't', InputOption::VALUE_REQUIRED, 'Show block type configuration')
+            ->addOption('provider', 'p', InputOption::VALUE_REQUIRED, 'Show data provider configuration')
+            ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Output format', 'txt')
+            ->setDescription('Displays layout configuration.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command displays layout configuration (default context,
+registered context configurators, block types and data providers).
+
+  <info>php %command.full_name%</info>
+
+The <info>--type</info> option can be used to see the specified block type details:
+
+  <info>php %command.full_name% --type=<block-type></info>
+
+The <info>--provider</info> option can be used to see the specified data provider details:
+
+  <info>php %command.full_name% --provider=<data-prodiver></info>
+
+HELP
             )
-            ->addOption(
-                'provider',
-                'p',
-                InputOption::VALUE_REQUIRED,
-                'Show the configuration of the layout data provider'
-            )
-            ->addOption(
-                'format',
-                'f',
-                InputOption::VALUE_REQUIRED,
-                'The output format (txt)',
-                'txt'
-            )
-            ->setDescription('Displays the layout configuration.');
+            ->addUsage('--type=<block-type>')
+            ->addUsage('--provider=<data-prodiver>')
+        ;
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -160,12 +136,6 @@ class DebugCommand extends Command
         return 0;
     }
 
-    /**
-     * @param string                  $blockTypeName
-     * @param LayoutRegistryInterface $registry
-     *
-     * @return DebugOptionsResolverDecorator
-     */
     private function getBlockTypeOptionsResolver(
         string $blockTypeName,
         LayoutRegistryInterface $registry
@@ -183,10 +153,6 @@ class DebugCommand extends Command
         return $decorator;
     }
 
-    /**
-     * @param BlockTypeInterface $blockType
-     * @return array
-     */
     private function getBlockTypeHierarchy(
         BlockTypeInterface $blockType
     ): array {
@@ -201,9 +167,6 @@ class DebugCommand extends Command
         return $hierarchy;
     }
 
-    /**
-     * @return array
-     */
     private function getContextConfigurators(): array
     {
         $registry = $this->getLayoutRegistry();
@@ -231,11 +194,7 @@ class DebugCommand extends Command
         return $property->getValue($context);
     }
 
-    /**
-     * @param array $blockTypeName
-     * @return array
-     */
-    private function getBlockTypeExtensions($blockTypeName): array
+    private function getBlockTypeExtensions(string $blockTypeName): array
     {
         $registry = $this->getLayoutRegistry();
 
@@ -245,9 +204,6 @@ class DebugCommand extends Command
         );
     }
 
-    /**
-     * @return LayoutRegistry
-     */
     private function getLayoutRegistry(): LayoutRegistry
     {
         if (!$this->layoutRegistry) {

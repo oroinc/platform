@@ -1,11 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
@@ -17,39 +16,21 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Cron commands launcher.
+ * Launches scheduled cron commands.
  */
 class CronCommand extends Command
 {
     /** @var string */
     protected static $defaultName = 'oro:cron';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private Mode $maintenanceMode;
+    private CronHelper $cronHelper;
+    private CommandRunnerInterface $commandRunner;
+    private LoggerInterface $logger;
 
-    /** @var Mode */
-    private $maintenanceMode;
+    private string $environment;
 
-    /** @var CronHelper */
-    private $cronHelper;
-
-    /** @var CommandRunner */
-    private $commandRunner;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var string */
-    private $environment;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param Mode $maintenanceMode
-     * @param CronHelper $cronHelper
-     * @param CommandRunnerInterface $commandRunner
-     * @param LoggerInterface $logger
-     * @param string $environment
-     */
     public function __construct(
         ManagerRegistry $registry,
         Mode $maintenanceMode,
@@ -68,17 +49,32 @@ class CronCommand extends Command
         $this->environment = $environment;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
         $this
-            ->setDescription('Cron commands launcher');
+            ->setDescription('Launches scheduled cron commands.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command launches scheduled cron commands that are due for execution.
+
+This launcher only schedules the actual command executions by adding messages to the message queue
+and the commands are executed asynchronously, so ensure that the message consumer processes
+(<info>oro:message-queue:consume</info>) are running for the scheduled commands to be executed in time.
+
+The commands implementing <info>\Oro\Bundle\CronBundle\Command\SynchronousCommandInterface</info>
+are an exception to this rule as they are launched immediately.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -143,11 +139,8 @@ class CronCommand extends Command
     /**
      * Convert command arguments to options. It needed for correctly pass this arguments into ArrayInput:
      * new ArrayInput(['name' => 'foo', '--bar' => 'foobar']);
-     *
-     * @param array $commandOptions
-     * @return array
      */
-    protected function resolveOptions(array $commandOptions)
+    protected function resolveOptions(array $commandOptions): array
     {
         $options = [];
         foreach ($commandOptions as $key => $option) {
@@ -162,28 +155,10 @@ class CronCommand extends Command
     }
 
     /**
-     * @param string $className
-     * @return ObjectManager
-     */
-    protected function getEntityManager($className)
-    {
-        return $this->registry->getManagerForClass($className);
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    private function getRepository($className)
-    {
-        return $this->getEntityManager($className)->getRepository($className);
-    }
-
-    /**
      * @return ArrayCollection|Schedule[]
      */
     private function getAllSchedules()
     {
-        return new ArrayCollection($this->getRepository('OroCronBundle:Schedule')->findAll());
+        return new ArrayCollection($this->registry->getRepository('OroCronBundle:Schedule')->findAll());
     }
 }

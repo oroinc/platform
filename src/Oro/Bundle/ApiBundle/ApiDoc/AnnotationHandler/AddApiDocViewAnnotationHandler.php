@@ -33,8 +33,8 @@ class AddApiDocViewAnnotationHandler implements ApiDocAnnotationHandlerInterface
     {
         $views = $annotation->getViews();
         if (!empty($views)
-            && in_array($this->existingView, $views, true)
-            && !in_array($this->additionalView, $views, true)
+            && \in_array($this->existingView, $views, true)
+            && !\in_array($this->additionalView, $views, true)
         ) {
             $annotation->addView($this->additionalView);
         }

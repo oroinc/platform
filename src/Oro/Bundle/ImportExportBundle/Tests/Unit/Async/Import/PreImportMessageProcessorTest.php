@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Import;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
@@ -573,7 +573,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS,
                 $this->callback(function (BeforeImportChunksEvent $eventData) use ($messageData) {
                     $body = $eventData->getBody();
 
@@ -587,7 +586,8 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame($messageData['options']['batch_number'], $body['options']['batch_number']);
 
                     return true;
-                })
+                }),
+                Events::BEFORE_CREATING_IMPORT_CHUNK_JOBS
             );
 
         $message = $this->createMessageMock();

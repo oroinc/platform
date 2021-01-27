@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;

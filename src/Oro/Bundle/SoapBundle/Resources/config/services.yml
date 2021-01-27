@@ -125,6 +125,8 @@ services:
 
     oro_soap.routing.options_resolver.old_options:
         class: Oro\Bundle\SoapBundle\Routing\OldOptionsRouteOptionsResolver
+        arguments:
+            - '@Doctrine\Inflector\Inflector'
         tags:
             - { name: routing.options_resolver }
 

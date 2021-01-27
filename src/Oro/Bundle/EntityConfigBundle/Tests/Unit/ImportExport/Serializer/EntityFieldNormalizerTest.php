@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\ImportExport\Serializer;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
@@ -33,7 +33,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->registry = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -131,7 +131,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testDenormalize(array $inputData, FieldConfigModel $expectedData)
     {
         /* @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager $objectManager */
-        $objectManager = $this->createMock('Doctrine\Common\Persistence\ObjectManager');
+        $objectManager = $this->createMock('Doctrine\Persistence\ObjectManager');
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')

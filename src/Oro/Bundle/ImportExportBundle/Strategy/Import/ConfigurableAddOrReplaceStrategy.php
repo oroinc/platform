@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
@@ -25,8 +25,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 {
     const STRATEGY_CONTEXT = 'configurable_add_or_replace_strategy';
 
-    /** @var ChainEntityClassNameProvider */
-    protected $chainEntityClassNameProvider;
+    /** @var EntityClassNameProviderInterface */
+    protected $entityClassNameProvider;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -54,7 +54,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param ImportStrategyHelper $strategyHelper
      * @param FieldHelper $fieldHelper
      * @param DatabaseHelper $databaseHelper
-     * @param ChainEntityClassNameProvider $chainEntityClassNameProvider
+     * @param EntityClassNameProviderInterface $entityClassNameProvider
      * @param TranslatorInterface $translator
      * @param NewEntitiesHelper $newEntitiesHelper
      * @param DoctrineHelper $doctrineHelper
@@ -65,14 +65,14 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         ImportStrategyHelper $strategyHelper,
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper,
-        ChainEntityClassNameProvider $chainEntityClassNameProvider,
+        EntityClassNameProviderInterface $entityClassNameProvider,
         TranslatorInterface $translator,
         NewEntitiesHelper $newEntitiesHelper,
         DoctrineHelper $doctrineHelper,
         RelatedEntityStateHelper $relatedEntityStateHelper
     ) {
         parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
-        $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
+        $this->entityClassNameProvider = $entityClassNameProvider;
         $this->translator = $translator;
         $this->newEntitiesHelper = $newEntitiesHelper;
         $this->doctrineHelper = $doctrineHelper;
@@ -636,7 +636,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
     {
         if (!$isPersistNew) {
             if ($entityIsRelation) {
-                $class = $this->chainEntityClassNameProvider->getEntityClassName($entityClass);
+                $class = $this->entityClassNameProvider->getEntityClassName($entityClass);
                 $errorMessages = [
                     $this->translator->trans(
                         'oro.importexport.import.errors.not_found_entity',

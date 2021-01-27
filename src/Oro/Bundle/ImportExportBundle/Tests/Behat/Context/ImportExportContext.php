@@ -8,7 +8,7 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Gaufrette\File;
 use GuzzleHttp\Client;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
@@ -406,6 +406,11 @@ class ImportExportContext extends OroFeatureContext implements
                     } elseif ($value === '<notEmpty()>') {
                         static::assertNotEmpty($entityDataFromCsv[$property]);
                     } else {
+                        static::assertArrayHasKey(
+                            $property,
+                            $entityDataFromCsv,
+                            sprintf('Failed asserting that the column "%s" exists in importing file', $property)
+                        );
                         static::assertEquals(
                             $value,
                             $entityDataFromCsv[$property],
@@ -466,7 +471,7 @@ class ImportExportContext extends OroFeatureContext implements
     {
         $name = strtolower($entityName);
         $nameParts = explode(' ', $name);
-        $nameParts = array_map([new Inflector(), 'singularize'], $nameParts);
+        $nameParts = array_map([(new InflectorFactory())->build(), 'singularize'], $nameParts);
 
         return implode('', $nameParts);
     }
@@ -817,12 +822,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         /** @var File $exportFile */
         $exportFile = reset($exportFiles);
-        $path = $this->getContainer()->getParameter('kernel.project_dir')
-            .DIRECTORY_SEPARATOR
-            .'var'
-            .DIRECTORY_SEPARATOR
-            .'import_export';
-        $this->importFile = $path . DIRECTORY_SEPARATOR . $exportFile->getName();
+        $this->importFile = $fileManager->writeToTmpLocalStorage($exportFile->getName());
         $this->tryImportFile();
     }
 
@@ -987,15 +987,19 @@ class ImportExportContext extends OroFeatureContext implements
     }
 
     /**
+     * Returns the path in /tmp directory where to store temporary files
+     *
      * @param string $prefix
      *
      * @return string
      */
     private function getTempFilePath(string $prefix): string
     {
-        return tempnam(
-            $this->getKernel()->getProjectDir().DIRECTORY_SEPARATOR.'var'.DIRECTORY_SEPARATOR.'import_export',
-            $prefix
-        ) . '.csv';
+        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'importexport';
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+
+        return tempnam($path, $prefix) . '.csv';
     }
 }

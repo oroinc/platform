@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Inflector;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariablesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -30,25 +30,20 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
     /** @var ManagerRegistry */
     protected $doctrine;
+    private Inflector $inflector;
 
-    /**
-     * EntityVariablesProvider constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param ConfigManager       $configManager
-     * @param ManagerRegistry     $doctrine
-     * @param FormatterManager    $formatterManager
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
-        FormatterManager $formatterManager
+        FormatterManager $formatterManager,
+        Inflector $inflector
     ) {
         $this->translator = $translator;
         $this->configManager = $configManager;
         $this->doctrine = $doctrine;
         $this->formatterManager = $formatterManager;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -209,7 +204,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
             return [$fieldName, null];
         }
 
-        $name = Inflector::classify($fieldName);
+        $name = $this->inflector->classify($fieldName);
         $getter = 'get' . $name;
         if ($reflClass->hasMethod($getter) && $reflClass->getMethod($getter)->isPublic()) {
             return [lcfirst($name), $getter];

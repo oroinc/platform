@@ -33,9 +33,9 @@ class MergeFieldsStep implements DependentMergeStepInterface
     public function run(EntityData $data)
     {
         foreach ($data->getFields() as $field) {
-            $this->eventDispatcher->dispatch(MergeEvents::BEFORE_MERGE_FIELD, new FieldDataEvent($field));
+            $this->eventDispatcher->dispatch(new FieldDataEvent($field), MergeEvents::BEFORE_MERGE_FIELD);
             $this->strategy->merge($field);
-            $this->eventDispatcher->dispatch(MergeEvents::AFTER_MERGE_FIELD, new FieldDataEvent($field));
+            $this->eventDispatcher->dispatch(new FieldDataEvent($field), MergeEvents::AFTER_MERGE_FIELD);
         }
     }
 

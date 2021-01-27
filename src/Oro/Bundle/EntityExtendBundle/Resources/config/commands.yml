@@ -41,9 +41,17 @@ services:
     Oro\Bundle\EntityExtendBundle\Command\RouterCacheClearCommand:
         arguments:
             - '@kernel'
-            - '@?router'
+            - '@router'
             - '@filesystem'
-            - '%kernel.cache_dir%'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\EntityExtendBundle\Command\ValidatorCacheClearCommand:
+        arguments:
+            - '@kernel'
+            - '@validator.mapping.cache_warmer'
+            - '@filesystem'
+            - '%validator.mapping.cache.file%'
         tags:
             - { name: console.command }
 

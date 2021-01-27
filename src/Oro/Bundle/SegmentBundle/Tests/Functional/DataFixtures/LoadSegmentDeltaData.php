@@ -4,8 +4,9 @@ namespace Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot;
 use Oro\Bundle\SegmentBundle\Entity\SegmentType;
@@ -64,7 +65,7 @@ class LoadSegmentDeltaData extends AbstractFixture implements DependentFixtureIn
         $segment->setName(self::SEGMENT);
         $segment->setEntity(Segment::class);
         $segment->setType($segmentType);
-        $segment->setDefinition(json_encode(self::SEGMENT_DEFINITION));
+        $segment->setDefinition(QueryDefinitionUtil::encodeDefinition(self::SEGMENT_DEFINITION));
         $manager->persist($segment);
         $this->setReference(self::SEGMENT, $segment);
 

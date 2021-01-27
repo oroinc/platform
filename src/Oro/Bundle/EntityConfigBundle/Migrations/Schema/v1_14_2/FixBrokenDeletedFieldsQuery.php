@@ -79,7 +79,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $query, $params, $types);
 
         if (!$dryRun) {
-            $this->connection->executeUpdate($query, $params, $types);
+            $this->connection->executeStatement($query, $params, $types);
         }
     }
 
@@ -101,7 +101,7 @@ class FixBrokenDeletedFieldsQuery extends ParametrizedMigrationQuery
             $this->logQuery($logger, $query, $updateParams, $types);
 
             if (!$dryRun) {
-                $this->connection->executeUpdate($query, $updateParams, $types);
+                $this->connection->executeStatement($query, $updateParams, $types);
             }
         }
     }

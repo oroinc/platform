@@ -1,9 +1,9 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\ReminderBundle\Command;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
@@ -13,23 +13,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Command to send all reminders
+ * Sends reminders that are due now.
  */
 class SendRemindersCommand extends Command implements CronCommandInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:send-reminders';
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private ReminderSenderInterface $sender;
 
-    /** @var ReminderSenderInterface */
-    private $sender;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param ReminderSenderInterface $sender
-     */
     public function __construct(ManagerRegistry $registry, ReminderSenderInterface $sender)
     {
         $this->registry = $registry;
@@ -38,17 +31,11 @@ class SendRemindersCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultDefinition()
     {
         return '*/1 * * * *';
     }
 
-    /**
-     * @return bool
-     */
     public function isActive()
     {
         $count = $this->getReminderRepository()->countRemindersToSend();
@@ -56,16 +43,25 @@ class SendRemindersCommand extends Command implements CronCommandInterface
         return ($count > 0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
-        $this->setDescription('Send reminders');
+        $this
+            ->setDescription('Sends reminders that are due now.')
+            ->setHelp(
+                <<<'HELP'
+The <info>%command.name%</info> command sends reminders that are due now.
+
+  <info>php %command.full_name%</info>
+
+HELP
+            )
+        ;
     }
 
     /**
-     * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @noinspection PhpMissingParentCallCommonInspection
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
@@ -80,7 +76,7 @@ class SendRemindersCommand extends Command implements CronCommandInterface
             sprintf('<comment>Reminders to send:</comment> %d', count($reminders))
         );
 
-        $em = $this->getEntityManager();
+        $em = $this->registry->getManager();
         try {
             $em->beginTransaction();
 
@@ -103,7 +99,7 @@ class SendRemindersCommand extends Command implements CronCommandInterface
      * @param Reminder[]      $reminders
      * @return int Count of sent reminders
      */
-    protected function sendReminders($output, array $reminders)
+    protected function sendReminders(OutputInterface $output, array $reminders): int
     {
         $result = 0;
 
@@ -128,19 +124,8 @@ class SendRemindersCommand extends Command implements CronCommandInterface
         return $result;
     }
 
-    /**
-     * @return ReminderRepository
-     */
-    protected function getReminderRepository()
+    protected function getReminderRepository(): ReminderRepository
     {
         return $this->registry->getRepository('OroReminderBundle:Reminder');
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->registry->getManager();
     }
 }

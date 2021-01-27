@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface as ConfigProvider;
 use Twig\Environment as TwigEnvironment;
 use Twig\Extension\ExtensionInterface;
@@ -39,16 +39,13 @@ abstract class TemplateRenderer
 
     /** @var EntityDataAccessor */
     private $entityDataAccessor;
+    private Inflector $inflector;
 
-    /**
-     * @param TwigEnvironment         $environment
-     * @param ConfigProvider            $configProvider
-     * @param VariableProcessorRegistry $variableProcessors
-     */
     public function __construct(
         TwigEnvironment $environment,
         ConfigProvider $configProvider,
-        VariableProcessorRegistry $variableProcessors
+        VariableProcessorRegistry $variableProcessors,
+        Inflector $inflector
     ) {
         $this->environment = $environment;
         $this->configProvider = $configProvider;
@@ -58,6 +55,7 @@ abstract class TemplateRenderer
             $variableProcessors,
             $this->entityDataAccessor
         );
+        $this->inflector = $inflector;
     }
 
     /**
@@ -232,7 +230,7 @@ abstract class TemplateRenderer
 
     /**
      * Parses the given TWIG template and replaces entity variables
-     * (they are starts with "entity." or "computed.entity__") with expression that adds default filters.
+     * (they start with "entity." or "computed.entity__") with expression that adds default filters.
      *
      * @param string       $template
      * @param TemplateData $data
@@ -246,7 +244,7 @@ abstract class TemplateRenderer
         $errorMessage = $this->getVariableNotFoundMessage();
 
         return \preg_replace_callback(
-            '/{{\s([\w\_\-\.]+?)\s}}/u',
+            '/{{\s*([\w\_\-\.]+?)\s*}}/u',
             function ($match) use ($formatExtension, $errorMessage, $data) {
                 list($result, $variable) = $match;
                 $variablePath = $variable;
@@ -256,7 +254,7 @@ abstract class TemplateRenderer
                 if (\strpos($variablePath, self::ENTITY_PREFIX) === 0) {
                     $lastSeparatorPos = \strrpos($variablePath, self::PATH_SEPARATOR);
                     $result = $formatExtension->getSafeFormatExpression(
-                        \lcfirst(Inflector::classify(\substr($variablePath, $lastSeparatorPos + 1))),
+                        \lcfirst($this->inflector->classify(\substr($variablePath, $lastSeparatorPos + 1))),
                         $variable,
                         $this->getFinalVariable(\substr($variablePath, 0, $lastSeparatorPos), $data),
                         $errorMessage
@@ -271,7 +269,7 @@ abstract class TemplateRenderer
 
     /**
      * Parses the given TWIG template and computes values for entity variables
-     * (they are starts with "entity.") that has a processor.
+     * (they start with "entity.") that has a processor.
      *
      * @param string       $template
      * @param TemplateData $data
@@ -281,17 +279,31 @@ abstract class TemplateRenderer
     private function processEntityVariables(string $template, TemplateData $data): string
     {
         return \preg_replace_callback(
-            '/({{\s)([\w\_\-\.]+?)((\|.+)*\s}})/u',
+            // Find expression that should be displayed by twig (strings between {{ and }})
+            '/{{(.+?)}}/u',
             function ($match) use ($data) {
-                list($result, $prefix, $variable, $suffix) = $match;
-                if (\strpos($variable, self::ENTITY_PREFIX) === 0) {
-                    $computedPath = $this->entityVariableComputer->computeEntityVariable($variable, $data);
-                    if ($computedPath) {
-                        $result = $prefix . $computedPath . $suffix;
-                    }
-                }
+                [$outputStr, $variableExpr] = $match;
 
-                return $result;
+                $replaceExpr = \preg_replace_callback(
+                    // Search entity variables (they start with "entity.")
+                    '/('. self::ENTITY_SECTION .'\.[\w|\.]+)/u',
+                    function ($m) use ($data) {
+                        // $variable contains string that starts with "entity."
+                        $variable = $m[0];
+
+                        // Trying to replace entity.* with data provided by processor if any
+                        $computedPath = $this->entityVariableComputer->computeEntityVariable($variable, $data);
+                        if ($computedPath) {
+                            return $computedPath;
+                        }
+
+                        // If no processor registered return raw variable
+                        return $variable;
+                    },
+                    $variableExpr
+                );
+
+                return \str_replace($variableExpr, $replaceExpr, $outputStr);
             },
             $template
         );

@@ -51,7 +51,9 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
         foreach ($taggedServices as $id => $taggedAttributes) {
             $processorServiceDef = $container->getDefinition($id);
             if ($this->isSimpleProcessor($processorServiceDef)) {
-                $simpleProcessors[$id] = $processorServiceDef->getClass();
+                $simpleProcessors[$id] = $processorServiceDef->getArguments()
+                    ? [$processorServiceDef->getClass(), $processorServiceDef->getArguments()]
+                    : $processorServiceDef->getClass();
                 $container->removeDefinition($id);
             } elseif (null !== $this->processorRegistryServiceId) {
                 $container->getDefinition($id)->setPublic(false);
@@ -77,9 +79,38 @@ class CleanUpProcessorsCompilerPass implements CompilerPassInterface
      */
     private function isSimpleProcessor(Definition $processorServiceDef): bool
     {
+        if ($processorServiceDef->isAbstract()) {
+            return false;
+        }
+        if ($processorServiceDef->isLazy()) {
+            return false;
+        }
+        if ($processorServiceDef->getMethodCalls()) {
+            return false;
+        }
+
+        $arguments = $processorServiceDef->getArguments();
+        foreach ($arguments as $argument) {
+            if (!$this->isSimpleArgument($argument)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed $argument
+     *
+     * @return bool
+     */
+    private function isSimpleArgument($argument): bool
+    {
         return
-            !$processorServiceDef->isLazy()
-            && !$processorServiceDef->isAbstract()
-            && count($processorServiceDef->getArguments()) === 0;
+            null === $argument
+            || \is_string($argument)
+            || \is_bool($argument)
+            || \is_int($argument)
+            || \is_float($argument);
     }
 }

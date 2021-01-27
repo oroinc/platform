@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Provider;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\DuplicateEntityAliasResolver;
@@ -24,20 +24,18 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
 
     /** @var DuplicateEntityAliasResolver */
     private $duplicateResolver;
+    private Inflector $inflector;
 
-    /**
-     * @param EntityAliasConfigBag         $config
-     * @param ConfigManager                $configManager
-     * @param DuplicateEntityAliasResolver $duplicateResolver
-     */
     public function __construct(
         EntityAliasConfigBag $config,
         ConfigManager $configManager,
-        DuplicateEntityAliasResolver $duplicateResolver
+        DuplicateEntityAliasResolver $duplicateResolver,
+        Inflector $inflector
     ) {
         $this->config = $config;
         $this->configManager = $configManager;
         $this->duplicateResolver = $duplicateResolver;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -137,7 +135,7 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
     private function createEntityAlias($name)
     {
         $alias = strtolower($name);
-        $pluralAlias = strtolower(Inflector::pluralize($name));
+        $pluralAlias = strtolower($this->inflector->pluralize($name));
         if ($this->duplicateResolver->hasAlias($alias, $pluralAlias)) {
             $alias = $this->duplicateResolver->getUniqueAlias($alias, $pluralAlias);
             $pluralAlias = $alias;

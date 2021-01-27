@@ -85,8 +85,8 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
             $configExtensionRegistry->getConfigurationSettings(),
             1
         );
-        $configBuilder = new TreeBuilder();
-        $configuration->configure($configBuilder->root('entity')->children());
+        $configBuilder = new TreeBuilder('entity');
+        $configuration->configure($configBuilder->getRootNode()->children());
 
         $processor = new Processor();
         $result    = $processor->process($configBuilder->buildTree(), [$config]);

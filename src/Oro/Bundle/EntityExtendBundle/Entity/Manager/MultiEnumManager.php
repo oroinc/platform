@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -12,6 +12,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class MultiEnumManager
 {
+    private Inflector $inflector;
+
+    public function __construct(Inflector $inflector)
+    {
+        $this->inflector = $inflector;
+    }
+
     /**
      * Handle onFlush event
      *
@@ -91,6 +98,6 @@ class MultiEnumManager
      */
     protected function getSnapshotFieldMethodSuffix($fieldName)
     {
-        return Inflector::classify(ExtendHelper::getMultiEnumSnapshotFieldName($fieldName));
+        return $this->inflector->classify(ExtendHelper::getMultiEnumSnapshotFieldName($fieldName));
     }
 }

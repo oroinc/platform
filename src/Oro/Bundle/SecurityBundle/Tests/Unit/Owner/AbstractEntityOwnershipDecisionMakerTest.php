@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\AbstractEntityOwnershipDecisionMaker;
@@ -62,7 +63,7 @@ class AbstractEntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwner
             ->setConstructorArgs([
                 $this->treeProvider,
                 new ObjectIdAccessor($doctrineHelper),
-                new EntityOwnerAccessor($this->metadataProvider),
+                new EntityOwnerAccessor($this->metadataProvider, (new InflectorFactory())->build()),
                 $this->metadataProvider
             ])
             ->getMockForAbstractClass();

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
@@ -223,7 +223,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         $eventDispatcher
             ->expects(self::atLeastOnce())
             ->method('dispatch')
-            ->with(PrepareContextTitleEvent::EVENT_NAME, self::isInstanceOf(PrepareContextTitleEvent::class));
+            ->with(self::isInstanceOf(PrepareContextTitleEvent::class), PrepareContextTitleEvent::EVENT_NAME);
 
         $this->manager->setEventDispatcher($eventDispatcher);
         $result = $this->manager->getActivityContext(TestActivity::class, 1);

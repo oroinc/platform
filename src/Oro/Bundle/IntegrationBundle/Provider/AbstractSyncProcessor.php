@@ -149,7 +149,7 @@ abstract class AbstractSyncProcessor implements
     protected function dispatchSyncEvent($eventName, $jobName, array $configuration, JobResult $jobResult = null)
     {
         $event = new SyncEvent($jobName, $configuration, $jobResult);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         return $event;
     }
