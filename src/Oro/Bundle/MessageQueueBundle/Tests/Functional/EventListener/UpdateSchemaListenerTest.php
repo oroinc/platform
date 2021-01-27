@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
@@ -58,11 +59,12 @@ class UpdateSchemaListenerTest extends WebTestCase
         $directory = dirname($filePath);
 
         @mkdir($directory, 0777, true);
-        touch($filePath, time() - 1);
+        touch($filePath);
 
         $this->assertFileExists($filePath);
 
         $timestamp = filemtime($filePath);
+        sleep(1);
 
         $this->removeListenersForEventExceptTested();
 
@@ -70,7 +72,7 @@ class UpdateSchemaListenerTest extends WebTestCase
 
         clearstatcache(true, $filePath);
 
-        $this->assertNotEquals($timestamp, filemtime($filePath));
+        $this->assertGreaterThan($timestamp, filemtime($filePath));
     }
 
     /**
