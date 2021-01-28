@@ -67,6 +67,10 @@ class EntityConfigListener
     public function updateEntity(EntityConfigEvent $event)
     {
         $className       = $event->getClassName();
+        if (!class_exists($className)) {
+            # Skip processing if the entity is a custom or enum and the cache file is not generated yet
+            return;
+        }
         $parentClassName = get_parent_class($className);
         if (!$parentClassName) {
             return;

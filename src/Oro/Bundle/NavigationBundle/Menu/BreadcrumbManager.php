@@ -8,6 +8,9 @@ use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Symfony\Component\Routing\Router;
 
+/**
+ * Provides breadcrumbs by the menu helps to find menu items
+ */
 class BreadcrumbManager implements BreadcrumbManagerInterface
 {
     /**
@@ -177,9 +180,9 @@ class BreadcrumbManager implements BreadcrumbManagerInterface
     {
         if ($pattern == $route) {
             return true;
-        } elseif (0 === strpos($pattern, '/') && strlen($pattern) - 1 === strrpos($pattern, '/')) {
+        } elseif (str_starts_with($pattern, '/') && strlen($pattern) - 1 === strrpos($pattern, '/')) {
             return preg_match($pattern, $route);
-        } elseif (false !== strpos($pattern, '*')) {
+        } elseif (str_contains($pattern, '*')) {
             $pattern = sprintf('/^%s$/', str_replace('*', '\w+', $pattern));
             return preg_match($pattern, $route);
         } else {

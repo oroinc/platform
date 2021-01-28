@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
 use Box\Spout\Common\Type;
-use Box\Spout\Writer\WriterFactory;
+use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
+use Box\Spout\Writer\Common\Creator\WriterFactory;
 use Box\Spout\Writer\WriterInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
@@ -27,7 +28,7 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
     public function getWriter(): WriterInterface
     {
         if (!$this->writer) {
-            $this->writer = WriterFactory::create(Type::XLSX);
+            $this->writer = WriterFactory::createFromType(Type::XLSX);
             $this->writer->openToFile($this->filePath);
         }
 
@@ -39,7 +40,10 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
      */
     public function write(array $items): void
     {
-        $writeArray = $items;
+        $rows = [];
+        foreach ($items as $item) {
+            $rows[] = WriterEntityFactory::createRowFromArray($item);
+        }
         // write a header if needed
         if ($this->firstLineIsHeader && $this->currentRow === 0) {
             if (!$this->header && count($items) > 0) {
@@ -47,13 +51,13 @@ abstract class XlsxFileStreamWriter extends FileStreamWriter
             }
 
             if ($this->header) {
-                array_unshift($writeArray, $this->header);
+                $header = WriterEntityFactory::createRowFromArray($this->header);
+                array_unshift($rows, $header);
             }
         }
+        $this->getWriter()->addRows($rows);
 
-        $this->getWriter()->addRows($writeArray);
-
-        $this->currentRow += count($writeArray) - 1;
+        $this->currentRow += count($rows) - 1;
     }
 
     /**

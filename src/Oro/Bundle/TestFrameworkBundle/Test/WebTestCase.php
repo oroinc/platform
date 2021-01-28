@@ -725,7 +725,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @return Client
      * @throws \BadMethodCallException
      */
-    public static function getClientInstance()
+    protected static function getClientInstance()
     {
         if (!self::$clientInstance) {
             throw new \BadMethodCallException('Client instance is not initialized.');

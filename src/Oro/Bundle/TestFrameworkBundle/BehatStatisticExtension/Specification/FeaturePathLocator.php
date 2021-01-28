@@ -32,12 +32,7 @@ class FeaturePathLocator
      */
     public function getRelativePath($featurePath)
     {
-        $basePath = rtrim($this->basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        if (strpos($featurePath, 'vendor' . DIRECTORY_SEPARATOR) !== 0) {
-            $basePath .= sprintf('..%s..%s', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
-        }
-
-        $featureDirectories = explode(DIRECTORY_SEPARATOR, realpath($basePath . $featurePath));
+        $featureDirectories = explode(DIRECTORY_SEPARATOR, realpath($featurePath));
 
         return implode(DIRECTORY_SEPARATOR, array_diff($featureDirectories, $this->basePathDirectories));
     }

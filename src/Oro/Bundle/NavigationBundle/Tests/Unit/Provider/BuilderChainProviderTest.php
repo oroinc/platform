@@ -84,8 +84,10 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $options = ['param' => 'value'];
 
         $item = new MenuItemStub();
+        $item->setName('item');
 
         $menu = new MenuItemStub();
+        $menu->setName('menu');
         $menu->addChild($item);
 
         $this->factory->expects(static::once())
@@ -111,8 +113,12 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $options = ['param' => 'value'];
         $menuName = 'menu_name';
 
+        $item = new MenuItemStub();
+        $item->setName('item');
+
         $menu = new MenuItemStub();
-        $menu->addChild(new MenuItemStub());
+        $menu->setName('menu');
+        $menu->addChild($item);
 
         $rebuildMenu = clone $menu;
         $rebuildMenu->setAttribute('custom', true);
@@ -149,8 +155,12 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $options = ['param' => 'value'];
         $menuName = 'menu_name';
 
+        $item = new MenuItemStub();
+        $item->setName('item');
+
         $menu = new MenuItemStub();
-        $menu->addChild(new MenuItemStub());
+        $menu->setName('menu');
+        $menu->addChild($item);
 
         $rebuildMenu = clone $menu;
         $rebuildMenu->setAttribute('custom', true);
