@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Title\TitleReader;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader;
 
 use Oro\Bundle\NavigationBundle\Tests\Unit\Title\TitleReader\Stub\TitleReaderStub;
+use Oro\Bundle\NavigationBundle\Title\TitleReader\TitleReaderRegistry;
 
 class TitleReaderRegistryTest extends \PHPUnit\Framework\TestCase
 {

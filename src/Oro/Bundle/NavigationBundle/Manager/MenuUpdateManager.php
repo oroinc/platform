@@ -15,6 +15,9 @@ use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\UIBundle\Model\TreeItem;
 
+/**
+ * The manager to manipulate menu items using menu updates
+ */
 class MenuUpdateManager
 {
     /** @var ManagerRegistry */
@@ -61,6 +64,8 @@ class MenuUpdateManager
 
         if (isset($options['key'])) {
             $entity->setKey($options['key']);
+        } else {
+            $entity->generateKey();
         }
 
         $entity->setMenu($menu->getName());
@@ -140,7 +145,7 @@ class MenuUpdateManager
      *
      * @return ItemInterface|null
      */
-    protected function findMenuItem(ItemInterface $menu, $key)
+    protected function findMenuItem(ItemInterface $menu, $key): ?ItemInterface
     {
         if ($menu->getName() === $key) {
             return $menu;

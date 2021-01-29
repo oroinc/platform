@@ -91,6 +91,9 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         )) {
             return;
         }
+        if ($argument->getClass() === MimeTypes::class) {
+            return;
+        }
 
         $argumentServiceId = array_search($argument, $container->getDefinitions());
         if (!$argumentServiceId) {

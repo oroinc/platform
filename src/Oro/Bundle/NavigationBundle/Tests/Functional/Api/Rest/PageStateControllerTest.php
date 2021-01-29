@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Functional\Api;
+namespace Oro\Bundle\NavigationBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\PageStateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
