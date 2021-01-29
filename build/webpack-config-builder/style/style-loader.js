@@ -13,28 +13,28 @@ class StyleLoader {
      * @return {Object} List of Webpack entry-points
      */
     getThemeEntryPoints(theme) {
-        let entryPoints = {};
-        let commonConfig = this._configLoader.loadConfig(theme, '/Resources/config/oro/assets.yml');
+        const entryPoints = {};
+        const commonConfig = this._configLoader.loadConfig(theme, '/Resources/config/oro/assets.yml');
         let themeConfig = this._configLoader.loadConfig(theme, '/Resources/public/themes/' + theme + '/settings.yml');
 
         themeConfig = themeConfig.styles;
-        for (let key in themeConfig) {
+        for (const key in themeConfig) {
             if (themeConfig.hasOwnProperty(key)) {
-                let config = themeConfig[key];
+                const config = themeConfig[key];
                 if (commonConfig[key]) {
                     commonConfig[key] = merge(commonConfig[key], config);
                 }
             }
         }
 
-        for (let key in commonConfig) {
+        for (const key in commonConfig) {
             if (commonConfig.hasOwnProperty(key)) {
-                let config = commonConfig[key];
-                let inputs = this._overrideInputs(config.inputs);
+                const config = commonConfig[key];
+                const inputs = this._overrideInputs(config.inputs);
                 if (config.output === undefined) {
                     throw new Error('"output" for "' + key + '" group in theme "' + theme + '" is not defined');
                 }
-                entryPoints[config.output.replace(/\.[^/.]+$/, "")] = inputs;
+                entryPoints[config.output.replace(/\.[^/.]+$/, '')] = inputs;
             }
         }
         return entryPoints;
@@ -46,13 +46,13 @@ class StyleLoader {
      * @private
      */
     _overrideInputs(inputs) {
-        let newInputs = [];
+        const newInputs = [];
 
         inputs.forEach((input, index) => {
             if (typeof input !== 'string') {
-                let oldInput = Object.keys(input)[0];
-                let newInput = input[oldInput];
-                let oldInputIndex = newInputs.findIndex(element => element === oldInput);
+                const oldInput = Object.keys(input)[0];
+                const newInput = input[oldInput];
+                const oldInputIndex = newInputs.findIndex(element => element === oldInput);
 
                 if (newInput) { // replace input
                     newInputs[oldInputIndex] = newInput;

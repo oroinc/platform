@@ -17,13 +17,10 @@ class AppModulesFileWriter {
      * @returns {string} JS file path of an output file
      */
     write(appModules, output) {
-        let buildPath = path.join(output, 'app-modules.js');
-        let content = 'export default [\n';
-        appModules.forEach(appModule => {
-            content += `    require('${appModule}'),\n`
-        });
-        content += '];\n';
-        let filepath = path.resolve(this._publicPath + buildPath);
+        const buildPath = path.join(output, 'app-modules.js');
+        const requireLines = appModules.map(appModule => `  require('${appModule}')`).join(',\n');
+        const content = `export default [\n${requireLines}\n];\n`;
+        const filepath = path.resolve(this._publicPath + buildPath);
         fs.mkdirSync(path.dirname(filepath), {recursive: true});
         fs.writeFileSync(filepath, content);
 

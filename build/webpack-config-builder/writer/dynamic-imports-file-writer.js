@@ -17,15 +17,14 @@ class DynamicImportsFileWriter {
      * @returns {string} JS file path of an output file
      */
     write(dynamicImports, output) {
-        let buildPath =  path.join(output, 'dynamic-imports.js');
-        let content = 'module.exports = {\n';
-        for (let chunkName in dynamicImports) {
-            dynamicImports[chunkName].forEach(function(moduleName) {
-                content += `  "${moduleName}": function() { return import(/* webpackChunkName: "${chunkName}" */ "${moduleName}") },\n`
-            });
-        }
-        content += '};\n';
-        let filepath = path.resolve(this._publicPath + buildPath);
+        const buildPath = path.join(output, 'dynamic-imports.js');
+        let content = Object.entries(dynamicImports).map(([chunkName, moduleNames]) => {
+            return moduleNames.map(moduleName =>
+                `'${moduleName}': function() { return import(/* webpackChunkName: "${chunkName}" */ '${moduleName}') }`
+            );
+        });
+        content = `module.exports = {\n  ${content.flat().join(',\n  ')}\n};\n`;
+        const filepath = path.resolve(this._publicPath + buildPath);
         fs.mkdirSync(path.dirname(filepath), {recursive: true});
         fs.writeFileSync(filepath, content);
         return filepath;

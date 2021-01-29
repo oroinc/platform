@@ -4,7 +4,7 @@ class MapModulesPlugin {
     }
 
     apply(resolver) {
-        const { '*': generalMap, ...customMap } = this.map;
+        const {'*': generalMap, ...customMap} = this.map;
         const customMapKeys = Object.keys(customMap);
         const source = resolver.ensureHook('before-resolve');
         const target = resolver.ensureHook('resolve');

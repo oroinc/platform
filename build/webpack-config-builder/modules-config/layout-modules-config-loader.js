@@ -9,9 +9,9 @@ class LayoutModulesConfigLoader extends ThemesConfigLoader {
     loadConfig(theme, filePath) {
         let themeConfig = super.loadConfig(theme, path.join('/Resources/views/layouts/', theme, filePath));
         // recursive process parent theme
-        let parentTheme = this.themes[theme];
-        if (typeof parentTheme === "string") {
-            let parentThemeConfig = this.loadConfig(parentTheme, filePath);
+        const parentTheme = this.themes[theme];
+        if (typeof parentTheme === 'string') {
+            const parentThemeConfig = this.loadConfig(parentTheme, filePath);
             themeConfig = merge(parentThemeConfig, themeConfig);
         }
 

@@ -17,8 +17,8 @@ class ConfigsFileWriter {
      * @returns {string} JS file path of an output file
      */
     write(configs, output) {
-        let buildPath = path.join(output, 'configs.json');
-        let filepath = path.resolve(this._publicPath + buildPath);
+        const buildPath = path.join(output, 'configs.json');
+        const filepath = path.resolve(this._publicPath + buildPath);
         fs.mkdirSync(path.dirname(filepath), {recursive: true});
         fs.writeFileSync(filepath, JSON.stringify(configs, null, 2));
         return filepath;

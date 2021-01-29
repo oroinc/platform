@@ -36,24 +36,24 @@ class ModulesConfigLoader {
      * @private
      */
     _getThemes(themesLocation, themeInfoFileName) {
-        let themes = {};
+        const themes = {};
         this._bundles.forEach(bundle => {
-            let source = bundle + themesLocation;
+            const source = bundle + themesLocation;
 
             if (!fs.existsSync(source)) return;
 
             fs.readdirSync(source).forEach(name => {
-                let theme = path.resolve(source, name);
+                const theme = path.resolve(source, name);
                 if (!fs.lstatSync(theme).isDirectory()) {
                     return;
                 }
-                let themeFile = path.resolve(theme, themeInfoFileName);
+                const themeFile = path.resolve(theme, themeInfoFileName);
                 if (!fs.existsSync(themeFile)) return;
 
                 if (!(name in themes)) {
                     themes[name] = null;
                 }
-                let themeInfo = yaml.safeLoad(fs.readFileSync(themeFile, 'utf8'));
+                const themeInfo = yaml.safeLoad(fs.readFileSync(themeFile, 'utf8'));
 
                 if ('parent' in themeInfo) {
                     themes[name] = themeInfo.parent;
@@ -72,10 +72,10 @@ class ModulesConfigLoader {
     loadConfig(theme, filePath) {
         let configs = {};
         this._bundles.forEach(bundle => {
-            let absolutePath = bundle + filePath;
+            const absolutePath = bundle + filePath;
             if (!fs.existsSync(absolutePath)) return;
 
-            let doc = yaml.safeLoad(fs.readFileSync(absolutePath, 'utf8'));
+            const doc = yaml.safeLoad(fs.readFileSync(absolutePath, 'utf8'));
             configs = merge(configs, doc);
         });
         return configs;

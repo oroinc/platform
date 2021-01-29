@@ -1,6 +1,3 @@
-const merge = require('deepmerge');
-const path = require('path');
-
 class ThemeConfigFactory {
     /**
      * @param {ThemesConfigLoader} configLoader
@@ -22,7 +19,7 @@ class ThemeConfigFactory {
      * @return {Object} List of Webpack entry-points
      */
     create(theme, buildPath, configFilepath) {
-        let jsModulesConfig = this._configLoader.loadConfig(theme, configFilepath);
+        const jsModulesConfig = this._configLoader.loadConfig(theme, configFilepath);
 
         const {
             map = {},
@@ -45,7 +42,7 @@ class ThemeConfigFactory {
             this._dynamicImportsFileWriter.write(dynamicImports, buildPath);
         }
 
-        return { map, shim, aliases };
+        return {map, shim, aliases};
     }
 }
 

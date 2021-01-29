@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const printf = require('printf');
 const AppConfigLoader = require('./app-config-loader');
 const AppModulesFileWriter = require('./writer/app-modules-file-writer');
 const CleanupStatsPlugin = require('./plugin/stats/cleanup-stats-plugin');
@@ -7,7 +8,7 @@ const EntryPointFileWriter = require('./writer/scss-entry-point-file-writer');
 const LayoutModulesConfigLoader = require('./modules-config/layout-modules-config-loader');
 const LayoutStyleLoader = require('./style/layout-style-loader');
 const MapModulesPlugin = require('./plugin/map/map-modules-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HappyPack = require('happypack');
 const ModulesConfigLoader = require('./modules-config/modules-config-loader');
 const DynamicImportsFileWriter = require('./writer/dynamic-imports-file-writer');
@@ -27,6 +28,7 @@ class ConfigBuilder {
     constructor() {
         this._publicPath = 'public/';
         this._adminTheme = 'admin.oro';
+        this._versionFormat = '%s?version=%s';
         this._enableLayoutThemes = false;
         this._defaultLayoutThemes = null;
     }
@@ -52,13 +54,24 @@ class ConfigBuilder {
     }
 
     /**
+     * Specifies a sprintf pattern that will be used with the version option to construct an asset’s path.
+     * By default ts `%s?version=%s`
+     * @param {string} versionFormat
+     * @returns {ConfigBuilder}
+     */
+    setVersionFormat(versionFormat) {
+        this._versionFormat = versionFormat;
+        return this;
+    }
+
+    /**
      * Set active admin (management console) theme. Out of the box there are 2 themes ("admin.oro" and "admin.demo")
      *
      * @param {string} adminTheme
      * @returns {ConfigBuilder}
      */
     setAdminTheme(adminTheme) {
-        const themeNameParts = adminTheme.split(".");
+        const themeNameParts = adminTheme.split('.');
         if (themeNameParts[0] !== 'admin' || themeNameParts.length !== 2) {
             throw new Error('Admin theme name should be in a format "admin.{themeName}", for example "admin.oro"');
         }
@@ -86,7 +99,8 @@ class ConfigBuilder {
         return (env = {}, args = {}) => {
             this._initialize(args, env);
 
-            let selectedTheme = env.theme;
+            const {assetVersion} = this._appConfig;
+            const {theme: selectedTheme} = env;
             this._validateThemeName(selectedTheme);
 
             let themes = [];
@@ -103,7 +117,6 @@ class ConfigBuilder {
             if (this._enableLayoutThemes) {
                 if (selectedTheme === undefined) {
                     // build all layout themes
-                    let layoutThemes = {};
                     if (this._defaultLayoutThemes) {
                         themes = [...themes, ...this._defaultLayoutThemes];
                     } else {
@@ -142,7 +155,7 @@ class ConfigBuilder {
                 output: {
                     filename: '[name].js',
                     // Because we use third party libraries 'chunkFilename' should include only [name]
-                    chunkFilename: 'chunk/[name].js?version=[chunkhash:8]',
+                    chunkFilename: printf(this._versionFormat, 'chunk/[name].js', assetVersion)
                 },
                 devtool: !env.skipSourcemap && 'inline-cheap-module-source-map',
                 mode: 'development',
@@ -160,7 +173,7 @@ class ConfigBuilder {
                             tinymce: {
                                 test: /tinymce/,
                                 name: 'tinymce.min',
-                                minChunks: 1,
+                                minChunks: 1
                             },
                             fusioncharts: {
                                 test: /fusioncharts/,
@@ -175,7 +188,7 @@ class ConfigBuilder {
                         resolvedPublicPath,
                         path.join(__dirname, './loader'),
                         resolvedPublicPath + '/bundles',
-                        path.join(__dirname, '../node_modules'),
+                        path.join(__dirname, '../node_modules')
                     ]
                 },
                 module: {
@@ -187,19 +200,19 @@ class ConfigBuilder {
                         {
                             test: /\.s?css$/,
                             use: [{
-                                loader: args.hot ? 'style-loader' : MiniCssExtractPlugin.loader,
+                                loader: args.hot ? 'style-loader' : MiniCssExtractPlugin.loader
                             }, {
                                 loader: 'css-loader',
                                 options: {
                                     importLoaders: 1,
-                                    sourceMap: true,
+                                    sourceMap: true
                                 }
                             }, {
                                 loader: 'postcss-loader',
                                 options: {
                                     sourceMap: true,
                                     config: {
-                                        path: postcssConfig,
+                                        path: postcssConfig
                                     }
                                 }
                             }, {
@@ -216,7 +229,7 @@ class ConfigBuilder {
                                 options: {
                                     includePaths: [
                                         resolvedPublicPath + '/bundles',
-                                        path.resolve(__dirname, '../node_modules'),
+                                        path.resolve(__dirname, '../node_modules')
                                     ],
                                     sourceMap: true
                                 }
@@ -229,7 +242,7 @@ class ConfigBuilder {
                                 limit: 1,
                                 emitFile: false,
                                 publicPath: '../../../',
-                                name: '[path][name].[ext]?[hash]'
+                                name: printf(this._versionFormat, '[path][name].[ext]', assetVersion)
                             }
                         }
                     ]
@@ -256,7 +269,7 @@ class ConfigBuilder {
             }
 
             if (!env.skipJS && !env.skipBabel) {
-                let happyPackOptions = {
+                const happyPackOptions = {
                     id: 'babel',
                     loaders: [
                         {
@@ -295,12 +308,12 @@ class ConfigBuilder {
                     clientLogLevel: 'error',
                     headers: {
                         'Access-Control-Allow-Origin': '*'
-                    },
+                    }
                 };
                 webpackConfig.output.publicPath = `${schema}://${devServerHost}:${devServerPort}/`;
             }
 
-            //Additional setting for production mode
+            // Additional setting for production mode
             if (this._isProduction) {
                 webpackConfig = webpackMerge(webpackConfig, {
                     devtool: false,
@@ -318,40 +331,42 @@ class ConfigBuilder {
                 });
             }
 
-            let webpackConfigs = [];
+            const webpackConfigs = [];
 
-            themes.forEach((theme) => {
-                let themeConfig,
-                    buildPublicPath;
+            themes.forEach(theme => {
+                let themeConfig;
+                let buildPublicPath;
                 if (this._isAdminTheme(theme)) {
                     buildPublicPath = '/build/';
-                    themeConfig = this._themeConfigFactory.create(theme, buildPublicPath, '/Resources/config/jsmodules.yml');
+                    themeConfig = this._themeConfigFactory
+                        .create(theme, buildPublicPath, '/Resources/config/jsmodules.yml');
                 } else {
                     buildPublicPath = `/layout-build/${theme}/`;
-                    themeConfig = this._layoutThemeConfigFactory.create(theme, buildPublicPath, '/config/jsmodules.yml');
+                    themeConfig = this._layoutThemeConfigFactory
+                        .create(theme, buildPublicPath, '/config/jsmodules.yml');
                 }
-                let resolvedBuildPath = path.join(resolvedPublicPath, buildPublicPath);
+                const resolvedBuildPath = path.join(resolvedPublicPath, buildPublicPath);
 
-                let resolverConfig = {
+                const resolverConfig = {
                     modules: [
                         resolvedBuildPath,
                         resolvedPublicPath,
                         resolvedPublicPath + '/bundles',
                         resolvedPublicPath + '/js',
-                        path.join(__dirname, '../node_modules'),
+                        path.join(__dirname, '../node_modules')
                     ],
                     alias: themeConfig.aliases,
                     symlinks: false
                 };
-                let resolver = (resolver => {
+                const resolver = (resolver => {
                     return moduleName => resolver({}, '', moduleName, {});
                 })(resolve.create.sync({...resolverConfig}));
 
-                let cssEntryPoints = !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
-                let jsEntryPoints = !env.skipJS && Object.keys(themeConfig.aliases).length
+                const cssEntryPoints = !env.skipCSS ? this._getCssEntryPoints(theme, buildPublicPath) : {};
+                const jsEntryPoints = !env.skipJS && Object.keys(themeConfig.aliases).length
                     ? this._getJsEntryPoints(theme) : {};
 
-                let entryPoints = {...cssEntryPoints, ...jsEntryPoints};
+                const entryPoints = {...cssEntryPoints, ...jsEntryPoints};
                 if (Object.keys(entryPoints).length === 0) {
                     return;
                 }
@@ -359,14 +374,14 @@ class ConfigBuilder {
                     entry: entryPoints,
                     output: {
                         publicPath: buildPublicPath,
-                        path: resolvedBuildPath,
+                        path: resolvedBuildPath
                     },
                     context: resolvedPublicPath,
                     resolve: {
                         ...resolverConfig,
                         plugins: [
                             new MapModulesPlugin(prepareModulesMap(resolver, themeConfig.map))
-                        ],
+                        ]
                     },
                     module: {
                         rules: [
@@ -421,12 +436,11 @@ class ConfigBuilder {
             new AppModulesFileWriter(this._publicPath),
             new ConfigsFileWriter(this._publicPath)
         );
-
     }
 
     _getJsEntryPoints(theme) {
         return {
-            'app': [
+            app: [
                 'oroui/js/app',
                 'oroui/js/app/services/app-ready-load-modules'
             ]
@@ -435,7 +449,7 @@ class ConfigBuilder {
 
     _getCssEntryPoints(theme, buildPath) {
         if (this._isAdminTheme(theme)) {
-            return this._styleLoader.getThemeEntryPoints(theme.split(".")[1]);
+            return this._styleLoader.getThemeEntryPoints(theme.split('.')[1]);
         }
 
         return this._layoutStyleLoader.getThemeEntryPoints(theme, buildPath);

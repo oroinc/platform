@@ -3,7 +3,7 @@ const _loaderUtils = require('loader-utils');
 
 module.exports = function(source) {
     this.cacheable && this.cacheable();
-    const { resolver, relativeTo = '' } = _loaderUtils.getOptions(this) || {};
+    const {resolver, relativeTo = ''} = _loaderUtils.getOptions(this) || {};
 
     if (typeof resolver !== 'function') {
         return source;
@@ -11,7 +11,7 @@ module.exports = function(source) {
     const rawConfigs = JSON.parse(source);
     const mappedConfigs = {};
 
-    for (let [moduleName, config] of Object.entries(rawConfigs)) {
+    for (const [moduleName, config] of Object.entries(rawConfigs)) {
         let moduleId = path.relative(relativeTo, resolver(moduleName)).split(path.sep).join('/');
         if (moduleId[0] !== '/' && moduleId.slice(0, 3) !== '../') {
             moduleId = './' + moduleId;

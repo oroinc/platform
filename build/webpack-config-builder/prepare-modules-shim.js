@@ -2,7 +2,7 @@ module.exports = (resolver, config) => {
     return Object.entries(config)
         .map(([moduleName, shim]) => {
             let {imports, exports, expose} = shim;
-            let uses = [];
+            const uses = [];
 
             // convert to expose-loader? syntax
             if (expose) {
@@ -23,6 +23,6 @@ module.exports = (resolver, config) => {
             return {
                 test: resolver(moduleName),
                 use: uses
-            }
+            };
         });
 };

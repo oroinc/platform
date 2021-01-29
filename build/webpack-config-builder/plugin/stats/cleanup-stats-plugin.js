@@ -9,7 +9,7 @@ class CleanUpStatsPlugin {
 
     apply(compiler) {
         compiler.hooks.done.tap('CleanUpStatsPlugin', stats => {
-            const { children } = stats.compilation;
+            const {children} = stats.compilation;
 
             if (Array.isArray(children)) {
                 stats.compilation.children = children.filter(child =>

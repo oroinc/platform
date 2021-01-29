@@ -21,14 +21,14 @@ class SCSSEntryPointFileWriter {
         let content = '';
         inputs.forEach(input => {
             // input = path.resolve(this._publicPath, input);
-            input = input.replace(/\.[^/.]+$/, "");
-            content += '@import "'+ baseInputPath + input + '";\n'
+            input = input.replace(/\.[^/.]+$/, '');
+            content += '@import "'+ baseInputPath + input + '";\n';
         });
-        let scssFilepath = path.resolve(this._publicPath + output + '.scss');
+        const scssFilepath = path.resolve(this._publicPath + output + '.scss');
         fs.mkdirSync(path.dirname(scssFilepath), {recursive: true});
         fs.writeFileSync(scssFilepath, content);
 
-        let jsFilepath = path.resolve(this._publicPath + output.replace(/\.[^/.]+$/, "") + '.scss.js');
+        const jsFilepath = path.resolve(this._publicPath + output.replace(/\.[^/.]+$/, '') + '.scss.js');
         fs.mkdirSync(path.dirname(jsFilepath), {recursive: true});
         fs.writeFileSync(
             jsFilepath,

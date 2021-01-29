@@ -1,5 +1,5 @@
 module.exports = (resolver, mapConfig) => {
-    const { '*': generalMap, ...customMap } = mapConfig;
+    const {'*': generalMap, ...customMap} = mapConfig;
 
     return {
         '*': generalMap || {},
