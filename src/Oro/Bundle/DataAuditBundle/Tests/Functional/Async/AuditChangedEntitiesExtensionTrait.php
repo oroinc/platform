@@ -124,5 +124,5 @@ trait AuditChangedEntitiesExtensionTrait
     /**
      * @return Client
      */
-    abstract protected function getClientInstance();
+    abstract protected static function getClientInstance();
 }
