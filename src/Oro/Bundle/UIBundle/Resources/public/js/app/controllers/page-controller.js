@@ -319,9 +319,9 @@ define(function(require, exports, module) {
             mediator.setHandler('redirectTo', function(pathDesc, params, options) {
                 const queue = [];
                 mediator.trigger('page:beforeRedirectTo', queue, pathDesc, params, options);
-                $.when(...queue).done(_.bind(function() {
+                return $.when(...queue).done(() => {
                     this._processRedirect(pathDesc, params, options);
-                }, this));
+                });
             }, this);
 
             mediator.setHandler('refreshPage', function(options) {
