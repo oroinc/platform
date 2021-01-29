@@ -27,7 +27,9 @@ define([
                 pageRefresh = _.isUndefined(pageRefresh) ? true : pageRefresh;
 
                 function doRedirect(redirectUrl) {
-                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
+                    mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true})
+                        // in case redirect action was canceled -- remove loading mask
+                        .fail(() => mediator.execute('hideLoading'));
                 }
                 function doReload() {
                     mediator.execute('refreshPage');
