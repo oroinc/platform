@@ -166,11 +166,13 @@ JS;
                 return false;
             }
             
-            if (document.body.classList.contains('loading')) {
+            if (document.body.classList.contains('loading') && !document.body.classList.contains('modal-open')) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
 
-            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame,.modal-open)>.loader-mask.shown, .lazy-loading') !== null) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
             
@@ -218,7 +220,8 @@ JS;
                 return false;
             }
             
-            if (document.body.classList.contains('loading')) {
+            if (document.body.classList.contains('loading') && !document.body.classList.contains('modal-open')) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
             
@@ -226,7 +229,8 @@ JS;
                 return false;
             }
 
-            if (document.querySelector(':not(.map-visual-frame)>.loader-mask.shown, .lazy-loading') !== null) {
+            if (document.querySelector(':not(.map-visual-frame,.modal-open)>.loader-mask.shown, .lazy-loading') !== null) {
+                // confirmation dialog can be shown over loading mask
                 return false;
             }
             
