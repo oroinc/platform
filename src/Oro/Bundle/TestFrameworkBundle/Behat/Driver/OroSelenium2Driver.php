@@ -171,7 +171,8 @@ JS;
                 return false;
             }
 
-            if (document.querySelector(':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading') !== null) {
+            const ladings = ':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading';
+            if (document.querySelector(ladings) !== null) {
                 // confirmation dialog can be shown over loading mask
                 return false;
             }
@@ -229,7 +230,8 @@ JS;
                 return false;
             }
 
-            if (document.querySelector(':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading') !== null) {
+            const ladings = ':not(.map-visual-frame):not(.modal-open)>.loader-mask.shown, .lazy-loading';
+            if (document.querySelector(ladings) !== null) {
                 // confirmation dialog can be shown over loading mask
                 return false;
             }
