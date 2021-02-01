@@ -151,7 +151,7 @@ services:
             - [ setNamespace, [ 'oro_layout_expression_language' ] ]
 
     oro_layout.expression_language.parsed_cache:
-        class: Symfony\Component\Cache\Adapter\DoctrineAdapter
+        class: Oro\Bundle\LayoutBundle\Cache\ExpressionLanguageDoctrineAdapter
         arguments:
             - '@oro_layout.expression_language.cache'
             - 'oro_layout_expression_language'
