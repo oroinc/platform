@@ -10,12 +10,15 @@
             color: $success-darken;
         }
 
-        .status-available-update {
+        .status-install_available {
             color: $warning-darken;
         }
 
-        .status-available-install {
+        .status-update_available {
             color: $success-darken;
+        }
+
+        .status-not_available {
         }
     }
 }

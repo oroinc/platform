@@ -144,6 +144,27 @@
             overflow: auto;
         }
     }
+
+    &.text-editor {
+        top: $inline-editor-text-editor-top;
+        bottom: $inline-editor-text-editor-bottom;
+
+        .inline-editor__inner,
+        .inline-editor__fields {
+            height: $inline-editor-inner-fields-height;
+        }
+
+        .inline-editor__inner {
+            margin-right: -$inline-editor-inner-outer-offset;
+        }
+
+        .inline-editor__fields {
+            textarea {
+                height: $inline-editor-inner-fields-height;
+                padding: $inline-editor-inner-textarea-offset;
+            }
+        }
+    }
 }
 
 .inline-editor__select2-drop {

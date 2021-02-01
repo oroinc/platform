@@ -25,17 +25,34 @@ define(function(require) {
         defaults: {
             enabled: true,
             isHtml: true,
-            plugins: ['textcolor', 'code', 'bdesk_photo', 'paste', 'lists', 'advlist'],
-            pluginsMap: {
-                bdesk_photo: 'build/_static/bundles/oroform/lib/bdeskphoto/plugin.min.js'
-            },
+            width: '100%',
+            min_height: 250,
+            plugins: ['code', 'paste', 'lists', 'advlist', 'image'],
+            pluginsMap: {},
             menubar: false,
-            toolbar: ['undo redo formatselect bold italic underline | forecolor backcolor | bullist numlist' +
-            '| alignleft aligncenter alignright alignjustify | bdesk_photo'],
-            statusbar: false,
+            toolbar: ['undo redo | formatselect | bold italic underline | forecolor backcolor | bullist numlist' +
+            '| alignleft aligncenter alignright alignjustify | image'],
+            toolbar_mode: 'sliding',
+            elementpath: false,
+            branding: false,
             browser_spellcheck: true,
             images_dataimg_filter: function() {
                 return false;
+            },
+            file_picker_types: 'image',
+            file_picker_callback: function(callback, value, meta) {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.onchange = () => {
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = event => {
+                        callback(event.target.result, {alt: file.name});
+                    };
+                    reader.readAsDataURL(file);
+                };
+                input.click();
             },
             paste_data_images: false,
             block_formats: [
@@ -137,6 +154,11 @@ define(function(require) {
                 options.readonly = true;
             }
 
+            if (options.toolbar_mode && _.isArray(options.toolbar)) {
+                // The toolbar modes are not available when using multiple toolbars or the toolbar(n) option.
+                options.toolbar = options.toolbar.join(' | ');
+            }
+
             _.each(this.options.pluginsMap, function(url, name) {
                 url = location.origin + '/' + this.options.assets_base_url + url;
                 if (this.options.plugins.indexOf(name) !== -1) {
@@ -174,30 +196,6 @@ define(function(require) {
                         });
                     });
 
-                    if (!tools.isMobile()) {
-                        self.tinymceInstance.on('FullscreenStateChanged', function(e) {
-                            if (e.state) {
-                                const rect = $('#container').get(0).getBoundingClientRect();
-                                const css = {
-                                    top: rect.top + 'px',
-                                    left: rect.left + 'px',
-                                    right: Math.max(window.innerWidth - rect.right, 0) + 'px'
-                                };
-
-                                const rules = _.map(_.pairs(css), function(item) {
-                                    return item.join(': ');
-                                }).join('; ');
-                                tools.addCSSRule('div.mce-container.mce-fullscreen', rules);
-                                self.$el.after($('<div />', {'class': 'mce-fullscreen-overlay'}));
-                                const DOM = editor.dom;
-                                const iframe = editor.iframeElement;
-                                const iframeTop = iframe.getBoundingClientRect().top;
-                                DOM.setStyle(iframe, 'height', window.innerHeight - iframeTop);
-                            } else {
-                                self.$el.siblings('.mce-fullscreen-overlay').remove();
-                            }
-                        });
-                    }
                     self.trigger('TinyMCE:initialized');
                     _.delay(function() {
                         /**
@@ -209,12 +207,6 @@ define(function(require) {
                 }
             }, options));
 
-            tinyMCE.activeEditor.on('OpenWindow', function(window) {
-                window.win.moveTo(
-                    Math.max(0, document.body.offsetWidth / 2 - window.win._lastRect.w / 2),
-                    0
-                );
-            });
             this.tinymceConnected = true;
             this.deferredRender.fail(function() {
                 self.removeSubview('loadingMask');
@@ -274,10 +266,8 @@ define(function(require) {
         },
 
         setHeight: function(newHeight) {
-            let currentToolbarHeight;
             if (this.tinymceConnected) {
-                currentToolbarHeight = this.$el.parent().find('.mce-toolbar-grp').outerHeight();
-                this.$el.parent().find('iframe').height(newHeight - currentToolbarHeight - this.TINYMCE_UI_HEIGHT);
+                this.tinymceInstance.editorContainer.style.height = `${newHeight}px`;
             } else {
                 this.$el.height(newHeight - this.TEXTAREA_UI_HEIGHT);
             }

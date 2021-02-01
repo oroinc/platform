@@ -8,7 +8,7 @@ use Oro\Bundle\InstallerBundle\InstallerEvent;
 use Oro\Bundle\InstallerBundle\InstallerEvents;
 use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Component\PhpUtils\PhpIniUtil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -217,7 +217,7 @@ HELP
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
                     ->runCommand(
-                        OroLanguageUpdateCommand::getDefaultName(),
+                        OroTranslationUpdateCommand::getDefaultName(),
                         ['--process-isolation' => true, '--all' => true]
                     );
             }

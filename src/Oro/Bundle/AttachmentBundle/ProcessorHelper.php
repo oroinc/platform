@@ -60,7 +60,8 @@ class ProcessorHelper
     {
         $binary = null;
         $parameter = $this->generateParameter($name);
-        if (null !== $this->parameterBag->get($parameter)) {
+        # parameter may be null or an empty string
+        if (!empty($this->parameterBag->get($parameter))) {
             $binary = $this->parameterBag->get($parameter);
             if (!is_executable($binary)) {
                 throw new ProcessorsException($name);

@@ -172,13 +172,17 @@ services:
 
     knp_voter_request:
         class: Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
+        arguments:
+            - '@request_stack'
         tags:
-            - { name: knp_menu.voter, request: true }
+            - { name: knp_menu.voter }
 
     knp_menu.voter.router:
         class: Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
+        arguments:
+            - '@request_stack'
         tags:
-            - { name: knp_menu.voter, request: true }
+            - { name: knp_menu.voter }
 
     oro_navigation.navigation_history_logger:
         class: Oro\Bundle\NavigationBundle\Utils\NavigationHistoryLogger

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\JsTree;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\MenuFactory;

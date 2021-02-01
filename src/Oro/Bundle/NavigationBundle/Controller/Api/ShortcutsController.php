@@ -13,6 +13,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Provides an action to get all shortcuts items for user
+ *
  * @RouteResource("shortcuts")
  * @NamePrefix("oro_api_")
  */
@@ -64,7 +66,7 @@ class ShortcutsController extends FOSRestController
         foreach ($iterator as $item) {
             if ($this->isItemAllowed($item)) {
                 $key = $translator->trans($item->getLabel());
-                if (strpos(strtolower($key), strtolower($query)) !== false) {
+                if (str_contains(strtolower($key), strtolower($query))) {
                     $this->uris[] = $item->getUri();
                     $result[$key] = $this->getData($item);
                 }
