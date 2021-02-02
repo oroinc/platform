@@ -14,16 +14,14 @@
             </div>
         </div>
         <div class="head-panel__col head-panel__col--side">
-            <% if (needHelp) {  %>
-                <button class="head-panel__link" data-click-action="open-help-carousel">
-                    <span class="head-panel__link-icon fa fa-info-circle" aria-hidden="true"></span>
-                    <%- needHelp %>
-                </button>
-            <% } %>
+            <button class="head-panel__link" data-click-action="open-help-carousel">
+                <span class="head-panel__link-icon fa fa-info-circle" aria-hidden="true"></span>
+                <%- _.__('oro_viewswitcher.inner_page_model.needHelp') %>
+            </button>
 
-            <% if (personalDemoUrl && personalizedDemo) { %>
+            <% if (personalDemoUrl) { %>
                 <a href="<%- personalDemoUrl %>" class="btn btn--light-solid" target="_blank" tabindex="-1" rel="noopener">
-                    <%- personalizedDemo %>
+                    <%- _.__('oro_viewswitcher.inner_page_model.personalizedDemo') %>
                 </a>
             <% } %>
         </div>
