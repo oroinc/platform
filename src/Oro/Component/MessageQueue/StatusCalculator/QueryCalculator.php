@@ -5,17 +5,15 @@ namespace Oro\Component\MessageQueue\StatusCalculator;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobStorage;
 
+/**
+ * Calculate root job status and root job progress with DB queries.
+ */
 class QueryCalculator extends AbstractStatusCalculator
 {
     /**
      * @var JobStorage
      */
     private $jobStorage;
-
-    /**
-     * @var array
-     */
-    private $childJobStatusCounts = [];
 
     /**
      * @var Job
@@ -36,7 +34,6 @@ class QueryCalculator extends AbstractStatusCalculator
     public function init(Job $rootJob)
     {
         $this->rootJob = $rootJob;
-        $this->childJobStatusCounts = $this->jobStorage->getChildStatusesWithJobCountByRootJob($rootJob);
     }
 
     /**
@@ -44,13 +41,11 @@ class QueryCalculator extends AbstractStatusCalculator
      */
     public function calculateRootJobProgress()
     {
-        if (empty($this->childJobStatusCounts)) {
-            return 0;
-        }
+        $childJobStatusCounts = $this->jobStorage->getChildStatusesWithJobCountByRootJob($this->rootJob);
 
         $processed = 0;
         $childrenCount = 0;
-        foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
+        foreach ($childJobStatusCounts as $jobStatus => $childJobCount) {
             if ($this->jobStatusChecker->isFinishedJobStatus($jobStatus)) {
                 $processed += $childJobCount;
             }
@@ -67,7 +62,6 @@ class QueryCalculator extends AbstractStatusCalculator
     public function clean()
     {
         $this->rootJob = null;
-        $this->childJobStatusCounts = [];
     }
 
     /**
@@ -75,8 +69,10 @@ class QueryCalculator extends AbstractStatusCalculator
      */
     protected function getChildrenInternalJobStatusCountList()
     {
+        $childJobStatusCounts = $this->jobStorage->getChildStatusesWithJobCountByRootJob($this->rootJob);
+
         $internalJobStatusCountList = $this->getFullInternalStatusCountList([]);
-        foreach ($this->childJobStatusCounts as $jobStatus => $childJobCount) {
+        foreach ($childJobStatusCounts as $jobStatus => $childJobCount) {
             $internalStatus = $this->convertJobStatusToInternalStatus($jobStatus);
             if (false === $internalStatus) {
                 $childJobIds = $this->jobStorage->getChildJobIdsByRootJobAndStatus($this->rootJob, $jobStatus);
