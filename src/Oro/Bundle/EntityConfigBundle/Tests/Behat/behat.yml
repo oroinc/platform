@@ -1,0 +1,14 @@
+oro_behat_extension:
+    suites:
+        OroEntityConfigBundle:
+            contexts:
+                - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+                - OroFormBundle::FormContext
+                - OroDataGridBundle::GridContext
+            paths:
+                - '@OroEntityConfigBundle/Tests/Behat/Features'
+
+    elements:
+        Product Attribute Audit Grid:
+            class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
+            selector: 'div[data-page-component-name^="auditfield-log-grid"]'
