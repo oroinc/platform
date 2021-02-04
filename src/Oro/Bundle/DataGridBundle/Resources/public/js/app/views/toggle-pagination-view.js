@@ -94,6 +94,15 @@ const TogglePaginationView = BaseView.extend({
         const pageSize = currentPageSize === this.maxPageSize ? initialPageSize : this.maxPageSize;
         this.grid.collection.setPageSize(pageSize);
     }
+}, {
+    isVisible(grid) {
+        const {pageSize: initialPageSize} = grid.collection.initialState;
+        const {pageSize: currentPageSize, totalPages, totalRecords} = grid.collection.state;
+        const {items} = grid.gridOptions.toolbarOptions.pageSize;
+        const isMaxPageSize = currentPageSize === Math.max(...items.map(item => item.size || item));
+
+        return totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize;
+    }
 });
 
 export default TogglePaginationView;
