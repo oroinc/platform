@@ -95,6 +95,10 @@ const TogglePaginationView = BaseView.extend({
         this.grid.collection.updateState({parameters});
         this.grid.collection.fetch({reset: true});
     }
+}, {
+    isVisible(grid) {
+        return grid.metadata.canBeGrouped || false;
+    }
 });
 
 export default TogglePaginationView;
