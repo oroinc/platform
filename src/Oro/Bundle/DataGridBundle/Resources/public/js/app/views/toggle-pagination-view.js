@@ -55,8 +55,7 @@ const TogglePaginationView = BaseView.extend({
     },
 
     getTemplateData: function() {
-        const {pageSize: initialPageSize} = this.grid.collection.initialState;
-        const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
+        const {pageSize: currentPageSize} = this.grid.collection.state;
         const isMaxPageSize = currentPageSize === this.maxPageSize;
         const translationPrefix = `${this.translationPrefix}.${isMaxPageSize ? 'show_less' : 'show_all'}`;
 
