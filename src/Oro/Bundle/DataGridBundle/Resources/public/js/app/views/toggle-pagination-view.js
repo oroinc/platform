@@ -62,7 +62,6 @@ const TogglePaginationView = BaseView.extend({
 
         return {
             enabled: this.enabled,
-            visible: totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize,
             isMaxPageSize,
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)

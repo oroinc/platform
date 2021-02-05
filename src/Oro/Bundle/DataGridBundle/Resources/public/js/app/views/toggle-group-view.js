@@ -64,7 +64,6 @@ const TogglePaginationView = BaseView.extend({
 
         return {
             enabled: this.enabled,
-            visible: this.grid.metadata.canBeGrouped || false,
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)
         };
