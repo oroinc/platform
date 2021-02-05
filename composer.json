@@ -117,7 +117,7 @@
         "php-http/httplug-bundle": "~1.20.0",
         "salsify/json-streaming-parser": "8.2.*",
         "myclabs/deep-copy": "1.10.*",
-        "oro/redis-config": "4.2.*"
+        "oro/redis-config": "5.0.*"
     },
     "require-dev": {
         "ext-ftp": "*",
@@ -216,7 +216,7 @@
             "require": "4.4.*"
         },
         "branch-alias": {
-            "dev-master": "4.2-dev"
+            "dev-master": "5.0-dev"
         }
     },
     "autoload": {
