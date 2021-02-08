@@ -245,7 +245,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return CacheProvider
      */
-    private function getQueryCacheImpl()
+    protected function getQueryCacheImpl()
     {
         // do not cache anything to avoid influence between tests
         return new ChainCache();

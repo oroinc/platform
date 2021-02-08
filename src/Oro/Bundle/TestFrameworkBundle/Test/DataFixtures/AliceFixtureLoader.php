@@ -63,10 +63,11 @@ class AliceFixtureLoader implements LoaderInterface
         array $objects = [],
         PurgeMode $purgeMode = null
     ): array {
+        $referenceRepositoryObjects = array_filter($this->referenceRepository->toArray());
         $objects = $this->loader->load(
             $dataOrFiles,
             $parameters,
-            \array_merge($this->referenceRepository->toArray(), $objects)
+            \array_merge($referenceRepositoryObjects, $objects)
         );
 
         $added = \array_filter(
