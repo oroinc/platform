@@ -13,11 +13,14 @@ use Behat\Behat\Output\Node\Printer\FeaturePrinter;
 use Behat\Behat\Output\Node\Printer\SetupPrinter;
 use Behat\Behat\Output\Node\Printer\StepPrinter;
 use Behat\Gherkin\Node\FeatureNode;
+use Behat\Testwork\Event\Event;
 use Behat\Testwork\EventDispatcher\Event\AfterSetup;
 use Behat\Testwork\Output\Formatter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitScenarioPrinter;
-use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * listener to print feature and scenario duration
+ */
 class JUnitFeatureElementListener
 {
     /**

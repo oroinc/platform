@@ -4,6 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
 {
@@ -12,17 +13,17 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
         $item = $this->createMock('Knp\Menu\ItemInterface');
         $item->expects($this->never())->method('getExtra');
 
-        $voter = new RoutePatternVoter();
+        $voter = new RoutePatternVoter(new RequestStack());
 
         $this->assertNull($voter->matchItem($item));
     }
 
     /**
-     * @param string $route
-     * @param array $parameters
+     * @param string       $route
+     * @param array        $parameters
      * @param string|array $itemRoutes
-     * @param array $itemsRoutesParameters
-     * @param boolean $expected
+     * @param array        $itemsRoutesParameters
+     * @param boolean      $expected
      *
      * @dataProvider matchingDataProvider
      */
@@ -33,10 +34,10 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getExtra')
             ->will(
                 $this->returnValueMap(
-                    array(
-                        array('routes', array(), $itemRoutes),
-                        array('routesParameters', array(), $itemsRoutesParameters)
-                    )
+                    [
+                        ['routes', [], $itemRoutes],
+                        ['routesParameters', [], $itemsRoutesParameters],
+                    ]
                 )
             );
 
@@ -46,56 +47,69 @@ class RoutePatternVoterTest extends \PHPUnit\Framework\TestCase
             $request->attributes->set($name, $value);
         }
 
-        $voter = new RoutePatternVoter();
-        $voter->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $voter = new RoutePatternVoter($requestStack);
 
         $this->assertSame($expected, $voter->matchItem($item));
     }
 
     public function matchingDataProvider()
     {
-        return array(
-            'no request route' => array(null, array(), 'foo', array(), null),
-            'no item route' => array('foo', array(), null, array(), null),
-            'same single route' => array('foo', array(), 'foo', array(), true),
-            'different single route' => array('foo', array(), 'bar', array(), null),
-            'matching mutiple routes' => array('foo', array(), array('foo', 'baz'), array(), true),
-            'matching mutiple routes 2' => array('baz', array(), array('foo', 'baz'), array(), true),
-            'different multiple routes' => array('foo', array(), array('bar', 'baz'), array(), null),
-            'same single route with different parameters' => array(
-                'foo', array('1' => 'bar'),
-                'foo', array('foo' => array('1' => 'baz')),
-                null
-            ),
-            'same single route with same parameters' => array(
-                'foo', array('1' => 'bar'),
-                'foo', array('foo' => array('1' => 'bar')),
-                true
-            ),
-            'same single route with additional parameters' => array(
-                'foo', array('1' => 'bar'),
-                'foo', array('foo' => array('1' => 'bar', '2' => 'baz')),
-                null
-            ),
-            'same single route with less parameters' => array(
-                'foo', array('1' => 'bar', '2' => 'baz'),
-                'foo', array('foo' => array('1' => 'bar')),
-                true
-            ),
-            'same single route with same type parameters' => array(
-                'foo', array('1' => 2),
-                'foo', array('foo' => array('1' => 2)),
-                true
-            ),
-            'same single route with different type parameters' => array(
-                'foo', array('1' => 2),
-                'foo', array('foo' => array('1' => '2')),
-                true
-            ),
-            'match regex pattern' => array('foo', array(), '/^foo$/', array(), true),
-            'not match regex pattern' => array('foo', array(), '/bar/', array(), null),
-            'match wildcard' => array('foo', array(), 'fo*', array(), true),
-            'not match wildcard' => array('foo', array(), 'ba*', array(), null),
-        );
+        return [
+            'no request route'                                 => [null, [], 'foo', [], null],
+            'no item route'                                    => ['foo', [], null, [], null],
+            'same single route'                                => ['foo', [], 'foo', [], true],
+            'different single route'                           => ['foo', [], 'bar', [], null],
+            'matching mutiple routes'                          => ['foo', [], ['foo', 'baz'], [], true],
+            'matching mutiple routes 2'                        => ['baz', [], ['foo', 'baz'], [], true],
+            'different multiple routes'                        => ['foo', [], ['bar', 'baz'], [], null],
+            'same single route with different parameters'      => [
+                'foo',
+                ['1' => 'bar'],
+                'foo',
+                ['foo' => ['1' => 'baz']],
+                null,
+            ],
+            'same single route with same parameters'           => [
+                'foo',
+                ['1' => 'bar'],
+                'foo',
+                ['foo' => ['1' => 'bar']],
+                true,
+            ],
+            'same single route with additional parameters'     => [
+                'foo',
+                ['1' => 'bar'],
+                'foo',
+                ['foo' => ['1' => 'bar', '2' => 'baz']],
+                null,
+            ],
+            'same single route with less parameters'           => [
+                'foo',
+                ['1' => 'bar', '2' => 'baz'],
+                'foo',
+                ['foo' => ['1' => 'bar']],
+                true,
+            ],
+            'same single route with same type parameters'      => [
+                'foo',
+                ['1' => 2],
+                'foo',
+                ['foo' => ['1' => 2]],
+                true,
+            ],
+            'same single route with different type parameters' => [
+                'foo',
+                ['1' => 2],
+                'foo',
+                ['foo' => ['1' => '2']],
+                true,
+            ],
+            'match regex pattern'                              => ['foo', [], '/^foo$/', [], true],
+            'not match regex pattern'                          => ['foo', [], '/bar/', [], null],
+            'match wildcard'                                   => ['foo', [], 'fo*', [], true],
+            'not match wildcard'                               => ['foo', [], 'ba*', [], null],
+        ];
     }
 }

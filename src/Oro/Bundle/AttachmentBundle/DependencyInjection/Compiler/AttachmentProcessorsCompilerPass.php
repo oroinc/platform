@@ -25,9 +25,15 @@ class AttachmentProcessorsCompilerPass implements CompilerPassInterface
             // needs of the system
         }
 
+        // liip_imagine expects paths to be strings, null is not allowed as a default value, so we override it
+        $PNGQuantLibraryPath = '';
+        $JPEGOptimLibraryPath = '';
         if ($librariesExists) {
-            $container->setParameter('liip_imagine.pngquant.binary', $processorHelper->getPNGQuantLibrary());
-            $container->setParameter('liip_imagine.jpegoptim.binary', $processorHelper->getJPEGOptimLibrary());
+            $PNGQuantLibraryPath = $processorHelper->getPNGQuantLibrary();
+            $JPEGOptimLibraryPath = $processorHelper->getJPEGOptimLibrary();
         }
+
+        $container->setParameter('liip_imagine.pngquant.binary', $PNGQuantLibraryPath);
+        $container->setParameter('liip_imagine.jpegoptim.binary', $JPEGOptimLibraryPath);
     }
 }

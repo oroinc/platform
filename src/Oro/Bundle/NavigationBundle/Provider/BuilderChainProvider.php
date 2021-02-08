@@ -80,7 +80,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param array $options
      * @return ItemInterface
      */
-    public function get($alias, array $options = [])
+    public function get(string $alias, array $options = []): ItemInterface
     {
         $this->assertAlias($alias);
         $ignoreCache = array_key_exists(self::IGNORE_CACHE_OPTION, $options);
@@ -141,7 +141,7 @@ class BuilderChainProvider implements MenuProviderInterface
      * @param  array   $options
      * @return boolean
      */
-    public function has($alias, array $options = [])
+    public function has(string $alias, array $options = []): bool
     {
         $this->assertAlias($alias);
 

@@ -30,6 +30,11 @@ interface MenuUpdateInterface
     public function setKey($key);
 
     /**
+     * Generates key, if it's not defined
+     */
+    public function generateKey();
+
+    /**
      * @return string
      */
     public function getParentKey();

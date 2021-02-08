@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Writer;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Box\Spout\Common\Type;
-use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\Common\Creator\ReaderFactory;
 use Box\Spout\Reader\XLSX\Sheet;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
@@ -209,12 +209,12 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
      */
     private function assertXlsx(string $expectedPath, string $actualPath): void
     {
-        $exceptedReader = ReaderFactory::create(Type::XLSX);
+        $exceptedReader = ReaderFactory::createFromType(Type::XLSX);
         $exceptedReader->open($expectedPath);
         /** @var Sheet[] $exceptedSheets */
         $exceptedSheets = iterator_to_array($exceptedReader->getSheetIterator());
 
-        $actualReader = ReaderFactory::create(Type::XLSX);
+        $actualReader = ReaderFactory::createFromType(Type::XLSX);
         $actualReader->open($actualPath);
         /** @var Sheet[] $actualSheets */
         $actualSheets = iterator_to_array($actualReader->getSheetIterator());
@@ -222,7 +222,7 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         static::assertCount(count($exceptedSheets), $actualSheets);
 
         foreach ($exceptedSheets as $sheetIndex => $sheet) {
-            static::assertSame(
+            static::assertEquals(
                 iterator_to_array($sheet->getRowIterator()),
                 iterator_to_array($actualSheets[$sheetIndex]->getRowIterator())
             );

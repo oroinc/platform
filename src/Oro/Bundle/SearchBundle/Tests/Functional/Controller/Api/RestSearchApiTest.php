@@ -79,16 +79,6 @@ class RestSearchApiTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @return array
-     */
-    public function searchDataAutocompleteProvider()
-    {
-        return $this->getApiRequestsData(
-            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests_autocomplete'
-        );
-    }
-
-    /**
      * @param array $items
      * @param array $result
      */

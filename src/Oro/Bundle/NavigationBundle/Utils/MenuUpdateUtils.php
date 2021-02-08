@@ -132,8 +132,10 @@ class MenuUpdateUtils
             return null;
         }
 
-        $parentItem = self::findMenuItem($menu, $update->getParentKey());
-        $parentItem = $parentItem === null ? $menu : $parentItem;
+        if (null !== $update->getParentKey()) {
+            $parentItem = self::findMenuItem($menu, $update->getParentKey());
+        }
+        $parentItem ??= $menu;
 
         if ($item === null) {
             $item = $parentItem->addChild($update->getKey(), $options);
@@ -154,8 +156,11 @@ class MenuUpdateUtils
      *
      * @return ItemInterface|null
      */
-    public static function findMenuItem(ItemInterface $menuItem, $name)
+    public static function findMenuItem(ItemInterface $menuItem, $name): ?ItemInterface
     {
+        if (null === $name) {
+            return null;
+        }
         $item = $menuItem->getChild($name);
         if (!$item) {
             foreach ($menuItem->getChildren() as $child) {

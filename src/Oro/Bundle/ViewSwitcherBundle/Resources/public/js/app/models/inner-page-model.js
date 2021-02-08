@@ -5,15 +5,12 @@ define(function(require) {
 
     const InnerPageModel = BaseModel.extend({
         defaults: {
-            backToLogin: 'Back to Demo Log-in',
             backToLoginIcon: 'fa-cogs',
             isLoggedIn: false,
             isAdminPanel: false,
             personalDemoUrl: '#',
             styleMode: null, // View-switcher has one more styleMode: 'dark-mode'
-            projectName: 'Oro',
-            needHelp: 'Need Help?',
-            personalizedDemo: 'Want a Personalized Demo?'
+            projectName: 'Oro'
         },
 
         /**
