@@ -44,12 +44,11 @@ define([
                     ) {
                         e.stopImmediatePropagation();
                         doRedirect(response.workflowItem.result.redirectUrl);
+                    } else if (pageRefresh) {
+                        /** By default reload page */
+                        element.one('transitions_success', doReload);
                     }
                 });
-                /** By default reload page */
-                if (pageRefresh) {
-                    element.one('transitions_success', doReload);
-                }
 
                 element.trigger('transitions_success', [response]);
             };
