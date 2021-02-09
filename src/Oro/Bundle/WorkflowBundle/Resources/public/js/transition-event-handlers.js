@@ -46,7 +46,7 @@ define([
                         doRedirect(response.workflowItem.result.redirectUrl);
                     } else if (pageRefresh) {
                         /** By default reload page */
-                        element.one('transitions_success', doReload);
+                        doReload();
                     }
                 });
 
