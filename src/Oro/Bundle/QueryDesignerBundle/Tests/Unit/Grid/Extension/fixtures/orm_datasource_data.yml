@@ -116,24 +116,24 @@
             (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
             AND
                 (EXISTS(
-                    SELECT _gpnpconditionsgroup4.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
-                        INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
-                        INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
+                    SELECT _gpnpl2conditionsgroup1.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpl2conditionsgroup1
+                        INNER JOIN _gpnpl2conditionsgroup1.address _gpnpl2conditionsgroup2
+                        INNER JOIN _gpnpl2conditionsgroup1.shippingAddresses _gpnpl2conditionsgroup3
                     WHERE (
                         (EXISTS(
-                                SELECT _gpnpconditionsgroup4.id
-                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
-                                    INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
-                                    INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
+                                SELECT _gpnpl2conditionsgroup4.id
+                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpl2conditionsgroup4
+                                    INNER JOIN _gpnpl2conditionsgroup4.address _gpnpl2conditionsgroup5
+                                    INNER JOIN _gpnpl2conditionsgroup4.shippingAddresses _gpnpl2conditionsgroup6
                                 WHERE
-                                (_gpnpconditionsgroup6.country LIKE :_gpnpstring2 OR _gpnpconditionsgroup6.city LIKE :_gpnpstring3)
-                                AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
+                                (_gpnpl2conditionsgroup6.country LIKE :_gpnpstring2 OR _gpnpl2conditionsgroup6.city LIKE :_gpnpstring3)
+                                AND _gpnpl2conditionsgroup4.id = _gpnpl2conditionsgroup1.id
                             )
                         )
-                        OR _gpnpconditionsgroup6.zip LIKE :_gpnpstring4
+                        OR _gpnpl2conditionsgroup3.zip LIKE :_gpnpstring4
                     )
-                    AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
+                    AND _gpnpl2conditionsgroup1.id = user.id
                 )
             )
         )
