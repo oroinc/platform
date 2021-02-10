@@ -80,9 +80,11 @@ services:
 
     oro_form.registry.form_handler:
         class: Oro\Bundle\FormBundle\Model\FormHandlerRegistry
-        public: false
         arguments:
             - ~ # service locator
+
+    Oro\Bundle\FormBundle\Model\FormHandlerRegistry:
+        alias: oro_form.registry.form_handler
 
     oro_form.form.handler.default:
         class: Oro\Bundle\FormBundle\Form\Handler\FormHandler
