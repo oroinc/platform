@@ -155,8 +155,19 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
         if (\is_string($object)) {
             $workflowName = $id = $group = null;
             $this->parseDescriptor($object, $workflowName, $id, $group);
-            $fieldName = ObjectIdentityHelper::decodeEntityFieldInfo($object)[1];
-            list($transitionName, $fromStep, $toStep) = explode('|', $fieldName);
+
+            $fieldInfo = ObjectIdentityHelper::decodeEntityFieldInfo($object);
+            if (!isset($fieldInfo[1])) {
+                return null;
+            }
+
+            $data = explode('|', $fieldInfo[1]);
+            $transitionName = $data[0] ?? '';
+            if (!$transitionName) {
+                return null;
+            }
+
+            $fromStep = $data[1] ?? '';
             // detect that given transition is start
             if ('' === $fromStep) {
                 $workflow = $this->getWorkflowManager()->getWorkflow($workflowName);
