@@ -48,6 +48,9 @@ The <info>%command.name%</info> command updates extend entity config.
 
   <info>php %command.full_name%</info>
 
+<error>This is an internal command. Please do not run it manually.</error>
+<error>Execution of this command can break the system.</error>
+
 Use the <info>--update-custom</info> option to apply user changes that require database schema update:
 
   <info>php %command.full_name% --update-custom</info>
