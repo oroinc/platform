@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     const config = require('module-config').default(module.id);
     const validateTopmostLabelMixin = config.useTopmostLabelMixin
         ? require('oroform/js/validate-topmost-label-mixin') : null;
+    const messageTemplate = require('tpl-loader!oroform/templates/error-template.html');
 
     const original = _.pick($.validator.prototype, 'init', 'showLabel', 'defaultShowErrors', 'resetElements');
 
@@ -462,12 +463,7 @@ define(function(require, exports, module) {
                 this.settings.errorPlacement(label, element);
             }
 
-            message = `
-                <span role="alert">
-                    <span class="validation-failed__icon" aria-hidden="true"></span>
-                    <span>${message}</span>
-                </span>
-            `;
+            message = this.settings.errorMessageTemplate({message: message});
 
             original.showLabel.call(this, element, message);
 
@@ -570,6 +566,8 @@ define(function(require, exports, module) {
     $.validator.setDefaults({
         errorElement: 'span',
         errorClass: 'validation-failed',
+        errorElementClassName: ERROR_CLASS_NAME,
+        errorMessageTemplate: messageTemplate,
         errorPlacement: function(label, $el) {
             const $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
