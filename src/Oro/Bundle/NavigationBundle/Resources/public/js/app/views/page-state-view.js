@@ -99,7 +99,7 @@ define(function(require) {
                 this.listenTo(confirmModal, 'ok', function() {
                     deferred.resolve({resetChanges: true});
                 });
-                this.listenTo(confirmModal, 'cancel', function() {
+                this.listenTo(confirmModal, 'cancel close', function() {
                     deferred.reject();
                 });
 
