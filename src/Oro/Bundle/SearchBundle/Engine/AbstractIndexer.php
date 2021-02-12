@@ -9,6 +9,8 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Query\Mode;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Abstract indexer for standard search engine
@@ -28,6 +30,9 @@ abstract class AbstractIndexer implements IndexerInterface
 
     /** @var EntityNameResolver */
     protected $entityNameResolver;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param ManagerRegistry              $registry
@@ -173,5 +178,28 @@ abstract class AbstractIndexer implements IndexerInterface
     public function getBatchSize()
     {
         return self::BATCH_SIZE;
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    protected function checkMappingErrors(): void
+    {
+        if (!$this->logger) {
+            throw new \LogicException('The \'logger\' must not be null.');
+        }
+
+        $errors = $this->mapper->getLastMappingErrors();
+        if ($errors) {
+            $message = <<<TEXT
+Errors occurred while preparing data for the search index. 
+For the entity "%s", the following fields: "%s" have wrong type.
+TEXT;
+            foreach ($errors as $alias => $fields) {
+                $this->logger->log(LogLevel::ERROR, sprintf($message, $alias, implode(', ', array_keys($fields))));
+            }
+        }
     }
 }

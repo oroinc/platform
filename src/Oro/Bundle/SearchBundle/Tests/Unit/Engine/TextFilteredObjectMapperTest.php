@@ -4,10 +4,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper;
+use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class TextFilteredObjectMapperTest extends ObjectMapperTest
 {
+    use SearchMappingTypeCastingHandlersTestTrait;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,6 +21,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             $this->dispatcher,
             $this->htmlTagHelper
         );
+        $this->mapper->setTypeCastingHandlerRegistry($this->getTypeCastingHandlerRegistry());
     }
 
     /**

@@ -9,6 +9,7 @@ use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
@@ -21,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 {
+    use SearchMappingTypeCastingHandlersTestTrait;
+
     private const TEST_COUNT = 10;
     private const TEST_PRICE = 150;
 
@@ -232,6 +235,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             $this->dispatcher,
             $this->htmlTagHelper
         );
+        $this->mapper->setTypeCastingHandlerRegistry($this->getTypeCastingHandlerRegistry());
     }
 
     /**
