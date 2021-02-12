@@ -106,7 +106,17 @@ define(function(require) {
                     slidesToShow: 1,
                     adaptiveHeight: true,
                     autoplay: true,
-                    autoplaySpeed: 10000
+                    autoplaySpeed: 10000,
+                    prevArrow: _.template(
+                        `<button type="button" aria-label="<%- _.__('Previous') %>" class="slick-prev">
+                            <%- _.__('Previous') %>
+                        </button>`
+                    )(),
+                    nextArrow: _.template(
+                        `<button type="button" aria-label="<%- _.__('Next') %>" class="slick-next"">
+                            <%- _.__('Next') %>
+                        </button>`
+                    )()
                 });
             });
         },

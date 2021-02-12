@@ -156,6 +156,8 @@ class OrmIndexer extends AbstractIndexer
             $hasSavedEntities = true;
         }
 
+        $this->checkMappingErrors();
+
         return $hasSavedEntities;
     }
 

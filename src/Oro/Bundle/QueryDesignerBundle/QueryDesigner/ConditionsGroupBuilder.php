@@ -15,6 +15,11 @@ use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAda
 class ConditionsGroupBuilder
 {
     /**
+     * @var int
+     */
+    private $groupLevel = 0;
+
+    /**
      * @param RestrictionBuilder                 $restrictionBuilder
      * @param GroupingOrmFilterDatasourceAdapter $ds
      * @param array                              $filters
@@ -33,7 +38,7 @@ class ConditionsGroupBuilder
                 $ds,
                 $this->createSubQueryBuilder($restrictionBuilder, $ds, $filters),
                 FilterOrmQueryUtil::getSingleIdentifierFieldExpr($qb),
-                'conditions_group'
+                'l_' . ++$this->groupLevel . '_conditions_group'
             );
             $filterExpression = $qb->expr()->exists($subDql);
         } else {

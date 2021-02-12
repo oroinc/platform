@@ -3,20 +3,20 @@
 namespace Oro\Bundle\UIBundle\Consumption\Extension;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Symfony\Component\Routing\RequestContext;
 
 /**
- * Updates the consumer state with the current message processor and message.
+ * Updates the current request context with application url from the system configuration for the required topics.
  */
 class ConsumptionExtension extends AbstractExtension
 {
-    /** @var RequestContext */
-    private $context;
-
-    /** @var ConfigManager */
-    private $configManager;
+    private RequestContext $context;
+    private ConfigManager $configManager;
+    private array $topicNames = [];
 
     /**
      * @param RequestContext $context
@@ -28,11 +28,20 @@ class ConsumptionExtension extends AbstractExtension
         $this->configManager = $configManager;
     }
 
+    public function addTopicName(string $topicName): void
+    {
+        $this->topicNames[] = $topicName;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function onPreReceived(Context $context): void
     {
+        if (!$this->isApplicable($context->getMessage())) {
+            return;
+        }
+
         $url = $this->configManager->get('oro_ui.application_url');
 
         $scheme = parse_url($url, PHP_URL_SCHEME);
@@ -58,5 +67,10 @@ class ConsumptionExtension extends AbstractExtension
         if ($path) {
             $this->context->setBaseUrl($path);
         }
+    }
+
+    private function isApplicable(?MessageInterface $message): bool
+    {
+        return $message && \in_array($message->getProperty(Config::PARAMETER_TOPIC_NAME), $this->topicNames, true);
     }
 }

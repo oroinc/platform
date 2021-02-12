@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
+use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -18,6 +20,12 @@ abstract class AbstractMapper
     /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
+    /** @var TypeCastingHandlerRegistry */
+    protected $handlerRegistry;
+
+    /** @var array  */
+    protected $mappingErrors = [];
+
     /**
      * @param SearchMappingProvider     $mappingProvider
      * @param PropertyAccessorInterface $propertyAccessor
@@ -28,6 +36,11 @@ abstract class AbstractMapper
     ) {
         $this->mappingProvider = $mappingProvider;
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    public function setTypeCastingHandlerRegistry(TypeCastingHandlerRegistry $handlerRegistry): void
+    {
+        $this->handlerRegistry = $handlerRegistry;
     }
 
     /**
@@ -117,22 +130,27 @@ abstract class AbstractMapper
         }
 
         $targetFields = $fieldConfig['target_fields'] ?? [$fieldConfig['name']];
-        if ($fieldConfig['target_type'] !== Query::TYPE_TEXT) {
-            foreach ($targetFields as $targetField) {
+        foreach ($targetFields as $targetField) {
+            try {
+                $value = $this->handlerRegistry->get($fieldConfig['target_type'])->castValue($value);
+            } catch (TypeCastingException $exception) {
+                $this->addMappingError($alias, $targetField, $exception->getMessage());
+                continue;
+            }
+
+            if ($fieldConfig['target_type'] !== Query::TYPE_TEXT) {
                 if ($isArray) {
                     $objectData[$fieldConfig['target_type']][$targetField][] = $value;
                 } else {
                     $objectData[$fieldConfig['target_type']][$targetField] = $value;
                 }
-            }
-        } else {
-            foreach ($targetFields as $targetField) {
+            } else {
                 if (!isset($objectData[$fieldConfig['target_type']][$targetField])) {
                     $objectData[$fieldConfig['target_type']][$targetField] = '';
                 }
                 $objectData[$fieldConfig['target_type']][$targetField] .= sprintf(' %s ', $value);
+                $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
             }
-            $objectData[$fieldConfig['target_type']] = array_map('trim', $objectData[$fieldConfig['target_type']]);
         }
 
         return $objectData;
@@ -193,5 +211,29 @@ abstract class AbstractMapper
         $objectData[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD] = $textAllDataField;
 
         return $objectData;
+    }
+
+    /**
+     * @param string $alias
+     * @param string $targetField
+     * @param string $message
+     */
+    private function addMappingError(string $alias, string $targetField, string $message): void
+    {
+        if (!array_key_exists($alias, $this->mappingErrors)) {
+            $this->mappingErrors[$alias] = [];
+        }
+        $this->mappingErrors[$alias][$targetField] = $message;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getLastMappingErrors(): array
+    {
+        $errors = $this->mappingErrors;
+        $this->mappingErrors = [];
+
+        return $errors;
     }
 }
