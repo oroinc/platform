@@ -15,3 +15,5 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_search.text_filtered_mapper'
             - '@oro_entity.entity_name_resolver'
+        calls:
+            - [setLogger, ['@logger']]
