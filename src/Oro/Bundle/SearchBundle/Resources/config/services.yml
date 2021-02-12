@@ -47,6 +47,7 @@ services:
         arguments:
             - '@oro_search.provider.search_mapping'
             - '@property_accessor'
+            - '@oro_search.handler.type_cast.type_casting_handler_registry'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
 
@@ -370,3 +371,27 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: invalidateCache }
+
+    oro_search.handler.type_cast.type_casting_handler_registry:
+        class: Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry
+        arguments:
+            - !tagged_iterator { tag: 'oro_search.type_cast_handler', default_index_method: 'getType' }
+
+    Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry:
+        alias: oro_search.handler.type_cast.type_casting_handler_registry
+
+    Oro\Bundle\SearchBundle\Handler\TypeCast\TextTypeCast:
+        tags:
+            - { name: 'oro_search.type_cast_handler'}
+
+    Oro\Bundle\SearchBundle\Handler\TypeCast\IntegerTypeCast:
+        tags:
+            - { name: 'oro_search.type_cast_handler'}
+
+    Oro\Bundle\SearchBundle\Handler\TypeCast\DecimalTypeCast:
+        tags:
+            - { name: 'oro_search.type_cast_handler' }
+
+    Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast:
+        tags:
+            - { name: 'oro_search.type_cast_handler' }

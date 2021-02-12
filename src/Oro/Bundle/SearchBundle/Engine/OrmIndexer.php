@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -20,21 +17,6 @@ class OrmIndexer extends AbstractIndexer
 
     /** @var OroEntityManager */
     private $indexManager;
-
-    /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     * @param ObjectMapper $mapper
-     * @param EntityNameResolver $entityNameResolver
-     */
-    public function __construct(
-        ManagerRegistry $registry,
-        DoctrineHelper $doctrineHelper,
-        ObjectMapper $mapper,
-        EntityNameResolver $entityNameResolver
-    ) {
-        parent::__construct($registry, $doctrineHelper, $mapper, $entityNameResolver);
-    }
 
     /**
      * {@inheritdoc}
@@ -155,6 +137,8 @@ class OrmIndexer extends AbstractIndexer
 
             $hasSavedEntities = true;
         }
+
+        $this->checkMappingErrors();
 
         return $hasSavedEntities;
     }
