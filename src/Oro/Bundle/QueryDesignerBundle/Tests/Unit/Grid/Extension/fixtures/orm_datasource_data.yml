@@ -116,24 +116,24 @@
             (user_status < :_gpnpdatetime1 OR user_status >= :_gpnpdatetime2)
             AND
                 (EXISTS(
-                    SELECT _gpnpconditionsgroup4.id
-                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
-                        INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
-                        INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
+                    SELECT user_2.id
+                    FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user_2
+                        INNER JOIN user_2.address address_2
+                        INNER JOIN user_2.shippingAddresses shippingAddresses_2
                     WHERE (
                         (EXISTS(
-                                SELECT _gpnpconditionsgroup4.id
-                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser _gpnpconditionsgroup4
-                                    INNER JOIN _gpnpconditionsgroup4.address _gpnpconditionsgroup5
-                                    INNER JOIN _gpnpconditionsgroup4.shippingAddresses _gpnpconditionsgroup6
+                                SELECT user_1.id
+                                FROM Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser user_1
+                                    INNER JOIN user_1.address address_1
+                                    INNER JOIN user_1.shippingAddresses shippingAddresses_1
                                 WHERE
-                                (_gpnpconditionsgroup6.country LIKE :_gpnpstring2 OR _gpnpconditionsgroup6.city LIKE :_gpnpstring3)
-                                AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
+                                (shippingAddresses_1.country LIKE :_gpnpstring2 OR shippingAddresses_1.city LIKE :_gpnpstring3)
+                                AND user_1.id = user_2.id
                             )
                         )
-                        OR _gpnpconditionsgroup6.zip LIKE :_gpnpstring4
+                        OR shippingAddresses_2.zip LIKE :_gpnpstring4
                     )
-                    AND _gpnpconditionsgroup4.id = _gpnpconditionsgroup4.id
+                    AND user_2.id = user.id
                 )
             )
         )

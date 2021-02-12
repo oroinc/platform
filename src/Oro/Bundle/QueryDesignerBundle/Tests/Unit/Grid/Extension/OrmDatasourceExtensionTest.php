@@ -145,6 +145,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         );
 
         $expected = str_replace([PHP_EOL, '( ', ' )'], [' ', '(', ')'], preg_replace('/\s+/', ' ', $expected));
+        // Check that generated DQL is valid and may be converted to SQL
+        $this->assertNotEmpty($qb->getQuery()->getSQL());
+        // Check that generated DQL is expected
         $this->assertEquals($expected, $result);
     }
 

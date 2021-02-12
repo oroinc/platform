@@ -38,7 +38,7 @@ class UpdateConfigCommand extends Command
     public function configure()
     {
         $this
-            ->setDescription('Prepare entity config')
+            ->setDescription('Prepare entity config. This is an internal command. Please do not run it manually.')
             ->addOption(
                 'update-custom',
                 null,

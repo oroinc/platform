@@ -52,33 +52,28 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
         unset($this->statusCalculatorResolver);
     }
 
-    public function testGetCalculatorForRootJobPersistentCollectionInitialized()
+    public function testGetQueryCalculatorForPersistentCollection()
     {
         $childJobCollection = new PersistentCollection(
             $this->createMock(EntityManager::class),
             Job::class,
             new ArrayCollection()
         );
-
-        $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
-        $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
-
-        $this->assertSame($this->collectionCalculator, $calculator);
-    }
-
-    public function testGetCalculatorForRootJobPersistentCollectionIsNotInitialized()
-    {
-        $childJobCollection = new PersistentCollection(
-            $this->createMock(EntityManager::class),
-            Job::class,
-            new ArrayCollection()
-        );
-        $childJobCollection->setInitialized(false);
 
         $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
         $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
 
         $this->assertSame($this->queryCalculator, $calculator);
+    }
+
+    public function testGetCollectionCalculatorForArrayCollection()
+    {
+        $childJobCollection = new ArrayCollection();
+
+        $rootJob = $this->getRootJobWithChildCollection($childJobCollection);
+        $calculator = $this->statusCalculatorResolver->getCalculatorForRootJob($rootJob);
+
+        $this->assertSame($this->collectionCalculator, $calculator);
     }
 
     public function testGetCalculatorForRootJobCollection()

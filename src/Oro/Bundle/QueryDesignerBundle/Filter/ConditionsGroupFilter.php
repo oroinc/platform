@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Filter\AbstractFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\GroupingOrmFilterDatasourceAdapter;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 
 /**
  * Apply filters within conditions group
@@ -21,6 +22,11 @@ class ConditionsGroupFilter extends AbstractFilter
      * @var RestrictionBuilder
      */
     private $restrictionBuilder;
+
+    /**
+     * @var array
+     */
+    private $knownAliases = [];
 
     /**
      * @param RestrictionBuilder $restrictionBuilder
@@ -47,6 +53,7 @@ class ConditionsGroupFilter extends AbstractFilter
         $filters = $data['filters'];
         $filters['in_group'] = true;
 
+        $this->rememberAliases($ds);
         $computedFilterExpression = null;
         if ($this->hasRelationsInFilters($ds, $filters)) {
             $qb = $ds->getQueryBuilder();
@@ -67,6 +74,34 @@ class ConditionsGroupFilter extends AbstractFilter
             $ds->addRestriction($computedFilterExpression, FilterUtility::CONDITION_AND, true);
         }
         $this->applyParameters($ds, $boundParameters);
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param QueryBuilder $qb
+     *
+     * @return [$dql, $replacedAliases]
+     */
+    protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
+    {
+        $replacements = [];
+        foreach (DqlUtil::getAliases($qb->getDQL()) as $alias) {
+            if (!array_key_exists($alias, $this->knownAliases)) {
+                $this->knownAliases[$alias] = 0;
+            } else {
+                $replacement = $alias . '_' . ++$this->knownAliases[$alias];
+                $replacements[] = [$alias, $replacement];
+            }
+        }
+
+        if ($replacements) {
+            return [
+                DqlUtil::replaceAliases($qb->getDQL(), $replacements),
+                array_combine(array_column($replacements, 0), array_column($replacements, 1))
+            ];
+        }
+
+        return [$qb->getDQL(), $qb->getParameters()];
     }
 
     /**
@@ -136,6 +171,17 @@ class ConditionsGroupFilter extends AbstractFilter
                 $parameter->getValue(),
                 $parameter->typeWasSpecified() ? $parameter->getType() : null
             );
+        }
+    }
+
+    /**
+     * @param GroupingOrmFilterDatasourceAdapter $ds
+     */
+    private function rememberAliases(GroupingOrmFilterDatasourceAdapter $ds): void
+    {
+        $this->knownAliases = [];
+        foreach (DqlUtil::getAliases($ds->getQueryBuilder()->getDQL()) as $alias) {
+            $this->knownAliases[$alias] = 0;
         }
     }
 }
