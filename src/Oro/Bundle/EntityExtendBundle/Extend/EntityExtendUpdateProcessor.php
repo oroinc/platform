@@ -67,7 +67,7 @@ class EntityExtendUpdateProcessor
 
         try {
             $this->maintenance->activate();
-            $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true]);
+            $this->executeCommand('oro:entity-extend:update-config', ['--update-custom' => true, '--force' => true]);
             $this->executeCommand('oro:entity-extend:cache:warmup');
             $this->executeCommand('oro:entity-extend:update-schema');
             $this->executeCommand('oro:entity-config:cache:warmup');
