@@ -133,6 +133,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldPercent' => '0.2'],
                 $expectedRows
             ],
+            'by percent_100 field'     => [
+                ['fieldPercent100' => '0.2'],
+                $expectedRows
+            ],
             'by money field'           => [
                 ['fieldMoney' => '2.3456'],
                 $expectedRows
@@ -257,6 +261,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldPercent' => '0.2'],
                 $expectedRows
             ],
+            'by percent_100 field'     => [
+                ['fieldPercent100' => '0.2'],
+                $expectedRows
+            ],
             'by money field'           => [
                 ['fieldMoney' => '2.3456'],
                 $expectedRows
@@ -327,6 +335,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ],
             'by percent field'         => [
                 ['fieldPercent' => '0.1,0.3'],
+                $expectedRows
+            ],
+            'by percent_100 field'     => [
+                ['fieldPercent100' => '0.1,0.3'],
                 $expectedRows
             ],
             'by money field'           => [
@@ -406,6 +418,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 $expectedRows
             ],
             'by percent field'         => [
+                ['fieldPercent' => '0.2..0.3'],
+                $expectedRows
+            ],
+            'by percent_100 field'     => [
                 ['fieldPercent' => '0.2..0.3'],
                 $expectedRows
             ],
@@ -494,6 +510,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ],
             'by percent field'         => [
                 ['fieldPercent' => '0.101..0.299'],
+                $expectedRows2
+            ],
+            'by percent_100 field'     => [
+                ['fieldPercent100' => '0.101..0.299'],
                 $expectedRows2
             ],
             'by money field'           => [
@@ -757,6 +777,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 'fieldPercent',
                 $expectedRows
             ],
+            'by percent_100 field'     => [
+                'fieldPercent100',
+                $expectedRows
+            ],
             'by money field'           => [
                 'fieldMoney',
                 $expectedRows
@@ -939,6 +963,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 'fieldPercent',
                 $expectedRows
             ],
+            'by percent_100 field'     => [
+                'fieldPercent100',
+                $expectedRows
+            ],
             'by money field'           => [
                 'fieldMoney',
                 $expectedRows
@@ -1050,6 +1078,10 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ],
             'by percent field'         => [
                 ['fieldPercent' => '0.2'],
+                $expectedRows
+            ],
+            'by percent_100 field'     => [
+                ['fieldPercent100' => '0.2'],
                 $expectedRows
             ],
             'by money field'           => [
