@@ -17,6 +17,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldTime: <(new DateTime('1970-01-01 10:11:12 UTC'))>
         fieldGuid: 'ae404bc5-c9bb-4677-9bad-21144c704734'
         fieldPercent: 0.1
+        fieldPercent100: 10.0
+        fieldPercentRound: 0.1
+        fieldPercent100Round: 10.0
         fieldMoney: 1.234
         fieldDuration: 11
         fieldMoneyValue: 1.2345
@@ -36,6 +39,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldTime: <(new DateTime('1970-01-01 10:12:13 UTC'))>
         fieldGuid: '12c9746c-f44d-4a84-a72c-bdf750c70568'
         fieldPercent: 0.2
+        fieldPercent100: 20.0
+        fieldPercentRound: 0.2
+        fieldPercent100Round: 20.0
         fieldMoney: 2.3456
         fieldDuration: 22
         fieldMoneyValue: 2.3456
@@ -55,6 +61,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldTime: <(new DateTime('1970-01-01 10:13:14 UTC'))>
         fieldGuid: '311e3b02-3cd2-4228-aff3-bafe9b0826de'
         fieldPercent: 0.3
+        fieldPercent100: 30.0
+        fieldPercentRound: 0.3
+        fieldPercent100Round: 30.0
         fieldMoney: 3.4567
         fieldDuration: 33
         fieldMoneyValue: 3.4567
@@ -74,6 +83,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldTime: <(new DateTime('1970-01-01 10:10:10 UTC'))>
         fieldGuid: '4253a910-5692-4510-bbd1-9beca05ee168'
         fieldPercent: 0.01
+        fieldPercent100: 1.0
+        fieldPercentRound: 0.01
+        fieldPercent100Round: 1.0
         fieldMoney: 10.1234
         fieldDuration: 10
         fieldMoneyValue: 10.1234
@@ -93,6 +105,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldTime: ~
         fieldGuid: ~
         fieldPercent: ~
+        fieldPercent100: ~
+        fieldPercentRound: ~
+        fieldPercent100Round: ~
         fieldMoney: ~
         fieldDuration: ~
         fieldMoneyValue: ~
