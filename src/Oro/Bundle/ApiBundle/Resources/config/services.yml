@@ -687,6 +687,7 @@ services:
                 'json_array': 'object'
                 'simple_array': 'array'
                 'percent': 'float'
+                'percent_100': 'float'
                 'currency': 'string'
                 'money_value': 'money'
                 'duration': 'integer'

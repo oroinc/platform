@@ -58,6 +58,11 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: float|percent, priority: -10 }
 
+    oro_api.normalize_value.percent_100:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizePercent100
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: percent_100, priority: -10 }
+
     #
     # REST API processors
     #
