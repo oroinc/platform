@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * The execution context for processors for "customize_form_data" action.
+ * Also {@see \Oro\Bundle\ApiBundle\Form\FormUtil} provides static methods that cam be helpful.
  */
 class CustomizeFormDataContext extends CustomizeDataContext
 {

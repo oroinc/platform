@@ -40,6 +40,14 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     {
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $entityId);
 
+        $fieldPercent100 = $entity->fieldPercent100;
+        if (null !== $fieldPercent100) {
+            $fieldPercent100 /= 100.0;
+        }
+        $fieldPercent100Round = $entity->fieldPercent100Round;
+        if (null !== $fieldPercent100Round) {
+            $fieldPercent100Round /= 100.0;
+        }
         $fieldDateTime = $entity->fieldDateTime;
         if (null !== $fieldDateTime) {
             $fieldDateTime = $entity->fieldDateTime->format('Y-m-d\TH:i:sO');
@@ -54,27 +62,30 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         }
 
         return [
-            'fieldString'         => $entity->fieldString,
-            'fieldText'           => $entity->fieldText,
-            'fieldInt'            => $entity->fieldInt,
-            'fieldSmallInt'       => $entity->fieldSmallInt,
-            'fieldBigInt'         => $entity->fieldBigInt,
-            'fieldBoolean'        => $entity->fieldBoolean,
-            'fieldDecimal'        => $entity->fieldDecimal,
-            'fieldDecimalDefault' => $entity->fieldDecimalDefault,
-            'fieldFloat'          => $entity->fieldFloat,
-            'fieldArray'          => $entity->fieldArray,
-            'fieldSimpleArray'    => $entity->fieldSimpleArray,
-            'fieldJsonArray'      => $entity->fieldJsonArray,
-            'fieldDateTime'       => $fieldDateTime,
-            'fieldDate'           => $fieldDate,
-            'fieldTime'           => $fieldTime,
-            'fieldGuid'           => $entity->fieldGuid,
-            'fieldPercent'        => $entity->fieldPercent,
-            'fieldMoney'          => $entity->fieldMoney,
-            'fieldDuration'       => $entity->fieldDuration,
-            'fieldMoneyValue'     => $entity->fieldMoneyValue,
-            'fieldCurrency'       => $entity->fieldCurrency
+            'fieldString'          => $entity->fieldString,
+            'fieldText'            => $entity->fieldText,
+            'fieldInt'             => $entity->fieldInt,
+            'fieldSmallInt'        => $entity->fieldSmallInt,
+            'fieldBigInt'          => $entity->fieldBigInt,
+            'fieldBoolean'         => $entity->fieldBoolean,
+            'fieldDecimal'         => $entity->fieldDecimal,
+            'fieldDecimalDefault'  => $entity->fieldDecimalDefault,
+            'fieldFloat'           => $entity->fieldFloat,
+            'fieldArray'           => $entity->fieldArray,
+            'fieldSimpleArray'     => $entity->fieldSimpleArray,
+            'fieldJsonArray'       => $entity->fieldJsonArray,
+            'fieldDateTime'        => $fieldDateTime,
+            'fieldDate'            => $fieldDate,
+            'fieldTime'            => $fieldTime,
+            'fieldGuid'            => $entity->fieldGuid,
+            'fieldPercent'         => $entity->fieldPercent,
+            'fieldPercent100'      => $fieldPercent100,
+            'fieldPercentRound'    => $entity->fieldPercentRound,
+            'fieldPercent100Round' => $fieldPercent100Round,
+            'fieldMoney'           => $entity->fieldMoney,
+            'fieldDuration'        => $entity->fieldDuration,
+            'fieldMoneyValue'      => $entity->fieldMoneyValue,
+            'fieldCurrency'        => $entity->fieldCurrency
         ];
     }
 
@@ -92,27 +103,30 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                     'type'       => $entityType,
                     'id'         => '<toString(@TestItem1->id)>',
                     'attributes' => [
-                        'fieldString'         => 'Test String 1 Value',
-                        'fieldText'           => 'Test Text 1 Value',
-                        'fieldInt'            => 1,
-                        'fieldSmallInt'       => 1,
-                        'fieldBigInt'         => '123456789012345',
-                        'fieldBoolean'        => false,
-                        'fieldDecimal'        => '1.234567',
-                        'fieldDecimalDefault' => '123',
-                        'fieldFloat'          => 1.1,
-                        'fieldArray'          => [1, 2, 3],
-                        'fieldSimpleArray'    => ['1', '2', '3'],
-                        'fieldJsonArray'      => ['key1' => 'value1'],
-                        'fieldDateTime'       => '2010-10-01T10:11:12Z',
-                        'fieldDate'           => '2010-10-01',
-                        'fieldTime'           => '10:11:12',
-                        'fieldGuid'           => 'ae404bc5-c9bb-4677-9bad-21144c704734',
-                        'fieldPercent'        => 0.1,
-                        'fieldMoney'          => '1.2340',
-                        'fieldDuration'       => 11,
-                        'fieldMoneyValue'     => '1.2345',
-                        'fieldCurrency'       => 'USD'
+                        'fieldString'          => 'Test String 1 Value',
+                        'fieldText'            => 'Test Text 1 Value',
+                        'fieldInt'             => 1,
+                        'fieldSmallInt'        => 1,
+                        'fieldBigInt'          => '123456789012345',
+                        'fieldBoolean'         => false,
+                        'fieldDecimal'         => '1.234567',
+                        'fieldDecimalDefault'  => '123',
+                        'fieldFloat'           => 1.1,
+                        'fieldArray'           => [1, 2, 3],
+                        'fieldSimpleArray'     => ['1', '2', '3'],
+                        'fieldJsonArray'       => ['key1' => 'value1'],
+                        'fieldDateTime'        => '2010-10-01T10:11:12Z',
+                        'fieldDate'            => '2010-10-01',
+                        'fieldTime'            => '10:11:12',
+                        'fieldGuid'            => 'ae404bc5-c9bb-4677-9bad-21144c704734',
+                        'fieldPercent'         => 0.1,
+                        'fieldPercent100'      => 0.1,
+                        'fieldPercentRound'    => 0.1,
+                        'fieldPercent100Round' => 0.1,
+                        'fieldMoney'           => '1.2340',
+                        'fieldDuration'        => 11,
+                        'fieldMoneyValue'      => '1.2345',
+                        'fieldCurrency'        => 'USD'
                     ]
                 ]
             ],
@@ -128,27 +142,30 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'data' => [
                 'type'       => $entityType,
                 'attributes' => [
-                    'fieldString'         => 'New String',
-                    'fieldText'           => 'Some Text',
-                    'fieldInt'            => 2147483647,
-                    'fieldSmallInt'       => 32767,
-                    'fieldBigInt'         => '9223372036854775807',
-                    'fieldBoolean'        => true,
-                    'fieldDecimal'        => '123.456789',
-                    'fieldDecimalDefault' => '123456',
-                    'fieldFloat'          => 123.456789,
-                    'fieldArray'          => [1, 2, 3],
-                    'fieldSimpleArray'    => ['1', '2', '3'],
-                    'fieldJsonArray'      => ['key' => 'value'],
-                    'fieldDateTime'       => '2017-01-21T10:20:30Z',
-                    'fieldDate'           => '2017-01-21',
-                    'fieldTime'           => '10:20:30',
-                    'fieldGuid'           => '6f690d83-9b60-4da4-9c47-1b163229db6d',
-                    'fieldPercent'        => 0.123,
-                    'fieldMoney'          => '123.456',
-                    'fieldDuration'       => 123,
-                    'fieldMoneyValue'     => '123.4567',
-                    'fieldCurrency'       => 'USD'
+                    'fieldString'          => 'New String',
+                    'fieldText'            => 'Some Text',
+                    'fieldInt'             => 2147483647,
+                    'fieldSmallInt'        => 32767,
+                    'fieldBigInt'          => '9223372036854775807',
+                    'fieldBoolean'         => true,
+                    'fieldDecimal'         => '123.456789',
+                    'fieldDecimalDefault'  => '123456',
+                    'fieldFloat'           => 123.456789,
+                    'fieldArray'           => [1, 2, 3],
+                    'fieldSimpleArray'     => ['1', '2', '3'],
+                    'fieldJsonArray'       => ['key' => 'value'],
+                    'fieldDateTime'        => '2017-01-21T10:20:30Z',
+                    'fieldDate'            => '2017-01-21',
+                    'fieldTime'            => '10:20:30',
+                    'fieldGuid'            => '6f690d83-9b60-4da4-9c47-1b163229db6d',
+                    'fieldPercent'         => 0.1234567,
+                    'fieldPercent100'      => 0.1234567,
+                    'fieldPercentRound'    => 0.1234567,
+                    'fieldPercent100Round' => 0.1234567,
+                    'fieldMoney'           => '123.456',
+                    'fieldDuration'        => 123,
+                    'fieldMoneyValue'      => '123.4567',
+                    'fieldCurrency'        => 'USD'
                 ]
             ]
         ];
@@ -156,12 +173,16 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $response = $this->post(['entity' => $entityType], $data);
 
         $expectedData = $data;
+        $expectedData['data']['attributes']['fieldPercentRound'] = 0.124;
+        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.124;
         $expectedData['data']['attributes']['fieldMoney'] .= '0';
         $this->assertResponseContains($expectedData, $response);
 
         $expectedEntityData = $data['data']['attributes'];
         $expectedEntityData['fieldDateTime'] = str_replace('Z', '+0000', $expectedEntityData['fieldDateTime']);
         $expectedEntityData['fieldDecimal'] .= '00';
+        $expectedEntityData['fieldPercentRound'] = 0.124;
+        $expectedEntityData['fieldPercent100Round'] = 0.124;
         $expectedEntityData['fieldMoney'] .= '0';
         self::assertArrayContains(
             $expectedEntityData,
@@ -209,6 +230,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'fieldTime'           => null,
                 'fieldGuid'           => null,
                 'fieldPercent'        => null,
+                'fieldPercent100'     => null,
                 'fieldMoney'          => null,
                 'fieldDuration'       => null,
                 'fieldMoneyValue'     => null,
@@ -227,27 +249,30 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'id'         => '<toString(@TestItem1->id)>',
                 'attributes' => [
-                    'fieldString'         => 'New String',
-                    'fieldText'           => 'Some Text',
-                    'fieldInt'            => -2147483648,
-                    'fieldSmallInt'       => -32768,
-                    'fieldBigInt'         => '-9223372036854775808',
-                    'fieldBoolean'        => true,
-                    'fieldDecimal'        => '123.456789',
-                    'fieldDecimalDefault' => '123456',
-                    'fieldFloat'          => 123.456789,
-                    'fieldArray'          => [1, 2, 3],
-                    'fieldSimpleArray'    => ['1', '2', '3'],
-                    'fieldJsonArray'      => ['key' => 'value'],
-                    'fieldDateTime'       => '2017-01-21T10:20:30Z',
-                    'fieldDate'           => '2017-01-21',
-                    'fieldTime'           => '10:20:30',
-                    'fieldGuid'           => '6f690d83-9b60-4da4-9c47-1b163229db6d',
-                    'fieldPercent'        => 0.123,
-                    'fieldMoney'          => '123.456',
-                    'fieldDuration'       => 123,
-                    'fieldMoneyValue'     => '123.4567',
-                    'fieldCurrency'       => 'UAH'
+                    'fieldString'          => 'New String',
+                    'fieldText'            => 'Some Text',
+                    'fieldInt'             => -2147483648,
+                    'fieldSmallInt'        => -32768,
+                    'fieldBigInt'          => '-9223372036854775808',
+                    'fieldBoolean'         => true,
+                    'fieldDecimal'         => '123.456789',
+                    'fieldDecimalDefault'  => '123456',
+                    'fieldFloat'           => 123.456789,
+                    'fieldArray'           => [1, 2, 3],
+                    'fieldSimpleArray'     => ['1', '2', '3'],
+                    'fieldJsonArray'       => ['key' => 'value'],
+                    'fieldDateTime'        => '2017-01-21T10:20:30Z',
+                    'fieldDate'            => '2017-01-21',
+                    'fieldTime'            => '10:20:30',
+                    'fieldGuid'            => '6f690d83-9b60-4da4-9c47-1b163229db6d',
+                    'fieldPercent'         => 0.1234567,
+                    'fieldPercent100'      => 0.1234567,
+                    'fieldPercentRound'    => 0.1234567,
+                    'fieldPercent100Round' => 0.1234567,
+                    'fieldMoney'           => '123.456',
+                    'fieldDuration'        => 123,
+                    'fieldMoneyValue'      => '123.4567',
+                    'fieldCurrency'        => 'UAH'
                 ]
             ]
         ];
@@ -255,12 +280,16 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@TestItem1->id)>'], $data);
 
         $expectedData = $data;
+        $expectedData['data']['attributes']['fieldPercentRound'] = 0.124;
+        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.124;
         $expectedData['data']['attributes']['fieldMoney'] .= '0';
         $this->assertResponseContains($expectedData, $response);
 
         $expectedEntityData = $data['data']['attributes'];
         $expectedEntityData['fieldDateTime'] = str_replace('Z', '+0000', $expectedEntityData['fieldDateTime']);
         $expectedEntityData['fieldDecimal'] .= '00';
+        $expectedEntityData['fieldPercentRound'] = 0.124;
+        $expectedEntityData['fieldPercent100Round'] = 0.124;
         $expectedEntityData['fieldMoney'] .= '0';
         self::assertArrayContains(
             $expectedEntityData,
@@ -383,6 +412,10 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Percent Zero'                 => ['fieldPercent', 0.0, 0, 0.0],
             'Percent Zero (string)'        => ['fieldPercent', '0', 0, 0.0],
             'Percent Zero (int)'           => ['fieldPercent', 0, 0, 0.0],
+            'Percent_100 NULL'             => ['fieldPercent100', null, null, null],
+            'Percent_100 Zero'             => ['fieldPercent100', 0.0, 0, 0.0],
+            'Percent_100 Zero (string)'    => ['fieldPercent100', '0', 0, 0.0],
+            'Percent_100 Zero (int)'       => ['fieldPercent100', 0, 0, 0.0],
             'Money NULL'                   => ['fieldMoney', null, null, null],
             'Money Zero'                   => ['fieldMoney', '0', '0.0000', '0.0000'],
             'Money Zero (int)'             => ['fieldMoney', 0, '0.0000', '0.0000'],
@@ -467,6 +500,8 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Time (not string)'                   => ['fieldTime', false, 'The "false" is not valid time.'],
             'Percent (empty string)'              => ['fieldPercent', ''],
             'Percent (not number string)'         => ['fieldPercent', 'a'],
+            'Percent_100 (empty string)'          => ['fieldPercent100', ''],
+            'Percent_100 (not number string)'     => ['fieldPercent100', 'a'],
             'Money (empty string)'                => ['fieldMoney', ''],
             'Money (not number string)'           => ['fieldMoney', 'a'],
             'Duration (not number string)'        => ['fieldDuration', 'a', 'Value is not in a valid duration format'],

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -59,6 +60,29 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         self::assertEquals(
             [
                 'field1' => 123
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessPercent100()
+    {
+        $data = [
+            'field1' => 123.4,
+            'field2' => null
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDataType(DataType::PERCENT_100);
+        $config->addField('field2')->setDataType(DataType::PERCENT_100);
+
+        $this->context->setClassName('Test\Class');
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'field1' => 1.234,
+                'field2' => null
             ],
             $this->context->getResult()
         );

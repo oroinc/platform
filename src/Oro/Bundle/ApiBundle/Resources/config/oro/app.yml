@@ -147,6 +147,8 @@ oro_api:
         simple_array: array
         percent: float
         percent[]: array of floats
+        percent_100: float
+        percent_100[]: array of floats
         currency: string
         currency[]: array of strings
         money_value: money
@@ -241,6 +243,8 @@ oro_api:
             supported_operators: ['*']
         percent:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
+        percent_100:
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         money_value:
@@ -282,6 +286,7 @@ oro_api:
         - Oro\Bundle\ApiBundle\Form\Type\ArrayType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
+        - Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         - Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
     form_type_extensions:
@@ -322,6 +327,8 @@ oro_api:
             form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
         percent:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
+        percent_100:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         money:
             form_type: Oro\Bundle\ApiBundle\Form\Type\NumberType
             options:

@@ -254,6 +254,13 @@ api:
                 fields:
                     name: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
+            fields:
+                fieldPercent100:
+                    data_type: percent_100
+                fieldPercentRound:
+                    data_type: test_percent_round
+                fieldPercent100Round:
+                    data_type: test_percent_100_round
             filters:
                 fields:
                     fieldString: ~
@@ -270,6 +277,7 @@ api:
                     fieldTime: ~
                     fieldGuid: ~
                     fieldPercent: ~
+                    fieldPercent100: ~
                     fieldMoney: ~
                     fieldDuration: ~
                     fieldMoneyValue: ~
@@ -289,6 +297,7 @@ api:
                     fieldTime: ~
                     fieldGuid: ~
                     fieldPercent: ~
+                    fieldPercent100: ~
                     fieldMoney: ~
                     fieldDuration: ~
                     fieldMoneyValue: ~

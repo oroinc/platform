@@ -33,6 +33,8 @@ parameters:
         dataType: 'money'
     fieldPercent:
         dataType: 'float'
+    fieldPercent100:
+        dataType: 'float'
     fieldSimpleArray:
         dataType: 'array'
     fieldSmallInt:
@@ -77,6 +79,8 @@ response:
     fieldMoneyValue:
         dataType: 'money'
     fieldPercent:
+        dataType: 'float'
+    fieldPercent100:
         dataType: 'float'
     fieldSimpleArray:
         dataType: 'array'
