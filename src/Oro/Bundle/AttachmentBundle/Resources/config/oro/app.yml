@@ -19,3 +19,7 @@ knp_gaufrette:
             alias: import_files_filesystem
 
     stream_wrapper: ~
+
+oro_api:
+    error_title_overrides:
+        'file constraint from system config constraint': 'file constraint'

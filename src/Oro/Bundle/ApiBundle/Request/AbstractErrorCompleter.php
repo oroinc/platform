@@ -14,14 +14,21 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
+    /** @var ErrorTitleOverrideProvider */
+    private $errorTitleOverrideProvider;
+
     /** @var ExceptionTextExtractorInterface */
-    protected $exceptionTextExtractor;
+    private $exceptionTextExtractor;
 
     /**
+     * @param ErrorTitleOverrideProvider      $errorTitleOverrideProvider
      * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      */
-    public function __construct(ExceptionTextExtractorInterface $exceptionTextExtractor)
-    {
+    public function __construct(
+        ErrorTitleOverrideProvider $errorTitleOverrideProvider,
+        ExceptionTextExtractorInterface $exceptionTextExtractor
+    ) {
+        $this->errorTitleOverrideProvider = $errorTitleOverrideProvider;
         $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
@@ -53,6 +60,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 
     /**
      * @param Error $error
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeTitle(Error $error): void
     {
@@ -67,9 +75,15 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
             }
             if (null === $error->getTitle()) {
                 $statusCode = $error->getStatusCode();
-                if (null !== $statusCode && array_key_exists($statusCode, Response::$statusTexts)) {
+                if (null !== $statusCode && \array_key_exists($statusCode, Response::$statusTexts)) {
                     $error->setTitle(Response::$statusTexts[$statusCode]);
                 }
+            }
+        }
+        if ($error->getTitle()) {
+            $title = $this->errorTitleOverrideProvider->getSubstituteErrorTitle($error->getTitle());
+            if ($title) {
+                $error->setTitle($title);
             }
         }
     }
