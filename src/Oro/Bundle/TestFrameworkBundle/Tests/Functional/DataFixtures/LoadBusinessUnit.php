@@ -12,6 +12,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\InitialFixtureInterface;
  */
 class LoadBusinessUnit extends AbstractFixture implements InitialFixtureInterface
 {
+    public const BUSINESS_UNIT = 'business_unit';
+
     /**
      * {@inheritdoc}
      */
@@ -23,6 +25,6 @@ class LoadBusinessUnit extends AbstractFixture implements InitialFixtureInterfac
             ->getQuery()
             ->setMaxResults(1)
             ->getSingleResult();
-        $this->addReference('business_unit', $businessUnit);
+        $this->addReference(self::BUSINESS_UNIT, $businessUnit);
     }
 }
