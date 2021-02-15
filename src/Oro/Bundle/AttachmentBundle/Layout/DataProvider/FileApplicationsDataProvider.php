@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Layout\DataProvider;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * Layout data provider for checking if field is allowed to display on the current application.
@@ -15,6 +16,9 @@ class FileApplicationsDataProvider
 
     /** @var CurrentApplicationProviderInterface */
     private $currentApplicationProvider;
+
+    /** @var ConfigProvider */
+    private $configProvider;
 
     /**
      * @param FileApplicationsProvider $fileApplicationsProvider
@@ -29,6 +33,14 @@ class FileApplicationsDataProvider
     }
 
     /**
+     * @param ConfigProvider $configProvider
+     */
+    public function setConfigProvider(ConfigProvider $configProvider): void
+    {
+        $this->configProvider = $configProvider;
+    }
+
+    /**
      * @param string $className
      * @param string $fieldName
      *
@@ -36,8 +48,19 @@ class FileApplicationsDataProvider
      */
     public function isValidForField(string $className, string $fieldName): bool
     {
-        return $this->currentApplicationProvider->isApplicationsValid(
-            $this->fileApplicationsProvider->getFileApplicationsForField($className, $fieldName)
-        );
+        if ($this->configProvider) {
+            $attachmentConfig = $this->configProvider->getConfig($className, $fieldName);
+
+            $isValid = !$attachmentConfig->is('acl_protected') ||
+                $this->currentApplicationProvider->isApplicationsValid(
+                    $this->fileApplicationsProvider->getFileApplicationsForField($className, $fieldName)
+                );
+        } else {
+            $isValid = $this->currentApplicationProvider->isApplicationsValid(
+                $this->fileApplicationsProvider->getFileApplicationsForField($className, $fieldName)
+            );
+        }
+
+        return $isValid;
     }
 }

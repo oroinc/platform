@@ -92,29 +92,20 @@ class AttributeGroupType extends AbstractContainerType
                 continue;
             }
 
-            $blockOptions = [
-                'entity' => $entityValue,
-                'fieldName' => $attribute->getFieldName(),
-                'className' => $attribute->getEntity()->getClassName(),
-            ];
-
-            $fieldConfig = $attribute->toArray('attachment');
-            if (isset($fieldConfig['acl_protected']) && $fieldConfig['acl_protected']) {
-                // Hides fields which should not be displayed on current application.
-                $blockOptions['visible'] = sprintf(
-                    '=data["file_applications"].isValidForField("%s", "%s")',
-                    addslashes($attribute->getEntity()->getClassName()),
-                    $attribute->getFieldName()
-                );
-            }
-
             $fieldName = $attribute->getFieldName();
             $blockType = $this->blockTypeMapper->getBlockType($attribute);
             $layoutManipulator->add(
                 $this->getAttributeBlockName($fieldName, $blockType, $attributeGroupBlockId),
                 $attributeGroupBlockId,
                 $blockType,
-                array_merge($blockOptions, $options['attribute_options']->toArray())
+                array_merge(
+                    [
+                        'entity' => $entityValue,
+                        'fieldName' => $attribute->getFieldName(),
+                        'className' => $attribute->getEntity()->getClassName(),
+                    ],
+                    $options['attribute_options']->toArray()
+                )
             );
         }
     }
