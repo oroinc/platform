@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -63,6 +64,25 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
                 new RequestExpressionMatcher()
             )
         );
+        $this->errorCompleter->setErrorTitleOverrideProvider(
+            new ErrorTitleOverrideProvider(['test title alias' => 'test title'])
+        );
+    }
+
+    public function testCompleteErrorWhenErrorTitleHasSubstitution()
+    {
+        $error = new Error();
+        $error->setStatusCode(400);
+        $error->setTitle('test title alias');
+        $error->setDetail('test detail');
+
+        $expectedError = new Error();
+        $expectedError->setStatusCode(400);
+        $expectedError->setTitle('test title');
+        $expectedError->setDetail('test detail');
+
+        $this->errorCompleter->complete($error, $this->requestType);
+        self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorWithoutInnerException()
