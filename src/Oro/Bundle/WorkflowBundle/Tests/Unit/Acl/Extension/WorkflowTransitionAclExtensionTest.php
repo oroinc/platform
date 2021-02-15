@@ -83,7 +83,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetExtensionKey()
     {
-        $this->assertEquals(WorkflowAclExtension::NAME, $this->extension->getExtensionKey());
+        self::assertEquals(WorkflowAclExtension::NAME, $this->extension->getExtensionKey());
     }
 
     public function testSupports()
@@ -327,6 +327,66 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetAccessLevelNamesWithoutTransition(): void
+    {
+        $object = 'workflow:test_flow';
+
+        $this->workflowManager->expects(self::never())
+            ->method('getWorkflow');
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->willReturn(new OwnershipMetadata());
+
+
+        $result = $this->extension->getAccessLevelNames($object);
+
+        self::assertEquals(
+            [0 => 'NONE', 5 => 'SYSTEM'],
+            $result
+        );
+    }
+
+    public function testGetAccessLevelNamesWithoutSteps(): void
+    {
+        $object = 'workflow:test_flow::trans1';
+
+        $transition = $this->createStartTransition();
+
+        $transitionManager = $this->createMock(TransitionManager::class);
+        $transitionManager->expects(self::once())
+            ->method('getTransition')
+            ->willReturn($transition);
+
+        $definition = new WorkflowDefinition();
+        $definition->setRelatedEntity('\stdClass');
+
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects(self::once())
+            ->method('getTransitionManager')
+            ->willReturn($transitionManager);
+        $workflow->expects(self::once())
+            ->method('getDefinition')
+            ->willReturn($definition);
+
+        $this->workflowManager->expects(self::any())
+            ->method('getWorkflow')
+            ->with('test_flow')
+            ->willReturn($workflow);
+
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->willReturn(new OwnershipMetadata());
+
+
+        $result = $this->extension->getAccessLevelNames($object);
+
+        self::assertEquals(
+            [0 => 'NONE', 5 => 'SYSTEM'],
+            $result
+        );
+    }
+
     public function testGetAccessLevelNamesWithNonStartTransition()
     {
         $object = 'workflow:test_flow::trans1|step1|step2';
@@ -336,16 +396,16 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity('\stdClass');
 
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with('\stdClass')
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
@@ -353,7 +413,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->extension->getAccessLevelNames($object);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['NONE', 'BASIC', 'LOCAL', 'DEEP', 'GLOBAL'],
             $result
         );
@@ -368,26 +428,26 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity('\stdClass');
 
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getDefinition')
             ->willReturn($definition);
 
         $transitionManager = $this->createMock(TransitionManager::class);
 
-        $transitionManager->expects($this->once())
+        $transitionManager->expects(self::once())
             ->method('getTransition')
             ->willReturn($this->createStartTransition());
 
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowManager->expects($this->exactly(2))
+        $this->workflowManager->expects(self::exactly(2))
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with('\stdClass')
             ->willReturn(new OwnershipMetadata('user', 'user', 'user'));
@@ -395,7 +455,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->extension->getAccessLevelNames($object);
 
-        $this->assertEquals(
+        self::assertEquals(
             ['NONE', 'BASIC', 'LOCAL', 'DEEP', 'GLOBAL'],
             $result
         );
@@ -408,25 +468,25 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createMock(Workflow::class);
 
-        $workflow->expects($this->never())
+        $workflow->expects(self::never())
             ->method('getDefinition');
 
         $transitionManager = $this->createMock(TransitionManager::class);
 
-        $transitionManager->expects($this->once())
+        $transitionManager->expects(self::once())
             ->method('getTransition')
             ->willReturn($transition);
 
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(null)
             ->willReturn(new OwnershipMetadata());
@@ -434,7 +494,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->extension->getAccessLevelNames($object);
 
-        $this->assertEquals(
+        self::assertEquals(
             [0 => 'NONE', 5 => 'SYSTEM'],
             $result
         );
@@ -447,25 +507,25 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $workflow = $this->createMock(Workflow::class);
 
-        $workflow->expects($this->never())
+        $workflow->expects(self::never())
             ->method('getDefinition');
 
         $transitionManager = $this->createMock(TransitionManager::class);
 
-        $transitionManager->expects($this->once())
+        $transitionManager->expects(self::once())
             ->method('getTransition')
             ->willReturn($transition);
 
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('getWorkflow')
             ->with('test_flow')
             ->willReturn($workflow);
 
-        $this->metadataProvider->expects($this->once())
+        $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
             ->with(null)
             ->willReturn(new OwnershipMetadata());
@@ -473,7 +533,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->extension->getAccessLevelNames($object);
 
-        $this->assertEquals(
+        self::assertEquals(
             [0 => 'NONE', 5 => 'SYSTEM'],
             $result
         );

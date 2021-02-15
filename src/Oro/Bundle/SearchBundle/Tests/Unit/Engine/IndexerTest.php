@@ -13,6 +13,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
+use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -21,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class IndexerTest extends \PHPUnit\Framework\TestCase
 {
+    use SearchMappingTypeCastingHandlersTestTrait;
+
     /** @var Indexer */
     protected $indexService;
 
@@ -79,6 +82,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $this->mapper = new ObjectMapper(
             $mapperProvider,
             PropertyAccess::createPropertyAccessor(),
+            $this->getTypeCastingHandlerRegistry(),
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(HtmlTagHelper::class)
         );

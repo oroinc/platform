@@ -322,6 +322,10 @@ The following command prepares extended entities configuration:
 php bin/console oro:entity-extend:update-config
 ```
 
+**NOTE**: _this command can break the system. It must not be executed as a standalone command._
+
+To force the execution, the command should be run with the `force` option.
+
 ## Updating database schema for extended entities
 
 The following command updates a database schema for extended entities:
