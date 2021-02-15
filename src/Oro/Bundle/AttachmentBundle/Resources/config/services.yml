@@ -501,6 +501,8 @@ services:
         arguments:
             - '@oro_attachment.provider.file_applications'
             - '@oro_action.provider.current_application'
+        calls:
+            - [setConfigProvider, ['@oro_entity_config.provider.attachment']]
         tags:
             - { name: layout.data_provider, alias: file_applications }
 
