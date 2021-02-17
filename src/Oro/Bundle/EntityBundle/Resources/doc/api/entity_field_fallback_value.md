@@ -32,13 +32,13 @@ The updated record is returned in the response.
 
 ## FIELDS
 
+### fallback
+
+The value of the fallback. Possible values: `systemConfig`.
+
 ### arrayValue
 
 The array value of the entity field.
-
-### fallback
-
-The value of the fallback, possible value is 'system'.
 
 ### scalarValue
 

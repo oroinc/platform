@@ -139,9 +139,7 @@ Delete a set of attachment records.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### target
 
