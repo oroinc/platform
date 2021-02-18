@@ -17,6 +17,7 @@ The type of an entity for which the asynchronous operation was created.
 ### summary
 
 {@inheritdoc}
+
 This field will have data only when an asynchronous operation is finished successfully.
 
 The summary can have the following properties:

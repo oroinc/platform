@@ -17,12 +17,23 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /** @var ExceptionTextExtractorInterface */
     protected $exceptionTextExtractor;
 
+    /** @var ErrorTitleOverrideProvider */
+    private $errorTitleOverrideProvider;
+
     /**
      * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      */
     public function __construct(ExceptionTextExtractorInterface $exceptionTextExtractor)
     {
         $this->exceptionTextExtractor = $exceptionTextExtractor;
+    }
+
+    /**
+     * @param ErrorTitleOverrideProvider $errorTitleOverrideProvider
+     */
+    public function setErrorTitleOverrideProvider(ErrorTitleOverrideProvider $errorTitleOverrideProvider): void
+    {
+        $this->errorTitleOverrideProvider = $errorTitleOverrideProvider;
     }
 
     /**
@@ -53,6 +64,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 
     /**
      * @param Error $error
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeTitle(Error $error): void
     {
@@ -67,9 +79,15 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
             }
             if (null === $error->getTitle()) {
                 $statusCode = $error->getStatusCode();
-                if (null !== $statusCode && array_key_exists($statusCode, Response::$statusTexts)) {
+                if (null !== $statusCode && \array_key_exists($statusCode, Response::$statusTexts)) {
                     $error->setTitle(Response::$statusTexts[$statusCode]);
                 }
+            }
+        }
+        if (null !== $this->errorTitleOverrideProvider && $error->getTitle()) {
+            $title = $this->errorTitleOverrideProvider->getSubstituteErrorTitle($error->getTitle());
+            if ($title) {
+                $error->setTitle($title);
             }
         }
     }
