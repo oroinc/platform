@@ -124,10 +124,10 @@ define(function(require) {
         },
 
         loadGoogleMaps: function() {
-            let googleMapsSettings = '';
+            const data = {};
 
             if (this.options.apiKey) {
-                googleMapsSettings += '&key=' + this.options.apiKey;
+                data.key = this.options.apiKey;
             } else {
                 this.mapsLoadExecuted = false;
                 this.addErrorMessage();
@@ -136,21 +136,18 @@ define(function(require) {
             }
 
             if (this.options.showWeather) {
-                googleMapsSettings += '&libraries=weather';
+                data.libraries = 'weather';
             }
 
             $.ajax({
-                url: window.location.protocol + '//www.google.com/jsapi',
+                url: `${location.protocol}//maps.googleapis.com/maps/api/js`,
+                data,
                 dataType: 'script',
                 cache: true,
-                success: _.bind(function() {
-                    google.load('maps', this.options.apiVersion, {
-                        other_params: googleMapsSettings,
-                        callback: _.bind(this.onGoogleMapsInit, this)
-                    });
-
+                success: () => {
+                    this.onGoogleMapsInit();
                     this.mapsLoadExecuted = false;
-                }, this),
+                },
                 errorHandlerMessage: false,
                 error: this.mapLocationUnknown.bind(this)
             });

@@ -43,6 +43,7 @@ class Configuration implements ConfigurationInterface
         $this->appendFormTypeExtensionsNode($node);
         $this->appendFormTypeGuessersNode($node);
         $this->appendFormTypeGuessesNode($node);
+        $this->appendErrorTitleOverrideNode($node);
         $this->appendCorsNode($node);
         $this->appendFeatureDependedFirewalls($node);
         $this->appendBatchApiNode($node);
@@ -116,7 +117,7 @@ class Configuration implements ConfigurationInterface
                 ->info('All supported API configuration files.')
                 ->validate()
                     ->always(function (array $value) {
-                        if (!array_key_exists('default', $value)) {
+                        if (!\array_key_exists('default', $value)) {
                             $value['default'] = ['file_name' => ['api.yml']];
                         }
                         foreach ($value as $k1 => $v1) {
@@ -142,7 +143,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                     ->beforeNormalization()
                         ->always(function (array $value) {
-                            if (!array_key_exists('file_name', $value)) {
+                            if (!\array_key_exists('file_name', $value)) {
                                 $value['file_name'] = 'api.yml';
                             }
 
@@ -230,7 +231,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->always(function ($value) {
-                                        if (is_string($value) || $value === null) {
+                                        if (\is_string($value) || $value === null) {
                                             $value = [['value' => $value, 'actions' => []]];
                                         }
 
@@ -371,7 +372,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * @param NodeBuilder $node
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function appendApiDocCacheNode(NodeBuilder $node)
     {
@@ -536,7 +536,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('factory')
                             ->validate()
                                 ->ifTrue(function ($value) {
-                                    return count($value) !== 2 || 0 !== strpos($value[0], '@');
+                                    return count($value) !== 2 || 0 !== strncmp($value[0], '@', 1);
                                 })
                                 ->thenInvalid('Expected [\'@serviceId\', \'methodName\']')
                             ->end()
@@ -629,6 +629,21 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+            ->end();
+    }
+
+    /**
+     * @param NodeBuilder $node
+     */
+    private function appendErrorTitleOverrideNode(NodeBuilder $node)
+    {
+        $node
+            ->arrayNode('error_title_overrides')
+                ->info('The map between error titles and their substitutions.')
+                ->example(['percent range constraint' => 'range constraint'])
+                ->useAttributeAsKey('name')
+                ->normalizeKeys(false)
+                ->prototype('scalar')->cannotBeEmpty()->end()
             ->end();
     }
 
@@ -788,7 +803,7 @@ class Configuration implements ConfigurationInterface
             ->prototype('scalar')
                 ->validate()
                     ->ifTrue(function ($value) {
-                        return null !== $value && !is_int($value);
+                        return null !== $value && !\is_int($value);
                     })
                     ->thenInvalid('Expected int or NULL.')
                 ->end()
@@ -803,12 +818,12 @@ class Configuration implements ConfigurationInterface
     private static function isValidConfigFileName($value)
     {
         $isValid = false;
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $isValid = ('' !== trim($value));
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             $isValid = true;
             foreach ($value as $v) {
-                if (!is_string($v) || '' === trim($v)) {
+                if (!\is_string($v) || '' === trim($v)) {
                     $isValid = false;
                     break;
                 }
@@ -839,14 +854,8 @@ class Configuration implements ConfigurationInterface
      */
     private static function getRequestType(array $value): array
     {
-        $requestType = null;
-        if (array_key_exists('request_type', $value)) {
-            $requestType = $value['request_type'];
-        }
-        if (null === $requestType) {
-            $requestType = '';
-        }
-        if (!is_array($requestType)) {
+        $requestType = $value['request_type'] ?? '';
+        if (!\is_array($requestType)) {
             $requestType = [(string)$requestType];
         }
 
