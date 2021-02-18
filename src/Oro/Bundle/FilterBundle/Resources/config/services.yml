@@ -7,6 +7,8 @@ services:
         arguments:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_filter.extension.orm_filter_bag'
+            - '@oro_filter.provider.datagrid_filters'
+            - '@oro_filter.provider.filters_metadata'
             - '@oro_filter.provider.state.filters'
             - '@oro_filter.execution_context'
             - '@translator'
@@ -74,3 +76,27 @@ services:
             - '@oro_filter.provider.state.filters'
         tags:
             - { name: oro_datagrid.selected_fields_provider }
+
+    oro_filter.factory.filter.orm:
+        class: Oro\Bundle\FilterBundle\Factory\FilterFactory
+        arguments:
+            - '@oro_filter.extension.orm_filter_bag'
+
+    oro_filter.provider.datagrid_filters:
+        class: Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderComposite
+        arguments:
+            - !tagged_iterator oro_filter.provider.datagrid_filters
+
+    oro_filter.provider.datagrid_filters.orm:
+        class: Oro\Bundle\FilterBundle\Provider\DatagridFiltersProvider
+        arguments:
+            - '@oro_filter.factory.filter.orm'
+            - !php/const Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource::TYPE
+        tags:
+            - { name: oro_filter.provider.datagrid_filters }
+
+    oro_filter.provider.filters_metadata:
+        class: Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider
+        arguments:
+            - '@oro_datagrid.configuration.provider.raw'
+            - '@translator'

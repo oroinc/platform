@@ -274,6 +274,8 @@ services:
         arguments:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_search.extension.search_filter_bag'
+            - '@oro_filter.provider.datagrid_filters'
+            - '@oro_filter.provider.filters_metadata'
             - '@oro_filter.provider.state.filters'
             - '@oro_filter.execution_context'
             - '@translator'
@@ -396,3 +398,16 @@ services:
     Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast:
         tags:
             - { name: 'oro_search.type_cast_handler' }
+
+    oro_search.factory.filter.search:
+        class: Oro\Bundle\FilterBundle\Factory\FilterFactory
+        arguments:
+            - '@oro_search.extension.search_filter_bag'
+
+    oro_search.provider.datagrid_filters.search:
+        class: Oro\Bundle\FilterBundle\Provider\DatagridFiltersProvider
+        arguments:
+            - '@oro_search.factory.filter.search'
+            - !php/const Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource::TYPE
+        tags:
+            - { name: oro_filter.provider.datagrid_filters }
