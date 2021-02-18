@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Layout\Mapper\AttributeBlockTypeMapperInterfac
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -63,109 +62,6 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
             ->addType($attributeType);
 
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
-    }
-
-    public function testGetBlockViewWhenFileApplications(): void
-    {
-        $fileAttribute = new FieldConfigModel('file_attribute', 'file');
-        $fileAttribute->fromArray('attachment', ['acl_protected' => true]);
-        $fileAttribute->setEntity(new EntityConfigModel(Item::class));
-
-        $attributeGroup = new AttributeGroup();
-        $attributeGroup->setCode('group_code');
-
-        $this->attributeManager->expects($this->once())
-            ->method('getAttributesByGroup')
-            ->with($attributeGroup)
-            ->willReturn([$fileAttribute]);
-
-        $this->blockTypeMapper->expects($this->any())
-            ->method('getBlockType')
-            ->willReturn('attribute_type');
-
-        $attributeFamily = new AttributeFamily();
-        $attributeFamily->setCode('family_code');
-        $attributeFamily->addAttributeGroup($attributeGroup);
-
-        $entityValue = new Expression('context["entity"]');
-
-        $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
-
-        $view = $this->getBlockView(
-            AttributeGroupType::NAME,
-            [
-                'group' => 'group_code',
-                'entity' => $entityValue,
-                'attribute_family' => $attributeFamily,
-                'attribute_options' => [
-                    'vars' => ['foo' => 'bar']
-                ]
-            ]
-        );
-        $this->assertCount(1, $view->children);
-
-        $firstAttributeView = $view->children['attribute_group_id_attribute_type_file_attribute'];
-        $this->assertEquals('attribute_type', $firstAttributeView->vars['block_type']);
-        $this->assertEquals($entityValue, $firstAttributeView->vars['entity']);
-        $this->assertEquals('file_attribute', $firstAttributeView->vars['fieldName']);
-        $this->assertEquals(Item::class, $firstAttributeView->vars['className']);
-        $this->assertEquals('bar', $firstAttributeView->vars['foo']);
-        $this->assertEquals(
-            '=data["file_applications"].isValidForField("Oro\\\\Bundle\\\\TestFrameworkBundle\\\\Entity\\\\Item", ' .
-            '"file_attribute")',
-            $firstAttributeView->vars['visible']
-        );
-
-        $this->assertTrue($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
-    }
-
-    public function testGetBlockViewWhenFileApplicationsDisabledProtection(): void
-    {
-        $fileAttribute = new FieldConfigModel('file_attribute', 'file');
-        $fileAttribute->fromArray('attachment', ['acl_protected' => false]);
-        $fileAttribute->setEntity(new EntityConfigModel(Item::class));
-
-        $attributeGroup = new AttributeGroup();
-        $attributeGroup->setCode('group_code');
-
-        $this->attributeManager->expects($this->once())
-            ->method('getAttributesByGroup')
-            ->with($attributeGroup)
-            ->willReturn([$fileAttribute]);
-
-        $this->blockTypeMapper->expects($this->any())
-            ->method('getBlockType')
-            ->willReturn('attribute_type');
-
-        $attributeFamily = new AttributeFamily();
-        $attributeFamily->setCode('family_code');
-        $attributeFamily->addAttributeGroup($attributeGroup);
-
-        $entityValue = new Expression('context["entity"]');
-
-        $this->assertFalse($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
-
-        $view = $this->getBlockView(
-            AttributeGroupType::NAME,
-            [
-                'group' => 'group_code',
-                'entity' => $entityValue,
-                'attribute_family' => $attributeFamily,
-                'attribute_options' => [
-                    'vars' => ['foo' => 'bar']
-                ]
-            ]
-        );
-        $this->assertCount(1, $view->children);
-
-        $firstAttributeView = $view->children['attribute_group_id_attribute_type_file_attribute'];
-        $this->assertEquals('attribute_type', $firstAttributeView->vars['block_type']);
-        $this->assertEquals($entityValue, $firstAttributeView->vars['entity']);
-        $this->assertEquals('file_attribute', $firstAttributeView->vars['fieldName']);
-        $this->assertEquals(Item::class, $firstAttributeView->vars['className']);
-        $this->assertEquals('bar', $firstAttributeView->vars['foo']);
-        $this->assertTrue($firstAttributeView->vars['visible']);
-        $this->assertTrue($this->attributeRenderRegistry->isGroupRendered($attributeFamily, $attributeGroup));
     }
 
     public function testGetBlockView()

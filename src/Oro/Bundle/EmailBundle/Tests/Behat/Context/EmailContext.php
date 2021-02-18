@@ -71,7 +71,9 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
                 ['From', 'To', 'Cc', 'Bcc', 'Subject', 'Body']
             );
 
-            $found = (bool) preg_match($pattern, implode(' ', $data));
+            $data = preg_replace('/\s+/u', ' ', implode(' ', $data));
+
+            $found = (bool) preg_match($pattern, $data);
             if ($found !== false) {
                 break;
             }
@@ -439,7 +441,7 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
      */
     private function getPattern($text)
     {
-        return sprintf('/%s/', preg_replace('/\s+/', '[[:space:][:cntrl:]]+', preg_quote($text, '/')));
+        return sprintf('/%s/ui', preg_replace('/\s+/', '[[:space:][:cntrl:]]+', preg_quote($text, '/')));
     }
 
     /**
