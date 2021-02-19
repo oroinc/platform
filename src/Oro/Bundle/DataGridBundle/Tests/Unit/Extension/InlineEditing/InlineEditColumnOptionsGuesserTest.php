@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\InlineEditing;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -15,6 +16,9 @@ class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
     /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $validator;
+
+    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintConverter;
 
     /** @var GuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerGuesser;
@@ -28,10 +32,15 @@ class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $this->validator = $this->createMock(ValidatorInterface::class);
+        $this->constraintConverter = $this->createMock(ConstraintConverterInterface::class);
         $this->validatorMetaData = $this->createMock(ClassMetadataInterface::class);
         $this->innerGuesser = $this->createMock(GuesserInterface::class);
 
-        $this->guesser = new InlineEditColumnOptionsGuesser([$this->innerGuesser], $this->validator);
+        $this->guesser = new InlineEditColumnOptionsGuesser(
+            [$this->innerGuesser],
+            $this->validator
+        );
+        $this->guesser->setConstraintConverter($this->constraintConverter);
     }
 
     /**

@@ -2,29 +2,35 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
+use Symfony\Component\Validator\Mapping\PropertyMetadata;
 
 class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadataFactory;
+    /** @var MetadataFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadataFactory;
 
-    /**
-     * @var ConstraintsProvider
-     */
-    protected $constraintsProvider;
+    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $constraintConverter;
+
+    /** @var ConstraintsProvider */
+    private $constraintsProvider;
 
     protected function setUp()
     {
         $this->metadataFactory = $this->createMock(MetadataFactoryInterface::class);
+        $this->constraintConverter = $this->createMock(ConstraintConverterInterface::class);
+
         $this->constraintsProvider = new ConstraintsProvider($this->metadataFactory);
+        $this->constraintsProvider->setConstraintConverter($this->constraintConverter);
     }
 
     /**
@@ -33,23 +39,24 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetFormConstraints(
         FormInterface $formView,
         $expectGetMetadata = false,
-        $expectedConstraints = array()
+        $expectedConstraints = []
     ) {
+        $this->constraintConverter->expects($this->exactly(count($expectedConstraints)))
+            ->method('convertConstraint')
+            ->willReturnArgument(0);
+
         if ($expectGetMetadata) {
-            $classMetadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $classMetadata->properties = array();
+            $classMetadata = $this->createMock(ClassMetadata::class);
+            $classMetadata->properties = [];
             foreach ($expectGetMetadata['propertyConstraints'] as $property => $constraints) {
-                $propertyMetadata = $this->getMockBuilder('Symfony\Component\Validator\Mapping\PropertyMetadata')
-                    ->disableOriginalConstructor()
-                    ->getMock();
+                $propertyMetadata = $this->createMock(PropertyMetadata::class);
                 $propertyMetadata->constraints = $constraints;
                 $classMetadata->properties[$property] = $propertyMetadata;
             }
-            $this->metadataFactory->expects($this->once())->method('getMetadataFor')
+            $this->metadataFactory->expects($this->once())
+                ->method('getMetadataFor')
                 ->with($expectGetMetadata['value'])
-                ->will($this->returnValue($classMetadata));
+                ->willReturn($classMetadata);
         }
 
         $this->assertEquals(
@@ -60,101 +67,101 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function getFormConstraintsDataProvider()
     {
-        return array(
-            'not_mapped' => array(
+        return [
+            'not_mapped' => [
                 'form' => $this->createForm(
                     'email',
                     null,
-                    array(
+                    [
                         'mapped' => false,
-                        'constraints' => array($this->createConstraint('NotBlank', array('Default'))),
-                    ),
-                    $this->createForm('user', 'stdClass', array())
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])],
+                    ],
+                    $this->createForm('user', 'stdClass', [])
                 ),
-                'expectGetMetadataFor' => array(),
-                'expectedConstraints' => array($this->createConstraint('NotBlank', array('Default')))
-            ),
-            'doesnt_have_parent' => array(
+                'expectGetMetadataFor' => [],
+                'expectedConstraints' => [$this->createConstraint('NotBlank', ['Default'])]
+            ],
+            'doesnt_have_parent' => [
                 'formView' => $this->createForm(
                     'email',
                     null,
-                    array(
+                    [
                         'mapped' => false,
-                        'constraints' => array($this->createConstraint('NotBlank', array('Default')))
-                    )
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])]
+                    ]
                 ),
-                'expectGetMetadataFor' => array(),
-                'expectedConstraints' => array($this->createConstraint('NotBlank', array('Default')))
-            ),
-            'ignore_all_by_groups' => array(
+                'expectGetMetadataFor' => [],
+                'expectedConstraints' => [$this->createConstraint('NotBlank', ['Default'])]
+            ],
+            'ignore_all_by_groups' => [
                 'formView' => $this->createForm(
                     'email',
                     null,
-                    array(
-                        'constraints' => array($this->createConstraint('NotBlank', array('Default')))
-                    ),
+                    [
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])]
+                    ],
                     $this->createForm(
                         'user',
                         'stdClass',
-                        array(
-                            'validation_groups' => array('Custom')
-                        )
+                        [
+                            'validation_groups' => ['Custom']
+                        ]
                     )
                 ),
-                'expectGetMetadataFor' => array(
+                'expectGetMetadataFor' => [
                     'value' => 'stdClass',
-                    'propertyConstraints' => array(
-                        'email' => array($this->createConstraint('Email', array('Default'))),
-                    )
-                ),
-                'expectedConstraints' => array()
-            ),
-            'ignore_one_by_groups' => array(
+                    'propertyConstraints' => [
+                        'email' => [$this->createConstraint('Email', ['Default'])],
+                    ]
+                ],
+                'expectedConstraints' => []
+            ],
+            'ignore_one_by_groups' => [
                 'formView' => $this->createForm(
                     'email',
                     null,
-                    array(
-                        'constraints' => array($this->createConstraint('NotBlank', array('Default')))
-                    ),
+                    [
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])]
+                    ],
                     $this->createForm(
                         'user',
                         'stdClass',
-                        array(
-                            'validation_groups' => array('Custom')
-                        )
+                        [
+                            'validation_groups' => ['Custom']
+                        ]
                     )
                 ),
-                'expectGetMetadataFor' => array(
+                'expectGetMetadataFor' => [
                     'value' => 'stdClass',
-                    'propertyConstraints' => array(
-                        'email' => array($this->createConstraint('Email', array('Custom'))),
-                    )
-                ),
-                'expectedConstraints' => array($this->createConstraint('Email', array('Custom')))
-            ),
-            'filter_by_name' => array(
+                    'propertyConstraints' => [
+                        'email' => [$this->createConstraint('Email', ['Custom'])],
+                    ]
+                ],
+                'expectedConstraints' => [$this->createConstraint('Email', ['Custom'])]
+            ],
+            'filter_by_name' => [
                 'formView' => $this->createForm(
                     'email',
                     null,
-                    array(
+                    [
                         'name' => 'email',
-                        'constraints' => array($this->createConstraint('NotBlank', array('Default')))
-                    ),
+                        'constraints' => [$this->createConstraint('NotBlank', ['Default'])]
+                    ],
                     $this->createForm('user', 'stdClass')
                 ),
-                'expectGetMetadataFor' => array(
+                'expectGetMetadataFor' => [
                     'value' => 'stdClass',
-                    'propertyConstraints' => array(
-                        'email' => array($this->createConstraint('Email', array('Default'))),
-                        'username' => array($this->createConstraint('NotBlank', array('Default'))),
-                    )
-                ),
-                'expectedConstraints' => array(
-                    $this->createConstraint('Email', array('Default')),
-                    $this->createConstraint('NotBlank', array('Default')),
-                )
-            ),
-        );
+                    'propertyConstraints' => [
+                        'email' => [$this->createConstraint('Email', ['Default'])],
+                        'username' => [$this->createConstraint('NotBlank', ['Default'])],
+                    ]
+                ],
+                'expectedConstraints' => [
+                    $this->createConstraint('Email', ['Default']),
+                    $this->createConstraint('NotBlank', ['Default']),
+                ]
+            ],
+        ];
     }
 
     /**
@@ -164,9 +171,9 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
      * @param FormInterface $parent
      * @return FormInterface
      */
-    protected function createForm($name, $dataClass = null, array $options = array(), FormInterface $parent = null)
+    private function createForm($name, $dataClass = null, array $options = [], FormInterface $parent = null)
     {
-        $eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $config = new FormConfigBuilder($name, $dataClass, $eventDispatcher, $options);
 
@@ -182,7 +189,7 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
      * @param array $options
      * @return Constraint
      */
-    protected function createConstraint($name, array $groups, array $options = array())
+    private function createConstraint($name, array $groups, array $options = [])
     {
         $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
 

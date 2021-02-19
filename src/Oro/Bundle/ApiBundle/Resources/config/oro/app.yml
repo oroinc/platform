@@ -226,6 +226,9 @@ oro_api:
             factory: ['@oro_api.filter_factory.search_aggregation', 'createFilter']
             supported_operators: ['=']
 
+    error_title_overrides:
+        'percent range constraint': 'range constraint'
+
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType
         - Symfony\Component\Form\Extension\Core\Type\CollectionType

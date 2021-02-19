@@ -174,7 +174,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
 
         $expectedData = $data;
         $expectedData['data']['attributes']['fieldPercentRound'] = 0.124;
-        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.124;
+        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.12346;
         $expectedData['data']['attributes']['fieldMoney'] .= '0';
         $this->assertResponseContains($expectedData, $response);
 
@@ -182,7 +182,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $expectedEntityData['fieldDateTime'] = str_replace('Z', '+0000', $expectedEntityData['fieldDateTime']);
         $expectedEntityData['fieldDecimal'] .= '00';
         $expectedEntityData['fieldPercentRound'] = 0.124;
-        $expectedEntityData['fieldPercent100Round'] = 0.124;
+        $expectedEntityData['fieldPercent100Round'] = 0.12346;
         $expectedEntityData['fieldMoney'] .= '0';
         self::assertArrayContains(
             $expectedEntityData,
@@ -281,7 +281,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
 
         $expectedData = $data;
         $expectedData['data']['attributes']['fieldPercentRound'] = 0.124;
-        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.124;
+        $expectedData['data']['attributes']['fieldPercent100Round'] = 0.12346;
         $expectedData['data']['attributes']['fieldMoney'] .= '0';
         $this->assertResponseContains($expectedData, $response);
 
@@ -289,7 +289,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $expectedEntityData['fieldDateTime'] = str_replace('Z', '+0000', $expectedEntityData['fieldDateTime']);
         $expectedEntityData['fieldDecimal'] .= '00';
         $expectedEntityData['fieldPercentRound'] = 0.124;
-        $expectedEntityData['fieldPercent100Round'] = 0.124;
+        $expectedEntityData['fieldPercent100Round'] = 0.12346;
         $expectedEntityData['fieldMoney'] .= '0';
         self::assertArrayContains(
             $expectedEntityData,
