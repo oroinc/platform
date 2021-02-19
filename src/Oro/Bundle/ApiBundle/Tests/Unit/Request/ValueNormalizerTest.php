@@ -738,9 +738,17 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [1200.0, '12', DataType::PERCENT_100, [RequestType::REST], true],
             [1200.0, '12', DataType::PERCENT_100, [RequestType::REST], false],
             [1.23, '.0123', DataType::PERCENT_100, [RequestType::REST], true],
+            [1.23, '.012300000000001', DataType::PERCENT_100, [RequestType::REST], true],
+            [1.230000000001, '.012300000000009', DataType::PERCENT_100, [RequestType::REST], true],
             [1.23, '.0123', DataType::PERCENT_100, [RequestType::REST], false],
+            [1.23, '.012300000000001', DataType::PERCENT_100, [RequestType::REST], false],
+            [1.230000000001, '.012300000000009', DataType::PERCENT_100, [RequestType::REST], false],
             [-1.23, '-.0123', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1.23, '-.012300000000001', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1.230000000001, '-.012300000000009', DataType::PERCENT_100, [RequestType::REST], true],
             [-1.23, '-.0123', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1.23, '-.012300000000001', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1.230000000001, '-.012300000000009', DataType::PERCENT_100, [RequestType::REST], false],
             [123.4, '1.234', DataType::PERCENT_100, [RequestType::REST], true],
             [123.4, '1.234', DataType::PERCENT_100, [RequestType::REST], false],
             [-1200.0, '-12', DataType::PERCENT_100, [RequestType::REST], true],
@@ -1913,6 +1921,23 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             }
         } else {
             self::assertSame($expected, $actual, $message);
+            /**
+             * do precise assertion for floats;
+             * it is required due to {@see \PHPUnit\Framework\Constraint\IsIdentical::EPSILON}
+             */
+            if (is_float($expected) && is_float($actual)) {
+                /** @noinspection PhpUnitTestsInspection */
+                self::assertTrue(
+                    $expected === $actual,
+                    sprintf(
+                        'Failed asserting that %s matches expected %s. Delta: %s. %s',
+                        $actual,
+                        $expected,
+                        $expected - $actual,
+                        $message
+                    )
+                );
+            }
         }
     }
 

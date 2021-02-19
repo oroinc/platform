@@ -215,6 +215,7 @@ services:
         arguments:
             - !tagged_iterator oro_datagrid.inline_edit_column_options_guesser
             - '@validator'
+            - '@oro_form.extension.js_validation.constraint_converter'
 
     oro_datagrid.datagrid.inline_edit_column_options.text_guesser:
         class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser

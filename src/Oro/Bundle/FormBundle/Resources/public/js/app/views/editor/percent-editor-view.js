@@ -70,13 +70,13 @@ define(function(require) {
         },
 
         parseRawValue: function(value) {
-            return parseFloat(value) * 100;
+            return this._roundValue(parseFloat(value) * 100);
         },
 
         getModelUpdateData: function() {
             const data = {};
             const value = this.getValue();
-            data[this.fieldName] = isNaN(value) ? null : value / 100;
+            data[this.fieldName] = isNaN(value) ? null : this._roundValue(value / 100);
             return data;
         },
 
@@ -86,6 +86,19 @@ define(function(require) {
                 return '';
             }
             return String(raw);
+        },
+
+        /**
+         * Removes insignificant fractional part of a float value that may occurs in result of math operations.
+         * For example, the string representation of the result of 1.11 * 100 is 111.00000000000001,
+         * but we need to show 111 in this case.
+         *
+         * @param {Float} value
+         * @returns {Float}
+         * @private
+         */
+        _roundValue: function(value) {
+            return parseFloat(Math.round(value + 'e12') + 'e-12');
         }
     });
 
