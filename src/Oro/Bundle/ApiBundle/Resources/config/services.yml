@@ -510,6 +510,11 @@ services:
         tags:
             - { name: oro.api.error_completer, priority: -255 }
 
+    oro_api.error_title_override_provider:
+        class: Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider
+        arguments:
+            - [] # error title substitutions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+
     oro_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory
         arguments:
@@ -531,6 +536,7 @@ services:
     oro_api.rest.error_completer:
         class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
         arguments:
+            - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
         tags:
             - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
@@ -549,6 +555,7 @@ services:
     oro_api.json_api.error_completer:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
         arguments:
+            - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
             - '@oro_api.value_normalizer'
             - '@oro_api.filter_names_registry'

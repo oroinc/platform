@@ -11,7 +11,7 @@ services:
             - '@oro_entity_extend.association_manager'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: customize_loaded_data }
+            - { name: oro.api.processor, action: customize_loaded_data, priority: 10 }
 
     oro_api.customize_loaded_data.expand_multi_target_associations:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandMultiTargetAssociations

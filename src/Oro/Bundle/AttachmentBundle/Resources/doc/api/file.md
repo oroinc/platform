@@ -109,9 +109,7 @@ Delete a set of file records.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### originalFilename
 
@@ -125,9 +123,7 @@ Delete a set of file records.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### content
 
@@ -143,9 +139,7 @@ The content of the file as a Base64 encoded string.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### parent
 

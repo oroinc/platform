@@ -18,6 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * * extended associations
  * * nested objects
  * * nested associations
+ * * percentage value multiplied by 100 (the "percent_100" data type)
  */
 class BuildCustomTypes implements ProcessorInterface
 {
@@ -60,23 +61,26 @@ class BuildCustomTypes implements ProcessorInterface
      * @param string                 $entityClass
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function processCustomTypes(array $data, EntityDefinitionConfig $config, string $entityClass): array
     {
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
-            if (\array_key_exists($fieldName, $data)) {
-                continue;
-            }
             $dataType = $field->getDataType();
             if (!$dataType) {
                 continue;
             }
 
-            if ($this->isNestedObject($dataType)) {
+            if (\array_key_exists($fieldName, $data)) {
+                if (DataType::PERCENT_100 === $dataType && null !== $data[$fieldName]) {
+                    $data[$fieldName] /= 100.0;
+                }
+            } elseif ($this->isNestedObject($dataType)) {
                 $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity(), $config);
             } elseif (DataType::isExtendedAssociation($dataType)) {
-                list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+                [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
                 $associationOwnerPath = $this->getAssociationOwnerPath($field);
                 if ($associationOwnerPath) {
                     $associationOwnerField = $config->findFieldByPath($associationOwnerPath, true);

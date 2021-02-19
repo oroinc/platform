@@ -137,15 +137,15 @@ Example:
 
 #### get_subresource
 
-Retrieve a record of localization assigned to a specific localizedfallbackvalues record.
+Retrieve a record of localization assigned to a specific localized fallback value record.
 
 #### get_relationship
 
-Retrieve ID of localization record assigned to a specific localizedfallbackvalues record.
+Retrieve ID of localization record assigned to a specific localized fallback value record.
 
 #### update_relationship
 
-Replace localization assigned to a specific localizedfallbackvalues record
+Replace localization assigned to a specific localized fallback value record.
 
 {@request:json_api}
 Example:
