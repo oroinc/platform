@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
+use Oro\Bundle\ApiBundle\Form\DataTransformer\Percent100ToLocalizedStringTransformer;
+
 /**
  * Converts a string to floating point number (float data type) that represents
  * a percentage value multiplied by 100.
@@ -13,6 +15,6 @@ class NormalizePercent100 extends NormalizeNumber
      */
     protected function normalizeValue($value)
     {
-        return parent::normalizeValue($value) * 100.0;
+        return round(parent::normalizeValue($value) * 100.0, Percent100ToLocalizedStringTransformer::PERCENT_SCALE);
     }
 }
