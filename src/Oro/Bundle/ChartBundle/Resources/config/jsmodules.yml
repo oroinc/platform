@@ -16,4 +16,4 @@ dynamic-imports:
 shim:
     flotr2:
         imports:
-            - jquery
+            - single|jquery|jQuery

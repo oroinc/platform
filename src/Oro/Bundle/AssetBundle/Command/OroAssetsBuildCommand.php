@@ -264,11 +264,10 @@ HELP
             $this->mapSslOptions($input, $command);
         } else {
             $command[] = self::BUILD_DIR.'/node_modules/webpack/bin/webpack.js';
-            $command[] = '--hide-modules';
         }
 
         if ($input->getArgument('theme')) {
-            $command[] = '--env.theme='.$input->getArgument('theme');
+            $command[] = '--env theme='.$input->getArgument('theme');
         }
         if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {
             $command[] = '--mode=production';
@@ -283,28 +282,35 @@ HELP
         } else {
             $verbosity = self::WEBPACK_VERBOSITY_MAP[$output->getVerbosity()];
         }
-        $command[] = '--env.stats='.$verbosity;
-
-        $command[] = '--env.symfony='.$input->getOption('env');
-        $command[] = '--colors';
+        if ($verbosity) {
+            $command[] = '--env';
+            $command[] = 'stats=' . $verbosity;
+        }
+        $command[] = '--env';
+        $command[] = 'symfony='.$input->getOption('env');
 
         if ($input->getOption('skip-css')) {
-            $command[] = '--env.skipCSS';
+            $command[] = '--env';
+            $command[] = 'skipCSS';
         }
         if ($input->getOption('skip-js')) {
-            $command[] = '--env.skipJS';
+            $command[] = '--env';
+            $command[] = 'skipJS';
         }
         if (!$input->getOption('with-babel')) {
-            $command[] = '--env.skipBabel';
+            $command[] = '--env';
+            $command[] = 'skipBabel';
         }
         if ($input->getOption('skip-sourcemap')) {
-            $command[] = '--env.skipSourcemap';
+            $command[] = '--env';
+            $command[] = 'skipSourcemap';
         }
         if ($input->getOption('skip-rtl')) {
             $command[] = '--env.skipRTL';
         }
         if ($input->getOption('analyze')) {
-            $command[] = '--env.analyze';
+            $command[] = '--env';
+            $command[] = 'analyze';
         }
 
         return $command;

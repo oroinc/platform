@@ -234,41 +234,40 @@ map:
 shim:
     bootstrap-typeahead:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     datepair:
-        exports: Datepair
+        exports: single|Datepair
     jquery:
         expose:
-            - $
-            - jQuery
+            - $,jQuery!jquery
     jquery.form:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.minicolors:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.multiselect:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.multiselect.filter:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.select2:
-        exports: Select2
+        exports: single|Select2
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.simplecolorpicker:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.uniform:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     lightgallery:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     lightgallery.print:
         imports:
-            - jQuery=jquery
-            - lightgallery
+            - single|jquery|jQuery
+            - single|lightgallery|lightgallery
     oroui/js/app/services/app-ready-load-modules:
         expose: loadModules

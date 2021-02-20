@@ -32,5 +32,4 @@ map:
 shim:
     '@oroinc/jsplumb/dist/js/jsPlumb-1.7.10':
         imports:
-            - define=>false
-            - this=>window
+            - additionalCode=var%20define%20=%20false&wrapper=window

@@ -77,4 +77,4 @@ map:
         jquery.validate: jquery.validate
 shim:
     tinymce/tinymce:
-        exports: tinymce
+        exports: single|tinymce
