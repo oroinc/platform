@@ -9,7 +9,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 
 /**
- * Normalizes objects that implement AbstractLocalizedFallbackValue.
+ * Normalizes LocalizedFallbackValue objects.
  */
 class LocalizedFallbackValueCollectionNormalizer extends CollectionNormalizer
 {

@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueCompleter;
+use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueExtractorInterface;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -24,6 +25,9 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     /** @var LocalizationHelper */
     private $localizationHelper;
 
+    /** @var LocalizedFallbackValueExtractorInterface */
+    private $valueExtractor;
+
     /**
      * @param DoctrineHelper     $doctrineHelper
      * @param LocalizationHelper $localizationHelper
@@ -32,6 +36,14 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizationHelper = $localizationHelper;
+    }
+
+    /**
+     * @param LocalizedFallbackValueExtractorInterface $valueExtractor
+     */
+    public function setLocalizedFallbackValueExtractor(LocalizedFallbackValueExtractorInterface $valueExtractor)
+    {
+        $this->valueExtractor = $valueExtractor;
     }
 
     /**
@@ -57,7 +69,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
         $ids = [];
         $idsPerField = [];
         foreach ($data as $key => $item) {
-            list($itemIds, $itemIdsPerField) = $this->getLocalizedFallbackValueIds(
+            [$itemIds, $itemIdsPerField] = $this->getLocalizedFallbackValueIds(
                 $fieldNames,
                 $config,
                 $context,
@@ -182,7 +194,9 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     {
         $value = $this->localizationHelper->getLocalizedValue($values);
         if (null !== $value) {
-            $value = (string)$value;
+            $value = null !== $this->valueExtractor
+                ? $this->valueExtractor->extractValue($value)
+                : (string)$value;
         }
 
         return $value;
