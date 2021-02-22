@@ -878,6 +878,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @When /^(?:|I )set range filter "(?P<filterName>.+)" as max value "(?P<maxValue>[\w\s\,\.\_\%]+)"$/
      * @When /^(?:|I )set range filter "(?P<filterName>.+)" as max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
      * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" and max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit$/
+     * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" and max value "(?P<maxValue>[\w\s\,\.\_\%]+)"$/
      * @When /^(?:|I )set range filter "(?P<filterName>.+)" as min value "(?P<minValue>[\w\s\,\.\_\%]+)" and max value "(?P<maxValue>[\w\s\,\.\_\%]+)" use "(?P<unitType>[\w\s\=\<\>]+)" unit in "(?P<filterGridName>[\w\s]+)" grid$/
      *
      * @param string $filterName
@@ -909,6 +910,31 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->setSecondFilterValue($maxValue);
 
         $filterItem->submit();
+    }
+
+    /**
+     * Open filter dropdown
+     * Example: And I open "Price" filter
+     * Example: And I open "Price" filter in "Product" grid
+     *
+     * @When /^(?:|I )open "(?P<filterName>.+)" filter$/
+     * @When /^(?:|I )open "(?P<filterName>.+)" filter in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param $filterName
+     * @param string $filterGridName
+     * @param string $strictly
+     */
+    public function openFilter(
+        $filterName,
+        string $filterGridName = 'Grid',
+        string $strictly = ''
+    ) {
+        /** @var GridFilterPriceItem $filterItem */
+        $filterItem = $this
+            ->getGridFilters($filterGridName)
+            ->getFilterItem('GridFilterPriceItem', $filterName, $strictly === 'strictly');
+
+        $filterItem->open();
     }
 
     //@codingStandardsIgnoreStart
