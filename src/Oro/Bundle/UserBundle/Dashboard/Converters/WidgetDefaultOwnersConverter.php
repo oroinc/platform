@@ -5,11 +5,15 @@ namespace Oro\Bundle\UserBundle\Dashboard\Converters;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Resolves the "owners" option in widget configuration.
+ */
 class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
 {
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var array [field name => ['converter' => ConfigValueConverterAbstract, 'label' => string], ...] */
     protected $converters = [];
 
     /**
@@ -39,10 +43,10 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
     public function getViewValue($value)
     {
         $data = [];
-        if ($value && is_array($value)) {
+        if ($value && \is_array($value)) {
             foreach ($value as $field => $ids) {
-                $ids = array_filter($ids);
                 if (isset($this->converters[$field]) && $ids) {
+                    $ids = array_filter($ids);
                     /** @var ConfigValueConverterAbstract $converter */
                     $converter = $this->converters[$field]['converter'];
                     $viewValue = $converter->getViewValue($ids);
@@ -91,12 +95,6 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
      */
     protected function getDefaultChoices(array $config)
     {
-        $values = [];
-
-        if (isset($config['converter_attributes']['default_selected'])) {
-            $values = $config['converter_attributes']['default_selected'];
-        }
-
-        return $values;
+        return $config['converter_attributes']['default_selected'] ?? [];
     }
 }

@@ -7,6 +7,8 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents a field configuration inside "actions" section.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ActionFieldConfig implements FieldConfigInterface
 {
@@ -328,5 +330,67 @@ class ActionFieldConfig implements FieldConfigInterface
         $formOptions = $this->getFormOptions();
         $formOptions['constraints'][] = $constraint;
         $this->setFormOptions($formOptions);
+    }
+
+    /**
+     * Indicates whether a post processor is set.
+     *
+     * @return bool
+     */
+    public function hasPostProcessor(): bool
+    {
+        return $this->has(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Gets the type of a post processor.
+     *
+     * @return string|null
+     */
+    public function getPostProcessor(): ?string
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Sets the type of a post processor.
+     *
+     * @param string|null $type
+     */
+    public function setPostProcessor(?string $type): void
+    {
+        $this->items[ConfigUtil::POST_PROCESSOR] = $type ?: null;
+    }
+
+    /**
+     * Removes a post processor.
+     */
+    public function removePostProcessor(): void
+    {
+        unset($this->items[ConfigUtil::POST_PROCESSOR]);
+    }
+
+    /**
+     * Gets the options for a post processor.
+     *
+     * @return array|null
+     */
+    public function getPostProcessorOptions(): ?array
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR_OPTIONS);
+    }
+
+    /**
+     * Sets the options for a post processor.
+     *
+     * @param array|null $options
+     */
+    public function setPostProcessorOptions(?array $options): void
+    {
+        if ($options) {
+            $this->items[ConfigUtil::POST_PROCESSOR_OPTIONS] = $options;
+        } else {
+            unset($this->items[ConfigUtil::POST_PROCESSOR_OPTIONS]);
+        }
     }
 }

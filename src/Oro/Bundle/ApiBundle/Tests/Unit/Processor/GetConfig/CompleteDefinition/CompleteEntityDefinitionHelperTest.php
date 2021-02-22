@@ -17,6 +17,7 @@ use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -78,7 +79,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             $this->customDataTypeHelper,
             $this->exclusionProviderRegistry,
             new ExpandedAssociationExtractor(),
-            $this->configManager
+            new EntityFieldFilteringHelper($this->configManager)
         );
     }
 

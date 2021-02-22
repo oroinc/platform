@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\Rest;
+namespace Oro\Bundle\ApiBundle\Request\Rest;
 
 /**
  * Provides the names of CORS preflight request headers.

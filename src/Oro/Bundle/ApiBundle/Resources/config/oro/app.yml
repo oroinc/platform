@@ -182,6 +182,8 @@ oro_api:
         - oro_api.config_extension.sorters
         - oro_api.config_extension.actions
         - oro_api.config_extension.subresources
+        - oro_api.config_extension.post_processor
+        - oro_api.config_extension.post_processor.twig
 
     filter_operators:
         eq:  '='  # equal to
