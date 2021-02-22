@@ -6,3 +6,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEntityForNestedObje
         namePrefix: 'name prefix'
         nameSuffix: 'name suffix'
     test_empty_entity:
+        firstName: ''
+        lastName: ''
+        middleName: ''
+        namePrefix: ''
+        nameSuffix: ''
+    test_no_data_entity:

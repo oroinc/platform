@@ -118,8 +118,7 @@ trait ApiDocExtractorTrait
                 $annotation = $this->reader->getMethodAnnotation($method, static::ANNOTATION_CLASS);
                 if (null !== $annotation) {
                     $this->apiDocAnnotationHandler->handle($annotation, $route);
-                    $views = $annotation->getViews();
-                    if ((\in_array($view, $views, true) || (empty($views) && ApiDoc::DEFAULT_VIEW === $view))
+                    if ($this->isApplicableForView($annotation, $view)
                         && !\in_array($annotation->getSection(), $excludeSections, true)
                     ) {
                         $element = ['annotation' => $this->extractData($annotation, $route, $method)];
@@ -285,5 +284,18 @@ trait ApiDocExtractorTrait
     protected function getRouteAction(Route $route)
     {
         return $route->getDefault('_action');
+    }
+
+    private function isApplicableForView(ApiDoc $annotation, string $view): bool
+    {
+        $views = $annotation->getViews();
+        if (!$views) {
+            return ApiDoc::DEFAULT_VIEW === $view;
+        }
+        if (count($views) === 1 && reset($views) === 'all') {
+            return true;
+        }
+
+        return \in_array($view, $views, true);
     }
 }

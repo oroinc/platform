@@ -1009,6 +1009,96 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @dataProvider isReadOnlyResourceDataProvider
+     */
+    public function testIsReadOnlyResource(bool $result, int $accessible, array $excludedActions)
+    {
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $entityClass = 'Test\Entity';
+
+        $this->resourcesCache->expects(self::at(0))
+            ->method('getResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([new ApiResource($entityClass)]);
+        $this->resourcesCache->expects(self::at(1))
+            ->method('getAccessibleResources')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([$entityClass => $accessible]);
+        $this->resourcesCache->expects(self::once())
+            ->method('getExcludedActions')
+            ->with($version, self::identicalTo($requestType))
+            ->willReturn([$entityClass => $excludedActions]);
+
+        self::assertSame(
+            $result,
+            $this->resourcesProvider->isReadOnlyResource($entityClass, $version, $requestType)
+        );
+    }
+
+    public function isReadOnlyResourceDataProvider(): array
+    {
+        return [
+            'not accessible entity'                  => [
+                'result'          => false,
+                'accessible'      => 0,
+                'excludedActions' => []
+            ],
+            'no excluded actions'                    => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => []
+            ],
+            'excluded all actions'                   => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['get', 'get_list', 'update', 'create', 'delete', 'delete_list']
+            ],
+            'excluded all "modify" actions'          => [
+                'result'          => true,
+                'accessible'      => 1,
+                'excludedActions' => ['update', 'create', 'delete', 'delete_list']
+            ],
+            'excluded "update" and "create" actions' => [
+                'result'          => true,
+                'accessible'      => 1,
+                'excludedActions' => ['update', 'create']
+            ],
+            'excluded "update" action'               => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['update']
+            ],
+            'excluded "create" action'               => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['create']
+            ],
+            'excluded "delete" actions'              => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['delete', 'delete_list']
+            ],
+            'excluded "get" and "get_list" action'   => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['get', 'get_list']
+            ],
+            'excluded "get" action'                  => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['get']
+            ],
+            'excluded "get_list" action'             => [
+                'result'          => false,
+                'accessible'      => 1,
+                'excludedActions' => ['get_list']
+            ],
+        ];
+    }
+
     public function testGetResourcesWithoutIdentifierWhenCacheExists()
     {
         $version = '1.2.3';

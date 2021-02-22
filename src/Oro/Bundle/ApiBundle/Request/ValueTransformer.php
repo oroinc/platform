@@ -69,6 +69,8 @@ class ValueTransformer
      * Converts a value of the given field using data transformer(s) from "data_transformer" configuration attribute.
      *
      * @see \Oro\Bundle\ApiBundle\Processor\ApiContext::getNormalizationContext for the transformation context.
+     * @see \Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig::toArray() for the field configuration. Usually
+     * the $excludeTargetEntity parameter is TRUE.
      *
      * @param mixed $fieldValue  A value to be transformed.
      * @param array $fieldConfig The field configuration.

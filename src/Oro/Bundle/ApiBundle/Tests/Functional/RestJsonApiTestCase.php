@@ -124,7 +124,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     protected function assertResponseContains($expectedContent, Response $response, $ignoreOrder = false)
     {
         $content = self::jsonToArray($response->getContent());
-        $expectedContent = self::processTemplateData($this->getResponseData($expectedContent));
+        $expectedContent = $this->getResponseData($expectedContent);
 
         self::assertThat($content, new JsonApiDocContainsConstraint($expectedContent, false, !$ignoreOrder));
     }
