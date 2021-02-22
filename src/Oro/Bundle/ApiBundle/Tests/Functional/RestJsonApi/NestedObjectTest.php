@@ -57,10 +57,26 @@ class NestedObjectTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGetWithoutNestedObjectData()
+    public function testGetWithEmptyNestedObjectData()
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_empty_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
+
+        $result = self::jsonToArray($response->getContent());
+        self::assertEquals((string)$entity->getId(), $result['data']['id']);
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertNull($result['data']['attributes']['middle']);
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertNull($result['data']['attributes']['suffix']);
+    }
+
+    public function testGetWithoutNestedObjectData()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_no_data_entity');
         $entityType = $this->getEntityType(TestEntity::class);
 
         $response = $this->get(['entity' => $entityType, 'id' => (string)$entity->getId()]);
@@ -124,6 +140,49 @@ class NestedObjectTest extends RestJsonApiTestCase
         self::assertEquals('last name', $entity->getLastName());
         self::assertNull($entity->getMiddleName());
         self::assertEquals('name prefix', $entity->getNamePrefix());
+        self::assertNull($entity->getNameSuffix());
+    }
+
+    public function testCreateWithEmptyNestedObjectData()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'attributes' => [
+                    'name'   => [
+                        'firstName' => '',
+                        'lastName'  => ''
+                    ],
+                    'middle' => [
+                        'value' => ''
+                    ],
+                    'prefix' => [
+                        'value' => ''
+                    ],
+                    'suffix' => [
+                        'value' => ''
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->post(['entity' => $entityType], $data);
+
+        $result = self::jsonToArray($response->getContent());
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertNull($result['data']['attributes']['middle']);
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertNull($result['data']['attributes']['suffix']);
+
+        // test that the data was created
+        $this->getEntityManager()->clear();
+        $entity = $this->getEntityManager()->find(TestEntity::class, (int)$result['data']['id']);
+        self::assertNull($entity->getFirstName());
+        self::assertNull($entity->getLastName());
+        self::assertNull($entity->getMiddleName());
+        self::assertNull($entity->getNamePrefix());
         self::assertNull($entity->getNameSuffix());
     }
 
@@ -222,6 +281,65 @@ class NestedObjectTest extends RestJsonApiTestCase
         self::assertEquals('new last name', $entity->getLastName());
         self::assertEquals('middle name', $entity->getMiddleName());
         self::assertEquals('new name prefix', $entity->getNamePrefix());
+        self::assertEquals('name suffix', $entity->getNameSuffix());
+    }
+
+    public function testUpdateToEmptyData()
+    {
+        /** @var TestEntity $entity */
+        $entity = $this->getReference('test_entity');
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $data = [
+            'data' => [
+                'type'       => $entityType,
+                'id'         => (string)$entity->getId(),
+                'attributes' => [
+                    'name'   => [
+                        'firstName' => '',
+                        'lastName'  => ''
+                    ],
+                    'middle' => [
+                        'value' => ''
+                    ],
+                    'prefix' => [
+                        'value' => ''
+                    ],
+                    'suffix' => [
+                        'value' => ''
+                    ]
+                ]
+            ]
+        ];
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => (string)$entity->getId()],
+            $data
+        );
+
+        $result = self::jsonToArray($response->getContent());
+        self::assertNull($result['data']['attributes']['name']);
+        self::assertEquals(
+            [
+                'value' => 'middle name'
+            ],
+            $result['data']['attributes']['middle']
+        );
+        self::assertNull($result['data']['attributes']['prefix']);
+        self::assertEquals(
+            [
+                'value' => 'name suffix'
+            ],
+            $result['data']['attributes']['suffix']
+        );
+
+        // test that the data was updated
+        $this->getEntityManager()->clear();
+        $entity = $this->getEntityManager()->find(TestEntity::class, $entity->getId());
+        self::assertNull($entity->getFirstName());
+        self::assertNull($entity->getLastName());
+        self::assertEquals('middle name', $entity->getMiddleName());
+        self::assertNull($entity->getNamePrefix());
         self::assertEquals('name suffix', $entity->getNameSuffix());
     }
 

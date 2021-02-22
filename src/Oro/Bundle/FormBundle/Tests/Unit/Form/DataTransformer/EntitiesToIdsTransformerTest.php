@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
@@ -378,7 +378,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $index = 0;
         if ($expectedCalls) {
             foreach ($expectedCalls as $expectedCall) {
-                list($method, $arguments, $result) = $expectedCall;
+                [$method, $arguments, $result] = $expectedCall;
 
                 if (is_callable($result)) {
                     $result = call_user_func($result);

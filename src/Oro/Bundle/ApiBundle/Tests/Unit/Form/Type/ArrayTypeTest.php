@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\Type\ArrayType;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 
-class ArrayTypeTest extends TypeTestCase
+class ArrayTypeTest extends ApiFormTypeTestCase
 {
     /**
      * @dataProvider validValuesDataProvider
@@ -23,9 +23,7 @@ class ArrayTypeTest extends TypeTestCase
         return [
             [[], []],
             [[1, 2], [1, 2]],
-            [['key' => 'value'], ['key' => 'value']],
-            ['', null],
-            [null, null]
+            [['key' => 'value'], ['key' => 'value']]
         ];
     }
 
@@ -43,7 +41,9 @@ class ArrayTypeTest extends TypeTestCase
     {
         return [
             ['test'],
-            [0]
+            [0],
+            [''],
+            [null]
         ];
     }
 }

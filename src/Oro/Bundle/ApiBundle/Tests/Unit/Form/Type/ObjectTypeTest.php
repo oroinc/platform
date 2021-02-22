@@ -11,19 +11,19 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ObjectTypeTest extends TypeTestCase
+class ObjectTypeTest extends ApiFormTypeTestCase
 {
     /**
      * {@inheritdoc}
@@ -33,7 +33,7 @@ class ObjectTypeTest extends TypeTestCase
         return [
             new PreloadedExtension(
                 [new ObjectType($this->getFormHelper())],
-                []
+                $this->getApiTypeExtensions()
             )
         ];
     }

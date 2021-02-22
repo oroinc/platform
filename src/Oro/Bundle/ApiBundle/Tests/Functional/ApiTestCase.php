@@ -510,51 +510,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * Asserts the given response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $headerName
-     * @param mixed    $expectedValue
-     */
-    protected static function assertResponseHeader(Response $response, string $headerName, string $expectedValue)
-    {
-        self::assertEquals(
-            $expectedValue,
-            $response->headers->get($headerName),
-            sprintf('"%s" response header', $headerName)
-        );
-    }
-
-    /**
-     * Asserts the given response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $headerName
-     */
-    protected static function assertResponseHeaderNotExists(Response $response, string $headerName)
-    {
-        self::assertFalse(
-            $response->headers->has($headerName),
-            sprintf('"%s" header should not exist in the response', $headerName)
-        );
-    }
-
-    /**
-     * Asserts "Allow" response header equals to the expected value.
-     *
-     * @param Response $response
-     * @param string   $expectedAllowedMethods
-     * @param string   $message
-     */
-    protected static function assertAllowResponseHeader(
-        Response $response,
-        string $expectedAllowedMethods,
-        string $message = ''
-    ) {
-        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
-    }
-
-    /**
      * Asserts response status code equals to 405 (Method Not Allowed)
      * and "Allow" response header equals to the expected value.
      *

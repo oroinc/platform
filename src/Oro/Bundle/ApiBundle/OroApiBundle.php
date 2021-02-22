@@ -37,6 +37,7 @@ class OroApiBundle extends Bundle
         $container->addCompilerPass(new Compiler\SimpleFilterFactoryCompilerPass());
         $container->addCompilerPass(new Compiler\FormCompilerPass());
         $container->addCompilerPass(new Compiler\DataTransformerCompilerPass());
+        $container->addCompilerPass(new Compiler\PostProcessorCompilerPass());
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
             'oro_api.object_normalizer_registry',
             'oro.api.object_normalizer',

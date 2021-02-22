@@ -6,13 +6,16 @@ use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
+/**
+ * Creates ResolvedFormTypeInterface instances for regular and API forms.
+ */
 class ApiResolvedFormTypeFactory implements ResolvedFormTypeFactoryInterface
 {
     /** @var ResolvedFormTypeFactoryInterface */
-    protected $defaultFactory;
+    private $defaultFactory;
 
     /** @var FormExtensionCheckerInterface */
-    protected $formExtensionChecker;
+    private $formExtensionChecker;
 
     /**
      * @param ResolvedFormTypeFactoryInterface $defaultFactory

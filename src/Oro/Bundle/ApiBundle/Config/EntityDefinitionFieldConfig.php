@@ -408,6 +408,68 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
+     * Indicates whether a post processor is set.
+     *
+     * @return bool
+     */
+    public function hasPostProcessor(): bool
+    {
+        return $this->has(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Gets the type of a post processor.
+     *
+     * @return string|null
+     */
+    public function getPostProcessor(): ?string
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR);
+    }
+
+    /**
+     * Sets the type of a post processor.
+     *
+     * @param string|null $type
+     */
+    public function setPostProcessor(?string $type): void
+    {
+        $this->items[ConfigUtil::POST_PROCESSOR] = $type ?: null;
+    }
+
+    /**
+     * Removes a post processor.
+     */
+    public function removePostProcessor(): void
+    {
+        unset($this->items[ConfigUtil::POST_PROCESSOR]);
+    }
+
+    /**
+     * Gets the options for a post processor.
+     *
+     * @return array|null
+     */
+    public function getPostProcessorOptions(): ?array
+    {
+        return $this->get(ConfigUtil::POST_PROCESSOR_OPTIONS);
+    }
+
+    /**
+     * Sets the options for a post processor.
+     *
+     * @param array|null $options
+     */
+    public function setPostProcessorOptions(?array $options): void
+    {
+        if ($options) {
+            $this->items[ConfigUtil::POST_PROCESSOR_OPTIONS] = $options;
+        } else {
+            unset($this->items[ConfigUtil::POST_PROCESSOR_OPTIONS]);
+        }
+    }
+
+    /**
      * Indicates whether at least one data transformer exists.
      *
      * @return bool
@@ -419,6 +481,13 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
 
     /**
      * Sets the data transformers to be applies to the field value.
+     *
+     * The data transformers can be the ID of a service in DIC
+     * or an array of data transformers.
+     * Each item of the array can be the ID of a service in DIC, an instance of
+     * {@see \Oro\Component\EntitySerializer\DataTransformerInterface} or
+     * {@see \Symfony\Component\Form\DataTransformerInterface},
+     * or function ($value, $config, $context) : mixed.
      *
      * @param string|array|null $dataTransformers
      */

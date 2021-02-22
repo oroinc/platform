@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
 class ConfigExtensionRegistry
 {
     /** @var int */
-    private $maxNestingLevel = [];
+    private $maxNestingLevel;
 
     /** @var ConfigExtensionInterface[] */
     private $extensions = [];
