@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 /**
  * Provides the image placeholder from the child provider which return it first.
  */
@@ -21,12 +23,12 @@ class ChainImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath(string $filter): ?string
+    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
     {
         $path = null;
 
         foreach ($this->providers as $provider) {
-            $path = $provider->getPath($filter);
+            $path = $provider->getPath($filter, $referenceType);
             if ($path) {
                 break;
             }
