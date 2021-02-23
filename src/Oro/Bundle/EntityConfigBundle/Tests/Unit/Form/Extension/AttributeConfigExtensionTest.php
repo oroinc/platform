@@ -289,14 +289,56 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->extension->onPostSubmit($event);
     }
 
+    public function testOnPostIsValidAndFieldConfigModelExists(): void
+    {
+        $fieldConfigModel = $this->getFieldConfigModel(1);
+        $this->assertConfigProviderCalled($fieldConfigModel);
+
+        $form = $this->createMock(FormInterface::class);
+        $form
+            ->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $formConfig = $this->createMock(FormConfigInterface::class);
+        $formConfig
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('config_model')
+            ->willReturn($fieldConfigModel);
+
+        $form
+            ->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($formConfig);
+
+        $this->serializedFieldProvider
+            ->expects($this->never())
+            ->method('isSerializedByData');
+
+        $event = new FormEvent($form, []);
+        $this->extension->buildForm($this->builder, ['config_model' => $fieldConfigModel]);
+        $this->extension->onPostSubmit($event);
+
+        $this->assertEmpty($event->getData());
+    }
+
     /**
+     * @param int|null $id
+     *
      * @return FieldConfigModel
      */
-    protected function getFieldConfigModel()
+    protected function getFieldConfigModel(int $id = null): FieldConfigModel
     {
         $entityConfigModel = new EntityConfigModel('class');
         $fieldConfigModel = new FieldConfigModel('test', 'string');
         $fieldConfigModel->setEntity($entityConfigModel);
+
+        if ($id) {
+            $reflectionProperty = new \ReflectionProperty(FieldConfigModel::class, 'id');
+            $reflectionProperty->setAccessible(true);
+            $reflectionProperty->setValue($fieldConfigModel, $id);
+        }
 
         return $fieldConfigModel;
     }

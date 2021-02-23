@@ -12,6 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Reorganizes form fields on the attribute configuration page.
+ */
 class AttributeConfigExtension extends AbstractTypeExtension
 {
     use AttributeConfigExtensionApplicableTrait;
@@ -110,10 +113,13 @@ class AttributeConfigExtension extends AbstractTypeExtension
     {
         if ($event->getForm()->isValid()) {
             $configModel = $event->getForm()->getConfig()->getOption('config_model');
-            $data = $event->getData();
-            $data['extend']['is_serialized'] = $this->serializedFieldProvider->isSerializedByData($configModel, $data);
+            if (!$configModel->getId()) {
+                $data = $event->getData();
+                $isSerialized = $this->serializedFieldProvider->isSerializedByData($configModel, $data);
+                $data['extend']['is_serialized'] = $isSerialized;
 
-            $event->setData($data);
+                $event->setData($data);
+            }
         }
     }
 
