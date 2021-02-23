@@ -375,9 +375,12 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         EntityDefinitionFieldConfig $config
     ) {
         $configuredFormOptions = $config->getFormOptions();
-        if (empty($configuredFormOptions['data_class'])
-            && !($configuredFormOptions['inherit_data'] ?? false)
-        ) {
+        $inheritData = $configuredFormOptions['inherit_data'] ?? false;
+        if ($inheritData) {
+            if (false === ($configuredFormOptions['mapped'] ?? true)) {
+                $configuredFormOptions['children_mapped'] = false;
+            }
+        } elseif (empty($configuredFormOptions['data_class'])) {
             throw new InvalidArgumentException(sprintf(
                 'The form options for the "%s" field should contain the "data_class" option.',
                 $metadata->getName()

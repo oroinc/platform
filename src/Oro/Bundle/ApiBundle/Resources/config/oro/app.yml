@@ -182,6 +182,8 @@ oro_api:
         - oro_api.config_extension.sorters
         - oro_api.config_extension.actions
         - oro_api.config_extension.subresources
+        - oro_api.config_extension.post_processor
+        - oro_api.config_extension.post_processor.twig
 
     filter_operators:
         eq:  '='  # equal to
@@ -267,6 +269,9 @@ oro_api:
         searchAggregation:
             factory: ['@oro_api.filter_factory.search_aggregation', 'createFilter']
             supported_operators: ['=']
+
+    error_title_overrides:
+        'percent range constraint': 'range constraint'
 
     form_types:
         - Symfony\Component\Form\Extension\Core\Type\FormType

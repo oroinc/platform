@@ -30,10 +30,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
     private const FILTER_OPERATOR_REGISTRY_SERVICE_ID           = 'oro_api.filter_operator_registry';
     private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
-    private const CACHE_CONTROL_PROCESSOR_SERVICE_ID            = 'oro_api.options.rest.set_cache_control';
-    private const MAX_AGE_PROCESSOR_SERVICE_ID                  = 'oro_api.options.rest.cors.set_max_age';
-    private const ALLOW_ORIGIN_PROCESSOR_SERVICE_ID             = 'oro_api.rest.cors.set_allow_origin';
-    private const CORS_HEADERS_PROCESSOR_SERVICE_ID             = 'oro_api.rest.cors.set_allow_and_expose_headers';
+    private const CORS_SETTINGS_SERVICE_ID                      = 'oro_api.rest.cors_settings';
     private const CONFIG_CACHE_WARMER_SERVICE_ID                = 'oro_api.config_cache_warmer';
     private const CACHE_MANAGER_SERVICE_ID                      = 'oro_api.cache_manager';
 
@@ -50,6 +47,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('services.yml');
         $loader->load('services_api.yml');
         $loader->load('data_transformers.yml');
+        $loader->load('post_processors.yml');
         $loader->load('filters.yml');
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
@@ -354,16 +352,12 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private function configureCors(ContainerBuilder $container, array $config): void
     {
         $corsConfig = $config['cors'];
-        $container->getDefinition(self::CACHE_CONTROL_PROCESSOR_SERVICE_ID)
-            ->replaceArgument(0, $corsConfig['preflight_max_age']);
-        $container->getDefinition(self::MAX_AGE_PROCESSOR_SERVICE_ID)
-            ->replaceArgument(0, $corsConfig['preflight_max_age']);
-        $container->getDefinition(self::ALLOW_ORIGIN_PROCESSOR_SERVICE_ID)
-            ->replaceArgument(0, $corsConfig['allow_origins']);
-        $container->getDefinition(self::CORS_HEADERS_PROCESSOR_SERVICE_ID)
-            ->replaceArgument(0, $corsConfig['allow_headers'])
-            ->replaceArgument(1, $corsConfig['expose_headers'])
-            ->replaceArgument(2, $corsConfig['allow_credentials']);
+        $container->getDefinition(self::CORS_SETTINGS_SERVICE_ID)
+            ->replaceArgument(0, $corsConfig['preflight_max_age'])
+            ->replaceArgument(1, $corsConfig['allow_origins'])
+            ->replaceArgument(2, $corsConfig['allow_credentials'])
+            ->replaceArgument(3, $corsConfig['allow_headers'])
+            ->replaceArgument(4, $corsConfig['expose_headers']);
     }
 
     /**

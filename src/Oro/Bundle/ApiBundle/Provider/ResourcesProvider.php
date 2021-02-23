@@ -187,6 +187,28 @@ class ResourcesProvider implements ResetInterface
     }
 
     /**
+     * Checks if the given entity has API resources to read data,
+     * but does not have API resources to create and update data.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isReadOnlyResource(string $entityClass, string $version, RequestType $requestType): bool
+    {
+        $excludeMap = array_fill_keys(
+            $this->getResourceExcludeActions($entityClass, $version, $requestType),
+            true
+        );
+
+        return
+            isset($excludeMap[ApiAction::UPDATE], $excludeMap[ApiAction::CREATE])
+            && !isset($excludeMap[ApiAction::GET], $excludeMap[ApiAction::GET_LIST]);
+    }
+
+    /**
      * Gets a list of resources that do not have an identifier field.
      *
      * @param string      $version     The API version

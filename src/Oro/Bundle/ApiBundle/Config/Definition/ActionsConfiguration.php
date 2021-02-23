@@ -38,22 +38,20 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->beforeNormalization()
                 ->always(function ($value) {
                     return false === $value
-                        ? \array_fill_keys($this->permissibleActions, false)
+                        ? array_fill_keys($this->permissibleActions, false)
                         : $value;
                 })
             ->end()
             ->validate()
                 ->always(function ($value) {
-                    $unknownActions = \array_diff(\array_keys($value), $this->permissibleActions);
+                    $unknownActions = array_diff(array_keys($value), $this->permissibleActions);
                     if (!empty($unknownActions)) {
-                        throw new \InvalidArgumentException(
-                            \sprintf(
-                                'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
-                                $this->sectionName,
-                                \implode(', ', $unknownActions),
-                                \implode(', ', $this->permissibleActions)
-                            )
-                        );
+                        throw new \InvalidArgumentException(sprintf(
+                            'The section "%s" contains not permissible actions: "%s". Permissible actions: "%s".',
+                            $this->sectionName,
+                            implode(', ', $unknownActions),
+                            implode(', ', $this->permissibleActions)
+                        ));
                     }
 
                     return $value;
@@ -136,9 +134,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
                         if (\is_array($v)) {
                             return $v;
                         }
-                        throw new \InvalidArgumentException(
-                            'The value must be a string or an array.'
-                        );
+                        throw new \InvalidArgumentException('The value must be a string or an array.');
                     })
                 ->end()
             ->end();
@@ -264,6 +260,12 @@ class ActionsConfiguration extends AbstractConfigurationSection
                 ->useAttributeAsKey('')
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
+            ->end()
+            ->scalarNode(ConfigUtil::POST_PROCESSOR)->end()
+            ->arrayNode(ConfigUtil::POST_PROCESSOR_OPTIONS)
+                ->useAttributeAsKey('')
+                ->performNoDeepMerging()
+                ->prototype('variable')->end()
             ->end();
     }
 
@@ -279,6 +281,12 @@ class ActionsConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ConfigUtil::FORM_OPTIONS])) {
             unset($config[ConfigUtil::FORM_OPTIONS]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR])) {
+            unset($config[ConfigUtil::POST_PROCESSOR]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR_OPTIONS])) {
+            unset($config[ConfigUtil::POST_PROCESSOR_OPTIONS]);
         }
 
         return $config;

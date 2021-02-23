@@ -7,6 +7,4 @@ layout:
             id: copyright
             parentId: page_footer
             prepend: false
-            blockType: text
-            options:
-                text: 'oro_frontend.copyright.label'
+            blockType: block

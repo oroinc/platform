@@ -34,7 +34,7 @@
                     </fieldset>
                 {{ form_end(form) }}
             </div>
-            <div class="login-copyright">{{ 'oro.auth.copy'|trans }}</div>
+            <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
         </div>
     </div>
 {% endblock %}

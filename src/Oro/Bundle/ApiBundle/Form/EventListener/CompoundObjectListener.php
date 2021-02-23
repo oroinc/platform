@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Form\EventListener;
 
 use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -39,6 +41,7 @@ class CompoundObjectListener implements EventSubscriberInterface
      */
     public function preSubmit(FormEvent $event): void
     {
+        $this->setDataToNull = false;
         $form = $event->getForm();
         $submittedData = $event->getData();
         if (null === $submittedData) {
@@ -52,11 +55,22 @@ class CompoundObjectListener implements EventSubscriberInterface
             }
         } elseif (\is_array($submittedData)) {
             if ($submittedData) {
+                $hasChanges = false;
+                /** @var EntityMetadata $metadata */
+                $metadata = $form->getConfig()->getOption('metadata');
                 /** @var FormInterface $child */
                 foreach ($form as $name => $child) {
-                    if (!\array_key_exists($name, $submittedData) && $child->isRequired()) {
+                    if (\array_key_exists($name, $submittedData)) {
+                        if ($this->isEmptyValue($submittedData, $name, $metadata)) {
+                            $submittedData[$name] = null;
+                            $hasChanges = true;
+                        }
+                    } elseif ($child->isRequired()) {
                         $this->addRequiredFieldConstraintViolation($form, $name);
                     }
+                }
+                if ($hasChanges) {
+                    $event->setData($submittedData);
                 }
             } elseif (null === $form->getData() && $form->getConfig()->getRequired()) {
                 $event->setData($this->getEmptySubmittedData($form));
@@ -120,5 +134,31 @@ class CompoundObjectListener implements EventSubscriberInterface
     private function addRequiredFieldConstraintViolation(FormInterface $form, string $fieldName): void
     {
         FormUtil::addFormError($form, 'This value is mandatory.', $fieldName);
+    }
+
+    /**
+     * @param array          $submittedData
+     * @param string         $name
+     * @param EntityMetadata $metadata
+     *
+     * @return bool
+     */
+    private function isEmptyValue(array $submittedData, string $name, EntityMetadata $metadata): bool
+    {
+        $dataType = null;
+        $property = $metadata->getProperty($name);
+        if (null !== $property) {
+            $dataType = $property->getDataType();
+        }
+        $value = $submittedData[$name];
+
+        if (null === $dataType || DataType::STRING === $dataType) {
+            return '' === $value;
+        }
+        if (DataType::OBJECT === $dataType || DataType::isArray($dataType)) {
+            return [] === $value;
+        }
+
+        return false;
     }
 }

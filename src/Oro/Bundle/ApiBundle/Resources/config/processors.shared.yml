@@ -1553,7 +1553,7 @@ services:
     oro_api.rest.cors.set_allow_origin:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowOrigin
         arguments:
-            - [] # allowedOrigins. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -235 }
@@ -1574,9 +1574,7 @@ services:
     oro_api.rest.cors.set_allow_and_expose_headers:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowAndExposeHeaders
         arguments:
-            - [] # allowedHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - [] # exposableHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - false # isCredentialsAllowed. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -240 }

@@ -42,15 +42,16 @@ class CompoundObjectType extends AbstractType
         /** @var EntityDefinitionConfig $config */
         $config = $options['config'];
         $inheritData = $options['inherit_data'];
+        $readOnlyChildren = (false === $options['children_mapped']);
 
         $fields = $metadata->getFields();
         foreach ($fields as $name => $field) {
-            $this->addFormField($builder, $config, $name, $field, $inheritData);
+            $this->addFormField($builder, $config, $name, $field, $inheritData, $readOnlyChildren);
         }
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             if (DataType::isAssociationAsField($association->getDataType())) {
-                $this->addFormField($builder, $config, $name, $association, $inheritData);
+                $this->addFormField($builder, $config, $name, $association, $inheritData, $readOnlyChildren);
             }
         }
 
@@ -64,8 +65,10 @@ class CompoundObjectType extends AbstractType
     {
         $resolver
             ->setRequired(['metadata', 'config'])
+            ->setDefault('children_mapped', null)
             ->setAllowedTypes('metadata', [EntityMetadata::class])
-            ->setAllowedTypes('config', [EntityDefinitionConfig::class]);
+            ->setAllowedTypes('config', [EntityDefinitionConfig::class])
+            ->setAllowedTypes('children_mapped', ['bool', 'null']);
     }
 
     /**
@@ -74,16 +77,21 @@ class CompoundObjectType extends AbstractType
      * @param string                 $fieldName
      * @param PropertyMetadata       $fieldMetadata
      * @param bool                   $inheritData
+     * @param bool                   $readOnly
      */
     private function addFormField(
         FormBuilderInterface $formBuilder,
         EntityDefinitionConfig $config,
         string $fieldName,
         PropertyMetadata $fieldMetadata,
-        bool $inheritData
+        bool $inheritData,
+        bool $readOnly
     ): void {
         $fieldConfig = $config->getField($fieldName);
         $options = ['required' => false];
+        if ($readOnly) {
+            $options['mapped'] = false;
+        }
         if ($inheritData) {
             $propertyPath = $fieldConfig->getPropertyPath();
             if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
