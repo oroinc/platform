@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
+use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
  * Translation entity for AddressType entity.
@@ -21,11 +21,4 @@ class AddressTypeTranslation extends AbstractTranslation
      * @ORM\Column(name="foreign_key", type="string", length=16)
      */
     protected $foreignKey;
-
-    /**
-     * @var string $content
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $content;
 }
