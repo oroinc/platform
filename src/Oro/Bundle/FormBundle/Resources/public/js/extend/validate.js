@@ -255,8 +255,6 @@ define(function(require, exports, module) {
                 }.bind(this)
             });
 
-            $.validator._loadMethod();
-
             original.init.call(this);
 
             this.bindInitialErrors();
@@ -549,6 +547,8 @@ define(function(require, exports, module) {
         const {_methodsToLoad: modules = []} = $.validator;
         modules.push(...$.makeArray(module));
         $.validator._methodsToLoad = modules;
+
+        $.validator._loadMethod();
     };
 
     /**
