@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Translatable\Entity\MappedSuperclass\AbstractTranslation;
+use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
  * Represent Gedmo translation dictionary for Region entity.
@@ -21,13 +21,6 @@ class RegionTranslation extends AbstractTranslation
      * @ORM\Column(name="foreign_key", type="string", length=16)
      */
     protected $foreignKey;
-
-    /**
-     * @var string $content
-     *
-     * @ORM\Column(type="string", length=255)
-     */
-    protected $content;
 
     /**
      * @return string

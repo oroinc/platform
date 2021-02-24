@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_0\RenameExtendTablesAndColumns;
-use Oro\Bundle\EntityExtendBundle\Migrations\Schema\v1_1\OroEntityExtendBundle as OroEntityExtendBundle11;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -15,7 +14,7 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -28,6 +27,16 @@ class OroEntityExtendBundleInstaller extends RenameExtendTablesAndColumns implem
             parent::up($schema, $queries);
         }
 
-        OroEntityExtendBundle11::oroEnumValueTransTable($schema);
+        /** Generate table oro_enum_value_trans **/
+        $table = $schema->createTable('oro_enum_value_trans');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('foreign_key', 'string', ['length' => 32]);
+        $table->addColumn('content', 'string', ['length' => 255]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
+        $table->addColumn('object_class', 'string', ['length' => 255]);
+        $table->addColumn('field', 'string', ['length' => 4]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['locale', 'object_class', 'field', 'foreign_key'], 'oro_enum_value_trans_idx', []);
+        /** End of generate table oro_enum_value_trans **/
     }
 }

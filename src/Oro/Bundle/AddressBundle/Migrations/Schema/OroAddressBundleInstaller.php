@@ -13,7 +13,7 @@ class OroAddressBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -90,7 +90,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
         $table->addColumn('object_class', 'string', ['length' => 255]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
@@ -123,7 +123,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 2]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
         $table->addColumn('object_class', 'string', ['length' => 255]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
@@ -158,7 +158,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('foreign_key', 'string', ['length' => 16]);
         $table->addColumn('content', 'string', ['length' => 255]);
-        $table->addColumn('locale', 'string', ['length' => 8]);
+        $table->addColumn('locale', 'string', ['length' => 16]);
         $table->addColumn('object_class', 'string', ['length' => 255]);
         $table->addColumn('field', 'string', ['length' => 32]);
         $table->setPrimaryKey(['id']);
