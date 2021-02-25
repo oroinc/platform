@@ -53,7 +53,7 @@
             </div>
         </div>
         <footer class="error-page-footer">
-            <p>&copy {{ 'now'|date('Y') }} {{ 'Oro Inc. All Rights Reserved.'|trans }}</p>
+            <p>{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</p>
         </footer>
     </div>
     <script type="application/javascript">

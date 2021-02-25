@@ -51,6 +51,10 @@ filters:
         requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
         type: 'float or array or range'
         operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
+    'filter[fieldPercent100]':
+        requirement: '-?\d*\.?\d+(,-?\d*\.?\d+)*|-?\d*\.?\d+..-?\d*\.?\d+'
+        type: 'float or array or range'
+        operators: 'eq,neq,lt,lte,gt,gte,exists,neq_or_null'
     'filter[fieldSmallInt]':
         requirement: '-?\d+(,-?\d+)*|-?\d+..-?\d+'
         type: 'smallint or array or range'

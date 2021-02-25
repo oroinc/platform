@@ -6,6 +6,10 @@ oro_behat_extension:
         - OroUIBundle::DragAndDropContext
         - OroFormBundle::FormContext
         - OroDataGridBundle::GridContext
+        - OroImportExportBundle::ImportExportContext:
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_importexport.processor.registry'
+        - OroEmailBundle::EmailContext
       paths:
         - '@OroUIBundle/Tests/Behat/Features'
 

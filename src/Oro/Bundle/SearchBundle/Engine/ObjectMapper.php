@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Mode;
@@ -27,16 +28,18 @@ class ObjectMapper extends AbstractMapper
     /**
      * @param SearchMappingProvider $mappingProvider
      * @param PropertyAccessorInterface $propertyAccessor
+     * @param TypeCastingHandlerRegistry $handlerRegistry
      * @param EventDispatcherInterface $dispatcher
      * @param HtmlTagHelper $htmlTagHelper
      */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
+        TypeCastingHandlerRegistry $handlerRegistry,
         EventDispatcherInterface $dispatcher,
         HtmlTagHelper $htmlTagHelper
     ) {
-        parent::__construct($mappingProvider, $propertyAccessor);
+        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry);
         $this->dispatcher = $dispatcher;
         $this->htmlTagHelper = $htmlTagHelper;
     }

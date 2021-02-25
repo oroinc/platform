@@ -1,0 +1,4 @@
+oro_api:
+    error_title_overrides:
+        'email address constraint': 'email constraint'
+        'not empty email template translation subject constraint': 'not blank constraint'

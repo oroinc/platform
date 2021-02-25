@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
 
 /**
- * This extensions provides validation constraints data for js validation via html attributes.
+ * This extensions provides validation constraints data for JS validation via HTML attributes.
  */
 class JsValidationExtension extends AbstractTypeExtension
 {

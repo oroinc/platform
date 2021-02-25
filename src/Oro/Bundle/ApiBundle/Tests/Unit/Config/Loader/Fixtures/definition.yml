@@ -515,6 +515,16 @@ field_form:
                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
                     option1: value1
+            field7:
+                post_processor: test
+                post_processor_options: ~
+            field8:
+                post_processor: test
+                post_processor_options: []
+            field9:
+                post_processor: test
+                post_processor_options:
+                    option1: value1
     expected:
         fields:
             field1: ~
@@ -528,4 +538,12 @@ field_form:
             field6:
                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                 form_options:
+                    option1: value1
+            field7:
+                post_processor: test
+            field8:
+                post_processor: test
+            field9:
+                post_processor: test
+                post_processor_options:
                     option1: value1

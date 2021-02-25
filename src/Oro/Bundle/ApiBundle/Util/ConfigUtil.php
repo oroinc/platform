@@ -163,6 +163,12 @@ class ConfigUtil extends BaseConfigUtil
      */
     public const PAGE_NUMBER = 'page_number';
 
+    /** the type of a post processor to be applies to the field value */
+    public const POST_PROCESSOR = 'post_processor';
+
+    /** the option for a post processor to be applies to the field value */
+    public const POST_PROCESSOR_OPTIONS = 'post_processor_options';
+
     /**
      * Gets a native PHP array representation of each object in a given array.
      *

@@ -209,7 +209,16 @@ services:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider
         arguments:
             - '@validator.mapping.class_metadata_factory'
+            - '@oro_form.extension.js_validation.constraint_converter'
 
+    oro_form.extension.js_validation.constraint_converter:
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter
+
+    oro_form.extension.js_validation.percent_range_constraint_converter:
+        class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\PercentRangeConstraintConverter
+        decorates: oro_form.extension.js_validation.constraint_converter
+        arguments:
+            - '@oro_form.extension.js_validation.percent_range_constraint_converter.inner'
 
     oro_form.extension.js_validation.repeated:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension

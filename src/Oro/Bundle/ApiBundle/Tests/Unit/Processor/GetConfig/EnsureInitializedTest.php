@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\EnsureInitialized;
-use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -17,8 +16,6 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $this->processor = new EnsureInitialized($this->configLoaderFactory);
     }

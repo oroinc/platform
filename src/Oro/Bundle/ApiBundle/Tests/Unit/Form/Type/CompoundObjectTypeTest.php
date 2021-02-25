@@ -3,70 +3,38 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\ApiFormBuilder;
-use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
-use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\CompoundObjectType;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\NameContainerType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CompoundObjectTypeTest extends TypeTestCase
+class CompoundObjectTypeTest extends ApiFormTypeTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->builder = new ApiFormBuilder('', null, $this->dispatcher, $this->factory);
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function getExtensions()
     {
-        $customizationProcessor = $this->createMock(ActionProcessorInterface::class);
-        $customizationProcessor->expects(self::any())
-            ->method('createContext')
-            ->willReturn($this->createMock(CustomizeFormDataContext::class));
-        $entityInstantiator = $this->createMock(EntityInstantiator::class);
-        $entityInstantiator->expects(self::any())
-            ->method('instantiate')
-            ->willReturnCallback(function ($class) {
-                return new $class();
-            });
-
         return [
             new PreloadedExtension(
                 [new CompoundObjectType($this->getFormHelper())],
-                [
-                    FormType::class => [
-                        new CustomizeFormDataExtension(
-                            $customizationProcessor,
-                            $this->createMock(CustomizeFormDataHandler::class)
-                        ),
-                        new EmptyDataExtension($entityInstantiator)
-                    ]
-                ]
+                $this->getApiTypeExtensions()
             )
         ];
     }
@@ -169,6 +137,38 @@ class CompoundObjectTypeTest extends TypeTestCase
         $form->submit(['renamedName' => 'testName']);
         self::assertTrue($form->isSynchronized());
         self::assertEquals('testName', $data->getName());
+    }
+
+    public function testBuildFormForReadOnlyField()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->addField(new FieldMetadata('name'));
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('name');
+
+        $context = $this->createMock(FormContext::class);
+
+        $data = new Entity\User();
+        $form = $this->factory->create(
+            CompoundObjectType::class,
+            $data,
+            [
+                'api_context'     => $context,
+                'data_class'      => Entity\User::class,
+                'metadata'        => $metadata,
+                'config'          => $config,
+                'children_mapped' => false
+            ]
+        );
+
+        $context->expects(self::once())
+            ->method('addAdditionalEntity')
+            ->with(self::identicalTo($data));
+
+        $form->submit(['name' => 'testName']);
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getName());
     }
 
     public function testBuildFormForFieldWithFormType()
@@ -434,6 +434,44 @@ class CompoundObjectTypeTest extends TypeTestCase
             ->with(self::isInstanceOf(Entity\ProductPrice::class));
 
         $form->submit([]);
+        self::assertTrue($form->isSynchronized());
+        self::assertNull($data->getPrice()->getValue());
+    }
+
+    public function testCreateNestedObjectWhenSubmittedDataIsEmpty()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->addField(new FieldMetadata('value'));
+        $metadata->addField(new FieldMetadata('currency'));
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('value');
+        $config->addField('currency');
+
+        $context = $this->createMock(FormContext::class);
+
+        $data = new Entity\Product();
+        $formBuilder = $this->factory->createBuilder(
+            FormType::class,
+            $data,
+            ['api_context' => $context, 'data_class' => Entity\Product::class]
+        );
+        $formBuilder->add(
+            'price',
+            CompoundObjectType::class,
+            [
+                'data_class' => Entity\ProductPrice::class,
+                'metadata'   => $metadata,
+                'config'     => $config
+            ]
+        );
+        $form = $formBuilder->getForm();
+
+        $context->expects(self::once())
+            ->method('addAdditionalEntity')
+            ->with(self::isInstanceOf(Entity\ProductPrice::class));
+
+        $form->submit(['price' => ['value' => '']]);
         self::assertTrue($form->isSynchronized());
         self::assertNull($data->getPrice()->getValue());
     }

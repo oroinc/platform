@@ -34,11 +34,11 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
         string $version,
         RequestType $requestType
     ): bool {
-        if (0 !== \strpos($dataType, self::LOCALIZED_FALLBACK_VALUE_PREFIX)) {
+        if (0 !== strpos($dataType, self::LOCALIZED_FALLBACK_VALUE_PREFIX)) {
             return false;
         }
 
-        $localizedFallbackFieldName = \substr($dataType, \strlen(self::LOCALIZED_FALLBACK_VALUE_PREFIX));
+        $localizedFallbackFieldName = substr($dataType, \strlen(self::LOCALIZED_FALLBACK_VALUE_PREFIX));
         $field->setDataType(DataType::STRING);
         $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
         $field->setDependsOn([$localizedFallbackFieldName]);
@@ -46,7 +46,7 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
         $localizedFallbackField = $definition->findField($localizedFallbackFieldName, true);
         if (null === $localizedFallbackField) {
             if ($localizedFallbackFieldName === $fieldName) {
-                throw new \RuntimeException(\sprintf(
+                throw new \RuntimeException(sprintf(
                     'The circular dependency is detected for localized fallback value field "%1$s::%2$s".'
                     . ' To solve this you can rename the target property of this field. For example:%3$s'
                     . '_%2$s:%3$s    property_path: %2$s%3$s',
@@ -62,7 +62,7 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
         }
         $localizedFallbackField->getOrCreateTargetEntity()->setMaxResults(-1);
 
-        $fieldNames = $definition->get(self::LOCALIZED_FALLBACK_VALUE_FIELDS, []);
+        $fieldNames = $definition->get(self::LOCALIZED_FALLBACK_VALUE_FIELDS) ?? [];
         $fieldNames[] = $fieldName;
         $definition->set(self::LOCALIZED_FALLBACK_VALUE_FIELDS, $fieldNames);
 

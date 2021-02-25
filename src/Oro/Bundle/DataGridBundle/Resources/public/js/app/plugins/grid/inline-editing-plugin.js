@@ -119,7 +119,7 @@ define(function(require) {
             this.listenTo(confirmModal, 'ok', function() {
                 deferredConfirmation.resolve();
             });
-            this.listenTo(confirmModal, 'cancel', function() {
+            this.listenTo(confirmModal, 'cancel close', function() {
                 deferredConfirmation.reject(deferredConfirmation.promise(), 'abort');
             });
 

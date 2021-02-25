@@ -131,6 +131,11 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
 
+    oro_api.entity_field_filtering_helper:
+        class: Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper
+        arguments:
+            - '@oro_entity_config.config_manager'
+
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
         arguments:
@@ -263,6 +268,14 @@ services:
         arguments:
             - '@oro_api.action_processor_bag'
             - '@oro_api.filter_operator_registry'
+
+    oro_api.config_extension.post_processor:
+        class: Oro\Bundle\ApiBundle\Config\Extension\PostProcessorConfigExtension
+        arguments:
+            - '@oro_api.post_processor_registry'
+
+    oro_api.config_extension.post_processor.twig:
+        class: Oro\Bundle\ApiBundle\Config\Extension\TwigPostProcessorConfigExtension
 
     oro_api.config_extension.feature:
         class: Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension
@@ -510,6 +523,11 @@ services:
         tags:
             - { name: oro.api.error_completer, priority: -255 }
 
+    oro_api.error_title_override_provider:
+        class: Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider
+        arguments:
+            - [] # error title substitutions. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+
     oro_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory
         arguments:
@@ -531,6 +549,7 @@ services:
     oro_api.rest.error_completer:
         class: Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter
         arguments:
+            - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
         tags:
             - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
@@ -549,11 +568,21 @@ services:
     oro_api.json_api.error_completer:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter
         arguments:
+            - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
             - '@oro_api.value_normalizer'
             - '@oro_api.filter_names_registry'
         tags:
             - { name: oro.api.error_completer, requestType: json_api }
+
+    oro_api.rest.cors_settings:
+        class: Oro\Bundle\ApiBundle\Request\Rest\CorsSettings
+        arguments:
+            - 0 # preflightMaxAge. It is set by Oro\Bundle\FrontendBundle\DependencyInjection\OroFrontendExtension
+            - [] # allowedOrigins. They are set by Oro\Bundle\FrontendBundle\DependencyInjection\OroFrontendExtension
+            - false # isCredentialsAllowed. It is set by Oro\Bundle\FrontendBundle\DependencyInjection\OroFrontendExtension
+            - [] # allowedHeaders. They are set by Oro\Bundle\FrontendBundle\DependencyInjection\OroFrontendExtension
+            - [] # exposableHeaders. They are set by Oro\Bundle\FrontendBundle\DependencyInjection\OroFrontendExtension
 
     oro_api.rest.routes_registry:
         class: Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry

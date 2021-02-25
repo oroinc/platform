@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueCompleter;
+use Oro\Bundle\LocaleBundle\Api\LocalizedFallbackValueExtractorInterface;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
@@ -25,19 +26,26 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     /** @var LocalizationHelper */
     private $localizationHelper;
 
+    /** @var LocalizedFallbackValueExtractorInterface */
+    private $valueExtractor;
+
     /**
-     * @param DoctrineHelper     $doctrineHelper
-     * @param LocalizationHelper $localizationHelper
+     * @param DoctrineHelper                           $doctrineHelper
+     * @param LocalizationHelper                       $localizationHelper
+     * @param LocalizedFallbackValueExtractorInterface $valueExtractor
      */
-    public function __construct(DoctrineHelper $doctrineHelper, LocalizationHelper $localizationHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        LocalizationHelper $localizationHelper,
+        LocalizedFallbackValueExtractorInterface $valueExtractor
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->localizationHelper = $localizationHelper;
+        $this->valueExtractor = $valueExtractor;
     }
 
     /**
      * {@inheritdoc}
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ContextInterface $context)
     {
@@ -54,7 +62,38 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
         }
 
         $data = $context->getData();
+        [$values, $idsPerField] = $this->extractIds($fieldNames, $config, $context, $data);
+        if (!$values) {
+            return;
+        }
 
+        foreach ($idsPerField as $key => [$itemIdsPerField, $classesPerField]) {
+            $valuesPerField = $this->groupLocalizedFallbackValues($values, $itemIdsPerField, $classesPerField);
+            foreach ($fieldNames as $fieldName) {
+                $value = null;
+                if (isset($valuesPerField[$fieldName])) {
+                    $value = $this->getLocalizedValue($valuesPerField[$fieldName]);
+                }
+                $data[$key][$fieldName] = $value;
+            }
+        }
+        $context->setData($data);
+    }
+
+    /**
+     * @param array                      $fieldNames
+     * @param EntityDefinitionConfig     $config
+     * @param CustomizeLoadedDataContext $context
+     * @param array                      $data
+     *
+     * @return array [values ([class name => [id => value, ...], ...]), idsPerField]
+     */
+    private function extractIds(
+        array $fieldNames,
+        EntityDefinitionConfig $config,
+        CustomizeLoadedDataContext $context,
+        array $data
+    ): array {
         $idsPerClass = [];
         $idsPerField = [];
         foreach ($data as $key => $item) {
@@ -71,21 +110,8 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
                 $idsPerField[$key] = [$itemIdsPerField, $classesPerField];
             }
         }
-        if (empty($idsPerClass)) {
-            return;
-        }
 
-        $values = $this->loadLocalizedFallbackValues($idsPerClass);
-
-        foreach ($idsPerField as $key => [$itemIdsPerField, $classesPerField]) {
-            $valuesPerField = $this->groupLocalizedFallbackValues($values, $itemIdsPerField, $classesPerField);
-            foreach ($fieldNames as $fieldName) {
-                $data[$key][$fieldName] = isset($valuesPerField[$fieldName])
-                    ? $this->getLocalizedValue($valuesPerField[$fieldName])
-                    : null;
-            }
-        }
-        $context->setData($data);
+        return [$this->loadLocalizedFallbackValues($idsPerClass), $idsPerField];
     }
 
     /**
@@ -137,6 +163,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
 
     /**
      * @param CustomizeLoadedDataContext $context
+     *
      * @return array
      */
     private function getAssociationMappings(CustomizeLoadedDataContext $context): array
@@ -214,7 +241,7 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     {
         $value = $this->localizationHelper->getLocalizedValue($values);
         if (null !== $value) {
-            $value = (string)$value;
+            $value = $this->valueExtractor->extractValue($value);
         }
 
         return $value;

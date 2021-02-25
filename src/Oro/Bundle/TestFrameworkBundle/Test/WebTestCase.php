@@ -1068,6 +1068,51 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     * @param mixed    $expectedValue
+     */
+    protected static function assertResponseHeader(Response $response, string $headerName, string $expectedValue): void
+    {
+        self::assertEquals(
+            $expectedValue,
+            $response->headers->get($headerName),
+            sprintf('"%s" response header', $headerName)
+        );
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     */
+    protected static function assertResponseHeaderNotExists(Response $response, string $headerName): void
+    {
+        self::assertFalse(
+            $response->headers->has($headerName),
+            sprintf('"%s" header should not exist in the response', $headerName)
+        );
+    }
+
+    /**
+     * Asserts "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    protected static function assertAllowResponseHeader(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ): void {
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
+    }
+
+    /**
      * Assert that intersect of $actual with $expected equals $expected
      *
      * @param array $expected
