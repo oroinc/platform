@@ -18,30 +18,23 @@ main {
 .demo-page {
     background-color: $demo-page-background-color;
     height: $demo-page-height;
-    padding-top: $demo-page-inner-offset-top;
+    display: $demo-page-display;
+    flex-direction: $demo-page-flex-direction;
     box-sizing: $demo-page-box-sizing;
     transition: $demo-page-transition;
-
-    &.closed-head-panel {
-        padding-top: $demo-page-closed-head-panel-inner-offset-top;
-    }
 }
 
 .head-panel {
+    min-width: $head-panel-min-width;
+    max-height: $head-panel-max-height;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    align-content: center;
-    flex-wrap: wrap;
-    height: $head-panel-height;
-    padding: 0 16px;
-    margin-top: $head-panel-offset-top;
+    align-items: flex-end;
     background-color: $head-panel-background-color;
-    border-bottom: $head-panel-border;
     box-sizing: $head-panel-box-sizing;
     box-shadow: $head-panel-box-shadow;
     position: $head-panel-position;
     z-index: $head-panel-z-index;
+    transition: $head-panel-transition;
 
     &.dark-mode {
         background-color: $dark-mode-head-panel-background-color;
@@ -68,11 +61,21 @@ main {
         }
     }
 
+    &__inner {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        flex-wrap: wrap;
+        padding: 0 16px;
+        border-bottom: $head-panel-border;
+        box-sizing: border-box;
+    }
+
     &__logo {
         display: $head-panel-logo-display;
-        height: $head-panel-logo-height;
         width: $head-panel-logo-width;
-        max-width: $head-panel-logo-max-width;
         background-image: url($head-panel-logo-background-image);
         background-repeat: $head-panel-logo-background-repeat;
         background-size: 134px 26px;
@@ -94,11 +97,15 @@ main {
         align-items: center;
         cursor: $head-panel-link-cursor;
         color: $head-panel-link-color;
-        line-height: $head-panel-link-line-height;
         font-size: $head-panel-link-font-size;
         text-decoration: none;
         border: none;
+        padding: $head-panel-link-padding;
         background: none;
+
+        &-help {
+            text-align: center;
+        }
 
         &-icon {
             display: block;
@@ -150,7 +157,9 @@ main {
         display: flex;
 
         &--side {
+            margin: 8px 0;
             flex: 1 0 320px;
+            align-items: center;
 
             &:last-child {
                 justify-content: flex-end;
@@ -164,6 +173,8 @@ main {
     }
 
     .closed-head-panel & {
+        max-height: $head-panel-closed-head-panel-max-height;
+
         &__trigger-wrapper {
             bottom: $head-panel-closed-head-panel-trigger-wrapper-bottom;
 
@@ -239,6 +250,7 @@ main {
 }
 
 .content-area {
+    min-width: $content-area-min-width;
     height: $content-area-height;
     overflow: $content-area-overflow;
     background-color: $content-area-background-color;
@@ -308,18 +320,20 @@ main {
 }
 
 @media only screen and (max-width: 800px) {
-    .demo-page {
-        padding-top: $demo-page-mobile-inner-offset-top;
-    }
-
     .head-panel {
-        height: $head-panel-mobile-height;
-        margin-top: $head-panel-mobile-offset-top;
+        &__inner {
+            justify-content: center;
+        }
 
         &__col {
             &--side {
+                max-width: 100%;
+                margin-bottom: 0;
                 flex-basis: auto;
-                padding-top: 8px;
+
+                &:last-child {
+                    flex-grow: 0;
+                }
             }
 
             &--center {
@@ -327,16 +341,6 @@ main {
                 width: 100%;
                 justify-content: center;
             }
-        }
-    }
-
-    .closed-head-panel {
-        .view-switcher {
-            padding-top: $closed-head-panel-view-switcher-mobile-offset-inner-top;
-        }
-
-        .head-panel {
-            margin-top: $closed-head-panel-head-panel-offset-top;
         }
     }
 
@@ -349,6 +353,7 @@ main {
 
 .btn {
     padding: $btn-inner-offset;
+    text-align: center;
     text-decoration: $btn-text-decoration;
 
     &--light-solid {
