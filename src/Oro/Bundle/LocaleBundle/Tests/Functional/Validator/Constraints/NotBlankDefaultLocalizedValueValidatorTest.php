@@ -33,6 +33,7 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
 
         $entity = new Localization();
         $defaultFallback = new LocalizedFallbackValue();
+        $defaultFallback->setString('Test');
         /**
          * Only fallback without localization will be default fallback
          * @see \Oro\Bundle\LocaleBundle\Entity\FallbackTrait::getDefaultFallbackValue
