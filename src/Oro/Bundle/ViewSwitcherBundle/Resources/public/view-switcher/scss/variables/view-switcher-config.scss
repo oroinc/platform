@@ -2,8 +2,6 @@
 
 // main variables
 $global-bg-color: #f8f8f8 !default;
-$head-panel-height: 50px !default;
-$head-panel-mobile-height: 88px !default;
 $head-panel-bg-color: #fff !default;
 $head-panel-border: 2px solid #ffca18 !default;
 
@@ -26,31 +24,32 @@ $body-overflow: hidden !default;
 // demo-page container
 $demo-page-background-color: $global-bg-color !default;
 $demo-page-height: 100% !default;
-$demo-page-inner-offset-top: $head-panel-height !default;
+$demo-page-display: flex !default;
+$demo-page-flex-direction: column !default;
 $demo-page-box-sizing: border-box !default;
 $demo-page-transition: padding-top 100ms linear !default;
 $demo-page-closed-head-panel-inner-offset-top: 0 !default;
 
 // head-panel container
-$head-panel-height: $head-panel-height !default;
-$head-panel-offset-top: -$head-panel-height !default;
+$head-panel-min-width: 100% !default;
+$head-panel-max-height: 80vh !default;
 $head-panel-background-color: $head-panel-bg-color !default;
 $head-panel-box-sizing: border-box !default;
 $head-panel-box-shadow: 1px 1px 2px -1px rgba(0, 0, 0, 0.08) !default;
 $head-panel-position: relative !default;
 $head-panel-z-index: 998 !default;
+$head-panel-transition: max-height 100ms linear !default;
 
 $head-panel-logo-display: flex !default;
 $head-panel-logo-height: 26px !default;
 $head-panel-logo-width: 100% !default;
-$head-panel-logo-max-width: 220px !default;
 $head-panel-logo-background-image: '/bundles/orocrm/images/oro-crm-logo.svg' !default;
 $head-panel-logo-background-repeat: no-repeat !default;
 $head-panel-logo-z-index: 999 !default;
 
 $head-panel-link-cursor: pointer !default;
 $head-panel-link-color: #4c4646 !default;
-$head-panel-link-line-height: 26px !default;
+$head-panel-link-padding: 5px !default;
 $head-panel-link-font-size: 14px !default;
 
 $head-panel-link-hover-color: #2b2c2e !default;
@@ -76,6 +75,7 @@ $head-panel-trigger-wrapper-text-align: center !default;
 $head-panel-trigger-wrapper-offset-top: -3px !default;
 $head-panel-trigger-wrapper-trigger-fa-icon: $fa-var-angle-up !default;
 
+$head-panel-closed-head-panel-max-height: 0;
 $head-panel-closed-head-panel-trigger-wrapper-bottom: -5px !default;
 $head-panel-closed-head-panel-trigger-wrapper-bottom-hover-bottom: -14px !default;
 $head-panel-closed-head-panel-trigger-wrapper-trigger-inner-offset-bottom: 12px !default;
@@ -104,6 +104,7 @@ $view-switcher-item-pad-fa-icon: $fa-var-tablet !default;
 $view-switcher-item-phone-fa-icon: $fa-var-mobile !default;
 
 // content-area container
+$content-area-min-width: 100% !default;
 $content-area-height: 100% !default;
 $content-area-overflow: auto !default;
 $content-area-background-color: $global-bg-color !default;
@@ -154,14 +155,6 @@ $content-area-wrapper-phone-border: solid #e9e9e9 !default;
 $content-area-wrapper-phone-border-radius: 55px !default;
 $content-area-wrapper-phone-border-width: 55px 20px 75px 20px !default;
 $content-area-wrapper-phone-transition: 1s transform !default;
-
-// mobile variables
-$demo-page-mobile-inner-offset-top: $head-panel-mobile-height !default;
-$head-panel-mobile-offset-top: -$head-panel-mobile-height !default;
-
-$closed-head-panel-view-switcher-mobile-offset-inner-top: 0 !default;
-
-$closed-head-panel-head-panel-offset-top: -$head-panel-mobile-height !default;
 
 // btn variables
 $btn-light-solid-font-size: 14px !default;
