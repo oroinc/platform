@@ -25,6 +25,11 @@ class NativeQueryExecutorHelper
     protected $tablesNames = [];
 
     /**
+     * @var array
+     */
+    protected $tablesColumns = [];
+
+    /**
      * @var array|ClassMetadata[]
      */
     protected $classesMetadata = [];
@@ -90,5 +95,33 @@ class NativeQueryExecutorHelper
         }
 
         return $this->classesMetadata[$className];
+    }
+
+    /**
+     * @param string $className
+     * @param array $fields
+     * @return array
+     */
+    public function getColumns(string $className, array $fields): array
+    {
+        $result = [];
+
+        foreach ($fields as $field) {
+            if (!isset($this->tablesColumns[$className][$field])) {
+                $classMetadata = $this->getClassMetadata($className);
+                if (!$classMetadata->hasField($field) && !$classMetadata->hasAssociation($field)) {
+                    throw new \InvalidArgumentException(sprintf('Field %s is not known for %s', $field, $className));
+                }
+                if ($classMetadata->hasAssociation($field)) {
+                    $mapping = $classMetadata->getAssociationMapping($field);
+                    $this->tablesColumns[$className][$field] = array_shift($mapping['joinColumnFieldNames']);
+                } else {
+                    $this->tablesColumns[$className][$field] = $classMetadata->getColumnName($field);
+                }
+            }
+            $result[] = $this->tablesColumns[$className][$field];
+        }
+
+        return $result;
     }
 }

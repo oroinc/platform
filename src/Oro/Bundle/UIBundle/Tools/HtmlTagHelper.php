@@ -194,7 +194,7 @@ class HtmlTagHelper implements TranslatorAwareInterface
         }
 
         $result = $this->htmlPurifiers[$scope]->purify($value);
-        if ($this->collectErrors) {
+        if ($this->collectErrors && $this->htmlPurifiers[$scope]->context->exists('ErrorCollector')) {
             $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector');
         }
 
