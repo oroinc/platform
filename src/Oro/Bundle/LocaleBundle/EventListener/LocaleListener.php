@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\EventListener;
 
 use Doctrine\DBAL\DBALException;
 use Gedmo\Translatable\TranslatableListener;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Symfony\Component\Console\ConsoleEvents;
@@ -101,6 +102,20 @@ class LocaleListener implements EventSubscriberInterface
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         if (!$this->installed) {
+            return;
+        }
+
+        /**
+         * Skip setting of localization settings during initialization of extended entities.
+         * This is required to prevent loading of {@see \Oro\Bundle\LocaleBundle\Entity\Localization} entity;
+         * this is an extendable entity and loading of it causes incorrect initialization ORM metadata for it.
+         * Steps to reproduce the issue:
+         * * remove the cache directory
+         * * run "cache:clear" command
+         * * run "doctrine:schema:update --dump-sql" command
+         * * this command must not return "ALTER TABLE oro_localization DROP serialized_data;" SQL query
+         */
+        if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
             return;
         }
 
