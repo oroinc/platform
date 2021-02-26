@@ -9,6 +9,9 @@ The current file describes significant changes in the code that may affect the u
 #### EntityExtendBundle
 * The `force` option was added to the `oro:entity-extend:update-config` CLI command to avoid accidental execution of it.
 
+#### LocaleBundle
+* The unused service `oro_locale.repository.localization` was removed.
+
 ## 4.2.0 (2020-01-29)
 [Show detailed list of changes](incompatibilities-4-2.md)
 
