@@ -485,15 +485,13 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             ->willReturn(true);
 
         $this->searchProvider
-            ->expects($this->exactly(6))
+            ->expects($this->exactly(4))
             ->method('getData')
             ->willReturn(
                 ['Third group'],
                 ['Fourth group'],
                 ['title some field', 'tooltip some field'],
-                ['title some other field'],
-                ['Another branch first group'],
-                ['Another branch second group']
+                ['title some other field']
             );
 
         $result = $provider->getJsTree();
@@ -510,17 +508,6 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                     'title some field',
                     'tooltip some field',
                     'title some other field',
-                ]
-            ],
-            [
-                'id' => 'another_branch_first',
-                'text' => 'Another branch first group',
-                'icon' => 'fa-file',
-                'parent' => 'second_group',
-                'priority' => 0,
-                'search_by' => [
-                    'Another branch first group',
-                    'Another branch second group',
                 ]
             ],
             [
@@ -592,13 +579,6 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                                                         'children' => [
                                                             'some_field',
                                                         ],
-                                                    ],
-                                                ],
-                                            ],
-                                            'another_branch_first' => [
-                                                'children' => [
-                                                    'another_branch_second' => [
-                                                        'children' => [],
                                                     ],
                                                 ],
                                             ],
