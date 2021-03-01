@@ -21,8 +21,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Abstract system config tree provider.
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractProvider implements ProviderInterface
@@ -208,10 +206,6 @@ abstract class AbstractProvider implements ProviderInterface
             } elseif (is_array($definitionRow) && array_key_exists('children', $definitionRow)) {
                 if ($this->featureChecker->isResourceEnabled($key, 'configuration')) {
                     $definitionRow['children'] = $this->filterDisabledNodes($definitionRow['children']);
-                    if (empty($definitionRow['children'])) {
-                        // Removes definition if it does not contain any children.
-                        unset($definition[$key]);
-                    }
                 } else {
                     unset($definition[$key]);
                 }
