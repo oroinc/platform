@@ -15,7 +15,9 @@ define(function(require) {
                 'autocomplete': 'off',
                 'aria-label': __('oro.ui.datepicker.aria_label')
             },
-            datePickerOptions: {}
+            datePickerOptions: {
+                isRTL: _.isRTL()
+            }
         },
 
         events: {
