@@ -3,63 +3,31 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Form\ApiFormBuilder;
-use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
-use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Form\Type\ScalarObjectType;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
-use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
-use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
-class ScalarObjectTypeTest extends TypeTestCase
+class ScalarObjectTypeTest extends ApiFormTypeTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->builder = new ApiFormBuilder('', null, $this->dispatcher, $this->factory);
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function getExtensions()
     {
-        $customizationProcessor = $this->createMock(ActionProcessorInterface::class);
-        $customizationProcessor->expects(self::any())
-            ->method('createContext')
-            ->willReturn($this->createMock(CustomizeFormDataContext::class));
-        $entityInstantiator = $this->createMock(EntityInstantiator::class);
-        $entityInstantiator->expects(self::any())
-            ->method('instantiate')
-            ->willReturnCallback(function ($class) {
-                return new $class();
-            });
-
         return [
             new PreloadedExtension(
                 [new ScalarObjectType($this->getFormHelper())],
-                [
-                    FormType::class => [
-                        new CustomizeFormDataExtension(
-                            $customizationProcessor,
-                            $this->createMock(CustomizeFormDataHandler::class)
-                        ),
-                        new EmptyDataExtension($entityInstantiator)
-                    ]
-                ]
+                $this->getApiTypeExtensions()
             )
         ];
     }

@@ -629,9 +629,29 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'default'               => [
                     'request_type' => []
                 ],
+                'rest_plain'            => [
+                    'file_name'    => 'api_rest_plain.yml',
+                    'request_type' => ['rest', '!json_api']
+                ],
+                'plain'                 => [
+                    'file_name'    => 'api_plain.yml',
+                    'request_type' => ['!json_api']
+                ],
                 'test'                  => [
                     'file_name'    => 'api_test.yml',
                     'request_type' => ['test']
+                ],
+                'test_plain'            => [
+                    'file_name'    => 'api_test_plain.yml',
+                    'request_type' => ['test', '!json_api']
+                ],
+                'test_json_api'         => [
+                    'file_name'    => 'api_test_json_api.yml',
+                    'request_type' => ['test', 'json_api']
+                ],
+                'test_rest'             => [
+                    'file_name'    => 'api_test_rest.yml',
+                    'request_type' => ['test', 'rest']
                 ],
                 'several_request_types' => [
                     'file_name'    => 'api_several_request_types.yml',
@@ -651,15 +671,25 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         if ($devMode) {
             self::assertServiceExists($container, 'oro_api.config_cache_state_registry');
             self::assertServiceExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.rest_plain');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.plain');
             self::assertServiceExists($container, 'oro_api.config_cache_state.test');
-            self::assertServiceExists($container, 'oro_api.config_cache_state.another');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.test_plain');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.test_json_api');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.test_rest');
             self::assertServiceExists($container, 'oro_api.config_cache_state.several_request_types');
+            self::assertServiceExists($container, 'oro_api.config_cache_state.another');
         } else {
             self::assertServiceNotExists($container, 'oro_api.config_cache_state_registry');
             self::assertServiceNotExists($container, 'oro_api.config_cache_state.default');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.rest_plain');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.plain');
             self::assertServiceNotExists($container, 'oro_api.config_cache_state.test');
-            self::assertServiceNotExists($container, 'oro_api.config_cache_state.another');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.test_plain');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.test_json_api');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.test_rest');
             self::assertServiceNotExists($container, 'oro_api.config_cache_state.several_request_types');
+            self::assertServiceNotExists($container, 'oro_api.config_cache_state.another');
         }
         self::assertServiceExists($container, 'oro_api.entity_exclusion_provider_registry');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver_registry');
@@ -668,8 +698,13 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 ['oro_api.config_bag.several_request_types', 'test1&test2'],
+                ['oro_api.config_bag.test_json_api', 'test&json_api'],
+                ['oro_api.config_bag.test_rest', 'test&rest'],
+                ['oro_api.config_bag.test_plain', 'test&!json_api'],
                 ['oro_api.config_bag.test', 'test'],
                 ['oro_api.config_bag.another', 'another'],
+                ['oro_api.config_bag.rest_plain', 'rest&!json_api'],
+                ['oro_api.config_bag.plain', '!json_api'],
                 ['oro_api.config_bag.default', '']
             ],
             $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
@@ -677,7 +712,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceLocator(
             [
                 'oro_api.config_bag.default',
+                'oro_api.config_bag.rest_plain',
+                'oro_api.config_bag.plain',
                 'oro_api.config_bag.test',
+                'oro_api.config_bag.test_plain',
+                'oro_api.config_bag.test_json_api',
+                'oro_api.config_bag.test_rest',
                 'oro_api.config_bag.several_request_types',
                 'oro_api.config_bag.another'
             ],
@@ -688,8 +728,13 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertEquals(
                 [
                     [new Reference('oro_api.config_cache_state.several_request_types'), 'test1&test2'],
+                    [new Reference('oro_api.config_cache_state.test_json_api'), 'test&json_api'],
+                    [new Reference('oro_api.config_cache_state.test_rest'), 'test&rest'],
+                    [new Reference('oro_api.config_cache_state.test_plain'), 'test&!json_api'],
                     [new Reference('oro_api.config_cache_state.test'), 'test'],
                     [new Reference('oro_api.config_cache_state.another'), 'another'],
+                    [new Reference('oro_api.config_cache_state.rest_plain'), 'rest&!json_api'],
+                    [new Reference('oro_api.config_cache_state.plain'), '!json_api'],
                     [new Reference('oro_api.config_cache_state.default'), '']
                 ],
                 $container->getDefinition('oro_api.config_cache_state_registry')->getArgument(0)
@@ -698,8 +743,13 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 ['oro_api.chain_entity_exclusion_provider.several_request_types', 'test1&test2'],
+                ['oro_api.chain_entity_exclusion_provider.test_json_api', 'test&json_api'],
+                ['oro_api.chain_entity_exclusion_provider.test_rest', 'test&rest'],
+                ['oro_api.chain_entity_exclusion_provider.test_plain', 'test&!json_api'],
                 ['oro_api.chain_entity_exclusion_provider.test', 'test'],
                 ['oro_api.chain_entity_exclusion_provider.another', 'another'],
+                ['oro_api.chain_entity_exclusion_provider.rest_plain', 'rest&!json_api'],
+                ['oro_api.chain_entity_exclusion_provider.plain', '!json_api'],
                 ['oro_api.chain_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
@@ -707,7 +757,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceLocator(
             [
                 'oro_api.chain_entity_exclusion_provider.default',
+                'oro_api.chain_entity_exclusion_provider.rest_plain',
+                'oro_api.chain_entity_exclusion_provider.plain',
                 'oro_api.chain_entity_exclusion_provider.test',
+                'oro_api.chain_entity_exclusion_provider.test_plain',
+                'oro_api.chain_entity_exclusion_provider.test_json_api',
+                'oro_api.chain_entity_exclusion_provider.test_rest',
                 'oro_api.chain_entity_exclusion_provider.several_request_types',
                 'oro_api.chain_entity_exclusion_provider.another'
             ],
@@ -715,42 +770,90 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             $container
         );
         self::assertEquals(
-            ['api_several_request_types.yml'],
-            $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getArgument(4)
+            ['api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_rest_plain.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.rest_plain')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_plain.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.plain')->getArgument(4)
         );
         self::assertEquals(
             ['api_test.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.test')->getArgument(4)
         );
         self::assertEquals(
+            ['api_test_plain.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.test_plain')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_test_json_api.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.test_json_api')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_test_rest.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.test_rest')->getArgument(4)
+        );
+        self::assertEquals(
+            ['api_several_request_types.yml'],
+            $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getArgument(4)
+        );
+        self::assertEquals(
             ['api_another.yml'],
             $container->getDefinition('oro_api.entity_alias_resolver.another')->getArgument(4)
         );
-        self::assertEquals(
-            ['api.yml'],
-            $container->getDefinition('oro_api.entity_alias_resolver.default')->getArgument(4)
-        );
         if ($devMode) {
             self::assertEquals(
-                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.several_request_types')]]],
-                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.rest_plain')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.rest_plain')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.plain')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.plain')->getMethodCalls()
             );
             self::assertEquals(
                 [['setConfigCacheState', [new Reference('oro_api.config_cache_state.test')]]],
                 $container->getDefinition('oro_api.entity_alias_resolver.test')->getMethodCalls()
             );
             self::assertEquals(
-                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.another')]]],
-                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.test_plain')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.test_plain')->getMethodCalls()
             );
             self::assertEquals(
-                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.default')]]],
-                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.test_json_api')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.test_json_api')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.test_rest')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.test_rest')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.several_request_types')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+            );
+            self::assertEquals(
+                [['setConfigCacheState', [new Reference('oro_api.config_cache_state.another')]]],
+                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
             );
         } else {
             self::assertEquals(
                 [],
-                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.rest_plain')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.plain')->getMethodCalls()
             );
             self::assertEquals(
                 [],
@@ -758,18 +861,35 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             );
             self::assertEquals(
                 [],
-                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
+                $container->getDefinition('oro_api.entity_alias_resolver.test_plain')->getMethodCalls()
             );
             self::assertEquals(
                 [],
-                $container->getDefinition('oro_api.entity_alias_resolver.default')->getMethodCalls()
+                $container->getDefinition('oro_api.entity_alias_resolver.test_json_api')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.test_rest')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.several_request_types')->getMethodCalls()
+            );
+            self::assertEquals(
+                [],
+                $container->getDefinition('oro_api.entity_alias_resolver.another')->getMethodCalls()
             );
         }
         self::assertEquals(
             [
                 ['oro_api.entity_alias_resolver.several_request_types', 'test1&test2'],
+                ['oro_api.entity_alias_resolver.test_json_api', 'test&json_api'],
+                ['oro_api.entity_alias_resolver.test_rest', 'test&rest'],
+                ['oro_api.entity_alias_resolver.test_plain', 'test&!json_api'],
                 ['oro_api.entity_alias_resolver.test', 'test'],
                 ['oro_api.entity_alias_resolver.another', 'another'],
+                ['oro_api.entity_alias_resolver.rest_plain', 'rest&!json_api'],
+                ['oro_api.entity_alias_resolver.plain', '!json_api'],
                 ['oro_api.entity_alias_resolver.default', '']
             ],
             $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(0)
@@ -777,7 +897,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceLocator(
             [
                 'oro_api.entity_alias_resolver.default',
+                'oro_api.entity_alias_resolver.rest_plain',
+                'oro_api.entity_alias_resolver.plain',
                 'oro_api.entity_alias_resolver.test',
+                'oro_api.entity_alias_resolver.test_plain',
+                'oro_api.entity_alias_resolver.test_json_api',
+                'oro_api.entity_alias_resolver.test_rest',
                 'oro_api.entity_alias_resolver.several_request_types',
                 'oro_api.entity_alias_resolver.another'
             ],
@@ -787,8 +912,13 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 ['oro_api.entity_override_provider.several_request_types', 'test1&test2'],
+                ['oro_api.entity_override_provider.test_json_api', 'test&json_api'],
+                ['oro_api.entity_override_provider.test_rest', 'test&rest'],
+                ['oro_api.entity_override_provider.test_plain', 'test&!json_api'],
                 ['oro_api.entity_override_provider.test', 'test'],
                 ['oro_api.entity_override_provider.another', 'another'],
+                ['oro_api.entity_override_provider.rest_plain', 'rest&!json_api'],
+                ['oro_api.entity_override_provider.plain', '!json_api'],
                 ['oro_api.entity_override_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
@@ -796,7 +926,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceLocator(
             [
                 'oro_api.entity_override_provider.default',
+                'oro_api.entity_override_provider.rest_plain',
+                'oro_api.entity_override_provider.plain',
                 'oro_api.entity_override_provider.test',
+                'oro_api.entity_override_provider.test_plain',
+                'oro_api.entity_override_provider.test_json_api',
+                'oro_api.entity_override_provider.test_rest',
                 'oro_api.entity_override_provider.several_request_types',
                 'oro_api.entity_override_provider.another'
             ],
@@ -1150,7 +1285,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.config_files":'
             . ' The "request_type" options for "test1" and "test2" are duplicated.'
@@ -1177,7 +1312,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.config_files":'
             . ' The "request_type" options for "test2" and "default" are duplicated.'
@@ -1325,30 +1460,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
 
-        self::assertSame(
-            600,
-            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
-        );
-        self::assertSame(
-            600,
-            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
-        );
-        self::assertSame(
-            false,
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
-        );
+        $corsSettingsDef = $container->getDefinition('oro_api.rest.cors_settings');
+        self::assertSame(600, $corsSettingsDef->getArgument(0));
+        self::assertSame([], $corsSettingsDef->getArgument(1));
+        self::assertFalse($corsSettingsDef->getArgument(2));
+        self::assertSame([], $corsSettingsDef->getArgument(3));
+        self::assertSame([], $corsSettingsDef->getArgument(4));
     }
 
     public function testConfigurationForCors()
@@ -1368,29 +1485,26 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
 
+        $corsSettingsDef = $container->getDefinition('oro_api.rest.cors_settings');
         self::assertSame(
             $config['cors']['preflight_max_age'],
-            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['preflight_max_age'],
-            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
+            $corsSettingsDef->getArgument(0)
         );
         self::assertSame(
             $config['cors']['allow_origins'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['allow_headers'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['expose_headers'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
+            $corsSettingsDef->getArgument(1)
         );
         self::assertSame(
             $config['cors']['allow_credentials'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
+            $corsSettingsDef->getArgument(2)
+        );
+        self::assertSame(
+            $config['cors']['allow_headers'],
+            $corsSettingsDef->getArgument(3)
+        );
+        self::assertSame(
+            $config['cors']['expose_headers'],
+            $corsSettingsDef->getArgument(4)
         );
     }
 
@@ -1745,7 +1859,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.batch_api.chunk_size_per_entity.Test\Entity1":'
             . ' Expected int or NULL.'
@@ -1769,7 +1883,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.batch_api.included_data_chunk_size_per_entity.Test\Entity1":'
             . ' Expected int or NULL.'

@@ -3,10 +3,12 @@
 namespace Oro\Bundle\LocaleBundle\Validator\Constraints;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\FallbackTrait;
-use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 /**
  * Custom validator for the localized fallback default value.
@@ -31,14 +33,41 @@ class NotBlankDefaultLocalizedFallbackValueValidator extends ConstraintValidator
     use FallbackTrait;
 
     /**
-     * @param null|Collection|LocalizedFallbackValue[] $value
+     * @param null|Collection|AbstractLocalizedFallbackValue[] $value
      * @param NotBlankDefaultLocalizedFallbackValue|Constraint $constraint
      */
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof NotBlankDefaultLocalizedFallbackValue) {
+            throw new UnexpectedTypeException($constraint, NotBlankDefaultLocalizedFallbackValue::class);
+        }
+
+        if (!$value instanceof Collection) {
+            throw new UnexpectedValueException($value, Collection::class);
+        }
+
         $defaultValue = $this->getDefaultFallbackValue($value);
-        if ($defaultValue === null) {
+        if ($defaultValue === null || $this->isLocalizationEmpty($defaultValue)) {
             $this->context->buildViolation($constraint->errorMessage)->addViolation();
         }
+    }
+
+    /**
+     * @param AbstractLocalizedFallbackValue $localizedFallbackValue
+     *
+     * @return bool
+     */
+    private function isLocalizationEmpty(AbstractLocalizedFallbackValue $localizedFallbackValue): bool
+    {
+        $notEmptyValues = array_filter(
+            [$localizedFallbackValue->getString(), $localizedFallbackValue->getText()],
+            static function ($value) {
+                $value = trim($value);
+
+                return '0' === $value || !empty($value);
+            }
+        );
+
+        return 0 === count($notEmptyValues);
     }
 }

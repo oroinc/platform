@@ -132,11 +132,7 @@ class ActionConfig implements ConfigBagInterface
      */
     public function getField($fieldName)
     {
-        if (!isset($this->fields[$fieldName])) {
-            return null;
-        }
-
-        return $this->fields[$fieldName];
+        return $this->fields[$fieldName] ?? null;
     }
 
     /**

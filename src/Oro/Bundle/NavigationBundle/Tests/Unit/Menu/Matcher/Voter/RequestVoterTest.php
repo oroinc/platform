@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu\Matcher\Voter;
 
 use Oro\Bundle\NavigationBundle\Menu\Matcher\Voter;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestVoterTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,8 +21,9 @@ class RequestVoterTest extends \PHPUnit\Framework\TestCase
             ->method('getUri')
             ->will($this->returnValue($uri));
 
-        $voter = new Voter\RequestVoter();
-        $voter->setRequest($request);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+        $voter = new Voter\RequestVoter($requestStack);
 
         $this->assertTrue($voter->matchItem($itemMock));
     }

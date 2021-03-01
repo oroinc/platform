@@ -198,7 +198,7 @@ class RouteChoiceType extends AbstractType
      */
     private function isParametersAllowed($withoutParametersOnly, Route $route)
     {
-        return !$withoutParametersOnly || strpos($route->getPath(), '{') === false;
+        return !$withoutParametersOnly || !str_contains($route->getPath(), '{');
     }
 
     /**

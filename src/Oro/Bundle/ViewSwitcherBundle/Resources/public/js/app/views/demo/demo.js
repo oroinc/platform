@@ -15,6 +15,10 @@ define(function(require, exports, module) {
     const pageModel = innerPageModelService.getModel();
     pageModel.set(_.pick(config, 'personalDemoUrl', 'projectName'));
 
+    if (config.translations) {
+        window.Translator.fromJSON(config.translations);
+    }
+
     const DeviceSwitcherApp = new DeviceSwitcherView({
         _sourceElement: $('<div class="demo-page" />').appendTo('body'),
         pageModel: pageModel

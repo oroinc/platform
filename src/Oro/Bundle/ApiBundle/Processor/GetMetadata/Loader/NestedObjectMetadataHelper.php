@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\FakeEntity;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Provides methods to build metadata for nested objects.
@@ -58,8 +59,7 @@ class NestedObjectMetadataHelper
             if (!$inheritData) {
                 throw new RuntimeException(sprintf(
                     'The "data_class" form option should be specified for the nested object'
-                    . ' when the "inherit_data" form option is not specified.'
-                    . ' Field: %s::%s.',
+                    . ' when the "inherit_data" form option is not specified. Field: %s::%s.',
                     $entityClass,
                     $fieldName
                 ));
@@ -113,7 +113,10 @@ class NestedObjectMetadataHelper
         $targetFieldName,
         EntityDefinitionFieldConfig $targetField
     ) {
-        $linkedField = $parentConfig->findField($targetField->getPropertyPath($targetFieldName), true);
+        $propertyPath = $targetField->getPropertyPath($targetFieldName);
+        $linkedField = ConfigUtil::IGNORE_PROPERTY_PATH !== $propertyPath
+            ? $parentConfig->findField($propertyPath, true)
+            : $targetField;
         if (null === $linkedField) {
             throw new RuntimeException(sprintf(
                 'The "%s" property path is not supported for the nested object.'

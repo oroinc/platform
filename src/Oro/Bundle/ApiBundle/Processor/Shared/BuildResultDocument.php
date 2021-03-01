@@ -87,12 +87,21 @@ abstract class BuildResultDocument implements ProcessorInterface
 
         $this->logger->error(
             sprintf('Building of the result document failed.'),
-            [
-                'exception' => $e,
-                'action'    => $context->getAction(),
-                'entity'    => $context->getClassName()
-            ]
+            array_merge(['exception' => $e], $this->getExceptionLoggingContext($context))
         );
+    }
+
+    /**
+     * @param Context $context
+     *
+     * @return array [key => value, ...]
+     */
+    protected function getExceptionLoggingContext(Context $context): array
+    {
+        return [
+            'action' => $context->getAction(),
+            'entity' => $context->getClassName()
+        ];
     }
 
     /**

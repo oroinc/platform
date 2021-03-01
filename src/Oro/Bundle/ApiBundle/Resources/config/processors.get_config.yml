@@ -36,7 +36,7 @@ services:
             - '@oro_api.complete_definition_helper.custom_data_type'
             - '@oro_api.entity_exclusion_provider_registry'
             - '@oro_api.expanded_association_extractor'
-            - '@oro_entity_config.config_manager'
+            - '@oro_api.entity_field_filtering_helper'
 
     oro_api.complete_definition_helper.object:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteObjectDefinitionHelper
@@ -196,6 +196,11 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
+    oro_api.get_config.update_field_exclusions:
+        class: Oro\Bundle\ApiBundle\Processor\GetConfig\UpdateFieldExclusions
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', requested_exclusion_policy: all, priority: -70 }
+
     oro_api.get_config.complete_filters:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters
         arguments:
@@ -265,6 +270,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\SetDataTransformers
         arguments:
             - '@oro_api.data_transformer_registry'
+            - '@oro_api.post_processor_registry'
             - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: 'data_transformers&!identifier_fields_only&!descriptions', priority: -160 }

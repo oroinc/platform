@@ -75,8 +75,8 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['en' => 'en']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en']);
 
         $this->dumper->dumpTranslations();
     }
@@ -106,7 +106,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test');
 
         $this->languageProvider->expects($this->never())
-            ->method('getAvailableLanguages');
+            ->method('getAvailableLanguageCodes');
 
         $this->dumper->dumpTranslations(['en_US']);
     }

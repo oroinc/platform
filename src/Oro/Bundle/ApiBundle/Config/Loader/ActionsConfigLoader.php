@@ -30,10 +30,12 @@ class ActionsConfigLoader extends AbstractConfigLoader
     ];
 
     private const FIELD_METHOD_MAP = [
-        ConfigUtil::DIRECTION    => 'setDirection',
-        ConfigUtil::FORM_TYPE    => 'setFormType',
-        ConfigUtil::FORM_OPTIONS => 'setFormOptions',
-        ConfigUtil::EXCLUDE      => 'setExcluded'
+        ConfigUtil::DIRECTION              => 'setDirection',
+        ConfigUtil::FORM_TYPE              => 'setFormType',
+        ConfigUtil::FORM_OPTIONS           => 'setFormOptions',
+        ConfigUtil::EXCLUDE                => 'setExcluded',
+        ConfigUtil::POST_PROCESSOR         => 'setPostProcessor',
+        ConfigUtil::POST_PROCESSOR_OPTIONS => 'setPostProcessorOptions'
     ];
 
     /** @var StatusCodesConfigLoader */

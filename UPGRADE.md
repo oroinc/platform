@@ -4,7 +4,8 @@ Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes i
 
 ## FROM 4.1.0 to 4.2.0
 
-The minimum required PHP version is 7.4.11.
+* The minimum required PHP version is 7.4.14.
+* The minimum supported MySQL version is 8.0.
 
 ### Directory structure and filesystem changes
 

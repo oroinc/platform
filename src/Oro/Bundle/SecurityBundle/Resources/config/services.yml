@@ -436,6 +436,13 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
+    oro_security.roles_change_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener
+        calls:
+            - [ 'addSupportedClass', [ 'Oro\Bundle\UserBundle\Entity\User'] ]
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+
     oro_security.token.factory.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
         public: true
@@ -816,10 +823,10 @@ services:
         decorates: fos_rest.exception_listener
         parent: fos_rest.exception_listener
 
-    oro_security.twig_exception_listener:
-        class: Oro\Bundle\SecurityBundle\EventListener\ExceptionListener
-        decorates: twig.exception_listener
-        parent: twig.exception_listener
+    oro_security.error_listener:
+        class: Oro\Bundle\SecurityBundle\EventListener\ErrorListener
+        decorates: exception_listener
+        parent: exception_listener
 
     oro_security.action.generate_uuid:
         class: 'Oro\Bundle\SecurityBundle\Action\GenerateUuidAction'

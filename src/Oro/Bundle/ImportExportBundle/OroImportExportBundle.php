@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ConsumptionExtensionCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
@@ -35,6 +36,7 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new WriterCompilerPass());
         $container->addCompilerPass(new ReaderCompilerPass());
         $container->addCompilerPass(new ImportExportConfigurationRegistryCompilerPass());
+        $container->addCompilerPass(new ConsumptionExtensionCompilerPass());
     }
 
     /**

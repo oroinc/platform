@@ -725,7 +725,7 @@ abstract class WebTestCase extends BaseWebTestCase
      * @return Client
      * @throws \BadMethodCallException
      */
-    public static function getClientInstance()
+    protected static function getClientInstance()
     {
         if (!self::$clientInstance) {
             throw new \BadMethodCallException('Client instance is not initialized.');
@@ -1065,6 +1065,51 @@ abstract class WebTestCase extends BaseWebTestCase
         $message .= PHP_EOL . $response->headers;
 
         \PHPUnit\Framework\TestCase::assertTrue($response->headers->contains('Content-Type', $contentType), $message);
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     * @param mixed    $expectedValue
+     */
+    protected static function assertResponseHeader(Response $response, string $headerName, string $expectedValue): void
+    {
+        self::assertEquals(
+            $expectedValue,
+            $response->headers->get($headerName),
+            sprintf('"%s" response header', $headerName)
+        );
+    }
+
+    /**
+     * Asserts the given response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $headerName
+     */
+    protected static function assertResponseHeaderNotExists(Response $response, string $headerName): void
+    {
+        self::assertFalse(
+            $response->headers->has($headerName),
+            sprintf('"%s" header should not exist in the response', $headerName)
+        );
+    }
+
+    /**
+     * Asserts "Allow" response header equals to the expected value.
+     *
+     * @param Response $response
+     * @param string   $expectedAllowedMethods
+     * @param string   $message
+     */
+    protected static function assertAllowResponseHeader(
+        Response $response,
+        string $expectedAllowedMethods,
+        string $message = ''
+    ): void {
+        self::assertEquals($expectedAllowedMethods, $response->headers->get('Allow'), $message);
     }
 
     /**

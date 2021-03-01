@@ -25,14 +25,14 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function buildItem(ItemInterface $item, array $options)
+    public function buildItem(ItemInterface $item, array $options): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildOptions(array $options = [])
+    public function buildOptions(array $options): array
     {
         if (!empty($options['route']) && $this->getExtraOption($options, 'isAllowed', true)) {
             $params = $this->getOption($options, 'routeParameters', []);

@@ -113,8 +113,8 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['locale1', 'currentLocale']);
 
         $this->command->run($this->input, $this->output);
 
@@ -144,8 +144,8 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn(['locale1' => 'locale1', 'currentLocale' => 'currentLocale']);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['locale1', 'currentLocale']);
 
         $this->translator->expects($this->exactly(2))->method('rebuildCache');
 

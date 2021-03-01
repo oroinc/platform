@@ -12,7 +12,7 @@ interface EntityOverrideProviderInterface
      *
      * @param string $entityClass
      *
-     * @return string|null The class name that substitute the given class name
+     * @return string|null The class name that substitutes the given class name
      *                     or NULL if there is no substitution
      */
     public function getSubstituteEntityClass(string $entityClass): ?string;

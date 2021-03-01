@@ -16,7 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  * * filters
  * * identifier field
  * * "createdAt" and "updatedAt" fields
- * * ownership fields such as "owner" and "organization".
+ * * ownership fields such as "owner" and "organization"
  * * fields for entities represent enumerations
  * By performance reasons all these actions are done in one processor.
  */

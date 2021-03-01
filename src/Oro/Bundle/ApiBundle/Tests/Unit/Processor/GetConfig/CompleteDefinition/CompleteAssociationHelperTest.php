@@ -75,7 +75,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
     public function completeAssociationDataProvider()
     {
         return [
-            'without config extras'                 => [
+            'without config extras'                        => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -114,7 +114,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'collapse = true'                       => [
+            'collapse = true'                              => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -154,7 +154,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'collapse = false'                      => [
+            'collapse = false'                             => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -190,7 +190,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                 ],
                 'expectedExtras' => [new EntityDefinitionConfigExtra()]
             ],
-            'with ExpandRelatedEntitiesConfigExtra' => [
+            'with ExpandRelatedEntitiesConfigExtra'        => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -232,7 +232,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'with target class'                     => [
+            'with target class'                            => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -272,7 +272,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'without fields'                        => [
+            'without fields'                               => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -310,7 +310,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'with id field names'                   => [
+            'with id field names'                          => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -371,7 +371,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                 ],
                 'expectedExtras' => [new EntityDefinitionConfigExtra()]
             ],
-            'with exclusion_policy=all'             => [
+            'with exclusion_policy=all'                    => [
                 'config'         => [
                     'fields' => [
                         'association' => [
@@ -405,6 +405,176 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     ]
                 ],
                 'expectedExtras' => [new EntityDefinitionConfigExtra()]
+            ],
+            'with form options'                            => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'fields' => [
+                                'id'   => null,
+                                'name' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'fields' => [
+                        'name' => [
+                            'form_type'    => 'form_type2',
+                            'form_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'           => [
+                                'id'   => null,
+                                'name' => [
+                                    'form_type'    => 'form_type2',
+                                    'form_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                                ]
+                            ],
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\TargetEntity',
+                            'collapse'         => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'with form options in source config'           => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'fields' => [
+                                'id'   => null,
+                                'name' => [
+                                    'form_type'    => 'form_type1',
+                                    'form_options' => ['option1' => 'value1', 'option2' => 'value2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'fields' => [
+                        'name' => [
+                            'form_type'    => 'form_type2',
+                            'form_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'           => [
+                                'id'   => null,
+                                'name' => [
+                                    'form_type'    => 'form_type1',
+                                    'form_options' => ['option1' => 'value1', 'option2' => 'value2']
+                                ]
+                            ],
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\TargetEntity',
+                            'collapse'         => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'with post processor options'                  => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'fields' => [
+                                'id'   => null,
+                                'name' => null
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'fields' => [
+                        'name' => [
+                            'post_processor'         => 'post_processor2',
+                            'post_processor_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'           => [
+                                'id'   => null,
+                                'name' => [
+                                    'post_processor'         => 'post_processor2',
+                                    'post_processor_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                                ]
+                            ],
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\TargetEntity',
+                            'collapse'         => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
+            ],
+            'with post processor options in source config' => [
+                'config'         => [
+                    'fields' => [
+                        'association' => [
+                            'fields' => [
+                                'id'   => null,
+                                'name' => [
+                                    'post_processor'         => 'post_processor1',
+                                    'post_processor_options' => ['option1' => 'value1', 'option2' => 'value2']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'targetConfig'   => [
+                    'fields' => [
+                        'name' => [
+                            'post_processor'         => 'post_processor2',
+                            'post_processor_options' => ['option1' => 'value1_new', 'option3' => 'value3_new']
+                        ]
+                    ]
+                ],
+                'extras'         => [],
+                'expectedConfig' => [
+                    'fields' => [
+                        'association' => [
+                            'fields'           => [
+                                'id'   => null,
+                                'name' => [
+                                    'post_processor'         => 'post_processor1',
+                                    'post_processor_options' => ['option1' => 'value1', 'option2' => 'value2']
+                                ]
+                            ],
+                            'exclusion_policy' => 'all',
+                            'target_class'     => 'Test\TargetEntity',
+                            'collapse'         => true
+                        ]
+                    ]
+                ],
+                'expectedExtras' => [
+                    new FilterIdentifierFieldsConfigExtra(),
+                    new EntityDefinitionConfigExtra()
+                ]
             ]
         ];
     }
@@ -555,10 +725,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                         ],
                         'fields'           => [
                             'field11' => [
-                                'property_path' => 'field2',
-                                'form_options'  => [
-                                    'mapped' => false
-                                ]
+                                'property_path' => 'field2'
                             ]
                         ],
                         'property_path'    => ConfigUtil::IGNORE_PROPERTY_PATH,
