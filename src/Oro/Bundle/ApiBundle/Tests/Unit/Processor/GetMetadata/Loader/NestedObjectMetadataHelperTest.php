@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */
@@ -262,6 +265,25 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
             $targetField
         );
         self::assertSame($linkedField, $result);
+    }
+
+    public function testGetLinkedFieldFoComputedField()
+    {
+        $parentConfig = new EntityDefinitionConfig();
+        $parentClassName = 'Test\ParentClass';
+        $parentFieldName = 'parentField';
+        $targetFieldName = 'targetField';
+        $targetField = new EntityDefinitionFieldConfig();
+        $targetField->setPropertyPath('_');
+
+        $result = $this->nestedObjectMetadataHelper->getLinkedField(
+            $parentConfig,
+            $parentClassName,
+            $parentFieldName,
+            $targetFieldName,
+            $targetField
+        );
+        self::assertSame($targetField, $result);
     }
 
     public function testSetTargetPropertyPathWhenFormPropertyPathEqualsToFieldName()

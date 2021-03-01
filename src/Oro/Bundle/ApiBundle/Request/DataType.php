@@ -22,7 +22,8 @@ final class DataType
     public const DATETIME         = 'datetime';
     public const DATE             = 'date';
     public const TIME             = 'time';
-    public const PERCENT          = 'percent';
+    public const PERCENT          = 'percent'; // a percentage value, 100% equals to 1
+    public const PERCENT_100      = 'percent_100'; // a percentage value multiplied by 100, 100% equals to 100
     public const MONEY            = 'money';
     public const DURATION         = 'duration';
     public const GUID             = 'guid';

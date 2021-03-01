@@ -201,7 +201,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     {
         $data = array_map(
             function ($value) {
-                if ($value === '') {
+                if (is_string($value) && trim($value) === '') {
                     return null;
                 }
 

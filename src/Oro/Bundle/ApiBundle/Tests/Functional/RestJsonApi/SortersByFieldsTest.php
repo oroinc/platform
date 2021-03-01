@@ -153,6 +153,10 @@ class SortersByFieldsTest extends RestJsonApiTestCase
                 '-fieldPercent',
                 $expectedRowsDefault
             ],
+            'by percent_100 field'     => [
+                '-fieldPercent100',
+                $expectedRowsDefault
+            ],
             'by money field'           => [
                 '-fieldMoney',
                 $expectedRowsSortedByMoney

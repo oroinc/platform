@@ -5,11 +5,14 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\ORM\QueryBuilder;
 
 /**
- * Abstract implementation of bulk insert query executor
+ * Abstract implementation of bulk insert query executor.
+ *
+ * @deprecated Implement InsertQueryExecutorInterface, current Abstract implementation is empty and will be removed.
  */
 abstract class AbstractInsertQueryExecutor implements InsertQueryExecutorInterface
 {
     /**
+     * @deprecated
      * @var array
      */
     protected $tablesColumns;
@@ -33,30 +36,13 @@ abstract class AbstractInsertQueryExecutor implements InsertQueryExecutorInterfa
     abstract public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder): int;
 
     /**
+     * @deprecated use NativeQueryExecutorHelper::getColumns instead
      * @param string $className
      * @param array $fields
      * @return array
      */
     protected function getColumns($className, array $fields)
     {
-        $result = [];
-
-        foreach ($fields as $field) {
-            if (!isset($this->tablesColumns[$className][$field])) {
-                $classMetadata = $this->helper->getClassMetadata($className);
-                if (!$classMetadata->hasField($field) && !$classMetadata->hasAssociation($field)) {
-                    throw new \InvalidArgumentException(sprintf('Field %s is not known for %s', $field, $className));
-                }
-                if ($classMetadata->hasAssociation($field)) {
-                    $mapping = $classMetadata->getAssociationMapping($field);
-                    $this->tablesColumns[$className][$field] = array_shift($mapping['joinColumnFieldNames']);
-                } else {
-                    $this->tablesColumns[$className][$field] = $classMetadata->getColumnName($field);
-                }
-            }
-            $result[] = $this->tablesColumns[$className][$field];
-        }
-
-        return $result;
+        return $this->helper->getColumns($className, $fields);
     }
 }

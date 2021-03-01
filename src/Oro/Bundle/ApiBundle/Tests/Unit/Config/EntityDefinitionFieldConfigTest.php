@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
@@ -330,6 +331,42 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->addFormConstraint(new NotBlank());
         self::assertEquals(['constraints' => [new NotNull(), new NotBlank()]], $config->getFormOptions());
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
+    }
+
+    public function testPostProcessor()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertFalse($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+
+        $config->setPostProcessor('test');
+        self::assertTrue($config->hasPostProcessor());
+        self::assertEquals('test', $config->getPostProcessor());
+        self::assertEquals(['post_processor' => 'test'], $config->toArray());
+
+        $config->setPostProcessor(null);
+        self::assertTrue($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+        self::assertEquals(['post_processor' => null], $config->toArray());
+
+        $config->removePostProcessor();
+        self::assertFalse($config->hasPostProcessor());
+        self::assertNull($config->getPostProcessor());
+        self::assertEquals([], $config->toArray());
+    }
+
+    public function testPostProcessorOptions()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertNull($config->getPostProcessorOptions());
+
+        $config->setPostProcessorOptions(['key' => 'val']);
+        self::assertEquals(['key' => 'val'], $config->getPostProcessorOptions());
+        self::assertEquals(['post_processor_options' => ['key' => 'val']], $config->toArray());
+
+        $config->setPostProcessorOptions(null);
+        self::assertNull($config->getPostProcessorOptions());
+        self::assertEquals([], $config->toArray());
     }
 
     public function testSetDataTransformers()

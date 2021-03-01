@@ -15,7 +15,7 @@ Retrieve a collection of business unit records.
 {@inheritdoc}
 
 ### create
-    
+
 Create a new business unit record.
 
 The created record is returned in the response.
@@ -108,7 +108,7 @@ Example:
 
 ### delete
 
-Delete a specific business unit record
+Delete a specific business unit record.
 
 {@inheritdoc}
 
@@ -132,9 +132,7 @@ Delete a collection of business unit records.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ## SUBRESOURCES
 

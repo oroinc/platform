@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslationUsers;
+use Symfony\Component\Intl\Locales;
 
 class LanguageControllerTest extends WebTestCase
 {
@@ -20,21 +21,22 @@ class LanguageControllerTest extends WebTestCase
         $this->loadFixtures([LoadLanguages::class]);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_language_index'));
 
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        static::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         static::assertStringContainsString('oro-translation-language-grid', $crawler->html());
 
-        $languages = $this->getContainer()->get('oro_translation.provider.language')->getAvailableLanguages();
+        $languages = static::getContainer()->get('oro_translation.provider.language')
+            ->getAvailableLanguagesByCurrentUser();
+        $languagesCount = \count($languages);
 
-        $result = $this->getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
-        $this->assertCount(1, $result['data']);
+        $result = static::getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
+        static::assertCount($languagesCount, $result['data']);
 
-        $data = array_shift($result['data']);
-
-        $this->assertArrayHasKey('language', $data);
-        $this->assertEquals($languages[LoadLanguages::LANGUAGE3], $data['language']);
+        for ($i = 0; $i < $languagesCount; $i ++) {
+            static::assertEquals(Locales::getName($languages[$i]->getCode(), 'en'), $result['data'][$i]['language']);
+        }
     }
 }

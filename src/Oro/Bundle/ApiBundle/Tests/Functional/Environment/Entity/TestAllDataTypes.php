@@ -142,6 +142,27 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
     public $fieldPercent;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_100", type="percent", nullable=true)
+     */
+    public $fieldPercent100;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_round", type="percent", nullable=true)
+     */
+    public $fieldPercentRound;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="field_percent_100_round", type="percent", nullable=true)
+     */
+    public $fieldPercent100Round;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="field_money", type="money", nullable=true)

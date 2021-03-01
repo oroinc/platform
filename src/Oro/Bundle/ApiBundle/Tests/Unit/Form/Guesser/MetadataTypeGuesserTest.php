@@ -1122,6 +1122,89 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGuessTypeForAssociationContainsNestedObjectWithInheritDataAndNotMapped()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            false,
+            'array'
+        );
+        $metadata->addAssociation($associationMetadata);
+
+        $targetMetadata = new EntityMetadata();
+        $targetMetadata->setClassName('Test\TargetEntity');
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY);
+        $associationConfig->setDataType('nestedObject');
+        $associationConfig->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $associationConfig->setFormOptions(['inherit_data' => true, 'mapped' => false]);
+        $associationTargetConfig = $associationConfig->getOrCreateTargetEntity();
+        $associationTargetConfig->addField('childField');
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
+        self::assertEquals(
+            new TypeGuess(
+                CompoundObjectType::class,
+                [
+                    'inherit_data'    => true,
+                    'metadata'        => $targetMetadata,
+                    'config'          => $associationTargetConfig,
+                    'mapped'          => false,
+                    'children_mapped' => false
+                ],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
+    public function testGuessTypeForAssociationContainsNestedObjectWithNotInheritDataAndNotMapped()
+    {
+        $metadata = new EntityMetadata();
+        $metadata->setClassName(self::TEST_CLASS);
+        $associationMetadata = $this->createAssociationMetadata(
+            self::TEST_PROPERTY,
+            'Test\TargetEntity',
+            false,
+            'array'
+        );
+        $metadata->addAssociation($associationMetadata);
+
+        $targetMetadata = new EntityMetadata();
+        $targetMetadata->setClassName('Test\TargetEntity');
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $config = new EntityDefinitionConfig();
+        $associationConfig = $config->addField(self::TEST_PROPERTY);
+        $associationConfig->setDataType('nestedObject');
+        $associationConfig->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+        $associationConfig->setFormOptions(['data_class' => 'Test\TargetEntity', 'mapped' => false]);
+        $associationTargetConfig = $associationConfig->getOrCreateTargetEntity();
+        $associationTargetConfig->addField('childField');
+
+        $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
+        $this->typeGuesser->setConfigAccessor($this->getConfigAccessor(self::TEST_CLASS, $config));
+        self::assertEquals(
+            new TypeGuess(
+                CompoundObjectType::class,
+                [
+                    'data_class' => 'Test\TargetEntity',
+                    'metadata'   => $targetMetadata,
+                    'config'     => $associationTargetConfig,
+                    'mapped'     => false
+                ],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
+            $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
+        );
+    }
+
     public function testGuessTypeForAssociationContainsNestedObjectWithoutFormOptions()
     {
         $metadata = new EntityMetadata();

@@ -391,17 +391,14 @@ trait MenuUpdateTrait
      */
     public function prePersist()
     {
-        if ($this->key === null) {
-            $this->key = $this->generateKey();
-        }
+        $this->generateKey();
     }
 
-    /**
-     * @return string
-     */
-    private function generateKey()
+    public function generateKey()
     {
-        return uniqid('menu_item_');
+        if ($this->key === null) {
+            $this->key = uniqid('menu_item_');
+        }
     }
 
     /**

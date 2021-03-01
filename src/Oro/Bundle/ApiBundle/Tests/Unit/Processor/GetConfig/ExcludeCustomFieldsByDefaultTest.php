@@ -20,12 +20,8 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject([]));
         $this->processor->process($this->context);
 
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'custom_fields'
-            ],
-            $this->context->getResult()
-        );
+        $this->assertConfig(['exclusion_policy' => 'custom_fields'], $this->context->getResult());
+        self::assertEquals('custom_fields', $this->context->getRequestedExclusionPolicy());
     }
 
     public function testProcessWhenExclusionPolicyIsAlreadySetToAll()
@@ -33,12 +29,8 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'all']));
         $this->processor->process($this->context);
 
-        $this->assertConfig(
-            [
-                'exclusion_policy' => 'all'
-            ],
-            $this->context->getResult()
-        );
+        $this->assertConfig(['exclusion_policy' => 'all'], $this->context->getResult());
+        self::assertNull($this->context->getRequestedExclusionPolicy());
     }
 
     public function testProcessWhenExclusionPolicyIsAlreadySetToNone()
@@ -46,9 +38,16 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'none']));
         $this->processor->process($this->context);
 
-        $this->assertConfig(
-            [],
-            $this->context->getResult()
-        );
+        $this->assertConfig([], $this->context->getResult());
+        self::assertNull($this->context->getRequestedExclusionPolicy());
+    }
+
+    public function testProcessWhenExclusionPolicyIsAlreadySetToCustomFields()
+    {
+        $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'custom_fields']));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(['exclusion_policy' => 'custom_fields'], $this->context->getResult());
+        self::assertNull($this->context->getRequestedExclusionPolicy());
     }
 }

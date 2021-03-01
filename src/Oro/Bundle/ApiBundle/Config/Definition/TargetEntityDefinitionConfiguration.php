@@ -7,7 +7,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
- * The base class for "entities" and "relations" configuration section builders.
+ * The base class for "entities" configuration section builder.
  */
 class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
 {
@@ -164,9 +164,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                         if (\is_array($v)) {
                             return $v;
                         }
-                        throw new \InvalidArgumentException(
-                            'The value must be a string or an array.'
-                        );
+                        throw new \InvalidArgumentException('The value must be a string or an array.');
                     })
                 ->end()
             ->end();
@@ -210,6 +208,12 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
                 ->performNoDeepMerging()
                 ->prototype('variable')->end()
             ->end()
+            ->scalarNode(ConfigUtil::POST_PROCESSOR)->end()
+            ->arrayNode(ConfigUtil::POST_PROCESSOR_OPTIONS)
+                ->useAttributeAsKey('')
+                ->performNoDeepMerging()
+                ->prototype('variable')->end()
+            ->end()
             ->arrayNode(ConfigUtil::DEPENDS_ON)
                 ->prototype('scalar')->end()
             ->end();
@@ -227,6 +231,12 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         }
         if (empty($config[ConfigUtil::FORM_OPTIONS])) {
             unset($config[ConfigUtil::FORM_OPTIONS]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR])) {
+            unset($config[ConfigUtil::POST_PROCESSOR]);
+        }
+        if (empty($config[ConfigUtil::POST_PROCESSOR_OPTIONS])) {
+            unset($config[ConfigUtil::POST_PROCESSOR_OPTIONS]);
         }
         if (!empty($config[ConfigUtil::TARGET_TYPE]) && ConfigUtil::COLLECTION === $config[ConfigUtil::TARGET_TYPE]) {
             $config[ConfigUtil::TARGET_TYPE] = ConfigUtil::TO_MANY;

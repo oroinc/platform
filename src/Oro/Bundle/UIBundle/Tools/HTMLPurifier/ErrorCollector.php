@@ -17,6 +17,14 @@ class ErrorCollector extends \HTMLPurifier_ErrorCollector
     {
         $errorsList = [];
         foreach ($this->lines as $line => $column) {
+            if ($column instanceof \HTMLPurifier_ErrorStruct) {
+                $line = $line < 0 ? 0 : $line;
+                $place = substr($value, $line, self::LENGTH);
+                $this->getErrors($errorsList, $column, $place);
+
+                continue;
+            }
+
             foreach ($column as $col => $struct) {
                 $place = substr($value, $col, self::LENGTH);
                 $this->getErrors($errorsList, $struct, $place);

@@ -330,6 +330,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $table->addColumn('field_time', 'time', ['notnull' => false]);
         $table->addColumn('field_guid', 'guid', ['notnull' => false]);
         $table->addColumn('field_percent', 'percent', ['notnull' => false]);
+        $table->addColumn('field_percent_100', 'percent', ['notnull' => false]);
+        $table->addColumn('field_percent_round', 'percent', ['notnull' => false]);
+        $table->addColumn('field_percent_100_round', 'percent', ['notnull' => false]);
         $table->addColumn('field_money', 'money', ['notnull' => false]);
         $table->addColumn('field_duration', 'duration', ['notnull' => false]);
         $table->addColumn('field_money_value', 'money_value', ['notnull' => false]);

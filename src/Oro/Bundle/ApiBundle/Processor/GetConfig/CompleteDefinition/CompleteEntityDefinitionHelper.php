@@ -19,10 +19,8 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * The helper class to complete the configuration of API resource based on ORM entity.
@@ -52,8 +50,8 @@ class CompleteEntityDefinitionHelper
     /** @var ExpandedAssociationExtractor */
     private $expandedAssociationExtractor;
 
-    /** @var ConfigManager */
-    private $configManager;
+    /** @var EntityFieldFilteringHelper */
+    private $entityFieldFilteringHelper;
 
     /**
      * @param DoctrineHelper                 $doctrineHelper
@@ -63,7 +61,7 @@ class CompleteEntityDefinitionHelper
      * @param CompleteCustomDataTypeHelper   $customDataTypeHelper
      * @param ExclusionProviderRegistry      $exclusionProviderRegistry
      * @param ExpandedAssociationExtractor   $expandedAssociationExtractor
-     * @param ConfigManager                  $configManager
+     * @param EntityFieldFilteringHelper     $entityFieldFilteringHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -73,7 +71,7 @@ class CompleteEntityDefinitionHelper
         CompleteCustomDataTypeHelper $customDataTypeHelper,
         ExclusionProviderRegistry $exclusionProviderRegistry,
         ExpandedAssociationExtractor $expandedAssociationExtractor,
-        ConfigManager $configManager
+        EntityFieldFilteringHelper $entityFieldFilteringHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
@@ -82,7 +80,7 @@ class CompleteEntityDefinitionHelper
         $this->customDataTypeHelper = $customDataTypeHelper;
         $this->exclusionProviderRegistry = $exclusionProviderRegistry;
         $this->expandedAssociationExtractor = $expandedAssociationExtractor;
-        $this->configManager = $configManager;
+        $this->entityFieldFilteringHelper = $entityFieldFilteringHelper;
     }
 
     /**
@@ -108,7 +106,7 @@ class CompleteEntityDefinitionHelper
             $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
             $skipNotConfiguredCustomFields =
                 $definition->getExclusionPolicy() === ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS
-                && $this->isExtendSystemEntity($entityClass);
+                && $this->entityFieldFilteringHelper->isExtendSystemEntity($entityClass);
             $this->customDataTypeHelper->completeCustomDataTypes($definition, $metadata, $version, $requestType);
             $existingFields = $this->getExistingFields($definition);
             $this->completeUnidirectionalAssociations(
@@ -292,7 +290,7 @@ class CompleteEntityDefinitionHelper
         foreach ($fieldNames as $propertyPath) {
             if ($skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
-                && $this->isCustomField($metadata->name, $propertyPath)
+                && $this->entityFieldFilteringHelper->isCustomField($metadata->name, $propertyPath)
             ) {
                 continue;
             }
@@ -341,7 +339,7 @@ class CompleteEntityDefinitionHelper
         foreach ($associations as $propertyPath => $mapping) {
             if ($skipNotConfiguredCustomFields
                 && !isset($existingFields[$propertyPath])
-                && $this->isCustomAssocation($metadata->name, $propertyPath)
+                && $this->entityFieldFilteringHelper->isCustomAssociation($metadata->name, $propertyPath)
             ) {
                 continue;
             }
@@ -730,62 +728,6 @@ class CompleteEntityDefinitionHelper
             $definition,
             $expandedEntities
         );
-    }
-
-    /**
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    private function isExtendSystemEntity($entityClass)
-    {
-        if (!$this->configManager->hasConfig($entityClass)) {
-            return false;
-        }
-
-        $entityConfig = $this->configManager->getEntityConfig('extend', $entityClass);
-
-        return
-            $entityConfig->is('is_extend')
-            && !$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM);
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    private function isCustomField($entityClass, $fieldName)
-    {
-        if (!$this->configManager->hasConfig($entityClass, $fieldName)) {
-            return false;
-        }
-
-        $fieldConfig = $this->configManager->getFieldConfig('extend', $entityClass, $fieldName);
-
-        return
-            $fieldConfig->is('is_extend')
-            && $fieldConfig->is('owner', ExtendScope::OWNER_CUSTOM);
-    }
-
-    /**
-     * @param string $entityClass
-     * @param string $associationName
-     *
-     * @return bool
-     */
-    private function isCustomAssocation($entityClass, $associationName)
-    {
-        return
-            $this->isCustomField($entityClass, $associationName)
-            || (
-                0 === \strpos($associationName, ExtendConfigDumper::DEFAULT_PREFIX)
-                && $this->isCustomField(
-                    $entityClass,
-                    \substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX))
-                )
-            );
     }
 
     /**

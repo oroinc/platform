@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Command;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Command;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;

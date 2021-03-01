@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -18,6 +19,7 @@ class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context = $this->createContext();
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+        $this->context->setSharedData(new ParameterBag());
     }
 
     /**

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Box\Spout\Common\Type;
-use Box\Spout\Reader\ReaderFactory;
+use Box\Spout\Reader\Common\Creator\ReaderFactory;
 use Box\Spout\Reader\ReaderInterface;
 use Box\Spout\Reader\XLSX\RowIterator;
 use Box\Spout\Reader\XLSX\Sheet;
@@ -57,7 +57,7 @@ class XlsxFileReader extends AbstractFileReader
         $data = $this->rowIterator->current();
         $this->rowIterator->next();
         $context->incrementReadCount();
-        return $data;
+        return $data->toArray();
     }
 
     /**
@@ -79,7 +79,7 @@ class XlsxFileReader extends AbstractFileReader
     {
         parent::initializeByContext($context);
 
-        $this->fileReader = ReaderFactory::create(Type::XLSX);
+        $this->fileReader = ReaderFactory::createFromType(Type::XLSX);
         $this->fileReader->open($this->fileInfo->getPathname());
 
         $sheetIterator = $this->fileReader->getSheetIterator();

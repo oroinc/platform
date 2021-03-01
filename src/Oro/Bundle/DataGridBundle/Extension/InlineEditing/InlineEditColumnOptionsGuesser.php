@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\InlineEditing;
 
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
+use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
@@ -20,6 +21,9 @@ class InlineEditColumnOptionsGuesser
     /** @var ValidatorInterface */
     private $validator;
 
+    /** @var ConstraintConverterInterface */
+    private $constraintConverter;
+
     /**
      * @param iterable|GuesserInterface[] $guessers
      * @param ValidatorInterface          $validator
@@ -28,6 +32,14 @@ class InlineEditColumnOptionsGuesser
     {
         $this->guessers = $guessers;
         $this->validator = $validator;
+    }
+
+    /**
+     * @param ConstraintConverterInterface $constraintConverter
+     */
+    public function setConstraintConverter(ConstraintConverterInterface $constraintConverter): void
+    {
+        $this->constraintConverter = $constraintConverter;
     }
 
     /**
@@ -92,14 +104,16 @@ class InlineEditColumnOptionsGuesser
                 continue;
             }
 
-            $reflectionClass = new \ReflectionClass($constraint);
-            $ruleKey = $reflectionClass->getNamespaceName() === substr(AbstractLoader::DEFAULT_NAMESPACE, 1, -1)
-                ? $reflectionClass->getShortName()
-                : $reflectionClass->getName();
+            $jsConstraint = $this->constraintConverter->convertConstraint($constraint);
+            if (null === $jsConstraint) {
+                continue;
+            }
+
+            $ruleKey = $this->getRuleKey($jsConstraint);
             if (!isset($rules[$ruleKey])) {
-                $rules[$ruleKey] = (array)$constraint;
+                $rules[$ruleKey] = (array)$jsConstraint;
             } elseif (!$this->isDefaultConstraint($rules[$ruleKey])) {
-                $rules[$ruleKey][] = $constraint;
+                $rules[$ruleKey][] = $jsConstraint;
             }
         }
 
@@ -143,5 +157,19 @@ class InlineEditColumnOptionsGuesser
         }
 
         return $constraint->groups;
+    }
+
+    /**
+     * @param Constraint $constraint
+     *
+     * @return string
+     */
+    private function getRuleKey(Constraint $constraint): string
+    {
+        $reflectionClass = new \ReflectionClass($constraint);
+
+        return $reflectionClass->getNamespaceName() === substr(AbstractLoader::DEFAULT_NAMESPACE, 1, -1)
+            ? $reflectionClass->getShortName()
+            : $reflectionClass->getName();
     }
 }

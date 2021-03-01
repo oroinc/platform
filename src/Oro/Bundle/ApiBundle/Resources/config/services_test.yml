@@ -155,6 +155,11 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOrderLineItem, priority: -55 }
 
+    oro_api.tests.customize_loaded_data.compute_percent_100_round_type:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\ComputePercent100RoundType
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, priority: 10 }
+
     oro_api.tests.update_loaded_data_for_overridden_entity:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataForOverriddenEntity
         tags:

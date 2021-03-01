@@ -84,8 +84,7 @@
     .tab-content {
         overflow-x: hidden;
 
-        .mce-tinymce {
-            width: 100%;
+        .tox-tinymce {
             max-width: 516px;
         }
 
@@ -187,8 +186,7 @@
                     input,
                     textarea,
                     .select2-container,
-                    .validate-group,
-                    .mce-tinymce {
+                    .validate-group {
                         width: 100%;
                         max-width: 100%;
                     }

@@ -18,7 +18,7 @@ use Oro\Bundle\InstallerBundle\ScriptManager;
 use Oro\Bundle\LocaleBundle\Command\UpdateLocalizationCommand;
 use Oro\Bundle\LocaleBundle\DependencyInjection\OroLocaleExtension;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
-use Oro\Bundle\TranslationBundle\Command\OroLanguageUpdateCommand;
+use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -635,7 +635,7 @@ HELP
             if (!$input->getOption('skip-download-translations')) {
                 $commandExecutor
                     ->runCommand(
-                        OroLanguageUpdateCommand::getDefaultName(),
+                        OroTranslationUpdateCommand::getDefaultName(),
                         ['--process-isolation' => true, '--all' => true]
                     );
             }

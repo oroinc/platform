@@ -103,6 +103,10 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 new Processor\NormalizeNumber()
             ],
             [
+                $this->addProcessor($builder, 'percent_100', DataType::PERCENT_100),
+                new Processor\NormalizePercent100()
+            ],
+            [
                 $this->addProcessor($builder, 'guid', DataType::GUID),
                 new Processor\NormalizeGuid()
             ],
@@ -166,6 +170,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [Processor\NormalizeDecimal::REQUIREMENT, DataType::MONEY, [RequestType::REST]],
             [Processor\NormalizeNumber::REQUIREMENT, DataType::FLOAT, [RequestType::REST]],
             [Processor\NormalizeNumber::REQUIREMENT, DataType::PERCENT, [RequestType::REST]],
+            [Processor\NormalizePercent100::REQUIREMENT, DataType::PERCENT_100, [RequestType::REST]],
             [Processor\NormalizeGuid::REQUIREMENT, DataType::GUID, [RequestType::REST]],
             [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
             [Processor\Rest\NormalizeDate::REQUIREMENT, DataType::DATE, [RequestType::REST]],
@@ -177,7 +182,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getArrayRequirementProvider
      */
-    public function testGetArrayRequirement($expectedValue, $dataType, $requestType)
+    public function testGetArrayRequirement($expectedValue, $dataType, $requestType): void
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true);
         self::assertSame($expectedValue, $result);
@@ -244,6 +249,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getArrayRequirement(Processor\NormalizeNumber::REQUIREMENT),
                 DataType::PERCENT,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                DataType::PERCENT_100,
                 [RequestType::REST]
             ],
             [
@@ -352,6 +362,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getRangeRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
                 $this->getRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
@@ -457,6 +472,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getArrayRangeRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
                 $this->getArrayRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
@@ -535,6 +555,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [null, null, DataType::FLOAT, [RequestType::REST], false],
             [null, null, DataType::PERCENT, [RequestType::REST], true],
             [null, null, DataType::PERCENT, [RequestType::REST], false],
+            [null, null, DataType::PERCENT_100, [RequestType::REST], true],
+            [null, null, DataType::PERCENT_100, [RequestType::REST], false],
             [null, null, DataType::DATETIME, [RequestType::REST], true],
             [null, null, DataType::DATETIME, [RequestType::REST], false],
             [null, null, DataType::DATE, [RequestType::REST], true],
@@ -707,6 +729,33 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], true],
             [-123.1, '-123.1', DataType::PERCENT, [RequestType::REST], false],
             [[123.1, -456.0], '123.1,-456', DataType::PERCENT, [RequestType::REST], true],
+            [123.1, 123.1, DataType::PERCENT_100, [RequestType::REST], true],
+            [123.1, 123.1, DataType::PERCENT_100, [RequestType::REST], false],
+            [[123.1, 456.1], [123.1, 456.1], DataType::PERCENT_100, [RequestType::REST], true],
+            [[123.1, 456.1], [123.1, 456.1], DataType::PERCENT_100, [RequestType::REST], false],
+            [0.0, '0', DataType::PERCENT_100, [RequestType::REST], true],
+            [0.0, '0', DataType::PERCENT_100, [RequestType::REST], false],
+            [1200.0, '12', DataType::PERCENT_100, [RequestType::REST], true],
+            [1200.0, '12', DataType::PERCENT_100, [RequestType::REST], false],
+            [1.23, '.0123', DataType::PERCENT_100, [RequestType::REST], true],
+            [1.23, '.012300000000001', DataType::PERCENT_100, [RequestType::REST], true],
+            [1.230000000001, '.012300000000009', DataType::PERCENT_100, [RequestType::REST], true],
+            [1.23, '.0123', DataType::PERCENT_100, [RequestType::REST], false],
+            [1.23, '.012300000000001', DataType::PERCENT_100, [RequestType::REST], false],
+            [1.230000000001, '.012300000000009', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1.23, '-.0123', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1.23, '-.012300000000001', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1.230000000001, '-.012300000000009', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1.23, '-.0123', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1.23, '-.012300000000001', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1.230000000001, '-.012300000000009', DataType::PERCENT_100, [RequestType::REST], false],
+            [123.4, '1.234', DataType::PERCENT_100, [RequestType::REST], true],
+            [123.4, '1.234', DataType::PERCENT_100, [RequestType::REST], false],
+            [-1200.0, '-12', DataType::PERCENT_100, [RequestType::REST], true],
+            [-1200.0, '-12', DataType::PERCENT_100, [RequestType::REST], false],
+            [-123.4, '-1.234', DataType::PERCENT_100, [RequestType::REST], true],
+            [-123.4, '-1.234', DataType::PERCENT_100, [RequestType::REST], false],
+            [[123.4, -456.0], '1.234,-4.56', DataType::PERCENT_100, [RequestType::REST], true],
             [
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
                 new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
@@ -1053,6 +1102,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [new Range(0.123, 0.456), '.123...456', DataType::PERCENT],
             [new Range(-0.456, -0.123), '-0.456..-0.123', DataType::PERCENT],
             [new Range(-0.456, -0.123), '-.456..-.123', DataType::PERCENT],
+            [new Range(12, 45), new Range(12, 45), DataType::PERCENT_100],
+            [new Range(123.4, 456.0), '1.234..4.56', DataType::PERCENT_100],
+            [new Range(12.3, 45.6), '.123...456', DataType::PERCENT_100],
+            [new Range(-45.6, -12.3), '-0.456..-0.123', DataType::PERCENT_100],
+            [new Range(-45.6, -12.3), '-.456..-.123', DataType::PERCENT_100],
             [
                 new Range(
                     new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
@@ -1392,6 +1446,36 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                'Expected number value. Given "test".',
+                'test',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "1a".',
+                '1a',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given ".0a".',
+                '.0a',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected number value. Given "-.0a".',
+                '-.0a',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of numbers. Given "1,2a".',
+                '1,2a',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
                 'Expected datetime value. Given "test".',
                 'test',
                 DataType::DATETIME,
@@ -1714,6 +1798,24 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                'Expected number value. Given "test".',
+                'test',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "test..0.1".',
+                'test..0.1',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
+                'Expected a pair of numbers (number..number). Given "0.1..test".',
+                '0.1..test',
+                DataType::PERCENT_100,
+                [RequestType::REST]
+            ],
+            [
                 'Expected datetime value. Given "test".',
                 'test',
                 DataType::DATETIME,
@@ -1819,6 +1921,23 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             }
         } else {
             self::assertSame($expected, $actual, $message);
+            /**
+             * do precise assertion for floats;
+             * it is required due to {@see \PHPUnit\Framework\Constraint\IsIdentical::EPSILON}
+             */
+            if (is_float($expected) && is_float($actual)) {
+                /** @noinspection PhpUnitTestsInspection */
+                self::assertTrue(
+                    $expected === $actual,
+                    sprintf(
+                        'Failed asserting that %s matches expected %s. Delta: %s. %s',
+                        $actual,
+                        $expected,
+                        $expected - $actual,
+                        $message
+                    )
+                );
+            }
         }
     }
 

@@ -11,17 +11,19 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
     private const METHOD_MAP = [
-        ConfigUtil::DATA_TYPE        => 'setDataType',
-        ConfigUtil::PROPERTY_PATH    => 'setPropertyPath',
-        ConfigUtil::FORM_TYPE        => 'setFormType',
-        ConfigUtil::FORM_OPTIONS     => 'setFormOptions',
-        ConfigUtil::TARGET_CLASS     => 'setTargetClass',
-        ConfigUtil::TARGET_TYPE      => 'setTargetType',
-        ConfigUtil::DEPENDS_ON       => 'setDependsOn',
-        ConfigUtil::DESCRIPTION      => 'setDescription',
-        ConfigUtil::EXCLUDE          => 'setExcluded',
-        ConfigUtil::COLLAPSE         => 'setCollapsed',
-        ConfigUtil::DATA_TRANSFORMER => 'setDataTransformers'
+        ConfigUtil::DATA_TYPE              => 'setDataType',
+        ConfigUtil::PROPERTY_PATH          => 'setPropertyPath',
+        ConfigUtil::FORM_TYPE              => 'setFormType',
+        ConfigUtil::FORM_OPTIONS           => 'setFormOptions',
+        ConfigUtil::TARGET_CLASS           => 'setTargetClass',
+        ConfigUtil::TARGET_TYPE            => 'setTargetType',
+        ConfigUtil::DEPENDS_ON             => 'setDependsOn',
+        ConfigUtil::DESCRIPTION            => 'setDescription',
+        ConfigUtil::EXCLUDE                => 'setExcluded',
+        ConfigUtil::COLLAPSE               => 'setCollapsed',
+        ConfigUtil::DATA_TRANSFORMER       => 'setDataTransformers',
+        ConfigUtil::POST_PROCESSOR         => 'setPostProcessor',
+        ConfigUtil::POST_PROCESSOR_OPTIONS => 'setPostProcessorOptions'
     ];
 
     private const TARGET_ENTITY_METHOD_MAP = [

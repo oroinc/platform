@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -45,25 +46,17 @@ class LanguageRepositoryTest extends WebTestCase
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    public function testGetAvailableLanguageCodes()
+    public function testGetAvailableLanguageCodesAsArrayKeys(): void
     {
-        $this->assertEmpty(array_diff(
-            [
-                LoadLanguages::LANGUAGE1,
-                LoadLanguages::LANGUAGE2,
-            ],
-            $this->repository->getAvailableLanguageCodes()
-        ));
-    }
+        $defaultAndLoadedLanguageCodes = \array_merge(
+            [Configuration::DEFAULT_LANGUAGE],
+            \array_keys(LoadLanguages::LANGUAGES)
+        );
 
-    public function testGetEnabledAvailableLanguageCodes()
-    {
-        $this->assertEmpty(array_diff(
-            [
-                LoadLanguages::LANGUAGE2,
-            ],
-            $this->repository->getAvailableLanguageCodes(true)
-        ));
+        static::assertSame(
+            \array_fill_keys($defaultAndLoadedLanguageCodes, true),
+            $this->repository->getAvailableLanguageCodesAsArrayKeys()
+        );
     }
 
     public function testGetAvailableLanguagesByCurrentUser()

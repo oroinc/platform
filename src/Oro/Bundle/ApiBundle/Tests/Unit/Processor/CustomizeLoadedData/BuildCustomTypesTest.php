@@ -3,12 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueTransformer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use Oro\Component\EntitySerializer\DataTransformer;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -21,6 +27,9 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    private $dataTransformer;
+
     /** @var BuildCustomTypes */
     private $processor;
 
@@ -30,8 +39,22 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 
         $this->associationManager = $this->createMock(AssociationManager::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->dataTransformer = $this->createMock(DataTransformerInterface::class);
 
-        $this->processor = new BuildCustomTypes($this->associationManager, $this->doctrineHelper);
+        $this->dataTransformer->expects(self::any())
+            ->method('transform')
+            ->willReturnCallback(function ($value) {
+                return 'transformed: ' . $value;
+            });
+
+        $this->processor = new BuildCustomTypes(
+            $this->associationManager,
+            $this->doctrineHelper,
+            new ValueTransformer(
+                $this->createMock(DataTransformerRegistry::class),
+                new DataTransformer($this->createMock(ContainerInterface::class))
+            )
+        );
     }
 
     public function testProcessWithoutConfig()
@@ -59,6 +82,29 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         self::assertEquals(
             [
                 'field1' => 123
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessPercent100()
+    {
+        $data = [
+            'field1' => 123.4,
+            'field2' => null
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setDataType(DataType::PERCENT_100);
+        $config->addField('field2')->setDataType(DataType::PERCENT_100);
+
+        $this->context->setClassName('Test\Class');
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'field1' => 1.234,
+                'field2' => null
             ],
             $this->context->getResult()
         );
@@ -165,6 +211,101 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $this->context->setResult([]);
         $this->context->setConfig($config);
         $this->processor->process($this->context);
+    }
+
+    public function testProcessNestedObjectWithDataTransformer()
+    {
+        $data = [
+            'field1' => 'val1',
+            'field2' => null,
+            'field3' => 'val3'
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setExcluded();
+        $config->addField('field2')->setExcluded();
+        $config->addField('field3')->setExcluded();
+        $nestedObjectFieldConfig = $config->addField('nestedObjectField');
+        $nestedObjectFieldConfig->setDataType('nestedObject');
+        $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
+        $targetField1 = $nestedObjectFieldTargetConfig->addField('targetField1');
+        $targetField1->setPropertyPath('field1');
+        $targetField1->addDataTransformer($this->dataTransformer);
+        $nestedObjectFieldTargetConfig->addField('targetField2')->setPropertyPath('field2');
+        $excludedTargetField = $nestedObjectFieldTargetConfig->addField('targetField3');
+        $excludedTargetField->setPropertyPath('field3');
+        $excludedTargetField->setExcluded();
+        $nestedObjectFieldTargetConfig->addField('targetField4')->setPropertyPath('field4');
+
+        $this->context->setClassName('Test\Class');
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'field1'            => 'val1',
+                'field2'            => null,
+                'field3'            => 'val3',
+                'nestedObjectField' => [
+                    'targetField1' => 'transformed: val1',
+                    'targetField2' => null,
+                    'targetField4' => null
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessNestedObjectWithEmptyData()
+    {
+        $data = [
+            'field1' => '',
+            'field2' => null,
+            'field3' => '',
+            'field4' => '',
+            'field5' => [],
+            'field6' => []
+        ];
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1')->setExcluded();
+        $config->addField('field2')->setExcluded();
+        $config->addField('field3')->setExcluded();
+        $config->addField('field4')->setExcluded();
+        $config->addField('field5')->setExcluded();
+        $config->addField('field6')->setExcluded();
+        $nestedObjectFieldConfig = $config->addField('nestedObjectField');
+        $nestedObjectFieldConfig->setDataType('nestedObject');
+        $nestedObjectFieldTargetConfig = $nestedObjectFieldConfig->getOrCreateTargetEntity();
+        $nestedObjectFieldTargetConfig->addField('targetField1')->setPropertyPath('field1');
+        $nestedObjectFieldTargetConfig->addField('targetField2')->setPropertyPath('field2');
+        $excludedTargetField = $nestedObjectFieldTargetConfig->addField('targetField3');
+        $excludedTargetField->setPropertyPath('field3');
+        $excludedTargetField->setExcluded();
+        $targetField4 = $nestedObjectFieldTargetConfig->addField('targetField4');
+        $targetField4->setPropertyPath('field4');
+        $targetField4->setDataType('string');
+        $targetField5 = $nestedObjectFieldTargetConfig->addField('targetField5');
+        $targetField5->setPropertyPath('field5');
+        $targetField5->setDataType('object');
+        $targetField6 = $nestedObjectFieldTargetConfig->addField('targetField6');
+        $targetField6->setPropertyPath('field6');
+        $targetField6->setDataType('string[]');
+
+        $this->context->setClassName('Test\Class');
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'field1'            => '',
+                'field2'            => null,
+                'field3'            => '',
+                'field4'            => '',
+                'field5'            => [],
+                'field6'            => [],
+                'nestedObjectField' => null
+            ],
+            $this->context->getResult()
+        );
     }
 
     public function testProcessNestedAssociation()

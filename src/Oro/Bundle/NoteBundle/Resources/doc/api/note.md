@@ -119,9 +119,7 @@ Delete a collection of note records.
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### activityTargets
 
@@ -197,7 +195,7 @@ Retrieve the record of the user who is the owner of a specific note record.
 
 #### get_relationship
 
-Retrieve the ID of a user who is the owner of a specific note record
+Retrieve the ID of a user who is the owner of a specific note record.
 
 #### update_relationship
 

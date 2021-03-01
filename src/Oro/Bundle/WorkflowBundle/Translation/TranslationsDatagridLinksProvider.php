@@ -8,6 +8,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * Prepares links to translations management UI for translating workflow-related labels.
+ */
 class TranslationsDatagridLinksProvider
 {
     /** @var TranslationsDatagridRouteHelper */
@@ -34,7 +37,7 @@ class TranslationsDatagridLinksProvider
     public function getWorkflowTranslateLinks(WorkflowDefinition $definition)
     {
         // translate links are available only if any language is available for current user
-        if (!$definition->getName() || 0 === count($this->languageProvider->getAvailableLanguages())) {
+        if (!$definition->getName() || 0 === count($this->languageProvider->getAvailableLanguageCodes())) {
             return [];
         }
 

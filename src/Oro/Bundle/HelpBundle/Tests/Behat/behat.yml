@@ -1,4 +1,11 @@
 oro_behat_extension:
+  suites:
+    OroHelpBundle:
+      contexts:
+        - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
+      paths:
+        - '@OroHelpBundle/Tests/Behat/Features'
+
   elements:
     Help Icon:
       selector: a.help

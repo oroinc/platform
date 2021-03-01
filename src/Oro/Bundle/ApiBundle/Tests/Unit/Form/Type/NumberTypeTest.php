@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\Type\NumberType;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 
-class NumberTypeTest extends TypeTestCase
+class NumberTypeTest extends ApiFormTypeTestCase
 {
     /**
      * @dataProvider validValuesDataProvider

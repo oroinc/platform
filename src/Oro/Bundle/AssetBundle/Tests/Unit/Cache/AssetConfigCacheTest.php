@@ -5,6 +5,7 @@ namespace Oro\Bundle\AssetBundle\Tests\Unit\Cache;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -24,6 +25,15 @@ class AssetConfigCacheTest extends TestCase
         $kernel->expects($this->once())
             ->method('getBundles')
             ->willReturn($bundles);
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())
+            ->method('getParameter')
+            ->with('assets_version')
+            ->willReturn('testAssetVersion');
+        $kernel->expects($this->once())
+            ->method('getContainer')
+            ->willReturn($container);
 
         $warmer = new AssetConfigCache($kernel, self::WEBPACK_DEV_SERVER_OPTIONS);
         $tempDir = $this->getTempDir('cache');
