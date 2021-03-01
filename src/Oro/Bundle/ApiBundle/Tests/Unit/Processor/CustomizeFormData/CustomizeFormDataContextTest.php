@@ -151,6 +151,25 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
+    public function testIsPrimaryEntityRequest()
+    {
+        $primaryEntity = new \stdClass();
+        $this->context->setData($primaryEntity);
+
+        self::assertTrue($this->context->isPrimaryEntityRequest());
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->setPrimaryEntityId(\stdClass::class, 1);
+        $includedEntities->setPrimaryEntity($primaryEntity, null);
+        $includedEntity = new \stdClass();
+        $includedEntities->add($includedEntity, \stdClass::class, 2, new IncludedEntityData('0', 0));
+        $this->context->setIncludedEntities($includedEntities);
+        self::assertTrue($this->context->isPrimaryEntityRequest());
+
+        $this->context->setData($includedEntity);
+        self::assertFalse($this->context->isPrimaryEntityRequest());
+    }
+
     public function testEvent()
     {
         self::assertNull($this->context->getPropertyPath());
