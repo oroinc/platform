@@ -245,6 +245,9 @@ entity_config:
                         - Range:
                             min:            1
                             max:            255
+                        - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValue:
+                            scope:          extend
+                            option:         length
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
