@@ -150,9 +150,8 @@ The **email** property is a string contains an email address.
 
 Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}\]**
 
-**Please note:**
-
-*Data should contain all of email addresses of the user.*
+**Note:**
+Data should contain all of email addresses of the user.
 
 ### username
 
@@ -166,9 +165,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### email
 
@@ -182,9 +179,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### firstName
 
@@ -198,9 +193,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### lastName
 
@@ -214,9 +207,7 @@ Example of data: **\[{"email": "first@email.com"}, {"email": "second@email.com"}
 
 {@inheritdoc}
 
-**Please note:**
-
-*This field is **required** and must remain defined.*
+**This field must not be empty, if it is passed.**
 
 ### passwordChangedAt
 

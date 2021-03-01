@@ -49,20 +49,16 @@ services:
         arguments:
             - '@doctrine'
 
-    oro_entity.orm.abstract.insert_query_executor:
-        class: Oro\Bundle\EntityBundle\ORM\AbstractInsertQueryExecutor
-        abstract: true
-        arguments:
-            - '@oro_entity.orm.native_query_executor_helper'
-
     oro_entity.orm.insert_from_select_query_executor:
         class: Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
-        parent: oro_entity.orm.abstract.insert_query_executor
+        arguments:
+            - '@oro_entity.orm.native_query_executor_helper'
         public: true
 
     oro_entity.orm.multi_insert_query_executor:
         class: Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor
-        parent: oro_entity.orm.abstract.insert_query_executor
+        arguments:
+            - '@oro_entity.orm.native_query_executor_helper'
         public: true
         shared: false
 

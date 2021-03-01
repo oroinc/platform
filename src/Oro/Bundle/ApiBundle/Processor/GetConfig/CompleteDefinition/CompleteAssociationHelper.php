@@ -17,8 +17,6 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The helper class to complete the configuration of different kind of ORM associations.
- *
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CompleteAssociationHelper
 {
@@ -88,20 +86,13 @@ class CompleteAssociationHelper
     {
         $field->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $target = $field->getOrCreateTargetEntity();
-        $target->setExcludeAll();
+        $field->getOrCreateTargetEntity()->setExcludeAll();
 
         $formOptions = $field->getFormOptions();
         $inheritData = $formOptions['inherit_data'] ?? false;
         if (!$inheritData && (null === $formOptions || !\array_key_exists('property_path', $formOptions))) {
             $formOptions['property_path'] = $fieldName;
             $field->setFormOptions($formOptions);
-        }
-        if ($inheritData && !($formOptions['mapped'] ?? true)) {
-            $targetFields = $target->getFields();
-            foreach ($targetFields as $targetField) {
-                $targetField->setFormOption('mapped', false);
-            }
         }
 
         $this->completeDependsOn($field);
@@ -264,6 +255,8 @@ class CompleteAssociationHelper
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::COLLAPSE);
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::PROPERTY_PATH);
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::DATA_TRANSFORMER);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::POST_PROCESSOR);
+        $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::POST_PROCESSOR_OPTIONS);
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::TARGET_CLASS);
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::TARGET_TYPE);
         $this->mergeAttribute($field, $fieldToMerge, ConfigUtil::DEPENDS_ON);

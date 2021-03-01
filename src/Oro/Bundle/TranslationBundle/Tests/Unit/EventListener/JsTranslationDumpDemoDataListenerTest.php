@@ -46,11 +46,8 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
             ->with('dump js translations files for locales: fr_FR.');
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn([
-                'en' => 'English',
-                'fr_FR' => 'French'
-            ]);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en', 'fr_FR']);
 
         $this->jsTranslationDumper->expects($this->any())
             ->method('isTranslationFileExist')
@@ -74,11 +71,8 @@ class JsTranslationDumpDemoDataListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn([
-                'en' => 'English',
-                'fr_FR' => 'French'
-            ]);
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en', 'fr_FR']);
 
         $this->jsTranslationDumper->expects($this->any())
             ->method('isTranslationFileExist')

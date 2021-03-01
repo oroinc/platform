@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\AbstractErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -34,16 +35,18 @@ class ErrorCompleter extends AbstractErrorCompleter
     private $filterNamesRegistry;
 
     /**
+     * @param ErrorTitleOverrideProvider      $errorTitleOverrideProvider
      * @param ExceptionTextExtractorInterface $exceptionTextExtractor
      * @param ValueNormalizer                 $valueNormalizer
      * @param FilterNamesRegistry             $filterNamesRegistry
      */
     public function __construct(
+        ErrorTitleOverrideProvider $errorTitleOverrideProvider,
         ExceptionTextExtractorInterface $exceptionTextExtractor,
         ValueNormalizer $valueNormalizer,
         FilterNamesRegistry $filterNamesRegistry
     ) {
-        parent::__construct($exceptionTextExtractor);
+        parent::__construct($errorTitleOverrideProvider, $exceptionTextExtractor);
         $this->valueNormalizer = $valueNormalizer;
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
@@ -76,16 +79,16 @@ class ErrorCompleter extends AbstractErrorCompleter
             $error->setSource(ErrorSource::createByPointer($entityPath));
         } else {
             $pointer = $errorSource->getPointer();
-            if ($pointer && 0 === \strpos($pointer, self::POINTER_DELIMITER . JsonApiDoc::DATA)) {
-                $errorSource->setPointer($entityPath . \substr($pointer, \strlen(JsonApiDoc::DATA) + 1));
+            if ($pointer && 0 === strpos($pointer, self::POINTER_DELIMITER . JsonApiDoc::DATA)) {
+                $errorSource->setPointer($entityPath . substr($pointer, \strlen(JsonApiDoc::DATA) + 1));
             } else {
                 $propertyPath = $errorSource->getPropertyPath();
                 if ($propertyPath) {
-                    $propertyPath = \str_replace(self::POINTER_DELIMITER, ConfigUtil::PATH_DELIMITER, $entityPath)
+                    $propertyPath = str_replace(self::POINTER_DELIMITER, ConfigUtil::PATH_DELIMITER, $entityPath)
                         . ConfigUtil::PATH_DELIMITER
                         . $propertyPath;
-                    if (0 === \strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
-                        $propertyPath = \substr($propertyPath, 1);
+                    if (0 === strpos($propertyPath, ConfigUtil::PATH_DELIMITER)) {
+                        $propertyPath = substr($propertyPath, 1);
                     }
                     $errorSource->setPropertyPath($propertyPath);
                 }
@@ -111,7 +114,7 @@ class ErrorCompleter extends AbstractErrorCompleter
                 $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
                 $error->setSource();
             } else {
-                list($normalizedPropertyPath, $path, $pointerPrefix) = $this->normalizePropertyPath($propertyPath);
+                [$normalizedPropertyPath, $path, $pointerPrefix] = $this->normalizePropertyPath($propertyPath);
                 $pointer = $this->getPointer($metadata, $normalizedPropertyPath, $path);
                 if (empty($pointer)) {
                     $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
@@ -124,7 +127,7 @@ class ErrorCompleter extends AbstractErrorCompleter
                         self::POINTER_DELIMITER
                         . $dataSection
                         . self::POINTER_DELIMITER
-                        . \implode(self::POINTER_DELIMITER, \array_merge($pointerPrefix, $pointer))
+                        . implode(self::POINTER_DELIMITER, array_merge($pointerPrefix, $pointer))
                     );
                     $source->setPropertyPath(null);
                 }
@@ -141,10 +144,10 @@ class ErrorCompleter extends AbstractErrorCompleter
     {
         $pointerPrefix = [];
         $normalizedPropertyPath = $propertyPath;
-        $path = \explode(ConfigUtil::PATH_DELIMITER, $propertyPath);
-        if (\count($path) > 1 && \is_numeric($path[0])) {
-            $normalizedPropertyPath = \substr($propertyPath, \strlen($path[0]) + 1);
-            $pointerPrefix[] = \array_shift($path);
+        $path = explode(ConfigUtil::PATH_DELIMITER, $propertyPath);
+        if (count($path) > 1 && is_numeric($path[0])) {
+            $normalizedPropertyPath = substr($propertyPath, \strlen($path[0]) + 1);
+            $pointerPrefix[] = array_shift($path);
         }
 
         return [$normalizedPropertyPath, $path, $pointerPrefix];
@@ -196,10 +199,10 @@ class ErrorCompleter extends AbstractErrorCompleter
         $pointer = DataType::isAssociationAsField($association->getDataType())
             ? [JsonApiDoc::ATTRIBUTES, $path[0]]
             : [JsonApiDoc::RELATIONSHIPS, $path[0], JsonApiDoc::DATA];
-        if (\count($path) > 1) {
+        if (count($path) > 1) {
             $pointer[] = $path[1];
             if (!$association->isCollapsed() && DataType::isAssociationAsField($association->getDataType())) {
-                $pointer = \array_merge($pointer, \array_slice($path, 2));
+                $pointer = array_merge($pointer, \array_slice($path, 2));
             }
         }
 
@@ -215,14 +218,14 @@ class ErrorCompleter extends AbstractErrorCompleter
     private function appendSourceToMessage(?string $message, string $source): string
     {
         if (!$message) {
-            return \sprintf('Source: %s.', $source);
+            return sprintf('Source: %s.', $source);
         }
 
         if (!$this->endsWith($message, '.')) {
             $message .= '.';
         }
 
-        return \sprintf('%s Source: %s.', $message, $source);
+        return sprintf('%s Source: %s.', $message, $source);
     }
 
     /**
@@ -233,7 +236,7 @@ class ErrorCompleter extends AbstractErrorCompleter
      */
     private function endsWith(string $haystack, string $needle): bool
     {
-        return \substr($haystack, -\strlen($needle)) === $needle;
+        return substr($haystack, -\strlen($needle)) === $needle;
     }
 
     /**
@@ -251,13 +254,13 @@ class ErrorCompleter extends AbstractErrorCompleter
             return $filterNames->getIncludeFilterName();
         }
         if (FilterFieldsConfigExtra::NAME === $e->getOperation()) {
-            return \sprintf(
+            return sprintf(
                 $filterNames->getFieldsFilterTemplate(),
                 $this->getEntityType($e->getClassName(), $requestType)
             );
         }
 
-        throw new \LogicException(\sprintf(
+        throw new \LogicException(sprintf(
             'Unexpected type of NotSupportedConfigOperationException: %s.',
             $e->getOperation()
         ));

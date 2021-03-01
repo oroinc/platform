@@ -225,7 +225,7 @@ class FeatureContext extends OroFeatureContext implements
                 $lastHistoryLink = $context->getLastHistoryLink();
                 $this->clickBarsIcon();
 
-                if (false === strpos($actualTitle, $lastHistoryLink)) {
+                if (!str_contains($actualTitle, $lastHistoryLink)) {
                     $context->getSession()->reload();
 
                     return false;

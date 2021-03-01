@@ -857,6 +857,16 @@ action_field_form:
                                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                                 form_options:
                                     option1: value1
+                            field7:
+                                post_processor: test
+                                post_processor_options: ~
+                            field8:
+                                post_processor: test
+                                post_processor_options: []
+                            field9:
+                                post_processor: test
+                                post_processor_options:
+                                    option1: value1
     expected:
         subresources:
             testSubresource:
@@ -874,6 +884,14 @@ action_field_form:
                             field6:
                                 form_type: Symfony\Component\Form\Extension\Core\Type\IntegerType
                                 form_options:
+                                    option1: value1
+                            field7:
+                                post_processor: test
+                            field8:
+                                post_processor: test
+                            field9:
+                                post_processor: test
+                                post_processor_options:
                                     option1: value1
 
 action_invalid_field_form_type:
@@ -899,6 +917,68 @@ action_invalid_field_form_options:
                                 form_options: test
     expected: []
     error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.form_options". Expected array, but got string'
+
+invalid_field_post_processor:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: []
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.post_processor". Expected scalar, but got array.'
+
+unknown_field_post_processor:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: another
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The post processor "another" is unknown. Known post processors: "twig, test".'
+
+invalid_field_post_processor_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor_options: test
+    expected: []
+    error: 'Invalid type for path "entity.subresources.testSubresource.actions.create.fields.field1.post_processor_options". Expected array, but got string'
+
+twig_field_post_processor_without_options:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: twig
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
+
+twig_field_post_processor_without_template:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    create:
+                        fields:
+                            field1:
+                                post_processor: twig
+                                post_processor_options:
+                                    option1: value1
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions.create.fields.field1": The "template" option is required for the "twig" post processor. Add it to the "post_processor_options".'
 
 empty_filters:
     config:

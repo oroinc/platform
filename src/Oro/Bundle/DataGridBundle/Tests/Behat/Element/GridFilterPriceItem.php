@@ -28,6 +28,22 @@ class GridFilterPriceItem extends GridFilterStringItem
     }
 
     /**
+     * Select unit type of price filter from radio buttons
+     *
+     * @param string $filterUnitType
+     */
+    public function selectRadioUnitType($filterUnitType)
+    {
+        $radio = $this->find('css', '.product-price-unit-filter input[value="' . $filterUnitType .'"]');
+        if (!empty($radio)) {
+            $radio->getParent()->click();
+            return;
+        }
+
+        self::fail(sprintf('Can\'t find filter with "%s" unit type', $filterUnitType));
+    }
+
+    /**
      * Set second value to input field
      *
      * @param string $value

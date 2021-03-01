@@ -1,3 +1,9 @@
+require.resolveWeak(// fixes issue with missing icons/default/icons.js file in public dir
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static!@oroinc/jquery.nicescroll/jquery.nicescroll.min.js'
+);
+require.resolveWeak(// fixes issue with missing icons/default/icons.js file in public dir
+    '!file-loader?name=[path][name].[ext]&outputPath=../_static!overlayscrollbars/js/OverlayScrollbars.js'
+);
 define(function(require, exports, module) {
     'use strict';
 
@@ -188,7 +194,7 @@ define(function(require, exports, module) {
                     if (iframe.document.querySelector('.mobile-version')) {
                         if (iframe.jQuery) {
                             this.loadScriptInFrame(
-                                '/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
+                                '/build/_static/_/node_modules/@oroinc/jquery.nicescroll/jquery.nicescroll.min.js',
                                 function(iframe) {
                                     iframe.jQuery('.mobile-version').first().niceScroll({
                                         cursorcolor: 'rgba(0, 0, 0, 0.5)',
@@ -201,7 +207,7 @@ define(function(require, exports, module) {
                         } else {
                             // In case when page has no other third-part libraries use OverlayScrollbars since it has no dependencies
                             this.loadScriptInFrame(
-                                '/overlayscrollbars/js/OverlayScrollbars.js',
+                                '/build/_static/_/node_modules/overlayscrollbars/js/OverlayScrollbars.js',
                                 function(iframe, bodyElement) {
                                     new iframe.OverlayScrollbars(bodyElement, {
                                         className: 'os-theme-dark',

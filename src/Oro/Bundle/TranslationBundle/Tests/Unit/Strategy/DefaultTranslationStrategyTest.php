@@ -37,22 +37,19 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->strategy->isApplicable());
     }
 
-    public function testGetLocaleFallbacks()
+    public function testGetLocaleFallbacks(): void
     {
-        $currentLanguages = [
-            'fr' => 'French',
-            'ua' => 'Ukrainian',
-        ];
+        $currentLanguagesCodes = ['fr_FR', 'uk_UA',];
 
-        $this->languageProvider->expects($this->once())
-            ->method('getAvailableLanguages')
-            ->willReturn($currentLanguages);
+        $this->languageProvider->expects(static::once())
+            ->method('getAvailableLanguageCodes')
+            ->willReturn($currentLanguagesCodes);
 
-        $this->assertEquals(
+        static::assertEquals(
             [
                 Configuration::DEFAULT_LOCALE => [
-                    'fr' => [],
-                    'ua' => [],
+                    'fr_FR' => [],
+                    'uk_UA' => [],
                 ],
             ],
             $this->strategy->getLocaleFallbacks()

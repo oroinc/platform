@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormInterface;
 
 /**
  * The execution context for processors for "customize_form_data" action.
+ * Also {@see \Oro\Bundle\ApiBundle\Form\FormUtil} provides static methods that cam be helpful.
  */
 class CustomizeFormDataContext extends CustomizeDataContext
 {
@@ -242,6 +243,20 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public function setIncludedEntities(IncludedEntityCollection $includedEntities): void
     {
         $this->includedEntities = $includedEntities;
+    }
+
+    /**
+     * Indicates whether the current action is executed for the primary entity or for an included entity.
+     *
+     * @return bool
+     */
+    public function isPrimaryEntityRequest(): bool
+    {
+        $includedEntities = $this->getIncludedEntities();
+
+        return
+            null === $includedEntities
+            || $includedEntities->getPrimaryEntity() === $this->getData();
     }
 
     /**

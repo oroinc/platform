@@ -77,5 +77,5 @@ trait DbIsolationExtension
     /**
      * @return \Symfony\Bundle\FrameworkBundle\Client
      */
-    abstract protected function getClientInstance();
+    abstract protected static function getClientInstance();
 }

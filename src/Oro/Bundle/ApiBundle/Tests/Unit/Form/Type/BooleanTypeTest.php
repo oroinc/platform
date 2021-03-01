@@ -3,15 +3,22 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
-use Symfony\Component\Form\Test\TypeTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 
-class BooleanTypeTest extends TypeTestCase
+class BooleanTypeTest extends ApiFormTypeTestCase
 {
     /**
      * @dataProvider validValuesDataProvider
      */
     public function testWithValidValue($value, $expected)
     {
+        /**
+         * @see \Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm::prepareRequestData
+         */
+        if (false === $value) {
+            $value = 'false';
+        }
+
         $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         self::assertTrue($form->isSynchronized());
@@ -29,10 +36,8 @@ class BooleanTypeTest extends TypeTestCase
             ['false', false],
             ['no', false],
             ['0', false],
-            [false, null], // Symfony Form treats false as NULL due to checkboxes
-            [0, false],
-            ['', null],
-            [null, null]
+            [false, false],
+            [0, false]
         ];
     }
 
@@ -49,7 +54,9 @@ class BooleanTypeTest extends TypeTestCase
     public function invalidValuesDataProvider()
     {
         return [
-            ['test']
+            ['test'],
+            [''],
+            [null]
         ];
     }
 }

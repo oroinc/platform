@@ -1,0 +1,22 @@
+request:
+    search: "456100  "
+    offset: ~
+    max_results: ~
+response:
+    records_count: 1
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                entity_label: oro.testframework.item.entity_label
+                record_string: "item1@mail.com 0123-456100"
+                record_url: http://localhost%oro_default_prefix%search/
+    soap:
+        item:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                entityLabel: oro.testframework.item.entity_label
+                recordTitle: "item1@mail.com 0123-456100"
+                recordUrl: http://localhost%oro_default_prefix%search/
+                selectedData: []

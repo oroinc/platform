@@ -23,6 +23,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 250 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 250 }
             - { name: oro.api.processor, action: options, group: initialize, priority: 250 }
 
     oro_api.validate_request_type_and_version:
@@ -44,6 +45,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: not_allowed, group: initialize, priority: 210 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 210 }
             - { name: oro.api.processor, action: options, group: initialize, priority: 210 }
 
     oro_api.normalize_include_header:
@@ -63,6 +65,7 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 200 }
             - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 200 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 200 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, priority: 200 }
 
     oro_api.check_no_hateoas_links:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\CheckNoHateoasLinks
@@ -81,6 +84,7 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: initialize, requestType: rest, priority: 190 }
             - { name: oro.api.processor, action: add_relationship, group: initialize, requestType: rest, priority: 190 }
             - { name: oro.api.processor, action: update_relationship, group: initialize, requestType: rest, priority: 190 }
+            - { name: oro.api.processor, action: unhandled_error, group: initialize, requestType: rest, priority: 190 }
 
     oro_api.subresource.normalize_parent_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityClass
@@ -1246,6 +1250,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -10 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -10 }
 
     oro_api.normalize_errors:
@@ -1269,6 +1274,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -20 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -20 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -20 }
 
     oro_api.rest.set_http_response_status_code:
@@ -1282,6 +1288,7 @@ services:
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, priority: -30 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, priority: -30 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -30 }
 
     oro_api.rest.set_http_response_status_code.created:
@@ -1357,6 +1364,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -40 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -40 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -40 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -40 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -40 }
 
     oro_api.rest.add_hateoas_links:
@@ -1493,6 +1501,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -150 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -150 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -150 }
 
     oro_api.assert_not_has_errors:
@@ -1514,6 +1523,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, priority: -190 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, priority: -190 }
             - { name: oro.api.processor, action: options, group: normalize_result, priority: -190 }
 
     oro_api.assert_has_result:
@@ -1541,6 +1551,7 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: json_api, priority: -210 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: json_api, priority: -210 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: json_api, priority: -210 }
 
     oro_api.json_api.assert_result_data_is_array:
@@ -1553,7 +1564,7 @@ services:
     oro_api.rest.cors.set_allow_origin:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowOrigin
         arguments:
-            - [] # allowedOrigins. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -235 }
@@ -1569,14 +1580,13 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, cors: true, priority: -235 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, cors: true, priority: -235 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -235 }
 
     oro_api.rest.cors.set_allow_and_expose_headers:
         class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetCorsAllowAndExposeHeaders
         arguments:
-            - [] # allowedHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - [] # exposableHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
-            - false # isCredentialsAllowed. It is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - '@oro_api.rest.cors_settings'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, cors: true, priority: -240 }
@@ -1592,6 +1602,7 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, cors: true, priority: -240 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, cors: true, priority: -240 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, cors: true, priority: -240 }
 
     oro_api.rest.set_http_allow_header.single_item:
@@ -1662,4 +1673,5 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: json_api, priority: -250 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: json_api, priority: -250 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: json_api, priority: -250 }

@@ -61,7 +61,7 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
         $definition = new WorkflowDefinition();
         $definition->setName('test_workflow')->setLabel(self::WORKFLOW_LABEL)->setConfiguration($config);
 
-        $this->languageProvider->expects($this->once())->method('getAvailableLanguages')->willReturn(
+        $this->languageProvider->expects($this->once())->method('getAvailableLanguageCodes')->willReturn(
             $languagesAvailable ? ['en'] : []
         );
 

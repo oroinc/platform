@@ -41,26 +41,32 @@ class UpdateConfigCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'File containing the initial state of entity configs'
             )
+            ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
             ->setDescription('Updates extend entity config.')
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command updates extend entity config.
 
   <info>php %command.full_name%</info>
+  
+<error>This is an internal command. Please do not run it manually.</error>
+<error>Execution of this command can break the system.</error>
+
+Use the <info>--force</info> option to force the execution.
 
 Use the <info>--update-custom</info> option to apply user changes that require database schema update:
 
-  <info>php %command.full_name% --update-custom</info>
+  <info>php %command.full_name% --force --update-custom</info>
 
 The <info>--initial-state-path</info> option can be used to provide a path to the file
 that contains the initial state of the entity configs:
 
-  <info>php %command.full_name% --initial-state-path=<file-path></info>
+  <info>php %command.full_name% --force --initial-state-path=<file-path></info>
 
 HELP
             )
-            ->addUsage('--update-custom')
-            ->addUsage('--initial-state-path=<file-path>')
+            ->addUsage('--force --update-custom')
+            ->addUsage('--force --initial-state-path=<file-path>')
         ;
     }
 
@@ -68,6 +74,14 @@ HELP
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln($this->getDescription());
+
+        $force = $input->getOption('force');
+        if (!$force) {
+            $output->writeln('<error>This is an internal command. Please do not run it manually.</error>');
+            $output->writeln('<error>Execution of this command can break the system.</error>');
+
+            return;
+        }
 
         $this->extendConfigDumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }

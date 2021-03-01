@@ -8,9 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WrongApiUriRequestsTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -19,6 +16,22 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/custom_entities.yml'
         ]);
+    }
+
+    private function getWebBackendPrefix(): string
+    {
+        return self::getContainer()->hasParameter('web_backend_prefix')
+            ? self::getContainer()->getParameter('web_backend_prefix')
+            : '';
+    }
+
+    private function getWebBackendPrefixPath(): string
+    {
+        $prefix = $this->getWebBackendPrefix();
+
+        return $prefix
+            ? '/..' . $prefix
+            : '';
     }
 
     public function testTryToGetAnotherApiResourceWithFullReplaceOfBaseUrl()
@@ -32,7 +45,19 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             $baseUrl . str_repeat('/..', $slashesCount) . $additionalUrl
         );
 
-        $this->assertNotFoundResponce($response);
+        $this->assertResponseContainsValidationError(
+            [
+                'status' => '404',
+                'title'  => 'not found http exception',
+                'detail' => sprintf(
+                    'No route found for "GET %1$s/api/testapientity1/..%2$s/api/users/1".',
+                    $this->getWebBackendPrefix(),
+                    $this->getWebBackendPrefixPath()
+                )
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testTryToGetAnotherApiResource()
@@ -44,7 +69,20 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             $baseUrl . '/../users/1'
         );
 
-        $this->assertNotFoundResponce($response);
+        $this->assertResponseContainsValidationError(
+            [
+                'status' => '404',
+                'title'  => 'not found http exception',
+                'detail' => sprintf(
+                    'No route found for "GET %1$s/api/testapientity1/../users/1"'
+                    . ' (from "http://localhost%1$s/api/testapientity1/..%2$s/api/users/1").',
+                    $this->getWebBackendPrefix(),
+                    $this->getWebBackendPrefixPath()
+                )
+            ],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
     }
 
     public function testTryToGetUserViewPageThroughtApiRequest()
@@ -58,18 +96,19 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
             $baseUrl . str_repeat('/..', $slashesCount) . $additionalUrl
         );
 
-        $this->assertNotFoundResponce($response);
-    }
-
-    private function assertNotFoundResponce(Response $response)
-    {
-        $this->assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
-        $this->assertResponseContains(
+        $this->assertResponseContainsValidationError(
             [
-                'code' => Response::HTTP_NOT_FOUND,
-                'message' => 'Not Found'
+                'status' => '404',
+                'title'  => 'not found http exception',
+                'detail' => sprintf(
+                    'No route found for "GET %1$s/api/testapientity1/..%2$s/user/view/1"'
+                    . ' (from "http://localhost%1$s/api/testapientity1/../users/1").',
+                    $this->getWebBackendPrefix(),
+                    $this->getWebBackendPrefixPath()
+                )
             ],
-            $response
+            $response,
+            Response::HTTP_NOT_FOUND
         );
     }
 }

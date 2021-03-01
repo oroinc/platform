@@ -21,6 +21,7 @@ class ExcludeCustomFieldsByDefault implements ProcessorInterface
         $definition = $context->getResult();
         if (!$definition->hasExclusionPolicy()) {
             $definition->setExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS);
+            $context->setRequestedExclusionPolicy(ConfigUtil::EXCLUSION_POLICY_CUSTOM_FIELDS);
         }
     }
 }

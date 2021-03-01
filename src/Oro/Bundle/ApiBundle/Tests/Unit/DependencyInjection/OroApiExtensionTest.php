@@ -1285,7 +1285,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.config_files":'
             . ' The "request_type" options for "test1" and "test2" are duplicated.'
@@ -1312,7 +1312,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.config_files":'
             . ' The "request_type" options for "test2" and "default" are duplicated.'
@@ -1460,30 +1460,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
 
-        self::assertSame(
-            600,
-            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
-        );
-        self::assertSame(
-            600,
-            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
-        );
-        self::assertSame(
-            [],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
-        );
-        self::assertSame(
-            false,
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
-        );
+        $corsSettingsDef = $container->getDefinition('oro_api.rest.cors_settings');
+        self::assertSame(600, $corsSettingsDef->getArgument(0));
+        self::assertSame([], $corsSettingsDef->getArgument(1));
+        self::assertFalse($corsSettingsDef->getArgument(2));
+        self::assertSame([], $corsSettingsDef->getArgument(3));
+        self::assertSame([], $corsSettingsDef->getArgument(4));
     }
 
     public function testConfigurationForCors()
@@ -1503,29 +1485,26 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
 
+        $corsSettingsDef = $container->getDefinition('oro_api.rest.cors_settings');
         self::assertSame(
             $config['cors']['preflight_max_age'],
-            $container->getDefinition('oro_api.options.rest.set_cache_control')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['preflight_max_age'],
-            $container->getDefinition('oro_api.options.rest.cors.set_max_age')->getArgument(0)
+            $corsSettingsDef->getArgument(0)
         );
         self::assertSame(
             $config['cors']['allow_origins'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_origin')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['allow_headers'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(0)
-        );
-        self::assertSame(
-            $config['cors']['expose_headers'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(1)
+            $corsSettingsDef->getArgument(1)
         );
         self::assertSame(
             $config['cors']['allow_credentials'],
-            $container->getDefinition('oro_api.rest.cors.set_allow_and_expose_headers')->getArgument(2)
+            $corsSettingsDef->getArgument(2)
+        );
+        self::assertSame(
+            $config['cors']['allow_headers'],
+            $corsSettingsDef->getArgument(3)
+        );
+        self::assertSame(
+            $config['cors']['expose_headers'],
+            $corsSettingsDef->getArgument(4)
         );
     }
 
@@ -1880,7 +1859,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.batch_api.chunk_size_per_entity.Test\Entity1":'
             . ' Expected int or NULL.'
@@ -1904,7 +1883,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize()
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'Invalid configuration for path "oro_api.batch_api.included_data_chunk_size_per_entity.Test\Entity1":'
             . ' Expected int or NULL.'

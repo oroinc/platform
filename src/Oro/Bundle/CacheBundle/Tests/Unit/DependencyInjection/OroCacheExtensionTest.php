@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
+namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\CacheBundle\DependencyInjection\OroCacheExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
@@ -9,39 +10,26 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class OroCacheExtensionTest extends ExtensionTestCase
 {
-    /**
-     * @var OroCacheExtension
-     */
-    private $extension;
-
-    protected function setUp(): void
+    protected function buildContainerMock(): ContainerBuilder
     {
-        $this->extension = new OroCacheExtension();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function buildContainerMock()
-    {
-        $mockBuilder = $this->createMock(ContainerBuilder::class);
+        $containerBuilder = parent::buildContainerMock();
 
         $warmerServiceDefinition = $this->createMock(Definition::class);
-        $warmerServiceDefinition->expects($this->once())
+        $warmerServiceDefinition->expects(static::once())
             ->method('replaceArgument')
-            ->with(0, $this->isType('array'));
-        $mockBuilder
-            ->expects($this->once())
+            ->with(0, static::isType('array'));
+        $containerBuilder
+            ->expects(static::once())
             ->method('getDefinition')
             ->with('oro.cache.serializer.mapping.cache_warmer')
             ->willReturn($warmerServiceDefinition);
 
-        return $mockBuilder;
+        return $containerBuilder;
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
-        $this->loadExtension($this->extension);
+        $this->loadExtension(new OroCacheExtension());
 
         $expectedDefinitions = [
             'oro_cache.action.handler.invalidate_scheduled',

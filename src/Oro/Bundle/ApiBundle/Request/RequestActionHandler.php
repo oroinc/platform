@@ -546,6 +546,29 @@ abstract class RequestActionHandler
     }
 
     /**
+     * Handles an unexpected error that happens before any public API action is started.
+     *
+     * @param Request    $request
+     * @param \Throwable $error
+     *
+     * @return Response
+     */
+    public function handleUnhandledError(Request $request, \Throwable $error): Response
+    {
+        $processor = $this->getProcessor('unhandled_error');
+        /** @var Context $context */
+        $context = $processor->createContext();
+        $this->preparePrimaryContext($context, $request);
+        $context->setResult($error);
+        $context->setConfig(null);
+        $context->setMetadata(null);
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
      * @param string $action
      *
      * @return ActionProcessorInterface
