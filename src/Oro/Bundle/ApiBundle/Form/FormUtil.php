@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
@@ -54,6 +55,55 @@ class FormUtil
     public static function isNotSubmittedOrSubmittedAndValid(FormInterface $form): bool
     {
         return !$form->isSubmitted() || $form->isValid();
+    }
+
+    /**
+     * Makes sure that a form associated with the given property is submitted.
+     *
+     * @param FormInterface               $form
+     * @param string                      $propertyName
+     * @param EntityDefinitionConfig|null $config
+     */
+    public static function ensureFieldSubmitted(
+        FormInterface $form,
+        string $propertyName,
+        EntityDefinitionConfig $config = null
+    ): void {
+        $fieldName = null;
+        if (null !== $config) {
+            $fieldName = $config->findFieldNameByPropertyPath($propertyName);
+        }
+        if (null === $fieldName) {
+            $fieldName = $propertyName;
+        }
+        if ($form->has($fieldName)) {
+            $fieldForm = $form->get($fieldName);
+            if (!$fieldForm->isSubmitted()) {
+                self::markAsSubmitted($fieldForm);
+            }
+        }
+    }
+
+    /**
+     * Marks the given form as submitted.
+     *
+     * @param FormInterface $form
+     *
+     * @throws \LogicException the the form was already submitted
+     */
+    public static function markAsSubmitted(FormInterface $form): void
+    {
+        if ($form->isSubmitted()) {
+            throw new \LogicException(sprintf('The form "%s" was already submitted.', self::getFormPath($form)));
+        }
+        $markClosure = \Closure::bind(
+            function ($form) {
+                $form->submitted = true;
+            },
+            null,
+            $form
+        );
+        $markClosure($form);
     }
 
     /**
@@ -200,5 +250,25 @@ class FormUtil
         );
 
         return \implode('.', $path);
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return string
+     */
+    private static function getFormPath(FormInterface $form): string
+    {
+        $path = [];
+        $current = $form;
+        while (null !== $current) {
+            $name = $current->getName();
+            if ($name) {
+                $path[] = $name;
+            }
+            $current = $current->getParent();
+        }
+
+        return implode('.', array_reverse($path));
     }
 }

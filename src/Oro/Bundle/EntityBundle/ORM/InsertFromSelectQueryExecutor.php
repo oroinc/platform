@@ -7,15 +7,28 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * Compiles and executes "insert from select" query
  */
-class InsertFromSelectQueryExecutor extends AbstractInsertQueryExecutor
+class InsertFromSelectQueryExecutor implements InsertQueryExecutorInterface
 {
+    /**
+     * @var NativeQueryExecutorHelper
+     */
+    private $helper;
+
+    /**
+     * @param NativeQueryExecutorHelper $helper
+     */
+    public function __construct(NativeQueryExecutorHelper $helper)
+    {
+        $this->helper = $helper;
+    }
+
     /**
      * {@inheritDoc}
      */
     public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder):int
     {
         $insertToTableName = $this->helper->getTableName($className);
-        $columns = $this->getColumns($className, $fields);
+        $columns = $this->helper->getColumns($className, $fields);
         $selectQuery = $selectQueryBuilder->getQuery();
 
         $sql = sprintf('insert into %s (%s) %s', $insertToTableName, implode(', ', $columns), $selectQuery->getSQL());
