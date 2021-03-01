@@ -53,8 +53,8 @@ define(function(require) {
 
             $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
 
-            this.isStateChanged = this.isStateChanged.bind(this);
-            pageStateChecker.registerChecker(this.isStateChanged);
+            this.isChangesLossConfirmationNeeded = this.isChangesLossConfirmationNeeded.bind(this);
+            pageStateChecker.registerChecker(this.isChangesLossConfirmationNeeded);
 
             PageStateView.__super__.initialize.call(this, options);
         },
@@ -66,7 +66,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            pageStateChecker.removeChecker(this.isStateChanged);
+            pageStateChecker.removeChecker(this.isChangesLossConfirmationNeeded);
             $(window).off(this.eventNamespace());
             PageStateView.__super__.dispose.call(this);
         },
@@ -118,13 +118,21 @@ define(function(require) {
         },
 
         /**
+         * Checks if there are changes and the page is not pinned (changes are temporary preserved)
+         * @return {boolean}
+         */
+        isChangesLossConfirmationNeeded: function() {
+            return this._isStateChanged() && !this._isStateTraceRequired();
+        },
+
+        /**
          * Handles navigation action and shows confirm dialog
          * if page changes is not preserved and the state is changed from initial
          * (excludes cancel action)
          */
         beforePageChange: function(e) {
             const action = $(e.target).data('action');
-            if (!e.prevented && action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
+            if (!e.prevented && action !== 'cancel' && this.isChangesLossConfirmationNeeded()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -153,7 +161,7 @@ define(function(require) {
          * if page changes is not preserved and the state is changed from initial
          */
         onWindowUnload: function() {
-            if (!this._isStateTraceRequired() && this._isStateChanged() && !pageStateChecker.hasChangesIgnored()) {
+            if (this.isChangesLossConfirmationNeeded() && !pageStateChecker.hasChangesIgnored()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
         },
