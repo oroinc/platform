@@ -466,4 +466,32 @@ class CorsRequestTest extends RestJsonApiTestCase
         self::assertResponseHeaderNotExists($response, 'Access-Control-Max-Age');
         self::assertResponseHeader($response, 'Access-Control-Allow-Credentials', 'true');
     }
+
+    public function testCorsRequestWithUnhandledError()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->request(
+            'POST',
+            $this->getUrl($this->getListRouteName(), ['entity' => $entityType]),
+            [],
+            [
+                'HTTP_Origin' => 'https://api.test.com'
+            ],
+            '{"data": {"type": test"}}'
+        );
+        $this->assertResponseValidationError(
+            ['title' => 'bad request http exception'],
+            $response
+        );
+        self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Methods');
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Headers');
+        self::assertResponseHeader(
+            $response,
+            'Access-Control-Expose-Headers',
+            'Location,X-Include-Total-Count,X-Include-Deleted-Count'
+        );
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Max-Age');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Credentials', 'true');
+    }
 }
