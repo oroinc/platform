@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
+use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -100,7 +101,8 @@ class NumberFormatter
             $symbols
         );
 
-        $formattedString = $formatter->formatCurrency($value, $currencyCode);
+        $fixedFraction = array_key_exists(IntlNumberFormatter::MIN_FRACTION_DIGITS, $attributes);
+        $formattedString = $this->formatCurrencyWithDynamicPrecision($formatter, $value, $currencyCode, $fixedFraction);
         $fromCurrencySymbol = $formatter->getSymbol(IntlNumberFormatter::CURRENCY_SYMBOL);
         $toCurrencySymbol = $this->localeSettings->getCurrencySymbolByCurrency($currencyCode, $locale);
 
@@ -119,6 +121,41 @@ class NumberFormatter
                 ' '
             );
         }
+
+        return $formattedString;
+    }
+
+    /**
+     * @param IntlNumberFormatter $currencyFormatter
+     * @param float|null $value
+     * @param string $currencyCode
+     * @param bool $fixedFraction
+     *
+     * @return string
+     */
+    private function formatCurrencyWithDynamicPrecision(
+        IntlNumberFormatter $currencyFormatter,
+        ?float $value,
+        string $currencyCode,
+        bool $fixedFraction = false
+    ): string {
+        if (!$value || ((int)$value == $value) || $fixedFraction) {
+            return $currencyFormatter->formatCurrency($value, $currencyCode);
+        }
+        $decimalObject = BigDecimal::of($value);
+
+        /**
+         * The number of fraction digits cannot be less than the number of fraction digits specified in the
+         * configuration of a particular currency.
+         */
+        $defaultFractionDigits = $currencyFormatter->getAttribute(\NumberFormatter::MIN_FRACTION_DIGITS);
+        $fractionDigits = $defaultFractionDigits > $decimalObject->getScale()
+            ? $defaultFractionDigits
+            : $decimalObject->getScale();
+
+        $currencyFormatter->setAttribute(IntlNumberFormatter::MIN_FRACTION_DIGITS, $fractionDigits);
+        $formattedString = $currencyFormatter->formatCurrency($decimalObject->toFloat(), $currencyCode);
+        $currencyFormatter->setAttribute(IntlNumberFormatter::MIN_FRACTION_DIGITS, $defaultFractionDigits);
 
         return $formattedString;
     }

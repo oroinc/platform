@@ -265,6 +265,87 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    /**
+     * @param string $locale
+     * @param string $currencyCode
+     * @param string $currencySymbol
+     * @param float $value
+     * @param string $formattedValue
+     * @param array $attributes
+     *
+     * @dataProvider dataProviderFormatCurrency
+     */
+    public function testFormatCurrencyWithNoneFractionDigits(
+        string $locale,
+        string $currencyCode,
+        string $currencySymbol,
+        float $value,
+        string $formattedValue,
+        array $attributes
+    ): void {
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getCurrencySymbolByCurrency')
+            ->with($currencyCode, $locale)
+            ->willReturn($currencySymbol);
+
+        $this->intlNumberFormatterFactory = new IntlNumberFormatterFactory($this->localeSettings);
+        $numberFormatter = new NumberFormatter($this->localeSettings, $this->intlNumberFormatterFactory);
+
+        $currency = $numberFormatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
+        $this->assertEquals($formattedValue, $currency);
+    }
+
+    /**
+     * @return array[]
+     */
+    public function dataProviderFormatCurrency(): array
+    {
+        return [
+            'Andorran Peseta(ADP) without decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 1.0,
+                'formattedValue' => 'ADP 1',
+                'attributes' => [],
+            ],
+            'Andorran Peseta(ADP) without scientific notation value' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 2.3456e2,
+                'formattedValue' => 'ADP 234.56',
+                'attributes' => [],
+            ],
+            'Andorran Peseta(ADP) with decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => 'ADP 9.9999',
+                'attributes' => [],
+            ],
+            'Andorran Peseta(ADP) with decimal part and fixed fraction digits' => [
+                'locale' => 'fr_FR',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => '10,000 ADP',
+                'attributes' => [IntlNumberFormatter::MIN_FRACTION_DIGITS => 3],
+            ],
+            'US Dollar with decimal part' => [
+                'locale' => 'en_US',
+                'currencyCode' => 'USD',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => '$9.9999',
+                'attributes' => [],
+            ]
+        ];
+    }
+
+
     public function testFormatDecimal(): void
     {
         $this->mockFormat(IntlNumberFormatter::DECIMAL);
