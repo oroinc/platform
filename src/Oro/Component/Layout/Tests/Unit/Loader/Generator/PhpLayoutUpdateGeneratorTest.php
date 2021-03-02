@@ -39,8 +39,10 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
  */
 class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator, Oro\Component\Layout\LayoutItemInterface $item)
-    {
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
         echo 123;
     }
 }
@@ -71,8 +73,10 @@ CODE
 
 class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator, Oro\Component\Layout\LayoutItemInterface $item)
-    {
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
         if (true) {
             echo 123;
         }
