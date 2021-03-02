@@ -111,6 +111,18 @@
                 width: 100%;
                 margin-right: auto;
             }
+
+            &--tablet-small {
+                &-gutter {
+                    &-l-none {
+                        padding-left: 0;
+                    }
+
+                    &-r-none {
+                        padding-right: 0;
+                    }
+                }
+            }
         }
     }
 }
