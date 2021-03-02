@@ -209,6 +209,18 @@ define(function(require, exports, module) {
             return this.settings.currency;
         },
 
+        getCurrencyMinFractionDigits: function() {
+            const format = this.getNumberFormats('currency');
+
+            return format['min_fraction_digits'];
+        },
+
+        getCurrencyMaxFractionDigits: function() {
+            const format = this.getNumberFormats('currency');
+
+            return format['max_fraction_digits'];
+        },
+
         getCurrencySymbol: function(currencyCode) {
             if (!currencyCode) {
                 currencyCode = this.settings.currency;
