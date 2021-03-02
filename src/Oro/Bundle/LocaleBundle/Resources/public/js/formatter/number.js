@@ -120,6 +120,16 @@ define(function(require) {
             return _.pick(opts, allowedCustomOptions);
         };
 
+        const currencyFractionDigits = function(value) {
+            const defaultFractionDigits = localeSettings.getCurrencyMinFractionDigits();
+            const numberValue = Number(value);
+            const digits = numberValue % 1 !== 0
+                ? numberValue.toString().split('.')[1].length || 0
+                : 0;
+
+            return digits > defaultFractionDigits ? digits : defaultFractionDigits;
+        };
+
         return {
             formatDecimal: function(value, opts) {
                 const customOptions = prepareCustomOptions(opts);
@@ -174,6 +184,8 @@ define(function(require) {
                     currency = localeSettings.getCurrency();
                 }
                 const options = _.extend({}, currencyOptions, customOptions);
+                options.min_fraction_digits = currencyFractionDigits(value);
+                options.max_fraction_digits = options.min_fraction_digits;
                 options.style = 'currency';
                 options.currency_code = currency;
                 const formattersChain = [

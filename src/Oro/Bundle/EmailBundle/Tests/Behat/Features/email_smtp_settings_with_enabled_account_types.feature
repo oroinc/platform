@@ -21,6 +21,5 @@ Feature: Email SMTP settings with enabled account types
       | Encryption  | SSL              |
       | User        | test_user        |
       | Password    | test_password    |
-    When I wait for action
     When I click "Check connection/Retrieve folders"
     Then I should see "SMTP connection is established successfully"
