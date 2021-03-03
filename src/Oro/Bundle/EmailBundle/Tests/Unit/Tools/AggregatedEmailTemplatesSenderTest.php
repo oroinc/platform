@@ -140,7 +140,8 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             ->method('getAggregated')
             ->with(
                 [$recipient],
-                new EmailTemplateCriteria('test', \stdClass::class), ['entity' => new \stdClass(), 'param' => 'value']
+                new EmailTemplateCriteria('test', \stdClass::class),
+                ['entity' => new \stdClass(), 'param' => 'value']
             )
             ->willReturn([$dto]);
 

@@ -29,7 +29,9 @@ class FilterFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateFilterWhenInvalidConfig(array $filterConfig): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectErrorMessage(sprintf('The filter config was expected to contain "%s" key', FilterUtility::TYPE_KEY));
+        $this->expectErrorMessage(
+            sprintf('The filter config was expected to contain "%s" key', FilterUtility::TYPE_KEY)
+        );
 
         $this->factory->createFilter('sample_name', $filterConfig);
     }
