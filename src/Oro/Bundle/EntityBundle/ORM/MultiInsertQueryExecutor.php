@@ -15,12 +15,25 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtil;
  * Additionally note that it's recommended to use this executor instead of 'insert from select' in mysql, because of
  * innodb auto increment table lock that force to wait to insert request until another insert on the same table be done.
  */
-class MultiInsertQueryExecutor extends AbstractInsertQueryExecutor
+class MultiInsertQueryExecutor implements InsertQueryExecutorInterface
 {
     /**
      * @var int
      */
     private $batchSize = 5000;
+
+    /**
+     * @var NativeQueryExecutorHelper
+     */
+    private $helper;
+
+    /**
+     * @param NativeQueryExecutorHelper $helper
+     */
+    public function __construct(NativeQueryExecutorHelper $helper)
+    {
+        $this->helper = $helper;
+    }
 
     /**
      * @param int $batchSize
@@ -38,7 +51,7 @@ class MultiInsertQueryExecutor extends AbstractInsertQueryExecutor
         $connection = $this->helper->getManager($className)->getConnection();
         $insertToTableName = $this->helper->getTableName($className);
 
-        $columns = $this->getColumns($className, $fields);
+        $columns = $this->helper->getColumns($className, $fields);
         $columnTypes = $this->getColumnTypes($className, $fields);
 
         $columnNamesWithNonNamedParameters = array_combine(
