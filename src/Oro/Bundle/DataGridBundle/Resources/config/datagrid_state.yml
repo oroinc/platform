@@ -1,6 +1,7 @@
 services:
     oro_datagrid.tools.parameters_helper:
         class: 'Oro\Bundle\DataGridBundle\Tools\DatagridParametersHelper'
+        public: true
 
     oro_datagrid.provider.state.abtract:
         class: 'Oro\Bundle\DataGridBundle\Provider\State\AbstractStateProvider'
