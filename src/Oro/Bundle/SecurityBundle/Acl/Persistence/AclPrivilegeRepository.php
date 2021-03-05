@@ -171,9 +171,7 @@ class AclPrivilegeRepository
     public function savePrivileges(SID $sid, ArrayCollection $privileges)
     {
         /**
-         * @var $rootKeys
-         * key = ExtensionKey
-         * value = a key in $privilege collection
+         * @var array $rootKeys [<ExtensionKey> => <a key in $privilege collection>]
          */
         $rootKeys = [];
         // find all root privileges
@@ -186,7 +184,8 @@ class AclPrivilegeRepository
         }
 
         /**
-         * @var $context
+         * @var array $context
+         *
          * key = ExtensionKey
          * value = array
          *      'extension' => extension

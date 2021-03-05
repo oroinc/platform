@@ -127,9 +127,9 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider dividingSuitesProvider
-     * @param int $divider
-     * @param array $suiteConfigs
-     * @param array $expectedSuites
+     *
+     * @param int   $divider
+     * @param array $expectedSuiteConfigs
      */
     public function testDivideSuites($divider, $expectedSuiteConfigs)
     {

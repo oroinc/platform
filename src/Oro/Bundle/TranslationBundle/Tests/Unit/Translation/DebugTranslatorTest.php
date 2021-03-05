@@ -87,7 +87,7 @@ class DebugTranslatorTest extends \PHPUnit\Framework\TestCase
      * @param string $locale
      * @param string $domain
      * @param string $source
-     * @param int number
+     * @param int    $number
      * @param string $expected
      * @dataProvider transChoiceDataProvider
      */

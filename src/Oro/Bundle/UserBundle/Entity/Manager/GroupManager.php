@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Repository\GroupRepository;
 
+/**
+ * Manager for the Group Entity
+ */
 class GroupManager
 {
     /**
@@ -22,7 +25,7 @@ class GroupManager
     /**
      * Get user query builder
      *
-     * @param  Group        $role
+     * @param Group $group
      * @return QueryBuilder
      */
     public function getUserQueryBuilder(Group $group)

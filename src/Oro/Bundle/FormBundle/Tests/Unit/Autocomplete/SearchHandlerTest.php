@@ -497,7 +497,6 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param \stdClass $stdClass
      * @param array $properties
      *
      * @return \stdClass
