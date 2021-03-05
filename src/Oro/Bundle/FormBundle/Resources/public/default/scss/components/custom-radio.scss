@@ -13,8 +13,7 @@
     &__control,
     input[type='radio'] {
         position: absolute;
-        height: 0;
-        width: 0;
+        z-index: z('base');
         margin: 0;
         padding: 0;
         border: 0 none;

@@ -142,6 +142,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And Description field should has Our new partner value
      *
      * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
+     * @When /^(?P<fieldName>[\w\s]*) field should have "(?P<fieldValue>(?:[^"]|\\")*)" value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
@@ -507,6 +508,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" checkbox$/
      */
     public function iUncheckElement($elementName)
     {
@@ -518,6 +520,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )check "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )check "(?P<value>[^"]*)" checkbox$/
      */
     public function iCheckElement($elementName)
     {
