@@ -45,7 +45,7 @@ class Configuration implements ConfigurationInterface
                             ->end()
                             ->scalarNode('screenshot')
                             ->end()
-                            ->booleanNode('rtlSupport')
+                            ->booleanNode('rtl_support')
                                 ->info('Defines whether Theme supports RTL and additional *.rtl.css have to be build')
                             ->end()
                         ->end()

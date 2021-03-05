@@ -37,7 +37,7 @@ Logo that will be displayed in the UI.
 _optional_
 This be displayed in theme management UI.
   
-* **rtlSupport**
+* **rtl_support**
   _optional_
   Defines whether Theme supports RTL and additional *.rtl.css files have to be build.
 
@@ -58,7 +58,7 @@ oro_theme:
             icon: mytheme/images/favicon.ico
             logo: mytheme/images/logo.png
             screenshot: /mytheme/images/screenshot.png
-            rtlSupport: true
+            rtl_support: true
 ```
 
 Make sure that your root public sites directory (generally a "web" directory in symfony) contains mytheme directory
