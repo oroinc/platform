@@ -13,7 +13,7 @@ const TogglePaginationView = BaseView.extend({
 
     grid: null,
 
-    className: 'datagrid-toggle-group',
+    className: 'datagrid-toggle-group datagrid-divider',
 
     defaultGroupState: false, // ungrouped by default
 
@@ -64,9 +64,14 @@ const TogglePaginationView = BaseView.extend({
 
         return {
             enabled: this.enabled,
+            visible: this.isVisible(),
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)
         };
+    },
+
+    isVisible() {
+        return this.grid.metadata.canBeGrouped || false;
     },
 
     disable() {
@@ -78,6 +83,13 @@ const TogglePaginationView = BaseView.extend({
     enable() {
         this.enabled = true;
         this.render();
+        return this;
+    },
+
+    render() {
+        TogglePaginationView.__super__.render.call(this);
+        this.$el.toggleClass('empty', !this.isVisible());
+
         return this;
     },
 
@@ -93,10 +105,6 @@ const TogglePaginationView = BaseView.extend({
         parameters.group = !this.getCurrentState();
         this.grid.collection.updateState({parameters});
         this.grid.collection.fetch({reset: true});
-    }
-}, {
-    isVisible(grid) {
-        return grid.metadata.canBeGrouped || false;
     }
 });
 

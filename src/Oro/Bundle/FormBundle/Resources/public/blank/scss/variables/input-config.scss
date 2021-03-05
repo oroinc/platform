@@ -24,4 +24,3 @@ $input-box-shadow-focus-state: $base-ui-element-focus-style !default;
 
 // Error
 $input-border-color-error-state: get-color('ui', 'error-dark') !default;
-$input-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
