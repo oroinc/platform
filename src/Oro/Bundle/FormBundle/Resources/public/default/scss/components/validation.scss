@@ -5,6 +5,10 @@
 .validation-passed,
 .validation-warning{
     @extend .notification;
+
+    &--lite {
+        @extend .notification--lite;
+    }
 }
 
 .validation-failed,

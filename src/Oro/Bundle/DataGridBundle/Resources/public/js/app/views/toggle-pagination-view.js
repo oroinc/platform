@@ -15,7 +15,7 @@ const TogglePaginationView = BaseView.extend({
 
     maxPageSize: void 0,
 
-    className: 'datagrid-toggle-pagination',
+    className: 'datagrid-toggle-pagination datagrid-divider',
 
     translationPrefix: 'oro.datagrid.btn',
 
@@ -61,10 +61,19 @@ const TogglePaginationView = BaseView.extend({
 
         return {
             enabled: this.enabled,
+            visible: this.isVisible(),
             isMaxPageSize,
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)
         };
+    },
+
+    isVisible() {
+        const {pageSize: initialPageSize} = this.grid.collection.initialState;
+        const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
+        const isMaxPageSize = currentPageSize === this.maxPageSize;
+
+        return totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize;
     },
 
     disable: function() {
@@ -76,6 +85,12 @@ const TogglePaginationView = BaseView.extend({
     enable: function() {
         this.enabled = true;
         this.render();
+        return this;
+    },
+
+    render() {
+        TogglePaginationView.__super__.render.call(this);
+        this.$el.toggleClass('empty', !this.isVisible());
         return this;
     },
 
@@ -91,15 +106,6 @@ const TogglePaginationView = BaseView.extend({
         const {pageSize: currentPageSize} = this.grid.collection.state;
         const pageSize = currentPageSize === this.maxPageSize ? initialPageSize : this.maxPageSize;
         this.grid.collection.setPageSize(pageSize);
-    }
-}, {
-    isVisible(grid) {
-        const {pageSize: initialPageSize} = grid.collection.initialState;
-        const {pageSize: currentPageSize, totalPages, totalRecords} = grid.collection.state;
-        const {items} = grid.gridOptions.toolbarOptions.pageSize;
-        const isMaxPageSize = currentPageSize === Math.max(...items.map(item => item.size || item));
-
-        return totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize;
     }
 });
 
