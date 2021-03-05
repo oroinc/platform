@@ -130,6 +130,7 @@ entity_config:
                     options:
                         value_type: boolean
                         default_value: false
+                        allowed_type: [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, enum, multiEnum, simple_array]
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
@@ -139,4 +140,3 @@ entity_config:
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.use_in_export.label
-                            tooltip: oro.entity_config.entity_config.attribute.field.items.use_in_export.tooltip
