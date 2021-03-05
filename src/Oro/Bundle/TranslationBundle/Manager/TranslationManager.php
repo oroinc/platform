@@ -189,7 +189,7 @@ class TranslationManager
     /**
      * Flushes all changes
      *
-     * @param bool|false $force
+     * @param bool $force
      */
     public function flush($force = false)
     {

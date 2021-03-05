@@ -9,6 +9,9 @@ use Oro\Bundle\UIBundle\View\ScrollData;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The base listener which should be extended by class which will manipulate scroll data blocks.
+ */
 abstract class AbstractFallbackFieldsFormView
 {
     /**
@@ -28,7 +31,7 @@ abstract class AbstractFallbackFieldsFormView
 
     /**
      * @param RequestStack $requestStack
-     * @param ManagerRegistry $doctrineHelper
+     * @param ManagerRegistry $doctrine
      * @param TranslatorInterface $translator
      */
     public function __construct(

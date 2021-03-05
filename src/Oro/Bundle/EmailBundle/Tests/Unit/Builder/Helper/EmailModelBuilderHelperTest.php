@@ -396,8 +396,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param object $user
-     * @param mixed  $expected
-     *
      * @dataProvider getUserProvider
      */
     public function testGetUser($user)

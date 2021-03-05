@@ -10,7 +10,6 @@ class PackagesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider installedPackagesProvider
      *
-     * @param array $packages
      * @param array $bundles
      * @param array $providers
      * @param array $expectedResult

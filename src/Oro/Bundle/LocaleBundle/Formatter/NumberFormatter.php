@@ -331,7 +331,7 @@ class NumberFormatter
     /**
      * Format duration to H:i:s format
      *
-     * @param float
+     * @param float $value
      * @return string
      */
     protected function formatDefaultDuration($value)

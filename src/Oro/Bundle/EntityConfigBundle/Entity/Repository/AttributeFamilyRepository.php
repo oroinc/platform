@@ -33,7 +33,7 @@ class AttributeFamilyRepository extends EntityRepository
     }
 
     /**
-     * @param array
+     * @param array $attributes
      * @return array ['<attributeId>' => [<'familyId'>, <'familyId'>], ...]
      */
     public function getFamilyIdsForAttributes(array $attributes)
@@ -42,7 +42,7 @@ class AttributeFamilyRepository extends EntityRepository
     }
 
     /**
-     * @param array
+     * @param array $attributes
      * @return QueryBuilder
      */
     public function getFamilyIdsForAttributesQb(array $attributes): QueryBuilder

@@ -126,7 +126,6 @@ class ImageRemovalManager implements ImageRemovalManagerInterface
     }
 
     /**
-     * @param \Gaufrette\Filesystem $fs
      * @param array $paths
      */
     private function performRemove(array $paths): void

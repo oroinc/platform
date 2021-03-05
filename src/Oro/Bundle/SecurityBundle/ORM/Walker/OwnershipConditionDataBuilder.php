@@ -287,7 +287,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
     /**
      * Gets SQL condition for the given owner id or ids
      *
-     * @param int|int[]|null idOrIds
+     * @param int|int[]|null $idOrIds
      * @param OwnershipMetadataInterface $metadata
      * @param string|null $columnName
      * @param bool $ignoreOwner

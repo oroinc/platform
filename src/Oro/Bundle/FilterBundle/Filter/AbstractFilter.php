@@ -438,7 +438,7 @@ abstract class AbstractFilter implements FilterInterface
      * @param FilterDatasourceAdapterInterface $ds
      * @param QueryBuilder $qb
      *
-     * @return [$dql, $replacedAliases]
+     * @return array [<dql>, <replacedAliases>]
      */
     protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
     {

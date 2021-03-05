@@ -48,8 +48,6 @@ class NavigationHistoryLoggerTest extends WebTestCase
     }
 
     /**
-     * @param int $id
-     *
      * @return NavigationHistoryItem|null
      */
     private function findLastNavigationHistoryItem(): ?NavigationHistoryItem

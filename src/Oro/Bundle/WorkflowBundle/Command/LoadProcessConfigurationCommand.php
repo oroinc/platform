@@ -33,7 +33,6 @@ class LoadProcessConfigurationCommand extends Command
      * @param ProcessConfigurationProvider $configurationProvider
      * @param ProcessConfigurator $processConfigurator
      * @param EventTriggerCache $eventTriggerCache
-     * @param string|null $name
      */
     public function __construct(
         ProcessConfigurationProvider $configurationProvider,

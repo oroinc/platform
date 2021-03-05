@@ -12,10 +12,7 @@ use Oro\Bundle\ImapBundle\Form\Model\EmailFolderModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 
 /**
- * Class ImapEmailFolderManager
- *
- * @package Oro\Bundle\ImapBundle\Manager
- *
+ * Allows to fetch and manipulate IMAP email folders.
  */
 class ImapEmailFolderManager
 {
@@ -118,7 +115,7 @@ class ImapEmailFolderManager
     }
 
     /**
-     * @param Folder[]|ArrayCollection $srcFolders
+     * @param array|Folder[] $srcFolders
      *
      * @return EmailFolderModel[]
      */

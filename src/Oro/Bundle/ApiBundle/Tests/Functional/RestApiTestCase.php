@@ -757,7 +757,6 @@ abstract class RestApiTestCase extends ApiTestCase
      *
      * @param string $routeName
      * @param array  $routeParameters
-     * @param array  $parameters
      * @param array  $server
      * @param bool   $assertValid
      *

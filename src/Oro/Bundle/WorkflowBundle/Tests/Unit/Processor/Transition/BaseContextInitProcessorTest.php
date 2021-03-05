@@ -154,7 +154,7 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $workflowName
      * @param string $transitionName
-     * @return array|[Workflow, Transition]
+     * @return array [<Workflow>, <Transition>]
      */
     protected function extractWorkflowAndTransition(string $workflowName, string $transitionName): array
     {

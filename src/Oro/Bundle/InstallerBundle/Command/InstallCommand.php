@@ -897,7 +897,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
 
     /**
      * @param OutputInterface $output
-     * @return int||null
+     * @return int|null
      */
     private function getBuildAssetsProcessExitCode(OutputInterface $output): ?int
     {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Doctrine\Persistence\Mapping\MappingException;
 use Oro\Bundle\ApiBundle\Batch\Async\Topics;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
@@ -103,10 +104,12 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     }
 
     /**
-     * @param string           $serviceId
+     * @param string           $processorServiceId
      * @param MessageInterface $message
      *
      * @return string
+     * @throws InvalidSecurityTokenException
+     * @throws MappingException
      */
     private function processMessage(string $processorServiceId, MessageInterface $message): string
     {

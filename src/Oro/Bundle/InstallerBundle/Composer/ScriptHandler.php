@@ -89,7 +89,6 @@ class ScriptHandler
      * Collects npm assets from extra.npm section of installed packages.
      *
      * @param Composer $composer
-     * @throws
      *
      * @return array
      */

@@ -65,7 +65,7 @@ class TagRepository extends EntityRepository
      * @param string            $entityClassName
      * @param int               $entityId
      * @param User|null         $owner
-     * @param bool|false        $all
+     * @param bool              $all
      * @param Organization|null $organization
      *
      * @return array

@@ -297,7 +297,7 @@ class EntityFieldProvider
      * @param string $className
      * @param string $applyExclusions
      * @param array $configs
-     * @return array|[]ConfigInterface
+     * @return array|ConfigInterface[]
      */
     protected function filterConfigFields(
         ClassMetadataInterface $metadata,

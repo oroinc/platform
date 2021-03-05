@@ -33,7 +33,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $expected
      * @param string $title
-     * @param int|null null $priority
+     * @param int|null $priority
      * @param string|null $class
      * @param bool $useSubBlockDivider
      * @dataProvider addBlockDataProvider

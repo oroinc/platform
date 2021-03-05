@@ -41,7 +41,7 @@ class FileRepository extends EntityRepository
      *
      * @param string $entityClass
      * @param int $entityId
-     * @param string|null fieldNames
+     * @param null|string $fieldName
      *
      * @return File[]
      */

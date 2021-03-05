@@ -20,11 +20,10 @@ class EmailRenderer extends TemplateRenderer
     private $translator;
 
     /**
-     * @param Environment $environment
+     * @param Environment                             $environment
      * @param TemplateRendererConfigProviderInterface $configProvider
-     * @param VariableProcessorRegistry $variableProcessors
-     * @param EmailTemplateContentProvider $contentProvider
-     * @param TranslatorInterface $translator
+     * @param VariableProcessorRegistry               $variableProcessors
+     * @param TranslatorInterface                     $translator
      */
     public function __construct(
         Environment $environment,

@@ -78,7 +78,7 @@ class ResourceFileImportProcessor implements ConfigImportProcessorInterface
     }
 
     /**
-     * @param \SplFileInfo
+     * @param \SplFileInfo $contentSource
      *
      * @return \SplFileInfo
      */

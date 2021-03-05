@@ -80,7 +80,7 @@ class ConditionsGroupFilter extends AbstractFilter
      * @param FilterDatasourceAdapterInterface $ds
      * @param QueryBuilder $qb
      *
-     * @return [$dql, $replacedAliases]
+     * @return array [<dql>, <replacedAliases>]
      */
     protected function createDQLWithReplacedAliases(FilterDatasourceAdapterInterface $ds, QueryBuilder $qb)
     {

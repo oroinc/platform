@@ -18,6 +18,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
+/**
+ * Manager for email attachments
+ */
 class EmailAttachmentManager
 {
     /** @var FileManager */
@@ -132,7 +135,7 @@ class EmailAttachmentManager
      * @param EmailAttachment $entity
      * @param int             $width
      * @param int             $height
-     * @param bool|string     $referenceType
+     * @param int             $referenceType
      *
      * @return string
      */

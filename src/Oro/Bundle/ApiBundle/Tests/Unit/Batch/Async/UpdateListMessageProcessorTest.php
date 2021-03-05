@@ -171,7 +171,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param RequestType                       $requestType
-     * @param ChunkFileClassifierInterface|null $splitter
+     * @param null|ChunkFileClassifierInterface $classifier
      */
     private function expectGetClassifier(RequestType $requestType, ?ChunkFileClassifierInterface $classifier)
     {

@@ -167,8 +167,6 @@ abstract class AbstractQueryConverter
      * @param string|FunctionInterface|null $functionExpr
      * @param string|null                   $functionReturnType
      * @param bool                          $isDistinct
-     *
-     * @return
      */
     abstract protected function addSelectColumn(
         $entityClassName,

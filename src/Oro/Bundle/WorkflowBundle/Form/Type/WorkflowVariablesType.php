@@ -13,6 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for workflow variables manipulation
+ */
 class WorkflowVariablesType extends AbstractType
 {
     const NAME = 'oro_workflow_variables';
@@ -28,8 +31,8 @@ class WorkflowVariablesType extends AbstractType
     protected $managerRegistry;
 
     /**
-     * @param VariableGuesser                 $variableGuesser
-     * @param WorkflowVariableDataTransformer $transformer
+     * @param VariableGuesser $variableGuesser
+     * @param ManagerRegistry $managerRegistry
      */
     public function __construct(VariableGuesser $variableGuesser, ManagerRegistry $managerRegistry)
     {

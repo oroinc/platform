@@ -932,8 +932,8 @@ class OroMainContext extends MinkContext implements
      * Example: Then I should see that "Header" contains "Some Text" placeholder
      * @Then /^(?:|I )should see that "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)" placeholder$/
      *
-     * @param string $elementName
-     * @param string $text
+     * @param string $locator
+     * @param string $value
      */
     public function assertDefinedElementContainsPlaceholder($locator, $value)
     {
