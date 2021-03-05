@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\IntegrationBundle\Utils;
 
+/**
+ * Sanitizes security information in a message string
+ */
 class SecureErrorMessageHelper
 {
     /**
      * Sanitize error message for secure info
      *
-     * @param string
+     * @param string $message
      *
      * @return string
      */

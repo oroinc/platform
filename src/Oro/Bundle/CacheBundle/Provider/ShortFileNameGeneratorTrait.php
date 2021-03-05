@@ -7,9 +7,9 @@ namespace Oro\Bundle\CacheBundle\Provider;
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
  *
- * @method string getDirectory
- * @method string getExtension
- * @method string getNamespace
+ * @method string getDirectory()
+ * @method string getExtension()
+ * @method string getNamespace()
  */
 trait ShortFileNameGeneratorTrait
 {

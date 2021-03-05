@@ -108,7 +108,9 @@ class CommentController extends RestController
      * Create new comment
      *
      * @param string $relationClass
-     * @param string $relationId
+     * @param int    $relationId
+     *
+     * @return Response
      *
      * @Rest\Post(requirements={"relationId"="\d+"})
      *
@@ -119,7 +121,6 @@ class CommentController extends RestController
      *
      * @AclAncestor("oro_comment_create")
      *
-     * @return Response
      */
     public function postAction($relationClass, int $relationId)
     {

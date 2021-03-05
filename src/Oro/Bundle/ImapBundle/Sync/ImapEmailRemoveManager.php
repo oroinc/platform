@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -15,6 +16,9 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * Allows to remove IMAP emails.
+ */
 class ImapEmailRemoveManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -33,8 +37,9 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
     /**
      * Remove emails which was removed in remote account
      *
+     * @param EmailFolder      $imapFolder
+     * @param EmailFolder      $folder
      * @param ImapEmailManager $manager
-     * @param array $imapFolders
      */
     public function removeRemotelyRemovedEmails($imapFolder, $folder, $manager)
     {

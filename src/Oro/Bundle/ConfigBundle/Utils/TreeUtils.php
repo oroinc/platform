@@ -5,14 +5,17 @@ namespace Oro\Bundle\ConfigBundle\Utils;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
+/**
+ * Fetches config tree nodes
+ */
 class TreeUtils
 {
     /**
      * Finds node by name in tree
      * called recursively
      *
-     * @param        array  GroupNodeDefinition $node
-     * @param string $nodeName
+     * @param GroupNodeDefinition $node
+     * @param string              $nodeName
      *
      * @return null|GroupNodeDefinition
      */
