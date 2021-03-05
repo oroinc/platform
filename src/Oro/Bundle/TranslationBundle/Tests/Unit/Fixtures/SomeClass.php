@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro \Bundle\TranslationBundle\Tests\Unit\Fixtures;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Fixtures;
 
 class SomeClass
 {

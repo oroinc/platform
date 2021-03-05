@@ -87,7 +87,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
      *
      * @param array $entities
      * @param array $workflows
-     * @param string $withWorkflowName
+     * @param bool $withWorkflowName
      * @param array|null $workflowNames
      */
     public function testGetGroupedWorkflowNameAndWorkflowStepName(

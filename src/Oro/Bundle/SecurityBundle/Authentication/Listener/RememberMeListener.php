@@ -32,7 +32,7 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
 
     /**
      * @param OrigRememberMeListener $innerListener
-     * @param array $sessionOptions
+     * @param SessionInterface|null  $session
      */
     public function __construct(
         OrigRememberMeListener $innerListener,
