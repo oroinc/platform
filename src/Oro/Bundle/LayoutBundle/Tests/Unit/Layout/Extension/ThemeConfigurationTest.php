@@ -54,7 +54,8 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
                     'css' => [
                         'inputs'  => ['input.scss'],
                         'output'  => 'output.css',
-                        'filters' => ['test_filter']
+                        'filters' => ['test_filter'],
+                        'auto_rtl_inputs' => ['bundles/test/**']
                     ]
                 ]
             ]

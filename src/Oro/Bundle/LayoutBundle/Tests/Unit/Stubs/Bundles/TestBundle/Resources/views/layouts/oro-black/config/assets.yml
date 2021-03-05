@@ -3,3 +3,5 @@ css:
         - 'bundles/test/css/scss/main.scss'
     filters:
         - some_filter
+    auto_rtl_inputs:
+        - 'bundles/test/**'
