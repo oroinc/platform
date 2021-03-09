@@ -14,6 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\TestEventsLoggerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
@@ -42,6 +43,7 @@ use Symfony\Component\Yaml\Yaml;
 abstract class WebTestCase extends BaseWebTestCase
 {
     use DbIsolationExtension;
+    use TestEventsLoggerTrait;
 
     /** Annotation names */
     const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
