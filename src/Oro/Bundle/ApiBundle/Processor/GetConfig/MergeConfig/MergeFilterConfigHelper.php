@@ -34,9 +34,8 @@ class MergeFilterConfigHelper
     }
 
     /**
-     * @param array $config1
-     * @param array $config2
-     *
+     * @param array $config
+     * @param array $filtersConfig
      * @return array
      */
     private function merge(array $config, array $filtersConfig): array

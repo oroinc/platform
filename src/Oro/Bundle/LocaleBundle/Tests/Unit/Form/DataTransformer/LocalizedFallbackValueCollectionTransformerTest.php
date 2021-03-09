@@ -479,12 +479,12 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     }
 
     /**
-     * @param AbstractLocalizedFallbackValue $entity
-     * @param int $id
-     * @param int|null $localizationId
-     * @param string|null $fallback
-     * @param string|null $string
-     * @param string|null $text
+     * @param AbstractLocalizedFallbackValue $value
+     * @param int                            $id
+     * @param int|null                       $localizationId
+     * @param string|null                    $fallback
+     * @param string|null                    $string
+     * @param string|null                    $text
      * @return AbstractLocalizedFallbackValue
      */
     protected function setLocalizedFallbackValues(

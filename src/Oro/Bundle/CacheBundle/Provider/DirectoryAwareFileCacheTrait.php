@@ -7,7 +7,7 @@ namespace Oro\Bundle\CacheBundle\Provider;
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
  *
- * @property string directory
+ * @property string $directory
  */
 trait DirectoryAwareFileCacheTrait
 {
