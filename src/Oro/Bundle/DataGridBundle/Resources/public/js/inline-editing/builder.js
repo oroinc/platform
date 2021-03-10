@@ -6,6 +6,7 @@ define(function(require) {
     const tools = require('oroui/js/tools');
     const loadModules = require('oroui/js/app/services/load-modules');
     const error = require('oroui/js/error');
+    const {validator} = require('jquery.validate');
 
     const inlineEdititngBuilder = {
         /**
@@ -42,7 +43,9 @@ define(function(require) {
                 return;
             }
             const promises = this.preparePlugin(options)
-                .concat(this.prepareColumns(options));
+                .concat(this.prepareColumns(options))
+                // preload validation methods, since validation in the inline editing form is initialized synchronously
+                .concat([validator.preloadMethods()]);
 
             $.when(...promises).done(function() {
                 if (!options.metadata.plugins) {
