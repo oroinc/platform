@@ -32,12 +32,24 @@ define(function(require) {
         },
 
         render: function() {
-            this.validator = this.$el.validate(this.validationOptions || {});
+            if (this.$el.data('validator')) {
+                // form already has initialized validator
+                return this;
+            }
+
+            this._deferredRender();
+            this.validator = this.$el.validate({
+                ...(this.validationOptions || {}),
+                onMethodsLoaded: () => this._resolveDeferredRender()
+            });
+
             return this;
         },
 
         onReset: function() {
-            this.validator.resetForm();
+            if (this.validator) {
+                this.validator.resetForm();
+            }
         },
 
         dispose: function() {
