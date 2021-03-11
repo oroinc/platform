@@ -137,7 +137,7 @@ abstract class AbstractDateFilter extends AbstractFilter implements FilterPrepar
             $valueKeys[] = 'end';
         }
 
-        $timezone = $this->localeSettings->getTimeZone();
+        $timezone = 'UTC';
         $data = $this->dateFilterModifier->modifyWithTimeZone($data, $valueKeys, true, $timezone);
 
         $isValueNormalizationRequired = $this->isValueNormalizationRequired($data['part'] ?? null);
