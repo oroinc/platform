@@ -290,7 +290,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 
         $expected = [];
         foreach ($table as $row) {
-            $expected[] = $row;
+            $expected[] = array_map(static function ($value) {
+                return TableRow::normalizeValueByGuessingType($value);
+            }, $row);
         }
 
         $headers = [];
