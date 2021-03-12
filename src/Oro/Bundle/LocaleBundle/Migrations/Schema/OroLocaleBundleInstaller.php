@@ -21,7 +21,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_4_1';
     }
 
     /**
@@ -76,6 +76,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('language_id', 'integer');
         $table->addColumn('formatting_code', 'string', ['length' => 16]);
+        $table->addColumn('rtl_mode', 'boolean', ['default' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

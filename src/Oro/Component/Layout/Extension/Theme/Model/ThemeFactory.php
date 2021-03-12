@@ -53,6 +53,7 @@ class ThemeFactory implements ThemeFactoryInterface
             'icon',
             'logo',
             'image_placeholders',
+            'rtl_support',
             'directory',
             'groups',
             'description',

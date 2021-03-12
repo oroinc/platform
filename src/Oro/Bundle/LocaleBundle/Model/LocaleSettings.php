@@ -7,6 +7,7 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Configuration as CurrencyConfi
 use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\Intl\Locales;
 
@@ -31,6 +32,9 @@ class LocaleSettings
 
     /** @var string */
     protected $language;
+
+    /** @var bool */
+    protected $rtlMode;
 
     /** @var string */
     protected $country;
@@ -113,6 +117,9 @@ class LocaleSettings
     /** @var LocaleConfigurationProvider */
     private $localeConfigProvider;
 
+    /** @var ThemeRegistry */
+    private $themeRegistry;
+
     /**
      * @param ConfigManager $configManager
      * @param CalendarFactoryInterface $calendarFactory
@@ -129,6 +136,14 @@ class LocaleSettings
         $this->calendarFactory = $calendarFactory;
         $this->localizationManager = $localizationManager;
         $this->localeConfigProvider = $localeConfigProvider;
+    }
+
+    /**
+     * @param ThemeRegistry $themeRegistry
+     */
+    public function setThemeRegistry(ThemeRegistry $themeRegistry): void
+    {
+        $this->themeRegistry = $themeRegistry;
     }
 
     /**
@@ -232,9 +247,7 @@ class LocaleSettings
     public function getLocale()
     {
         if (null === $this->locale) {
-            $localization = $this->localizationManager->getLocalizationData(
-                (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-            );
+            $localization = $this->getLocalizationdData();
 
             $this->locale = $localization['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
         }
@@ -253,6 +266,27 @@ class LocaleSettings
         }
 
         return $this->language;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRtlMode(): bool
+    {
+        if (null === $this->rtlMode) {
+            $this->rtlMode = false;
+
+            if ($this->themeRegistry) {
+                $theme = $this->themeRegistry->getActiveTheme();
+                if ($theme && $theme->isRtlSupport()) {
+                    $localization = $this->getLocalizationdData();
+
+                    $this->rtlMode = $localization['rtlMode'] ?? false;
+                }
+            }
+        }
+
+        return $this->rtlMode;
     }
 
     /**
@@ -512,10 +546,18 @@ class LocaleSettings
      */
     private function getLanguageConfigurationValue(): string
     {
-        $localization = $this->localizationManager->getLocalizationData(
-            (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
-        );
+        $localization = $this->getLocalizationdData();
 
         return $localization['languageCode'] ?? Configuration::DEFAULT_LANGUAGE;
+    }
+
+    /**
+     * @return array
+     */
+    private function getLocalizationdData(): array
+    {
+        return $this->localizationManager->getLocalizationData(
+            (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))
+        );
     }
 }

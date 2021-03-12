@@ -97,6 +97,9 @@ class ThemeRegistry
         if (isset($settings['screenshot'])) {
             $result->setScreenshot($settings['screenshot']);
         }
+        if (isset($settings['rtl_support'])) {
+            $result->setRtlSupport($settings['rtl_support']);
+        }
         return $result;
     }
 

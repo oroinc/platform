@@ -96,7 +96,7 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
     {
         $cache = !$useCache ? false : $this->cacheProvider->fetch(self::SIMPLE_CACHE_NAMESPACE);
         if ($cache === false) {
-            $sql = 'SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language ' .
+            $sql = 'SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language, loc.rtl_mode AS rtl ' .
                 'FROM oro_localization AS loc ' .
                 'INNER JOIN oro_language AS lang ON lang.id = loc.language_id';
             $stmt = $this->doctrineHelper->getEntityManager(Localization::class)
@@ -107,6 +107,7 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
                 $cache[$row['id']] = [
                     'languageCode' => $row['language'],
                     'formattingCode' => $row['formatting'],
+                    'rtlMode' => $row['rtl'],
                 ];
             }
         }

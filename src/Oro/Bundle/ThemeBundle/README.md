@@ -38,8 +38,8 @@ _optional_
 This be displayed in theme management UI.
   
 * **rtl_support**
-  _optional_
-  Defines whether Theme supports RTL and additional *.rtl.css files have to be build.
+_optional_
+Defines whether Theme supports RTL and additional *.rtl.css files have to be build.
 
 ## Adding a theme using config.yml
 
