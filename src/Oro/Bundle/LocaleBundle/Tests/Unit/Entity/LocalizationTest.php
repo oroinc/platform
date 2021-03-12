@@ -16,32 +16,33 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
     use EntityTrait;
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
-        $this->assertPropertyAccessors(new Localization(), [
+        self::assertPropertyAccessors(new Localization(), [
             ['id', 1],
             ['name', 'test_name'],
             ['language', new Language()],
             ['formattingCode', 'formatting_test_code'],
+            ['rtlMode', false, true],
             ['parentLocalization', new Localization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
         ]);
-        $this->assertPropertyCollections(new Localization(), [
+        self::assertPropertyCollections(new Localization(), [
             ['childLocalizations', new Localization()],
             ['titles', new LocalizedFallbackValue()],
         ]);
     }
 
-    public function getLanguageCode()
+    public function getLanguageCode(): void
     {
         $localization = new Localization();
 
-        $this->assertNull($localization->getLanguageCode());
+        self::assertNull($localization->getLanguageCode());
 
         $localization->setLanguage((new Language())->setCode('test'));
 
-        $this->assertEquals('test', $localization->getLanguageCode());
+        self::assertEquals('test', $localization->getLanguageCode());
     }
 
     /**
@@ -50,18 +51,18 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider isUpdatedAtSetDataProvider
      */
-    public function testIsUpdatedAtSet($expected, \DateTime $date = null)
+    public function testIsUpdatedAtSet($expected, \DateTime $date = null): void
     {
         $entity = new Localization();
         $entity->setUpdatedAt($date);
 
-        $this->assertEquals($expected, $entity->isUpdatedAtSet());
+        self::assertEquals($expected, $entity->isUpdatedAtSet());
     }
 
     /**
      * @return array
      */
-    public function isUpdatedAtSetDataProvider()
+    public function isUpdatedAtSetDataProvider(): array
     {
         return [
             ['expected' => true, 'date' => new \DateTime()],
@@ -69,27 +70,27 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $entity = new Localization();
         $expectedString = 'Expected String';
         $entity->setName($expectedString);
-        $this->assertEquals($expectedString, (string)$entity);
+        self::assertEquals($expectedString, (string)$entity);
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $entity = new Localization();
-        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChildLocalizations());
-        $this->assertEmpty($entity->getChildLocalizations()->toArray());
-        $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getTitles());
-        $this->assertEmpty($entity->getTitles()->toArray());
+        self::assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getChildLocalizations());
+        self::assertEmpty($entity->getChildLocalizations()->toArray());
+        self::assertInstanceOf('Doctrine\Common\Collections\Collection', $entity->getTitles());
+        self::assertEmpty($entity->getTitles()->toArray());
     }
 
-    public function testTitleAccessors()
+    public function testTitleAccessors(): void
     {
         $entity = $this->getEntity(Localization::class, ['id' => 1]);
-        $this->assertEmpty($entity->getTitles()->toArray());
+        self::assertEmpty($entity->getTitles()->toArray());
 
         $defaultTitle = $this->createLocalizedValue('default', true);
         $firstTitle = $this->createLocalizedValue('test1');
@@ -108,23 +109,23 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
             ->addTitle($secondTitle)
             ->addTitle($withParentTitle);
 
-        $this->assertCount(4, $entity->getTitles()->toArray());
-        $this->assertEquals(
+        self::assertCount(4, $entity->getTitles()->toArray());
+        self::assertEquals(
             [$defaultTitle, $firstTitle, $secondTitle, $withParentTitle],
             array_values($entity->getTitles()->toArray())
         );
 
-        $this->assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocalization()));
-        $this->assertEquals($defaultTitle, $entity->getTitle());
-        $this->assertEquals($withParentTitle, $entity->getTitle($localization));
-        $this->assertEquals($defaultTitle->getString(), $entity->getTitle(new Localization()));
+        self::assertEquals($secondTitle, $entity->getTitle($secondTitle->getLocalization()));
+        self::assertEquals($defaultTitle, $entity->getTitle());
+        self::assertEquals($withParentTitle, $entity->getTitle($localization));
+        self::assertEquals($defaultTitle->getString(), $entity->getTitle(new Localization()));
 
         $entity->removeTitle($firstTitle)->removeTitle($firstTitle)->removeTitle($defaultTitle);
 
-        $this->assertEquals([$secondTitle, $withParentTitle], array_values($entity->getTitles()->toArray()));
+        self::assertEquals([$secondTitle, $withParentTitle], array_values($entity->getTitles()->toArray()));
     }
 
-    public function testGetDefaultTitle()
+    public function testGetDefaultTitle(): void
     {
         $defaultTitle = $this->createLocalizedValue('default', true);
         $localizedTitle = $this->createLocalizedValue('default');
@@ -133,10 +134,10 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         $entity->addTitle($defaultTitle)
             ->addTitle($localizedTitle);
 
-        $this->assertEquals($defaultTitle, $entity->getDefaultTitle());
+        self::assertEquals($defaultTitle, $entity->getDefaultTitle());
     }
 
-    public function testGetDefaultTitleWithDuplication()
+    public function testGetDefaultTitleWithDuplication(): void
     {
         $entity = new Localization();
         $firstFallbackValue = $this->createLocalizedValue('test1', true, null, 'test1');
@@ -145,18 +146,18 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
             $entity->addTitle($title);
         }
 
-        $this->assertEquals($firstFallbackValue, $entity->getDefaultTitle());
+        self::assertEquals($firstFallbackValue, $entity->getDefaultTitle());
     }
 
-    public function testSetDefaultTitle()
+    public function testSetDefaultTitle(): void
     {
         $entity = new Localization();
         $entity->setDefaultTitle('test_title_string1');
-        $this->assertEquals('test_title_string1', $entity->getDefaultTitle());
+        self::assertEquals('test_title_string1', $entity->getDefaultTitle());
 
         // check second time to make sure we don't have an exception in getter
         $entity->setDefaultTitle('test_title_string2');
-        $this->assertEquals('test_title_string2', $entity->getDefaultTitle());
+        self::assertEquals('test_title_string2', $entity->getDefaultTitle());
     }
 
     /**
@@ -187,7 +188,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         return $localized;
     }
 
-    public function testGetHierarchy()
+    public function testGetHierarchy(): void
     {
         $parentLocalizationId = 42;
         $parentLocalization = $this->getEntity(
@@ -197,7 +198,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         $localization = new Localization();
         $localization->setParentLocalization($parentLocalization);
 
-        $this->assertEquals([$parentLocalizationId, null], $localization->getHierarchy());
+        self::assertEquals([$parentLocalizationId, null], $localization->getHierarchy());
     }
 
     /**
@@ -207,15 +208,15 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
      * @param bool $withOwnId
      * @param array $expected
      */
-    public function testGetChildrenIds(Localization $localization, $withOwnId, array $expected)
+    public function testGetChildrenIds(Localization $localization, bool $withOwnId, array $expected): void
     {
-        $this->assertEquals($expected, $localization->getChildrenIds($withOwnId));
+        self::assertEquals($expected, $localization->getChildrenIds($withOwnId));
     }
 
     /**
      * @return \Generator
      */
-    public function getChildrenIdsDataProvider()
+    public function getChildrenIdsDataProvider(): \Generator
     {
         $localization = $this->getEntity(
             Localization::class,

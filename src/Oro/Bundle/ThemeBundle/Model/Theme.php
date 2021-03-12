@@ -33,6 +33,11 @@ class Theme
     protected $screenshot;
 
     /**
+     * @var bool
+     */
+    protected $rtlSupport = false;
+
+    /**
      * @param string $name
      */
     public function __construct($name)
@@ -110,5 +115,21 @@ class Theme
     public function setScreenshot($screenshot)
     {
         $this->screenshot = $screenshot;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRtlSupport(): bool
+    {
+        return $this->rtlSupport;
+    }
+
+    /**
+     * @param bool $rtlSupport
+     */
+    public function setRtlSupport(bool $rtlSupport): void
+    {
+        $this->rtlSupport = $rtlSupport;
     }
 }
