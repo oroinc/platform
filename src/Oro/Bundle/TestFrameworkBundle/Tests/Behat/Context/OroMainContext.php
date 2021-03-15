@@ -932,8 +932,8 @@ class OroMainContext extends MinkContext implements
      * Example: Then I should see that "Header" contains "Some Text" placeholder
      * @Then /^(?:|I )should see that "(?P<elementName>[^"]*)" contains "(?P<text>[^"]*)" placeholder$/
      *
-     * @param string $elementName
-     * @param string $text
+     * @param string $locator
+     * @param string $value
      */
     public function assertDefinedElementContainsPlaceholder($locator, $value)
     {
@@ -2414,52 +2414,6 @@ JS;
         }, 10);
 
         parent::assertPageAddress($page);
-    }
-
-    /**
-     * Returns the name of the current and the last browser tab as an array.
-     *
-     * @return array [$currentTab, $lastTab]
-     */
-    public function getCurrentAndLastTabNames()
-    {
-        $currentTab = $this->getSession()->getWindowName();
-        $windowNames = $this->getSession()->getWindowNames();
-        $lastTab = end($windowNames);
-        return [$currentTab, $lastTab];
-    }
-
-    /**
-     * Check if the browser opened a new tab.
-     *
-     * It is based on the assumption that the current window was the last tab before a new tab was opened.
-     *
-     * Example: Then a new browser tab is opened
-     * @Then /^a new browser tab is opened$/
-     */
-    public function newBrowserTabIsOpened()
-    {
-        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
-        if ($lastTab === $currentTab) {
-            self::fail('No new browser tabs detected after the current one');
-        }
-    }
-
-    /**
-     * Check if the browser opened a new tab, and switch to this tab if it is.
-     *
-     * It is based on the assumption that the current window was the last tab before a new tab was opened.
-     *
-     * Example: Then a new browser tab is opened and I switch to it
-     * @Then /^a new browser tab is opened and I switch to it$/
-     */
-    public function newBrowserTabIsOpenedAndISwitchToIt()
-    {
-        list($currentTab, $lastTab) = $this->getCurrentAndLastTabNames();
-        if ($lastTab === $currentTab) {
-            self::fail('No new browser tabs detected after the current one');
-        }
-        $this->getSession()->switchToWindow($lastTab);
     }
 
     /**

@@ -246,6 +246,20 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
+     * Indicates whether the current action is executed for the primary entity or for an included entity.
+     *
+     * @return bool
+     */
+    public function isPrimaryEntityRequest(): bool
+    {
+        $includedEntities = $this->getIncludedEntities();
+
+        return
+            null === $includedEntities
+            || $includedEntities->getPrimaryEntity() === $this->getData();
+    }
+
+    /**
      * This method is just an alias for getData.
      *
      * @return mixed

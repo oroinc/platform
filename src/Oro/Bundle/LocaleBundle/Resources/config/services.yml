@@ -323,12 +323,6 @@ services:
         tags:
             - { name: security.voter }
 
-    oro_locale.repository.localization:
-        class: Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository
-        parent: oro_entity.abstract_repository
-        arguments:
-            - 'Oro\Bundle\LocaleBundle\Entity\Localization'
-
     oro_locale.provider.localization_choices:
         class: Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider
         public: true

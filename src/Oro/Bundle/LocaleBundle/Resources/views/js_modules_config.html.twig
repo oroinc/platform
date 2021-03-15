@@ -12,12 +12,13 @@
 
 {% set numberFormatSettings = {} %}
 {% for style in ['decimal', 'percent', 'currency'] %}
+    {% set locale = style == 'currency' ? oro_locale() ~ '@currency=' ~ oro_currency() : oro_locale() %}
     {% set numberFormatSettings = numberFormatSettings|merge({
         (style): {
             'grouping_size':       oro_locale_number_attribute('grouping_size', style),
             'grouping_used':       oro_locale_number_attribute('grouping_used', style),
-            'max_fraction_digits': oro_locale_number_attribute('max_fraction_digits', style),
-            'min_fraction_digits': oro_locale_number_attribute('min_fraction_digits', style),
+            'min_fraction_digits': oro_locale_number_attribute('min_fraction_digits', style, locale),
+            'max_fraction_digits': oro_locale_number_attribute('max_fraction_digits', style, locale),
 
             'negative_prefix':   oro_locale_number_text_attribute('negative_prefix', style),
             'negative_suffix':   oro_locale_number_text_attribute('negative_suffix', style),

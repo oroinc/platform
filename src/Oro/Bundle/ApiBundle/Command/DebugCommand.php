@@ -52,7 +52,10 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
         $this->processorBag = $processorBag;
     }
 
-    protected function configure()
+    /**
+     * {@inheritdoc }
+     */
+    protected function configure(): void
     {
         $this
             ->addArgument(
@@ -119,20 +122,23 @@ HELP
             ->addUsage('--attribute=collection:true <action>')
             ->addUsage('--attribute=extra:[definition,filters] <action>')
             ->addUsage('--processors')
-            ->addUsage('--processors-without-description')
-        ;
+            ->addUsage('--processors-without-description');
 
         parent::configure();
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
+    /**
+     * {@inheritdoc }
+     */
     protected function getDefaultRequestType(): array
     {
         return ['any'];
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    public function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * {@inheritdoc }
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): void
     {
         $showProcessors = $input->getOption('processors');
         if ($showProcessors) {
@@ -166,7 +172,7 @@ HELP
 
     private function dumpActions(OutputInterface $output): void
     {
-        $publicActions = $this->actionProcessorBag->getActions();
+        $publicActions = $this->getPublicActions();
 
         $processorsForPublicActions = [];
         $processorsForOtherActions = [];
@@ -235,7 +241,7 @@ HELP
         $table = new Table($output);
         $table->setHeaders(['Action', 'Groups', 'Details']);
         $i = 0;
-        foreach ($processors as $action => list($numberOfProcessors, $groups)) {
+        foreach ($processors as $action => [$numberOfProcessors, $groups]) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
@@ -344,7 +350,7 @@ HELP
         $context->set(ApiContext::REQUEST_TYPE, $requestType);
         $specifiedAttributes = [];
         foreach ($attributes as $attribute) {
-            list($name, $value) = explode(':', $attribute, 2);
+            [$name, $value] = explode(':', $attribute, 2);
             $value = $this->getTypedValue($value);
             if ('group' === $name) {
                 $context->setFirstGroup($value);
@@ -533,8 +539,17 @@ HELP
 
     /**
      * @return string[]
-     *
-     * @SuppressWarnings(PHPMD.UnusedLocalVariable)
+     */
+    private function getPublicActions(): array
+    {
+        $publicActions = $this->actionProcessorBag->getActions();
+        unset($publicActions[array_search('unhandled_error', $publicActions, true)]);
+        $publicActions = array_values($publicActions);
+
+        return $publicActions;
+    }
+    /**
+     * @return string[]
      */
     private function getProcessorIds(string $action): array
     {
@@ -544,8 +559,7 @@ HELP
         $processors->setApplicableChecker(new ChainApplicableChecker());
 
         $result = [];
-
-        /** * @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection PhpUnusedLocalVariableInspection */
         foreach ($processors as $processor) {
             $result[] = $processors->getProcessorId();
         }

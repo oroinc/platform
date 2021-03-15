@@ -104,7 +104,7 @@ class UrlUtil
      * If any of a path is an empty string, the method concatenates the remaining paths.
      * If all paths are empty strings, the result is an empty string as well.
      *
-     * @param string[] $paths
+     * @param string ...$paths
      *
      * @return string
      */
