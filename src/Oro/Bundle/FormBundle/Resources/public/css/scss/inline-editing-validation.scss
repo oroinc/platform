@@ -18,6 +18,10 @@
             text-align: left;
         }
 
+        .validation-failed__icon {
+            overflow: hidden;
+        }
+
         &:after {
             border-width: 6px 4px 0;
             margin-top: 0;
