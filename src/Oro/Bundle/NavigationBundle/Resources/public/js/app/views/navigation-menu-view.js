@@ -79,14 +79,22 @@ const NavigationMenuView = BaseView.extend({
         this.registerKey(KEY_CODES.SPACE, this.onPressedSpace);
         this.registerKey(KEY_CODES.END, this.onPressedEnd);
         this.registerKey(KEY_CODES.HOME, this.onPressedHome);
-        this.registerKey(KEY_CODES.LEFT, this.onPressedLeft);
-        this.registerKey(KEY_CODES.RIGHT, this.onPressedRight);
 
-        // For simple (plain) menu buttons TOP and BOTTOM are doing the some behoviur as LEFT and RIGHT
         if (this.isPlainMenu) {
+            this.registerKey(KEY_CODES.LEFT, this.onPressedLeft);
+            this.registerKey(KEY_CODES.RIGHT, this.onPressedRight);
+            // For simple (plain) menu buttons TOP and BOTTOM are doing the some behaviour as LEFT and RIGHT
             this.registerKey(KEY_CODES.UP, this.onPressedLeft);
             this.registerKey(KEY_CODES.DOWN, this.onPressedRight);
         } else {
+            if (_.isRTL()) {
+                this.registerKey(KEY_CODES.RIGHT, this.onPressedLeft);
+                this.registerKey(KEY_CODES.LEFT, this.onPressedRight);
+            } else {
+                this.registerKey(KEY_CODES.LEFT, this.onPressedLeft);
+                this.registerKey(KEY_CODES.RIGHT, this.onPressedRight);
+            }
+
             this.registerKey(KEY_CODES.UP, this.onPressedUp);
             this.registerKey(KEY_CODES.DOWN, this.onPressedDown);
         }
