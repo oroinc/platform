@@ -291,7 +291,87 @@ class UserTest extends RestJsonApiTestCase
 
         $user = $this->getEntityManager()->find(User::class, $userId);
         self::assertEquals('Updated First Name', $user->getFirstName());
-        self::assertNotNull($user->getOwner(LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT));
+        self::assertNotNull($user->getOwner());
+    }
+
+    public function testTryToUpdateCurrentLoggedInUserWhenDataAreInvalid()
+    {
+        /** @var User $user */
+        $user = $this->getEntityManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
+        $userId = $user->getId();
+        $userName = $user->getUsername();
+
+        // do not use patch() method to prevent clearing of the entity manager
+        // and as result refreshing the security context
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getItemRouteName(), ['entity' => 'users', 'id' => $userId]),
+            [
+                'data' => [
+                    'type'       => 'users',
+                    'id'         => (string)$userId,
+                    'attributes' => ['username' => null]
+                ]
+            ]
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'source' => ['pointer' => '/data/attributes/username']
+            ],
+            $response
+        );
+
+        /** @var User $loggedInUser */
+        $loggedInUser = self::getContainer()->get('security.token_storage')->getToken()->getUser();
+        self::assertSame($userId, $loggedInUser->getId());
+        self::assertSame($userName, $loggedInUser->getUsername());
+    }
+
+    public function testTryToUpdateCurrentLoggedInUserViaUpdateBusinessUnitRequestWhenUserDataAreInvalid()
+    {
+        /** @var User $user */
+        $user = $this->getEntityManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
+        $userId = $user->getId();
+        $userName = $user->getUsername();
+        $buId = $user->getOwner()->getId();
+
+        // do not use patch() method to prevent clearing of the entity manager
+        // and as result refreshing the security context
+        $response = $this->request(
+            'PATCH',
+            $this->getUrl($this->getItemRouteName(), ['entity' => 'businessunits', 'id' => $buId]),
+            [
+                'data'     => ['type' => 'businessunits', 'id' => (string)$buId],
+                'included' => [
+                    [
+                        'type'          => 'users',
+                        'id'            => (string)$userId,
+                        'meta'          => ['update' => true],
+                        'attributes'    => ['username' => null],
+                        'relationships' => ['owner' => ['data' => ['type' => 'businessunits', 'id' => (string)$buId]]]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'source' => ['pointer' => '/included/0/attributes/username']
+            ],
+            $response
+        );
+
+        /** @var User $loggedInUser */
+        $loggedInUser = self::getContainer()->get('security.token_storage')->getToken()->getUser();
+        self::assertSame($userId, $loggedInUser->getId());
+        self::assertSame($userName, $loggedInUser->getUsername());
     }
 
     public function testUpdateRelationshipForOwner()
@@ -308,12 +388,12 @@ class UserTest extends RestJsonApiTestCase
                 'data' => [
                     'type' => 'businessunits',
                     'id'   => (string)$businessUnitId
-                ],
+                ]
             ]
         );
 
         $user = $this->getEntityManager()->find(User::class, $userId);
-        self::assertNotNull($user->getOwner(LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT));
+        self::assertNotNull($user->getOwner());
     }
 
     public function testDeleteRelationshipForOwner()
