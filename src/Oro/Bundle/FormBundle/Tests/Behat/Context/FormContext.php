@@ -28,6 +28,20 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     use PageObjectDictionary;
 
     /**
+     * Focus on the specified id|name|title|alt|value field
+     *
+     * Example: And I focus on "Some" field
+     *
+     * @When /^(?:|I )focus on "(?P<fieldName>[^"]*)" field$/
+     * @param string $fieldName
+     */
+    public function focusOnField($fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        $field->focus();
+    }
+
+    /**
      * Fill form with data
      * Example: And fill form with:
      *            | Subject     | Simple text     |
