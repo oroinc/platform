@@ -5278,16 +5278,16 @@
         },
         {
             "name": "nelmio/security-bundle",
-            "version": "v2.10.2",
+            "version": "v2.10.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nelmio/NelmioSecurityBundle.git",
-                "reference": "302b0f572361c2b737e903c8cd7f3cb8e187266c"
+                "reference": "40d5ac148ce72e79849da27568833794bd70fec9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nelmio/NelmioSecurityBundle/zipball/302b0f572361c2b737e903c8cd7f3cb8e187266c",
-                "reference": "302b0f572361c2b737e903c8cd7f3cb8e187266c",
+                "url": "https://api.github.com/repos/nelmio/NelmioSecurityBundle/zipball/40d5ac148ce72e79849da27568833794bd70fec9",
+                "reference": "40d5ac148ce72e79849da27568833794bd70fec9",
                 "shasum": ""
             },
             "require": {
@@ -5305,9 +5305,6 @@
                 "psr/cache": "^1.0",
                 "symfony/phpunit-bridge": "^5.0.5",
                 "twig/twig": "^1.38|^2.10|^3.0"
-            },
-            "suggest": {
-                "ua-parser/uap-php": "To allow adapt CSP directives given the user-agent"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -5343,9 +5340,9 @@
             ],
             "support": {
                 "issues": "https://github.com/nelmio/NelmioSecurityBundle/issues",
-                "source": "https://github.com/nelmio/NelmioSecurityBundle/tree/v2.10.2"
+                "source": "https://github.com/nelmio/NelmioSecurityBundle/tree/v2.10.3"
             },
-            "time": "2021-02-17T14:44:26+00:00"
+            "time": "2021-03-16T08:47:32+00:00"
         },
         {
             "name": "nesbot/carbon",
