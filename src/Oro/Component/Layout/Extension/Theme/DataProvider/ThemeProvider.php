@@ -72,7 +72,7 @@ class ThemeProvider
      *
      * @return string|null
      */
-    public function getStylesOutput(string $themeName, string $sectionName = 'styles'): ?string
+    public function getStylesOutput($themeName, $sectionName = 'styles')
     {
         $outputPath = $this->getOutputPath($themeName, $sectionName);
         if ($outputPath) {
