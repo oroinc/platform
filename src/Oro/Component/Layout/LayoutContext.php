@@ -27,8 +27,8 @@ class LayoutContext implements ContextInterface
     protected $hash;
 
     /**
-     * @param array         $parameters Context items
-     * @param null|string[] $vars Array of allowed layout context variables
+     * @param array          $parameters Context items
+     * @param array|string[] $vars       Array of allowed layout context variables
      */
     public function __construct(array $parameters = [], array $vars = [])
     {

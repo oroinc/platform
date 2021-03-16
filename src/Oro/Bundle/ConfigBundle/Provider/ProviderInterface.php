@@ -7,6 +7,9 @@ use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Provides Config for the form
+ */
 interface ProviderInterface
 {
     /**
@@ -28,7 +31,7 @@ interface ProviderInterface
     /**
      * Return specified tree for js-tree component
      *
-     * @return []
+     * @return array
      */
     public function getJsTree();
 

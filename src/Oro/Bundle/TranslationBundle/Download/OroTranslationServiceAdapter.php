@@ -34,7 +34,6 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
      * @param LoggerInterface $logger
      * @param string[] $translationPackageNames
      * @param array $translationServiceCredentials empty array or ['apikey' => 'your_API_key_here']
-     * @phpstan-param array{apikey?: string} $credentials
      */
     public function __construct(
         ClientInterface $guzzleHttpClient,
