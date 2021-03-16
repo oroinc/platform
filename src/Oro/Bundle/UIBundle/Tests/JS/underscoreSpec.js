@@ -38,5 +38,23 @@ define([
 
             expect(result).toEqual('<span>Listed price: 100</span>');
         });
+
+        describe('escapeForJSON should return safe string for JSON definition over strings concatenation', function() {
+            const cases = [
+                ['string', '"\/\b\f\t\n\r\\'],
+                ['number', 3.45],
+                ['null', null],
+                ['boolean', true]
+            ];
+
+            cases.forEach(testCase => {
+                it(`escape "${testCase[0]}" type value for JSON`, function() {
+                    const value = testCase[1];
+                    const jsonString = '{"prop": "prefix ' + _.escapeForJSON(value) + ' suffix"}';
+                    const obj = JSON.parse(jsonString);
+                    expect(obj.prop).toEqual('prefix ' + value + ' suffix');
+                });
+            });
+        });
     });
 });
