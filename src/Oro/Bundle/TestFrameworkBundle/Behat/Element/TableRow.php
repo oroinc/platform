@@ -48,7 +48,7 @@ class TableRow extends Element
     {
         $columnNumber = $this->getColumnNumberByHeader($header);
 
-        return $this->normalizeValueByGuessingType(
+        return self::normalizeValueByGuessingType(
             $this->getCellElementValue($columnNumber)
         );
     }
@@ -88,7 +88,7 @@ class TableRow extends Element
      * @param string $value
      * @return \DateTime|int|string
      */
-    protected function normalizeValueByGuessingType($value)
+    public static function normalizeValueByGuessingType($value)
     {
         $value = trim($value);
 
@@ -98,9 +98,9 @@ class TableRow extends Element
 
         if (preg_match('/^-?[0-9]+$/', $value)) {
             return (int) $value;
-        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/', $value, $matches)) {
+        } elseif (preg_match('/^\p{Sc}(?P<amount>[0-9]+)$/u', $value, $matches)) {
             return (int) $matches['amount'];
-        } elseif (($date = date_create($value)) &&
+        } elseif (($date = date_create($value, new \DateTimeZone('UTC'))) &&
             (
                 preg_match(
                     '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s([1-3])?[0-9]\,\s[1-2][0-9]{3}/',

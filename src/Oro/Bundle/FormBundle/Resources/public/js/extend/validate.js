@@ -256,7 +256,8 @@ define(function(require, exports, module) {
                 }.bind(this)
             });
 
-            $.validator._loadMethod();
+            $.validator._loadMethod()
+                .then(this.settings.onMethodsLoaded || (() => {}));
 
             original.init.call(this);
 
@@ -553,14 +554,22 @@ define(function(require, exports, module) {
     $.validator._loadMethod = function() {
         const {_methodsToLoad: modules = []} = $.validator;
         $.validator._methodsToLoad = []; // flush collected modules
-        loadModules(modules, (...methods) => {
+        return loadModules(modules, (...methods) => {
             methods.forEach(method => $.validator.addMethod(...method));
-
+        }).then(() => {
             if ($.validator._methodsToLoad.length) {
                 // there are new methods were added to load
-                $.validator._loadMethod();
+                return $.validator._loadMethod();
             }
         });
+    };
+
+    /**
+     * Allows to preload validation methods before validator initialization
+     * @return {Promise}
+     */
+    $.validator.preloadMethods = function() {
+        return $.validator._loadMethod();
     };
 
     $.validator.setDefaults({
