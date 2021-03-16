@@ -179,7 +179,7 @@ class MainMenu extends Element
     }
 
     /**
-     * @param NodeElement $menuItem
+     * @param NodeElement $menuTitle
      * @return int
      */
     private function getMenuLevel(NodeElement $menuTitle)

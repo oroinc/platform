@@ -311,7 +311,7 @@ class EmailUserRepository extends EntityRepository
      * @param Email        $email
      * @param User         $user
      * @param Organization $organization
-     * @param bool|false   $checkThread
+     * @param bool         $checkThread
      *
      * @return EmailUser[]
      */

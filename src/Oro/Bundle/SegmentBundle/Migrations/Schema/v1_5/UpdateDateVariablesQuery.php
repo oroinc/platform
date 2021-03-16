@@ -148,7 +148,7 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
     /**
      * Replaces old month variables ({{17}} - {{28}}) by month numbers (1 - 12)
      *
-     * @param string $value
+     * @param array  $value
      * @param string $offset
      *
      * @return string|false Replaced value or false if nothing was replaced

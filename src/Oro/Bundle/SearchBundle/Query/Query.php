@@ -518,7 +518,7 @@ class Query
      * Parse field name and check if there is an alias declared in it.
      *
      * @param string $field
-     * @param string|null
+     * @param string|null $enforcedFieldType
      * @return string
      */
     private function parseFieldAliasing($field, $enforcedFieldType = null)

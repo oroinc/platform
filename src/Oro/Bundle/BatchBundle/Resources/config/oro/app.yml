@@ -10,6 +10,7 @@ doctrine:
                 password: '%database_password%'
                 options:  '%database_driver_options%'
                 charset:  '%database_charset%'
+                server_version: '%database_server_version%'
     orm:
         entity_managers:
             batch:

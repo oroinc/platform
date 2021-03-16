@@ -24,7 +24,7 @@ interface SendProcessorInterface
     /**
      * Gets label of processor
      *
-     * @param string
+     * @return string
      */
     public function getLabel();
 }

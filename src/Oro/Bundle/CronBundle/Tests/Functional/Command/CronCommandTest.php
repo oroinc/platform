@@ -84,7 +84,7 @@ class CronCommandTest extends WebTestCase
     }
 
     /**
-     * @param bool|false $isDue
+     * @param bool $isDue
      */
     protected function mockCronHelper($isDue = false)
     {
