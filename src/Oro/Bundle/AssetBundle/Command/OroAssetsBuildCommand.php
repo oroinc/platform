@@ -94,7 +94,7 @@ class OroAssetsBuildCommand extends Command
             ->addOption('npm-install', 'i', InputOption::VALUE_NONE, 'Reinstall npm dependencies')
             ->addOption('skip-css', null, InputOption::VALUE_NONE, 'Skip build of CSS assets')
             ->addOption('skip-js', null, InputOption::VALUE_NONE, 'Skip build of JS assets')
-            ->addOption('skip-babel', null, InputOption::VALUE_NONE, 'Skip transpiling code with Babel')
+            ->addOption('with-babel', null, InputOption::VALUE_NONE, 'Transpile code with Babel')
             ->addOption('skip-sourcemap', null, InputOption::VALUE_NONE, 'Skip building source maps')
             ->addOption('skip-rtl', null, InputOption::VALUE_NONE, 'Skip building RTL styles')
             ->addOption('analyze', null, InputOption::VALUE_NONE, 'Run BundleAnalyzerPlugin')
@@ -151,15 +151,15 @@ in <comment>vendor/oro/platform/build</comment> folder. It may be required when
 
   <info>php %command.full_name% --npm-install</info>
 
-The <info>--skip-css</info>, <info>--skip-js</info>, <info>--skip-babel</info>, <info>--skip-sourcemap</info> and <info>--skip-rtl</info> options allow to
-skip building CSS and JavaScript files, skip transpiling Javascript with Babel,
+The <info>--skip-css</info>, <info>--skip-js</info>, <info>--with-babel</info>, <info>--skip-sourcemap</info> and <info>--skip-rtl</info> options allow to
+skip building CSS and JavaScript files, and transpiling Javascript with Babel,
 skip building sourcemaps and skip building RTL styles respectively:
 
   <info>php %command.full_name% --skip-css</info>
   <info>php %command.full_name% --skip-js</info>
-  <info>php %command.full_name% --skip-babel</info>
   <info>php %command.full_name% --skip-sourcemap</info>
   <info>php %command.full_name% --skip-rtl</info>
+  <info>php %command.full_name% --with-babel</info>
 
 The <info>--analyze</info> option can be used to run BundleAnalyzerPlugin:
 
@@ -186,9 +186,9 @@ HELP
             ->addUsage('--npm-install')
             ->addUsage('--skip-css')
             ->addUsage('--skip-js')
-            ->addUsage('--skip-babel')
             ->addUsage('--skip-sourcemap')
             ->addUsage('--skip-rtl')
+            ->addUsage('--with-babel')
             ->addUsage('--analyze')
         ;
     }
@@ -294,7 +294,7 @@ HELP
         if ($input->getOption('skip-js')) {
             $command[] = '--env.skipJS';
         }
-        if ($input->getOption('skip-babel')) {
+        if (!$input->getOption('with-babel')) {
             $command[] = '--env.skipBabel';
         }
         if ($input->getOption('skip-sourcemap')) {
