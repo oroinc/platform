@@ -351,7 +351,7 @@ define(function(require, exports, module) {
             }
 
             if (_.isRTL() && shift < 0) {
-                 $dropdown.css('margin-inline-start', shift);
+                $dropdown.css('margin-inline-start', shift);
             }
         },
 
