@@ -335,8 +335,8 @@ define(function(require, exports, module) {
          */
         _getSelectWidgetPosition: function() {
             return {
-                my: 'left top+8',
-                at: 'left bottom',
+                my: `${_.isRTL() ? 'right' : 'left'} top+8`,
+                at: `${_.isRTL() ? 'right' : 'left'} bottom`,
                 of: this.$el,
                 collision: _.isMobile() ? 'none' : 'fit none',
                 within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
