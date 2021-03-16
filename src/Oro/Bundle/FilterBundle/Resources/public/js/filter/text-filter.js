@@ -351,7 +351,7 @@ define(function(require, exports, module) {
             }
 
             if (_.isRTL() && shift < 0) {
-                 $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, shift);
+                $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, shift);
             }
         },
 
