@@ -332,16 +332,26 @@ define(function(require, exports, module) {
                 return;
             }
             const $dropdown = this.$(this.criteriaSelector);
-            $dropdown.css('margin-left', 'auto');
+            $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, 'auto');
+
             const rect = $dropdown.get(0).getBoundingClientRect();
+            const rectInlineEnd = rect[_.isRTL() ? 'left' : 'right'];
+
             const containerRect = $container.get(0).getBoundingClientRect();
-            let shift = rect.right - containerRect.right;
-            if (shift > 0) {
+            const containerRectInlineEnd = containerRect[_.isRTL() ? 'left' : 'right'];
+
+            let shift = rectInlineEnd - containerRectInlineEnd;
+
+            if (!_.isRTL() && shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container
                  */
                 shift -= Math.max(0, containerRect.left - (rect.left - shift));
-                $dropdown.css('margin-left', -shift);
+                $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, -shift);
+            }
+
+            if (_.isRTL() && shift < 0) {
+                 $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, shift);
             }
         },
 
