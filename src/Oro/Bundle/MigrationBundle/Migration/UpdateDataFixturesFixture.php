@@ -5,6 +5,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
@@ -60,6 +61,8 @@ class UpdateDataFixturesFixture extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
+        $this->checkEntityManagerOpen($manager);
+
         $this->deprecatedLoad($manager);
 
         if (!$this->fixtures) {
@@ -82,7 +85,20 @@ class UpdateDataFixturesFixture extends AbstractFixture
             if (!$dataFixture) {
                 $dataFixture = new DataFixture();
                 $dataFixture->setClassName($className);
-                $manager->persist($dataFixture);
+
+                try {
+                    $manager->persist($dataFixture);
+                } catch (\Exception $e) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Exception during persisting the fixture %s with version %s.',
+                            $dataFixture->getClassName(),
+                            $dataFixture->getVersion()
+                        ),
+                        $e->getCode(),
+                        $e
+                    );
+                }
             }
 
             $dataFixture->setVersion($version);
@@ -119,6 +135,17 @@ class UpdateDataFixturesFixture extends AbstractFixture
                 unset($this->fixtures[$className]);
             }
             $manager->flush();
+        }
+    }
+
+    private function checkEntityManagerOpen(EntityManager $manager)
+    {
+        if (!$manager->isOpen()) {
+            throw new \RuntimeException('EntityManager is closed');
+        }
+
+        if ($manager->getConnection()->isRollbackOnly()) {
+            throw new \RuntimeException('EntityManager\'s connection in rollback only state');
         }
     }
 }

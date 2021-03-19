@@ -23,9 +23,8 @@ class LoadDataFixturesTest extends WebTestCase
 
     public function testLoadDemoDataFixtures()
     {
-        $this->markTestSkipped('will be fixed in BAP-19445');
         // for manual execution needs reset autoincrements, like that ALTER TABLE `<table_name>` AUTO_INCREMENT=2
-        $this->runCommand(LoadDataFixturesCommand::getDefaultName(), ['--fixtures-type=demo'], true, true);
+        $this->runCommand(LoadDataFixturesCommand::getDefaultName(), ['--fixtures-type=demo', '-vvv'], true, true);
 
         $messages = [];
         foreach ($this->getMessageCollector()->getSentMessages() as $message) {
