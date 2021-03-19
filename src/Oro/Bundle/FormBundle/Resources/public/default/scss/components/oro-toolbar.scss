@@ -62,6 +62,7 @@
     }
 
     &__link {
+        display: block;
         line-height: 2;
 
         color: get-color('additional', 'dark');
