@@ -4,6 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\FixtureInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
@@ -47,6 +48,8 @@ class UpdateDataFixturesFixture extends AbstractFixture
 
         $loadedAt = new \DateTime('now', new \DateTimeZone('UTC'));
 
+        $this->checkEntityManagerOpen($manager);
+
         $repository = $manager->getRepository(DataFixture::class);
         foreach ($this->fixtures as $className => $fixture) {
             $dataFixture = null;
@@ -61,7 +64,20 @@ class UpdateDataFixturesFixture extends AbstractFixture
             if (!$dataFixture) {
                 $dataFixture = new DataFixture();
                 $dataFixture->setClassName($className);
-                $manager->persist($dataFixture);
+
+                try {
+                    $manager->persist($dataFixture);
+                } catch (\Exception $e) {
+                    throw new \RuntimeException(
+                        sprintf(
+                            'Exception during persisting the fixture %s with version %s.',
+                            $dataFixture->getClassName(),
+                            $dataFixture->getVersion()
+                        ),
+                        $e->getCode(),
+                        $e
+                    );
+                }
             }
 
             $dataFixture->setVersion($version);
@@ -69,5 +85,16 @@ class UpdateDataFixturesFixture extends AbstractFixture
         }
 
         $manager->flush();
+    }
+
+    private function checkEntityManagerOpen(EntityManager $manager): void
+    {
+        if (!$manager->isOpen()) {
+            throw new \RuntimeException('EntityManager is closed');
+        }
+
+        if ($manager->getConnection()->isRollbackOnly()) {
+            throw new \RuntimeException('EntityManager\'s connection in rollback only state');
+        }
     }
 }
