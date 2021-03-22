@@ -27,7 +27,35 @@ class ChunksHelper
         }
 
         if ($chunk) {
-            yield ceil($counter / $chunkSize) => $chunk;
+            yield ((int) ceil($counter / $chunkSize)) => $chunk;
+        }
+
+        return [];
+    }
+
+    /**
+     * Splits in chunks and preserves original keys.
+     *
+     * @param iterable $data Data to split in chunks.
+     * @param int $chunkSize
+     * @return iterable
+     */
+    public static function splitInChunksAssoc(iterable $data, int $chunkSize): iterable
+    {
+        $counter = 0;
+        $chunk = [];
+        foreach ($data as $key => $value) {
+            $counter++;
+            $chunk[$key] = $value;
+
+            if (($counter % $chunkSize) === 0) {
+                yield ($counter / $chunkSize) => $chunk;
+                $chunk = [];
+            }
+        }
+
+        if ($chunk) {
+            yield ((int) ceil($counter / $chunkSize)) => $chunk;
         }
 
         return [];
@@ -54,7 +82,7 @@ class ChunksHelper
         }
 
         if ($chunk) {
-            yield ceil($counter / $chunkSize) => $chunk;
+            yield ((int) ceil($counter / $chunkSize)) => $chunk;
         }
 
         return [];
