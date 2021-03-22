@@ -19,9 +19,6 @@ class ChunksHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function chunksDataProvider(): array
     {
         return [
@@ -77,5 +74,62 @@ class ChunksHelperTest extends \PHPUnit\Framework\TestCase
         foreach (ChunksHelper::splitInChunksByColumn($data, 2, 'sample_key') as $chunk) {
             $this->assertEquals(array_column(array_shift($expectedChunks), 'sample_key'), $chunk);
         }
+    }
+
+    /**
+     * @dataProvider splitInChunksAssocDataProvider
+     *
+     * @param array $data
+     * @param array $expectedChunks
+     */
+    public function testSplitInChunksAssoc(array $data, array $expectedChunks): void
+    {
+        foreach (ChunksHelper::splitInChunksAssoc($data, 2) as $chunk) {
+            $this->assertEquals(array_shift($expectedChunks), $chunk);
+        }
+    }
+
+    public function splitInChunksAssocDataProvider(): array
+    {
+        return [
+            'empty data set' => [
+                'data' => [],
+                'expectedChunks' => [],
+            ],
+            'even data set' => [
+                'data' => [
+                    'key1' => ['sample_key' => 'sample_value1'],
+                    'key2' => ['sample_key' => 'sample_value2'],
+                    'key3' => ['sample_key' => 'sample_value3'],
+                    'key4' => ['sample_key' => 'sample_value4'],
+                ],
+                'expectedChunks' => [
+                    [
+                        'key1' => ['sample_key' => 'sample_value1'],
+                        'key2' => ['sample_key' => 'sample_value2'],
+                    ],
+                    [
+                        'key3' => ['sample_key' => 'sample_value3'],
+                        'key4' => ['sample_key' => 'sample_value4'],
+                    ],
+                ],
+            ],
+            'not even data set' => [
+                'data' => [
+                    'key1' => ['sample_key' => 'sample_value1'],
+                    'key2' => ['sample_key' => 'sample_value2'],
+                    'key3' => ['sample_key' => 'sample_value3'],
+                ],
+                'expectedChunks' => [
+                    [
+                        'key1' => ['sample_key' => 'sample_value1'],
+                        'key2' => ['sample_key' => 'sample_value2'],
+                    ],
+                    [
+                        'key3' => ['sample_key' => 'sample_value3'],
+                    ],
+                ],
+            ],
+        ];
     }
 }
