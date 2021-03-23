@@ -10,10 +10,16 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    private CacheManager $imagineCacheManager;
+    /** @var CacheManager */
+    private $imagineCacheManager;
 
-    private string $defaultPath;
+    /** @var string */
+    private $defaultPath;
 
+    /**
+     * @param CacheManager $imagineCacheManager
+     * @param string $defaultPath
+     */
     public function __construct(CacheManager $imagineCacheManager, string $defaultPath)
     {
         $this->imagineCacheManager = $imagineCacheManager;
@@ -23,8 +29,14 @@ class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterfa
     /**
      * {@inheritdoc}
      */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
+    public function getPath(string $filter): ?string
     {
-        return $this->imagineCacheManager->generateUrl($this->defaultPath, $filter, [], null, $referenceType);
+        return $this->imagineCacheManager->generateUrl(
+            $this->defaultPath,
+            $filter,
+            [],
+            null,
+            UrlGeneratorInterface::ABSOLUTE_PATH
+        );
     }
 }

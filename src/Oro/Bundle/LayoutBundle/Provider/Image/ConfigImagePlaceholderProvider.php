@@ -6,7 +6,6 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Provides the path to the image placeholder based on the parameter from the system configuration.
@@ -46,7 +45,7 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
     /**
      * {@inheritdoc}
      */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
+    public function getPath(string $filter): ?string
     {
         $id = $this->configManager->get($this->configKey);
         if (!$id) {
@@ -59,6 +58,6 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
             return null;
         }
 
-        return $this->attachmentManager->getFilteredImageUrl($image, $filter, $referenceType);
+        return $this->attachmentManager->getFilteredImageUrl($image, $filter);
     }
 }

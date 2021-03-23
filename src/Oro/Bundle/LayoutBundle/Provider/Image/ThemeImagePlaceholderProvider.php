@@ -46,7 +46,7 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
+    public function getPath(string $filter): ?string
     {
         $imagePlaceholders = $this->getImagePlaceholders();
         if (!isset($imagePlaceholders[$this->placeholderName])) {
@@ -58,7 +58,7 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
             $filter,
             [],
             null,
-            $referenceType
+            UrlGeneratorInterface::ABSOLUTE_PATH
         );
     }
 

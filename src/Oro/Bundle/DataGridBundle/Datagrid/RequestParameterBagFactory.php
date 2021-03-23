@@ -37,7 +37,7 @@ class RequestParameterBagFactory
      *
      * @return array
      */
-    public function fetchParameters(string $gridParameterName = self::DEFAULT_ROOT_PARAM): array
+    public function fetchParameters($gridParameterName = self::DEFAULT_ROOT_PARAM)
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -58,7 +58,7 @@ class RequestParameterBagFactory
             $parameters = [];
         }
 
-        $minifiedParameters = $this->getMinifiedParameters($request, $gridParameterName);
+        $minifiedParameters = $this->getMinifiedParametersFromRequest($request, $gridParameterName);
         if ($minifiedParameters) {
             $parameters[ParameterBag::MINIFIED_PARAMETERS] = $minifiedParameters;
         }
@@ -70,7 +70,7 @@ class RequestParameterBagFactory
      * @param string $gridParameterName
      * @return ParameterBag
      */
-    public function createParameters(string $gridParameterName = self::DEFAULT_ROOT_PARAM): ParameterBag
+    public function createParameters($gridParameterName = self::DEFAULT_ROOT_PARAM)
     {
         $parameters = $this->fetchParameters($gridParameterName);
 
@@ -96,7 +96,7 @@ class RequestParameterBagFactory
      * @param string $gridParameterName
      * @return array
      */
-    private function getMinifiedParameters(Request $request, string $gridParameterName): array
+    private function getMinifiedParametersFromRequest(Request $request, string $gridParameterName): array
     {
         $gridData = $request->get(self::DEFAULT_ROOT_PARAM, []);
 
@@ -105,5 +105,22 @@ class RequestParameterBagFactory
         }
 
         return $parameters ?? [];
+    }
+
+    /**
+     * @param string $gridParameterName
+     * @return null
+     */
+    protected function getMinifiedParameters($gridParameterName)
+    {
+        $request = $this->requestStack->getCurrentRequest();
+        $gridData = $request ? $request->get(self::DEFAULT_ROOT_PARAM, []) : [];
+        if (empty($gridData[$gridParameterName])) {
+            return null;
+        }
+
+        parse_str($gridData[$gridParameterName], $parameters);
+
+        return $parameters;
     }
 }

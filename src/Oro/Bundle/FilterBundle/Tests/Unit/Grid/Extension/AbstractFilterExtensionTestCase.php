@@ -16,6 +16,7 @@ use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
 use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\FilterBagStub;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -43,6 +44,9 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $filtersStateProvider;
 
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $translator;
+
     /** @var AbstractFilterExtension */
     protected $extension;
 
@@ -56,6 +60,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->filtersProvider = $this->createMock(DatagridFiltersProviderInterface::class);
         $this->filtersMetadataProvider = $this->createMock(FiltersMetadataProvider::class);
         $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->datagridParameters = $this->createMock(ParameterBag::class);
     }
 

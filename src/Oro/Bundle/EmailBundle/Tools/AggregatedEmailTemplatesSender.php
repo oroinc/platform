@@ -56,13 +56,57 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
      * @param EmailHolderInterface[] $recipients
      * @param string $from
      * @param string $templateName
+     * @return EmailUser[]
+     *
+     * @throws EntityNotFoundException if the specified email template cannot be found
+     * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
+     */
+    public function send(object $entity, array $recipients, string $from, string $templateName): array
+    {
+        $templateCollection = $this->localizedTemplateProvider->getAggregated(
+            $recipients,
+            new EmailTemplateCriteria($templateName, $this->doctrineHelper->getEntityClass($entity)),
+            ['entity' => $entity]
+        );
+
+        $emailUsers = [];
+        foreach ($templateCollection as $localizedTemplateDTO) {
+            $emailTemplate = $localizedTemplateDTO->getEmailTemplate();
+
+            $emailModel = new Email();
+            $emailModel->setFrom($from);
+            $emailModel->setTo($localizedTemplateDTO->getEmails());
+            $emailModel->setSubject($emailTemplate->getSubject());
+            $emailModel->setBody($emailTemplate->getContent());
+            $emailModel->setType($emailTemplate->getType() === EmailTemplate::CONTENT_TYPE_HTML ? 'html' : 'text');
+
+            try {
+                $emailOrigin = $this->emailOriginHelper->getEmailOrigin(
+                    $emailModel->getFrom(),
+                    $emailModel->getOrganization()
+                );
+
+                $emailUsers[] = $this->emailProcessor->process($emailModel, $emailOrigin);
+            } catch (\Swift_SwiftException $exception) {
+                $this->logger->error('Workflow send email template action.', ['exception' => $exception]);
+            }
+        }
+
+        return $emailUsers;
+    }
+
+    /**
+     * @param object $entity
+     * @param EmailHolderInterface[] $recipients
+     * @param string $from
+     * @param string $templateName
      * @param array $templateParams
      * @return EmailUser[]
      *
      * @throws EntityNotFoundException if the specified email template cannot be found
      * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
-    public function send(
+    public function sendWithParameters(
         object $entity,
         array $recipients,
         string $from,

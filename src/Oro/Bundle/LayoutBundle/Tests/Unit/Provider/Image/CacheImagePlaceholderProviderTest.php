@@ -5,7 +5,6 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\LayoutBundle\Provider\Image\CacheImagePlaceholderProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,11 +28,10 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $filter = 'test_filter';
         $path = 'test/path';
-        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
         $this->cache->expects(self::once())
             ->method('fetch')
-            ->with($cacheKey)
+            ->with($filter)
             ->willReturn($path);
 
         $this->cache->expects(self::never())
@@ -49,20 +47,19 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $filter = 'test_filter';
         $path = 'test/path';
-        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
         $this->cache->expects(self::once())
             ->method('fetch')
-            ->with($cacheKey)
+            ->with($filter)
             ->willReturn(false);
 
         $this->cache->expects(self::once())
             ->method('save')
-            ->with($cacheKey, $path);
+            ->with($filter, $path);
 
         $this->imagePlaceholderProvider->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter)
             ->willReturn($path);
 
         $this->assertEquals($path, $this->decorator->getPath($filter));

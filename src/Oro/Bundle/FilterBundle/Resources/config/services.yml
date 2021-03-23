@@ -7,11 +7,12 @@ services:
         arguments:
             - '@oro_datagrid.configuration.provider.raw'
             - '@oro_filter.extension.orm_filter_bag'
-            - '@oro_filter.provider.datagrid_filters'
-            - '@oro_filter.provider.filters_metadata'
             - '@oro_filter.provider.state.filters'
             - '@oro_filter.execution_context'
             - '@translator'
+        calls:
+            - [setFiltersProvider,  ['@oro_filter.provider.datagrid_filters']]
+            - [setFiltersMetadataProvider,  ['@oro_filter.provider.filters_metadata']]
         tags:
             - { name: oro_datagrid.extension }
 

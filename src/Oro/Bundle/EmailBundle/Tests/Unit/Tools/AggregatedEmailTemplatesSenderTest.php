@@ -141,7 +141,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             ->with(
                 [$recipient],
                 new EmailTemplateCriteria('test', \stdClass::class),
-                ['entity' => new \stdClass(), 'param' => 'value']
+                ['entity' => new \stdClass()]
             )
             ->willReturn([$dto]);
 
@@ -182,6 +182,79 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($emailUserEntity);
 
         $this->sender->send(
+            $options['entity'],
+            [new EmailAddressDTO($options['to'])],
+            $options['from'],
+            $options['template']
+        );
+    }
+
+    /**
+     * @dataProvider executeOptionsDataProvider
+     *
+     * @param array $options
+     * @param string|object $recipient
+     * @param array $expected
+     */
+    public function testExecuteWithParamters(array $options, $recipient, array $expected): void
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityClass')
+            ->willReturn(\stdClass::class);
+
+        if (!$recipient instanceof EmailHolderInterface) {
+            $recipient = new EmailAddressDTO($recipient);
+        }
+
+        $dto = new LocalizedTemplateDTO($this->emailTemplate);
+        $dto->addRecipient(is_object($recipient) ? $recipient : new EmailAddressDTO($recipient));
+
+        $this->localizedTemplateProvider->expects($this->once())
+            ->method('getAggregated')
+            ->with(
+                [$recipient],
+                new EmailTemplateCriteria('test', \stdClass::class),
+                ['entity' => new \stdClass(), 'param' => 'value']
+            )
+            ->willReturn([$dto]);
+
+        $this->emailTemplate->expects($this->once())
+            ->method('getType')
+            ->willReturn('plain/text');
+        $this->emailTemplate->expects($this->once())
+            ->method('getSubject')
+            ->willReturn($expected['subject']);
+        $this->emailTemplate->expects($this->once())
+            ->method('getContent')
+            ->willReturn($expected['body']);
+
+        $emailEntity = $this->createMock(EmailEntity::class);
+
+        $emailUserEntity = $this->createMock(EmailUser::class);
+        $emailUserEntity->expects($this->any())
+            ->method('getEmail')
+            ->willReturn($emailEntity);
+
+        $emailOrigin = new TestEmailOrigin();
+        $this->emailOriginHelper->expects($this->once())
+            ->method('getEmailOrigin')
+            ->with($expected['from'], null)
+            ->willReturn($emailOrigin);
+
+        $this->emailProcessor->expects($this->once())
+            ->method('process')
+            ->with(
+                (new Email())
+                    ->setFrom($expected['from'])
+                    ->setSubject($expected['subject'])
+                    ->setBody($expected['body'])
+                    ->setTo($expected['to'])
+                    ->setType('text'),
+                $emailOrigin
+            )
+            ->willReturn($emailUserEntity);
+
+        $this->sender->sendWithParameters(
             $options['entity'],
             [new EmailAddressDTO($options['to'])],
             $options['from'],

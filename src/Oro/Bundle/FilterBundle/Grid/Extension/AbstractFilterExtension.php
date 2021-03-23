@@ -16,6 +16,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
 use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Updates datagrid metadata object with:
@@ -35,10 +36,10 @@ abstract class AbstractFilterExtension extends AbstractExtension
     protected $filterBag;
 
     /** @var DatagridFiltersProviderInterface */
-    protected DatagridFiltersProviderInterface $filtersProvider;
+    protected $filtersProvider;
 
     /** @var FiltersMetadataProvider */
-    protected FiltersMetadataProvider $filtersMetadataProvider;
+    protected $filtersMetadataProvider;
 
     /** @var DatagridStateProviderInterface */
     protected $filtersStateProvider;
@@ -46,28 +47,44 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /** @var FilterExecutionContext */
     protected $filterExecutionContext;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /**
-     * @param RawConfigurationProvider $configurationProvider
-     * @param FilterBagInterface $filterBag
-     * @param DatagridFiltersProviderInterface $datagridFiltersProvider
-     * @param FiltersMetadataProvider $filtersMetadataProvider
+     * @param RawConfigurationProvider       $configurationProvider
+     * @param FilterBagInterface             $filterBag
      * @param DatagridStateProviderInterface $filtersStateProvider
-     * @param FilterExecutionContext $filterExecutionContext
+     * @param FilterExecutionContext         $filterExecutionContext
+     * @param TranslatorInterface            $translator
      */
     public function __construct(
         RawConfigurationProvider $configurationProvider,
         FilterBagInterface $filterBag,
-        DatagridFiltersProviderInterface $datagridFiltersProvider,
-        FiltersMetadataProvider $filtersMetadataProvider,
         DatagridStateProviderInterface $filtersStateProvider,
-        FilterExecutionContext $filterExecutionContext
+        FilterExecutionContext $filterExecutionContext,
+        TranslatorInterface $translator
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->filterBag = $filterBag;
-        $this->filtersProvider = $datagridFiltersProvider;
-        $this->filtersMetadataProvider = $filtersMetadataProvider;
         $this->filtersStateProvider = $filtersStateProvider;
         $this->filterExecutionContext = $filterExecutionContext;
+        $this->translator = $translator;
+    }
+
+    /**
+     * @param DatagridFiltersProviderInterface $filtersProvider
+     */
+    public function setFiltersProvider(DatagridFiltersProviderInterface $filtersProvider): void
+    {
+        $this->filtersProvider = $filtersProvider;
+    }
+
+    /**
+     * @param FiltersMetadataProvider $filtersMetadataProvider
+     */
+    public function setFiltersMetadataProvider(FiltersMetadataProvider $filtersMetadataProvider): void
+    {
+        $this->filtersMetadataProvider = $filtersMetadataProvider;
     }
 
     /**
@@ -92,14 +109,21 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metadata)
     {
-        $filters = $this->filtersProvider->getDatagridFilters($config);
+        if ($this->filtersProvider && $this->filtersMetadataProvider) {
+            $filters = $this->filtersProvider->getDatagridFilters($config);
 
-        $this->updateState($filters, $config, $metadata);
+            $this->updateState($filters, $config, $metadata);
 
-        $metadata->offsetAddToArray(
-            'filters',
-            $this->filtersMetadataProvider->getMetadataForFilters($filters, $config)
-        );
+            $metadata->offsetAddToArray(
+                'filters',
+                $this->filtersMetadataProvider->getMetadataForFilters($filters, $config)
+            );
+        } else {
+            $filters = $this->getFiltersToApply($config);
+
+            $this->updateState($filters, $config, $metadata);
+            $this->updateMetadata($filters, $config, $metadata);
+        }
 
         $metadata->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }
@@ -223,5 +247,51 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $filterForm->submit($filterState);
 
         return $filterForm;
+    }
+
+    /**
+     * @param FilterInterface[] $filters
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $metadata
+     */
+    protected function updateMetadata(
+        array $filters,
+        DatagridConfiguration $config,
+        MetadataObject $metadata
+    ): void {
+        $rawConfig = $this->configurationProvider->getRawConfiguration($config->getName());
+
+        $filtersMetadata = [];
+        foreach ($filters as $filter) {
+            $filterMetadata = $filter->getMetadata();
+            $label = $filterMetadata['label'] ?? '';
+            if ($label && !empty($filterMetadata[FilterUtility::TRANSLATABLE_KEY])) {
+                $label = $this->translator->trans($label);
+            }
+            $cacheId = null;
+            if ($rawConfig && !empty($filterMetadata['lazy'])) {
+                $cacheId = $this->getFilterCacheId($rawConfig, $filterMetadata);
+            }
+
+            $filtersMetadata[] = array_merge(
+                $filterMetadata,
+                ['label' => $label, 'cacheId' => $cacheId]
+            );
+        }
+
+        $metadata->offsetAddToArray('filters', $filtersMetadata);
+    }
+
+    /**
+     * @param array $rawGridConfig
+     * @param array $filterMetadata
+     *
+     * @return string|null
+     */
+    protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata): ?string
+    {
+        $rawOptions = ArrayUtil::getIn($rawGridConfig, ['filters', 'columns', $filterMetadata['name'], 'options']);
+
+        return $rawOptions ? md5(serialize($rawOptions)) : null;
     }
 }
