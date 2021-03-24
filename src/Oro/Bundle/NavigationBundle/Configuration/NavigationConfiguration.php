@@ -107,6 +107,7 @@ class NavigationConfiguration implements ConfigurationInterface
                                 ->children()
                                     ->scalarNode('class')->end()
                                     ->scalarNode('id')->end()
+                                    ->scalarNode('dir')->end()
                                 ->end()
                             ->end()
                             ->scalarNode('display')->end()
