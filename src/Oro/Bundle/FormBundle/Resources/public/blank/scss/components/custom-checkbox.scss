@@ -12,6 +12,7 @@
         margin: 0;
 
         opacity: 0;
+        cursor: $base-ui-element-cursor;
 
         &:hover {
             ~ .custom-checkbox__icon {
@@ -53,7 +54,7 @@
 
         border-radius: $checkbox-icon-border-radius;
 
-        cursor: pointer;
+        cursor: $base-ui-element-cursor;
 
         vertical-align: middle;
     }
