@@ -285,7 +285,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         // generate conversion rules and backend header
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if (!$this->isFieldAvailableForExport($entityName, $fieldName)) {
                 continue;
             }
 
@@ -325,6 +325,16 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
 
         return $this->prepareDataAfterSort($event, true, true);
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @return bool
+     */
+    protected function isFieldAvailableForExport(string $entityName, string $fieldName): bool
+    {
+        return !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded');
     }
 
     /**
