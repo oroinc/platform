@@ -13,12 +13,16 @@
     &__control,
     input[type='radio'] {
         position: absolute;
-        z-index: z('base');
+        top: $custom-radio-icon-size / 2;
+        left: $custom-radio-icon-size + 2px;
+
+        height: 2px;
+        width: 2px;
         margin: 0;
         padding: 0;
-        border: 0 none;
+
         opacity: 0;
-        cursor: $base-ui-element-cursor;
+        appearance: none;
     }
 
     &__input,
