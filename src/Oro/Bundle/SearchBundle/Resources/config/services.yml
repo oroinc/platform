@@ -395,3 +395,8 @@ services:
     Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast:
         tags:
             - { name: 'oro_search.type_cast_handler' }
+
+    oro_search.importexport.filtered_entity.search_entity_identity_reader:
+        class: Oro\Bundle\SearchBundle\Datagrid\FilteredEntityReader\SearchSourceFilteredEntityIdentityReader
+        tags:
+            - { name: oro_datagrid.filtered_entity_identity_reader}
