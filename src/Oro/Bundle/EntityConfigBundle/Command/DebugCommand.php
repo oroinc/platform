@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -689,6 +690,8 @@ HELP
      */
     protected function convertArrayToString(array $array)
     {
+        $array = $this->sortDataByKeys($array);
+
         $replace = [
             false => 'false',
             true  => 'true',
@@ -705,5 +708,19 @@ HELP
         );
 
         return print_r($array, true);
+    }
+
+    private function sortDataByKeys(array $array): array
+    {
+        if (ArrayUtil::isAssoc($array)) {
+            ksort($array);
+        }
+        foreach ($array as &$val) {
+            if (is_array($val) && ArrayUtil::isAssoc($val)) {
+                ksort($val);
+            }
+        }
+
+        return $array;
     }
 }
