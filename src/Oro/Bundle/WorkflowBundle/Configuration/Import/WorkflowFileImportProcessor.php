@@ -95,7 +95,7 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
     }
 
     /**
-     * @param \SplFileInfo
+     * @param \SplFileInfo $contentSource
      *
      * @return \SplFileInfo
      */

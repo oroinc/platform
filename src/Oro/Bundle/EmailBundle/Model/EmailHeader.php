@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+/**
+ * The model that represents email headers
+ */
 class EmailHeader
 {
     /**
@@ -262,7 +265,7 @@ class EmailHeader
     /**
      * Set email importance
      *
-     * @param integer -1 = LOW, 0 = NORMAL, 1 = HIGH
+     * @param integer $importance -1 = LOW, 0 = NORMAL, 1 = HIGH
      *
      * @return self
      */

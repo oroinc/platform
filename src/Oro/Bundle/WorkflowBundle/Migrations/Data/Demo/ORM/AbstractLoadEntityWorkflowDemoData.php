@@ -14,6 +14,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Abstract fixture to load workflow data
+ */
 abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implements
     ContainerAwareInterface,
     DependentFixtureInterface
@@ -21,7 +24,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
     use ContainerAwareTrait;
 
     /**
-     * @return array|[<workflow1Name>, <workflow2Name>...]
+     * @return string[] [<workflow1Name>, <workflow2Name>, ...]
      */
     abstract protected function getWorkflows();
 
@@ -44,7 +47,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
     abstract protected function getDeepLevel();
 
     /**
-     * @return array|[<workflow1Name> => [<transition1Name>, <transition2Name>...]]
+     * @return string[] [<workflow1Name> => [<transition1Name>, <transition2Name>, ...]]
      */
     protected function getIgnoredTransitions()
     {

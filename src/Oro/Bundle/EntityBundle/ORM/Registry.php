@@ -26,7 +26,7 @@ class Registry extends BaseRegistry
     private $defaultQueryCacheLifetime;
 
     /**
-     * @param int|null
+     * @param int|null $defaultQueryCacheLifetime
      */
     public function setDefaultQueryCacheLifetime($defaultQueryCacheLifetime)
     {

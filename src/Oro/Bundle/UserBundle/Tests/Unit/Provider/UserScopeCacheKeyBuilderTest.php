@@ -15,8 +15,7 @@ class UserScopeCacheKeyBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @param ScopeCriteria $criteria
-     * @param string|null   $key
-     *
+     * @param string|null   $cacheKey
      * @return ScopeCacheKeyBuilderInterface
      */
     private function getInnerBuilder(ScopeCriteria $criteria, ?string $cacheKey): ScopeCacheKeyBuilderInterface

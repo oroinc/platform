@@ -361,11 +361,25 @@ define(function(require) {
                 component.deferredInit
                     .always(initDeferred.resolve.bind(initDeferred))
                     .fail(function(error) {
-                        const moduleName = $elem.attr('data-bound-component');
-                        let message = 'Initialization has failed for component "' + moduleName + '"';
+                        const componentModuleName = $elem.attr('data-bound-component');
+                        const viewModuleName = $elem.attr('data-bound-view');
+                        const widgetName = $elem.attr('data-bound-input-widget');
+                        let notes = [];
                         if (name) {
-                            message += ' (name "' + name + '")';
+                            notes.push(`component name "${name}"`);
                         }
+                        if (viewModuleName) {
+                            notes.push(`view module "${viewModuleName}"`);
+                        }
+                        if (widgetName) {
+                            if (viewModuleName !== 'no-name') {
+                                notes.push(` with widget "${viewModuleName}"`);
+                            } else {
+                                notes.push('with some widget');
+                            }
+                        }
+                        notes = notes.length ? ` (${notes.join(', ')})` : '';
+                        const message = `Initialization has failed for component "${componentModuleName}"${notes}`;
                         this._handleError(message, error);
                     }.bind(this));
             } else {

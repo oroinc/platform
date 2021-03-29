@@ -77,11 +77,11 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isTaggableDataProvider
      *
-     * @param object     $object
-     * @param bool       $expected
-     * @param bool|false $needSetConfig
-     * @param bool|false $hasConfig
-     * @param bool|false $isEnableGridColumn
+     * @param object $object
+     * @param bool   $expected
+     * @param bool   $needSetConfig
+     * @param bool   $hasConfig
+     * @param bool   $isEnableGridColumn
      */
     public function testIsEnableGridColumn(
         $object,
@@ -99,11 +99,11 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isTaggableDataProvider
      *
-     * @param object     $object
-     * @param bool       $expected
-     * @param bool|false $needSetConfig
-     * @param bool|false $hasConfig
-     * @param bool|false $isEnableGridFilter
+     * @param object $object
+     * @param bool   $expected
+     * @param bool   $needSetConfig
+     * @param bool   $hasConfig
+     * @param bool   $isEnableGridFilter
      */
     public function testIsEnableGridFilter(
         $object,
@@ -121,9 +121,9 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider shouldRenderDefaultDataProvider
      *
-     * @param object     $object
-     * @param bool       $expected
-     * @param bool|false $shouldRenderDefault
+     * @param object $object
+     * @param bool   $expected
+     * @param bool   $shouldRenderDefault
      */
     public function testShouldRenderDefault($object, $expected, $shouldRenderDefault)
     {
