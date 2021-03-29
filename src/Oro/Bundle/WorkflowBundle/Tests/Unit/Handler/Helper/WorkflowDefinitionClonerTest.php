@@ -68,7 +68,7 @@ class WorkflowDefinitionClonerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param WorkflowDefinition $definition1
      * @param WorkflowDefinition $definition2
-     * @param bool|false $isCopy
+     * @param bool               $isCopy
      */
     protected function assertObjectsDefinitions(
         WorkflowDefinition $definition1,

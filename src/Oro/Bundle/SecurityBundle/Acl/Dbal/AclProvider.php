@@ -451,7 +451,7 @@ class AclProvider implements AclProviderInterface
      * Does either overwrite the passed ACE, or saves it in the global identity
      * map to ensure every ACE only gets instantiated once.
      *
-     * @param EntryInterface[] &$aces
+     * @param EntryInterface[] $aces
      */
     private function doUpdateAceIdentityMap(array &$aces)
     {

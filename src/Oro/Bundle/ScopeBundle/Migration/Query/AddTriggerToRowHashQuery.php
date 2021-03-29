@@ -42,8 +42,7 @@ class AddTriggerToRowHashQuery extends AbstractScopeQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param bool $dryRun
-     * @return string
+     * @param bool            $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function executePgSqlTriggerQuery(LoggerInterface $logger, bool $dryRun): void

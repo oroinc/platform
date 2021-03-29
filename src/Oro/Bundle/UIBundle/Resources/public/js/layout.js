@@ -367,11 +367,23 @@ define(function(require) {
         },
 
         onContentChanged: function(e) {
-            layout.styleForm($(e.target));
+            if (e.isLayoutProcessed) {
+                return;
+            }
+            const $target = $(e.target);
+            layout.styleForm($target);
+            $target.trigger('initLayout');
+            e.isLayoutProcessed = true;
         },
 
         onContentRemove: function(e) {
-            layout.unstyleForm($(e.target));
+            if (e.isLayoutProcessed) {
+                return;
+            }
+            const $target = $(e.target);
+            $target.trigger('disposeLayout');
+            layout.unstyleForm($target);
+            e.isLayoutProcessed = true;
         },
 
         /**

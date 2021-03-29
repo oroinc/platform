@@ -114,8 +114,10 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
  */
 class testClassName implements Oro\Component\Layout\LayoutUpdateInterface
 {
-    public function updateLayout(Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator, Oro\Component\Layout\LayoutItemInterface $item)
-    {
+    public function updateLayout(
+        Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator,
+        Oro\Component\Layout\LayoutItemInterface $item
+    ) {
         $layoutManipulator->add( 'root', NULL, 'root' );
         $layoutManipulator->add( 'header', 'root', 'header' );
         $layoutManipulator->addAlias( 'header', 'header_alias' );

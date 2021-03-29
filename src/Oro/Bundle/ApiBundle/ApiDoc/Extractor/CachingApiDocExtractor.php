@@ -40,7 +40,7 @@ class CachingApiDocExtractor extends BaseExtractor implements
      * @param array                $handlers
      * @param array                $annotationsProviders
      * @param string               $cacheFile
-     * @param bool|false           $debug
+     * @param bool                 $debug
      */
     public function __construct(
         ContainerInterface $container,

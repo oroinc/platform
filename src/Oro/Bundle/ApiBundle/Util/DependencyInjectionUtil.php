@@ -47,11 +47,9 @@ class DependencyInjectionUtil
 
     /**
      * Removes the loaded and processed configuration of ApiBundle.
-     * @internal never use this method outside of ApiBundle.
-     *
      * @param ContainerBuilder $container
      *
-     * @return array
+     * @internal never use this method outside of ApiBundle.
      */
     public static function removeConfig(ContainerBuilder $container): void
     {

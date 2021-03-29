@@ -7,6 +7,20 @@ define(['underscore', 'asap'], function(_, asap) {
             return String(str).replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
         },
 
+        /**
+         * Escape unsecure characters for JSON definition over strings concatenation, like:
+         *     let json = '{"prop": "prefix ' + _.escapeForJSON(value) + ' suffix"}';
+         * @param {string} value
+         * @return {string}
+         */
+        escapeForJSON: function(value) {
+            let result = JSON.stringify(value);
+            if (typeof value === 'string') {
+                result = result.slice(1, -1);
+            }
+            return result;
+        },
+
         trunc: function(str, maxLength, useWordBoundary, hellip) {
             hellip = hellip || '&hellip;';
             const toLong = str.length > maxLength;

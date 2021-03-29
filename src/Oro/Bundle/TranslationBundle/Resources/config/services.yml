@@ -12,13 +12,6 @@ services:
             - ""
         lazy: true
 
-    oro_translation.extractor.php_code_extractor:
-        class: Oro\Bundle\TranslationBundle\Extractor\PhpCodeExtractor
-        arguments:
-            - '@service_container'
-        tags:
-            - { name: translation.extractor, alias: oro_translation_php_extractor }
-
     Oro\Bundle\TranslationBundle\Download\TranslationDownloader:
         arguments:
             - '@Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter'
