@@ -232,17 +232,11 @@ map:
     oroui/js/tools:
         chaplin: chaplin
 shim:
-    bootstrap-typeahead:
-        imports:
-            - single|jquery|jQuery
     datepair:
         exports: single|Datepair
     jquery:
         expose:
-            - $,jQuery!jquery
-    jquery.form:
-        imports:
-            - single|jquery|jQuery
+            - $,jQuery
     jquery.minicolors:
         imports:
             - single|jquery|jQuery
@@ -256,18 +250,8 @@ shim:
         exports: single|Select2
         imports:
             - single|jquery|jQuery
-    jquery.simplecolorpicker:
-        imports:
-            - single|jquery|jQuery
     jquery.uniform:
         imports:
             - single|jquery|jQuery
-    lightgallery:
-        imports:
-            - single|jquery|jQuery
-    lightgallery.print:
-        imports:
-            - single|jquery|jQuery
-            - single|lightgallery|lightgallery
     oroui/js/app/services/app-ready-load-modules:
         expose: loadModules

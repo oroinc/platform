@@ -188,17 +188,11 @@ map:
     oroui/js/tools:
         chaplin: chaplin
 shim:
-    bootstrap-typeahead:
-        imports:
-            - single|jquery|jQuery
     datepair:
         exports: single|Datepair
     jquery:
         expose:
             - $,jQuery
-    jquery.form:
-        imports:
-            - single|jquery|jQuery
     jquery.multiselect:
         imports:
             - single|jquery|jQuery

@@ -62,7 +62,8 @@ define(function(require) {
                 this.collection.reset(data);
             }
 
-            this._createSubViews();
+            // wait for controller to be ready before initializing views
+            this.listenToOnce(mediator, 'page:update', this._createSubViews.bind(this));
         },
 
         _createSubViews: function() {

@@ -11,6 +11,9 @@ The current file describes significant changes in the code that may affect the u
   (`oro_embedded_form_default_data` route)
   action the request method was changed to GET.
 
+#### @oroinc/webpack-config-builder
+* Platform now requires updated version of `@oroinc/webpack-config-builder` package which is migrated to Webpack 5. See [Webpack migration guide](https://webpack.js.org/migrate/5/).
+
 ## 5.0.0-alpha.1 (2021-03-31)
 [Show detailed list of changes](incompatibilities-5-0-alpha-1.md)
 
