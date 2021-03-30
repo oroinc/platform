@@ -150,7 +150,7 @@ class TimezoneType extends AbstractType
                 if ($a['offset'] == $b['offset']) {
                     return strcmp($a['timezone_id'], $b['timezone_id']);
                 }
-                return ($a['offset'] > $b['offset']) ? 1 : -1;
+                return $a['offset'] <=> $b['offset'];
             }
         );
         return $timezones;

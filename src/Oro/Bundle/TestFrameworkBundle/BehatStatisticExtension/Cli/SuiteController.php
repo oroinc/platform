@@ -144,7 +144,6 @@ class SuiteController implements Controller
      */
     private function exitIfNoAvailableFeatures(InputInterface $input)
     {
-        // disable all isolators and other preparation logic if no suites to test
         $suites = $this->behatSuiteRegistry->getSuites();
         if ($suites) {
             foreach ($suites as $key => $suite) {

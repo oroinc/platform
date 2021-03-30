@@ -81,7 +81,7 @@ trait TaggedServiceTrait
     {
         if ($services) {
             krsort($services);
-            $services = array_merge(...$services);
+            $services = array_merge(...array_values($services));
         }
 
         return $services;
@@ -102,7 +102,7 @@ trait TaggedServiceTrait
     {
         if ($services) {
             ksort($services);
-            $services = array_merge(...$services);
+            $services = array_merge(...array_values($services));
         }
 
         return $services;

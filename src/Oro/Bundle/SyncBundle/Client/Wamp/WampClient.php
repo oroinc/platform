@@ -349,17 +349,20 @@ class WampClient implements ClientInterface, LoggerAwareInterface
      */
     protected function openSocket()
     {
-        $socket = @stream_socket_client(
-            $this->endpoint,
-            $errno,
-            $errstr,
-            1,
-            STREAM_CLIENT_CONNECT,
-            stream_context_create($this->contextOptions)
-        );
-
-        if (!$socket) {
-            throw new BadResponseException('Could not open socket. Reason: ' . $errstr);
+        try {
+            $socket = @stream_socket_client(
+                $this->endpoint,
+                $errno,
+                $errstr,
+                1,
+                STREAM_CLIENT_CONNECT,
+                stream_context_create($this->contextOptions)
+            );
+            if (!$socket) {
+                throw new BadResponseException('Could not open socket. Reason: ' . $errstr);
+            }
+        } catch (\ErrorException $exception) {
+            throw new BadResponseException('Could not open socket. Reason: ' . $errstr, 0, $exception);
         }
 
         return $socket;

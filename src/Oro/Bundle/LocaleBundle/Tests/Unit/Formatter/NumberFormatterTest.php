@@ -13,8 +13,8 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
  */
 class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    private const UNFORMATTED_VALUE = 'unformatted';
-    private const FORMATTED_VALUE = 'formatted';
+    private const UNFORMATTED_VALUE = '18908997.16908';
+    private const FORMATTED_VALUE = 18908997.16908;
     private const LOCALE = 'en_US';
     private const CURRENCY = 'USD';
 
