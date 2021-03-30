@@ -67,6 +67,7 @@ class ClearLoggerExtension extends AbstractExtension
         foreach ($handlers as $handler) {
             $this->clearHandler($handler);
         }
+        $logger->reset();
     }
 
     /**

@@ -8,8 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * This compiler pass hides detailed logs handler's nested handler for all channels
- * and also injects configured nested handler into detailed logs handler
+ * Registers swiftmailer.plugin.no_recipient.abstract for all mailer services
  */
 class SwiftMailerHandlerPass implements CompilerPassInterface
 {
