@@ -9,6 +9,7 @@ use Oro\Bundle\LocaleBundle\Configuration\LocaleConfigurationProvider;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings as BaseLocaleSettings;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
 /**
  * LocaleSettings specific for CurrencyBundle:
@@ -34,6 +35,7 @@ class LocaleSettings extends BaseLocaleSettings
      * @param LocaleConfigurationProvider $localeConfigProvider
      * @param ViewTypeProviderInterface $viewTypeProvider
      * @param CurrencyProviderInterface $currencyProvider
+     * @param ThemeRegistry $themeRegistry
      */
     public function __construct(
         ConfigManager $configManager,
@@ -41,9 +43,17 @@ class LocaleSettings extends BaseLocaleSettings
         LocalizationManager $localizationManager,
         LocaleConfigurationProvider $localeConfigProvider,
         ViewTypeProviderInterface $viewTypeProvider,
-        CurrencyProviderInterface $currencyProvider
+        CurrencyProviderInterface $currencyProvider,
+        ThemeRegistry $themeRegistry
     ) {
-        parent::__construct($configManager, $calendarFactory, $localizationManager, $localeConfigProvider);
+        parent::__construct(
+            $configManager,
+            $calendarFactory,
+            $localizationManager,
+            $localeConfigProvider,
+            $themeRegistry
+        );
+
         $this->viewTypeProvider = $viewTypeProvider;
         $this->currencyProvider = $currencyProvider;
     }

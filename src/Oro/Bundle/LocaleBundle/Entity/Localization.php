@@ -14,6 +14,8 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalization;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 
 /**
+ * Localization entity class.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository")
  * @ORM\Table(name="oro_localization")
  * @Config(
@@ -101,6 +103,13 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
      * @ORM\Column(name="formatting_code", type="string", length=16, nullable=false)
      */
     protected $formattingCode;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="rtl_mode", type="boolean", options={"default"=false})
+     */
+    protected $rtlMode = false;
 
     /**
      * @var Localization
@@ -194,6 +203,25 @@ class Localization extends ExtendLocalization implements DatesAwareInterface
     public function getFormattingCode()
     {
         return $this->formattingCode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRtlMode(): bool
+    {
+        return $this->rtlMode;
+    }
+
+    /**
+     * @param bool $rtlMode
+     * @return $this
+     */
+    public function setRtlMode(bool $rtlMode): self
+    {
+        $this->rtlMode = $rtlMode;
+
+        return $this;
     }
 
     /**

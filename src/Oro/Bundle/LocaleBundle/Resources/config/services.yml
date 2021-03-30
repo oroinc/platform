@@ -7,6 +7,7 @@ services:
             - '@oro_locale.calendar_factory'
             - '@oro_locale.manager.localization'
             - '@oro_locale.configuration_provider'
+            - '@oro_theme.registry'
 
     Oro\Bundle\LocaleBundle\Model\LocaleSettings:
         alias: 'oro_locale.settings'

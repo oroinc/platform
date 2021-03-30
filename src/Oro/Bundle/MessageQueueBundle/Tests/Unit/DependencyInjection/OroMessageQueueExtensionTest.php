@@ -556,7 +556,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
             'oro_message_queue.log.processor.restore_original_channel',
             'oro_message_queue.log.processor.add_consumer_state',
             'oro_message_queue.log.handler.console',
-            'oro_message_queue.log.handler.console_error',
             'oro_message_queue.log.handler.verbosity_filter',
             'oro_message_queue.log.handler.resend_job',
             // job.yml

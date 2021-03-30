@@ -152,6 +152,7 @@ $.extend($.datepicker.constructor.prototype, {
 
     _onKeyboardNav(event) {
         const curInst = this._curInst;
+        const isRTL = curInst.dpDiv.is('.ui-datepicker-rtl');
         const target = curInst.input;
         let handled = false;
         let focuseble = false;
@@ -169,7 +170,7 @@ $.extend($.datepicker.constructor.prototype, {
 
         switch ( event.keyCode ) {
             case $.ui.keyCode.LEFT:
-                this._adjustDate(target, -1, 'D');
+                this._adjustDate(target, (isRTL ? +1 : -1), 'D');
                 handled = $.ui.keyCode.LEFT;
                 focuseble = true;
                 break;
@@ -179,7 +180,7 @@ $.extend($.datepicker.constructor.prototype, {
                 focuseble = true;
                 break;
             case $.ui.keyCode.RIGHT:
-                this._adjustDate(target, +1, 'D');
+                this._adjustDate(target, (isRTL ? -1 : +1), 'D');
                 handled = $.ui.keyCode.RIGHT;
                 focuseble = true;
                 break;

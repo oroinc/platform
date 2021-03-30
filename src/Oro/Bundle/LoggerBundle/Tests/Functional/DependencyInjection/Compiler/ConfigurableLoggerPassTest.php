@@ -5,7 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\DependencyInjection\Compiler;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Command\LoggerLevelCommand;
-use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
+use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ConfigurableLoggerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\OroLoggerExtension;
 use Oro\Bundle\LoggerBundle\Tests\Functional\Stub\CustomLogChannelCommandStub;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DetailedLogsHandlerPassTest extends WebTestCase
+class ConfigurableLoggerPassTest extends WebTestCase
 {
     /** @var RequestStack */
     private $requestStack;
@@ -90,7 +90,7 @@ class DetailedLogsHandlerPassTest extends WebTestCase
         $container->registerExtension(new OroLoggerExtension());
 
         $container->addCompilerPass(new LoggerChannelPass());
-        $container->addCompilerPass(new DetailedLogsHandlerPass());
+        $container->addCompilerPass(new ConfigurableLoggerPass());
 
         $this->loadYmlFixture($container, 'custom_channels');
 

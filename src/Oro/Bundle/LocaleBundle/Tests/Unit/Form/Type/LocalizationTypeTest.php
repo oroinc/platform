@@ -77,7 +77,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
     /**
      * @return array
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         $localizationItem = $this->createLocalization('name', 'title', 0, 'en');
         $parent = $this->getEntity(Localization::class, ['id' => 1]);
@@ -90,8 +90,9 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     'titles' => [['string' => 'TITLE']],
                     'language' => '1',
                     'formattingCode' => 'ru',
+                    'rtlMode' => true,
                 ],
-                'expectedData' => $this->createLocalization('NAME', 'TITLE', '1', 'ru'),
+                'expectedData' => $this->createLocalization('NAME', 'TITLE', '1', 'ru', true),
             ],
             'with entity' => [
                 'defaultData' => $localizationItem,
@@ -100,6 +101,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     'titles' => [['string' => 'new_localization_item_title']],
                     'language' => '2',
                     'formattingCode' => 'en_US',
+                    'rtlMode' => true,
                     'parentLocalization' => 1,
                 ],
                 'expectedData' => $this->createLocalization(
@@ -107,6 +109,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     'new_localization_item_title',
                     '2',
                     'en_US',
+                    true,
                     $parent
                 )
             ]
@@ -118,17 +121,19 @@ class LocalizationTypeTest extends FormIntegrationTestCase
      * @param string $title
      * @param string $languageId
      * @param string $formattingCode
-     * @param Localization $parentLocalization
+     * @param bool $rtlMode
+     * @param null|Localization $parentLocalization
      *
      * @return Localization
      */
     protected function createLocalization(
-        $name,
-        $title,
-        $languageId,
-        $formattingCode,
+        string $name,
+        string $title,
+        string $languageId,
+        string $formattingCode,
+        bool $rtlMode = false,
         Localization $parentLocalization = null
-    ) {
+    ): Localization {
         /** @var Localization $localization */
         $localization = $this->getEntity(
             Localization::class,
@@ -139,6 +144,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
                     ['id' => (int)$languageId, 'code' => (string)self::$languages[$languageId]]
                 ),
                 'formattingCode' => $formattingCode,
+                'rtlMode' => $rtlMode,
                 'parentLocalization' => $parentLocalization,
             ]
         );

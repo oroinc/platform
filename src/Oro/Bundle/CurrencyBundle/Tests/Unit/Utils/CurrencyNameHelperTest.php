@@ -12,6 +12,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
 class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements ViewTypeProviderInterface
 {
@@ -135,11 +136,14 @@ class CurrencyNameHelperTest extends \PHPUnit\Framework\TestCase implements View
         /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject $localeConfigProvider */
         $localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
 
+        $themeRegistry = $this->createMock(ThemeRegistry::class);
+
         return new LocaleSettings(
             $configManager,
             $calendarFactory,
             $localizationManager,
-            $localeConfigProvider
+            $localeConfigProvider,
+            $themeRegistry
         );
     }
 

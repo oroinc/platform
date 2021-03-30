@@ -21,9 +21,7 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->localeSettings =$this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->localeSettings =$this->createMock(LocaleSettings::class);
 
         $container = self::getContainerBuilder()
             ->add(LocaleSettings::class, $this->localeSettings)
@@ -32,29 +30,32 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new LocaleExtension($container);
     }
 
-    protected function tearDown(): void
+    public function testGetName(): void
     {
-        unset($this->localeSettings);
-        unset($this->extension);
+        self::assertEquals('oro_locale', $this->extension->getName());
     }
 
-    public function testGetName()
-    {
-        $this->assertEquals('oro_locale', $this->extension->getName());
-    }
-
-    public function testGetTimeZoneOffset()
+    public function testGetTimeZoneOffset(): void
     {
         $timezoneString = 'UTC';
         $timezoneOffset = '+00:00';
 
-        $this->localeSettings->expects($this->once())
+        $this->localeSettings->expects(self::once())
             ->method('getTimeZone')
-            ->will($this->returnValue($timezoneString));
+            ->will(self::returnValue($timezoneString));
 
-        $this->assertEquals(
+        self::assertEquals(
             $timezoneOffset,
             self::callTwigFunction($this->extension, 'oro_timezone_offset', [])
         );
+    }
+
+    public function testIsRtlMode(): void
+    {
+        $this->localeSettings->expects(self::any())
+            ->method('isRtlMode')
+            ->willReturn(true);
+
+        self::assertTrue(self::callTwigFunction($this->extension, 'oro_is_rtl_mode', []));
     }
 }
