@@ -90,7 +90,7 @@
         "nelmio/api-doc-bundle": "2.13.3",
         "nelmio/security-bundle": "~2.10.2",
         "ass/xmlsecurity": "1.1.1",
-        "stof/doctrine-extensions-bundle": "1.5.*",
+        "stof/doctrine-extensions-bundle": "~1.6.0",
         "liip/imagine-bundle": "~2.5.0",
         "laminas/laminas-mail": "^2.12.0",
         "dragonmantank/cron-expression": "~3.1.0",

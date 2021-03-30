@@ -25,50 +25,6 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider processConsoleErrorProvider
-     *
-     * @param array $handler
-     * @param int $level
-     */
-    public function testProcessConsoleError(array $handler, $level)
-    {
-        $configuration = new Configuration();
-        $monologExtension = $this->createMock(MonologExtension::class);
-        $monologExtension->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
-
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('monolog')
-            ->willReturn($monologExtension);
-        $container->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('monolog')
-            ->willReturn([
-                ['handlers' => [$handler]]
-            ]);
-
-
-        $consoleErrorHandler = $this->createMock(Definition::class);
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with($handler['id'])
-            ->willReturn($consoleErrorHandler);
-
-        $consoleErrorHandler->expects($this->exactly(2))
-            ->method('setArgument')
-            ->withConsecutive(
-                [1, new Reference('monolog.handler.' . $handler['handler'])],
-                [2, $level]
-            );
-
-        $this->buildMonologHandlersPass->process($container);
-    }
-
-    /**
      * @dataProvider processVerbosityFilterProvider
      *
      * @param array $handler
@@ -96,13 +52,13 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ]);
 
 
-        $consoleErrorHandler = $this->createMock(Definition::class);
+        $filterHandlerDefinition = $this->createMock(Definition::class);
         $container->expects($this->once())
             ->method('getDefinition')
             ->with($handler['id'])
-            ->willReturn($consoleErrorHandler);
+            ->willReturn($filterHandlerDefinition);
 
-        $consoleErrorHandler->expects($this->exactly(2))
+        $filterHandlerDefinition->expects($this->exactly(2))
             ->method('setArgument')
             ->withConsecutive(
                 [1, new Reference('monolog.handler.' . $handler['handler'])],
@@ -182,34 +138,6 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
             ->method('getDefinition');
 
         $this->buildMonologHandlersPass->process($container);
-    }
-
-    /**
-     * @return array
-     */
-    public function processConsoleErrorProvider()
-    {
-        return [
-            'simple console error handler' => [
-                'handler' => [
-                    'name' => 'console_error',
-                    'type' => 'service',
-                    'id' => 'oro_message_queue.log.handler.console_error',
-                    'handler' => 'nested',
-                ],
-                'level' => 'DEBUG',
-            ],
-            'with level' => [
-                'handler' => [
-                    'name' => 'console_error',
-                    'type' => 'service',
-                    'id' => 'oro_message_queue.log.handler.console_error',
-                    'handler' => 'nested',
-                    'level' => 'NOTICE'
-                ],
-                'level' => 'NOTICE',
-            ]
-        ];
     }
 
     /**

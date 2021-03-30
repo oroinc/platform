@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler;
 
-use Monolog\Logger;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -10,11 +9,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Pass arguments to the `oro_message_queue.log.handler.console_error` service from monolog configuration
+ * Pass arguments to the `oro_message_queue.log.handler.verbosity_filter` service from monolog configuration
  */
 class BuildMonologHandlersPass implements CompilerPassInterface
 {
-    private const CONSOLE_ERROR_HANDLER_ID = 'oro_message_queue.log.handler.console_error';
     private const VERBOSITY_FILTER_HANDLER_ID = 'oro_message_queue.log.handler.verbosity_filter';
 
     /**
@@ -48,7 +46,7 @@ class BuildMonologHandlersPass implements CompilerPassInterface
      */
     private function buildHandler(ContainerBuilder $container, array $handler): void
     {
-        if (!in_array($handler['id'], [self::CONSOLE_ERROR_HANDLER_ID, self::VERBOSITY_FILTER_HANDLER_ID], true)) {
+        if ($handler['id'] !== self::VERBOSITY_FILTER_HANDLER_ID) {
             return;
         }
 
@@ -56,16 +54,8 @@ class BuildMonologHandlersPass implements CompilerPassInterface
 
         $nestedHandlerId = sprintf('monolog.handler.%s', $handler['handler']);
         $handlerDefinition->setArgument(1, new Reference($nestedHandlerId));
-
-        switch ($handler['id']) {
-            case self::CONSOLE_ERROR_HANDLER_ID:
-                $handlerDefinition->setArgument(2, $this->getArgument($handler, 'level', Logger::DEBUG));
-                break;
-            case self::VERBOSITY_FILTER_HANDLER_ID:
-                $handlerDefinition->setArgument(2, $this->getArgument($handler, 'verbosity_levels', []));
-                $handlerDefinition->addTag('kernel.event_subscriber');
-                break;
-        }
+        $handlerDefinition->setArgument(2, $this->getArgument($handler, 'verbosity_levels', []));
+        $handlerDefinition->addTag('kernel.event_subscriber');
     }
 
     /**
