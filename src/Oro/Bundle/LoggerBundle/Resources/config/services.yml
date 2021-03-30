@@ -22,18 +22,13 @@ services:
             - ['setContainer', ['@service_container']]
             - ['setFormatter', ['@monolog.formatter.normalizer']]
 
-    oro_logger.monolog.detailed_logs.handler.prototype:
-        abstract: true
-        class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
+    oro_logger.log_level_config_provider:
+        class: Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig
         arguments:
-            - '@?oro_config.user'
             - '@oro_logger.cache'
+            - '@?oro_config.user'
             - '%installed%'
             - '%oro_logger.detailed_logs_default_level%'
-            - true
-
-    oro_logger.monolog.detailed_logs.handler:
-        parent: oro_logger.monolog.detailed_logs.handler.prototype
 
     oro_logger.message_factory:
         class: Oro\Bundle\LoggerBundle\Mailer\MessageFactory

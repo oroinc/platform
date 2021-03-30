@@ -7,6 +7,9 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configures system configuration for the LoggerBundle
+ */
 class Configuration implements ConfigurationInterface
 {
     const ROOT_NODE = 'oro_logger';
@@ -27,7 +30,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append($rootNode, [
             self::LOGS_LEVEL_KEY => [
                 'type' => 'string',
-                'value' => 'notice'
+                'value' => 'error'
             ],
             self::LOGS_TIMESTAMP_KEY => [
                 'type' => 'integer',

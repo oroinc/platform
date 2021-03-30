@@ -52,7 +52,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'settings' => [
                         'resolved' => true,
-                        'detailed_logs_level' => ['value' => 'notice', 'scope' => 'app'],
+                        'detailed_logs_level' => ['value' => 'error', 'scope' => 'app'],
                         'detailed_logs_end_timestamp' => ['value' => null, 'scope' => 'app'],
                         'email_notification_recipients' => ['value' => '', 'scope' => 'app'],
                         'email_notification_subject' => ['value' => 'An Error Occurred!', 'scope' => 'app']

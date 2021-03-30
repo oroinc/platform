@@ -58,13 +58,6 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    oro_message_queue.log.handler.console_error:
-        class: Oro\Bundle\MessageQueueBundle\Log\Handler\ConsoleErrorHandler
-        arguments:
-            - '@oro_message_queue.log.consumer_state'
-            - ~
-            - ~
-
     oro_message_queue.log.handler.verbosity_filter:
         class: Oro\Bundle\MessageQueueBundle\Log\Handler\VerbosityFilterHandler
         arguments:
