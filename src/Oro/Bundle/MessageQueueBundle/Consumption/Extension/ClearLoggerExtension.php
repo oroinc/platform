@@ -66,6 +66,9 @@ class ClearLoggerExtension extends AbstractExtension
         $handlers = $logger->getHandlers();
         foreach ($handlers as $handler) {
             $this->clearHandler($handler);
+            if (\method_exists($handler, 'reset')) {
+                $handler->reset();
+            }
         }
     }
 

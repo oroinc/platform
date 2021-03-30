@@ -6,10 +6,10 @@ use Monolog\Handler\BufferHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\TestHandler;
-use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearLoggerExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\DependencyInjection\Container;
 
 class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase

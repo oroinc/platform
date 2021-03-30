@@ -24,7 +24,7 @@ class OroLoggerExtensionTest extends ExtensionTestCase
 
         $expectedServices = [
             'oro_logger.event_subscriber.console_command',
-            'oro_logger.monolog.detailed_logs.handler'
+            'oro_logger.log_level_config_provider'
         ];
 
         $this->assertDefinitionsLoaded($expectedServices);
