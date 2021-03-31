@@ -205,6 +205,26 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_dataaudit.async.audit_changed_entities_inverse_collections:
+        class: Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
+            - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.client.message_producer'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_dataaudit.async.audit_changed_entities_inverse_collections_chunk:
+        class: Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsChunkProcessor
+        arguments:
+            - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_dataaudit.migration.demo_data_fixtures_listener:
         class: Oro\Bundle\DataAuditBundle\EventListener\DemoDataFixturesListener
         arguments:

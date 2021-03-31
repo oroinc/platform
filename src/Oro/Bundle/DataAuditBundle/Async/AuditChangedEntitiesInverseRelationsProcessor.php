@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
@@ -16,7 +14,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 
 /**
- * Listen for flush events and send data to MQ for audition
+ * Processes inverse relation that should be added to data audit.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -32,7 +30,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     private $auditConfigProvider;
 
     /**
-     * @param ManagerRegistry                    $doctrine
+     * @param ManagerRegistry $doctrine
      * @param EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter
      */
     public function __construct(
@@ -75,10 +73,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         $this->processAssociations($body['entities_updated'], $map);
         $this->processAssociations($body['entities_deleted'], $map);
         $this->processAssociations($body['collections_updated'], $map);
-
-        $this->processEntityFromCollection($body['entities_inserted'], $map, 'inserted', 1);
-        $this->processEntityFromCollection($body['entities_updated'], $map, 'changed', 1);
-        $this->processEntityFromCollection($body['entities_deleted'], $map, 'deleted', 0);
 
         try {
             $this->entityChangesToAuditEntryConverter->convert(
@@ -365,90 +359,9 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
     }
 
     /**
-     * Add change sets from collections elements changes to the map
-     *
-     * @param array $sourceEntitiesData
-     * @param array $map
-     * @param string $key
-     * @param int $idx
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    private function processEntityFromCollection(array $sourceEntitiesData, array &$map, string $key, int $idx)
-    {
-        foreach ($sourceEntitiesData as $sourceEntityData) {
-            $sourceEntityClass = $sourceEntityData['entity_class'];
-            $sourceEntityId = $sourceEntityData['entity_id'];
-            if (empty($sourceEntityData['change_set'])) {
-                continue;
-            }
-
-            /** @var EntityManagerInterface $sourceEntityManager */
-            $sourceEntityManager = $this->doctrine->getManagerForClass($sourceEntityClass);
-            $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
-            $sourceEntity = $sourceEntityManager->find($sourceEntityClass, $sourceEntityId);
-            if (!$sourceEntity) {
-                // the entity may be removed after update and since we are processing stuff in background
-                // it is possible that the update is processed after the real remove was performed.
-                continue;
-            }
-
-            foreach ($sourceEntityMeta->associationMappings as $sourceFieldName => $associationMapping) {
-                if (!empty($sourceEntityData['change_set'][$sourceFieldName])) {
-                    continue;
-                }
-
-                $entityClass = $sourceEntityMeta->associationMappings[$sourceFieldName]['targetEntity'];
-
-                $fieldName = $this->getTargetFieldName($sourceEntityMeta, $sourceFieldName);
-                if (!$fieldName) {
-                    // the unidirectional relation
-                    continue;
-                }
-
-                $value = $sourceEntityMeta->getFieldValue($sourceEntity, $sourceFieldName);
-                if (!$value) {
-                    // this the case where source entity does not belong to any collections
-                    continue;
-                }
-
-                $entityManager = $this->doctrine->getManagerForClass($entityClass);
-                $entityIds = $this->getEntityIds($entityManager, $value);
-                if (!$entityIds) {
-                    continue;
-                }
-
-                foreach ($entityIds as $entityId) {
-                    $change = $this->getCollectionChangeSetFromMap($map, $entityClass, $entityId, $fieldName);
-                    foreach (['inserted' => 1, 'changed' => 1, 'deleted' => 0] as $changeSetType => $changeSetIdx) {
-                        if ($changeSetType === $key) {
-                            continue;
-                        }
-
-                        if (isset($change[$changeSetIdx][$changeSetType][$sourceEntityClass.$sourceEntityId])) {
-                            $idx = $changeSetIdx;
-                            $key = $changeSetType;
-
-                            break;
-                        }
-                    }
-
-                    $change[$idx][$key][$sourceEntityClass.$sourceEntityId] = [
-                        'entity_class' => $sourceEntityClass,
-                        'entity_id' => $sourceEntityId,
-                        'change_set' => $sourceEntityData['change_set'],
-                    ];
-
-                    $this->addChangeSetToMap($map, $entityClass, $entityId, $fieldName, $change);
-                }
-            }
-        }
-    }
-
-    /**
      * @param ClassMetadata $sourceEntityMeta
      * @param string $sourceFieldName
+     *
      * @return string
      */
     private function getTargetFieldName(ClassMetadata $sourceEntityMeta, string $sourceFieldName)
@@ -532,42 +445,6 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
         }
 
         return $change;
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param mixed $entity
-     *
-     * @return int[]|string[]
-     */
-    private function getEntityIds(EntityManagerInterface $em, $entity): array
-    {
-        if ($entity instanceof Collection) {
-            $ids = [];
-            foreach ($entity as $item) {
-                $ids[] = $this->getEntityId($em, $item);
-            }
-
-            return $ids;
-        }
-
-        if (is_object($entity)) {
-            return [$this->getEntityId($em, $entity)];
-        }
-
-        return [];
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param object $entity
-     * @return mixed
-     */
-    private function getEntityId(EntityManagerInterface $em, $entity)
-    {
-        return $em->getClassMetadata(ClassUtils::getClass($entity))
-            ->getSingleIdReflectionProperty()
-            ->getValue($entity);
     }
 
     /**

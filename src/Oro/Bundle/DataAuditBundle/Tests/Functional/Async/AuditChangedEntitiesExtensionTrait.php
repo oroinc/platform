@@ -91,6 +91,7 @@ trait AuditChangedEntitiesExtensionTrait
 
         $message = new NullMessage();
         $message->setBody(json_encode($body));
+        $message->setMessageId('some_message_id');
 
         return $message;
     }

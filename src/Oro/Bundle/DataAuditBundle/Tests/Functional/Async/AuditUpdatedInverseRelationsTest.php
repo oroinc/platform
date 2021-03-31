@@ -6,6 +6,7 @@ use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcess
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Null\NullSession;
 
@@ -15,6 +16,7 @@ use Oro\Component\MessageQueue\Transport\Null\NullSession;
  */
 class AuditUpdatedInverseRelationsTest extends WebTestCase
 {
+    use MessageQueueAssertTrait;
     use AuditChangedEntitiesExtensionTrait;
 
     protected function setUp()
@@ -654,52 +656,6 @@ class AuditUpdatedInverseRelationsTest extends WebTestCase
         $this->assertSame('owners', $auditField->getField());
         $this->assertEquals("Added: TestAuditDataOwner::123", $auditField->getNewValue());
         $this->assertEquals("Removed: TestAuditDataOwner::124", $auditField->getOldValue());
-    }
-
-    public function testShouldTrackChangedEntityIfPartOfCollection()
-    {
-        $owner = $this->createOwner();
-        $child = $this->createChild();
-
-        $child->setOwnerManyToOne($owner);
-
-        $this->getEntityManager()->flush();
-
-        $message = $this->createDummyMessage([
-            'entities_updated' => [
-                '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => TestAuditDataChild::class,
-                    'entity_id' => $child->getId(),
-                    'change_set' => [
-                        'stringProperty' => [null, 'foo'],
-                    ]
-                ]
-            ],
-        ]);
-
-        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
-
-        $processor->process($message, new NullSession());
-
-        $this->assertStoredAuditCount(2);
-
-        $audit = $this->findLastStoredAudit();
-        $this->assertSame(TestAuditDataOwner::class, $audit->getObjectClass());
-        $this->assertEquals($owner->getId(), $audit->getObjectId());
-        $this->assertCount(1, $audit->getFields());
-
-        $auditField = $audit->getField('childrenOneToMany');
-        $this->assertInstanceOf(AuditField::class, $auditField);
-
-        $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('text', $auditField->getDataType());
-        $this->assertSame('childrenOneToMany', $auditField->getField());
-        $this->assertEquals(
-            "\nChanged: Item #" . $child->getId(),
-            $auditField->getNewValue()
-        );
-        $this->assertEquals(null, $auditField->getOldValue());
     }
 
     public function testShouldTrackChangedEntityWhichPartOfCollectionIfSourceEntityNoLongerExist()
