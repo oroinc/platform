@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle;
 
+use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\ConfigurableLoggerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\DetailedLogsHandlerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\LoggerPass;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\SwiftMailerHandlerPass;
@@ -20,6 +21,7 @@ class OroLoggerBundle extends Bundle
     {
         parent::build($container);
 
+        $container->addCompilerPass(new ConfigurableLoggerPass());
         $container->addCompilerPass(new DetailedLogsHandlerPass());
         $container->addCompilerPass(new SwiftMailerHandlerPass());
         $container->addCompilerPass(new LoggerPass());

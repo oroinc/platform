@@ -15,6 +15,7 @@ define(function(require, exports, module) {
         defaults: {
             locale: 'en_US',
             language: 'en',
+            rtl_mode: false,
             country: 'US',
             currency: 'USD',
             timezone: 'UTC',
@@ -23,6 +24,7 @@ define(function(require, exports, module) {
         settings: {
             locale: 'en_US',
             language: 'en',
+            rtl_mode: false,
             country: 'US',
             currency: 'USD',
             currencyViewType: 'symbol',

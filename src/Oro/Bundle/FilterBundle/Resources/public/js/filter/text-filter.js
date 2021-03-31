@@ -302,10 +302,10 @@ define(function(require, exports, module) {
          */
         _showCriteria: function() {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
-            this.$(this.criteriaSelector).css({
-                marginLeft: 'auto',
-                visibility: 'visible'
-            }).removeAttr('aria-hidden');
+            this.$(this.criteriaSelector)
+                .removeClass('criteria-hidden')
+                .removeAttr('aria-hidden')
+                .addClass('criteria-visible');
             this._alignCriteria();
             if (this.autoClose !== false) {
                 this._focusCriteria();
@@ -332,16 +332,26 @@ define(function(require, exports, module) {
                 return;
             }
             const $dropdown = this.$(this.criteriaSelector);
-            $dropdown.css('margin-left', 'auto');
+            $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, 'auto');
+
             const rect = $dropdown.get(0).getBoundingClientRect();
+            const rectInlineEnd = rect[_.isRTL() ? 'left' : 'right'];
+
             const containerRect = $container.get(0).getBoundingClientRect();
-            let shift = rect.right - containerRect.right;
-            if (shift > 0) {
+            const containerRectInlineEnd = containerRect[_.isRTL() ? 'left' : 'right'];
+
+            let shift = rectInlineEnd - containerRectInlineEnd;
+
+            if (!_.isRTL() && shift > 0) {
                 /**
                  * reduce shift to avoid overlaping left edge of container
                  */
                 shift -= Math.max(0, containerRect.left - (rect.left - shift));
-                $dropdown.css('margin-left', -shift);
+                $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, -shift);
+            }
+
+            if (_.isRTL() && shift < 0) {
+                $dropdown.css(`margin-${_.isRTL() ? 'right' : 'left'}`, shift);
             }
         },
 
@@ -351,10 +361,10 @@ define(function(require, exports, module) {
          * @protected
          */
         _hideCriteria: function() {
-            this.$(this.criteriaSelector).css({
-                marginLeft: '-9999px',
-                visibility: 'hidden'
-            }).attr('aria-hidden', true);
+            this.$(this.criteriaSelector)
+                .removeClass('criteria-visible')
+                .addClass('criteria-hidden')
+                .attr('aria-hidden', true);
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             this.trigger('hideCriteria', this);
             setTimeout(_.bind(function() {

@@ -22,6 +22,25 @@ services:
             - ['setContainer', ['@service_container']]
             - ['setFormatter', ['@monolog.formatter.normalizer']]
 
+    oro_logger.log_level_config_provider:
+        class: Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig
+        arguments:
+            - '@oro_logger.cache'
+            - '@?oro_config.user'
+            - '%installed%'
+            - '%oro_logger.detailed_logs_default_level%'
+
+    oro_logger.monolog.detailed_logs.activation_strategy:
+        class: Symfony\Bridge\Monolog\Handler\FingersCrossed\HttpCodeActivationStrategy
+        arguments:
+            - '@request_stack'
+            -
+                - code: 404
+                  urls: []
+                - code: 405
+                  urls: []
+            - '%oro_logger.detailed_logs_default_level%'
+
     oro_logger.monolog.detailed_logs.handler.prototype:
         abstract: true
         class: Oro\Bundle\LoggerBundle\Monolog\DetailedLogsHandler
@@ -31,6 +50,8 @@ services:
             - '%installed%'
             - '%oro_logger.detailed_logs_default_level%'
             - true
+        calls:
+            - [ 'setActivationStrategy', [ '@oro_logger.monolog.detailed_logs.activation_strategy' ] ]
 
     oro_logger.monolog.detailed_logs.handler:
         parent: oro_logger.monolog.detailed_logs.handler.prototype

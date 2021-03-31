@@ -38,6 +38,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             'groups'             => ['test group'],
             'icon'               => 'test.ico',
             'image_placeholders' => ['placeholder' => '/path/to/test.img'],
+            'rtl_support'        => true,
             'logo'               => 'test_logo.jpg',
             'screenshot'         => 'test_screenshot.jpg'
         ];
@@ -54,7 +55,8 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
                     'css' => [
                         'inputs'  => ['input.scss'],
                         'output'  => 'output.css',
-                        'filters' => ['test_filter']
+                        'filters' => ['test_filter'],
+                        'auto_rtl_inputs' => ['bundles/test/**']
                     ]
                 ]
             ]

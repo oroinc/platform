@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Extension\Theme\DataProvider;
 
+use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 
@@ -13,6 +14,9 @@ class ThemeProvider
     /** @var ThemeManager */
     protected $themeManager;
 
+    /** @var LocalizationProviderInterface */
+    protected $localizationProvider;
+
     /** @var Theme[] */
     protected $themes = [];
 
@@ -22,6 +26,14 @@ class ThemeProvider
     public function __construct(ThemeManager $themeManager)
     {
         $this->themeManager = $themeManager;
+    }
+
+    /**
+     * @param LocalizationProviderInterface $localizationProvider
+     */
+    public function setLocalizationProvider(LocalizationProviderInterface $localizationProvider): void
+    {
+        $this->localizationProvider = $localizationProvider;
     }
 
     /**
@@ -62,9 +74,9 @@ class ThemeProvider
      */
     public function getStylesOutput($themeName, $sectionName = 'styles')
     {
-        $assets = $this->getTheme($themeName)->getConfigByKey('assets');
-        if ($assets && array_key_exists($sectionName, $assets) && array_key_exists('output', $assets[$sectionName])) {
-            return sprintf('build/%s/%s', $themeName, $assets[$sectionName]['output']);
+        $outputPath = $this->getOutputPath($themeName, $sectionName);
+        if ($outputPath) {
+            return sprintf('build/%s/%s', $themeName, $outputPath);
         }
 
         $parentTheme = $this->getTheme($themeName)->getParentTheme();
@@ -87,5 +99,34 @@ class ThemeProvider
         }
 
         return $this->themes[$themeName];
+    }
+
+    /**
+     * @param string $themeName
+     * @param string $sectionName
+     *
+     * @return string|null
+     */
+    private function getOutputPath(string $themeName, string $sectionName): ?string
+    {
+        $theme = $this->getTheme($themeName);
+
+        $output = $theme->getConfigByKey('assets')[$sectionName]['output'] ?? null;
+        if (!$output) {
+            return null;
+        }
+
+        if (!$theme->isRtlSupport() || !$this->localizationProvider) {
+            return $output;
+        }
+
+        $localization = $this->localizationProvider->getCurrentLocalization();
+        if (!$localization || !$localization->isRtlMode()) {
+            return $output;
+        }
+
+        preg_match('/^(?<path>.+)(?<extension>\.[\w\-]*)?$/Uui', $output, $matches);
+
+        return sprintf('%s.rtl%s', $matches['path'], $matches['extension'] ?? '');
     }
 }

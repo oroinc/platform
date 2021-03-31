@@ -17,6 +17,16 @@
         margin-#{$start}: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
+        &.criteria-visible {
+            visibility: visible;
+        }
+
+        &.criteria-hidden {
+            // Break inline styles
+            margin-left: -9999px !important;
+            visibility: hidden;
+        }
+
         .btn-block {
             .btn:not(.filter-update) {
                 border-radius: $filter-box-criteria-btn-group-border-radius;

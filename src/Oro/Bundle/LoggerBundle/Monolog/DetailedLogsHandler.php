@@ -4,6 +4,7 @@ namespace Oro\Bundle\LoggerBundle\Monolog;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -27,7 +28,7 @@ class DetailedLogsHandler extends AbstractProcessingHandler
     /** @var bool|null */
     private $loading;
 
-    /** @var ConfigManager|null  */
+    /** @var ConfigManager|null */
     private $configManager;
 
     /** @var CacheProvider */
@@ -35,6 +36,8 @@ class DetailedLogsHandler extends AbstractProcessingHandler
 
     /** @var string|null */
     private $installed;
+
+    private ?ActivationStrategyInterface $activationStrategy = null;
 
     /**
      * @param ConfigManager|null $configManager
@@ -66,12 +69,22 @@ class DetailedLogsHandler extends AbstractProcessingHandler
         $this->handler = $handler;
     }
 
+    public function setActivationStrategy(ActivationStrategyInterface $activationStrategy): void
+    {
+        $this->activationStrategy = $activationStrategy;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function isHandling(array $record)
     {
-        $this->setLevel($this->getLogLevel());
+        $logLevel = $this->getLogLevel();
+        if ($logLevel === $this->detailedLogsDefaultLevel &&
+            $this->activationStrategy && !$this->activationStrategy->isHandlerActivated($record)) {
+            return false;
+        }
+        $this->setLevel($logLevel);
 
         return parent::isHandling($record);
     }
@@ -144,6 +157,6 @@ class DetailedLogsHandler extends AbstractProcessingHandler
      */
     private function isInstalled()
     {
-        return (bool) $this->installed;
+        return (bool)$this->installed;
     }
 }

@@ -14,6 +14,7 @@ use Twig\TwigFunction;
  *   - oro_currency_name
  *   - oro_locale
  *   - oro_language
+ *   - oro_is_rtl_mode
  *   - oro_country
  *   - oro_currency_symbol
  *   - oro_currency
@@ -59,6 +60,7 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('oro_currency_name', [$this, 'getCurrencyName']),
             new TwigFunction('oro_locale', [$this, 'getLocale']),
             new TwigFunction('oro_language', [$this, 'getLanguage']),
+            new TwigFunction('oro_is_rtl_mode', [$this, 'isRtlMode']),
             new TwigFunction('oro_country', [$this, 'getCountry']),
             new TwigFunction('oro_currency_symbol', [$this, 'getCurrencySymbolByCurrency']),
             new TwigFunction('oro_currency', [$this, 'getCurrency']),
@@ -96,6 +98,14 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
     public function getLanguage()
     {
         return $this->getLocaleSettings()->getLanguage();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRtlMode(): bool
+    {
+        return $this->getLocaleSettings()->isRtlMode();
     }
 
     /**

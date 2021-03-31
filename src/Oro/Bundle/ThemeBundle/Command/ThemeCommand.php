@@ -83,5 +83,7 @@ HELP
         if ($theme->getScreenshot()) {
             $output->writeln(sprintf(' - <info>screenshot:</info> %s', $theme->getScreenshot()));
         }
+
+        $output->writeln(sprintf(' - <info>rtl_support:</info> %s', $theme->isRtlSupport() ? 'Yes' : 'No'));
     }
 }

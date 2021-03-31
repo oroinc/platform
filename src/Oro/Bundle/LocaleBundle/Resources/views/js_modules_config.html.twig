@@ -42,6 +42,7 @@
 {% set defaults = {
     'locale':   constant(localeConfigurationClass ~ 'DEFAULT_LOCALE'),
     'language': constant(localeConfigurationClass ~ 'DEFAULT_LANGUAGE'),
+    'rtl_mode': false,
     'country':  constant(localeConfigurationClass ~ 'DEFAULT_COUNTRY'),
     'currency': constant(currencyConfigurationClass ~ 'DEFAULT_CURRENCY')
 } %}
@@ -60,6 +61,7 @@
 {% set settings = {
     'locale':   oro_locale(),
     'language': oro_language(),
+    'rtl_mode': oro_is_rtl_mode(),
     'country':  oro_country(),
     'currency': oro_currency(),
     'currencyViewType': oro_currency_view_type(),

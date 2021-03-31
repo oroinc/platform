@@ -1,0 +1,35 @@
+{% block address %}
+    {{- formatted|raw -}}
+{% endblock %}
+
+{% block address_part %}
+    {%- if part_value != '' -%}
+        <span {{- block('_address_part_attributes') -}}>{{- part_value -}}</span>
+    {%- endif -%}
+{% endblock %}
+
+{% block address_part_postal_code %}
+    {{- block('_address_part_ltr') -}}
+{% endblock %}
+
+{% block address_part_phone %}
+    {{- block('_address_part_ltr') -}}
+{% endblock %}
+
+{% block _address_part_ltr %}
+    {%- if part_value != '' -%}
+        {%- set attr = {'dir': 'ltr'} -%}
+        <bdo {{- block('_address_part_attributes') -}}>{{- part_value -}}</bdo>
+    {%- endif -%}
+{% endblock %}
+
+{% block _address_part_attributes %}
+    {%- set attr = {
+        'data-part': part_name,
+        'class': 'address-part-' ~ part_name|replace({'_': '-'})
+    }|merge(attr|default({})) -%}
+
+    {%- for name, value in attr -%}
+        {{- ' ' ~ name }}="{{ value }}"
+    {%- endfor -%}
+{% endblock %}
