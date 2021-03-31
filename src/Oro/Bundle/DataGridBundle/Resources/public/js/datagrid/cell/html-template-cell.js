@@ -15,8 +15,11 @@ const HtmlTemplateCell = StringCell.extend({
         };
     },
 
-    getTemplateFunction: function() {
-        return this.column.get('metadata').template;
+    getTemplateFunction: function(templateKey = 'default') {
+        if (typeof this.column.get('metadata').template === 'function') {
+            return this.column.get('metadata').template;
+        }
+        return this.column.get('metadata').template[templateKey];
     },
 
     render: function() {

@@ -5,6 +5,10 @@
 .validation-passed,
 .validation-warning{
     @extend .notification;
+
+    &--lite {
+        @extend .notification--lite;
+    }
 }
 
 .validation-failed,
@@ -16,6 +20,11 @@
             display: inline-block;
             margin-right: 6px;
         }
+    }
+
+    &--flex {
+        display: flex;
+        align-items: baseline;
     }
 
     /* Following css rule covers case when a few inputs has the same place for errors (e.g. datetime picker).
