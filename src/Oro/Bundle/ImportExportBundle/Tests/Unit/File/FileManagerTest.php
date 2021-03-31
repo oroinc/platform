@@ -111,6 +111,9 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileInfo->expects(self::once())
             ->method('openFile')
             ->willReturn($fileObject);
+        $fileInfo->expects(self::once())
+            ->method('getSize')
+            ->willReturn(1);
 
         $this->gaufretteFileManager->expects(self::once())
             ->method('writeToStorage')

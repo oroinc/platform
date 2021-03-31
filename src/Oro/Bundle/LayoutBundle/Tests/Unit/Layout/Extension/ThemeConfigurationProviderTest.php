@@ -82,7 +82,8 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'assets'         => [
                     'css' => [
                         'inputs'  => ['bundles/test/css/scss/main.scss'],
-                        'filters' => ['some_filter']
+                        'filters' => ['some_filter'],
+                        'auto_rtl_inputs' => ['bundles/test/**']
                     ]
                 ],
                 'images'         => [

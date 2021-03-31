@@ -49,7 +49,7 @@ const NavigationMenuView = BaseView.extend({
 
     /**
      * @inheritDoc
-     * @param {object} options
+     * @param {Object} options
      */
     options: {
         openClass: 'show',
@@ -64,7 +64,7 @@ const NavigationMenuView = BaseView.extend({
 
     /**
      * @inheritDoc
-     * @param {object} options
+     * @param {Object} options
      */
     initialize(options) {
         this.options = {...this.options, ...options};
@@ -79,14 +79,22 @@ const NavigationMenuView = BaseView.extend({
         this.registerKey(KEY_CODES.SPACE, this.onPressedSpace);
         this.registerKey(KEY_CODES.END, this.onPressedEnd);
         this.registerKey(KEY_CODES.HOME, this.onPressedHome);
-        this.registerKey(KEY_CODES.LEFT, this.onPressedLeft);
-        this.registerKey(KEY_CODES.RIGHT, this.onPressedRight);
 
-        // For simple (plain) menu buttons TOP and BOTTOM are doing the some behoviur as LEFT and RIGHT
         if (this.isPlainMenu) {
-            this.registerKey(KEY_CODES.UP, this.onPressedLeft);
-            this.registerKey(KEY_CODES.DOWN, this.onPressedRight);
+            this.registerKey(KEY_CODES.LEFT, this.onPressedStartSide);
+            this.registerKey(KEY_CODES.RIGHT, this.onPressedEndSide);
+            // For simple (plain) menu buttons TOP and BOTTOM are doing the some behaviour as LEFT and RIGHT
+            this.registerKey(KEY_CODES.UP, this.onPressedStartSide);
+            this.registerKey(KEY_CODES.DOWN, this.onPressedEndSide);
         } else {
+            if (_.isRTL()) {
+                this.registerKey(KEY_CODES.RIGHT, this.onPressedStartSide);
+                this.registerKey(KEY_CODES.LEFT, this.onPressedEndSide);
+            } else {
+                this.registerKey(KEY_CODES.LEFT, this.onPressedStartSide);
+                this.registerKey(KEY_CODES.RIGHT, this.onPressedEndSide);
+            }
+
             this.registerKey(KEY_CODES.UP, this.onPressedUp);
             this.registerKey(KEY_CODES.DOWN, this.onPressedDown);
         }
@@ -163,7 +171,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onKeyDown(event) {
         if ($(event.target).is(this.options.focusableElements)) {
@@ -172,7 +180,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onFocus(event) {
         const $element = $(event.target);
@@ -193,7 +201,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onFocusOut(event) {
         if (!$.contains(event.currentTarget, event.relatedTarget)) {
@@ -224,7 +232,7 @@ const NavigationMenuView = BaseView.extend({
 
     /**
      *
-     * @param {object} event
+     * @param {Object} event
      */
     navigateTo(event) {
         if (typeof this._keysMap[event.keyCode] === 'function') {
@@ -243,7 +251,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedEsc(event) {
         this.openNextRootMenu = false;
@@ -252,7 +260,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedSpace(event) {
         const $element = $(event.target);
@@ -269,7 +277,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedEnd(event) {
         event.preventDefault();
@@ -280,7 +288,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedHome(event) {
         event.preventDefault();
@@ -291,9 +299,11 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * Handler of left or right  buttons depend on the direction of the text of the document
+     *
+     * @param {Object} event
      */
-    onPressedLeft(event) {
+    onPressedStartSide(event) {
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
 
@@ -317,9 +327,11 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * Handler of right or left buttons depend on the direction of the text of the document
+     *
+     * @param {Object} event
      */
-    onPressedRight(event) {
+    onPressedEndSide(event) {
         const $element = $(event.target);
         const $currentMenu = this.getCurrentMenu($element);
         const $subMenu = this.getSubMenu($element);
@@ -341,7 +353,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedUp(event) {
         const $element = $(event.target);
@@ -376,7 +388,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     onPressedDown(event) {
         const $element = $(event.target);
@@ -756,7 +768,7 @@ const NavigationMenuView = BaseView.extend({
     },
 
     /**
-     * @param {object} event
+     * @param {Object} event
      */
     setFocusByFirstCharacter(event) {
         if (!this._searchData) {

@@ -68,7 +68,11 @@ class NumberFormatter
         array $symbols = [],
         $locale = null
     ) {
-        return $this->getFormatter($locale, $style, $attributes, $textAttributes, $symbols)->format($value);
+        try {
+            return $this->getFormatter($locale, $style, $attributes, $textAttributes, $symbols)->format($value);
+        } catch (\TypeError $error) {
+            return $value;
+        }
     }
 
     /**
@@ -294,8 +298,7 @@ class NumberFormatter
         if ($value instanceof \DateTime) {
             $value = $value->getTimestamp();
         }
-
-        $value = abs($value);
+        $value = abs((float) $value);
 
         if ($useDefaultFormat) {
             return $this->formatDefaultDuration($value);

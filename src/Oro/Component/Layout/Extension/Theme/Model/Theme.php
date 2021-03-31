@@ -24,6 +24,9 @@ class Theme
     /** @var array */
     protected $imagePlaceholders = [];
 
+    /** @var bool */
+    protected $rtlSupport = false;
+
     /** @var string */
     protected $logo;
 
@@ -129,6 +132,22 @@ class Theme
     public function setImagePlaceholders(array $imagePlaceholders): void
     {
         $this->imagePlaceholders = $imagePlaceholders;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRtlSupport(): bool
+    {
+        return $this->rtlSupport;
+    }
+
+    /**
+     * @param bool $rtlSupport
+     */
+    public function setRtlSupport(bool $rtlSupport): void
+    {
+        $this->rtlSupport = $rtlSupport;
     }
 
     /**

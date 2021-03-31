@@ -3,6 +3,9 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 ## 5.0-alpha.1
 
+### Added
+* Added support for Right To Left UI design see more [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html). 
+
 ### Changed
 
 #### TestFrameworkBundle

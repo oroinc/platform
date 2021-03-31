@@ -36,6 +36,10 @@ Logo that will be displayed in the UI.
 * **screenshot**
 _optional_
 This be displayed in theme management UI.
+  
+* **rtl_support**
+_optional_
+Defines whether Theme supports RTL and additional *.rtl.css files have to be build.
 
 ## Adding a theme using config.yml
 
@@ -54,6 +58,7 @@ oro_theme:
             icon: mytheme/images/favicon.ico
             logo: mytheme/images/logo.png
             screenshot: /mytheme/images/screenshot.png
+            rtl_support: true
 ```
 
 Make sure that your root public sites directory (generally a "web" directory in symfony) contains mytheme directory

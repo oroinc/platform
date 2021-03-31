@@ -10,7 +10,6 @@ services:
 
     oro_ui.placeholder.resolver:
         class: Oro\Component\Config\Resolver\SystemAwareResolver
-        public: false
         arguments:
             - '@service_container'
 
@@ -20,7 +19,6 @@ services:
 
     oro_ui.placeholder.configuration.provider:
         class: Oro\Bundle\UIBundle\Placeholder\PlaceholderConfigurationProvider
-        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/placeholders.php'
@@ -45,7 +43,6 @@ services:
             - '@oro_ui.dynamic_asset_version.cache'
 
     oro_ui.dynamic_asset_version.cache:
-        public: false
         parent: oro.cache.abstract
         calls:
             - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
@@ -290,7 +287,6 @@ services:
 
     oro_ui.controller_class_provider:
         class: Oro\Bundle\UIBundle\Provider\ControllerClassProvider
-        public: false
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/controllers.php'
@@ -302,7 +298,6 @@ services:
 
     oro_ui.controller_class_provider.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer
-        public: false
         arguments:
             - '@oro_ui.controller_class_provider'
         tags:
@@ -315,7 +310,6 @@ services:
 
     oro_ui.twig.extension.formatter:
         class: Oro\Bundle\UIBundle\Twig\FormatExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -323,7 +317,6 @@ services:
 
     oro_ui.twig.tab_extension:
         class: Oro\Bundle\UIBundle\Twig\TabExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -331,7 +324,6 @@ services:
 
     oro_ui.twig.html_tag:
         class: Oro\Bundle\UIBundle\Twig\HtmlTagExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -339,7 +331,6 @@ services:
 
     oro_ui.twig.placeholder_extension:
         class: Oro\Bundle\UIBundle\Twig\PlaceholderExtension
-        public: false
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -347,9 +338,8 @@ services:
 
     oro_ui.twig.ui_extension:
         class: Oro\Bundle\UIBundle\Twig\UiExtension
-        public: false
         arguments:
-            -  '@oro_platform.twig.service_locator'
+            - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
 

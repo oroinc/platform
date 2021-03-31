@@ -117,6 +117,16 @@ This filter use *format* method from address formatter, and has same logic.
 {{ address|oro_format_address('US') }}
 ```
 
+### oro_format_address_html
+
+This filter outputs a formatted address where each address part (i.e. city, country, etc.) is wrapped into the HTML tag
+with CSS class `address-part-PART-NAME` and `data-part="PART_NAME"` attribute to allow more fine-grained control
+on address styling.
+
+```
+{{ address|oro_format_address_html('US') }}
+```
+
 JS
 ============
 
