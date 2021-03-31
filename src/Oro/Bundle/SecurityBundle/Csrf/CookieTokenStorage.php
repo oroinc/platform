@@ -20,6 +20,9 @@ class CookieTokenStorage implements TokenStorageInterface
     /** @var bool */
     private $httpOnly;
 
+    /** @var string|null */
+    private $sameSite;
+
     /** @var RequestStack */
     private $requestStack;
 
@@ -28,11 +31,23 @@ class CookieTokenStorage implements TokenStorageInterface
      * @param bool         $httpOnly
      * @param RequestStack $requestStack
      */
-    public function __construct($secure, bool $httpOnly, RequestStack $requestStack)
-    {
+    public function __construct(
+        $secure,
+        bool $httpOnly,
+        RequestStack $requestStack
+    ) {
         $this->secure = $secure;
         $this->httpOnly = $httpOnly;
         $this->requestStack = $requestStack;
+    }
+
+    /**
+     * @deprecated
+     * @param string|null $sameSite
+     */
+    public function setSameSite(?string $sameSite): void
+    {
+        $this->sameSite = $sameSite;
     }
 
     /**
@@ -90,7 +105,9 @@ class CookieTokenStorage implements TokenStorageInterface
             '/',
             null,
             'auto' === $this->secure ? null : $this->secure,
-            $this->httpOnly
+            $this->httpOnly,
+            false,
+            $this->sameSite
         );
     }
 
