@@ -1,6 +1,7 @@
 /* @theme: default; */
 
-$input-padding: 9px 11px 8px;
+$input-padding-y: 11px;
+$input-padding: 9px $input-padding-y 8px;
 $input-padding--m: 8px 9px 7px;
 $input-padding--s: 5px 9px 4px;
 $input-padding--x-s: 4px 9px 3px;
