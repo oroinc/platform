@@ -55,6 +55,7 @@ class OroSecurityExtension extends Extension
     {
         $container->getDefinition('oro_security.csrf.cookie_token_storage')
             ->addMethodCall('setSecure', [$config['csrf_cookie']['cookie_secure']])
-            ->addMethodCall('setHttpOnly', [$config['csrf_cookie']['cookie_httponly']]);
+            ->addMethodCall('setHttpOnly', [$config['csrf_cookie']['cookie_httponly']])
+            ->addMethodCall('setSameSite', [$config['csrf_cookie']['cookie_samesite']]);
     }
 }
