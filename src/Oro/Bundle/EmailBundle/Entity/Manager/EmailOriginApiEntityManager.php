@@ -42,7 +42,7 @@ class EmailOriginApiEntityManager extends ApiEntityManager
             }
         ];
 
-        foreach (array_unique(call_user_func_array('array_merge', $this->getEmailOriginProperties())) as $prop) {
+        foreach (array_unique(array_merge(...array_values($this->getEmailOriginProperties()))) as $prop) {
             $config['fields'][$prop] = null;
         }
 

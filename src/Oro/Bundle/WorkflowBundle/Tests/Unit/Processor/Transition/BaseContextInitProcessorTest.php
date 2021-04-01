@@ -48,9 +48,14 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     public function testTransitionSpecified()
     {
         $this->expectException(\TypeError::class);
+        if (PHP_VERSION_ID < 80000) {
+            $messagePattern = 'Return value of %s::getTransitionName() must be of the type string, null returned';
+        } else {
+            $messagePattern = '%s::getTransitionName(): Return value must be of type %s, null returned';
+        }
         $this->expectExceptionMessage(
             sprintf(
-                'Return value of %s::getTransitionName() must be of the type string, null returned',
+                $messagePattern,
                 TransitionContext::class
             )
         );
@@ -61,9 +66,14 @@ class BaseContextInitProcessorTest extends \PHPUnit\Framework\TestCase
     public function testNoItemAndWorkflowSpecified()
     {
         $this->expectException(\TypeError::class);
+        if (PHP_VERSION_ID < 80000) {
+            $messagePattern = 'Return value of %s::getWorkflowName() must be of the type string, null returned';
+        } else {
+            $messagePattern = '%s::getWorkflowName(): Return value must be of type %s, null returned';
+        }
         $this->expectExceptionMessage(
             sprintf(
-                'Return value of %s::getWorkflowName() must be of the type string, null returned',
+                $messagePattern,
                 TransitionContext::class
             )
         );

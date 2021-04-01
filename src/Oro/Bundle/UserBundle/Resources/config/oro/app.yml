@@ -39,6 +39,8 @@ security:
             organization-remember-me:
                 token_provider:             oro_security.token.provider.rememberme
                 secret:                     '%secret%'
+                # More info about remember me cookie configuration can be found at
+                # https://doc.oroinc.com/backend/setup/post-install/cookies-configuration/#back-office-remember-me-cookie
                 name:                       BAPRM
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true

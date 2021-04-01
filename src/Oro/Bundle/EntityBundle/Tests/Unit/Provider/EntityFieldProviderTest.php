@@ -630,7 +630,7 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->provider->getFields('Acme:Test', true, true);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEqualsCanonicalizing($expected, $result);
     }
 
     /**

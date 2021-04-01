@@ -32,7 +32,7 @@ trait MemoryCacheProviderAwareTestTrait
             ->willReturnCallback(
                 static function ($cacheKeyArguments, $callable = null) use ($cachedData) {
                     if (!$cachedData && is_callable($callable)) {
-                        return call_user_func_array($callable, (array) $cacheKeyArguments);
+                        return call_user_func_array($callable, array_values((array)$cacheKeyArguments));
                     }
 
                     return $cachedData;

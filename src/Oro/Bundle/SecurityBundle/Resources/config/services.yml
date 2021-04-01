@@ -736,6 +736,7 @@ services:
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
             - '@request_stack'
+            - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
 
     oro_security.csrf_token_manager:
         class: Symfony\Component\Security\Csrf\CsrfTokenManager
