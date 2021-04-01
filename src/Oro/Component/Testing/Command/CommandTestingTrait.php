@@ -7,10 +7,13 @@ use Oro\Component\Testing\Command\Assert\CommandOutputIsEmpty;
 use Oro\Component\Testing\Command\Assert\CommandProducedError;
 use Oro\Component\Testing\Command\Assert\CommandProducedWarning;
 use Oro\Component\Testing\Command\Assert\CommandSuccessReturnCode;
+use Oro\Component\Testing\Unit\Command\Stub\InputStub;
+use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use PHPUnit\Framework\Exception;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -47,6 +50,15 @@ trait CommandTestingTrait
     private function assertOutputContains(CommandTester $commandTester, string $expectedText): void
     {
         self::assertStringContainsString($expectedText, CommandOutputNormalizer::toSingleLine($commandTester));
+    }
+
+    private function assertOutputContainsNote(CommandTester $commandTester, string $expectedText): void
+    {
+        $output = new OutputStub();
+        $symfonyStyle = new SymfonyStyle(new InputStub(), $output);
+        $symfonyStyle->note($expectedText);
+
+        $this->assertOutputContains($commandTester, CommandOutputNormalizer::toSingleLine($output->getOutput()));
     }
 
     private function assertOutputNotContains(CommandTester $commandTester, string $expectedText): void
