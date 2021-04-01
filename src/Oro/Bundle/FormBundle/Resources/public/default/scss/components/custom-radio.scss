@@ -72,6 +72,8 @@
         vertical-align: middle;
 
         word-break: break-word;
+    
+        cursor: $base-ui-element-cursor;
 
         &::before {
             flex-shrink: 0;
