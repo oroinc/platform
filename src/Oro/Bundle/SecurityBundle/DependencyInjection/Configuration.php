@@ -38,6 +38,15 @@ class Configuration implements ConfigurationInterface
                         ->end()
                 ->end()
             ->end()
+            ->arrayNode('login_target_path_excludes')
+                ->normalizeKeys(false)
+                ->defaultValue([])
+                ->prototype('variable')
+                ->info(
+                    "List of routes that must not be used as a redirect path after log in. ".
+                    "See \Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener."
+                )
+            ->end()
         ->end();
 
         return $treeBuilder;
