@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * Overrides class for security.exception_listener
+ * Overrides class for security.exception_listener and sets excluded routes from a parameter
  */
 class SetFirewallExceptionListenerPass implements CompilerPassInterface
 {
@@ -18,6 +18,7 @@ class SetFirewallExceptionListenerPass implements CompilerPassInterface
     {
         $container
             ->getDefinition('security.exception_listener')
-            ->setClass(ExceptionListener::class);
+            ->setClass(ExceptionListener::class)
+            ->addMethodCall('setExcludedRoutes', ['%oro_security.login_target_path_excludes%']);
     }
 }
