@@ -695,6 +695,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
+     *
+     * @param string $fieldName
+     */
+    public function fieldShouldBeEnabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
+     *
+     * @param string $fieldName
+     */
+    public function fieldShouldBeDisabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
+    }
+
+    /**
      * @param string $selectField
      * @param array $optionLabels
      */
