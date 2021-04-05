@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AbstractAuditProcessor;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Async\AuditChangedEntitiesExtensionTrait;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -33,6 +36,7 @@ class DataAuditTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->clearMessageCollector();
         $token = new UsernamePasswordOrganizationToken(
             $this->findAdmin(),
             self::AUTH_PW,
@@ -41,6 +45,19 @@ class DataAuditTest extends WebTestCase
             $this->findAdmin()->getRoles()
         );
         $this->getContainer()->get('security.token_storage')->setToken($token);
+    }
+
+    protected function tearDown(): void
+    {
+        /** @var Registry $doctrine */
+        $doctrine = $this->getContainer()->get('doctrine');
+        $entityManager = $doctrine->getManager();
+        /** @var AuditRepository $repository */
+        $repository = $doctrine->getRepository(Audit::class);
+        foreach ($repository->findAll() as $entity) {
+            $entityManager->remove($entity);
+        }
+        $entityManager->flush();
     }
 
     public function testCoverage()
@@ -476,11 +493,12 @@ class DataAuditTest extends WebTestCase
     {
         $owner = new TestAuditDataOwner();
         $owner->setStringProperty('ownerString');
+
         $child = new TestAuditDataChild();
         $child->setStringProperty('childString');
+        $child->setOwners(new ArrayCollection([$owner]));
 
         $owner->addChildrenManyToMany($child);
-        $child->setOwners(new ArrayCollection([$owner]));
 
         $em = $this->getEntityManager();
         $em->persist($owner);
@@ -557,7 +575,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -621,7 +639,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -657,7 +675,7 @@ class DataAuditTest extends WebTestCase
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -956,7 +974,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1246,7 +1264,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1281,7 +1299,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1317,7 +1335,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1353,7 +1371,7 @@ class DataAuditTest extends WebTestCase
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1385,7 +1403,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1424,7 +1442,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1462,7 +1480,7 @@ class DataAuditTest extends WebTestCase
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1734,7 +1752,7 @@ class DataAuditTest extends WebTestCase
         $child->setStringProperty('childString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -1771,7 +1789,7 @@ class DataAuditTest extends WebTestCase
         $owner->setStringProperty('ownerString2');
         $em->flush();
 
-        $this->processMessages();
+        $this->processMessages(false, true);
 
         $this->assertData(
             [
@@ -2125,15 +2143,21 @@ class DataAuditTest extends WebTestCase
     }
 
     /**
+     * @param bool $withRelations
      * @param bool $withCollections
      */
-    private function processMessages(bool $withCollections = false): void
+    private function processMessages(bool $withRelations = false, bool $withCollections = false): void
     {
         $processors[] = 'oro_dataaudit.async.audit_changed_entities';
-        if ($withCollections) {
+        $processors[] = 'oro_dataaudit.async.audit_changed_entities_inverse_relations';
+        if ($withRelations) {
             $processors[] = 'oro_dataaudit.async.audit_changed_entities_relations';
         }
-        $processors[] = 'oro_dataaudit.async.audit_changed_entities_inverse_relations';
+
+        if ($withCollections) {
+            $processors[] = 'oro_dataaudit.async.audit_changed_entities_inverse_collections';
+            $processors[] = 'oro_dataaudit.async.audit_changed_entities_inverse_collections_chunk';
+        }
 
         /** @var ConnectionInterface $connection */
         $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
@@ -2147,6 +2171,7 @@ class DataAuditTest extends WebTestCase
             foreach ($processor::getSubscribedTopics() as $topic) {
                 $message = $this->getSentMessage($topic);
                 $messageModel = $session->createMessage(json_encode($message->getBody()));
+                $messageModel->setMessageId('oro_owner');
 
                 $processor->process($messageModel, $session);
             }
