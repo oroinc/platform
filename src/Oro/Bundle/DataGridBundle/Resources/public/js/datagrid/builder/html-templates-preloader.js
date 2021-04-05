@@ -11,7 +11,7 @@ const htmlTemplatesPreloader = {
      */
     processDatagridOptions: function(deferred, options) {
         const promises = options.metadata.columns
-            .filter(column => column.frontend_template && typeof column.frontend_template === 'string')
+            .filter(column => column.frontend_template)
             .map(column => loadModules(column.frontend_template).then(template => {
                 column.template = template;
                 delete column.frontend_template;

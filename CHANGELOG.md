@@ -5,6 +5,9 @@ The current file describes significant changes in the code that may affect the u
 ## 5.0-alpha.2
 * `Mixins` and `SCSS Variables` related to `direction.scss` were removed. For implementing Right To Left UI design have a look in [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html).
 
+## 5.0.0-alpha.1 (2021-03-31)
+[Show detailed list of changes](incompatibilities-5-0-alpha-1.md)
+
 ## 5.0-alpha.1
 
 ### Added

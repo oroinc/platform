@@ -15,7 +15,7 @@ const TogglePaginationView = BaseView.extend({
 
     maxPageSize: void 0,
 
-    className: 'datagrid-toggle-pagination',
+    className: 'datagrid-toggle-pagination datagrid-divider',
 
     translationPrefix: 'oro.datagrid.btn',
 
@@ -55,18 +55,25 @@ const TogglePaginationView = BaseView.extend({
     },
 
     getTemplateData: function() {
-        const {pageSize: initialPageSize} = this.grid.collection.initialState;
-        const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
+        const {pageSize: currentPageSize} = this.grid.collection.state;
         const isMaxPageSize = currentPageSize === this.maxPageSize;
         const translationPrefix = `${this.translationPrefix}.${isMaxPageSize ? 'show_less' : 'show_all'}`;
 
         return {
             enabled: this.enabled,
-            visible: totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize,
+            visible: this.isVisible(),
             isMaxPageSize,
             label: __(`${translationPrefix}.label`),
             ariaLabel: __(`${translationPrefix}.aria_label`)
         };
+    },
+
+    isVisible() {
+        const {pageSize: initialPageSize} = this.grid.collection.initialState;
+        const {pageSize: currentPageSize, totalPages, totalRecords} = this.grid.collection.state;
+        const isMaxPageSize = currentPageSize === this.maxPageSize;
+
+        return totalPages > 1 || isMaxPageSize && totalRecords > initialPageSize;
     },
 
     disable: function() {
@@ -78,6 +85,12 @@ const TogglePaginationView = BaseView.extend({
     enable: function() {
         this.enabled = true;
         this.render();
+        return this;
+    },
+
+    render() {
+        TogglePaginationView.__super__.render.call(this);
+        this.$el.toggleClass('empty', !this.isVisible());
         return this;
     },
 

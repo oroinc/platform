@@ -49,7 +49,7 @@ class ChainWidgetProvider implements WidgetProviderInterface
         // sort by priority and flatten
         if ($result) {
             ksort($result);
-            $result = array_merge(...$result);
+            $result = array_merge(...array_values($result));
         }
 
         return $result;

@@ -123,7 +123,7 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
         // sort by priority and flatten
         if (!empty($watchers)) {
             krsort($watchers);
-            $watchers = array_merge(...$watchers);
+            $watchers = array_merge(...array_values($watchers));
         }
 
         return $watchers;
