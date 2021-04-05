@@ -45,6 +45,8 @@ class OroSecurityExtension extends Extension
         }
 
         $this->configureCookieTokenStorage($container, $config);
+
+        $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
     }
 
     /**

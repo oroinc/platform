@@ -25,3 +25,10 @@ knp_gaufrette:
 oro_api:
     error_title_overrides:
         'file constraint from system config constraint': 'file constraint'
+
+oro_security:
+    login_target_path_excludes:
+        - oro_attachment_get_file
+        - oro_resize_attachment
+        - oro_filtered_attachment
+        - _oro_filtered_attachment
