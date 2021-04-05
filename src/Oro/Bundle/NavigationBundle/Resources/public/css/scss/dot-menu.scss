@@ -19,17 +19,11 @@
 
         .tabs-left {
             > .nav-tabs {
-                float: #{$start};
+                float: left;
                 margin: 0;
                 padding: 0;
                 width: 132px;
-
                 border: 0;
-
-                @include if-rtl {
-                    #{$start}: 0;
-                    #{$end}: auto;
-                }
 
                 li {
                     width: 100%;
@@ -56,7 +50,7 @@
                         .menu-icon {
                             min-width: $dropdown-item-icon-fa-size;
                             height: $dropdown-item-icon-fa-size;
-                            margin-#{$end}: $dropdown-item-icon-fa-offset;
+                            margin-right: $dropdown-item-icon-fa-offset;
 
                             font-size: $dropdown-item-icon-fa-font-size;
 
@@ -123,7 +117,7 @@
 
             .close {
                 position: absolute;
-                #{$end}: $dot-menu-close-pisotion;
+                right: $dot-menu-close-pisotion;
                 top: $dot-menu-close-pisotion;
 
                 font-size: 0;

@@ -11,7 +11,7 @@
     }
 
     .field-permission-container {
-        margin-#{$start}: $workflow-permission-grid-permission-offset;
+        margin-left: $workflow-permission-grid-permission-offset;
         padding: $workflow-permission-grid-permission-inner-offset;
 
         border-top: $workflow-permission-grid-permission-border;
@@ -25,18 +25,18 @@
 
     .field-name {
         width: $workflow-permission-grid-entity-name-width - $workflow-permission-grid-permission-offset;
-        float: #{$start};
+        float: left;
     }
 
     .entity-name,
     .field-name {
-        padding-#{$end}: $workflow-permission-grid-field-name-offset;
+        padding-right: $workflow-permission-grid-field-name-offset;
     }
 
     .action-permissions__item {
         width: $workflow-permission-grid-item-width;
-        margin-#{$end}: 0;
-        padding-#{$end}: $workflow-permission-grid-field-name-offset;
+        margin-right: 0;
+        padding-right: $workflow-permission-grid-field-name-offset;
     }
 
     .action-permissions__label {

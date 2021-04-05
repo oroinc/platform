@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/mixins/direction";
-
 .entity-pagination {
     display: flex;
     align-items: baseline;
@@ -30,7 +28,7 @@
     }
 
     &_total {
-        margin-#{$start}: $entity-pagination-total-margin-start;
+        margin-left: $entity-pagination-total-margin-start;
         color: $entity-pagination-total-color;
         font-size: $entity-pagination-total-font-size;
     }

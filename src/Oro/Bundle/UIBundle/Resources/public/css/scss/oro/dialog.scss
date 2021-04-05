@@ -26,7 +26,7 @@
         padding: $dialog-titlebar-inner-offset;
         width: $dialog-titlebar-width;
         top: $dialog-titlebar-top;
-        #{$start}: $dialog-titlebar-start;
+        left: $dialog-titlebar-start;
         flex-shrink: $dialog-titlebar-flex-shrink;
         align-items: $dialog-titlebar-falign-items;
         display: $dialog-titlebar-display;
@@ -44,7 +44,7 @@
 
         .ui-dialog-titlebar-close {
             position: $dialog-titlebar-close-position;
-            #{$end}: $dialog-titlebar-close-end;
+            right: $dialog-titlebar-close-end;
             top: $dialog-titlebar-close-top;
         }
     }
@@ -60,8 +60,8 @@
         text-overflow: $dialog-title-text-overflow;
         flex-grow: 1;
         flex-shrink: 1;
-        text-align: $start;
-        margin-#{$end}: $content-padding-medium;
+        text-align: left;
+        margin-right: $content-padding-medium;
 
         .lang-en & {
             text-transform: capitalize;
@@ -152,13 +152,15 @@
     }
 
     .ui-dialog-titlebar-buttonpane {
-        #{$end}: $dialog-titlebar-buttonpane-end;
-
-        /* iOS 11 */
-        #{$end}: $dialog-titlebar-buttonpane-end-ios11 !important;
+        right: $dialog-titlebar-buttonpane-end;
 
         /* iOS 11.2+ */
-        #{$end}: $dialog-titlebar-buttonpane-end-ios11-2 !important;
+        /*rtl:ignore*/
+        right: calc(env(safe-area-inset-right) + 16px);
+        /*rtl:ignore*/
+        /*rtl:raw:
+        left: calc(env(safe-area-inset-left) + 16px);
+        */
         top: $dialog-titlebar-buttonpane-top;
         margin: $dialog-titlebar-buttonpane-outer-offset;
         height: $dialog-titlebar-buttonpane-height;
@@ -167,8 +169,8 @@
         position: static;
 
         [class*='ui-dialog-titlebar-'] {
-            margin-#{$end}: 13px;
-            margin-#{$start}: 0;
+            margin-right: 13px;
+            margin-left: 0;
             padding: 0;
 
             .ui-icon {
@@ -194,7 +196,7 @@
         }
 
         .close-dialog {
-            margin-#{$end}: 0;
+            margin-right: 0;
         }
 
         .ui-dialog-titlebar-close:before {
@@ -237,14 +239,14 @@
             .ui-dialog-titlebar-buttonpane {
                 background: $dialog-titlebar-min-background;
                 border: $dialog-titlebar-min-border;
-                #{$end}: $dialog-titlebar-min-end;
+                right: $dialog-titlebar-min-end;
                 top: $dialog-titlebar-min-top;
 
                 [class*='ui-dialog-titlebar-'] {
-                    margin-#{$end}: $dialog-titlebar-min-button-outer-offset;
+                    margin-right: $dialog-titlebar-min-button-outer-offset;
 
                     &:before {
-                        border-#{$end}: none;
+                        border-right: none;
                         color: $primary-700;
                         font-size: $base-font-size;
                     }
@@ -271,11 +273,11 @@
         flex-shrink: $dialog-buttonpane-flex-shrink;
 
         .widget-actions-section {
-            margin-#{$start}: $dialog-buttonpane-widget-actions-section-offset-left;
+            margin-left: $dialog-buttonpane-widget-actions-section-offset-left;
         }
 
         .action-wrapper {
-            margin-#{$start}: $dialog-buttonpane-action-wrapper-offset-left;
+            margin-left: $dialog-buttonpane-action-wrapper-offset-left;
         }
     }
 
@@ -293,7 +295,7 @@
     margin: $dialog-resizable-se-outer-offset;
     position: $dialog-resizable-se-position;
     bottom: $dialog-resizable-se-bottom;
-    #{$end}: $dialog-resizable-se-end;
+    right: $dialog-resizable-se-end;
     cursor: $dialog-resizable-se-cursor;
 
     &:before,
@@ -303,9 +305,9 @@
         display: $dialog-resizable-se-presudo-display;
         position: $dialog-resizable-se-presudo-position;
         top: $dialog-resizable-se-presudo-top;
-        #{$end}: $dialog-resizable-se-presudo-end;
+        right: $dialog-resizable-se-presudo-end;
         bottom: $dialog-resizable-se-presudo-bottom;
-        #{$start}: $dialog-resizable-se-presudo-start;
+        left: $dialog-resizable-se-presudo-start;
         height: $dialog-resizable-se-presudo-height;
         margin: $dialog-resizable-se-presudo-margin;
         transform: $dialog-resizable-se-presudo-transform;
@@ -335,4 +337,3 @@
     z-index: $ui-widget-overlay-z-index;
     background-color: $ui-widget-overlay-background-color;
 }
-

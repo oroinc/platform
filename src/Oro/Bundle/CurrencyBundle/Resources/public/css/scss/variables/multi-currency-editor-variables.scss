@@ -11,11 +11,10 @@ $multi-currency-editor-single-border:
     solid
     $multi-currency-editor-single-border-color !default;
 $multi-currency-editor-single-color: $primary-830 !default;
-$multi-currency-editor-single-add-on-inner-offset: side-values(
-    $oro-datagrid-body-cell-inner-top - $multi-currency-editor-single-border-width
+$multi-currency-editor-single-add-on-inner-offset:
+    ($oro-datagrid-body-cell-inner-top - $multi-currency-editor-single-border-width)
     $multi-currency-editor-single-offset
-    $oro-datagrid-body-cell-inner-bottom - $multi-currency-editor-single-border-width
-) !default;
+    ($oro-datagrid-body-cell-inner-bottom - $multi-currency-editor-single-border-width) !default;
 $multi-currency-editor-multi-width: 100% !default;
 $multi-currency-editor-multi-choice-offset: 52px !default;
 $multi-currency-editor-multi-choice-active: $secondary !default;

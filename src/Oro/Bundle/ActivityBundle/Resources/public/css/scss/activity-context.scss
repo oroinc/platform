@@ -11,7 +11,7 @@
 }
 
 .activity-context-activity-label {
-    float: $start;
+    float: left;
     margin: $activity-context-activity-label-offset;
 
     color: $activity-context-activity-label-color;
@@ -19,7 +19,7 @@
 
 .activity-context-activity-items {
     .activity-context-activity-label + & {
-        margin-#{$start}: $activity-context-activity-items-offset;
+        margin-left: $activity-context-activity-items-offset;
     }
 }
 

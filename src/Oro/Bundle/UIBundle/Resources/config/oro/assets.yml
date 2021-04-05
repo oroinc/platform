@@ -8,7 +8,7 @@ css:
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
         # libraries' styles
-        - 'font-awesome/scss/font-awesome.scss'
+        - 'bundles/oroui/css/scss/font-awesome/font-awesome.scss'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'

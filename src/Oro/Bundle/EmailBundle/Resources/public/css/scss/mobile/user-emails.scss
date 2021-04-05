@@ -26,7 +26,7 @@
     &__contacts {
         float: left;
         max-width: calc(100% - 84px);
-        margin-#{$start}: 6px;
+        margin-left: 6px;
         overflow: hidden;
         text-overflow: ellipsis;
     }

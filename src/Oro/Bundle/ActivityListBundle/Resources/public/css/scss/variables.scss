@@ -27,13 +27,13 @@ $activity-actions-offset: 8px !default;
 $activity-count-offset: 0 24px !default;
 $activity-count-color: $primary-700 !default;
 
-$activity-accordion-icon-offset: side-values(0 2px 0 0) !default;
+$activity-accordion-icon-offset: 0 2px 0 0 !default;
 $activity-accordion-icon-color-hover: $primary-400 !default;
 $activity-accordion-icon-expanded: $fa-var-minus-square-o !default;
 $activity-accordion-icon-collapsed: $fa-var-plus-square-o !default;
 
 $activity-details-width: 240px !default;
-$activity-details-offset: side-values(0 12px 0 20px) !default;
+$activity-details-offset: 0 12px 0 20px !default;
 
 $activity-info-width: calc(100% - 372px) !default;
 
@@ -41,13 +41,13 @@ $activity-message-subject-color: $primary !default;
 
 $activity-accordion-body-offset: 12px !default;
 
-$activity-user-fieldset-offset: side-values(4px 20px 0 0) !default;
+$activity-user-fieldset-offset: 4px 20px 0 0 !default;
 
 $activity-filter-select-color: $primary-400 !default;
 
 $activity-short-message-offset: 0 8px !default;
 
-$activity-item-content-padding: side-values(8px 16px 0) !default;
+$activity-item-content-padding: 8px 16px 0 !default;
 $activity-item-email-content-padding: 0 16px !default;
 $activity-item-content-margin: 22px !default;
 

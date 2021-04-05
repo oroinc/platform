@@ -49,12 +49,12 @@
         align-items: center;
 
         &--forgot {
-            padding-#{$end}: 0;
+            padding-right: 0;
         }
     }
 
     &__oauth {
-        padding: side-values(24px 0 0 93px);
+        padding: 24px 0 0 93px;
     }
 
     &__section {
@@ -83,10 +83,10 @@
     .title-box {
         color: $primary-200;
         margin: 0 0 27px;
-        text-align: #{$start};
+        text-align: left;
 
         .divider-vertical {
-            float: #{$start};
+            float: left;
             background: url(../../img/vertical-divider.png) no-repeat;
             width: 2px;
             height: 28px;
@@ -94,7 +94,7 @@
         }
 
         .oro-title {
-            float: #{$start};
+            float: left;
             font-size: 22px;
             line-height: 28px;
             margin: 0;
@@ -130,9 +130,9 @@
 
     .add-on {
         background: none;
-        text-align: #{$end};
+        text-align: right;
         color: $primary-200;
-        padding: side-values(0 25px 0 0);
+        padding: 0 25px 0 0;
         border: none;
     }
 
@@ -148,15 +148,15 @@
     .organization-selector-arrow {
         position: relative;
         top: 8px;
-        #{$start}: -15px;
-        margin-#{$end}: -9px;
+        left: -15px;
+        margin-right: -9px;
         z-index: 5;
     }
 
     .forgot-pass {
-        float: #{$start};
+        float: left;
         font-weight: bold;
-        margin: side-values(9px 10px 0 0);
+        margin: 9px 10px 0 0;
     }
 
     &__fieldset {
@@ -178,7 +178,7 @@
         height: 32px;
         line-height: 32px;
         min-width: 95px;
-        float: #{$start};
+        float: left;
     }
 
     .extra-submit {
@@ -192,8 +192,8 @@
     }
 
     .form-row {
-        margin-#{$start}: 0;
-        margin-#{$end}: 0;
+        margin-left: 0;
+        margin-right: 0;
     }
 
     .form-text {
@@ -204,7 +204,7 @@
 
     &.form-row-layout {
         .oro-remember-me {
-            padding-#{$start}: 91px;
+            padding-left: 91px;
         }
 
         .form-signin__footer {
@@ -239,10 +239,10 @@
             width: 100%;
             height: auto;
 
-            padding-#{$end}: 0;
+            padding-right: 0;
             padding-bottom: 4px;
 
-            text-align: #{$start};
+            text-align: left;
             line-height: 1.5;
         }
 
@@ -256,8 +256,8 @@
 
         .field-set,
         .title-box {
-            margin-#{$start}: auto;
-            margin-#{$end}: auto;
+            margin-left: auto;
+            margin-right: auto;
 
             width: $field-width;
         }
@@ -293,7 +293,7 @@
 
     &--login.form-row-layout {
         .form-signin__footer {
-            padding-#{$start}: 91px;
+            padding-left: 91px;
         }
     }
 }

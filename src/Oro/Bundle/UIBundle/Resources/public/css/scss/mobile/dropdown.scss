@@ -16,6 +16,6 @@
 
     [class^="fa-"],
     [class*=" fa-"] {
-        margin-#{$end}: $dropdown-item-icon-fa-offset;
+        margin-right: $dropdown-item-icon-fa-offset;
     }
 }

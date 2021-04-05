@@ -37,10 +37,10 @@ define(function(require, exports, module) {
     };
 
     const AttachmentMap = {
-        TOP: 'top-start',
-        TOPEND: 'top-end',
-        BOTTOM: 'bottom-start',
-        BOTTOMEND: 'bottom-end',
+        TOP: _.isRTL() ? 'top-end' : 'top-start',
+        TOPEND: _.isRTL() ? 'top-start' : 'top-end',
+        BOTTOM: _.isRTL() ? 'bottom-end' : 'bottom-start',
+        BOTTOMEND: _.isRTL() ? 'bottom-start' : 'bottom-end',
         RIGHT: _.isRTL() ? 'left-start' : 'right-start',
         RIGHTEND: _.isRTL() ? 'left-end' : 'right-end',
         LEFT: _.isRTL() ? 'right-start' : 'left-start',

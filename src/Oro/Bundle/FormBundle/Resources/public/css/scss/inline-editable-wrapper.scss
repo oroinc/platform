@@ -28,7 +28,7 @@
             &:before {
                 position: absolute;
                 top: $inline-editable-wrapper-loading-top;
-                #{$end}: $inline-editable-wrapper-loading-end;
+                right: $inline-editable-wrapper-loading-end;
 
                 display: block;
 

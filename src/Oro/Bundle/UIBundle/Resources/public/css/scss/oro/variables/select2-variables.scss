@@ -96,7 +96,7 @@ $select2-search-choice-inner-offset-horizontal-unlocked: $content-padding !defau
 $select2-search-choice-offset: 3px !default;
 $select2-search-choice-position: relative !default;
 $select2-search-choice-box-sizing: border-box !default;
-$select2-search-choice-float: $start !default;
+$select2-search-choice-float: left !default;
 $select2-search-choice-list-style: none !default;
 
 $select2-search-choice-img-offset-top: -2px !default;
@@ -105,8 +105,8 @@ $select2-search-choice-img-offset-vertical-align: top !default;
 $select2-search-choice-img-offset-width: 16px !default;
 $select2-search-choice-img-offset-height: 16px !default;
 
-$select2-search-field-inner-offset: side-values(0 0 $select2-search-choice-offset $select2-search-choice-offset) !default;
-$select2-search-field-float: $start !default;
+$select2-search-field-inner-offset: 0 0 $select2-search-choice-offset $select2-search-choice-offset !default;
+$select2-search-field-float: left !default;
 $select2-search-field-line-height: $select2-search-choice-line-height + (2 * $select2-search-choice-inner-offset-vertical) !default;
 $select2-search-field-height: $select2-search-field-line-height !default;
 $select2-search-field-background-color: transparent !default;
@@ -138,12 +138,11 @@ $select2-search-choice-close-z-index: 1 !default;
 $select2-search-multi-choices-list-style: none !default;
 $select2-search-multi-choices-inner-offset-top: $select2-search-choice-offset !default;
 $select2-search-multi-choices-inner-offset-start: $select2-search-choice-offset !default;
-$select2-search-multi-choices-inner-offset: side-values(
+$select2-search-multi-choices-inner-offset:
     $select2-search-multi-choices-inner-offset-top
     0
     0
-    $select2-search-multi-choices-inner-offset-start
-) !default;
+    $select2-search-multi-choices-inner-offset-start !default;
 $select2-search-multi-choices-offset: 0 !default;
 $select2-search-multi-choices-height: auto !default;
 $select2-search-multi-choices-overflow: hidden !default;
@@ -191,7 +190,7 @@ $select2-search-white-space: nowrap !default;
 
 // !important for override default input width
 $select2-search-input-width: 100% !important !default;
-$select2-search-input-inner-offset: side-values(0 0 0 $select2-search-choice-offset) !default;
+$select2-search-input-inner-offset: 0 0 0 $select2-search-choice-offset !default;
 
 $select2-results-max-height: 300px !default;
 $select2-results-inner-offset: 8px !default;

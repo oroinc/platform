@@ -23,9 +23,9 @@ $comments-block-avatar-radius: 50% !default;
 
 $comments-block-author-info-offset: 6px !default;
 
-$comments-block-content-offset: side-values(0 16px 12px 16px) !default;
-$comments-block-paragraph-offset:side-values(0 0 22px 0) !default;
-$comments-block-paragraph-last-offset:side-values(0 0 16px 0) !default;
+$comments-block-content-offset: 0 16px 12px 16px !default;
+$comments-block-paragraph-offset: 0 0 22px 0 !default;
+$comments-block-paragraph-last-offset: 0 0 16px 0 !default;
 
 $comments-block-body-color: $primary !default;
 

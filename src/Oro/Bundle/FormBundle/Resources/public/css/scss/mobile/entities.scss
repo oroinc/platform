@@ -5,7 +5,7 @@
         width: calc(#{$entities-list-mobile-group-item-width} - #{$entities-list-group-item-offset-start});
 
         &__header {
-            padding-#{$end}: $entities-list-group-item-header-mobile-inner-offset-end;
+            padding-right: $entities-list-group-item-header-mobile-inner-offset-end;
         }
     }
 }

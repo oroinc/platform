@@ -86,7 +86,7 @@
     &-close {
         position: $popover-close-position;
         top: $popover-close-position-y;
-        #{$end}: $popover-close-position-x;
+        right: $popover-close-position-x;
         cursor: $popover-close-cursor;
         color: $popover-close-color;
 
