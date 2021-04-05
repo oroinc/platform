@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseRelationsProcessor;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -18,21 +18,23 @@ use Oro\Component\MessageQueue\Transport\Message;
 class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
+    use AuditChangedEntitiesExtensionTrait;
+
+    /** @var AuditChangedEntitiesInverseRelationsProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
         $this->initClient();
+        $this->processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
     }
 
-    public function testCouldBeGetFromContainerAsService()
+    public function testCouldBeGetFromContainerAsService(): void
     {
-        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
-
-        $this->assertInstanceOf(AuditChangedEntitiesInverseRelationsProcessor::class, $processor);
+        $this->assertInstanceOf(AuditChangedEntitiesInverseRelationsProcessor::class, $this->processor);
     }
 
-    public function testShouldDoNothingIfAnythingChangedInMessage()
+    public function testShouldDoNothingIfAnythingChangedInMessage(): void
     {
         $message = $this->createMessage([
             'timestamp' => time(),
@@ -43,17 +45,12 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
             'collections_updated' => [],
         ]);
 
-        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(0);
     }
 
-    public function testShouldReturnAckOnProcess()
+    public function testShouldReturnAckOnProcess(): void
     {
         $message = $this->createMessage([
             'timestamp' => time(),
@@ -73,37 +70,31 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
             'collections_updated' => [],
         ]);
 
-        /** @var AuditChangedEntitiesInverseRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_inverse_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-        $session = $connection->createSession();
-
-        $this->assertEquals(MessageProcessorInterface::ACK, $processor->process($message, $session));
-    }
-
-    private function assertStoredAuditCount($expected)
-    {
-        $this->assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
+        $this->assertEquals(
+            MessageProcessorInterface::ACK,
+            $this->processor->process($message, $this->getConnection()->createSession())
+        );
     }
 
     /**
      * @param array $body
+     *
      * @return Message
      */
-    private function createMessage(array $body)
+    private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
-        $message->setBody(json_encode($body));
+        $message->setBody(JSON::encode($body));
+        $message->setMessageId('some_message_id');
 
         return $message;
     }
 
     /**
-     * @return EntityManagerInterface
+     * @return ConnectionInterface|object
      */
-    private function getEntityManager()
+    private function getConnection(): ConnectionInterface
     {
-        return $this->getContainer()->get('doctrine.orm.entity_manager');
+        return $this->getContainer()->get('oro_message_queue.transport.connection');
     }
 }
