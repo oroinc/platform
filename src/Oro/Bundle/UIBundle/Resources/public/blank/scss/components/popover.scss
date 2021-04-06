@@ -9,6 +9,10 @@
         }
     }
 
+    &.fixed-min-width {
+        min-width: $popover-min-width;
+    }
+
     &--no-title {
         .popover-header {
             display: none;
