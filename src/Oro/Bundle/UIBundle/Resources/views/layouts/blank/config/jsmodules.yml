@@ -50,6 +50,7 @@ app-modules:
     - oroui/js/app/modules/layout-module
     - oroui/js/app/modules/messenger-module
 #    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
+    - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs
