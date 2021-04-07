@@ -53,7 +53,7 @@ class LanguageRepositoryTest extends WebTestCase
             \array_keys(LoadLanguages::LANGUAGES)
         );
 
-        static::assertSame(
+        static::assertEqualsCanonicalizing(
             \array_fill_keys($defaultAndLoadedLanguageCodes, true),
             $this->repository->getAvailableLanguageCodesAsArrayKeys()
         );
