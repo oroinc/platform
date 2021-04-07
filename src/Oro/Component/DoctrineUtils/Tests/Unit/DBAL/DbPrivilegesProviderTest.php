@@ -11,19 +11,20 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $dbName = 'test';
         $pdo = $this->createMock(\PDO::class);
-        $pdo->expects($this->exactly(2))
+        $pdo->expects($this->exactly(4))
             ->method('exec')
             ->withConsecutive(
                 ['CREATE TABLE oro_privileges_check(id INT)'],
-                ['DROP TABLE oro_privileges_check']
+                ['CREATE TEMP TABLE IF NOT EXISTS oro_privileges_check_tmp AS TABLE oro_privileges_check WITH NO DATA'],
+                ['DROP TABLE oro_privileges_check'],
+                ['DROP TABLE IF EXISTS oro_privileges_check_tmp']
             );
 
         $this->assertPgSqlPrivilegesFetch($dbName, $pdo);
 
         $privileges = DbPrivilegesProvider::getPostgresGrantedPrivileges($pdo, $dbName);
-        sort($privileges);
 
-        $this->assertEquals(['CREATE', 'DROP', 'INSERT', 'SELECT', 'TRIGGER'], $privileges);
+        $this->assertEqualsCanonicalizing(['CREATE', 'DROP', 'INSERT', 'SELECT', 'TEMPORARY', 'TRIGGER'], $privileges);
     }
 
     public function testGetPostgresGrantedPrivilegesCreateTableException()
@@ -44,10 +45,11 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $dbName = 'test';
         $pdo = $this->createMock(\PDO::class);
-        $pdo->expects($this->exactly(2))
+        $pdo->expects($this->exactly(3))
             ->method('exec')
             ->withConsecutive(
                 ['CREATE TABLE oro_privileges_check(id INT)'],
+                ['CREATE TEMP TABLE IF NOT EXISTS oro_privileges_check_tmp AS TABLE oro_privileges_check WITH NO DATA'],
                 ['DROP TABLE oro_privileges_check']
             )
             ->willReturnCallback(function ($sql) {
@@ -59,9 +61,8 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertPgSqlPrivilegesFetch($dbName, $pdo);
 
         $privileges = DbPrivilegesProvider::getPostgresGrantedPrivileges($pdo, $dbName);
-        sort($privileges);
 
-        $this->assertEquals(['CREATE', 'INSERT', 'SELECT', 'TRIGGER'], $privileges);
+        $this->assertEqualsCanonicalizing(['CREATE', 'INSERT', 'SELECT', 'TEMPORARY', 'TRIGGER'], $privileges);
     }
 
     /**
@@ -96,6 +97,7 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
             'GRANT USAGE ON *.* TO `jeffrey`@`localhost`',
             'GRANT SELECT, INSERT, UPDATE, TRIGGER ON `db1`.* TO `jeffrey`@`localhost`',
             'GRANT SELECT, INSERT, TRIGGER ON `test`.* TO `jeffrey`@`localhost`',
+            'GRANT CREATE TEMPORARY TABLES ON `test`.* TO `jeffrey`@`localhost`',
             "GRANT PROXY ON ''@'' TO 'root'@'localhost' WITH GRANT OPTION",
             'GRANT `r1`@`%`,`r2`@`%` TO `u1`@`localhost`',
             "GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION"
@@ -104,7 +106,10 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $privileges = DbPrivilegesProvider::getMySqlGrantedPrivileges($pdo, $dbName);
         \sort($privileges);
 
-        static::assertEquals(['ALL PRIVILEGES', 'INSERT', 'SELECT', 'TRIGGER', 'USAGE'], $privileges);
+        static::assertEquals(
+            ['ALL PRIVILEGES', 'CREATE TEMPORARY TABLES', 'INSERT', 'SELECT', 'TRIGGER', 'USAGE'],
+            $privileges
+        );
     }
 
     public function testGetMySqlGrantedPrivilegesWithWildcards()
