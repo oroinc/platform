@@ -25,7 +25,10 @@ class SearchNumberRangeFilter extends SearchNumberFilter
         switch ($data['type']) {
             case NumberRangeFilterType::TYPE_BETWEEN:
                 $ds->addRestriction($builder->gte($fieldName, $value), FilterUtility::CONDITION_AND);
-                $ds->addRestriction($builder->lte($fieldName, $valueEnd), FilterUtility::CONDITION_AND);
+
+                if (null !== $valueEnd) {
+                    $ds->addRestriction($builder->lte($fieldName, $valueEnd), FilterUtility::CONDITION_AND);
+                }
 
                 return true;
 
