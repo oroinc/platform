@@ -20,7 +20,16 @@ Feature: Check product attribute audit data
   Scenario: Check grid of attribute audit
     Given I click Edit "StringAttribute" in grid
     When I click "Change History"
-    Then I should see following "Product Attribute Audit Grid" grid:
-      | Diffs                                                                                                                                                                                                                                  |
-      | Contact information: State: New Is serialized: 1 Is attribute: 1 Is global: 0 Field name: StringAttribute Organization id: 1 Is visible: 3 Show filter: 0 Order: Priority: Searchable: 0 Title field: 0 Order: Identity: 0 Excluded: 0 |
-
+    Then I should see text matching "State: New"
+    And should not see text matching "State: Active New"
+    And should see text matching "Field name: StringAttribute"
+    And should see text matching "Is attribute: 1"
+    And should see text matching "Is serialized: 1"
+    And should see text matching "Is global: 0"
+    And should see text matching "Organization id: 1"
+    And should see text matching "Is visible: 3"
+    And should see text matching "Show filter: 0"
+    And should see text matching "Searchable: 0"
+    And should see text matching "Title field: 0"
+    And should see text matching "Identity: 0"
+    And should see text matching "Excluded: 0"
