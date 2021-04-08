@@ -69,6 +69,29 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testApplyBetweenWithoutValueEnd(): void
+    {
+        $fieldName = 'decimal.field';
+
+        $ds = $this->createMock(SearchFilterDatasourceAdapter::class);
+
+        $ds->expects($this->once())
+            ->method('addRestriction')
+            ->with(new BaseComparison($fieldName, Comparison::GTE, 123), FilterUtility::CONDITION_AND, false);
+
+        $this->filter->init('test', [FilterUtility::DATA_NAME_KEY => $fieldName]);
+        $this->assertTrue(
+            $this->filter->apply(
+                $ds,
+                [
+                    'type' => NumberRangeFilterType::TYPE_BETWEEN,
+                    'value' => 123,
+                    'value_end' => null,
+                ]
+            )
+        );
+    }
+
     public function testApplyNotBetween()
     {
         $fieldName = 'decimal.field';
