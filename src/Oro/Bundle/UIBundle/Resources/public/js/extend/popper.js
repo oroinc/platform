@@ -72,7 +72,6 @@ define(function(require) {
         return offsets;
     }
 
-    Popper.Defaults.rtl = _.isRTL();
     Popper.Defaults.modifiers.adjustHeight = {
         order: 550,
         enabled: false,
@@ -101,26 +100,41 @@ define(function(require) {
         }
     };
 
-    Popper.Defaults.modifiers.flip = {
-        behavior: 'flip',
-        boundariesElement: 'viewport',
-        enabled: true,
-        order: 600,
-        padding: 5,
-        fn: function flip(data, options) {
-            if (
-                ['left', 'right'].includes(data.placement) &&
-                data.instance.options.rtl
-            ) {
-                const placementRTLMap = {
-                    left: 'right',
-                    right: 'left'
-                };
-                data.placement = data.placement.replace(
+    Popper.Defaults.modifiers.rtl = {
+        order: 0,
+        enabled: _.isRTL(),
+        fn: data => {
+            if (!data.originalPlacement) {
+                return data;
+            }
+
+            const placementRTLMap = {
+                left: 'right',
+                right: 'left',
+                start: 'end',
+                end: 'start'
+            };
+
+            if (data.originalPlacement.search(/right|left/g) !== -1) {
+                data.originalPlacement = data.originalPlacement.replace(
                     /right|left/g,
                     matched => placementRTLMap[matched]
                 );
             }
+
+            if (data.originalPlacement.search(/top|bottom/g) !== -1) {
+                data.originalPlacement = data.originalPlacement.replace(
+                    /start|end/g,
+                    matched => placementRTLMap[matched]
+                );
+            }
+
+            data.attributes['x-placement'] = data.originalPlacement;
+
+            if (data.positionFixed) {
+                data.placement = data.originalPlacement;
+            }
+
             return data;
         }
     };

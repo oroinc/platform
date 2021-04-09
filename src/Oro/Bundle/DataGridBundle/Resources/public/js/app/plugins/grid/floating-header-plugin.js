@@ -224,7 +224,10 @@ define(function(require) {
                         left: ''
                     });
                     this.domCache.theadTr.css({
-                        marginLeft: tableRect.left - theadRect.left
+                        // marginLeft: tableRect.left - theadRect.left
+                        [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
+                            ? theadRect.right - tableRect.right
+                            : tableRect.left - theadRect.left
                     });
                     if (mode === 'relative') {
                         this._lastScrollTop = this.domCache.gridScrollableContainer.scrollTop();
@@ -251,7 +254,9 @@ define(function(require) {
                     this.domCache.theadTr.css({
                         // possible solution set scrollLeft instead
                         // could be more fast for rendering
-                        marginLeft: tableRect.left - theadRect.left
+                        [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
+                            ? theadRect.right - tableRect.right
+                            : tableRect.left - theadRect.left
                     });
                     break;
                 default:

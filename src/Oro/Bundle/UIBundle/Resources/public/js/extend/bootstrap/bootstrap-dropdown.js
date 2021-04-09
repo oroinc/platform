@@ -125,17 +125,6 @@ define(function(require, exports, module) {
 
         _getConfig: function() {
             const config = original._getConfig.call(this);
-            let placement = config.placement;
-
-            if (
-                placement && _.isRTL() &&
-                (placement = placement.split('-')).length === 2 &&
-                ['auto', 'top', 'bottom'].indexOf(placement[0]) !== -1 &&
-                ['start', 'end'].indexOf(placement[1]) !== -1
-            ) {
-                placement[1] = {start: 'end', end: 'start'}[placement[1]];
-                config.placement = placement.join('-');
-            }
 
             if ('adjustHeight' in config) {
                 // empty attribute `data-adjust-height` considered as turn ON option
