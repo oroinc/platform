@@ -1,11 +1,12 @@
 @regression
 @ticket-BAP-18931
+@ticket-BAP-20488
 @fixture-OroUserBundle:users.yml
 
 Feature: Report export with custom batch size
-  In order to ...
-  As an ...
-  I should be able to ...
+  In order to get grid data in CSV format
+  As an administrator
+  I should be able to export a grid containing any number of rows
 
   Scenario: Feature Background
     Given I login as administrator
