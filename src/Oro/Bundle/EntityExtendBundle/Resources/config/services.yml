@@ -663,6 +663,9 @@ services:
         arguments:
             - '@translator'
             - '@oro_entity_extend.cache.enum_translation'
+        calls:
+            - [setLocalizationHelper, ['@oro_locale.helper.localization']]
+            - [setLocaleSettings, ['@oro_locale.settings']]
 
     oro_entity_extend.listener.cache.enum_value.abstract:
         abstract: true
