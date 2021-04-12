@@ -235,6 +235,18 @@ class ConfigManager
     }
 
     /**
+     * Removes scope settings. To save changes in a database, a flush method should be called.
+     *
+     * @param int|object $scopeIdentifier
+     */
+    public function deleteScope($scopeIdentifier): void
+    {
+        $this->getScopeManager()->deleteScope($scopeIdentifier);
+
+        $this->resetArrayCache();
+    }
+
+    /**
      * Save changes made with set or reset methods in a database
      *
      * @param null|int|object $scopeIdentifier
