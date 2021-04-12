@@ -722,4 +722,26 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
             $this->manager->get('oro_test.servicestring', false, false, $scopeIdentifier)
         );
     }
+
+    public function testDeleteScope()
+    {
+        $scopeIdentifier = 1;
+
+        $this->userScopeManager->expects(self::once())
+            ->method('deleteScope')
+            ->with($scopeIdentifier);
+
+        $this->manager->deleteScope($scopeIdentifier);
+    }
+
+    public function testDeleteScopeWithObjectAsIdentifier()
+    {
+        $scopeIdentifier = new \stdClass();
+
+        $this->userScopeManager->expects(self::once())
+            ->method('deleteScope')
+            ->with($scopeIdentifier);
+
+        $this->manager->deleteScope($scopeIdentifier);
+    }
 }

@@ -180,6 +180,33 @@ abstract class AbstractScopeManager
     }
 
     /**
+     * Removes scope settings. To save changes in a database, a flush method should be called.
+     *
+     * @param int|object $scopeIdentifier
+     */
+    public function deleteScope($scopeIdentifier): void
+    {
+        $entity   = $this->getScopedEntityName();
+        $entityId = $this->resolveIdentifier($scopeIdentifier);
+
+        /** @var Config $config */
+        $config = $this->doctrine->getManagerForClass(Config::class)
+            ->getRepository(Config::class)
+            ->findByEntity($entity, $entityId);
+
+        if ($config) {
+            foreach ($config->getValues() as $value) {
+                $name = $value->getSection() . ConfigManager::SECTION_MODEL_SEPARATOR . $value->getName();
+                $this->changedSettings[$entityId][$name] = [
+                    ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => true
+                ];
+            }
+        }
+
+        $this->cache->delete($this->getCacheKey($entity, $entityId));
+    }
+
+    /**
      * @param null|int $scopeIdentifier
      * @return array
      */
@@ -222,7 +249,7 @@ abstract class AbstractScopeManager
      *
      * @return array [updated, removed]
      */
-    public function save($settings, $scopeIdentifier = null)
+    public function save($settings, $scopeIdentifier = null): array
     {
         $entity   = $this->getScopedEntityName();
         $entityId = $this->resolveIdentifier($scopeIdentifier);
@@ -253,8 +280,12 @@ abstract class AbstractScopeManager
                 $config->getValues()->add($configValue);
             }
         }
+        if (0 === $config->getValues()->count()) {
+            $em->remove($config);
+        } else {
+            $em->persist($config);
+        }
 
-        $em->persist($config);
         $em->flush();
 
         foreach ($settings as $name => $value) {
