@@ -94,6 +94,17 @@
     border-bottom: $oro-datagrid-body-cell-border-bottom;
 
     vertical-align: top;
+
+    &-identifier,
+    &-productSku,
+    &-poNumber,
+    &-identifier,
+    &-primaryEmail,
+    &-email,
+    &-zip {
+        /*rtl:ignore*/
+        direction: ltr;
+    }
 }
 
 .grid-body-cell-contexts {

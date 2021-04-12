@@ -1382,7 +1382,7 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone">{{ title }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone"><bdo dir="ltr">{{ title }}</bdo></a>
     {% endif %}
 {%- endmacro -%}
 

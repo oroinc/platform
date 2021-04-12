@@ -48,8 +48,7 @@
         }
 
         &:last-child {
-            &:before {
-                content: '>';
+            @include fa-icon(var(--fa-var-angle-right), before, true, true) {
                 font-weight: normal;
             }
         }
