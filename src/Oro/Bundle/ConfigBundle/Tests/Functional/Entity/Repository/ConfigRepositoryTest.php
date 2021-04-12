@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Functional\Entity\Repository;
 
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
+use Oro\Bundle\ConfigBundle\Tests\Functional\DataFixtures\LoadTestConfigValue;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ConfigRepositoryTest extends WebTestCase
@@ -16,6 +17,7 @@ class ConfigRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
+        $this->loadFixtures([LoadTestConfigValue::class]);
 
         $this->repository = $this->getContainer()->get('doctrine')->getManagerForClass(Config::class)
             ->getRepository(Config::class);
@@ -23,14 +25,10 @@ class ConfigRepositoryTest extends WebTestCase
 
     public function testRemoveSection()
     {
-        /** @var Config $config */
-        $config = $this->repository->findOneBy([]);
+        $this->assertNotEmpty($this->repository->findByEntity('test', 1));
 
-        $entity = $config->getScopedEntity();
-        $entityId = $config->getRecordId();
+        $this->repository->deleteByEntity('test', 1);
 
-        $this->repository->deleteByEntity($entity, $entityId);
-
-        $this->assertEmpty($this->repository->findAll());
+        $this->assertEmpty($this->repository->findByEntity('test', 1));
     }
 }
