@@ -25,6 +25,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'cookie_httponly' => false,
                     'cookie_samesite' => null
                 ],
+                'login_target_path_excludes' => []
             ],
             $processor->processConfiguration(new Configuration(), [])
         );

@@ -41,8 +41,20 @@ class DbPrivilegesProvider
         );
 
         try {
+            // Check TEMPORARY permission.
+            // CREATE TEMP TABLE to fetch granted permissions
+            $pdo->exec(
+                'CREATE TEMP TABLE IF NOT EXISTS oro_privileges_check_tmp AS TABLE oro_privileges_check WITH NO DATA'
+            );
+            $granted[] = 'TEMPORARY';
+        } catch (\Exception $e) {
+            return $granted;
+        }
+
+        try {
             // Drop temporary table
             $pdo->exec('DROP TABLE oro_privileges_check');
+            $pdo->exec('DROP TABLE IF EXISTS oro_privileges_check_tmp');
             $granted[] = 'DROP';
         } catch (\Exception $e) {
         }
