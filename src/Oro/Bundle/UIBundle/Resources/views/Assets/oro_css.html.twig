@@ -1,6 +1,8 @@
 {% import '@OroAsset/Asset.html.twig' as Asset %}
 
-{{ Asset.css('build/admin/css/oro.css', 'media="all"')}}
+{% set extension = oro_is_rtl_mode() ? 'rtl.css' : 'css' %}
+
+{{ Asset.css('build/admin/css/oro.' ~ extension, 'media="all"')}}
 {% if 'Trident' in app.request.headers.get('User-Agent') %}
-    {{ Asset.css('build/admin/css/oro-ie.css', 'media="all"')}}
+    {{ Asset.css('build/admin/css/oro-ie.' ~ extension, 'media="all"')}}
 {% endif %}

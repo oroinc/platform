@@ -46,7 +46,7 @@ define(['underscore', 'asap'], function(_, asap) {
         },
 
         isRTL: function() {
-            return document.getElementsByTagName('html')[0].getAttribute('dir') === 'rtl';
+            return document.dir === 'rtl';
         },
 
         trim: function(text) {

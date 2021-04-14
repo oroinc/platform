@@ -5,17 +5,17 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\LayoutBundle\Provider\Image\CacheImagePlaceholderProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagePlaceholderProvider;
+    private ImagePlaceholderProviderInterface $imagePlaceholderProvider;
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private Cache $cache;
 
-    /** @var CacheImagePlaceholderProvider */
-    private $decorator;
+    private CacheImagePlaceholderProvider $decorator;
 
     protected function setUp(): void
     {
@@ -29,16 +29,17 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $filter = 'test_filter';
         $path = 'test/path';
+        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
-            ->with($filter)
+            ->with($cacheKey)
             ->willReturn($path);
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('save');
 
-        $this->imagePlaceholderProvider->expects($this->never())
+        $this->imagePlaceholderProvider->expects(self::never())
             ->method($this->anything());
 
         $this->assertEquals($path, $this->decorator->getPath($filter));
@@ -48,19 +49,20 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $filter = 'test_filter';
         $path = 'test/path';
+        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
-            ->with($filter)
+            ->with($cacheKey)
             ->willReturn(false);
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('save')
-            ->with($filter, $path);
+            ->with($cacheKey, $path);
 
-        $this->imagePlaceholderProvider->expects($this->once())
+        $this->imagePlaceholderProvider->expects(self::once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($path);
 
         $this->assertEquals($path, $this->decorator->getPath($filter));

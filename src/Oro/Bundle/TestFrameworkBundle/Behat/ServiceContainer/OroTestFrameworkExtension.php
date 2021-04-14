@@ -187,7 +187,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         // sort by priority and flatten
         krsort($isolators);
-        $isolators = call_user_func_array('array_merge', $isolators);
+        $isolators = array_merge(...array_values($isolators));
 
         $container->getDefinition('oro_behat_extension.isolation.test_isolation_subscriber')->replaceArgument(
             0,

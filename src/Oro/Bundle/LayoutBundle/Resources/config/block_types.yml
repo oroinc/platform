@@ -26,7 +26,7 @@ services:
     oro_layout.block_type.root:
         parent: oro_layout.block_type.abstract_configurable_container
         calls:
-            - [setOptionsConfig, [{doctype: {default: ''}, languageCode: {default: '%oro_locale.language%'}}]]
+            - [setOptionsConfig, [{doctype: {default: ''}, languageCode: {default: '%oro_locale.language%'}, dir: {default: ''}}]]
             - [setName, ['root']]
         tags:
              - { name: layout.block_type, alias: root }

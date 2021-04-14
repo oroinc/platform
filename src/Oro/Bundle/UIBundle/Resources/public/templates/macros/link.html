@@ -1,0 +1,16 @@
+<% if (obj.text && obj.href) {
+    var renderedAttrs = '';
+    var attributes = ['href', 'title', 'target', 'class', 'id'];
+
+     _.each(obj, function(value, key) {
+        if (attributes.indexOf(key) !== -1) {
+            var attr = key + '="' + _.escape(value) + '" ';
+
+            renderedAttrs = renderedAttrs + attr;
+        }
+    })
+
+    renderedAttrs = renderedAttrs.trim();
+    %>
+    <a <%= renderedAttrs %>><%- obj.text %></a>
+<% } %>

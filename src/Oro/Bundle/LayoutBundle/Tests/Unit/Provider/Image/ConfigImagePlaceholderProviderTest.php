@@ -7,6 +7,7 @@ use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Provider\Image\ConfigImagePlaceholderProvider;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -59,7 +60,7 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->attachmentManager->expects($this->once())
             ->method('getFilteredImageUrl')
-            ->with($image, $filter)
+            ->with($image, $filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/path/to/filtered.img');
 
         $this->assertEquals('/path/to/filtered.img', $this->provider->getPath($filter));

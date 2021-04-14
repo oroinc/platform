@@ -2,6 +2,7 @@ define(function(require) {
     'use strict';
 
     const Popper = require('popper');
+    const _ = require('underscore');
 
     function getStyleComputedProperty(element, property) {
         if (element.nodeType !== 1) {
@@ -71,6 +72,7 @@ define(function(require) {
         return offsets;
     }
 
+    Popper.Defaults.rtl = _.isRTL();
     Popper.Defaults.modifiers.adjustHeight = {
         order: 550,
         enabled: false,
@@ -94,6 +96,30 @@ define(function(require) {
             } else {
                 data.styles.maxHeight = 'none';
                 data.attributes['x-adjusted-height'] = false;
+            }
+            return data;
+        }
+    };
+
+    Popper.Defaults.modifiers.flip = {
+        behavior: 'flip',
+        boundariesElement: 'viewport',
+        enabled: true,
+        order: 600,
+        padding: 5,
+        fn: function flip(data, options) {
+            if (
+                ['left', 'right'].includes(data.placement) &&
+                data.instance.options.rtl
+            ) {
+                const placementRTLMap = {
+                    left: 'right',
+                    right: 'left'
+                };
+                data.placement = data.placement.replace(
+                    /right|left/g,
+                    matched => placementRTLMap[matched]
+                );
             }
             return data;
         }

@@ -147,7 +147,7 @@ class ConfigurationPass implements CompilerPassInterface
         }
         foreach ($typeExtensions as $key => $items) {
             ksort($items);
-            $typeExtensions[$key] = array_merge(...$items);
+            $typeExtensions[$key] = array_merge(...array_values($items));
         }
 
         return $typeExtensions;
@@ -177,7 +177,7 @@ class ConfigurationPass implements CompilerPassInterface
         }
         foreach ($layoutUpdates as $key => $items) {
             ksort($items);
-            $layoutUpdates[$key] = array_merge(...$items);
+            $layoutUpdates[$key] = array_merge(...array_values($items));
         }
 
         return $layoutUpdates;
@@ -200,7 +200,7 @@ class ConfigurationPass implements CompilerPassInterface
         }
         if (!empty($configurators)) {
             ksort($configurators);
-            $configurators = array_merge(...$configurators);
+            $configurators = array_merge(...array_values($configurators));
         }
 
         return $configurators;

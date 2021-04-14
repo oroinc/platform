@@ -88,6 +88,7 @@ services:
             - '@oro_locale.configuration_provider'
             - '@oro_currency.provider.view_type'
             - '@oro_currency.config.currency'
+            - '@oro_theme.registry'
 
     oro_currency.converter.currency_to_string:
         class: Oro\Bundle\CurrencyBundle\Converter\CurrencyToString

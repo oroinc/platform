@@ -13,15 +13,14 @@ use Oro\Bundle\ScopeBundle\Migrations\Schema\OroScopeBundleInstaller;
 
 class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    protected $extendExtension;
+    protected ExtendExtension $extendExtension;
 
     /**
      * {@inheritdoc}
      */
-    public function getMigrationVersion()
+    public function getMigrationVersion(): string
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -29,7 +28,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param ExtendExtension $extendExtension
      */
-    public function setExtendExtension(ExtendExtension $extendExtension)
+    public function setExtendExtension(ExtendExtension $extendExtension): void
     {
         $this->extendExtension = $extendExtension;
     }
@@ -37,7 +36,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * {@inheritdoc}
      */
-    public function up(Schema $schema, QueryBag $queries)
+    public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/
         $this->createOroLocalizationTable($schema);
@@ -68,7 +67,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function createOroLocalizationTable(Schema $schema)
+    protected function createOroLocalizationTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_localization');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -76,6 +75,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('language_id', 'integer');
         $table->addColumn('formatting_code', 'string', ['length' => 16]);
+        $table->addColumn('rtl_mode', 'boolean', ['default' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);
@@ -87,7 +87,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function createOroFallbackLocalizedValueTable(Schema $schema)
+    protected function createOroFallbackLocalizedValueTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_fallback_localization_val');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -105,7 +105,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function createOroLocalizationTitleTable(Schema $schema)
+    protected function createOroLocalizationTitleTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_localization_title');
         $table->addColumn('localization_id', 'integer', []);
@@ -119,7 +119,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function addOroLocalizationForeignKeys(Schema $schema)
+    protected function addOroLocalizationForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_localization');
         $table->addForeignKeyConstraint(
@@ -141,7 +141,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema)
+    protected function addOroFallbackLocalizedValueForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_fallback_localization_val');
         $table->addForeignKeyConstraint(
@@ -157,7 +157,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      *
      * @param Schema $schema
      */
-    protected function addOroLocalizationTitleForeignKeys(Schema $schema)
+    protected function addOroLocalizationTitleForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_localization_title');
         $table->addForeignKeyConstraint(
@@ -177,7 +177,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
     /**
      * @param Schema $schema
      */
-    protected function addRelationsToScope(Schema $schema)
+    protected function addRelationsToScope(Schema $schema): void
     {
         $this->extendExtension->addManyToOneRelation(
             $schema,

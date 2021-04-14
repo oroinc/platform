@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
-use Doctrine\ORM\Query\Expr\OrderBy;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
@@ -97,11 +95,9 @@ class DatagridExportIdFetcher implements ContextAwareInterface
      */
     public function getGridDataIds()
     {
-        /** @var OrmDatasource $dataSource */
-        $dataSource = clone $this->grid->getAcceptedDatasource();
-
         // select only identifier field
-        $qb = $dataSource->getQueryBuilder();
+        /** @var QueryBuilder $qb */
+        $qb = clone $this->grid->getAcceptedDatasource()->getQueryBuilder();
         $alias = $qb->getRootAliases()[0];
         $name = $qb->getEntityManager()->getClassMetadata($qb->getRootEntities()[0])->getSingleIdentifierFieldName();
 
@@ -110,73 +106,37 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             OrmResultBeforeQuery::NAME
         );
 
-        if (!empty($qb->getDQLPart('groupBy')) || !empty($qb->getDQLPart('having'))) {
-            return array();
+        $field = $alias . '.' . $name;
+        if (!empty($qb->getDQLPart('groupBy'))) {
+            if (empty($qb->getDQLPart('having'))) {
+                // If there is no having we may select unique IDs only without grouping.
+                $qb->select($field)
+                    ->distinct(true)
+                    ->resetDQLPart('groupBy');
+            } else {
+                // When there is a having clause, to select IDs, we should add them to the query
+                $qb->addSelect($field)
+                    ->addGroupBy($field);
+            }
+        } else {
+            // When there is no group by we may select unique IDs only
+            $qb->select($field)
+                ->distinct(true);
         }
-
-        $qb
-            ->indexBy($alias, $alias . '.'. $name)
-            ->select($alias . '.' . $name)
+        $qb->indexBy($alias, $field)
+            ->resetDQLPart('orderBy')
             ->setFirstResult(null)
             ->setMaxResults(null);
-
-        if ($this->isOrderedByExpressionOrAlias($qb)) {
-            $qb->resetDQLPart('orderBy');
-        }
 
         return $this->queryExecutor->execute(
             $this->grid,
             $qb->getQuery(),
             function ($qb) {
-                return array_keys($qb->getArrayResult());
+                // indexBy forces to use a given field as a result array key. We have chosen an ID to be the index.
+                $ids = array_keys($qb->getArrayResult());
+
+                return array_unique($ids);
             }
         );
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @return bool
-     */
-    private function isOrderedByExpressionOrAlias(QueryBuilder $queryBuilder): bool
-    {
-        $orderByParts = $queryBuilder->getDQLPart('orderBy');
-        if ($orderByParts === null) {
-            return false;
-        }
-
-        $aliases = $queryBuilder->getAllAliases();
-        /** @var OrderBy $orderByPart */
-        foreach ($orderByParts as $orderByPart) {
-            foreach ($orderByPart->getParts() as $part) {
-                $part = preg_replace('/(ASC|DESC)$/i', '', $part);
-                if (!$this->isOrderedByTableField($part, $aliases)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * This function handles only not quoted(delimited) identifiers (i.e. without special characters).
-     *
-     * @param string $orderBy
-     * @param array $aliases
-     * @return bool
-     */
-    private function isOrderedByTableField(string $orderBy, array $aliases): bool
-    {
-        $parts = explode('.', trim($orderBy));
-        if (count($parts) !== 2) {
-            return false;
-        }
-
-        list($tableName, $fieldName) = $parts;
-        if (!in_array($tableName, $aliases, true)) {
-            return false;
-        }
-
-        return preg_match('/^[\w\_\$]+$/', $fieldName);
     }
 }

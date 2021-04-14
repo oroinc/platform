@@ -63,15 +63,12 @@ class ImapEmailFolderRepository extends EntityRepository
 
         $imapFolders = $qb->getQuery()->getResult();
         if ($sortByFailedCount) {
-            usort($imapFolders, function (ImapEmailFolder $imapFolder1, ImapEmailFolder $imapFolder2) {
-                $failedCount1 = $imapFolder1->getFolder()->getFailedCount();
-                $failedCount2 = $imapFolder2->getFolder()->getFailedCount();
-                if ($failedCount1 === $failedCount2) {
-                    return 0;
+            usort(
+                $imapFolders,
+                function (ImapEmailFolder $imapFolder1, ImapEmailFolder $imapFolder2) {
+                    return $imapFolder1->getFolder()->getFailedCount() <=> $imapFolder2->getFolder()->getFailedCount();
                 }
-
-                return ($failedCount1 < $failedCount2) ? -1 : 1;
-            });
+            );
         }
 
         return $imapFolders;

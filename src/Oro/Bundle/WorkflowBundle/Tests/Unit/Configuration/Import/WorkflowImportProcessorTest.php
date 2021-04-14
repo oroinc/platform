@@ -295,9 +295,15 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $getter = 'get' . ucfirst($property);
 
         $this->expectException(\TypeError::class);
+
+        if (PHP_VERSION_ID < 80000) {
+            $messagePattern = 'Return value of %s::%s() must be of the type %s, null returned';
+        } else {
+            $messagePattern = '%s::%s(): Return value must be of type %s, null returned';
+        }
         $this->expectExceptionMessage(
             sprintf(
-                'Return value of %s::%s() must be of the type %s, null returned',
+                $messagePattern,
                 WorkflowImportProcessor::class,
                 $getter,
                 $type

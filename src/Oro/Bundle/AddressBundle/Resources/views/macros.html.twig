@@ -1,10 +1,14 @@
-{% macro renderAddress(address) %}
+{% macro renderAddress(address, formatWithHtml = false) %}
     {% if address %}
         {% if address.label %}
             <b>{{ address.label|escape }}</b>
             <br />
         {% endif %}
-        {{ address|oro_format_address|nl2br }}
+        {%- if formatWithHtml -%}
+            {{- address|oro_format_address_html -}}
+        {%- else -%}
+            {{- address|oro_format_address|nl2br -}}
+        {% endif %}
     {% else %}
         {{ 'oro.ui.empty'|trans }}
     {% endif %}

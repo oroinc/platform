@@ -3,22 +3,17 @@
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
 use Doctrine\Common\Cache\Cache;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Caching decorator for image placeholder provider.
  */
 class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    /** @var ImagePlaceholderProviderInterface */
-    private $imagePlaceholderProvider;
+    private ImagePlaceholderProviderInterface $imagePlaceholderProvider;
 
-    /** @var Cache */
-    private $cache;
+    private Cache $cache;
 
-    /**
-     * @param ImagePlaceholderProviderInterface $imagePlaceholderProvider
-     * @param Cache $cache
-     */
     public function __construct(ImagePlaceholderProviderInterface $imagePlaceholderProvider, Cache $cache)
     {
         $this->imagePlaceholderProvider = $imagePlaceholderProvider;
@@ -28,12 +23,14 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPath(string $filter): ?string
+    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
     {
-        $path = $this->cache->fetch($filter);
+        $key = $filter . '|' . $referenceType;
+
+        $path = $this->cache->fetch($key);
         if (!$path) {
-            $path = $this->imagePlaceholderProvider->getPath($filter);
-            $this->cache->save($filter, $path);
+            $path = $this->imagePlaceholderProvider->getPath($filter, $referenceType);
+            $this->cache->save($key, $path);
         }
 
         return $path;

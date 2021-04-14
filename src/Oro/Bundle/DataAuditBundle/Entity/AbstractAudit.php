@@ -119,6 +119,7 @@ abstract class AbstractAudit
      * @ORM\OneToMany(
      *     targetEntity="Oro\Bundle\DataAuditBundle\Entity\AuditField",
      *     mappedBy="audit",
+     *     orphanRemoval=true,
      *     cascade={"persist"}
      * )
      */

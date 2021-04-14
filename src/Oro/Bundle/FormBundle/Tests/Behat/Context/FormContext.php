@@ -142,6 +142,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And Description field should has Our new partner value
      *
      * @When /^(?P<fieldName>[\w\s]*) field should has (?P<fieldValue>.+) value$/
+     * @When /^(?P<fieldName>[\w\s]*) field should have "(?P<fieldValue>(?:[^"]|\\")*)" value$/
      */
     public function fieldShouldHaveValue($fieldName, $fieldValue)
     {
@@ -507,6 +508,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )uncheck "(?P<value>[^"]*)" checkbox$/
      */
     public function iUncheckElement($elementName)
     {
@@ -518,6 +520,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Given /^(?:|I )check "(?P<value>[^"]*)" element$/
+     * @Given /^(?:|I )check "(?P<value>[^"]*)" checkbox$/
      */
     public function iCheckElement($elementName)
     {
@@ -689,6 +692,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         }
 
         self::fail(sprintf('Not expect to find a selected option, but was found "%s".', $selectedOptionText));
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
+     *
+     * @param string $fieldName
+     */
+    public function fieldShouldBeEnabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
+    }
+
+    /**
+     * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
+     *
+     * @param string $fieldName
+     */
+    public function fieldShouldBeDisabled(string $fieldName): void
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
     }
 
     /**

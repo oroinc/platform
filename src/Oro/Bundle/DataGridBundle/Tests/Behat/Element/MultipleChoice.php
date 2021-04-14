@@ -12,15 +12,13 @@ class MultipleChoice extends AbstractGridFilterItem
     public function checkItems(array $values)
     {
         $this->open();
-        // Wait for open widget
-        $this->getDriver()->waitForAjax();
         $widget = $this->getWidget();
         $inputs = $widget->findAll('css', 'li > label');
 
         foreach ($values as $value) {
             $item = $this->findElementByText($inputs, $value);
 
-            self::assertNotNull($item, sprintf('Cann\'t find checkbox with "%s" text', $value));
+            self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
 
             $item->click();
             $this->getDriver()->waitForAjax();
@@ -41,6 +39,25 @@ class MultipleChoice extends AbstractGridFilterItem
     }
 
     /**
+     * @param string $value checkbox label to verify
+     * @return bool
+     */
+    public function isItemChecked(string $value): bool
+    {
+        $this->open();
+        $widget = $this->getWidget();
+        $inputs = $widget->findAll('css', 'li > label');
+        $item = $this->findElementByText($inputs, $value);
+
+        self::assertNotNull($item, sprintf('Could not find checkbox with "%s" text', $value));
+        $checkbox = $item->find('css', 'input');
+        $isChecked = $checkbox->isChecked();
+        $this->close();
+
+        return $isChecked;
+    }
+
+    /**
      * Get visible miltiselect checkboxes widget.
      * There are only one visible widget can be on the page
      *
@@ -57,7 +74,7 @@ class MultipleChoice extends AbstractGridFilterItem
             }
         }
 
-        self::fail('Can\'t find widget on page or it\'s not visible');
+        self::fail('Could not find widget on page or it\'s not visible');
     }
 
     /**
@@ -78,6 +95,13 @@ class MultipleChoice extends AbstractGridFilterItem
         }
 
         return null;
+    }
+
+    public function open()
+    {
+        parent::open();
+        // Wait for open widget
+        $this->getDriver()->waitForAjax();
     }
 
     public function close()

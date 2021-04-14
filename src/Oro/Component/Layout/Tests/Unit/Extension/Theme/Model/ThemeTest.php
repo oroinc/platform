@@ -19,11 +19,6 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->theme = new Theme('test');
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->theme);
-    }
-
     public function testGetNameAndConstructor()
     {
         $this->assertEquals('test', $this->theme->getName());
@@ -64,6 +59,13 @@ class ThemeTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->theme->getImagePlaceholders());
         $this->theme->setImagePlaceholders(['test' => '/test/url.png']);
         $this->assertEquals(['test' => '/test/url.png'], $this->theme->getImagePlaceholders());
+    }
+
+    public function testRtlSupport(): void
+    {
+        $this->assertFalse($this->theme->isRtlSupport());
+        $this->theme->setRtlSupport(true);
+        $this->assertTrue($this->theme->isRtlSupport());
     }
 
     public function testScreenshotMethods()

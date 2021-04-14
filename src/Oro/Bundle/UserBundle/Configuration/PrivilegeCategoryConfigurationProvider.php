@@ -56,7 +56,7 @@ class PrivilegeCategoryConfigurationProvider extends PhpArrayConfigProvider
         }
         if ($visibleItems) {
             ksort($visibleItems);
-            $visibleItems = array_merge(...$visibleItems);
+            $visibleItems = array_merge(...array_values($visibleItems));
         }
 
         return $visibleItems;
