@@ -1391,6 +1391,56 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->checkItemsInFilter($filterItems);
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Verify checkbox state in checkbox grid filter
+     *
+     * Example: Then I should see filter Brand contains checked "ACME"
+     *
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked "(?P<value>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains checked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param string $filterName
+     * @param string $value
+     * @param string $filterGridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertsInputValueInCheckboxFilterContainCheckedValue(
+        string $filterName,
+        string $value = '',
+        string $filterGridName = 'Grid'
+    ): void {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
+        self::assertTrue($filterItem->isItemChecked($value));
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * Verify checkbox state in checkbox grid filter
+     *
+     * Example: Then I should see filter Brand contains checked "ACME"
+     *
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked "(?P<value>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked ""(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @Then /^(?:|I )should see filter (?P<filterName>[\w\s]+) contains unchecked "(?P<value>(?:[^"]|\\")*)" in "(?P<filterGridName>[\w\s]+)" grid$/
+     *
+     * @param string $filterName
+     * @param string $value
+     * @param string $filterGridName
+     */
+    //@codingStandardsIgnoreEnd
+    public function assertsInputValueInCheckboxFilterContainUncheckedValue(
+        string $filterName,
+        string $value = '',
+        string $filterGridName = 'Grid'
+    ):void {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
+        self::assertFalse($filterItem->isItemChecked($value));
+    }
+
     /**
      * Reset filter
      * Example: And I reset Activity Type filter

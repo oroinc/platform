@@ -7,10 +7,19 @@
 // Use: @include fa-icon($view-product-gallery-icon, before, true) {
 //  extra rules
 // }
-@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false, $rawIcon: false) {
     @if ($icon) {
+        $content: $icon;
+
+        @if ($rawIcon) {
+            $content: $icon;
+        } @else {
+            $content: '#{$icon}';
+        }
+
         &:#{$state} {
-            content: '#{$icon}';
+            content: $content;
+
             font-family: $icon-font;
 
             @if ($extra-rules) {

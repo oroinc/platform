@@ -12,6 +12,7 @@ use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\TranslationBundle\Translation\TranslatableQueryTrait;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -36,11 +37,14 @@ class DictionaryApiEntityManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var AclHelper */
+    private $aclHelper;
+
     /**
-     * @param ObjectManager $om
+     * @param ObjectManager                    $om
      * @param ChainDictionaryValueListProvider $dictionaryProvider
-     * @param ConfigManager $entityConfigManager
-     * @param EntityNameResolver $entityNameResolver
+     * @param ConfigManager                    $entityConfigManager
+     * @param EntityNameResolver               $entityNameResolver
      */
     public function __construct(
         ObjectManager $om,
@@ -52,6 +56,15 @@ class DictionaryApiEntityManager extends ApiEntityManager
         $this->dictionaryProvider = $dictionaryProvider;
         $this->entityConfigManager = $entityConfigManager;
         $this->entityNameResolver = $entityNameResolver;
+    }
+
+    /**
+     * @deprecated
+     * @param AclHelper $aclHelper
+     */
+    public function setAclHelper(AclHelper $aclHelper): void
+    {
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -126,7 +139,8 @@ class DictionaryApiEntityManager extends ApiEntityManager
             $qb->setParameter('translated_title', '%' . $searchQuery . '%');
         }
 
-        $query = $qb->getQuery();
+        $query = $this->aclHelper->apply($qb);
+
         $query->setHint(
             Query::HINT_CUSTOM_OUTPUT_WALKER,
             TranslatableSqlWalker::class

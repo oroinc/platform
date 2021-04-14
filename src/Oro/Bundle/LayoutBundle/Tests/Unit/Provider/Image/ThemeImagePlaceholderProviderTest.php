@@ -8,6 +8,7 @@ use Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -65,8 +66,8 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $filter = 'image_filter';
 
         $this->imagineCacheManager->expects($this->once())
-            ->method('getBrowserPath')
-            ->with('/path/to/pl2.img', $filter)
+            ->method('generateUrl')
+            ->with('/path/to/pl2.img', $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/path/to/filtered_pl2.img');
 
         $this->assertEquals('/path/to/filtered_pl2.img', $this->provider->getPath($filter));

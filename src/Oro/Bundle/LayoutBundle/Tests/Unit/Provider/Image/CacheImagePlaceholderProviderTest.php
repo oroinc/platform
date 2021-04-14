@@ -9,13 +9,12 @@ use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
 class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagePlaceholderProvider;
+    private ImagePlaceholderProviderInterface $imagePlaceholderProvider;
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private Cache $cache;
 
-    /** @var CacheImagePlaceholderProvider */
-    private $decorator;
+    private CacheImagePlaceholderProvider $decorator;
 
     protected function setUp(): void
     {
@@ -30,15 +29,15 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $filter = 'test_filter';
         $path = 'test/path';
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
             ->with($filter)
             ->willReturn($path);
 
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('save');
 
-        $this->imagePlaceholderProvider->expects($this->never())
+        $this->imagePlaceholderProvider->expects(self::never())
             ->method($this->anything());
 
         $this->assertEquals($path, $this->decorator->getPath($filter));
@@ -49,16 +48,16 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $filter = 'test_filter';
         $path = 'test/path';
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('fetch')
             ->with($filter)
             ->willReturn(false);
 
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('save')
             ->with($filter, $path);
 
-        $this->imagePlaceholderProvider->expects($this->once())
+        $this->imagePlaceholderProvider->expects(self::once())
             ->method('getPath')
             ->with($filter)
             ->willReturn($path);

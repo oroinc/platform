@@ -8,6 +8,14 @@ define(function(require) {
     const Tooltip = $.fn.tooltip.Constructor;
     const original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer');
 
+    const AttachmentMap = {
+        AUTO: 'auto',
+        TOP: 'top',
+        RIGHT: _.isRTL() ? 'left' : 'right',
+        BOTTOM: 'bottom',
+        LEFT: _.isRTL() ? 'right' : 'left'
+    };
+
     const DATA_ATTRIBUTE_PATTERN = /^data-[\w-]*$/i;
     Tooltip.Default.whiteList['*'].push(DATA_ATTRIBUTE_PATTERN);
     _.extend(Tooltip.Default.whiteList, {
@@ -29,6 +37,10 @@ define(function(require) {
         blockquote: [],
         figure: []
     });
+
+    Tooltip.prototype._getAttachment = function(placement) {
+        return AttachmentMap[placement.toUpperCase()];
+    };
 
     Tooltip.prototype.show = function(...args) {
         const result = original.show.apply(this, args);

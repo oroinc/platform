@@ -24,4 +24,13 @@
 
         text-align: $datagrid-body-cell-action-cell-text-align;
     }
+
+    &-poNumber,
+    &-identifier,
+    &-email,
+    &-zip {
+        /*rtl:ignore*/
+        direction: ltr;
+        /*rtl:ignore*/
+    }
 }

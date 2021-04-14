@@ -5,7 +5,6 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
@@ -13,6 +12,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Grid\Extension\AbstractFilterExtension;
 use Oro\Bundle\FilterBundle\Grid\Extension\Configuration;
+use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
+use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\FilterBagStub;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,6 +35,12 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var FilterBagStub */
     protected $filterBag;
 
+    /** @var DatagridFiltersProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $filtersProvider;
+
+    /** @var FiltersMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
+    protected $filtersMetadataProvider;
+
     /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $filtersStateProvider;
 
@@ -50,6 +57,8 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     {
         $this->configurationProvider = $this->createMock(RawConfigurationProvider::class);
         $this->filterBag = new FilterBagStub();
+        $this->filtersProvider = $this->createMock(DatagridFiltersProviderInterface::class);
+        $this->filtersMetadataProvider = $this->createMock(FiltersMetadataProvider::class);
         $this->filtersStateProvider = $this->createMock(DatagridStateProviderInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->datagridParameters = $this->createMock(ParameterBag::class);
@@ -131,84 +140,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
     }
 
-    /**
-     * @dataProvider visitMetadataForFilterLabelDataProvider
-     *
-     * @param array $datagridConfigArray
-     * @param array $expectedFilterConfig
-     */
-    public function testVisitMetadataFilterLabelIsSet(
-        array $datagridConfigArray,
-        array $expectedFilterConfig
-    ): void {
-        $datagridConfig = $this->createDatagridConfig($datagridConfigArray);
-
-        $filter = $this->createMock(FilterInterface::class);
-        $filter
-            ->expects(self::once())
-            ->method('init')
-            ->with(self::FILTER_NAME, $expectedFilterConfig);
-
-        $filter
-            ->expects(self::once())
-            ->method('getMetadata')
-            ->willReturn([]);
-
-        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
-        $this->extension->setParameters($this->datagridParameters);
-        $this->extension->visitMetadata($datagridConfig, $this->createMetadataObject([]));
-    }
-
-    /**
-     * @return array
-     */
-    public function visitMetadataForFilterLabelDataProvider(): array
-    {
-        return [
-            'filter label is set' => [
-                'datagridConfigArray' => [
-                    'name' => self::DATAGRID_NAME,
-                    FormatterConfiguration::COLUMNS_KEY => [
-                        self::FILTER_NAME => [
-                            'label' => 'SampleColumnLabel1'
-                        ],
-                    ],
-                    'filters' => [
-                        'columns' => [
-                            self::FILTER_NAME => [
-                                'label' => self::FILTER_LABEL,
-                                FilterUtility::TYPE_KEY => self::FILTER_TYPE,
-                            ],
-                        ],
-                    ],
-                ],
-                'expectedFilterConfig' => [
-                    'label' => self::FILTER_LABEL,
-                    FilterUtility::TYPE_KEY => self::FILTER_TYPE,
-                ],
-            ],
-            'filter label is inherited from column label' => [
-                'datagridConfigArray' => [
-                    'name' => self::DATAGRID_NAME,
-                    FormatterConfiguration::COLUMNS_KEY => [
-                        self::FILTER_NAME => [
-                            'label' => 'SampleColumnLabel1'
-                        ],
-                    ],
-                    'filters' => [
-                        'columns' => [
-                            self::FILTER_NAME => [FilterUtility::TYPE_KEY => self::FILTER_TYPE],
-                        ],
-                    ],
-                ],
-                'expectedFilterConfig' => [
-                    'label' => 'SampleColumnLabel1',
-                    FilterUtility::TYPE_KEY => self::FILTER_TYPE,
-                ],
-            ],
-        ];
-    }
-
     public function testVisitMetadataStateIsSetWhenNoFilters(): void
     {
         $datagridConfig = $this->createDatagridConfig(['name' => self::DATAGRID_NAME]);
@@ -266,15 +197,23 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
             $defaultFiltersState = [self::FILTER_NAME => ['value' => 'sampleValue0']]
         );
 
-        $filter
+        $this->filtersProvider
             ->expects(self::once())
-            ->method('getMetadata')
-            ->willReturn([]);
+            ->method('getDatagridFilters')
+            ->with($datagridConfig)
+            ->willReturn([self::FILTER_NAME => $filter]);
 
-        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
+        $filtersMetadata = ['sample_key' => 'sample_value'];
+        $this->filtersMetadataProvider
+            ->expects(self::once())
+            ->method('getMetadataForFilters')
+            ->with([self::FILTER_NAME => $filter], $datagridConfig)
+            ->willReturn($filtersMetadata);
+
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata);
 
+        self::assertEquals(['filters' => $filtersMetadata], $metadata->toArray(['filters']));
         self::assertEquals($filtersState, $metadata->offsetGetByPath('[state][filters]'));
         self::assertEquals($defaultFiltersState, $metadata->offsetGetByPath('[initialState][filters]'));
     }
@@ -325,11 +264,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     {
         $filter = $this->createMock(FilterInterface::class);
         $filter
-            ->expects(self::once())
-            ->method('init')
-            ->with(self::FILTER_NAME, ['label' => self::FILTER_LABEL, FilterUtility::TYPE_KEY => self::FILTER_TYPE]);
-
-        $filter
             ->method('getName')
             ->willReturn(self::FILTER_NAME);
 
@@ -351,15 +285,24 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $this->mockStateProviders($filtersState = [], $defaultFiltersState = []);
 
-        $filter
+        $this->filtersProvider
             ->expects(self::once())
-            ->method('getMetadata')
-            ->willReturn([]);
+            ->method('getDatagridFilters')
+            ->with($datagridConfig)
+            ->willReturn([self::FILTER_NAME => $filter]);
 
-        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
+        $filtersMetadata = ['sample_key' => 'sample_value'];
+        $this->filtersMetadataProvider
+            ->expects(self::once())
+            ->method('getMetadataForFilters')
+            ->with([self::FILTER_NAME => $filter], $datagridConfig)
+            ->willReturn($filtersMetadata);
+
+        $metadata = $this->createMetadataObject([]);
         $this->extension->setParameters($this->datagridParameters);
-        $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
+        $this->extension->visitMetadata($datagridConfig, $metadata);
 
+        self::assertEquals(['filters' => $filtersMetadata], $metadata->toArray(['filters']));
         self::assertEquals($filtersState, $metadata->offsetGetByPath('[state][filters]'));
         self::assertEquals($defaultFiltersState, $metadata->offsetGetByPath('[initialState][filters]'));
     }
@@ -399,12 +342,19 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $this->mockStateProviders($filtersState, $defaultFiltersState);
 
-        $filter
+        $this->filtersProvider
             ->expects(self::once())
-            ->method('getMetadata')
-            ->willReturn([]);
+            ->method('getDatagridFilters')
+            ->with($datagridConfig)
+            ->willReturn([self::FILTER_NAME => $filter]);
 
-        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
+        $filtersMetadata = ['sample_key' => 'sample_value'];
+        $this->filtersMetadataProvider
+            ->expects(self::once())
+            ->method('getMetadataForFilters')
+            ->with([self::FILTER_NAME => $filter], $datagridConfig)
+            ->willReturn($filtersMetadata);
+
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($datagridConfig, $metadata = $this->createMetadataObject([]));
 
@@ -454,109 +404,6 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
                 'expectedMetadata' => [
                     'initialState' => ['filters' => [self::FILTER_NAME => ['value' => 'sampleValue0']]],
                     'state' => ['filters' => [self::FILTER_NAME => ['value' => 'sampleValue1']]],
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider visitMetadataFiltersMetadataUpdatedDataProvider
-     *
-     * @param array $filterMetadata
-     * @param array $rawDatagridConfig
-     * @param array $expectedFiltersMetadata
-     */
-    public function testVisitMetadataFiltersMetadataUpdated(
-        array $filterMetadata,
-        array $rawDatagridConfig,
-        array $expectedFiltersMetadata
-    ): void {
-        $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
-
-        $this->configurationProvider
-            ->method('getRawConfiguration')
-            ->with(self::DATAGRID_NAME)
-            ->willReturn($rawDatagridConfig);
-
-        $this->translator
-            ->method('trans')
-            ->willReturn(self::TRANSLATED_FILTER_LABEL);
-
-        $filter
-            ->expects(self::once())
-            ->method('getMetadata')
-            ->willReturn($filterMetadata);
-
-        $this->mockStateProviders([], []);
-
-        $this->filterBag->addFilter(self::FILTER_TYPE, $filter);
-        $this->extension->setParameters($this->datagridParameters);
-        $metadata = $this->createMetadataObject([]);
-        $this->extension->visitMetadata($datagridConfig, $metadata);
-
-        foreach ($metadata->toArray()['filters'] as $filterMetadata) {
-            foreach ($expectedFiltersMetadata as $key => $expectedValue) {
-                $this->assertEquals($expectedValue, $filterMetadata[$key]);
-            }
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function visitMetadataFiltersMetadataUpdatedDataProvider(): array
-    {
-        return [
-            'cachedId is empty when filter is not lazy' => [
-                'filterMetadata' => ['lazy' => false],
-                'rawDatagridConfig' => [],
-                'expectedFiltersMetadata' => [
-                    'lazy' => false,
-                    'label' => '',
-                    'cacheId' => null,
-                ],
-            ],
-            'cachedId is not empty when filter is lazy' => [
-                'filterMetadata' => ['lazy' => true, 'name' => self::FILTER_NAME],
-                'rawDatagridConfig' => [
-                    'filters' => [
-                        'columns' => [
-                            self::FILTER_NAME => [
-                                'options' => ['sampleOption1' => 'sampleValue1'],
-                            ],
-                        ],
-                    ],
-                ],
-                'expectedFiltersMetadata' => [
-                    'lazy' => true,
-                    'cacheId' => '49562a7117e315def0e023a9008f844c',
-                ],
-            ],
-            'label is translated when translatable is true' => [
-                'filterMetadata' => [
-                    'lazy' => false,
-                    'label' => self::FILTER_LABEL,
-                    FilterUtility::TRANSLATABLE_KEY => true,
-                ],
-                'rawDatagridConfig' => [],
-                'expectedFiltersMetadata' => [
-                    'lazy' => false,
-                    'label' => self::TRANSLATED_FILTER_LABEL,
-                    FilterUtility::TRANSLATABLE_KEY => true,
-                ],
-            ],
-            'label is not translated when translatable is false' => [
-                'filterMetadata' => [
-                    'lazy' => false,
-                    'label' => self::FILTER_LABEL,
-                    FilterUtility::TRANSLATABLE_KEY => false,
-                ],
-                'rawDatagridConfig' => [],
-                'expectedFiltersMetadata' => [
-                    'lazy' => false,
-                    'label' => self::FILTER_LABEL,
-                    FilterUtility::TRANSLATABLE_KEY => false,
                 ],
             ],
         ];

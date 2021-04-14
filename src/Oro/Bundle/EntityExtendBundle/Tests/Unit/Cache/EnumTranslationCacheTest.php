@@ -4,15 +4,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Cache;
 
 use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
-use Symfony\Component\Translation\Translator;
+use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = 'FooBar';
-    const LOCALE = 'en';
-
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    const LOCALE = 'en_US';
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
@@ -20,16 +20,26 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     private $enumTranslationCache;
 
+    /** @var LocalizationHelper */
+    private $localizationHelper;
+
+    /** @var LocaleSettings */
+    private $localeSettings;
+
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
-        $this->translator->expects($this->once())
-            ->method('getLocale')
-            ->willReturn(self::LOCALE);
+        $this->translator
+            ->expects($this->never())
+            ->method('getLocale');
 
         $this->cache = $this->createMock(Cache::class);
+        $this->localizationHelper = $this->createMock(LocalizationHelper::class);
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
 
         $this->enumTranslationCache = new EnumTranslationCache($this->translator, $this->cache);
+        $this->enumTranslationCache->setLocalizationHelper($this->localizationHelper);
+        $this->enumTranslationCache->setLocaleSettings($this->localeSettings);
     }
 
     /**
@@ -40,6 +50,12 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
      */
     public function testContains(bool $isContains, bool $expected)
     {
+        $localization = (new Localization())->setFormattingCode(self::LOCALE);
+        $this->localizationHelper
+            ->expects($this->any())
+            ->method('getCurrentLocalization')
+            ->willReturn($localization);
+
         $this->cache->expects($this->once())
             ->method('contains')
             ->with($this->getKey())
@@ -74,6 +90,10 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     public function testFetch(bool $isContains, array $values)
     {
         $key = $this->getKey();
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getLocale')
+            ->willReturn(self::LOCALE);
 
         $this->cache->expects($this->once())
             ->method('fetch')
@@ -115,6 +135,11 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
             ['value' => 2]
         ];
 
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getLocale')
+            ->willReturn(self::LOCALE);
+
         $this->cache->expects($this->once())
             ->method('save')
             ->with($key);
@@ -125,6 +150,12 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     public function testInvalidate()
     {
         $key = $this->getKey();
+        $localization = new Localization();
+        $localization->setFormattingCode(self::LOCALE);
+        $this->localizationHelper
+            ->expects($this->once())
+            ->method('getLocalizations')
+            ->willReturn([$localization]);
 
         $this->cache->expects($this->once())
             ->method('delete')

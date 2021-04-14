@@ -9,6 +9,8 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfigura
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\CalendarFactoryInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\ThemeBundle\Model\Theme;
+use Oro\Bundle\ThemeBundle\Model\ThemeRegistry;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -28,6 +30,9 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $localeConfigProvider;
 
+    /** @var ThemeRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $themeRegistry;
+
     /** @var LocaleSettings */
     private $localeSettings;
 
@@ -37,6 +42,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         $this->calendarFactory = $this->createMock(CalendarFactoryInterface::class);
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localeConfigProvider = $this->createMock(LocaleConfigurationProvider::class);
+        $this->themeRegistry = $this->createMock(ThemeRegistry::class);
 
         $this->localeSettings = new LocaleSettings(
             $this->configManager,
@@ -44,6 +50,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
             $this->localizationManager,
             $this->localeConfigProvider
         );
+        $this->localeSettings->setThemeRegistry($this->themeRegistry);
     }
 
     public function testGetNameFormats()
@@ -306,15 +313,14 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
     {
         $expectedCountry = 'US';
 
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->any())
             ->method('get')
-            ->with('oro_locale.country')
-            ->willReturn(null);
-
-        $this->configManager->expects($this->at(1))
-            ->method('get')
-            ->with('oro_locale.default_localization')
-            ->willReturn(42);
+            ->willReturnMap(
+                [
+                    ['oro_locale.country', false, false, null, null],
+                    ['oro_locale.default_localization', false, false, null, 42],
+                ]
+            );
 
         $this->localizationManager->expects($this->once())
             ->method('getLocalizationData')
@@ -426,14 +432,13 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     public function testIsFormatAddressByAddressCountry()
     {
-        $this->configManager->expects($this->at(0))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_locale.format_address_by_address_country')
-            ->willReturn('');
-        $this->configManager->expects($this->at(1))
-            ->method('get')
-            ->with('oro_locale.format_address_by_address_country')
-            ->willReturn('1');
+            ->willReturnOnConsecutiveCalls(
+                '',
+                '1'
+            );
 
         $this->assertFalse($this->localeSettings->isFormatAddressByAddressCountry());
         $this->assertTrue($this->localeSettings->isFormatAddressByAddressCountry());
@@ -477,6 +482,113 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
                 'configurationValue' => null,
             ],
         ];
+    }
+
+    public function testIsRtlModeWhenNoActiveTheme(): void
+    {
+        $this->themeRegistry->expects(self::any())
+            ->method('getActiveTheme')
+            ->willReturn(null);
+
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
+
+        $this->localizationManager->expects(self::any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['rtlMode' => true]);
+
+        self::assertFalse($this->localeSettings->isRtlMode());
+    }
+
+    public function testIsRtlModeNoLocalization(): void
+    {
+        $theme = new Theme('test');
+        $theme->setRtlSupport(true);
+
+        $this->themeRegistry->expects(self::any())
+            ->method('getActiveTheme')
+            ->willReturn($theme);
+
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
+
+        $this->localizationManager->expects(self::any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn([]);
+
+        self::assertFalse($this->localeSettings->isRtlMode());
+    }
+
+    public function testIsRtlModeWhenThemeWithoutRtl(): void
+    {
+        $theme = new Theme('test');
+        $theme->setRtlSupport(false);
+
+        $this->themeRegistry->expects(self::any())
+            ->method('getActiveTheme')
+            ->willReturn($theme);
+
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
+
+        $this->localizationManager->expects(self::any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['rtlMode' => true]);
+
+        self::assertFalse($this->localeSettings->isRtlMode());
+    }
+
+    public function testIsRtlModeWhenLocalizationWithoutRtl(): void
+    {
+        $theme = new Theme('test');
+        $theme->setRtlSupport(true);
+
+        $this->themeRegistry->expects(self::any())
+            ->method('getActiveTheme')
+            ->willReturn($theme);
+
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
+
+        $this->localizationManager->expects(self::any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['rtlMode' => false]);
+
+        self::assertFalse($this->localeSettings->isRtlMode());
+    }
+
+    public function testIsRtlMode(): void
+    {
+        $theme = new Theme('test');
+        $theme->setRtlSupport(true);
+
+        $this->themeRegistry->expects(self::any())
+            ->method('getActiveTheme')
+            ->willReturn($theme);
+
+        $this->configManager->expects(self::any())
+            ->method('get')
+            ->with('oro_locale.default_localization')
+            ->willReturn(42);
+
+        $this->localizationManager->expects(self::any())
+            ->method('getLocalizationData')
+            ->with(42)
+            ->willReturn(['rtlMode' => true]);
+
+        self::assertTrue($this->localeSettings->isRtlMode());
     }
 
     public function testGetActualLanguage()

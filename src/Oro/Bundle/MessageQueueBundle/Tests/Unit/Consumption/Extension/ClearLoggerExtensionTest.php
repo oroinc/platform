@@ -76,6 +76,8 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
         $fooLogger->expects(self::exactly(2))
             ->method('getHandlers')
             ->willReturn([$testHandler]);
+        $fooLogger->expects(self::exactly(2))
+            ->method('reset');
 
         $this->extension->onPostReceived($this->createMock(Context::class));
         $this->extension->onIdle($this->createMock(Context::class));
@@ -99,6 +101,8 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$testHandler]);
         $testHandler->expects(self::exactly(2))
             ->method('clear');
+        $fooLogger->expects(self::exactly(2))
+            ->method('reset');
 
         $this->extension->onPostReceived($this->createMock(Context::class));
         $this->extension->onIdle($this->createMock(Context::class));
@@ -122,6 +126,8 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$testHandler]);
         $testHandler->expects(self::exactly(2))
             ->method('clear');
+        $fooLogger->expects(self::exactly(2))
+            ->method('reset');
 
         $this->extension->onPostReceived($this->createMock(Context::class));
         $this->extension->onIdle($this->createMock(Context::class));
@@ -145,6 +151,8 @@ class ClearLoggerExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$testHandler]);
         $testHandler->expects(self::exactly(2))
             ->method('clear');
+        $fooLogger->expects(self::exactly(2))
+            ->method('reset');
 
         $this->extension->onPostReceived($this->createMock(Context::class));
         $this->extension->onIdle($this->createMock(Context::class));

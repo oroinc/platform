@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Loader;
 
-use Imagine\Image\ImageInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
@@ -11,13 +10,14 @@ use Oro\Bundle\LayoutBundle\Provider\CustomImageFilterProviderInterface;
 use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 
 /**
- * Load dimensions from theme config to LiipImagine filters
+ * Load dimensions from theme config to LiipImagine filters.
+ * For the options reference {@see https://symfony.com/doc/2.x/bundles/LiipImagineBundle/filters/sizing.html}.
  */
 class ImageFilterLoader
 {
     const IMAGE_QUALITY = 85;
     const BACKGROUND_COLOR = '#fff';
-    const RESIZE_MODE = ImageInterface::THUMBNAIL_INSET;
+    const RESIZE_MODE = 'inset';
     const INTERLACE_MODE = 'line';
 
     /** @var ImageTypeProvider */

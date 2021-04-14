@@ -70,7 +70,7 @@ oro:
         leave_page_save_data_or_discard_title: "Navigation confirmation"
         leave_page_save_data_or_discard: "You have unsaved changes. Do you want to save them before leaving the page?"
         error:
-            unexpected: "Unexpected content format"
+            unexpected: "Unexpected content format."
             performing: "There was an error performing the requested operation. Please try again or contact us for assistance."
         request_too_large_error: >
             The data you are submitting is too large to be processed by the web server.

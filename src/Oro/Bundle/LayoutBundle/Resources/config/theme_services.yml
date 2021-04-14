@@ -65,6 +65,14 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
+    oro_layout.layout_context_configurator.rtl_mode:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\RtlModeContextConfigurator
+        arguments:
+            - '@oro_layout.theme_manager'
+            - '@oro_locale.provider.current_localization'
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.theme_extension:
         class: Oro\Component\Layout\Extension\Theme\ThemeExtension
         arguments:
@@ -129,6 +137,8 @@ services:
         class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider
         arguments:
             - '@oro_layout.theme_manager'
+        calls:
+            - [setLocalizationProvider, ['@oro_locale.provider.current_localization']]
         tags:
             - { name: layout.data_provider, alias: theme }
 

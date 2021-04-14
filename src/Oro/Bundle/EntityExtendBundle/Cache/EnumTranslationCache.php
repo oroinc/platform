@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EntityExtendBundle\Cache;
 
 use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -21,6 +23,16 @@ class EnumTranslationCache
     protected $translator;
 
     /**
+     * @var LocalizationHelper
+     */
+    private $localizationHelper;
+
+    /**
+     * @var LocaleSettings
+     */
+    private $localeSettings;
+
+    /**
      * @param TranslatorInterface $translator
      * @param Cache $cache
      */
@@ -28,6 +40,46 @@ class EnumTranslationCache
     {
         $this->translator = $translator;
         $this->cache = $cache;
+    }
+
+    /**
+     * @return LocalizationHelper
+     */
+    public function getLocalizationHelper(): LocalizationHelper
+    {
+        if (!$this->localizationHelper) {
+            throw new \LogicException('LocalizationHelper must not be null.');
+        }
+
+        return $this->localizationHelper;
+    }
+
+    /**
+     * @param LocalizationHelper $localizationHelper
+     */
+    public function setLocalizationHelper(LocalizationHelper $localizationHelper): void
+    {
+        $this->localizationHelper = $localizationHelper;
+    }
+
+    /**
+     * @return LocaleSettings
+     */
+    public function getLocaleSettings(): LocaleSettings
+    {
+        if (!$this->localeSettings) {
+            throw new \LogicException('LocaleSettings must not be null.');
+        }
+
+        return $this->localeSettings;
+    }
+
+    /**
+     * @param LocaleSettings $localeSettings
+     */
+    public function setLocaleSettings(LocaleSettings $localeSettings): void
+    {
+        $this->localeSettings = $localeSettings;
     }
 
     /**
@@ -85,17 +137,30 @@ class EnumTranslationCache
      */
     public function invalidate(string $enumValueEntityClass)
     {
-        $key = $this->getKey($enumValueEntityClass);
-
-        $this->cache->delete($key);
+        foreach ($this->getLocalizationHelper()->getLocalizations() as $localization) {
+            $key = $this->getKey($enumValueEntityClass, $localization->getFormattingCode());
+            $this->cache->delete($key);
+        }
     }
 
     /**
      * @param string $enumValueEntityClass
+     * @param string|null $locale
+     *
      * @return string
      */
-    private function getKey(string $enumValueEntityClass): string
+    private function getKey(string $enumValueEntityClass, string $locale = null): string
     {
-        return sprintf('%s|%s', $enumValueEntityClass, $this->translator->getLocale());
+        return sprintf('%s|%s', $enumValueEntityClass, $locale ?? $this->getLocaleKey());
+    }
+
+    /**
+     * @return string
+     */
+    private function getLocaleKey(): string
+    {
+        return $this->getLocalizationHelper()->getCurrentLocalization()
+            ? $this->getLocalizationHelper()->getCurrentLocalization()->getFormattingCode()
+            : $this->getLocaleSettings()->getLocale();
     }
 }

@@ -11,6 +11,7 @@ datagrids:
                     - l.name as name
                     - lng.code AS languageCode
                     - l.formattingCode
+                    - l.rtlMode
                     - l.createdAt
                     - l.updatedAt
                 from:
@@ -68,6 +69,11 @@ datagrids:
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/formattingCode.html.twig
+            rtlMode:
+                label: oro.locale.localization.rtl_mode.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/rtlMode.html.twig
             parentName:
                 label: oro.locale.localization.parent_localization.label
                 type:          twig
@@ -92,6 +98,8 @@ datagrids:
                     data_name: languageCode
                 formattingCode:
                     data_name: formattingCode
+                rtlMode:
+                    data_name: rtlMode
                 parentName:
                     data_name: parentName
                 createdAt:
@@ -120,6 +128,14 @@ datagrids:
                         field_options:
                             choices: "@oro_locale.provider.localization_choices->getFormattingChoices"
                             translatable_options: false
+                rtlMode:
+                    type: boolean
+                    data_name: l.rtlMode
+                    options:
+                        field_options:
+                            choices:
+                                Yes: 1
+                                No: 2
                 parentName:
                     type: choice
                     data_name: pl.id
@@ -162,6 +178,11 @@ datagrids:
                 type:          twig
                 frontend_type: html
                 template:      OroLocaleBundle:Localization:Datagrid/formattingCode.html.twig
+            rtlMode:
+                label: oro.locale.localization.rtl_mode.label
+                type:          twig
+                frontend_type: html
+                template:      OroLocaleBundle:Localization:Datagrid/rtlMode.html.twig
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime

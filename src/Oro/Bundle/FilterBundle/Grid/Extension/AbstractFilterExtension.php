@@ -13,7 +13,8 @@ use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\FilterBundle\Provider\DatagridFiltersProviderInterface;
+use Oro\Bundle\FilterBundle\Provider\FiltersMetadataProvider;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -33,6 +34,12 @@ abstract class AbstractFilterExtension extends AbstractExtension
 
     /** @var FilterBagInterface */
     protected $filterBag;
+
+    /** @var DatagridFiltersProviderInterface */
+    protected $filtersProvider;
+
+    /** @var FiltersMetadataProvider */
+    protected $filtersMetadataProvider;
 
     /** @var DatagridStateProviderInterface */
     protected $filtersStateProvider;
@@ -65,6 +72,22 @@ abstract class AbstractFilterExtension extends AbstractExtension
     }
 
     /**
+     * @param DatagridFiltersProviderInterface $filtersProvider
+     */
+    public function setFiltersProvider(DatagridFiltersProviderInterface $filtersProvider): void
+    {
+        $this->filtersProvider = $filtersProvider;
+    }
+
+    /**
+     * @param FiltersMetadataProvider $filtersMetadataProvider
+     */
+    public function setFiltersMetadataProvider(FiltersMetadataProvider $filtersMetadataProvider): void
+    {
+        $this->filtersMetadataProvider = $filtersMetadataProvider;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function processConfigs(DatagridConfiguration $config)
@@ -86,10 +109,21 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metadata)
     {
-        $filters = $this->getFiltersToApply($config);
+        if ($this->filtersProvider && $this->filtersMetadataProvider) {
+            $filters = $this->filtersProvider->getDatagridFilters($config);
 
-        $this->updateState($filters, $config, $metadata);
-        $this->updateMetadata($filters, $config, $metadata);
+            $this->updateState($filters, $config, $metadata);
+
+            $metadata->offsetAddToArray(
+                'filters',
+                $this->filtersMetadataProvider->getMetadataForFilters($filters, $config)
+            );
+        } else {
+            $filters = $this->getFiltersToApply($config);
+
+            $this->updateState($filters, $config, $metadata);
+            $this->updateMetadata($filters, $config, $metadata);
+        }
 
         $metadata->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orofilter/js/datafilter-builder']);
     }

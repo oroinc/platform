@@ -218,6 +218,12 @@ define(function(require, exports, module) {
                                         },
                                         overflowBehavior: {
                                             x: 'hidden'
+                                        },
+                                        callbacks: {
+                                            onScroll: function() {
+                                                iframe.pageYOffset = this.getElements('viewport').scrollTop;
+                                                iframe.dispatchEvent(new Event('scroll'));
+                                            }
                                         }
                                     });
                                 }.bind(this, iframe, htmlElement.querySelector('body'))

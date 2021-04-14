@@ -6,6 +6,7 @@ use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Provides the path to the image placeholder for the actual theme.
@@ -52,7 +53,13 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
             return null;
         }
 
-        return $this->imagineCacheManager->getBrowserPath($imagePlaceholders[$this->placeholderName], $filter);
+        return $this->imagineCacheManager->generateUrl(
+            $imagePlaceholders[$this->placeholderName],
+            $filter,
+            [],
+            null,
+            UrlGeneratorInterface::ABSOLUTE_PATH
+        );
     }
 
     /**

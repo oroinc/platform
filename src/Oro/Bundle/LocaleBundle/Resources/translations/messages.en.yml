@@ -22,6 +22,9 @@ oro.locale:
         formatting_code:
             label:                  'Formatting'
             description:            Code of the formatting style that should apply in the localized instance.
+        rtl_mode:
+            label:                  'Enable RTL Mode'
+            description:            This option enables "Right-To-Left" text direction if such direction is supported by your design theme.
         child_localizations:
             label:                  'Child localizations'
             description:            The relationships between the localization item and other localization items that treat the localization item as a parent localization.
