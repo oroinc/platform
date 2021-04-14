@@ -213,7 +213,7 @@ class Form extends Element
             if (in_array('custom-checkbox__input', $classes, true)) {
                 return $this->elementFactory->wrapElement(
                     'PrettyCheckbox',
-                    $field->getParent()->find('css', '.custom-checkbox__icon')
+                    $field->getParent()->find('css', '.custom-checkbox__input')
                 );
             }
 

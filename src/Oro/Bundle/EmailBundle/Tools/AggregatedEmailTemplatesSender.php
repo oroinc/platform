@@ -56,17 +56,23 @@ class AggregatedEmailTemplatesSender implements LoggerAwareInterface
      * @param EmailHolderInterface[] $recipients
      * @param string $from
      * @param string $templateName
+     * @param array $templateParams
      * @return EmailUser[]
      *
      * @throws EntityNotFoundException if the specified email template cannot be found
      * @throws \Twig\Error\Error When an error occurred in Twig during email template loading, compilation or rendering
      */
-    public function send(object $entity, array $recipients, string $from, string $templateName): array
-    {
+    public function send(
+        object $entity,
+        array $recipients,
+        string $from,
+        string $templateName,
+        array $templateParams = []
+    ): array {
         $templateCollection = $this->localizedTemplateProvider->getAggregated(
             $recipients,
             new EmailTemplateCriteria($templateName, $this->doctrineHelper->getEntityClass($entity)),
-            ['entity' => $entity]
+            array_merge(['entity' => $entity], $templateParams)
         );
 
         $emailUsers = [];

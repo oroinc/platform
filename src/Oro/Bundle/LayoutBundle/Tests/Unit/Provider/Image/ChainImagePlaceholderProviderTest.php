@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Oro\Bundle\LayoutBundle\Provider\Image\ChainImagePlaceholderProvider;
 use Oro\Bundle\LayoutBundle\Provider\Image\ImagePlaceholderProviderInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +34,7 @@ class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider1->expects($this->once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($data);
 
         $this->provider2->expects($this->never())
@@ -49,12 +50,12 @@ class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider1->expects($this->once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
         $this->provider2->expects($this->once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($data);
 
         $this->assertEquals($data, $this->provider->getPath($filter));
@@ -66,12 +67,12 @@ class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider1->expects($this->once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
         $this->provider2->expects($this->once())
             ->method('getPath')
-            ->with($filter)
+            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
         $this->assertNull($this->provider->getPath($filter));

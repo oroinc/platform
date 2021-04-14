@@ -8,10 +8,15 @@
 
     &__input {
         position: absolute;
-        z-index: z('hidden');
+        top: $checkbox-icon-size / 2;
+        left: $checkbox-icon-size + 2px;
+
+        height: 2px;
+        width: 2px;
         margin: 0;
 
         opacity: 0;
+        appearance: none;
 
         &:hover {
             ~ .custom-checkbox__icon {
@@ -53,7 +58,7 @@
 
         border-radius: $checkbox-icon-border-radius;
 
-        cursor: pointer;
+        cursor: $base-ui-element-cursor;
 
         vertical-align: middle;
     }

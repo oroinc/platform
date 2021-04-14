@@ -138,7 +138,11 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
         $this->localizedTemplateProvider->expects($this->once())
             ->method('getAggregated')
-            ->with([$recipient], new EmailTemplateCriteria('test', \stdClass::class), ['entity' => new \stdClass()])
+            ->with(
+                [$recipient],
+                new EmailTemplateCriteria('test', \stdClass::class),
+                ['entity' => new \stdClass(), 'param' => 'value']
+            )
             ->willReturn([$dto]);
 
         $this->emailTemplate->expects($this->once())
@@ -181,7 +185,8 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             $options['entity'],
             [new EmailAddressDTO($options['to'])],
             $options['from'],
-            $options['template']
+            $options['template'],
+            ['param' => 'value']
         );
     }
 
