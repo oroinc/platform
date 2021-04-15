@@ -75,6 +75,3 @@ map:
         jquery.validate: oroform/js/extend/validate
     oroform/js/extend/validate:
         jquery.validate: jquery.validate
-shim:
-    tinymce/tinymce:
-        exports: tinymce
