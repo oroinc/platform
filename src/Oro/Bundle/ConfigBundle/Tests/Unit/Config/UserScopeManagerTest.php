@@ -5,7 +5,10 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
+use Oro\Bundle\ConfigBundle\Entity\Config;
+use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -109,5 +112,25 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
     protected function getScopedEntity()
     {
         return $this->getEntity(User::class, ['id' => 123]);
+    }
+
+    public function testDeleteScope()
+    {
+        $configValue1 = new ConfigValue();
+        $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
+
+        $config = new Config();
+        $config->getValues()->add($configValue1);
+
+        $this->repo->expects($this->once())
+            ->method('findByEntity')
+            ->with($this->getScopedEntityName(), 101)
+            ->willReturn($config);
+
+        $this->manager->deleteScope(101);
+        self::assertEquals(
+            ['oro_user.update' => [ConfigManager::USE_PARENT_SCOPE_VALUE_KEY => true]],
+            $this->manager->getChanges(101)
+        );
     }
 }

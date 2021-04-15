@@ -50,6 +50,7 @@ app-modules:
     - oroui/js/app/modules/layout-module
     - oroui/js/app/modules/messenger-module
 #    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
+    - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
     - oroui/js/extend/scriptjs
@@ -187,30 +188,23 @@ map:
     oroui/js/tools:
         chaplin: chaplin
 shim:
-    bootstrap-typeahead:
-        imports:
-            - jQuery=jquery
     datepair:
-        exports: Datepair
+        exports: single|Datepair
     jquery:
         expose:
-            - $
-            - jQuery
-    jquery.form:
-        imports:
-            - jQuery=jquery
+            - $,jQuery
     jquery.multiselect:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.multiselect.filter:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.select2:
-        exports: Select2
+        exports: single|Select2
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     jquery.uniform:
         imports:
-            - jQuery=jquery
+            - single|jquery|jQuery
     oroui/js/app/services/app-ready-load-modules:
         expose: loadModules

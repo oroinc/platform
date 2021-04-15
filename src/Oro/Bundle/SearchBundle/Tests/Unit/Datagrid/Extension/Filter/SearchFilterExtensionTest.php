@@ -26,9 +26,10 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension = new SearchFilterExtension(
             $this->configurationProvider,
             $this->filterBag,
+            $this->filtersProvider,
+            $this->filtersMetadataProvider,
             $this->filtersStateProvider,
-            new FilterExecutionContext(),
-            $this->translator
+            new FilterExecutionContext()
         );
 
         $this->datasource = $this->createMock(SearchDatasource::class);

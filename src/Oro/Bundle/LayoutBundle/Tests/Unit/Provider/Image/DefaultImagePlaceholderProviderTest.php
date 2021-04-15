@@ -4,23 +4,22 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\LayoutBundle\Provider\Image\DefaultImagePlaceholderProvider;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private const DEFAULT_PATH = '/some/default/image.png';
+
     /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagineCacheManager;
+    private CacheManager $imagineCacheManager;
 
-    /** @var string */
-    private $defaultPath = '/some/default/image.png';
-
-    /** @var DefaultImagePlaceholderProvider */
-    private $provider;
+    private DefaultImagePlaceholderProvider $provider;
 
     protected function setUp(): void
     {
         $this->imagineCacheManager = $this->createMock(CacheManager::class);
 
-        $this->provider = new DefaultImagePlaceholderProvider($this->imagineCacheManager, $this->defaultPath);
+        $this->provider = new DefaultImagePlaceholderProvider($this->imagineCacheManager, self::DEFAULT_PATH);
     }
 
     public function testGetPath(): void
@@ -28,9 +27,9 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $expected = '/some/default/filtered_image.png';
         $filter = 'image_filter';
 
-        $this->imagineCacheManager->expects($this->once())
-            ->method('getBrowserPath')
-            ->with($this->defaultPath, $filter)
+        $this->imagineCacheManager->expects(self::once())
+            ->method('generateUrl')
+            ->with(self::DEFAULT_PATH, $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($expected);
 
         $this->assertEquals($expected, $this->provider->getPath($filter));

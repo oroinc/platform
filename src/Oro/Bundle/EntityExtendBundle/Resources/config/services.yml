@@ -655,8 +655,9 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache
         public: false
         arguments:
-            - '@translator'
             - '@oro_entity_extend.cache.enum_translation'
+            - '@oro_locale.helper.localization'
+            - '@oro_locale.settings'
 
     oro_entity_extend.listener.cache.enum_value.abstract:
         abstract: true

@@ -265,6 +265,37 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->assertEquals('new value', $this->manager->getSettingValue('oro_user.add'));
     }
 
+    public function testSaveWithRemoveScopeEntity()
+    {
+        $scopeId = 0;
+        $settings = [
+            'oro_user.update' => [
+                'use_parent_scope_value' => true
+            ]
+        ];
+        $config = new Config();
+
+        $configValue1 = new ConfigValue();
+        $configValue1->setSection('oro_user')->setName('update')->setValue('old value')->setType('scalar');
+
+        $config->getValues()->add($configValue1);
+
+        $this->repo->expects($this->any())
+            ->method('findByEntity')
+            ->with($this->getScopedEntityName(), $scopeId)
+            ->willReturn($config);
+
+        $this->em->expects($this->once())->method('remove')->with($this->identicalTo($config));
+        $this->em->expects($this->once())->method('flush');
+
+        $this->configBag->expects($this->any())
+            ->method('getConfig')
+            ->willReturn(['fields' => []]);
+
+        $result = $this->manager->save($settings);
+        $this->assertEquals([[], ['oro_user.update']], $result);
+    }
+
     public function testGetScopedEntityName()
     {
         $this->assertEquals($this->getScopedEntityName(), $this->manager->getScopedEntityName());

@@ -13,12 +13,16 @@
     &__control,
     input[type='radio'] {
         position: absolute;
-        height: 0;
-        width: 0;
+        top: $custom-radio-icon-size / 2;
+        left: $custom-radio-icon-size + 2px;
+
+        height: 2px;
+        width: 2px;
         margin: 0;
         padding: 0;
-        border: 0 none;
+
         opacity: 0;
+        appearance: none;
     }
 
     &__input,
@@ -68,6 +72,8 @@
         vertical-align: middle;
 
         word-break: break-word;
+    
+        cursor: $base-ui-element-cursor;
 
         &::before {
             flex-shrink: 0;
@@ -82,6 +88,7 @@
             border: $custom-radio-icon-border;
             border-radius: 50%;
             background: $custom-radio-icon-bg;
+            cursor: $base-ui-element-cursor;
         }
 
         &:not(:empty)::before {

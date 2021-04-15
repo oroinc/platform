@@ -67,11 +67,12 @@ class EmbeddedFormController extends AbstractController
     }
 
     /**
-     * @Route("default-data/{formType}", name="oro_embedded_form_default_data", methods={"POST"})
-     * @CsrfProtection()
+     * @Route("default-data/{formType}", name="oro_embedded_form_default_data", methods={"GET"})
+     * @AclAncestor("oro_embedded_form_create")
      */
-    public function defaultDataAction($formType)
+    public function defaultDataAction(string $formType)
     {
+        $formType = str_replace('_', '\\', $formType);
         $formManager = $this->getFormManager();
         $css = $formManager->getDefaultCssByType($formType);
         $successMessage = $formManager->getDefaultSuccessMessageByType($formType);

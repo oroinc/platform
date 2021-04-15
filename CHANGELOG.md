@@ -2,13 +2,23 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 5.0-alpha.2
+## 5.0.0-alpha.2
+
+### Changed
+
+#### EmbeddedFormBundle
+* In `Oro\Bundle\EmbeddedFormBundle\Controller\EmbeddedFormController::defaultDataAction`
+  (`oro_embedded_form_default_data` route)
+  action the request method was changed to GET.
+
+#### UIBundle
 * `Mixins` and `SCSS Variables` related to `direction.scss` were removed. For implementing Right To Left UI design have a look in [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html).
+
+#### @oroinc/webpack-config-builder
+* Platform now requires updated version of `@oroinc/webpack-config-builder` package which is migrated to Webpack 5. See [Webpack migration guide](https://webpack.js.org/migrate/5/).
 
 ## 5.0.0-alpha.1 (2021-03-31)
 [Show detailed list of changes](incompatibilities-5-0-alpha-1.md)
-
-## 5.0-alpha.1
 
 ### Added
 * Added support for Right To Left UI design see more [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html). 
