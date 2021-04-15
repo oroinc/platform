@@ -100,8 +100,10 @@
     &-poNumber,
     &-identifier,
     &-primaryEmail,
+    &-sku,
     &-email,
-    &-zip {
+    &-zip,
+    &.direction-ltr {
         /*rtl:ignore*/
         direction: ltr;
     }

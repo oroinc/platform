@@ -214,9 +214,18 @@
                     }
 
                     .divider {
-                        padding-left: 6px;
+                        display: inline-block;
 
-                        border-left: 1px solid $primary-700;
+                        &:before {
+                            content: '';
+                            display: inline-block;
+                            vertical-align: middle;
+                            padding-left: 6px;
+                            height: 16px;
+                            width: 1px;
+                            line-height: 1;
+                            border-left: 1px solid $primary-700;
+                        }
                     }
                 }
 
