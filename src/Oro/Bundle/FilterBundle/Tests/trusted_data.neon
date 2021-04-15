@@ -1,6 +1,9 @@
 # Configuration for https://github.com/oroinc/phpstan-rules/
 trusted_data:
     variables:
+        Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
+            processSubQueryExpressionGroupBy:
+                fieldExpr: true
         Oro\Bundle\FilterBundle\Filter\DuplicateFilter:
             buildComparisonExpr:
                 fieldName: true
