@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\ReportBundle\Entity\CalendarDate;
 use Oro\Component\DoctrineUtils\ORM\DqlUtil;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -83,6 +84,7 @@ abstract class AbstractFilter implements FilterInterface
     }
 
     /**
+     * @param OrmFilterDatasourceAdapter $ds
      * {@inheritDoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
@@ -94,7 +96,8 @@ abstract class AbstractFilter implements FilterInterface
 
         $type = $data['type'];
         $notExpression = $this->getJoinOperator($type);
-        $useExists = empty($data['in_group']) && $this->findRelatedJoin($ds);
+        $useExists = $this->shouldUseExists($ds, $data);
+
         if ($notExpression && $useExists) {
             $type = $notExpression;
         }
@@ -104,22 +107,7 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         if ($useExists) {
-            /** @var OrmFilterDatasourceAdapter $ds */
-            $qb = $ds->getQueryBuilder();
-
-            $fieldsExprs = $this->createConditionFieldExprs($qb);
-            $subExprs = [];
-
-            foreach ($fieldsExprs as $fieldExpr) {
-                $subDql = $this->getSubQueryExpressionWithParameters($ds, $fieldExpr, $comparisonExpr)[0];
-
-                $subExpr = $qb->expr()->exists($subDql);
-                if ($notExpression) {
-                    $subExpr = $qb->expr()->not($subExpr);
-                }
-                $subExprs[] = $subExpr;
-            }
-            $comparisonExpr = $qb->expr()->andX(...$subExprs);
+            $comparisonExpr = $this->getExistsComparisonExpression($ds, $comparisonExpr, $notExpression);
         }
 
         $this->applyFilterToClause($ds, $comparisonExpr);
@@ -238,16 +226,13 @@ abstract class AbstractFilter implements FilterInterface
         $filter
     ): array {
         $subQb = $this->createSubQueryBuilder($ds, $filter);
-        $groupBy = implode(', ', $this->getSelectFieldFromGroupBy($ds->getQueryBuilder()));
         $subQb
             ->resetDQLPart('orderBy')
+            ->resetDQLPart('groupBy')
             ->select($fieldExpr)
             ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
 
-        if ($groupBy) {
-            // replace aliases from SELECT by expressions, since SELECT clause is changed, add current field
-            $subQb->groupBy(sprintf('%s, %s', $groupBy, $fieldExpr));
-        }
+        $this->processSubQueryExpressionGroupBy($ds, $subQb, $fieldExpr);
         [$dql, $replacements] = $this->createDQLWithReplacedAliases($ds, $subQb);
         [$fieldAlias, $field] = explode('.', $fieldExpr);
         $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
@@ -615,5 +600,108 @@ abstract class AbstractFilter implements FilterInterface
     protected function isValueRequired($type): bool
     {
         return FilterUtility::TYPE_EMPTY !== $type && FilterUtility::TYPE_NOT_EMPTY !== $type;
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string $comparisonExpr
+     * @param $notExpression
+     * @return mixed
+     */
+    protected function getExistsComparisonExpression(
+        FilterDatasourceAdapterInterface $ds,
+        string $comparisonExpr,
+        $notExpression
+    ) {
+        $qb = $ds->getQueryBuilder();
+
+        $fieldsExprs = $this->createConditionFieldExprs($qb);
+        $subExprs = [];
+
+        foreach ($fieldsExprs as $fieldExpr) {
+            $subDql = $this->getSubQueryExpressionWithParameters($ds, $fieldExpr, $comparisonExpr)[0];
+
+            $subExpr = $qb->expr()->exists($subDql);
+            if ($notExpression) {
+                $subExpr = $qb->expr()->not($subExpr);
+            }
+            $subExprs[] = $subExpr;
+        }
+
+        return $qb->expr()->andX(...$subExprs);
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param array $data
+     * @return bool
+     */
+    protected function shouldUseExists(FilterDatasourceAdapterInterface $ds, array $data): bool
+    {
+        // Exists is supported for OrmFilterDatasourceAdapter only
+        if (!$ds instanceof OrmFilterDatasourceAdapter) {
+            return false;
+        }
+
+        // When grouping by CalendarDate is enabled filtering with EXISTS will behave incorrectly, because CalendarDate
+        // became the root entity and EXISTS by sub-query will return a date id instead of entity id when there is
+        // at least one entity that satisfies the filter.
+        // Example of an incorrect query with a filter by order.status when sub-select is used:
+        // SELECT order.identifier FROM CalendarDate cd LEFT JOIN Order order ... WHERE
+        // EXISTS(SELECT cd1.id FROM CalendarDate cd1 LEFT JOIN Order order1 WHERE order1.status_id = 'open')
+        if (in_array(CalendarDate::class, $ds->getQueryBuilder()->getRootEntities(), true)) {
+            return false;
+        }
+
+        // Because of Doctrine bug https://github.com/doctrine/orm/issues/1845 GROUP BY does not work with functions.
+        // So expression with alias should be present in the select and alias should be used in the GROUP BY
+        // instead of the expression.
+        // But, at the same time, exists sub-query can't contain more than one field selected. Because of this
+        // exists cannot be used when there is grouping by some expression or function and having clause is present
+        if ($this->containGroupByFunctionAndHaving($ds)) {
+            return false;
+        }
+
+        return empty($data['in_group']) && $this->findRelatedJoin($ds);
+    }
+
+    /**
+     * @param OrmFilterDatasourceAdapter $ds
+     * @return bool
+     */
+    protected function containGroupByFunctionAndHaving(
+        OrmFilterDatasourceAdapter $ds
+    ): bool {
+        $qb = $ds->getQueryBuilder();
+        if (!$qb->getDQLPart('having')) {
+            return false;
+        }
+
+        foreach ($this->getSelectFieldFromGroupBy($qb) as $groupByField) {
+            if (strpos($groupByField, '(') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param OrmFilterDatasourceAdapter $ds
+     * @param QueryBuilder $subQuery
+     * @param string $fieldExpr
+     */
+    protected function processSubQueryExpressionGroupBy(
+        OrmFilterDatasourceAdapter $ds,
+        QueryBuilder $subQuery,
+        string $fieldExpr
+    ): void {
+        // No need to add group by to sub-query if there is no additional having conditions applied
+        if ($ds->getQueryBuilder()->getDQLPart('having')
+            && $groupByFields = $this->getSelectFieldFromGroupBy($ds->getQueryBuilder())
+        ) {
+            $subQuery->addGroupBy(implode(', ', $groupByFields));
+            $subQuery->addGroupBy($fieldExpr);
+        }
     }
 }

@@ -2,8 +2,15 @@
 
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\ManyToManyFilter;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
 {
@@ -11,76 +18,64 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
 
     public function setUp()
     {
-        $formFactory = $this->createMock('Symfony\Component\Form\FormFactoryInterface');
-        $filterUtility = $this->getMockBuilder('Oro\Bundle\FilterBundle\Filter\FilterUtility')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $formFactory = $this->createMock(FormFactoryInterface::class);
+        $filterUtility = $this->createMock(FilterUtility::class);
 
         $this->manyToManyfilter = new ManyToManyFilter($formFactory, $filterUtility);
     }
 
-    /**
-     * @expectedException LogicException
-     */
     public function testApplyShouldThrowExceptionIfWrongDatasourceTypeIsGiven()
     {
         $this->expectException(\LogicException::class);
-        $ds = $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface');
+        $ds = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->manyToManyfilter->apply($ds, ['type' => FilterUtility::TYPE_EMPTY]);
     }
 
     public function testApplyEmptyType()
     {
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ds = $this->createMock(OrmFilterDatasourceAdapter::class);
 
         $data = [
-            'type' => FilterUtility::TYPE_EMPTY,
+            'type' => FilterUtility::TYPE_EMPTY
         ];
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
             ->method('getClassMetadata')
             ->with('entity')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
         $qb->expects($this->any())
             ->method('getDqlPart')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $qb->expects($this->any())
             ->method('getRootAliases')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
+        $qb->expects($this->any())
+            ->method('getRootEntities')
+            ->willReturn([]);
 
-        $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expressionBuilder = $this->createMock(OrmExpressionBuilder::class);
         $expressionBuilder->expects($this->once())
             ->method('isNull')
             ->with('alias.id')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
 
         $ds->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $ds->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
         $ds->expects($this->once())
             ->method('addRestriction')
             ->with($expressionBuilder);
@@ -94,56 +89,48 @@ class ManyToManyFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyNotEmptyType()
     {
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $ds = $this->createMock(OrmFilterDatasourceAdapter::class);
         $data = [
             'type' => FilterUtility::TYPE_NOT_EMPTY,
         ];
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(['id']));
+            ->willReturn(['id']);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
             ->method('getClassMetadata')
             ->with('entity')
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->any())
             ->method('getEntityManager')
-            ->will($this->returnValue($em));
+            ->willReturn($em);
         $qb->expects($this->any())
             ->method('getDqlPart')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $qb->expects($this->any())
             ->method('getRootAliases')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
+        $qb->expects($this->any())
+            ->method('getRootEntities')
+            ->willReturn([]);
 
-        $expressionBuilder = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmExpressionBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $expressionBuilder = $this->createMock(OrmExpressionBuilder::class);
         $expressionBuilder->expects($this->once())
             ->method('isNotNull')
             ->with('alias.id')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
 
         $ds->expects($this->any())
             ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $ds->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($expressionBuilder));
+            ->willReturn($expressionBuilder);
         $ds->expects($this->once())
             ->method('addRestriction')
             ->with($expressionBuilder);

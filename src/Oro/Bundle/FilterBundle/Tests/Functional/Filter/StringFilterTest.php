@@ -219,6 +219,38 @@ class StringFilterTest extends WebTestCase
         $whereParts = $qb->getDQLPart('where')->getParts();
         self::assertCount(2, $whereParts);
         self::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
+        self::assertStringNotContainsString('GROUP BY ', $whereParts[1]);
+    }
+
+    public function testStringInHasGroupByAndHaving()
+    {
+        $qb = $this->createQueryBuilder('u');
+        $qb->select('u.username, e.email')
+            ->join('u.emails', 'e')
+            ->orderBy('u.username')
+            ->andWhere($qb->expr()->in('u.username', ['u1', 'u2']))
+            ->addGroupBy('u.id, e.id')
+            ->having('MIN(u.id) > 0');
+
+        $this->filter->init('string', ['data_name' => 'e.email']);
+
+        $filterForm = $this->filter->getForm();
+        $filterForm->submit(['type' => TextFilterType::TYPE_IN, 'value' => 'test2@example.com']);
+        self::assertTrue($filterForm->isValid());
+        self::assertTrue($filterForm->isSynchronized());
+
+        $ds = new OrmFilterDatasourceAdapter($qb);
+        $this->filter->apply($ds, $filterForm->getData());
+
+        $qb = $ds->getQueryBuilder();
+
+        $actualData = $qb->getQuery()->getResult();
+        self::assertCount(1, $actualData);
+        self::assertEquals(['username' => 'u2', 'email' => 'test2@example.com'], $actualData[0]);
+
+        $whereParts = $qb->getDQLPart('where')->getParts();
+        self::assertCount(2, $whereParts);
+        self::assertStringContainsString('EXISTS(SELECT', $whereParts[1]);
         self::assertStringContainsString('GROUP BY ', $whereParts[1]);
     }
 

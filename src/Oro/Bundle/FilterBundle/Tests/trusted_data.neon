@@ -75,6 +75,8 @@ trusted_data:
                 fieldExpr: true
             createSubQueryBuilder:
                 filter: true
+            processSubQueryExpressionGroupBy:
+                fieldExpr: true
     safe_methods:
         Oro\Bundle\FilterBundle\Filter\AbstractFilter:
             getSelectFieldFromGroupBy: true
