@@ -100,41 +100,51 @@ define(function(require) {
         }
     };
 
+    function swapPlacement(placement) {
+        const placementRTLMap = {
+            left: 'right',
+            right: 'left',
+            start: 'end',
+            end: 'start'
+        };
+
+        if (placement.search(/right|left/g) !== -1) {
+            placement = placement.replace(
+                /right|left/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        if (placement.search(/top|bottom/g) !== -1) {
+            placement = placement.replace(
+                /start|end/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        return placement;
+    }
+
     Popper.Defaults.modifiers.rtl = {
-        order: 0,
+        order: 650,
         enabled: _.isRTL(),
-        fn: data => {
-            if (!data.originalPlacement) {
-                return data;
+        fn(data, options) {
+            if (data.originalPlacement) {
+                data.originalPlacement = swapPlacement(data.originalPlacement);
             }
 
-            const placementRTLMap = {
-                left: 'right',
-                right: 'left',
-                start: 'end',
-                end: 'start'
-            };
-
-            if (data.originalPlacement.search(/right|left/g) !== -1) {
-                data.originalPlacement = data.originalPlacement.replace(
-                    /right|left/g,
-                    matched => placementRTLMap[matched]
-                );
+            if (data.placement) {
+                data.placement = swapPlacement(data.placement);
+                data.instance.options.placement = swapPlacement(data.instance.options.placement);
             }
 
-            if (data.originalPlacement.search(/top|bottom/g) !== -1) {
-                data.originalPlacement = data.originalPlacement.replace(
-                    /start|end/g,
-                    matched => placementRTLMap[matched]
-                );
+            if (data.attributes['x-placement']) {
+                data.attributes['x-placement'] = swapPlacement(data.attributes['x-placement']);
             }
 
-            data.attributes['x-placement'] = data.originalPlacement;
+            data.instance.scheduleUpdate();
 
-            if (data.positionFixed) {
-                data.placement = data.originalPlacement;
-            }
-
+            options.enabled = false;
             return data;
         }
     };

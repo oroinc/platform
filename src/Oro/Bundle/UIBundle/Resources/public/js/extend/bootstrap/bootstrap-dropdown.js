@@ -36,17 +36,6 @@ define(function(require, exports, module) {
         POSITION_STATIC: 'position-static'
     };
 
-    const AttachmentMap = {
-        TOP: _.isRTL() ? 'top-end' : 'top-start',
-        TOPEND: _.isRTL() ? 'top-start' : 'top-end',
-        BOTTOM: _.isRTL() ? 'bottom-end' : 'bottom-start',
-        BOTTOMEND: _.isRTL() ? 'bottom-start' : 'bottom-end',
-        RIGHT: _.isRTL() ? 'left-start' : 'right-start',
-        RIGHTEND: _.isRTL() ? 'left-end' : 'right-end',
-        LEFT: _.isRTL() ? 'right-start' : 'left-start',
-        LEFTEND: _.isRTL() ? 'right-end' : 'left-end'
-    };
-
     config = _.extend({
         displayArrow: true,
         keepSeparately: true
@@ -230,27 +219,6 @@ define(function(require, exports, module) {
                 this._popper.destroy();
                 this._popper = null;
             }
-        },
-
-        _getPlacement() {
-            const $parentDropdown = $(this._element.parentNode);
-            let placement = AttachmentMap.BOTTOM;
-
-            // Handle dropup
-            if ($parentDropdown.hasClass(ClassName.DROPUP)) {
-                placement = AttachmentMap.TOP;
-                if ($(this._menu).hasClass(ClassName.MENURIGHT)) {
-                    placement = AttachmentMap.TOPEND;
-                }
-            } else if ($parentDropdown.hasClass(ClassName.DROPRIGHT)) {
-                placement = AttachmentMap.RIGHT;
-            } else if ($parentDropdown.hasClass(ClassName.DROPLEFT)) {
-                placement = AttachmentMap.LEFT;
-            } else if ($(this._menu).hasClass(ClassName.MENURIGHT)) {
-                placement = AttachmentMap.BOTTOMEND;
-            }
-
-            return placement;
         },
 
         _getPopperConfig: function() {
