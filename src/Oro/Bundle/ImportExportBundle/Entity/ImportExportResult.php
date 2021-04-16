@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\OrganizationAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -31,7 +32,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @ORM\HasLifecycleCallbacks()
  */
-class ImportExportResult implements CreatedAtAwareInterface
+class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareInterface
 {
     use CreatedAtAwareTrait;
     use OrganizationAwareTrait;
