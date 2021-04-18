@@ -14,7 +14,6 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass as CacheConfiguration;
 use Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider;
-use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 use Oro\Component\Config\Cache\ChainConfigCacheState;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -404,6 +403,12 @@ class ConfigurationLoader
         string $configCacheServiceId,
         string $entityAliasResolverServiceId
     ): string {
+        $aliasedExclusionProviderServiceId = 'oro_api.aliased_entity_exclusion_provider.' . $configKey;
+        $this->container
+            ->register($aliasedExclusionProviderServiceId, AliasedEntityExclusionProvider::class)
+            ->setArguments([new Reference($entityAliasResolverServiceId)])
+            ->setPublic(false);
+
         $exclusionProviderServiceId = 'oro_api.config_entity_exclusion_provider.' . $configKey;
         $this->container
             ->register($exclusionProviderServiceId, ConfigExclusionProvider::class)
@@ -411,23 +416,11 @@ class ConfigurationLoader
                 new Reference('oro_entity.entity_hierarchy_provider.all'),
                 new Reference($configCacheServiceId)
             ])
-            ->setPublic(false);
-
-        $aliasedExclusionProviderServiceId = 'oro_api.aliased_entity_exclusion_provider.' . $configKey;
-        $this->container
-            ->register($aliasedExclusionProviderServiceId, AliasedEntityExclusionProvider::class)
-            ->setArguments([new Reference($entityAliasResolverServiceId)])
-            ->setPublic(false);
-
-        $chainExclusionProviderServiceId = 'oro_api.chain_entity_exclusion_provider.' . $configKey;
-        $this->container
-            ->register($chainExclusionProviderServiceId, ChainExclusionProvider::class)
             ->setPublic(false)
-            ->addMethodCall('addProvider', [new Reference($exclusionProviderServiceId)])
             ->addMethodCall('addProvider', [new Reference($aliasedExclusionProviderServiceId)])
             ->addMethodCall('addProvider', [new Reference(self::SHARED_ENTITY_EXCLUSION_PROVIDER_SERVICE_ID)]);
 
-        return $chainExclusionProviderServiceId;
+        return $exclusionProviderServiceId;
     }
 
     /**

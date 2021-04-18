@@ -57,6 +57,7 @@ api:
 
     entities:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+            exclude: false # see Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider
             fields:
                 title:
                     exclude: false
@@ -67,6 +68,7 @@ api:
             actions:
                 update_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee:
+            exclude: false # see Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider
             filters:
                 fields:
                     name: ~
