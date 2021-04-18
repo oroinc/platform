@@ -60,6 +60,28 @@ class InvalidRequestDataTest extends RestJsonApiTestCase
         );
     }
 
+    public function testInvalidJsonInRequestDataTrailingCommaAfterProperty()
+    {
+        $response = $this->request(
+            'POST',
+            $this->getUrl(
+                $this->getListRouteName(),
+                ['entity' => $this->getEntityType(TestProduct::class)]
+            ),
+            [],
+            [],
+            '{"data": {"type": "test", "attributes": {"name": "some name",}}}'
+        );
+        static::assertResponseStatusCodeEquals($response, 400);
+        $this->assertResponseContains(
+            [
+                'code'    => 400,
+                'message' => 'Invalid json message received'
+            ],
+            $response
+        );
+    }
+
     public function testInvalidJsonWithInvalidUtf8CharacterInRequestData()
     {
         $response = $this->request(

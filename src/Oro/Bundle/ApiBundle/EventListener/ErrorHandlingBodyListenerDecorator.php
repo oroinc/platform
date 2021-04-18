@@ -35,13 +35,14 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
         } catch (BadRequestHttpException $e) {
             if ($e->getMessage() === 'Invalid json message received') {
                 $content = $event->getRequest()->getContent();
-                if (is_string($content) && '' !== $content) {
+                if (\is_string($content) && '' !== $content) {
                     $errorMessage = $this->getInvalidJsonExceptionMessage($content);
                     if ($errorMessage) {
                         throw new BadRequestHttpException($errorMessage);
                     }
                 }
             }
+            throw $e;
         }
     }
 
