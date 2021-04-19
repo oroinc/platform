@@ -5,8 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\ApiFeatureTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,27 +15,19 @@ class ApiFeatureTest extends RestJsonApiTestCase
 {
     use ApiFeatureTrait;
 
-    /** @var string */
-    private $entityType;
-
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
-            LoadOrganization::class,
-            LoadBusinessUnit::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/test_department.yml'
         ]);
-
-        $this->entityType = $this->getEntityType(TestDepartment::class);
     }
 
     public function testGetListOptionsOnEnabledFeature()
     {
         $response = $this->options(
             $this->getListRouteName(),
-            ['entity' => $this->entityType]
+            ['entity' => $this->getEntityType(TestDepartment::class)]
         );
 
         self::assertAllowResponseHeader($response, 'OPTIONS, GET, PATCH, POST, DELETE');
@@ -49,7 +39,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
         try {
             $response = $this->options(
                 $this->getListRouteName(),
-                ['entity' => $this->entityType],
+                ['entity' => $this->getEntityType(TestDepartment::class)],
                 [],
                 false
             );
@@ -62,10 +52,11 @@ class ApiFeatureTest extends RestJsonApiTestCase
 
     public function testGetListOnEnabledFeature()
     {
-        $response = $this->cget(['entity' => $this->entityType]);
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(['entity' => $entityType]);
 
         $this->assertResponseContains(
-            ['data' => [['type' => $this->entityType, 'id' => '<toString(@entity1->id)>']]],
+            ['data' => [['type' => $entityType, 'id' => '<toString(@entity1->id)>']]],
             $response
         );
     }
@@ -75,7 +66,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
         $this->disableApiFeature();
         try {
             $response = $this->cget(
-                ['entity' => $this->entityType],
+                ['entity' => $this->getEntityType(TestDepartment::class)],
                 [],
                 [],
                 false
@@ -89,10 +80,11 @@ class ApiFeatureTest extends RestJsonApiTestCase
 
     public function testGetOnEnabledFeature()
     {
-        $response = $this->get(['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>']);
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->get(['entity' => $entityType, 'id' => '<toString(@entity1->id)>']);
 
         $this->assertResponseContains(
-            ['data' => ['type' => $this->entityType, 'id' => '<toString(@entity1->id)>']],
+            ['data' => ['type' => $entityType, 'id' => '<toString(@entity1->id)>']],
             $response
         );
     }
@@ -102,7 +94,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
         $this->disableApiFeature();
         try {
             $response = $this->get(
-                ['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>'],
+                ['entity' => $this->getEntityType(TestDepartment::class), 'id' => '<toString(@entity1->id)>'],
                 [],
                 [],
                 false
@@ -116,29 +108,31 @@ class ApiFeatureTest extends RestJsonApiTestCase
 
     public function testCreateOnEnabledFeature()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
         $data = [
             'data' => [
-                'type'       => $this->entityType,
+                'type'       => $entityType,
                 'attributes' => [
                     'title' => 'test department'
                 ]
             ]
         ];
 
-        $response = $this->post(['entity' => $this->entityType], $data);
+        $response = $this->post(['entity' => $entityType], $data);
 
         $this->assertResponseContains($data, $response);
     }
 
     public function testTryToCreateOnDisabledFeature()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
         $this->disableApiFeature();
         try {
             $response = $this->post(
-                ['entity' => $this->entityType],
+                ['entity' => $entityType],
                 [
                     'data' => [
-                        'type'       => $this->entityType,
+                        'type'       => $entityType,
                         'attributes' => [
                             'title' => 'test department'
                         ]
@@ -156,9 +150,10 @@ class ApiFeatureTest extends RestJsonApiTestCase
 
     public function testUpdateOnEnabledFeature()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
         $data = [
             'data' => [
-                'type'       => $this->entityType,
+                'type'       => $entityType,
                 'id'         => '<toString(@entity1->id)>',
                 'attributes' => [
                     'title' => 'test department'
@@ -166,20 +161,21 @@ class ApiFeatureTest extends RestJsonApiTestCase
             ]
         ];
 
-        $response = $this->patch(['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>'], $data);
+        $response = $this->patch(['entity' => $entityType, 'id' => '<toString(@entity1->id)>'], $data);
 
         $this->assertResponseContains($data, $response);
     }
 
     public function testTryToUpdateOnDisabledFeature()
     {
+        $entityType = $this->getEntityType(TestDepartment::class);
         $this->disableApiFeature();
         try {
             $response = $this->patch(
-                ['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>'],
+                ['entity' => $entityType, 'id' => '<toString(@entity1->id)>'],
                 [
                     'data' => [
-                        'type'       => $this->entityType,
+                        'type'       => $entityType,
                         'id'         => '<toString(@entity1->id)>',
                         'attributes' => [
                             'title' => 'test department'
@@ -198,7 +194,10 @@ class ApiFeatureTest extends RestJsonApiTestCase
 
     public function testDeleteOnEnabledFeature()
     {
-        $this->delete(['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>']);
+        $this->delete([
+            'entity' => $this->getEntityType(TestDepartment::class),
+            'id'     => '<toString(@entity1->id)>'
+        ]);
     }
 
     public function testTryToDeleteOnDisabledFeature()
@@ -206,7 +205,7 @@ class ApiFeatureTest extends RestJsonApiTestCase
         $this->disableApiFeature();
         try {
             $response = $this->delete(
-                ['entity' => $this->entityType, 'id' => '<toString(@entity1->id)>'],
+                ['entity' => $this->getEntityType(TestDepartment::class), 'id' => '<toString(@entity1->id)>'],
                 [],
                 [],
                 false
