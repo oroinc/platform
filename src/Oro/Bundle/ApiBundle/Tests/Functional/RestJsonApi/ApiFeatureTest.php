@@ -5,8 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 use Oro\Bundle\ApiBundle\Tests\Functional\ApiFeatureTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -25,8 +23,6 @@ class ApiFeatureTest extends RestJsonApiTestCase
         parent::setUp();
 
         $this->loadFixtures([
-            LoadOrganization::class,
-            LoadBusinessUnit::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/test_department.yml'
         ]);
 

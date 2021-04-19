@@ -9,8 +9,10 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -190,6 +192,86 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
             ],
             $result
         );
+    }
+
+    public function testParseMetaProperty()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $field = $metadata->addMetaProperty(new MetaPropertyMetadata('property1'));
+        $field->setDataType('string');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('property1')->setDescription('Property Description');
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertEquals(
+            [
+                'property1' => [
+                    'required'    => false,
+                    'dataType'    => 'string',
+                    'actualType'  => 'string',
+                    'description' => 'Property Description'
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testParseClassNameMetaProperty()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $field = $metadata->addMetaProperty(new MetaPropertyMetadata(ConfigUtil::CLASS_NAME));
+        $field->setDataType('string');
+
+        $config = new EntityDefinitionConfig();
+        $config->addField(ConfigUtil::CLASS_NAME);
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertSame([], $result);
+    }
+
+    public function testParseRenamedClassNameMetaProperty()
+    {
+        $requestType = new RequestType([]);
+
+        $metadata = new EntityMetadata();
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $field = $metadata->addMetaProperty(new MetaPropertyMetadata('renamedClassName'));
+        $field->setDataType('string');
+        $field->setPropertyPath(ConfigUtil::CLASS_NAME);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('renamedClassName')->setPropertyPath(ConfigUtil::CLASS_NAME);
+
+        $result = $this->parser->parse([
+            'options' => [
+                'direction' => 'input',
+                'metadata'  => new ApiDocMetadata('create', $metadata, $config, $requestType)
+            ]
+        ]);
+
+        self::assertSame([], $result);
     }
 
     public function testParseNullableField()

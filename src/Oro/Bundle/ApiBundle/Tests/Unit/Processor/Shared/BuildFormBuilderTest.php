@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
@@ -49,6 +50,19 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                 $this->container
             )
         );
+    }
+
+    /**
+     * @param string $fieldName
+     *
+     * @return MetaPropertyMetadata
+     */
+    private function createMetaPropertyMetadata($fieldName)
+    {
+        $fieldMetadata = new MetaPropertyMetadata();
+        $fieldMetadata->setName($fieldName);
+
+        return $fieldMetadata;
     }
 
     /**
@@ -158,6 +172,8 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
         $config = new EntityDefinitionConfig();
+        $config->addField('metaProperty1');
+        $config->addField('metaProperty2')->setPropertyPath('realMetaProperty2');
         $config->addField('field1');
         $config->addField('field2')->setPropertyPath('realField2');
         $configField3 = $config->addField('field3');
@@ -172,6 +188,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation3->setFormOptions(['trim' => false]);
 
         $metadata = new EntityMetadata();
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty2'))
+            ->setPropertyPath('realMetaProperty2');
         $metadata->addField($this->createFieldMetadata('field1'));
         $metadata->addField($this->createFieldMetadata('field2'))
             ->setPropertyPath('realField2');
@@ -203,9 +222,11 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $formBuilder->expects(self::once())
             ->method('setDataMapper')
             ->with(self::isInstanceOf(PropertyPathMapper::class));
-        $formBuilder->expects(self::exactly(6))
+        $formBuilder->expects(self::exactly(8))
             ->method('add')
             ->withConsecutive(
+                ['metaProperty1', null, []],
+                ['metaProperty2', null, ['property_path' => 'realMetaProperty2']],
                 ['field1', null, []],
                 ['field2', null, ['property_path' => 'realField2']],
                 ['field3', 'text', ['property_path' => 'realField3', 'trim' => false]],
@@ -218,6 +239,63 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForClassNameMetaProperty()
+    {
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField(ConfigUtil::CLASS_NAME);
+
+        $metadata = new EntityMetadata();
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME));
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::never())
+            ->method('add');
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForRenamedClassNameMetaProperty()
+    {
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('renamedClassName')->setPropertyPath(ConfigUtil::CLASS_NAME);
+
+        $metadata = new EntityMetadata();
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('renamedClassName'))
+            ->setPropertyPath(ConfigUtil::CLASS_NAME);
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(PropertyPathMapper::class));
+        $formBuilder->expects(self::never())
+            ->method('add');
+
+        $this->context->setClassName('Test\Entity');
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
