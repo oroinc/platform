@@ -1,6 +1,8 @@
 /* @theme: blank; */
 
 // Use: @include flexible-arrow();
+// Mixin can't wrap in RTLCSS directives
+// Use RTL directives only for a specific line
 @mixin flexible-arrow(
     $arrow-height: 10px,
     $arrow-width: 11px,
@@ -23,9 +25,11 @@
     &:after {
         position: absolute;
         top: 0;
+        /*rtl:ignore*/
         right: 0;
         bottom: 0;
         border: 0 none;
+        /*rtl:ignore*/
         left: 0;
         z-index: z('hidden');
 
@@ -66,6 +70,7 @@
 
         &:before {
             top: 0;
+            /*rtl:ignore*/
             right: 100%;
 
             height: 100%;
@@ -73,6 +78,7 @@
         }
 
         .arrow {
+            /*rtl:ignore*/
             left: $arrow-offset;
 
             transform: $arrow-placement-end-transform;
@@ -92,10 +98,12 @@
     }
 
     &[x-placement^="left"] {
+        /*rtl:ignore*/
         margin-right: $arrow-placeholder;
 
         &:before {
             top: 0;
+            /*rtl:ignore*/
             left: 100%;
 
             width: $arrow-placeholder;
@@ -103,6 +111,7 @@
         }
 
         .arrow {
+            /*rtl:ignore*/
             right: $arrow-offset;
 
             transform: $arrow-placement-start-transform;

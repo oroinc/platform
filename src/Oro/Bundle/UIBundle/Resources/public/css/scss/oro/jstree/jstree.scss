@@ -120,9 +120,11 @@
         &:before {
             position: $jstree-icon-checkbox-icon-position;
             top: $jstree-icon-checkbox-icon-top;
+            /*rtl:begin:ignore*/
             left: $jstree-icon-checkbox-icon-left;
             transform: $jstree-icon-checkbox-icon-transform;
             margin-left: $jstree-icon-checkbox-icon-offset-left;
+            /*rtl:end:ignore*/
             font-size: $jstree-icon-checkbox-icon-font-size;
             line-height: $jstree-icon-checkbox-icon-line-height;
             font-family: $jstree-icon-checkbox-icon-font-family;
