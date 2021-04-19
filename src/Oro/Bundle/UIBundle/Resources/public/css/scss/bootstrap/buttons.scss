@@ -60,14 +60,14 @@ fieldset:disabled a.btn {
 
         [class^="fa-"],
         [class*=" fa-"] {
-            #{$start}: $btn-icon-dropdown-toggle-fa-left;
+            left: $btn-icon-dropdown-toggle-fa-left;
             transform: $btn-icon-dropdown-toggle-fa-transform;
         }
 
         &:after {
             position: $btn-icon-dropdown-toggle-after-position;
             top: $btn-icon-dropdown-toggle-after-top;
-            #{$end}: $btn-icon-dropdown-toggle-after-right;
+            right: $btn-icon-dropdown-toggle-after-right;
             transform: $btn-icon-dropdown-toggle-after-transform;
         }
     }
@@ -82,11 +82,11 @@ fieldset:disabled a.btn {
 
             [class^="fa-"],
             [class*=" fa-"] {
-                #{$start}: $btn-square-icon-dropdown-toggle-fa-left;
+                left: $btn-square-icon-dropdown-toggle-fa-left;
             }
 
             &:after {
-                #{$end}: $btn-square-icon-dropdown-toggle-after-right;
+                right: $btn-square-icon-dropdown-toggle-after-right;
             }
         }
     }

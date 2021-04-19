@@ -39,7 +39,7 @@
             height: 10px;
             position: absolute;
             top: -5px;
-            #{$start}: 9px;
+            left: 9px;
             transform: rotate(53deg) skewX(15deg);
             box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
             z-index: -1;
@@ -51,8 +51,8 @@
             content: '';
             position: absolute;
             top: 0;
-            #{$start}: 0;
-            #{$end}: 0;
+            left: 0;
+            right: 0;
             bottom: 0;
             border-radius: inherit;
             z-index: -1;
@@ -72,7 +72,7 @@
 
     &__search-and-shortcuts { // Includes Shortcuts and Search
         .dropdown {
-            float: #{$start};
+            float: left;
 
             .nav-header {
                 font-weight: $header-dropdown-menu-header-font-weight;
@@ -110,7 +110,7 @@
                             flex-grow: 1;
 
                             width: auto;
-                            margin-#{$end}: $header-search-field-container-margin-end;
+                            margin-right: $header-search-field-container-margin-end;
 
                             vertical-align: top;
 
@@ -123,14 +123,14 @@
                         }
 
                         .btn-search {
-                            margin-#{$start}: -1px;
+                            margin-left: -1px;
 
                             flex-shrink: 0;
                         }
 
                         .search-suggestion-list {
                             position: absolute;
-                            #{$start}: 0;
+                            left: 0;
                             width: 100%;
                             max-height: $header-search-suggestion-list-max-height;
                             margin: 0;
@@ -174,10 +174,10 @@
                             }
 
                             li.selected {
-                                margin-#{$start}: $header-search-suggestion-item-h-margin / 2;
-                                margin-#{$end}: $header-search-suggestion-item-h-margin / 2;
-                                padding-#{$start}: $header-search-suggestion-item-h-margin / 2;
-                                padding-#{$end}: $header-search-suggestion-item-h-margin / 2;
+                                margin-left: $header-search-suggestion-item-h-margin / 2;
+                                margin-right: $header-search-suggestion-item-h-margin / 2;
+                                padding-left: $header-search-suggestion-item-h-margin / 2;
+                                padding-right: $header-search-suggestion-item-h-margin / 2;
                                 background-color: $header-search-selected-suggestion-item-bg;
 
                                 .description, .entity-label {
@@ -200,7 +200,7 @@
 
                         .no-data {
                             position: absolute;
-                            #{$start}: 0;
+                            left: 0;
                             width: 100%;
                             padding: $header-search-no-data-padding;
                             margin: 0;
@@ -223,7 +223,7 @@
                         }
 
                         .avatar {
-                            float: $end;
+                            float: right;
                         }
 
                         &:after {
@@ -247,8 +247,8 @@
                     .typeahead {
                         width: 100%;
                         padding: $header-shortcut-typeahead-padding;
-                        border-top-#{$start}-radius: 0;
-                        border-top-#{$end}-radius: 0;
+                        border-top-left-radius: 0;
+                        border-top-right-radius: 0;
 
                         &:before,
                         &:after {

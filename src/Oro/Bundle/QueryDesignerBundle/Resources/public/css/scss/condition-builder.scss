@@ -13,7 +13,7 @@
     .condition-container.empty & {
         display: table;
         position: absolute;
-        #{$start}: 50%;
+        left: 50%;
         width: $condition-builder-drag-n-drop-hint-width;
         height: 100%;
         margin: 0 $condition-builder-drag-n-drop-hint-width / -2;
@@ -89,7 +89,7 @@
         position: relative;
 
         &.controls {
-            margin-#{$start}: 0;
+            margin-left: 0;
 
             &.loading {
                 &:after {
@@ -97,7 +97,7 @@
                     display: block;
                     position: absolute;
                     top: 50%;
-                    #{$start}: 50%;
+                    left: 50%;
                     margin: -$condition-builder-condition-item-loader-size / 2;
 
                     @include loader($condition-builder-condition-item-loader-size, $condition-builder-condition-item-loader-width);
@@ -112,13 +112,13 @@
 
         .conditions-group {
             min-height: $condition-builder-conditions-group-min-height;
-            border-#{$start}: $condition-builder-conditions-group-start-border;
-            padding-#{$start}: $condition-builder-conditions-group-start-padding;
+            border-left: $condition-builder-conditions-group-start-border;
+            padding-left: $condition-builder-conditions-group-start-padding;
         }
 
         & > .btn-close {
             position: relative;
-            float: #{$end};
+            float: right;
             margin: $condition-builder-close-item-margin;
             color: $condition-builder-close-item-color;
             z-index: 1;
@@ -139,7 +139,7 @@
                 float: none;
                 position: absolute;
                 top: 50%;
-                #{$start}: ceil($condition-builder-conditions-group-start-border-width / 2);
+                left: ceil($condition-builder-conditions-group-start-border-width / 2);
                 margin: $condition-builder-close-item-size / -2;
                 width: $condition-builder-close-item-size;
                 height: $condition-builder-close-item-size;
@@ -248,7 +248,7 @@
             }
 
             .select2-chosen {
-                padding-#{$end}: $condition-builder-condition-item-select2-chosen-padding-end;
+                padding-right: $condition-builder-condition-item-select2-chosen-padding-end;
             }
         }
 
@@ -280,7 +280,7 @@
     }
 
     .filter-item {
-        padding-#{$start}: 0;
+        padding-left: 0;
         vertical-align: baseline;
     }
 
@@ -324,8 +324,8 @@
                     font-weight: normal;
                     outline: none;
                     color: $link-color;
-                    padding-#{$start}: 0;
-                    padding-#{$end}: $condition-builder-condition-item-choice-filter-dropdown-toggle-padding-end;
+                    padding-left: 0;
+                    padding-right: $condition-builder-condition-item-choice-filter-dropdown-toggle-padding-end;
 
                     &:hover,
                     &:focus {
@@ -340,8 +340,8 @@
 
             .value-field-frame {
                 display: inline;
-                margin-#{$start}: 0 !important;
-                padding-#{$start}: 0 !important;
+                margin-left: 0 !important;
+                padding-left: 0 !important;
             }
 
             .filter-value {
@@ -374,7 +374,7 @@
         display: flex;
         position: relative;
         width: calc(100% - #{$condition-builder-filter-criteria-width});
-        margin-#{$start}: $condition-builder-condition-container-margin-start;
+        margin-left: $condition-builder-condition-container-margin-start;
         background-color: $condition-builder-condition-container-background-color;
     }
 

@@ -146,6 +146,7 @@ datagrids:
                 label: oro.notification.datagrid.recipient.custom_email
                 frontend_type: string
                 order: 80
+                cellClassName: 'direction-ltr'
 
         properties:
             id: ~

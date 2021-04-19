@@ -22,16 +22,16 @@ a.disabled.workflow-transition-buttons {
 }
 
 .workflow-history-container {
-    margin-#{$end}: 10px;
+    margin-right: 10px;
 }
 
 table.grid {
     .grid-workflow-step-column {
         .grid-workflow-step-column-row {
-            float: $start;
+            float: left;
             min-height: 1px;
             position: relative;
-            margin-#{$end}: 4px;
+            margin-right: 4px;
         }
     }
 }
@@ -58,7 +58,7 @@ table.grid {
     padding-top: $content-padding-medium / 2;
     line-height: $workflow-widget-row-height;
 
-    float: $start;
+    float: left;
 
     button {
         padding: 0 1px;
@@ -76,12 +76,12 @@ table.grid {
     }
 
     &.only-workflow .workflow-label {
-        padding-#{$start}: 0;
+        padding-left: 0;
     }
 
     .collapse &,
     .collapsing & {
-        margin-#{$start}: $icon-font-size;
+        margin-left: $icon-font-size;
         border-top: 1px solid $primary-860;
     }
 
@@ -89,7 +89,7 @@ table.grid {
         display: inline-flex;
         vertical-align: middle;
         > .btn {
-            margin-#{$start}: 8px;
+            margin-left: 8px;
         }
     }
 
@@ -104,7 +104,7 @@ table.grid {
 }
 
 .workflow-widget-content {
-    padding-#{$end}: $content-padding;
+    padding-right: $content-padding;
 }
 
 .workflow-content {
@@ -112,11 +112,11 @@ table.grid {
 }
 
 .workflow-steps {
-    padding: side-values(0 10px 0 0);
+    padding: 0 10px 0 0;
     vertical-align: middle;
 
     &:last-child {
-        padding: side-values(0 0 0 10px);
+        padding: 0 0 0 10px;
     }
 }
 
@@ -148,13 +148,13 @@ table.grid {
 
     &:before {
         position: absolute;
-        #{$start}: 0;
+        left: 0;
         z-index: 1;
         content: '';
         display: block;
         height: 0;
         width: 0;
-        border-#{$start}: $workflow-widget-arrow-skew solid transparent;
+        border-left: $workflow-widget-arrow-skew solid transparent;
         border-top: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
         border-bottom: $workflow-widget-row-height / 2 solid $workflow-step-background-color;
         line-height: 0;
@@ -163,13 +163,13 @@ table.grid {
     &:after {
         position: absolute;
         top: 0;
-        #{$end}: 0;
+        right: 0;
         z-index: 1;
         content: '';
         display: block;
         height: 0;
         width: 0;
-        border-#{$start}: $workflow-widget-arrow-skew solid $workflow-step-background-color;
+        border-left: $workflow-widget-arrow-skew solid $workflow-step-background-color;
         border-top: $workflow-widget-row-height / 2 solid transparent;
         border-bottom: $workflow-widget-row-height / 2 solid transparent;
         line-height: 0;
@@ -190,7 +190,7 @@ table.grid {
             }
 
             &:after {
-                border-#{$start}-color: $workflow-final-step-background-color;
+                border-left-color: $workflow-final-step-background-color;
             }
 
             &:last-child {
@@ -205,7 +205,7 @@ table.grid {
                 }
 
                 &:after {
-                    border-#{$start}-color: $workflow-final-step-background-color;
+                    border-left-color: $workflow-final-step-background-color;
                 }
             }
         }
@@ -222,7 +222,7 @@ table.grid {
             }
 
             &:after {
-                border-#{$start}-color: $workflow-step-background-color;
+                border-left-color: $workflow-step-background-color;
             }
         }
 
@@ -237,7 +237,7 @@ table.grid {
         }
 
         &:after {
-            border-#{$start}-color: $workflow-ordered-step-background-color;
+            border-left-color: $workflow-ordered-step-background-color;
         }
 
         ~ .workflow-ordered-steps {
@@ -254,7 +254,7 @@ table.grid {
             }
 
             &:after {
-                border-#{$start}-color: $primary-860;
+                border-left-color: $primary-860;
             }
 
             + .workflow-ordered-steps {
@@ -275,14 +275,14 @@ table.grid {
         }
 
         &:after {
-            border-#{$start}-color: $workflow-not-started-steps-background-color;
+            border-left-color: $workflow-not-started-steps-background-color;
         }
     }
 }
 
 .workflow-step-name {
     display: block;
-    padding: side-values(0 10px 0 20px);
+    padding: 0 10px 0 20px;
     max-width: 100%;
     line-height: $workflow-widget-row-height;
     text-align: center;
@@ -310,8 +310,8 @@ table.grid {
 
 .workflow-controls {
     width: 2%;
-    padding: side-values(0 0 0 10px);
-    text-align: $end;
+    padding: 0 0 0 10px;
+    text-align: right;
     .workflow-transition-buttons {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -320,8 +320,8 @@ table.grid {
 }
 
 .workflow-translatable-field {
-    padding-#{$start}: 5px;
-    padding-#{$end}: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
 
     a {
         color: $workflow-translatable-field-color;

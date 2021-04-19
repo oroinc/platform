@@ -10,7 +10,7 @@
             height: auto;
             min-width: initial;
             padding: $multi-currency-editor-single-add-on-inner-offset;
-            margin-#{$start}: -$multi-currency-editor-single-border-width;
+            margin-left: -$multi-currency-editor-single-border-width;
 
             border: $multi-currency-editor-single-border;
             background-color: $multi-currency-editor-single-color;
@@ -38,14 +38,14 @@
 
         .select2-container-active {
             &:after {
-                #{$start}: $multi-currency-editor-multi-choice-offset;
+                left: $multi-currency-editor-multi-choice-offset;
             }
         }
     }
 
     .inline-editor__fields {
         input[type="text"] {
-            text-align: #{$end};
+            text-align: right;
         }
     }
 
@@ -58,14 +58,14 @@
     }
 
     .select2-container {
-        margin-#{$start}: -$input-border-width;
+        margin-left: -$input-border-width;
     }
 
     .select2-container-active {
         z-index: $multi-currency-editor-multi-choice-active-z-index;
 
         &:before {
-            #{$start}: -$input-border-width;
+            left: -$input-border-width;
         }
     }
 }

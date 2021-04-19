@@ -19,14 +19,14 @@
 form.change-password-form {
     .controls {
         position: relative;
-        padding-#{$end}: $content-padding;
+        padding-right: $content-padding;
     }
 
     span.fa-eye-slash,
     span.fa-eye {
         position: absolute;
         top: 7px;
-        #{$start}: $field-width + 12px;
+        left: $field-width + 12px;
     }
 
     .validation-failed {
@@ -48,7 +48,7 @@ form.change-password-form {
 
         span.fa-eye-slash,
         span.fa-eye {
-            #{$start}: calc(100% - 12px);
+            left: calc(100% - 12px);
         }
     }
 }
@@ -58,7 +58,7 @@ form.change-password-form {
         &.control-group-oro_user_emailsettings,
         &.control-group-oro_imap_configuration {
             > .controls {
-                margin-#{$start}: 0;
+                margin-left: 0;
             }
         }
     }

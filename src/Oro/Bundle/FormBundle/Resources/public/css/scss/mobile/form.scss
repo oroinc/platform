@@ -24,7 +24,7 @@ fieldset .span6 {
 
     .float-holder {
         width: calc(100% - 44px);
-        margin-#{$end}: $content-padding-small;
+        margin-right: $content-padding-small;
     }
 
     input[type="text"]:not(.precision, .conversionRate),

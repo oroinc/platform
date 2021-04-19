@@ -59,6 +59,7 @@
 	top: -154px;
 }
 
+/*rtl:begin:ignore*/
 .minicolors-position-right .minicolors-panel {
 	right: 0;
 }
@@ -70,7 +71,7 @@
 .minicolors-position-left .minicolors-panel {
 	left: 0;
 }
-
+/*rtl:end:ignore*/
 .minicolors-with-opacity .minicolors-panel {
 	width: 194px;
 }

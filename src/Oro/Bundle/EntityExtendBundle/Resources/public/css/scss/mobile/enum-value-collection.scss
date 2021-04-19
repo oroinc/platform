@@ -8,12 +8,12 @@
     }
 
     .oro-item-collection > div {
-        margin-#{$end}: $tooltip-icon-container-mobile-size;
+        margin-right: $tooltip-icon-container-mobile-size;
     }
 
     .removeRow,
     .tooltip-icon-container {
-        #{$end}: -$tooltip-icon-container-mobile-size;
+        right: -$tooltip-icon-container-mobile-size;
     }
 
     .tooltip-icon-container {
@@ -26,6 +26,6 @@
     }
 
     &__clear-default {
-        #{$end}: $tooltip-icon-container-mobile-size;
+        right: $tooltip-icon-container-mobile-size;
     }
 }

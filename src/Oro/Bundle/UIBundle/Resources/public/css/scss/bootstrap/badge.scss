@@ -6,7 +6,7 @@
     [class^="icon-status-"],
     [class*=" icon-status-"] {
         font-size: $badge-icon-height;
-        margin-#{$end}: $badge-icon-offset;
+        margin-right: $badge-icon-offset;
     }
 }
 

@@ -34,7 +34,7 @@
     }
 
     &__label {
-        padding: side-values(14px 8px 10px);
+        padding: 14px 8px 10px;
 
         color: $dashboard-launchpad-label-color;
         text-align: center;
@@ -83,7 +83,7 @@
 
         text-align: center;
 
-        float: #{$start};
+        float: left;
         vertical-align: top;
     }
 
@@ -115,7 +115,7 @@
     }
 
     &__list {
-        margin-#{$start}: $quick-launchpad-item-start-padding + $quick-launchpad-item-title-width;
+        margin-left: $quick-launchpad-item-start-padding + $quick-launchpad-item-title-width;
         margin-bottom: 0;
         list-style: none;
     }
@@ -138,14 +138,14 @@
     .launchpad-second-column {
         @include clearfix();
 
-        float: #{$start};
+        float: left;
         width: 50%;
     }
 
     .launchpad-first-column {
         > .launchpad-widget-content {
-            float: #{$end};
-            clear: #{$end};
+            float: right;
+            clear: right;
         }
     }
 }

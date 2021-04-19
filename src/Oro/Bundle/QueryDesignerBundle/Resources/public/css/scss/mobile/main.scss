@@ -20,7 +20,7 @@
             .condition-container {
                 width: 100%;
                 min-height: $condition-container-min-height;
-                margin-#{$start}: 0;
+                margin-left: 0;
                 margin-top: $condition-builder-condition-container-margin-start;
 
                 .drag-n-drop-hint {

@@ -2,9 +2,9 @@
 
 .oro_attachment_file {
     margin-top: $attachment-file-offset-top;
-    padding: side-values($attachment-file-inner-offset);
+    padding: $attachment-file-inner-offset;
     line-height: 1.3;
-    text-align: #{$start};
+    text-align: left;
 
     @include text-line-truncate($attachment-section-width);
 
@@ -13,7 +13,7 @@
     }
 
     .delete {
-        float: $end;
+        float: right;
         margin-top: -4px;
         line-height: 20px;
 
@@ -28,7 +28,7 @@
 
     [class^="fa-"],
     [class*="fa-"] {
-        margin-#{$end}: $attachment-offset-global;
+        margin-right: $attachment-offset-global;
     }
 }
 
@@ -106,7 +106,7 @@
 
     &__icon {
         font-size: $attachment-item-icon-size;
-        margin-#{$end}: $attachment-item-fa-right;
+        margin-right: $attachment-item-fa-right;
     }
 
     &__filename {
@@ -118,7 +118,7 @@
     }
 
     &__file-size {
-        margin-#{$start}: $attachment-offset-global;
+        margin-left: $attachment-offset-global;
         white-space: nowrap;
     }
 
@@ -132,7 +132,7 @@
         top: $attachment-item-remove-top;
         width: $attachment-item-icon-size;
         height: $attachment-item-icon-size;
-        margin-#{$start}: $attachment-offset-global;
+        margin-left: $attachment-offset-global;
 
         align-self: normal;
     }

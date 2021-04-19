@@ -31,7 +31,7 @@ body {
     visibility: hidden;
     position: absolute;
     top: -9999px;
-    #{$start}: -9999px;
+    left: -9999px;
 }
 
 .scrollspy.container-fluid,
@@ -75,29 +75,29 @@ body {
                 margin-bottom: 0;
 
                 &:not(:only-child) {
-                    float: #{$start};
+                    float: left;
                     width: 50%;
                 }
 
                 &:first-child {
-                    padding-#{$start}: $content-padding;
-                    padding-#{$end}: 24px;
+                    padding-left: $content-padding;
+                    padding-right: 24px;
                 }
 
                 &:last-child {
-                    padding-#{$start}: 24px;
-                    padding-#{$end}: 0;
+                    padding-left: 24px;
+                    padding-right: 0;
                 }
 
                 &:only-child {
-                    padding-#{$start}: $content-padding;
+                    padding-left: $content-padding;
                 }
 
                 .inner-grid {
-                    margin-#{$start}: -$content-padding;
+                    margin-left: -$content-padding;
 
                     .grid-views {
-                        margin-#{$start}: $content-padding;
+                        margin-left: $content-padding;
                     }
                 }
             }
@@ -147,8 +147,8 @@ body {
             margin-bottom: 0;
 
             .container-fluid {
-                padding-#{$start}: $content-padding;
-                padding-#{$end}: $content-padding;
+                padding-left: $content-padding;
+                padding-right: $content-padding;
             }
         }
     }
@@ -162,8 +162,8 @@ body {
         }
 
         .container-fluid {
-            padding-#{$start}: 0;
-            padding-#{$end}: 0;
+            padding-left: 0;
+            padding-right: 0;
         }
     }
 }
@@ -176,34 +176,34 @@ body {
 
     // Update offset on pages with sidebar
     > .sidebar-container .category-data {
-        padding-#{$start}: $content-padding;
+        padding-left: $content-padding;
     }
 
     //  Update offset on view pages
     .layout-content .scrollspy-main-container > .scrollable-container {
-        margin-#{$start}: -$content-padding;
-        margin-#{$end}: -$content-padding;
-        padding-#{$start}: $content-padding;
-        padding-#{$end}: $content-padding;
+        margin-left: -$content-padding;
+        margin-right: -$content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
     }
 }
 
 //  Update offset on create / update pages
 form > .layout-content {
-    padding-#{$start}: $content-padding;
-    padding-#{$end}: $content-padding;
+    padding-left: $content-padding;
+    padding-right: $content-padding;
 
     .scrollspy-main-container > .scrollable-container {
-        margin-#{$start}: -$content-padding;
-        margin-#{$end}: -$content-padding;
-        padding-#{$start}: $content-padding;
-        padding-#{$end}: $content-padding;
+        margin-left: -$content-padding;
+        margin-right: -$content-padding;
+        padding-left: $content-padding;
+        padding-right: $content-padding;
     }
 }
 
 .page-title + [data-bound-component*="datagrid"] {
-    padding-#{$start}: $content-padding;
-    padding-#{$end}: $content-padding;
+    padding-left: $content-padding;
+    padding-right: $content-padding;
 }
 
 .oro-page {
@@ -275,7 +275,7 @@ form > .layout-content {
                     margin-bottom: 0;
 
                     &:not(:only-child) {
-                        float: #{$start};
+                        float: left;
                         width: 50%;
                     }
 
@@ -294,10 +294,10 @@ form > .layout-content {
                     }
 
                     .inner-grid {
-                        margin-#{$start}: -$content-padding;
+                        margin-left: -$content-padding;
 
                         .grid-views {
-                            margin-#{$start}: $content-padding;
+                            margin-left: $content-padding;
                         }
                     }
                 }

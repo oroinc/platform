@@ -40,7 +40,7 @@
                 display: $select2-search-choice-close-allow-display;
             }
             .select2-chosen {
-                padding-#{$end}: $select2-chosen-end-offset + $select2-search-choice-close-right;
+                padding-right: $select2-chosen-end-offset + $select2-search-choice-close-right;
             }
         }
 
@@ -116,13 +116,13 @@
     }
 
     &-chosen {
-        padding: side-values($select2-chosen-inner-offset);
+        padding: $select2-chosen-inner-offset;
         height: $select2-chosen-height;
 
         & > i[class^="fa-"] {
             height: $select2-chosen-icon-height;
             margin-top: $select2-chosen-icon-offset-left;
-            margin-#{$end}: $select2-result-label-icon-offset;
+            margin-right: $select2-result-label-icon-offset;
             vertical-align: $select2-chosen-icon-vertical-align;
         }
 
@@ -138,7 +138,7 @@
         height: $select2-search-choice-close-height;
         display: $select2-search-choice-close-display;
         position: $select2-search-choice-close-position;
-        #{$end}: $select2-search-choice-close-right;
+        right: $select2-search-choice-close-right;
         top: $select2-search-choice-close-top;
         font-size: $select2-search-choice-close-font-size;
         text-decoration: $select2-search-choice-close-text-decoration;
@@ -164,7 +164,7 @@
     &-arrow {
         display: $select2-search-choice-arrow-display;
         position: $select2-search-choice-arrow-position;
-        #{$end}: $select2-search-choice-arrow-right;
+        right: $select2-search-choice-arrow-right;
         top: $select2-search-choice-arrow-top;
         font-size: $select2-search-choice-arrow-font-size;
         font-family: $select2-search-choice-arrow-font-family;
@@ -192,8 +192,8 @@
 
         .select2-choices {
             list-style: $select2-search-multi-choices-list-style;
-            margin: side-values($select2-search-multi-choices-offset);
-            padding: side-values($select2-search-multi-choices-inner-offset);
+            margin: $select2-search-multi-choices-offset;
+            padding: $select2-search-multi-choices-inner-offset;
             height: $select2-search-multi-choices-height;
             overflow: $select2-search-multi-choices-overflow;
 
@@ -216,22 +216,20 @@
 
                 > div {
                     background: $select2-search-choice-background;
-                    padding: side-values(
+                    padding:
                         $select2-search-choice-inner-offset-vertical
                         $select2-search-choice-inner-offset-horizontal-unlocked
                         $select2-search-choice-inner-offset-vertical
-                        $select2-search-choice-inner-offset-horizontal
-                    );
+                        $select2-search-choice-inner-offset-horizontal;
                     border-radius: $select2-search-choice-border-radius;
-                    margin: side-values(0 $select2-search-choice-offset $select2-search-choice-offset 0);
+                    margin: 0 $select2-search-choice-offset $select2-search-choice-offset 0;
                 }
 
                 &.select2-locked {
                     > div {
-                        padding: side-values(
+                        padding:
                             $select2-search-choice-inner-offset-vertical
-                            $select2-search-choice-inner-offset-horizontal
-                        );
+                            $select2-search-choice-inner-offset-horizontal;
                     }
                 }
 
@@ -248,7 +246,7 @@
                 margin: $select2-search-field-offset;
                 padding: $select2-search-field-inner-offset;
                 white-space: $select2-search-field-white-space;
-                float: #{$start};
+                float: left;
 
                 input,
                 .select2-input {
@@ -280,7 +278,7 @@
             align-items: $select2-search-multi-choice-close-align-items;
             width: $select2-search-multi-choice-close-width;
             height: $select2-search-multi-choice-close-height;
-            #{$end}: $select2-search-multi-choice-close-right;
+            right: $select2-search-multi-choice-close-right;
             top: $select2-search-multi-choice-close-top;
 
             &:hover {
@@ -305,7 +303,7 @@
         white-space: $select2-search-white-space;
 
         .select2-input {
-            padding-#{$start}: $select2-search-field-input-inner-offset-start;
+            padding-left: $select2-search-field-input-inner-offset-start;
         }
     }
 
@@ -450,7 +448,7 @@
                 vertical-align: $select2-chosen-icon-vertical-align;
                 min-width: $select2-result-label-icon-size;
                 height: $select2-result-label-icon-size;
-                margin-#{$end}: $select2-result-label-icon-offset;
+                margin-right: $select2-result-label-icon-offset;
 
                 line-height: 0;
 
@@ -549,9 +547,9 @@
 
     &-result-label {
         &-icon {
-            float: #{$start};
+            float: left;
             width: $select2-result-label-title-offset;
-            margin-#{$end}: -$select2-result-label-title-offset;
+            margin-right: -$select2-result-label-title-offset;
 
             img {
                 vertical-align: text-top;
@@ -570,7 +568,7 @@
 
         &-icon + &-title {
             display: block;
-            margin-#{$start}: $select2-result-label-title-offset;
+            margin-left: $select2-result-label-title-offset;
         }
     }
 }
@@ -665,7 +663,7 @@
             }
 
             .select2-search-choice-close {
-                #{$end}: 3px;
+                right: 3px;
                 top: 1px;
 
                 @include fa-icon($select2-tree-autocomplete-choice-item-close-icon, before, true) {
@@ -681,4 +679,3 @@
         }
     }
 }
-

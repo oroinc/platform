@@ -36,8 +36,8 @@
     font-weight: bold;
     text-align: center;
 
-    border-top-#{$start}-radius: $oro-datagrid-radius;
-    border-top-#{$end}-radius: $oro-datagrid-radius;
+    border-top-left-radius: $oro-datagrid-radius;
+    border-top-right-radius: $oro-datagrid-radius;
 }
 
 &.with-floating-header {
@@ -47,8 +47,8 @@
         &:after {
             position: absolute;
             top: 100%;
-            #{$end}: 0;
-            #{$start}: 0;
+            right: 0;
+            left: 0;
             z-index: 2;
 
             height: 20px;
@@ -72,12 +72,12 @@
 .board-column {
     /* these items should have same min-width and margins */
     min-width: $oro-datagrid-board-column-width;
-    margin-#{$start}: $oro-datagrid-board-column-offset;
+    margin-left: $oro-datagrid-board-column-offset;
 
     background-color: $oro-datagrid-board-column-header-background-color;
 
     &:first-child {
-        margin-#{$start}: 0;
+        margin-left: 0;
     }
 }
 

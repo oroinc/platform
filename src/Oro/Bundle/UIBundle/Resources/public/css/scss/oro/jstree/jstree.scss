@@ -9,7 +9,7 @@
     .jstree-node {
         position: $jstree-default-node-position;
         background: $jstree-default-node-background;
-        margin: side-values(0 0 0 $jstree-default-node-offset-left);
+        margin: 0 0 0 $jstree-default-node-offset-left;
     }
 
     > .jstree-container-ul > .jstree-node {
@@ -41,6 +41,10 @@
 
     .jstree-closed > .jstree-ocl:before {
         content: $jstree-closed-jocl-content;
+
+        [dir="rtl"] & {
+            content: $jstree-closed-jocl-content-rtl;
+        }
     }
 
     .jstree-icon,
@@ -116,9 +120,9 @@
         &:before {
             position: $jstree-icon-checkbox-icon-position;
             top: $jstree-icon-checkbox-icon-top;
-            #{$start}: $jstree-icon-checkbox-icon-left;
+            left: $jstree-icon-checkbox-icon-left;
             transform: $jstree-icon-checkbox-icon-transform;
-            margin-#{$start}: $jstree-icon-checkbox-icon-offset-left;
+            margin-left: $jstree-icon-checkbox-icon-offset-left;
             font-size: $jstree-icon-checkbox-icon-font-size;
             line-height: $jstree-icon-checkbox-icon-line-height;
             font-family: $jstree-icon-checkbox-icon-font-family;
@@ -172,7 +176,7 @@
         position: $jstree-search-component-clear-icon-position;
         margin-top: $jstree-search-component-clear-offset-top;
         top: $jstree-search-component-clear-icon-top;
-        #{$end}: $jstree-search-component-clear-icon-right;
+        right: $jstree-search-component-clear-icon-right;
         font-size: $jstree-search-component-clear-icon-font-size;
         color: $jstree-search-component-clear-icon-color;
         cursor: $jstree-search-component-clear-icon-cursor;

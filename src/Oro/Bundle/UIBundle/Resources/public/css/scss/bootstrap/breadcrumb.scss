@@ -7,18 +7,18 @@
     color: $breadcrumb-color;
 
     + .breadcrumb-item {
-        @include if-rtl() {
-            padding-left: 0;
-        }
+    /*rtl:raw:
+        padding-left: 0;
+    */
 
-        padding-#{$start}: $breadcrumb-item-padding;
+        padding-left: $breadcrumb-item-padding;
 
         &::before {
-            @include if-rtl() {
-                padding-right: 0;
-            }
+        /*rtl:raw:
+            padding-right: 0;
+        */
 
-            padding-#{$end}: $breadcrumb-item-padding;
+            padding-right: $breadcrumb-item-padding;
         }
     }
 }

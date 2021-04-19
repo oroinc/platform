@@ -14,7 +14,7 @@
         visibility: $filter-box-criteria-visibility;
         z-index: $filter-box-criteria-z-index;
         margin-top: $filter-box-criteria-offset-top;
-        margin-#{$start}: $filter-box-criteria-offset-left;
+        margin-left: $filter-box-criteria-offset-left;
         top: $filter-box-criteria-top;
 
         &.criteria-visible {
@@ -51,13 +51,13 @@
 
             .dropdown-toggle {
                 padding: $selector-uniform-inner-offset;
-                text-align: #{$start};
+                text-align: left;
                 width: 100%;
                 font-size: $selector-uniform-font-size;
 
                 &:after {
                     position: $selector-uniform-arrow-position;
-                    #{$end}: $number-range-filter-field-caret-end;
+                    right: $number-range-filter-field-caret-end;
                     top: $number-range-filter-field-caret-top;
                     margin-top: $number-range-filter-field-caret-margin;
                 }
@@ -454,13 +454,13 @@
         width: 100%;
         text-align: $filters-state-page-title-center-text-align;
         height: $filters-state-page-title-center-height;
-        padding: side-values(0 0 0 10px);
+        padding: 0 0 0 10px;
     }
 
     .center-under-left & {
         width: auto;
         max-width: 100%;
-        padding-#{$start}: 0;
+        padding-left: 0;
     }
 }
 
@@ -557,14 +557,14 @@
 
             .clear-search {
                 position: absolute;
-                #{$end}: 8px;
+                right: 8px;
                 top: 8px;
 
                 border-radius: 0;
             }
 
             .input-with-search {
-                padding-#{$end}: $btn-icon-width;
+                padding-right: $btn-icon-width;
             }
 
             .ui-helper-reset {

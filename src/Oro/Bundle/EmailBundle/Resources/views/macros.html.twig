@@ -240,10 +240,10 @@
     {% set label = label|oro_html_strip_tags|default(emailAddressName|default('N/A')) %}
     {% set route = oro_entity_route(emailAddress.owner.class) %}
     {% if route is not null %}
-        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}" dir="ltr">
             {{ label }}</a>
     {% else %}
-        {{ label }}
+        <bdo dir="ltr">{{ label }}</bdo>
     {% endif %}
 {%- endmacro -%}
 
@@ -535,7 +535,7 @@
         {% if emailAddressName == '' and emailAddress == '' %}
             {% set recipientName = '' %}
         {% else %}
-            {% set recipientName = emailAddressName ~ " &lt;" ~ emailAddress ~ "&gt;" %}
+            {% set recipientName = emailAddressName ~ ' <bdo dir="ltr">&lt;' ~ emailAddress ~ '&gt;</bdo>' %}
         {% endif %}
         {% if recipient.type == 'to' %}
             {% set recipientsTo = recipientsTo|merge([recipientName])%}
@@ -546,7 +546,7 @@
         {% endif %}
     {% endfor %}
     {% set fromUserName = oro_get_email_address_name(email.fromName)|oro_html_strip_tags %}
-    {% set fromEmailAddress = '&lt;' ~ oro_get_email_address(email.fromName)|oro_html_strip_tags ~ '&gt;' %}
+    {% set fromEmailAddress = '<bdo dir="ltr">&lt;' ~ oro_get_email_address(email.fromName)|oro_html_strip_tags ~ '&gt;</bdo>' %}
     {% set data = [{
             label: 'From'|trans,
             value: fromUserName ? '<b>' ~ fromUserName ~ '</b> ' ~ fromEmailAddress : '<b>' ~ fromEmailAddress ~ '</b>' ,
