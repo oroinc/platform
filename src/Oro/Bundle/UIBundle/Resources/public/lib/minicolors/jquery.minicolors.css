@@ -3,11 +3,11 @@
 }
 
 .minicolors-sprite {
-	background-image: url(jquery.minicolors.png);
+	background-image: url('~bundles/oroui/lib/minicolors/jquery.minicolors.png');
 }
 
 .minicolors-no-data-uris .minicolors-sprite {
-	background-image: url(jquery.minicolors.png);
+	background-image: url('~bundles/oroui/lib/minicolors/jquery.minicolors.png');
 }
 
 .minicolors-swatch {

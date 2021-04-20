@@ -1,11 +1,8 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/oro/variables";
-
 .mce-object {
     border: 1px dotted $primary-100;
-    background: url(img/object.gif) no-repeat center $primary-800;
+    background: url('#{$global-url}/oroform/css/scss/tinymce/img/object.gif') no-repeat center $primary-800;
 }
 
 .mce-pagebreak {
@@ -26,7 +23,7 @@
     width: 9px !important;
     height: 9px !important;
     border: 1px dotted $primary-100;
-    background: url(img/anchor.gif) no-repeat center $primary-800
+    background: url('#{$global-url}/oroform/css/scss/tinymce/img/anchor.gif') no-repeat center $primary-800
 }
 
 .mce-nbsp {

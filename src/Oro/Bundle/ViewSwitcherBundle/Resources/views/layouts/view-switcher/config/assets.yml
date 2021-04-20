@@ -1,5 +1,11 @@
 styles:
     inputs:
-        - "~slick-carousel/slick/slick.scss"
-        - "bundles/oroviewswitcher/view-switcher/scss/styles.scss"
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
+
+        # Styles
+        - '~slick-carousel/slick/slick.scss'
+        - 'bundles/oroui/css/scss/oro/loading/loading-bar.scss'
+        - 'bundles/oroviewswitcher/view-switcher/scss/font-awesome.scss'
+        - 'bundles/oroviewswitcher/view-switcher/scss/styles.scss'
     output: 'css/view-switcher.css'

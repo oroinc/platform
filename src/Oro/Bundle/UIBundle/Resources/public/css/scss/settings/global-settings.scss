@@ -1,0 +1,9 @@
+/* @theme: admin.oro; */
+
+$global-url: '~bundles' !default;
+
+@import "font-awesome";
+@import "../mixins";
+@import "../colors";
+@import "../variables";
+@import "../oro/variables/variables";

@@ -147,7 +147,7 @@ fieldset:disabled a.btn {
 
     &:after {
         content: '';
-        background: transparent url(../../../img/loader-16.gif) no-repeat center left;
+        background: transparent url('#{$global-url}/oroui/img/loader-16.gif') no-repeat center left;
         position: absolute;
         width: 12px;
         height: 12px;

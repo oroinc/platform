@@ -470,7 +470,7 @@ input[type='number'] {
         bottom: 0;
         left: 0;
         right: 0;
-        background: url(../../../orodatagrid/images/preloader.gif) repeat;
+        background: url('#{$global-url}/oroui/img/preloader.gif') repeat;
     }
 }
 

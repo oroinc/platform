@@ -164,7 +164,7 @@
 
 .modal-body {
     .loading-content {
-        background: #fff url(../../img/loader.gif) no-repeat center left;
+        background: #fff url('#{$global-url}/oroemail/img/loader.gif') no-repeat center left;
         padding-left: 30px;
     }
 }

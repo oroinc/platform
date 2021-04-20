@@ -26,13 +26,13 @@ $enable-safe-area: true;
 }
 
 @mixin cursor-grab() {
-    cursor: url(../../../oroui/img/cursor/grab.cur), move;
+    cursor: url('#{$global-url}/oroui/img/cursor/grab.cur'), move;
     cursor: -webkit-grab;
     cursor: -moz-grab;
 }
 
 @mixin cursor-grabbing() {
-    cursor: url(../../../oroui/img/cursor/grabbing.cur), move;
+    cursor: url('#{$global-url}/oroui/img/cursor/grabbing.cur'), move;
     cursor: -webkit-grabbing;
     cursor: -moz-grabbing;
 }
@@ -105,7 +105,7 @@ $enable-safe-area: true;
     }
 }
 
-@mixin process($loadingImagePath: '../../img/loader-16.gif') {
+@mixin process($loadingImagePath: '#{$global-url}/oroui/img/loader-16.gif') {
     position: relative;
 
     &:after {

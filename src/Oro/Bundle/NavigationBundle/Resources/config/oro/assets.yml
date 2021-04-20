@@ -1,3 +1,7 @@
 css:
     inputs:
-      - 'bundles/oronavigation/css/scss/main.scss'
+        # Variables
+        - 'bundles/oronavigation/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oronavigation/css/scss/main.scss'

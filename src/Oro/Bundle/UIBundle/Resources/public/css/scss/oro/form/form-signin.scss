@@ -2,7 +2,7 @@
 
 /* Login + Forgot Password */
 .login-page {
-    background: url(../../img/background.jpg) no-repeat 50% 50% #fff;
+    background: url('#{$global-url}/oroui/img/background.jpg') no-repeat 50% 50% #fff;
     background-size: cover;
     height: 100%;
     min-height: 280px;
@@ -87,7 +87,7 @@
 
         .divider-vertical {
             float: left;
-            background: url(../../img/vertical-divider.png) no-repeat;
+            background: url('#{$global-url}/oroui/img/vertical-divider.png') no-repeat;
             width: 2px;
             height: 28px;
             margin: 0 10px 0;

@@ -109,7 +109,7 @@ $table-user-state-font-size: 14px !default;
 $table-user-state-inner-offset: 0 15px !default;
 $table-user-state-color: $primary-300 !default;
 
-$table-open-row-background: url(../../img/bg-opener-grid.png) no-repeat !default;
+$table-open-row-background: url('#{$global-url}/oroui/img/bg-opener-grid.png') no-repeat !default;
 $table-open-row-width: 13px !default;
 $table-open-row-height: 13px !default;
 $table-open-row-text-indent: -9999px !default;

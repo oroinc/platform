@@ -1,10 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/variables";
-@import "oroui/css/scss/mixins";
-@import "oroui/css/scss/oro/variables/select2-variables";
-@import "orodatagrid/css/scss/variables/grid-variables";
-
 $tag-selector-min-width: 100px !default;
 $tag-selector-items-width: 100% !important;
 $tag-selector-item-font-size: $base-font-size--s !default;
