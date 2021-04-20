@@ -18,7 +18,7 @@ The current file describes significant changes in the code that may affect the u
 [Show detailed list of changes](incompatibilities-5-0-alpha-1.md)
 
 ### Added
-* Added support for Right To Left UI design see more [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html). 
+* Added support for Right To Left UI design; see more in the [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support/) topic. 
 
 ### Changed
 
