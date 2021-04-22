@@ -23,7 +23,7 @@ The current file describes significant changes in the code that may affect the u
 ### Removed
 
 #### UIBundle
-* Separate styles build for third-party libraries with RTL support is removed for back-office themes. Now, RTL styles are build in a same way as it is done for Layout Themes. See [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support/#configure-theme) 
+* A separate styles build for third-party libraries with RTL support was removed for back-office themes. Now, RTL styles are build the same way as for Layout Themes. See [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support/#configure-theme) 
 
 ## 5.0.0-alpha.1 (2021-03-31)
 [Show detailed list of changes](incompatibilities-5-0-alpha-1.md)
