@@ -87,7 +87,13 @@ define([
                     }
                 }
             }
-            mediator.execute('redirectTo', {url: url}, options);
+
+            const {attributes = {}} = this.launcherOptions;
+            if (!attributes.target) {
+                mediator.execute('redirectTo', {url: url}, options);
+            } else {
+                window.open(url, attributes.target);
+            }
         },
 
         /**
