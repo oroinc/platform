@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -96,6 +97,16 @@ class FormHelper
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $entityConfig
     ) {
+        $metaProperties = $entityMetadata->getMetaProperties();
+        foreach ($metaProperties as $name => $metaProperty) {
+            if (!$metaProperty->isInput()) {
+                continue;
+            }
+            if (ConfigUtil::CLASS_NAME === ($metaProperty->getPropertyPath() ?? $name)) {
+                continue;
+            }
+            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $metaProperty);
+        }
         $fields = $entityMetadata->getFields();
         foreach ($fields as $name => $field) {
             if (!$field->isInput()) {

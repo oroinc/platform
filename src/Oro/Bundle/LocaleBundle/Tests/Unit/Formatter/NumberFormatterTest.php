@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
+use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 /**
+ * Please note that this test should check only our logic,
+ * DO NOT use IntlNumberFormatter directly to prevent problems with different libicu versions
+ *
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -313,10 +317,20 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ->with($currencyCode, $locale)
             ->willReturn($currencySymbol);
 
-        $this->intlNumberFormatterFactory = new IntlNumberFormatterFactory($this->localeSettings);
-        $numberFormatter = new NumberFormatter($this->localeSettings, $this->intlNumberFormatterFactory);
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('formatCurrency')
+            ->with($value, $currencyCode)
+            ->willReturn($formattedValue);
 
-        $currency = $numberFormatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
+        $this->intlNumberFormatterFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
         $this->assertEquals($formattedValue, $currency);
     }
 
@@ -334,6 +348,76 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
                 'formattedValue' => 'ADP 1',
                 'attributes' => [],
             ],
+            'Andorran Peseta(ADP) with decimal part and fixed fraction digits' => [
+                'locale' => 'fr_FR',
+                'currencyCode' => 'ADP',
+                'currencySymbol' => '',
+                'value' => 9.9999,
+                'formattedValue' => '10,000 ADP',
+                'attributes' => [IntlNumberFormatter::MIN_FRACTION_DIGITS => 3],
+            ],
+        ];
+    }
+
+
+    /**
+     * @param string $locale
+     * @param string $currencyCode
+     * @param string $currencySymbol
+     * @param float $value
+     * @param string $formattedValue
+     * @param array $attributes
+     * @param int $minFractionDigits
+     *
+     * @dataProvider dataProviderFormatCurrencyWithFractionDigits
+     */
+    public function testFormatCurrencyWithFractionDigits(
+        string $locale,
+        string $currencyCode,
+        string $currencySymbol,
+        float $value,
+        string $formattedValue,
+        array $attributes,
+        int $minFractionDigits = 0
+    ): void {
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getCurrencySymbolByCurrency')
+            ->with($currencyCode, $locale)
+            ->willReturn($currencySymbol);
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('formatCurrency')
+            ->with($value, $currencyCode)
+            ->willReturn($formattedValue);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('getAttribute')
+            ->with(\NumberFormatter::MIN_FRACTION_DIGITS)
+            ->willReturn($minFractionDigits);
+        $intlNumberFormatter
+            ->expects($this->exactly(2))
+            ->method('setAttribute')
+            ->withConsecutive(
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, BigDecimal::of($value)->getScale()],
+                [IntlNumberFormatter::MIN_FRACTION_DIGITS, $minFractionDigits]
+            );
+
+        $this->intlNumberFormatterFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, $attributes, [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $currency = $this->formatter->formatCurrency($value, $currencyCode, $attributes, [], [], $locale);
+        $this->assertEquals($formattedValue, $currency);
+    }
+
+    public function dataProviderFormatCurrencyWithFractionDigits(): array
+    {
+        return [
             'Andorran Peseta(ADP) without scientific notation value' => [
                 'locale' => 'en_US',
                 'currencyCode' => 'ADP',
@@ -350,14 +434,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
                 'formattedValue' => 'ADP 9.9999',
                 'attributes' => [],
             ],
-            'Andorran Peseta(ADP) with decimal part and fixed fraction digits' => [
-                'locale' => 'fr_FR',
-                'currencyCode' => 'ADP',
-                'currencySymbol' => '',
-                'value' => 9.9999,
-                'formattedValue' => '10,000 ADP',
-                'attributes' => [IntlNumberFormatter::MIN_FRACTION_DIGITS => 3],
-            ],
             'US Dollar with decimal part' => [
                 'locale' => 'en_US',
                 'currencyCode' => 'USD',
@@ -365,6 +441,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
                 'value' => 9.9999,
                 'formattedValue' => '$9.9999',
                 'attributes' => [],
+                'minFractionDigits' => 2
             ]
         ];
     }
