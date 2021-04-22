@@ -1,4 +1,4 @@
-define(['jquery'], function($) {
+define(['jquery', 'lightgallery'], function($) {
     'use strict';
 
     const defaults = {

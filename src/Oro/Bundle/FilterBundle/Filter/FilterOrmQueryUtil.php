@@ -28,16 +28,13 @@ class FilterOrmQueryUtil
         string $filterName
     ): array {
         QueryBuilderUtil::checkField($fieldExpr);
-        $groupBy = implode(', ', self::getSelectFieldFromGroupBy($ds->getQueryBuilder()));
         $subQuery
             ->resetDQLPart('orderBy')
+            ->resetDQLPart('groupBy')
             ->select($fieldExpr)
             ->andWhere(sprintf('%1$s = %1$s', $fieldExpr));
 
-        if ($groupBy) {
-            // replace aliases from SELECT by expressions, since SELECT clause is changed, add current field
-            $subQuery->groupBy(sprintf('%s, %s', $groupBy, $fieldExpr));
-        }
+        self::processSubQueryExpressionGroupBy($ds, $subQuery, $fieldExpr);
         [$dql, $replacements] = self::createDqlWithReplacedAliases($ds, $subQuery, $filterName);
         [$fieldAlias, $field] = explode('.', $fieldExpr);
         $replacedFieldExpr = sprintf('%s.%s', $replacements[$fieldAlias], $field);
@@ -46,6 +43,23 @@ class FilterOrmQueryUtil
         $dql = strtr($dql, [$oldExpr => $newExpr]);
 
         return [$dql, $subQuery->getParameters()];
+    }
+
+    public static function containGroupByFunctionAndHaving(
+        OrmFilterDatasourceAdapter $ds
+    ): bool {
+        $qb = $ds->getQueryBuilder();
+        if (!$qb->getDQLPart('having')) {
+            return false;
+        }
+
+        foreach (self::getSelectFieldFromGroupBy($qb) as $groupByField) {
+            if (strpos($groupByField, '(') !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -170,5 +184,24 @@ class FilterOrmQueryUtil
         }
 
         return $expressions;
+    }
+
+    /**
+     * @param OrmFilterDatasourceAdapter $ds
+     * @param QueryBuilder $subQuery
+     * @param string $fieldExpr
+     */
+    private static function processSubQueryExpressionGroupBy(
+        OrmFilterDatasourceAdapter $ds,
+        QueryBuilder $subQuery,
+        string $fieldExpr
+    ): void {
+        // No need to add group by to sub-query if there is no additional having conditions applied
+        if ($ds->getQueryBuilder()->getDQLPart('having')
+            && $groupByFields = self::getSelectFieldFromGroupBy($ds->getQueryBuilder())
+        ) {
+            $subQuery->addGroupBy(implode(', ', $groupByFields));
+            $subQuery->addGroupBy($fieldExpr);
+        }
     }
 }

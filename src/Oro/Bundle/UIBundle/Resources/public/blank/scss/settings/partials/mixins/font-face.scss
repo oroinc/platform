@@ -29,22 +29,7 @@
         } @else {
             src: url('#{$file-path}.woff') format('woff');
 
-            @warn "The $font-formats argument doesn't exist. Please add needed formats to your custom font
-            Example:
-            $theme-fonts: (
-                'secondary': (
-                    'family': 'Roboto',
-                    'variants': (
-                        (
-                            'path': '#{$global-url}/orofrontend/default/fonts/roboto/roboto-regular-webfont',
-                            'weight': 700,
-                            'style': normal
-                        )
-                    ),
-                    'formats': ('woff', 'woff2')
-                )
-            );
-            ";
+            @warn "The $font-formats argument doesn't exist";
         }
 
         font-weight: $font-weight;
