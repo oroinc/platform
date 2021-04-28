@@ -219,10 +219,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
             . ' u1_.id AS id_2, u1_.name AS name_3'
             . ' FROM product_table p0_'
@@ -239,9 +236,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1'
             . ' FROM user_table u0_'
             . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
@@ -260,6 +255,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -307,10 +303,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
             . ' u1_.id AS id_2, u1_.name AS name_3'
             . ' FROM product_table p0_'
@@ -327,9 +320,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1, g1_.name AS name_2'
             . ' FROM user_table u0_'
             . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
@@ -350,6 +341,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,

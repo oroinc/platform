@@ -173,14 +173,10 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('getEntityConfig');
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->exactly(2))
             ->method('fetch')
-            ->with($this->equalTo('UndefinedClass'))
-            ->will($this->returnValue(false));
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with($this->equalTo('UndefinedClass'))
-            ->will($this->returnValue(true));
+            ->with('UndefinedClass')
+            ->willReturnOnConsecutiveCalls(false, true);
         $this->cache->expects($this->once())
             ->method('save')
             ->with($this->equalTo('UndefinedClass'), $this->equalTo(true));

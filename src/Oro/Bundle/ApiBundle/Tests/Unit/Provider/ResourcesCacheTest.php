@@ -157,30 +157,28 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
             'Test\Entity3' => ['create']
         ];
 
-        $this->cache->expects(self::at(0))
+        $this->cache->expects(self::exactly(3))
             ->method('save')
-            ->with(
-                'resources_1.2rest',
+            ->withConsecutive(
                 [
-                    null,
+                    'resources_1.2rest',
                     [
-                        'Test\Entity1' => [[]],
-                        'Test\Entity2' => [['get', 'get_list']],
-                        'Test\Entity3' => [['create']]
+                        null,
+                        [
+                            'Test\Entity1' => [[]],
+                            'Test\Entity2' => [['get', 'get_list']],
+                            'Test\Entity3' => [['create']]
+                        ]
                     ]
+                ],
+                [
+                    'accessible_1.2rest',
+                    [null, $accessibleResources]
+                ],
+                [
+                    'excluded_actions_1.2rest',
+                    [null, $excludedActions]
                 ]
-            );
-        $this->cache->expects(self::at(1))
-            ->method('save')
-            ->with(
-                'accessible_1.2rest',
-                [null, $accessibleResources]
-            );
-        $this->cache->expects(self::at(2))
-            ->method('save')
-            ->with(
-                'excluded_actions_1.2rest',
-                [null, $excludedActions]
             );
 
         $this->resourcesCache->saveResources(
