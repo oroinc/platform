@@ -2125,13 +2125,10 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         ];
         $actionDocumentation = 'action description';
 
-        $this->resourceDocParser->expects(self::at(0))
+        $this->resourceDocParser->expects(self::exactly(2))
             ->method('registerDocumentationResource')
-            ->with('foo_file.md');
-        $this->resourceDocParser->expects(self::at(1))
-            ->method('registerDocumentationResource')
-            ->with('bar_file.md');
-        $this->resourceDocParser->expects(self::at(2))
+            ->withConsecutive(['foo_file.md'], ['bar_file.md']);
+        $this->resourceDocParser->expects(self::once())
             ->method('getActionDocumentation')
             ->with($entityClass, $targetAction)
             ->willReturn($actionDocumentation);

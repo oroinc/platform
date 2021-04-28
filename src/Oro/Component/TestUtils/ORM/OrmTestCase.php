@@ -11,6 +11,7 @@ use Oro\Component\Testing\TempDirExtension;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
+use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
 
 /**
  * The base class for ORM related test cases.
@@ -23,6 +24,17 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 
     /** @var CacheProvider The metadata cache that is shared between all ORM tests */
     private $metadataCacheImpl;
+
+    /** @var array|null */
+    private $queryExpectations;
+
+    /**
+     * @after
+     */
+    protected function resetQueryExpectations()
+    {
+        $this->queryExpectations = null;
+    }
 
     protected function getProxyDir($shouldBeCreated = true)
     {
@@ -103,7 +115,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
-        $statement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
+        $statement = $this->createMock(StatementMock::class);
         $statement->expects($this->exactly(count($records) + 1))
             ->method('fetch')
             ->will(
@@ -116,12 +128,13 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
             ->willReturn(new FetchIterator($statement));
         if ($params) {
             if ($types) {
-                $counter = 0;
+                $withConsecutive = [];
                 foreach ($params as $key => $val) {
-                    $statement->expects($this->at($counter++))
-                        ->method('bindValue')
-                        ->with($key, $val, $types[$key]);
+                    $withConsecutive[] = [$key, $val, $types[$key]];
                 }
+                $statement->expects($this->exactly(count($params)))
+                    ->method('bindValue')
+                    ->withConsecutive(...$withConsecutive);
                 $statement->expects($this->once())
                     ->method('execute');
             } else {
@@ -143,7 +156,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getDriverConnectionMock(EntityManagerMock $em)
     {
-        $conn = $this->createMock('\Doctrine\DBAL\Driver\Connection');
+        $conn = $this->createMock(Connection::class);
         $this->setDriverConnection($conn, $em);
 
         return $conn;
@@ -158,9 +171,10 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function createCountStatementMock($numberOfRecords)
     {
-        $countStatement = $this->createMock('Oro\Component\TestUtils\ORM\Mocks\StatementMock');
-        $countStatement->expects($this->once())->method('fetchColumn')
-            ->will($this->returnValue($numberOfRecords));
+        $countStatement = $this->createMock(StatementMock::class);
+        $countStatement->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn($numberOfRecords);
 
         return $countStatement;
     }
@@ -184,27 +198,22 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
             $conn->expects($this->once())
                 ->method('prepare')
                 ->with($sql)
-                ->will($this->returnValue($stmt));
+                ->willReturn($stmt);
         } else {
-            $conn
-                ->expects($this->once())
+            $conn->expects($this->once())
                 ->method('query')
                 ->with($sql)
-                ->will($this->returnValue($stmt));
+                ->willReturn($stmt);
         }
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $conn
-     * @param int                                      $expectsAt
-     * @param string                                   $sql
-     * @param array                                    $result
-     * @param array                                    $params
-     * @param array                                    $types
+     * @param string $sql
+     * @param array  $result
+     * @param array  $params
+     * @param array  $types
      */
-    protected function setQueryExpectationAt(
-        \PHPUnit\Framework\MockObject\MockObject $conn,
-        $expectsAt,
+    protected function addQueryExpectation(
         $sql,
         $result,
         $params = [],
@@ -212,19 +221,34 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     ) {
         $stmt = $this->createFetchStatementMock($result, $params, $types);
         if ($params) {
-            $conn->expects($this->at($expectsAt))
-                ->method('prepare')
-                ->with($sql)
-                ->will($this->returnValue($stmt));
+            $this->queryExpectations['prepare'][] = [$sql, $stmt];
         } else {
-            $conn
-                ->expects($this->at($expectsAt))
-                ->method('query')
-                ->with($sql)
-                ->will($this->returnValue($stmt));
+            $this->queryExpectations['query'][] = [$sql, $stmt];
         }
     }
 
+    protected function applyQueryExpectations(\PHPUnit\Framework\MockObject\MockObject $conn)
+    {
+        if (!$this->queryExpectations) {
+            throw new \LogicException('The addQueryExpectation() should be called before.');
+        }
+
+        $queryExpectations = $this->queryExpectations;
+        $this->queryExpectations = null;
+
+        foreach ($queryExpectations as $method => $queries) {
+            $with = [];
+            $will = [];
+            foreach ($queries as [$sql, $stmt]) {
+                $with[] = [$sql];
+                $will[] = $stmt;
+            }
+            $conn->expects($this->exactly(count($queries)))
+                ->method($method)
+                ->withConsecutive(...$with)
+                ->willReturnOnConsecutiveCalls(...$will);
+        }
+    }
     /**
      * @return CacheProvider
      */

@@ -71,9 +71,8 @@ class OwnerTreeListenerTest extends OrmTestCase
      */
     private function findUser($userId, $userName, $ownerId)
     {
-        $this->setQueryExpectationAt(
+        $this->setQueryExpectation(
             $this->conn,
-            0,
             'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'
             . ' FROM tbl_user t0 WHERE t0.id = ?',
             [['id_1' => $userId, 'username_2' => $userName, 'owner_id_3' => $ownerId]],
@@ -86,17 +85,31 @@ class OwnerTreeListenerTest extends OrmTestCase
 
     /**
      * @param int      $userId
+     * @param string   $userName
+     * @param int|null $ownerId
+     */
+    private function addFindUserExpectation($userId, $userName, $ownerId)
+    {
+        $this->addQueryExpectation(
+            'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'
+            . ' FROM tbl_user t0 WHERE t0.id = ?',
+            [['id_1' => $userId, 'username_2' => $userName, 'owner_id_3' => $ownerId]],
+            [1 => $userId],
+            [1 => \PDO::PARAM_INT]
+        );
+    }
+
+    /**
+     * @param int      $userId
      * @param int|null $businessUnitId
      */
-    private function setLoadUserBusinessUnitsExpectation($userId, $businessUnitId)
+    private function addLoadUserBusinessUnitsExpectation($userId, $businessUnitId)
     {
         $rows = [];
         if (null !== $businessUnitId) {
             $rows[] = ['id_1' => $businessUnitId, 'parent_id_2' => null, 'organization_id_3' => null];
         }
-        $this->setQueryExpectationAt(
-            $this->conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.parent_id AS parent_id_2, t0.organization_id AS organization_id_3'
             . ' FROM tbl_business_unit t0'
             . ' INNER JOIN tbl_user_to_business_unit ON t0.id = tbl_user_to_business_unit.business_unit_id'
@@ -250,9 +263,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->treeProvider->expects($this->once())
             ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->applyQueryExpectations($this->conn);
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
@@ -262,9 +277,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->treeProvider->expects($this->never())
             ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->applyQueryExpectations($this->conn);
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
@@ -276,9 +293,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->treeProvider->expects($this->never())
             ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->applyQueryExpectations($this->conn);
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->addBusinessUnit($this->getBusinessUnitReference(20));
         $this->em->flush();
     }
@@ -290,9 +309,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->treeProvider->expects($this->once())
             ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->applyQueryExpectations($this->conn);
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->removeBusinessUnit($this->getBusinessUnitReference(10));
         $this->em->flush();
     }
@@ -302,9 +323,11 @@ class OwnerTreeListenerTest extends OrmTestCase
         $this->treeProvider->expects($this->never())
             ->method('clearCache');
 
-        $this->setLoadUserBusinessUnitsExpectation(1, 10);
+        $this->addFindUserExpectation(1, 'test', 10);
+        $this->addLoadUserBusinessUnitsExpectation(1, 10);
+        $this->applyQueryExpectations($this->conn);
 
-        $user = $this->findUser(1, 'test', 10);
+        $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $user->removeBusinessUnit($this->getBusinessUnitReference(10));
         $this->em->flush();
     }

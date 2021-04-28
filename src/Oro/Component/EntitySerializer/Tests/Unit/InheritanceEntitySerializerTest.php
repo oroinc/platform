@@ -144,10 +144,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT d0_.id AS id_0, d0_.name AS name_1'
             . ' FROM department_table d0_'
             . ' WHERE d0_.id IN (?, ?)',
@@ -164,9 +161,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT d0_.id AS id_0, p1_.id AS id_1, p1_.name AS name_2, p1_.type AS type_3'
             . ' FROM person_table p1_'
             . ' INNER JOIN department_table d0_ ON p1_.department_id = d0_.id'
@@ -188,6 +183,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -245,10 +241,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT d0_.id AS id_0, d0_.name AS name_1,'
             . ' d0_.manager_id AS manager_id_2, d0_.owner_id AS owner_id_3'
             . ' FROM department_table d0_'
@@ -270,9 +263,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.name AS name_2,'
             . ' t0.department_id AS department_id_3, t0.owner_id AS owner_id_4,'
             . ' t0.type, t0.position AS position_5'
@@ -292,9 +283,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             [1 => 50],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
+        $this->addQueryExpectation(
             'SELECT d0_.id AS id_0, p1_.id AS id_1, p1_.name AS name_2,'
             . ' p1_.position AS position_3, p1_.type AS type_4,'
             . ' p1_.department_id AS department_id_5, p1_.owner_id AS owner_id_6'
@@ -324,6 +313,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,

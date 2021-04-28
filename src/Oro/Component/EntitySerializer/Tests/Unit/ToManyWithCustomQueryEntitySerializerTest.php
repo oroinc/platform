@@ -17,10 +17,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, g0_.name AS name_1'
             . ' FROM group_table g0_'
             . ' WHERE g0_.id IN (?, ?)',
@@ -37,9 +34,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, u1_.id AS id_1'
             . ' FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
@@ -60,6 +55,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1, 2 => 123, 3 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $associationQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -118,10 +114,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, g0_.name AS name_1'
             . ' FROM group_table g0_'
             . ' WHERE g0_.id IN (?, ?)',
@@ -138,9 +131,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
             . ' FROM ('
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
@@ -168,6 +159,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $associationQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -227,10 +219,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, g0_.name AS name_1'
             . ' FROM group_table g0_'
             . ' WHERE g0_.id IN (?, ?)',
@@ -247,9 +236,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, u1_.id AS id_1, u1_.name AS name_2'
             . ' FROM group_table g0_'
             . ' INNER JOIN user_table u1_ ON (EXISTS ('
@@ -272,6 +259,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1, 2 => 123, 3 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT, 3 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $associationQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')
@@ -331,10 +319,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, g0_.name AS name_1'
             . ' FROM group_table g0_'
             . ' WHERE g0_.id IN (?, ?)',
@@ -351,9 +336,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
             . ' FROM ('
             . '(SELECT g0_.id AS id_0, u1_.id AS id_1 FROM group_table g0_'
@@ -381,9 +364,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
@@ -400,6 +381,7 @@ class ToManyWithCustomQueryEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $associationQb = $this->em->getRepository(Entity\Group::class)
             ->createQueryBuilder('e')

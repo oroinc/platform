@@ -88,14 +88,10 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
 
-        $this->valueNormalizer->expects(self::at(0))
+        $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->with('123', 'integer')
-            ->willReturn(123);
-        $this->valueNormalizer->expects(self::at(1))
-            ->method('normalizeValue')
-            ->with('456', 'integer')
-            ->willReturn(456);
+            ->withConsecutive(['123', 'integer'], ['456', 'integer'])
+            ->willReturnOnConsecutiveCalls(123, 456);
 
         $result = $this->entityIdTransformer->reverseTransform($value, $metadata);
         self::assertSame(
