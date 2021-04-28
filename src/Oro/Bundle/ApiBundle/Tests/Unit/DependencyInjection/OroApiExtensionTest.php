@@ -165,9 +165,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceExists($container, 'oro_api.entity_alias_loader.default');
         self::assertServiceExists($container, 'oro_api.entity_alias_resolver.default');
         self::assertServiceExists($container, 'oro_api.entity_override_provider.default');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.default');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.default');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
 
         self::assertEquals(
             [
@@ -190,12 +189,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(
             [
-                ['oro_api.chain_entity_exclusion_provider.default', '']
+                ['oro_api.config_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertServiceLocator(
-            ['oro_api.chain_entity_exclusion_provider.default'],
+            ['oro_api.config_entity_exclusion_provider.default'],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
             $container
         );
@@ -275,11 +274,10 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.default')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.default')->getMethodCalls()
         );
         self::assertEquals(
             new Reference('oro_api.config_cache.default'),
@@ -349,15 +347,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceExists($container, 'oro_api.entity_override_provider.default');
         self::assertServiceExists($container, 'oro_api.entity_override_provider.first');
         self::assertServiceExists($container, 'oro_api.entity_override_provider.second');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.first');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.second');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.default');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.first');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.second');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.default');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.first');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.second');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.first');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.second');
 
         self::assertEquals(
             [
@@ -384,17 +379,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(
             [
-                ['oro_api.chain_entity_exclusion_provider.first', 'first'],
-                ['oro_api.chain_entity_exclusion_provider.second', 'second'],
-                ['oro_api.chain_entity_exclusion_provider.default', '']
+                ['oro_api.config_entity_exclusion_provider.first', 'first'],
+                ['oro_api.config_entity_exclusion_provider.second', 'second'],
+                ['oro_api.config_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertServiceLocator(
             [
-                'oro_api.chain_entity_exclusion_provider.default',
-                'oro_api.chain_entity_exclusion_provider.first',
-                'oro_api.chain_entity_exclusion_provider.second'
+                'oro_api.config_entity_exclusion_provider.default',
+                'oro_api.config_entity_exclusion_provider.first',
+                'oro_api.config_entity_exclusion_provider.second'
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
             $container
@@ -579,27 +574,24 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.default')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.default')->getMethodCalls()
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.first')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.first')->getMethodCalls()
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.second')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.second')->getMethodCalls()
         );
         self::assertEquals(
             new Reference('oro_api.config_cache.default'),
@@ -742,29 +734,29 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(
             [
-                ['oro_api.chain_entity_exclusion_provider.several_request_types', 'test1&test2'],
-                ['oro_api.chain_entity_exclusion_provider.test_json_api', 'test&json_api'],
-                ['oro_api.chain_entity_exclusion_provider.test_rest', 'test&rest'],
-                ['oro_api.chain_entity_exclusion_provider.test_plain', 'test&!json_api'],
-                ['oro_api.chain_entity_exclusion_provider.test', 'test'],
-                ['oro_api.chain_entity_exclusion_provider.another', 'another'],
-                ['oro_api.chain_entity_exclusion_provider.rest_plain', 'rest&!json_api'],
-                ['oro_api.chain_entity_exclusion_provider.plain', '!json_api'],
-                ['oro_api.chain_entity_exclusion_provider.default', '']
+                ['oro_api.config_entity_exclusion_provider.several_request_types', 'test1&test2'],
+                ['oro_api.config_entity_exclusion_provider.test_json_api', 'test&json_api'],
+                ['oro_api.config_entity_exclusion_provider.test_rest', 'test&rest'],
+                ['oro_api.config_entity_exclusion_provider.test_plain', 'test&!json_api'],
+                ['oro_api.config_entity_exclusion_provider.test', 'test'],
+                ['oro_api.config_entity_exclusion_provider.another', 'another'],
+                ['oro_api.config_entity_exclusion_provider.rest_plain', 'rest&!json_api'],
+                ['oro_api.config_entity_exclusion_provider.plain', '!json_api'],
+                ['oro_api.config_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertServiceLocator(
             [
-                'oro_api.chain_entity_exclusion_provider.default',
-                'oro_api.chain_entity_exclusion_provider.rest_plain',
-                'oro_api.chain_entity_exclusion_provider.plain',
-                'oro_api.chain_entity_exclusion_provider.test',
-                'oro_api.chain_entity_exclusion_provider.test_plain',
-                'oro_api.chain_entity_exclusion_provider.test_json_api',
-                'oro_api.chain_entity_exclusion_provider.test_rest',
-                'oro_api.chain_entity_exclusion_provider.several_request_types',
-                'oro_api.chain_entity_exclusion_provider.another'
+                'oro_api.config_entity_exclusion_provider.default',
+                'oro_api.config_entity_exclusion_provider.rest_plain',
+                'oro_api.config_entity_exclusion_provider.plain',
+                'oro_api.config_entity_exclusion_provider.test',
+                'oro_api.config_entity_exclusion_provider.test_plain',
+                'oro_api.config_entity_exclusion_provider.test_json_api',
+                'oro_api.config_entity_exclusion_provider.test_rest',
+                'oro_api.config_entity_exclusion_provider.several_request_types',
+                'oro_api.config_entity_exclusion_provider.another'
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
             $container
@@ -1003,15 +995,12 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertServiceExists($container, 'oro_api.entity_override_provider.default');
         self::assertServiceExists($container, 'oro_api.entity_override_provider.first');
         self::assertServiceExists($container, 'oro_api.entity_override_provider.second');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.first');
-        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.second');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.default');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.first');
         self::assertServiceExists($container, 'oro_api.aliased_entity_exclusion_provider.second');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.default');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.first');
-        self::assertServiceExists($container, 'oro_api.chain_entity_exclusion_provider.second');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.default');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.first');
+        self::assertServiceExists($container, 'oro_api.config_entity_exclusion_provider.second');
 
         self::assertEquals(
             [
@@ -1038,17 +1027,17 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         }
         self::assertEquals(
             [
-                ['oro_api.chain_entity_exclusion_provider.first', 'first'],
-                ['oro_api.chain_entity_exclusion_provider.second', 'second'],
-                ['oro_api.chain_entity_exclusion_provider.default', '']
+                ['oro_api.config_entity_exclusion_provider.first', 'first'],
+                ['oro_api.config_entity_exclusion_provider.second', 'second'],
+                ['oro_api.config_entity_exclusion_provider.default', '']
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
         );
         self::assertServiceLocator(
             [
-                'oro_api.chain_entity_exclusion_provider.default',
-                'oro_api.chain_entity_exclusion_provider.first',
-                'oro_api.chain_entity_exclusion_provider.second'
+                'oro_api.config_entity_exclusion_provider.default',
+                'oro_api.config_entity_exclusion_provider.first',
+                'oro_api.config_entity_exclusion_provider.second'
             ],
             $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
             $container
@@ -1247,27 +1236,24 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.default')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.default')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.default')->getMethodCalls()
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.first')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.first')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.first')->getMethodCalls()
         );
         self::assertEquals(
             [
-                ['addProvider', [new Reference('oro_api.config_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.aliased_entity_exclusion_provider.second')]],
                 ['addProvider', [new Reference('oro_api.entity_exclusion_provider.shared')]]
             ],
-            $container->getDefinition('oro_api.chain_entity_exclusion_provider.second')->getMethodCalls()
+            $container->getDefinition('oro_api.config_entity_exclusion_provider.second')->getMethodCalls()
         );
         self::assertEquals(
             new Reference('oro_api.config_cache.default'),

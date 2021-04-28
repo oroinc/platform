@@ -36,6 +36,11 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
+    oro_api.tests.entity_exclusion_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
+
     oro_api.tests.check_request_type:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\CheckRequestType
         tags:
