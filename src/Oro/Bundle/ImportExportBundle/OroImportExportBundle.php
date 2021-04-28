@@ -6,6 +6,7 @@ use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerComp
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ConsumptionExtensionCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\FormatterProviderPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ImportExportConfigurationRegistryCompilerPass;
+use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\MigrateFileStorageCommandCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ProcessorRegistryCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\ReaderCompilerPass;
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\TemplateEntityRepositoryCompilerPass;
@@ -37,6 +38,7 @@ class OroImportExportBundle extends Bundle
         $container->addCompilerPass(new ReaderCompilerPass());
         $container->addCompilerPass(new ImportExportConfigurationRegistryCompilerPass());
         $container->addCompilerPass(new ConsumptionExtensionCompilerPass());
+        $container->addCompilerPass(new MigrateFileStorageCommandCompilerPass());
     }
 
     /**
