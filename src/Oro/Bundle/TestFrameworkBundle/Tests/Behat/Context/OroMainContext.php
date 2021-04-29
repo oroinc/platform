@@ -1203,6 +1203,46 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Checks, that element's inner text complies to the specified text exactly
+     * Example: Then I should see exact "Batman" in the "heroes_list" element
+     * Example: And I should see exact "Batman" in the "heroes_list" element
+     *
+     * @Then /^(?:|I )should see exact "(?P<text>(?:[^"]|\\")*)" in the "(?P<element>[^"]*)" element$/
+     */
+    public function assertElementContainsExactText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+
+        $actual = trim($elementObject->getText());
+        $text = $this->fixStepArgument($text);
+
+        $message = sprintf('Failed asserting that "%s" complies to "%s" exactly', $text, $actual);
+
+        self::assertTrue($actual === $text, $message, $element);
+    }
+
+    /**
+     * Checks, that element's inner text doesn't comply to the specified text exactly
+     * Example: Then I should not see exact "Batman" in the "heroes_list" element
+     * Example: And I should not see exact "Batman" in the "heroes_list" element
+     *
+     * @Then /^(?:|I )should not see exact "(?P<text>(?:[^"]|\\")*)" in the "(?P<element>[^"]*)" element$/
+     */
+    public function assertElementNotContainsExactText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+
+        $actual = trim($elementObject->getText());
+        $text = $this->fixStepArgument($text);
+
+        $message = sprintf('Failed asserting that "%s" doesn\'t comply to "%s" exactly', $text, $actual);
+
+        self::assertTrue($actual !== $text, $message, $element);
+    }
+
+    /**
      * Example: When I scroll to top
      * @When /^I scroll to top$/
      */
