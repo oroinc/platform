@@ -52,7 +52,11 @@
             <% }) %>
         </ul>
         <address class="address-book-item__address">
-            <%= _.escape(formatted_address).replace(/\n/g, "<br/>") %>
+            <% if (isAddressHtmlFormatted) { %>
+                <%= formatted_address.replace(/\n/g, "<br/>") %>
+            <% } else { %>
+                <%= _.escape(formatted_address).replace(/\n/g, "<br/>") %>
+            <% } %>
         </address>
     </div>
 </script>
