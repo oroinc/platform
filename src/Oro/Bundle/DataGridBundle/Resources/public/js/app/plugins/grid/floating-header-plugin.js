@@ -224,7 +224,6 @@ define(function(require) {
                         left: ''
                     });
                     this.domCache.theadTr.css({
-                        // marginLeft: tableRect.left - theadRect.left
                         [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
                             ? theadRect.right - tableRect.right
                             : tableRect.left - theadRect.left
@@ -344,7 +343,7 @@ define(function(require) {
             }, this);
             scrollStateModel.on('change:clientWidth', function(model, val) {
                 otherScroll.css({
-                    marginLeft: val - scrollBarWidth
+                    [`margin${_.isRTL() ? 'Right' : 'Left'}`]: val - scrollBarWidth
                 });
             }, this);
             scrollStateModel.on('change:scrollHeight', function(model, val) {
