@@ -325,17 +325,42 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
         $cacheManager->addResettableService($resettableService);
 
-        $this->configProvider->expects(self::at(0))
-            ->method('disableFullConfigsCache');
-        $this->configProvider->expects(self::at(1))
-            ->method('enableFullConfigsCache');
+        $calls = [];
+        $this->configProvider->expects(self::once())
+            ->method('disableFullConfigsCache')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'disableFullConfigsCache';
+            });
+        $this->configProvider->expects(self::once())
+            ->method('enableFullConfigsCache')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'enableFullConfigsCache';
+            });
         $apiDocExtractor->expects(self::exactly(2))
             ->method('warmUp')
-            ->withConsecutive(['view1'], ['view2']);
+            ->withConsecutive(['view1'], ['view2'])
+            ->willReturnCallback(function ($view) use (&$calls) {
+                $calls[] = 'apiDocExtractor::warmUp - ' . $view;
+            });
         $resettableService->expects(self::exactly(2))
-            ->method('reset');
+            ->method('reset')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'resettableService::reset';
+            });
 
         $cacheManager->warmUpApiDocCache();
+
+        self::assertEquals(
+            [
+                'disableFullConfigsCache',
+                'apiDocExtractor::warmUp - view1',
+                'resettableService::reset',
+                'apiDocExtractor::warmUp - view2',
+                'resettableService::reset',
+                'enableFullConfigsCache'
+            ],
+            $calls
+        );
     }
 
     public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsSpecified()
@@ -345,16 +370,39 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager = $this->getCacheManager([], ['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
         $cacheManager->addResettableService($resettableService);
 
-        $this->configProvider->expects(self::at(0))
-            ->method('disableFullConfigsCache');
-        $this->configProvider->expects(self::at(1))
-            ->method('enableFullConfigsCache');
+        $calls = [];
+        $this->configProvider->expects(self::once())
+            ->method('disableFullConfigsCache')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'disableFullConfigsCache';
+            });
+        $this->configProvider->expects(self::once())
+            ->method('enableFullConfigsCache')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'enableFullConfigsCache';
+            });
         $apiDocExtractor->expects(self::once())
             ->method('warmUp')
-            ->with('view1');
+            ->with('view1')
+            ->willReturnCallback(function ($view) use (&$calls) {
+                $calls[] = 'apiDocExtractor::warmUp - ' . $view;
+            });
         $resettableService->expects(self::once())
-            ->method('reset');
+            ->method('reset')
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'resettableService::reset';
+            });
 
         $cacheManager->warmUpApiDocCache('view1');
+
+        self::assertEquals(
+            [
+                'disableFullConfigsCache',
+                'apiDocExtractor::warmUp - view1',
+                'resettableService::reset',
+                'enableFullConfigsCache'
+            ],
+            $calls
+        );
     }
 }

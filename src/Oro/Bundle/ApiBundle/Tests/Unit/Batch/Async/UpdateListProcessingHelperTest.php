@@ -11,6 +11,7 @@ use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -160,13 +161,19 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             ->method('findFiles')
             ->with('api_chunk_test_')
             ->willReturn([$chunk1FileName, $chunk2FileName]);
-        $this->fileManager->expects(self::at(1))
+        $this->fileManager->expects(self::exactly(2))
             ->method('deleteFile')
-            ->with($chunk1FileName)
-            ->willThrowException($exception);
-        $this->fileManager->expects(self::at(2))
-            ->method('deleteFile')
-            ->with($chunk2FileName);
+            ->withConsecutive(
+                [$chunk1FileName],
+                [$chunk2FileName]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () use ($exception) {
+                    throw $exception;
+                }),
+                new ReturnCallback(function () {
+                })
+            );
         $this->logger->expects(self::once())
             ->method('error')
             ->with(
@@ -355,24 +362,26 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $firstChunkFileIndex = 10;
         $lastChunkFileIndex = 11;
 
-        $jobRunner->expects(self::at(0))
+        $jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
-            ->with('oro:batch_api:123:chunk:11')
-            ->willReturnCallback(function ($name, $startCallback) use ($jobRunner) {
-                $job = new Job();
-                $job->setId(110);
+            ->withConsecutive(
+                ['oro:batch_api:123:chunk:11'],
+                ['oro:batch_api:123:chunk:12']
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($name, $startCallback) use ($jobRunner) {
+                    $job = new Job();
+                    $job->setId(110);
 
-                return $startCallback($jobRunner, $job);
-            });
-        $jobRunner->expects(self::at(1))
-            ->method('createDelayed')
-            ->with('oro:batch_api:123:chunk:12')
-            ->willReturnCallback(function ($name, $startCallback) use ($jobRunner) {
-                $job = new Job();
-                $job->setId(111);
+                    return $startCallback($jobRunner, $job);
+                }),
+                new ReturnCallback(function ($name, $startCallback) use ($jobRunner) {
+                    $job = new Job();
+                    $job->setId(111);
 
-                return $startCallback($jobRunner, $job);
-            });
+                    return $startCallback($jobRunner, $job);
+                })
+            );
 
         $indexFile = $this->createMock(File::class);
         $indexFile->expects(self::once())

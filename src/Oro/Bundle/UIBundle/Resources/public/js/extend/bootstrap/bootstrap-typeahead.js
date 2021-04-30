@@ -74,6 +74,12 @@ define(function(require) {
         },
         keypress: function() {
             // do nothing;
+        },
+        highlighter: function(item) {
+            if (!this.query) {
+                return item;
+            }
+            return origTypeahead.prototype.highlighter.call(this, item);
         }
     };
 

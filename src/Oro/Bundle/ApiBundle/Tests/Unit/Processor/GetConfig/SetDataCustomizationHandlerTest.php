@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\SetDataCustomizationHandler;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
@@ -19,14 +20,9 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /** @var SetDataCustomizationHandler */
     private $processor;
 
-    /** @var int */
-    private $customizationProcessorCallIndex;
-
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->customizationProcessorCallIndex = 0;
 
         $this->customizationProcessor = $this->createMock(CustomizeLoadedDataProcessor::class);
 
@@ -115,7 +111,10 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $configObject->getPostSerializeCollectionHandler()
         );
 
-        $assert = $this->getRootHandlerAssertion($configObject);
+        [$assert, $expect] = $this->getRootHandlerAssertion($configObject);
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback($expect);
         $assert();
     }
 
@@ -149,8 +148,14 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $configObject->getPostSerializeCollectionHandler()
         );
 
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $rootCollectionAssert = $this->getRootHandlerAssertion($configObject, 'collection');
+        [$rootAssert, $rootExpect] = $this->getRootHandlerAssertion($configObject);
+        [$rootCollectionAssert, $rootCollectionExpect] = $this->getRootHandlerAssertion($configObject, 'collection');
+        $this->customizationProcessor->expects(self::exactly(2))
+            ->method('process')
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback($rootExpect),
+                new ReturnCallback($rootCollectionExpect)
+            );
         foreach ([$rootAssert, $rootCollectionAssert] as $assert) {
             $assert();
         }
@@ -245,19 +250,26 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $field2Assert = $this->getChildHandlerAssertion(
+        [$rootAssert, $rootExpect] = $this->getRootHandlerAssertion($configObject);
+        [$field2Assert, $field2Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
-        $field22Assert = $this->getChildHandlerAssertion(
+        [$field22Assert, $field22Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
         );
+        $this->customizationProcessor->expects(self::exactly(3))
+            ->method('process')
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback($rootExpect),
+                new ReturnCallback($field2Expect),
+                new ReturnCallback($field22Expect)
+            );
         foreach ([$rootAssert, $field2Assert, $field22Assert] as $assert) {
             $assert();
         }
@@ -354,33 +366,42 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $field2Assert = $this->getChildHandlerAssertion(
+        [$rootAssert, $rootExpect] = $this->getRootHandlerAssertion($configObject);
+        [$field2Assert, $field2Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
-        $field2CollectionAssert = $this->getChildHandlerAssertion(
+        [$field2CollectionAssert, $field2CollectionExpect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2',
             'collection'
         );
-        $field22Assert = $this->getChildHandlerAssertion(
+        [$field22Assert, $field22Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
         );
-        $field22CollectionAssert = $this->getChildHandlerAssertion(
+        [$field22CollectionAssert, $field22CollectionExpect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22',
             'collection'
         );
+        $this->customizationProcessor->expects(self::exactly(5))
+            ->method('process')
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback($rootExpect),
+                new ReturnCallback($field2Expect),
+                new ReturnCallback($field2CollectionExpect),
+                new ReturnCallback($field22Expect),
+                new ReturnCallback($field22CollectionExpect)
+            );
         $asserts = [$rootAssert, $field2Assert, $field2CollectionAssert, $field22Assert, $field22CollectionAssert];
         foreach ($asserts as $assert) {
             $assert();
@@ -462,19 +483,26 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $field2Assert = $this->getChildHandlerAssertion(
+        [$rootAssert, $rootExpect] = $this->getRootHandlerAssertion($configObject);
+        [$field2Assert, $field2Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity(),
             'Test\Field2Target',
             'field2'
         );
-        $field22Assert = $this->getChildHandlerAssertion(
+        [$field22Assert, $field22Expect] = $this->getChildHandlerAssertion(
             $configObject,
             $configObject->getField('field2')->getTargetEntity()->getField('field22')->getTargetEntity(),
             'Test\Field22Target',
             'field2.field22'
         );
+        $this->customizationProcessor->expects(self::exactly(3))
+            ->method('process')
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback($rootExpect),
+                new ReturnCallback($field2Expect),
+                new ReturnCallback($field22Expect)
+            );
         foreach ([$rootAssert, $field2Assert, $field22Assert] as $assert) {
             $assert();
         }
@@ -549,39 +577,38 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 ->getTargetEntity()
         );
 
-        $rootAssert = $this->getRootHandlerAssertion($configObject);
-        $rootAssert();
+        [$assert, $expect] = $this->getRootHandlerAssertion($configObject);
+        $this->customizationProcessor->expects(self::once())
+            ->method('process')
+            ->willReturnCallback($expect);
+        $assert();
     }
 
     /**
      * @param EntityDefinitionConfig $configObject
      * @param string                 $handlerType
      *
-     * @return callable
+     * @return callable[] [assertion, expectation]
      */
     private function getRootHandlerAssertion(EntityDefinitionConfig $configObject, $handlerType = '')
     {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
-        $this->customizationProcessor->expects(self::at($this->customizationProcessorCallIndex++))
-            ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use (
-                    $sourceDataItem,
-                    $processedDataItem,
-                    $configObject
-                ) {
-                    self::assertEquals($this->context->getVersion(), $context->getVersion());
-                    self::assertEquals($this->context->getRequestType(), $context->getRequestType());
-                    self::assertEquals($this->context->getClassName(), $context->getClassName());
-                    self::assertSame($configObject, $context->getConfig());
-                    self::assertEquals($sourceDataItem, $context->getResult());
+        $expectation = function (CustomizeLoadedDataContext $context) use (
+            $sourceDataItem,
+            $processedDataItem,
+            $configObject
+        ) {
+            self::assertEquals($this->context->getVersion(), $context->getVersion());
+            self::assertEquals($this->context->getRequestType(), $context->getRequestType());
+            self::assertEquals($this->context->getClassName(), $context->getClassName());
+            self::assertSame($configObject, $context->getConfig());
+            self::assertEquals($sourceDataItem, $context->getResult());
 
-                    $context->setResult($processedDataItem);
-                }
-            );
+            $context->setResult($processedDataItem);
+        };
 
-        return function () use ($configObject, $processedDataItem, $sourceDataItem, $handlerType) {
+        $assertion = function () use ($configObject, $processedDataItem, $sourceDataItem, $handlerType) {
             $getter = 'getPostSerialize' . ucfirst($handlerType) . 'Handler';
             $rootHandler = $configObject->{$getter}();
             self::assertEquals(
@@ -589,6 +616,8 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 $rootHandler($sourceDataItem, ['sharedData' => $this->createMock(ParameterBagInterface::class)])
             );
         };
+
+        return [$assertion, $expectation];
     }
 
     /**
@@ -598,7 +627,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
      * @param string                 $fieldPath
      * @param string                 $handlerType
      *
-     * @return callable
+     * @return callable[] [assertion, expectation]
      */
     private function getChildHandlerAssertion(
         EntityDefinitionConfig $configObject,
@@ -609,31 +638,27 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     ) {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
-        $this->customizationProcessor->expects(self::at($this->customizationProcessorCallIndex++))
-            ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) use (
-                    $sourceDataItem,
-                    $processedDataItem,
-                    $childEntityClass,
-                    $fieldPath,
-                    $configObject,
-                    $childConfigObject
-                ) {
-                    self::assertEquals($this->context->getVersion(), $context->getVersion());
-                    self::assertEquals($this->context->getRequestType(), $context->getRequestType());
-                    self::assertEquals($this->context->getClassName(), $context->getRootClassName());
-                    self::assertEquals($childEntityClass, $context->getClassName());
-                    self::assertEquals($fieldPath, $context->getPropertyPath());
-                    self::assertSame($configObject, $context->getRootConfig());
-                    self::assertSame($childConfigObject, $context->getConfig());
-                    self::assertEquals($sourceDataItem, $context->getResult());
+        $expectation = function (CustomizeLoadedDataContext $context) use (
+            $sourceDataItem,
+            $processedDataItem,
+            $childEntityClass,
+            $fieldPath,
+            $configObject,
+            $childConfigObject
+        ) {
+            self::assertEquals($this->context->getVersion(), $context->getVersion());
+            self::assertEquals($this->context->getRequestType(), $context->getRequestType());
+            self::assertEquals($this->context->getClassName(), $context->getRootClassName());
+            self::assertEquals($childEntityClass, $context->getClassName());
+            self::assertEquals($fieldPath, $context->getPropertyPath());
+            self::assertSame($configObject, $context->getRootConfig());
+            self::assertSame($childConfigObject, $context->getConfig());
+            self::assertEquals($sourceDataItem, $context->getResult());
 
-                    $context->setResult($processedDataItem);
-                }
-            );
+            $context->setResult($processedDataItem);
+        };
 
-        return function () use ($childConfigObject, $processedDataItem, $sourceDataItem, $handlerType) {
+        $assertion = function () use ($childConfigObject, $processedDataItem, $sourceDataItem, $handlerType) {
             $getter = 'getPostSerialize' . ucfirst($handlerType) . 'Handler';
             $childHandler = $childConfigObject->{$getter}();
             self::assertEquals(
@@ -641,5 +666,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
                 $childHandler($sourceDataItem, ['sharedData' => $this->createMock(ParameterBagInterface::class)])
             );
         };
+
+        return [$assertion, $expectation];
     }
 }

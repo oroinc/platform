@@ -37,6 +37,7 @@ class OroGaufretteExtension extends Extension implements PrependExtensionInterfa
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('controllers.yml');
+        $loader->load('commands.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');

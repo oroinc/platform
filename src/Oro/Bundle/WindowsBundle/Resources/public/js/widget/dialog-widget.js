@@ -20,9 +20,10 @@ define(function(require, exports, module) {
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,
-        messengerContainerClass: '',
+        messengerContainerClass: 'ui-dialog-messages',
         mobileLoadingBar: true,
-        desktopLoadingBar: false
+        desktopLoadingBar: false,
+        triggerEventOnMessagesRemoved: true
     }, require('module-config').default(module.id));
 
     /**
@@ -139,12 +140,14 @@ define(function(require, exports, module) {
          */
         _addMessengerContainer: function() {
             const containerClass = this.options.messengerContainerClass;
-            const $title = this.widget.dialog('instance').uiDialogTitlebar;
+            const $uiDialog = this.widget.dialog('instance').uiDialog;
 
-            if (containerClass && !$title.find('.' + containerClass).length) {
-                this.$messengerContainer = $('<div/>').appendTo($title)
+            if (containerClass && !$uiDialog.find('.' + containerClass).length) {
+                this.$messengerContainer = $('<div/>')
                     .addClass(containerClass)
                     .attr('data-role', 'messenger-temporary-container');
+
+                this.widget.before(this.$messengerContainer);
             }
         },
 
@@ -192,11 +195,22 @@ define(function(require, exports, module) {
          * @param {Function|undefined} onClose External onClose handler
          */
         closeHandler: function(onClose) {
+            this.removeMessageContainer();
+
             if (_.isFunction(onClose)) {
                 onClose();
             }
             if (!this.keepAliveOnClose) {
                 this.dispose();
+            }
+        },
+
+        removeMessageContainer: function() {
+            if (this.$messengerContainer.length) {
+                if (this.options.triggerEventOnMessagesRemoved) {
+                    this.$messengerContainer.trigger('remove');
+                }
+                this.$messengerContainer.remove();
             }
         },
 
@@ -208,9 +222,7 @@ define(function(require, exports, module) {
                 return;
             }
 
-            if (this.$messengerContainer) {
-                this.$messengerContainer.trigger('remove').remove();
-            }
+            this.removeMessageContainer();
 
             $(window).off(this.eventNamespace());
             dialogManager.remove(this);

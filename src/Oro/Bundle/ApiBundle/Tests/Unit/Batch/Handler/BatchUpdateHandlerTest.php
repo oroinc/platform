@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -79,60 +80,56 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         $records = [['key' => 'val1']];
         $processedItemStatuses = [BatchUpdateItemStatus::NO_ERRORS];
 
-        $this->processor->expects(self::at(0))
+        $this->itemProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->setResult($records);
-            });
-        $this->itemProcessor->expects(self::at(0))
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    self::assertEquals($records[0], $context->getRequestData());
+                }),
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
+                })
+            );
+        $this->processor->expects(self::exactly(4))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertEquals($records[0], $context->getRequestData());
-            });
-        $this->itemProcessor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
-            });
-        $this->processor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request, $processedItemStatuses) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
-                $items = $context->getBatchItems();
-                self::assertCount(1, $items);
-                self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
-                $context->setProcessedItemStatuses($processedItemStatuses);
-                $context->getSummary()->incrementWriteCount();
-                $context->getSummary()->incrementCreateCount();
-            });
-        $this->processor->expects(self::at(2))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::FINALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::FINALIZE, $context->getLastGroup());
-            });
-        $this->processor->expects(self::at(3))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->setResult($records);
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request, $processedItemStatuses) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
+                    $items = $context->getBatchItems();
+                    self::assertCount(1, $items);
+                    self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
+                    $context->setProcessedItemStatuses($processedItemStatuses);
+                    $context->getSummary()->incrementWriteCount();
+                    $context->getSummary()->incrementCreateCount();
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::FINALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::FINALIZE, $context->getLastGroup());
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertFalse($response->hasUnexpectedErrors(), 'UnexpectedErrors');
@@ -163,25 +160,25 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager
         );
 
-        $this->processor->expects(self::at(0))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->addError(Error::create('some error'));
-            });
         $this->itemProcessor->expects(self::never())
             ->method('process');
-        $this->processor->expects(self::at(1))
+        $this->processor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-                $context->resetErrors();
-                $context->setHasUnexpectedErrors(true);
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->addError(Error::create('some error'));
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                    $context->resetErrors();
+                    $context->setHasUnexpectedErrors(true);
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertTrue($response->hasUnexpectedErrors(), 'UnexpectedErrors');
@@ -212,24 +209,24 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
             $this->fileManager
         );
 
-        $this->processor->expects(self::at(0))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->skipGroup(ApiActionGroup::INITIALIZE);
-                $context->setRetryReason('test retry reason');
-            });
         $this->itemProcessor->expects(self::never())
             ->method('process');
-        $this->processor->expects(self::at(1))
+        $this->processor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->skipGroup(ApiActionGroup::INITIALIZE);
+                    $context->setRetryReason('test retry reason');
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertFalse($response->hasUnexpectedErrors(), 'UnexpectedErrors');
@@ -262,53 +259,51 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $records = [['key' => 'val1']];
 
-        $this->processor->expects(self::at(0))
+        $this->itemProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->setResult($records);
-            });
-        $this->itemProcessor->expects(self::at(0))
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    self::assertEquals($records[0], $context->getRequestData());
+                }),
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
+                })
+            );
+        $this->processor->expects(self::exactly(3))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertEquals($records[0], $context->getRequestData());
-            });
-        $this->itemProcessor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
-            });
-        $this->processor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
-                $items = $context->getBatchItems();
-                self::assertCount(1, $items);
-                self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
-                $context->addError(Error::create('some error'));
-            });
-        $this->processor->expects(self::at(2))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-                $context->resetErrors();
-                $context->setHasUnexpectedErrors(true);
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->setResult($records);
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
+                    $items = $context->getBatchItems();
+                    self::assertCount(1, $items);
+                    self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
+                    $context->addError(Error::create('some error'));
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                    $context->resetErrors();
+                    $context->setHasUnexpectedErrors(true);
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertTrue($response->hasUnexpectedErrors(), 'UnexpectedErrors');
@@ -341,53 +336,51 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $records = [['key' => 'val1']];
 
-        $this->processor->expects(self::at(0))
+        $this->itemProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->setResult($records);
-            });
-        $this->itemProcessor->expects(self::at(0))
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    self::assertEquals($records[0], $context->getRequestData());
+                }),
+                new ReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
+                    self::assertEquals($request->getVersion(), $context->getVersion());
+                    self::assertEquals($request->getRequestType(), $context->getRequestType());
+                    self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
+                })
+            );
+        $this->processor->expects(self::exactly(3))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                self::assertEquals($records[0], $context->getRequestData());
-            });
-        $this->itemProcessor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request) {
-                self::assertEquals($request->getVersion(), $context->getVersion());
-                self::assertEquals($request->getRequestType(), $context->getRequestType());
-                self::assertEquals($request->getSupportedEntityClasses(), $context->getSupportedEntityClasses());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::TRANSFORM_DATA, $context->getLastGroup());
-            });
-        $this->processor->expects(self::at(1))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
-                $items = $context->getBatchItems();
-                self::assertCount(1, $items);
-                self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
-                $context->skipGroup(ApiActionGroup::SAVE_DATA);
-                $context->setRetryReason('test retry reason');
-            });
-        $this->processor->expects(self::at(2))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-                $context->resetErrors();
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->setResult($records);
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
+                    $items = $context->getBatchItems();
+                    self::assertCount(1, $items);
+                    self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
+                    $context->skipGroup(ApiActionGroup::SAVE_DATA);
+                    $context->setRetryReason('test retry reason');
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                    $context->resetErrors();
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertFalse($response->hasUnexpectedErrors(), 'UnexpectedErrors');
@@ -420,14 +413,6 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $records = [['key' => 'val1']];
 
-        $this->processor->expects(self::at(0))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
-                $context->setResult($records);
-            });
         $this->itemProcessor->expects(self::once())
             ->method('process')
             ->willReturnCallback(function (BatchUpdateItemContext $context) use ($request, $records) {
@@ -439,30 +424,34 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($records[0], $context->getRequestData());
                 $context->addError(Error::create('some error'));
             });
-        $this->processor->expects(self::at(1))
+        $this->processor->expects(self::exactly(4))
             ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
-                $items = $context->getBatchItems();
-                self::assertCount(1, $items);
-                self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
-            });
-        $this->processor->expects(self::at(2))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::FINALIZE, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::FINALIZE, $context->getLastGroup());
-            });
-        $this->processor->expects(self::at(3))
-            ->method('process')
-            ->willReturnCallback(function (BatchUpdateContext $context) use ($request) {
-                $this->assertBatchUpdateContext($context, $request);
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
-                self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request, $records) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
+                    $context->setResult($records);
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_DATA, $context->getLastGroup());
+                    $items = $context->getBatchItems();
+                    self::assertCount(1, $items);
+                    self::assertInstanceOf(BatchUpdateItem::class, $items[0]);
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::FINALIZE, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::FINALIZE, $context->getLastGroup());
+                }),
+                new ReturnCallback(function (BatchUpdateContext $context) use ($request) {
+                    $this->assertBatchUpdateContext($context, $request);
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getFirstGroup());
+                    self::assertEquals(ApiActionGroup::SAVE_ERRORS, $context->getLastGroup());
+                })
+            );
 
         $response = $this->handler->handle($request);
         self::assertFalse($response->hasUnexpectedErrors(), 'UnexpectedErrors');
