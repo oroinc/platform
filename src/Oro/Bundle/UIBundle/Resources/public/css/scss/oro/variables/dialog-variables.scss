@@ -16,7 +16,9 @@ $dialog-buttonpane-flex-shrink: 0 !default;
 $dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
 $dialog-buttonpane-action-wrapper-offset-left: 8px !default;
 
-$dialog-titlebar-inner-offset: side-values(10px 18px 10px 18px) !default;
+$dialog-ui-dialog-messages-inner-offset: 18px 18px 0 !default;
+
+$dialog-titlebar-inner-offset: 10px 18px 10px 18px !default;
 $dialog-titlebar-width: 100% !default;
 $dialog-titlebar-cursor: move !default;
 $dialog-titlebar-start: 1px !default;
