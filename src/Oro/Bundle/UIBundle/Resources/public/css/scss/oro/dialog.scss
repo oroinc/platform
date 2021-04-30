@@ -110,6 +110,15 @@
         }
     }
 
+    .ui-dialog-messages {
+        padding: $dialog-ui-dialog-messages-inner-offset;
+        background: $primary-inverse;
+
+        &:empty {
+            display: none;
+        }
+    }
+
     .ui-widget-content {
         border: $dialog-widget-content-border;
         color: $dialog-widget-content-color;

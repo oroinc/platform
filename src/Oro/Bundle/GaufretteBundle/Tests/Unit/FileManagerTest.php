@@ -11,6 +11,7 @@ use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
+use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Oro\Bundle\GaufretteBundle\FileManager;
@@ -329,7 +330,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetAdapterDescription()
     {
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->expects(self::once())
+        $filesystem->expects(self::exactly(2))
             ->method('getAdapter')
             ->willReturn(new Adapter\InMemory());
         $filesystemMap = $this->createMock(FilesystemMap::class);
@@ -341,6 +342,59 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $fileManager->setFilesystemMap($filesystemMap);
 
         self::assertEquals('InMemory', $fileManager->getAdapterDescription());
+    }
+
+    public function testGetAdapterDescriptionWithLocalAdapter()
+    {
+        $expected = __DIR__;
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::once())
+            ->method('getAdapter')
+            ->willReturn(new LocalAdapter($expected));
+        $filesystemMap = $this->createMock(FilesystemMap::class);
+        $filesystemMap->expects(self::once())
+            ->method('get')
+            ->with(self::TEST_FILE_SYSTEM_NAME)
+            ->willReturn($filesystem);
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME);
+        $fileManager->setFilesystemMap($filesystemMap);
+
+        self::assertEquals($expected, $fileManager->getAdapterDescription());
+    }
+
+    public function testGetLocalPathWithNonLocalAdapter()
+    {
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::once())
+            ->method('getAdapter')
+            ->willReturn(new Adapter\InMemory());
+        $filesystemMap = $this->createMock(FilesystemMap::class);
+        $filesystemMap->expects(self::once())
+            ->method('get')
+            ->with(self::TEST_FILE_SYSTEM_NAME)
+            ->willReturn($filesystem);
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME);
+        $fileManager->setFilesystemMap($filesystemMap);
+
+        self::assertNull($fileManager->getLocalPath());
+    }
+
+    public function testGetLocalPathWithLocalAdapter()
+    {
+        $expected = __DIR__;
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects(self::once())
+            ->method('getAdapter')
+            ->willReturn(new LocalAdapter($expected));
+        $filesystemMap = $this->createMock(FilesystemMap::class);
+        $filesystemMap->expects(self::once())
+            ->method('get')
+            ->with(self::TEST_FILE_SYSTEM_NAME)
+            ->willReturn($filesystem);
+        $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME);
+        $fileManager->setFilesystemMap($filesystemMap);
+
+        self::assertEquals($expected, $fileManager->getLocalPath());
     }
 
     public function testGetFileMimeType()

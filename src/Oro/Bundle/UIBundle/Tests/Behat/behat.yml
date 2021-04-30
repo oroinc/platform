@@ -57,7 +57,7 @@ oro_behat_extension:
       selector: 'a.edit-remove'
 
     Flash Message:
-      selector: '#flash-messages div.alert'
+      selector: '#flash-messages div.alert, .ui-dialog-messages .alert'
 
     Flash Message Close Button:
       selector: '#flash-messages div.alert .notification-flash__close'
