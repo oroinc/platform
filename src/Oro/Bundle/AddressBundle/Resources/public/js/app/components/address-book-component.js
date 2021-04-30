@@ -6,10 +6,12 @@ define(function(require) {
 
     const AddressBookComponent = BaseComponent.extend({
         optionNames: BaseComponent.prototype.optionNames.concat([
-            'addressListUrl', 'addressBookSelector', 'addresses', 'addressMapOptions'
+            'addressListUrl', 'addressBookSelector', 'addresses', 'addressMapOptions', 'isAddressHtmlFormatted'
         ]),
 
         addressBookSelector: '#address-book',
+
+        isAddressHtmlFormatted: false,
 
         /**
          * @inheritDoc
@@ -37,7 +39,8 @@ define(function(require) {
             return {
                 el: this.addressBookSelector,
                 addressListUrl: this.addressListUrl,
-                addressMapOptions: this.addressMapOptions || {}
+                addressMapOptions: this.addressMapOptions || {},
+                isAddressHtmlFormatted: this.isAddressHtmlFormatted
             };
         },
 

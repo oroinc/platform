@@ -12,7 +12,7 @@
         @include selector-width($currency-select-enabled-base-currency-select-width);
 
         .selector {
-            margin-#{$start}: $currency-select-enabled-base-currency-selector-offset-left;
+            margin-left: $currency-select-enabled-base-currency-selector-offset-left;
             font-size: $currency-select-enabled-base-currency-selector-font-size;
             flex-shrink: 0;
 

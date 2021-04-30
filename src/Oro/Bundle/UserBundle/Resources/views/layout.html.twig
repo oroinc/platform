@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
+<html lang="{{ oro_language()|slice(0,2) }}"{{ oro_is_rtl_mode() ? ' dir="rtl"' : ''}}
+      class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
 <head>
     {% block head %}
     <title>{% block title %}{{ oro_title_render() }}{% endblock %}</title>

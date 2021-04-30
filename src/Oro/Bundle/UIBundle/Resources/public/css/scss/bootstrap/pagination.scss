@@ -25,11 +25,11 @@
     }
 
     &-previous {
-        margin-#{$end}: 4px;
+        margin-right: 4px;
     }
 
     &-next {
-        margin-#{$start}: 4px;
+        margin-left: 4px;
     }
 }
 

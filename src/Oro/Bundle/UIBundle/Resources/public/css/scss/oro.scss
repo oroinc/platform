@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "oroui/css/scss/oro/variables";
-
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -119,13 +117,13 @@ footer {
 
 .list-inline {
     list-style: none;
-    padding-#{$start}: 0;
+    padding-left: 0;
 }
 
 .list-inline > li {
     display: inline-block;
-    padding-#{$start}: 5px;
-    padding-#{$end}: 4px;
+    padding-left: 5px;
+    padding-right: 4px;
 }
 
 .list-group > .list-group-item {
@@ -141,7 +139,7 @@ footer {
 }
 
 .icons-holder .icons-holder-text [class^="fa-"] {
-    margin-#{$end}: 5px;
+    margin-right: 5px;
 }
 
 .navigation {
@@ -150,7 +148,7 @@ footer {
     .top-action-box {
         padding: 0 12px;
         background-color: $primary-inverse;
-        float: #{$end};
+        float: right;
         > * {
             margin-top: 3px;
             margin-bottom: 3px;
@@ -165,7 +163,7 @@ footer {
 .user-profile-cols .label {
     display: block;
     background: none;
-    padding: side-values(0 0 7px 0);
+    padding: 0 0 7px 0;
     text-shadow: none;
     color: $body-color;
     font-weight: normal;
@@ -220,7 +218,7 @@ footer {
     }
 
     &.inline li {
-        float: #{$start};
+        float: left;
         margin-bottom: -1px;
         padding: 0;
         line-height: 20px;
@@ -246,7 +244,7 @@ footer {
     margin-bottom: 0;
 
     li {
-        padding: side-values(4px 4px 0 0);
+        padding: 4px 4px 0 0;
     }
 
     a:hover span.label {
@@ -286,7 +284,7 @@ footer {
 textarea {
     height: 150px;
     resize: vertical;
-    text-align: #{$start};
+    text-align: left;
     vertical-align: top;
 }
 
@@ -301,7 +299,7 @@ textarea {
 }
 
 .horizontal .oro-clearfix .label {
-    float: #{$start};
+    float: left;
 }
 
 .input-append,
@@ -310,7 +308,7 @@ textarea {
 }
 
 .oro-action .btn-group {
-    margin-#{$end}: 0;
+    margin-right: 0;
 }
 
 .top-messages {
@@ -332,7 +330,7 @@ textarea {
 
 .ui-slider {
     position: relative;
-    text-align: #{$start};
+    text-align: left;
 }
 
 .ui-slider .ui-slider-handle {
@@ -358,7 +356,7 @@ textarea {
 
 .ui-slider-horizontal .ui-slider-handle {
     top: -.3em;
-    margin-#{$start}: -.6em;
+    margin-left: -.6em;
 }
 
 .ui-slider-horizontal .ui-slider-range {
@@ -366,11 +364,11 @@ textarea {
 }
 
 .ui-slider-horizontal .ui-slider-range-min {
-    #{$start}: 0;
+    left: 0;
 }
 
 .ui-slider-horizontal .ui-slider-range-max {
-    #{$end}: 0;
+    right: 0;
 }
 
 .ui-slider-vertical {
@@ -379,13 +377,13 @@ textarea {
 }
 
 .ui-slider-vertical .ui-slider-handle {
-    #{$start}: -.3em;
-    margin-#{$start}: 0;
+    left: -.3em;
+    margin-left: 0;
     margin-bottom: -.6em;
 }
 
 .ui-slider-vertical .ui-slider-range {
-    #{$start}: 0;
+    left: 0;
     width: 100%;
 }
 
@@ -411,8 +409,8 @@ textarea {
     font-size: $content-title-font-size;
     line-height: $content-title-line-height;
     padding-bottom: $content-title-inner-offset-bottom;
-    margin: side-values(0 0 $content-padding-medium);
-    text-align: $start;
+    margin: 0 0 $content-padding-medium;
+    text-align: left;
 }
 
 .widget-title {
@@ -428,14 +426,14 @@ textarea {
 }
 
 .separator-btn {
-    border-#{$start}: 1px solid $additional-extra-lighten;
+    border-left: 1px solid $additional-extra-lighten;
     margin: 4px 8px 0;
     height: $btn-line-height;
 }
 
 .pagination-centered > label {
-    margin-#{$end}: -4px;
-    padding-#{$start}: 5px;
+    margin-right: -4px;
+    padding-left: 5px;
 }
 
 .alert-error > ul {
@@ -486,7 +484,7 @@ textarea {
 
     &:before {
         display: inline-block;
-        margin-#{$start}: 8px;
+        margin-left: 8px;
         font: normal 18px/1em FontAwesome;
         font-style: normal;
         text-decoration: inherit;
@@ -516,7 +514,7 @@ textarea {
 
 label.checkbox.error,
 label.radio.error {
-    padding-#{$end}: 12px;
+    padding-right: 12px;
 }
 
 .scrollable-container {
@@ -559,7 +557,7 @@ label.radio.error {
     }
 
     .add-list-item {
-        margin-#{$start}: 183px;
+        margin-left: 183px;
     }
 
     .row-oro.oro-multiselect-holder {
@@ -603,14 +601,14 @@ label.radio.error {
     }
 
     .add-list-item {
-        margin-#{$start}: 183px;
+        margin-left: 183px;
     }
 
     .removeRow {
         position: absolute;
         width: 28px;
         top: 6px;
-        #{$end}: 6px;
+        right: 6px;
         text-decoration: none;
 
         &:after {
@@ -639,7 +637,7 @@ label.radio.error {
     }
 
     .list-inline {
-        margin-#{$start}: 0;
+        margin-left: 0;
     }
 }
 
@@ -648,7 +646,7 @@ label.radio.error {
 }
 
 .float-holder {
-    float: #{$start};
+    float: left;
 
     .removeRow {
         margin: 0;
@@ -689,7 +687,7 @@ iframe.email-body {
 
     & > div {
         display: inline-block;
-        margin-#{$end}: 20px;
+        margin-right: 20px;
     }
 
     input[type="checkbox"] {
@@ -720,16 +718,16 @@ span.validation-failed {
 }
 
 .create-select-entity-container {
-    padding: side-values(5px 30px 30px 30px);
+    padding: 5px 30px 30px 30px;
     border: 1px solid $primary-860;
     border-radius: 3px;
 
     .buttons-container {
-        margin-#{$start}: -20px;
+        margin-left: -20px;
         margin-bottom: 30px;
 
         a {
-            margin-#{$end}: 20px;
+            margin-right: 20px;
         }
     }
 
@@ -738,7 +736,7 @@ span.validation-failed {
     }
 
     .box-type1 .title {
-        padding-#{$start}: 0;
+        padding-left: 0;
         padding-top: 0;
     }
 }
@@ -762,7 +760,7 @@ span.validation-failed {
 }
 
 .pull-left-extra {
-    margin-#{$start}: 20px;
+    margin-left: 20px;
 }
 
 .tooltip-icon {
@@ -780,17 +778,17 @@ label .popover-body {
         vertical-align: middle;
 
         &:not(:first-of-type) .btn {
-            margin-#{$start}: 5px;
+            margin-left: 5px;
         }
 
         .collapse-all-button,
         .expand-all-button {
-            padding: side-values(0 8px 0 6px);
+            padding: 0 8px 0 6px;
         }
     }
 
     .expand-all-button {
-        border-#{$end}: 1px solid $primary-750;
+        border-right: 1px solid $primary-750;
     }
 }
 
@@ -806,7 +804,7 @@ label .popover-body {
 
         .actions {
             position: relative;
-            float: #{$end};
+            float: right;
             z-index: 99;
         }
     }
@@ -843,8 +841,8 @@ label .popover-body {
         display: inline-block;
         border-radius: 8px;
         position: relative;
-        margin-#{$start}: -10px;
-        margin-#{$end}: -5px;
+        margin-left: -10px;
+        margin-right: -5px;
         top: -7px;
         line-height: 15px;
         text-align: center;

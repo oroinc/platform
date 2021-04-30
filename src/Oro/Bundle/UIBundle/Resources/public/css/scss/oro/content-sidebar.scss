@@ -136,7 +136,7 @@
 
     &--container {
         display: $content-sidebar-container-display;
-        margin-#{$start}: $content-sidebar-container-offset-left;
+        margin-left: $content-sidebar-container-offset-left;
 
         &:only-child {
             height: 100%;

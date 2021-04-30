@@ -477,6 +477,7 @@ datagrids:
                 label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+                cellClassName: 'direction-ltr'
             subject:
                 data_name: subject
                 type: twig

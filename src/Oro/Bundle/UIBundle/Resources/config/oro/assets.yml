@@ -1,22 +1,26 @@
 css:
     inputs:
-        - 'timepicker/jquery.timepicker.css'
+        # Settings
+        - 'bundles/oroui/css/scss/settings/global-settings.scss'
 
-        - 'jstree/dist/themes/default/style.min.css'
+        # Styles
+        - '~timepicker/jquery.timepicker.css'
+
+        - '~jstree/dist/themes/default/style.min.css'
 
         # Bootstrap port
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
-        # libraries' styles
-        - 'font-awesome/scss/font-awesome.scss'
+        # Libraries styles
+        - 'bundles/oroui/css/scss/font-awesome/core.scss'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
-        - 'lightgallery/dist/css/lg-transitions.css'
-        - 'lightgallery/dist/css/lightgallery.css'
-        - 'overlayscrollbars/css/OverlayScrollbars.css'
-        - 'jquery-ui-multiselect-widget/jquery.multiselect.css'
-        - 'jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
+        - '~lightgallery/dist/css/lg-transitions.css'
+        - '~lightgallery/dist/css/lightgallery.css'
+        - '~overlayscrollbars/css/OverlayScrollbars.css'
+        - '~jquery-ui-multiselect-widget/jquery.multiselect.css'
+        - '~jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
 
         # customized libraries' styles
         - 'bundles/oroui/css/jquery-ui.grid.css'
@@ -27,7 +31,5 @@ css:
         - 'bundles/oroui/css/scss/main.scss'
         - 'bundles/oroui/css/all.css'
     output: css/oro.css
-css_ie:
-    inputs:
-        - 'bundles/oroui/css/scss/ie/main-ie.scss'
-    output: css/oro-ie.css
+    auto_rtl_inputs:
+        - 'bundles/oro*/**'

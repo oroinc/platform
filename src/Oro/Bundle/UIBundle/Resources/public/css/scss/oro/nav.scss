@@ -59,7 +59,7 @@
     }
 
     &-extra-right {
-        padding-#{$end}: $content-padding;
+        padding-right: $content-padding;
     }
 }
 
@@ -124,7 +124,7 @@
 
         &.pull-right {
             flex-grow: 1;
-            text-align: #{$end};
+            text-align: right;
         }
     
         &:not(.dropdown-menu) {

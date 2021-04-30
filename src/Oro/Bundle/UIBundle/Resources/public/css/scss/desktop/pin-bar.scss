@@ -22,7 +22,7 @@
         .btn-close {
             position: absolute;
             top: 50%;
-            #{$end}: 6px;
+            right: 6px;
             width: 14px;
             height: 14px;
             display: block;
@@ -30,7 +30,7 @@
             color: transparent;
             font-size: 0;
             padding: 0;
-            margin: side-values(-7px 0 0 0);
+            margin: -7px 0 0 0;
             border-width: 0;
 
             &:active,
@@ -83,7 +83,7 @@
         .btn-close {
             position: absolute;
             top: 4px;
-            #{$end}: 4px;
+            right: 4px;
 
             &:before {
                 color: $pin-item-close-color;
@@ -106,7 +106,7 @@
     display: none; // don't show dropbox by default
     position: absolute;
     top: 0;
-    margin-#{$start}: -$pin-item-show-more-menu-width;
+    margin-left: -$pin-item-show-more-menu-width;
     height: 100%;
 
     &:before {
@@ -114,7 +114,7 @@
         display: block;
         position: absolute;
         top: 0;
-        #{$end}: 100%;
+        right: 100%;
         height: 100%;
         width: 32px;
         background-image: $pin-show-more-gradient;
@@ -137,12 +137,12 @@
     }
 
     .dropdown-menu {
-        #{$start}: auto;
-        #{$end}: $pin-item-show-more-menu-offset;
+        left: auto;
+        right: $pin-item-show-more-menu-offset;
 
         &:before {
-            #{$start}: auto;
-            #{$end}: $pin-item-show-more-menu-arrow-end;
+            left: auto;
+            right: $pin-item-show-more-menu-arrow-end;
         }
     }
 
@@ -151,10 +151,10 @@
         margin: 0;
         overflow-y: auto;
 
-        @include if-ltr() {
-            right: 0;
-            left: auto;
-        }
+        /*rtl:begin:ignore*/
+        right: 0;
+        left: auto;
+        /*rtl:end:ignore*/
     }
 
     li {
@@ -165,7 +165,7 @@
         }
 
         a {
-            padding: side-values(7px 26px 7px 13px);
+            padding: 7px 26px 7px 13px;
         }
     }
 }
@@ -191,7 +191,7 @@
         text-align: left;
         line-height: inherit;
         position: relative;
-        padding: side-values(0 22px 0 8px);
+        padding: 0 22px 0 8px;
 
         &.active {
             background-color: $pin-item-active-bg-color;

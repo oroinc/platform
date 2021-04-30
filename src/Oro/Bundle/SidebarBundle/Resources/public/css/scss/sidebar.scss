@@ -58,15 +58,15 @@
     }
 
     .sidebar.sidebar-right &__resize {
-        #{$start}: -1px;
-        padding-#{$start}: 4px;
-        border-#{$start}-width: 2px;
+        left: -1px;
+        padding-left: 4px;
+        border-left-width: 2px;
     }
 
     .sidebar.sidebar-left &__resize {
-        #{$end}: -1px;
-        padding-#{$end}: 4px;
-        border-#{$end}-width: 2px;
+        right: -1px;
+        padding-right: 4px;
+        border-right-width: 2px;
     }
 
     // add-widget and toggle elements, common styles
@@ -92,24 +92,24 @@
 
     &.sidebar-right &__add-widget,
     &.sidebar-right &__toggle {
-        #{$start}: 0;
+        left: 0;
     }
 
     &.maximized.sidebar-right &__add-widget {
         bottom: 0;
-        #{$start}: auto;
-        #{$end}: 0;
+        left: auto;
+        right: 0;
     }
 
     &.maximized.sidebar-left &__add-widget {
         bottom: 0;
-        #{$start}: 0;
-        #{$end}: auto;
+        left: 0;
+        right: auto;
     }
 
     &.sidebar-left &__add-widget,
     &.sidebar-left &__toggle {
-        #{$end}: 0;
+        right: 0;
     }
 
     // add-widget element
@@ -123,19 +123,19 @@
     }
 
     &.sidebar-right &__toggle {
-        @include fa-icon($sidebar-icon-left);
+        @include fa-icon($sidebar-icon-left, before, false, true);
     }
 
     &.sidebar-left &__toggle {
-        @include fa-icon($sidebar-icon-right);
+        @include fa-icon($sidebar-icon-right, before, false, true);
     }
 
     &.sidebar-right.maximized &__toggle {
-        @include fa-icon($sidebar-icon-right);
+        @include fa-icon($sidebar-icon-right, before, false, true);
     }
 
     &.sidebar-left.maximized &__toggle {
-        @include fa-icon($sidebar-icon-left);
+        @include fa-icon($sidebar-icon-left, before, false, true);
     }
 }
 
@@ -175,11 +175,11 @@
     }
 
     .sidebar.minimized.sidebar-right &.poppedup &__popup_wrapper {
-        margin-#{$start}: -10px;
+        margin-left: -10px;
     }
 
     .sidebar.minimized.sidebar-left &.poppedup &__popup_wrapper {
-        margin-#{$start}: $sidebar-minimized-width + 10;
+        margin-left: $sidebar-minimized-width + 10;
     }
 
     .sidebar.minimized &.poppedup &__popup {
@@ -214,33 +214,33 @@
     }
 
     .sidebar.minimized.sidebar-right &.poppedup &__popup {
-        #{$end}: 0;
+        right: 0;
 
         &_wrapper {
             &:before {
-                #{$start}: -6px;
+                left: -6px;
                 transform: rotate(-37deg) skewX(15deg);
-                box-shadow: if-ltr(1px 2px, -2px -2px) 13px 1px rgba(0, 0, 0, .13);
+                box-shadow: 2px 2px 13px 1px rgba(0, 0, 0, .13);
             }
 
             &:after {
-                #{$end}: 100%;
+                right: 100%;
             }
         }
     }
 
     .sidebar.minimized.sidebar-left &.poppedup &__popup {
-        #{$start}: 0;
+        left: 0;
 
         &_wrapper {
             &:before {
-                #{$end}: -6px;
+                right: -6px;
                 transform: rotate(-37deg) skewX(15deg);
-                box-shadow: if-ltr(-2px -2px, 1px 2px) 13px 1px rgba(0, 0, 0, .13);
+                box-shadow: -2px -2px 13px 1px rgba(0, 0, 0, .13);
             }
 
             &:after {
-                #{$start}: 100%;
+                left: 100%;
             }
         }
     }
@@ -293,27 +293,20 @@
         .dropdown-menu {
             min-width: 115px;
         }
-
-        @include if-rtl() {
-            @at-root .sidebar-right .dropdown-menu {
-                right: auto;
-                left: 0;
-            }
-        }
     }
 
     &__header-icon {
         color: $sidebar-widget-title-color;
         background-color: transparent;
-        padding-#{$end}: 8px;
-        padding-#{$start}: 2px;
+        padding-right: 8px;
+        padding-left: 2px;
     }
 
     &__header-toggle {
         width: 20px;
         font-size: 18px;
 
-        @include fa-icon($sidebar-icon-toggle);
+        @include fa-icon($sidebar-icon-toggle, before, false, true);
 
         background-color: transparent;
     }
@@ -363,6 +356,12 @@
         filter: none;
     }
 }
+/*rtl:raw:
+.sidebar-right .dropdown-menu {
+    right: auto;
+    left: 0;
+}
+*/
 
 // sidebar widget icon
 .sidebar-widget-icon {
@@ -393,7 +392,7 @@
             display: inline-block;
             position: absolute;
             top: -4px;
-            #{$end}: -9px;
+            right: -9px;
             margin: 0;
             padding: 0;
             border-radius: 8px;
@@ -410,13 +409,13 @@
     .sidebar.minimized & {
         .loading-icon {
             top: -7px;
-            #{$end}: 0;
+            right: 0;
         }
 
         .item-counter {
             top: -10px;
-            margin-#{$start}: -20px;
-            margin-#{$end}: 0;
+            margin-left: -20px;
+            margin-right: 0;
         }
     }
 }

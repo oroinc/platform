@@ -34,7 +34,7 @@ define(['underscore', 'backgrid'
          */
         generateLinkHTML: function(phoneNumber) {
             const number = phoneNumber.trim();
-            return '<a href="tel:' + _.escape(number) + '" class="nowrap">' + _.escape(number) + '</a>';
+            return `<a href="tel:${_.escape(number)}" class="nowrap"><bdo dir="ltr">${_.escape(number)}</bdo></a>`;
         }
     });
 

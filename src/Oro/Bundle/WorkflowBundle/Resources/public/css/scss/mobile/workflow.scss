@@ -2,12 +2,12 @@
 
 .workflow-widget-content {
     position: relative;
-    padding-#{$end}: 0;
+    padding-right: 0;
 }
 
 .workflow-collapse {
     position: absolute;
-    #{$start}: -$icon-font-size;
+    left: -$icon-font-size;
 
     float: none;
 }
@@ -15,7 +15,7 @@
 .collapse,
 .collapsing {
     .workflow-entity {
-        margin-#{$start}: 0;
+        margin-left: 0;
     }
 }
 
@@ -58,7 +58,7 @@
     }
 
     .workflow-scroller {
-        padding-#{$end}: 5px;
+        padding-right: 5px;
         overflow-x: auto;
     }
 
@@ -69,14 +69,14 @@
     .workflow-steps {
         display: block;
         width: 100%;
-        padding: side-values(5px 0 10px 8px);
+        padding: 5px 0 10px 8px;
     }
 
     .workflow-controls {
         display: block;
         width: 100%;
         padding: 0;
-        text-align: $start;
+        text-align: left;
 
         .transitions-btn-group {
             width: 100%;

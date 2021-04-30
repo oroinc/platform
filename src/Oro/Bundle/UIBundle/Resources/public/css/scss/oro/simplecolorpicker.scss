@@ -79,20 +79,20 @@
 
         .minicolors-grid {
             top: $position;
-            #{$start}: $position;
+            left: $position;
         }
 
         .minicolors-slider {
             top: $position;
-            #{$start}: auto;
-            #{$end}: $position;
+            left: auto;
+            right: $position;
         }
     }
 
     .form-actions {
         position: absolute;
         top: auto;
-        #{$end}: $position;
+        right: $position;
         bottom: $position;
 
         width: 100%;
@@ -100,7 +100,7 @@
         box-sizing: border-box;
 
         .btn {
-            margin-#{$start}: 6px;
+            margin-left: 6px;
         }
     }
 }
@@ -136,7 +136,7 @@
 .custom-color-wrapper {
     display: inline-block;
     min-width: $dropdown-item-icon-fa-size;
-    margin-#{$end}: $dropdown-item-icon-fa-offset;
+    margin-right: $dropdown-item-icon-fa-offset;
     vertical-align: middle;
 
     line-height: 1;

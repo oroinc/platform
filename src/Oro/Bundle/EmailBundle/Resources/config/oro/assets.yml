@@ -1,3 +1,7 @@
 css:
     inputs:
-      - 'bundles/oroemail/css/scss/main.scss'
+        # Variables
+        - 'bundles/oroemail/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroemail/css/scss/main.scss'

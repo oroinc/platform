@@ -21,7 +21,7 @@
         width: $role-collapse-action-container-width;
 
         .collapse-action {
-            margin-#{$end}: $inner-permissions-grid-collapse-action-offset;
+            margin-right: $inner-permissions-grid-collapse-action-offset;
 
             font-size: $role-capability-icon-size;
             text-align: center;
@@ -40,24 +40,24 @@
     }
 
     .entity-name {
-        padding-#{$end}: $inner-permissions-grid-entity-name-offset;
+        padding-right: $inner-permissions-grid-entity-name-offset;
 
         font-weight: $inner-permissions-grid-entity-name-weight;
     }
 
     .entity-row-action {
-        margin-#{$start}: auto;
+        margin-left: auto;
     }
 
     .fields-list {
-        padding-#{$start}: $inner-permissions-grid-fields-list-indent;
+        padding-left: $inner-permissions-grid-fields-list-indent;
         padding-bottom: $inner-permissions-grid-fields-list-offset;
     }
 
     .field-name {
         width: $role-collapse-action-container-width - $inner-permissions-grid-fields-list-indent;
 
-        padding-#{$end}: $inner-permissions-grid-entity-name-offset;
+        padding-right: $inner-permissions-grid-entity-name-offset;
     }
 
     .collapse {
@@ -113,7 +113,7 @@
 
     &__item {
         width: $action-permissions-item-width;
-        padding-#{$end}: $action-permissions-item-offset;
+        padding-right: $action-permissions-item-offset;
 
         line-height: $action-permissions-item-line-height;
 
@@ -129,7 +129,7 @@
                 @include fa-icon($role-capability-icon-action, after, true) {
                     position: absolute;
                     top: 2px;
-                    #{$end}: 0;
+                    right: 0;
 
                     // Reset Bootstrap styles
                     width: auto;
@@ -147,7 +147,7 @@
 
     &__item-wrapper {
         display: inline-block;
-        padding-#{$end}: $action-permissions-item-wrapper-offset;
+        padding-right: $action-permissions-item-wrapper-offset;
         max-width: 100%;
 
         color: $role-capability-item-color;

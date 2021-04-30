@@ -1,22 +1,22 @@
 /* @theme: admin.oro; */
 
 .form-layout {
-    margin-#{$end}: -$content-padding-medium / 2;
-    margin-#{$start}: -$content-padding-medium / 2;
+    margin-right: -$content-padding-medium / 2;
+    margin-left: -$content-padding-medium / 2;
 
     &__row {
-        padding-#{$end}: $content-padding-medium / 2;
-        padding-#{$start}: $content-padding-medium / 2;
+        padding-right: $content-padding-medium / 2;
+        padding-left: $content-padding-medium / 2;
     }
 
     &__part {
         &.is-label {
             justify-content: flex-end;
             padding-top: $form-horizontal-control-label-offset;
-            padding-#{$end}: $content-padding;
+            padding-right: $content-padding;
 
             line-height: $form-horizontal-control-label-line-height;
-            text-align: #{$end};
+            text-align: right;
         }
 
         &.is-group {
@@ -24,16 +24,16 @@
 
             .form-layout__part {
                 &:nth-child(odd) {
-                    padding-#{$end}: $content-padding-small / 2;
+                    padding-right: $content-padding-small / 2;
                 }
 
                 &:nth-child(even) {
-                    padding-#{$start}: $content-padding-small / 2;
+                    padding-left: $content-padding-small / 2;
                 }
 
                 &:only-child {
-                    padding-#{$start}: 0;
-                    padding-#{$end}: 0;
+                    padding-left: 0;
+                    padding-right: 0;
                 }
             }
         }

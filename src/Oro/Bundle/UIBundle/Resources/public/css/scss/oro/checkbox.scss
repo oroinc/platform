@@ -64,7 +64,7 @@
         height: 100%;
         margin: 0 !important;
         top: 0;
-        #{$start}: 0;
+        left: 0;
     }
 
     &__input {
@@ -137,7 +137,7 @@
     }
 
     &__text {
-        margin-#{$start}: $checkbox-text-outer-offset-start;
+        margin-left: $checkbox-text-outer-offset-start;
         vertical-align: $checkbox-text-vertical-align;
         font-size: $base-font-size;
 
@@ -160,7 +160,7 @@
     + div,
     + label,
     &-label {
-        margin-#{$start}: $checkbox-sibling-outer-offset;
+        margin-left: $checkbox-sibling-outer-offset;
         vertical-align: middle;
         display: inline-block;
     }
@@ -171,11 +171,11 @@
 }
 
 .shift-checkbox {
-    padding-#{$start}: $checkbox-shift-offset;
+    padding-left: $checkbox-shift-offset;
 
     .checkbox-view {
         vertical-align: text-top;
-        margin-#{$start}: -$checkbox-shift-offset;
-        margin-#{$end}: $checkbox-shift-offset - $checkbox-icon-width;
+        margin-left: -$checkbox-shift-offset;
+        margin-right: $checkbox-shift-offset - $checkbox-icon-width;
     }
 }

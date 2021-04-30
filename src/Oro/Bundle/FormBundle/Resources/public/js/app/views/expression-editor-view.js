@@ -62,6 +62,10 @@ define(function(require) {
 
             this.initAutocomplete();
 
+            if (_.isRTL()) {
+                this.$el.attr('dir', 'ltr');
+            }
+
             return ExpressionEditorView.__super__.initialize.call(this, options);
         },
 

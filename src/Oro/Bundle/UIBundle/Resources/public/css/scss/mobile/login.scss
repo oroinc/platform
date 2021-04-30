@@ -107,7 +107,7 @@
     }
 
     .oro-remember-me {
-        padding-#{$start}: 0;
+        padding-left: 0;
     }
 
     span.validation-failed {
@@ -140,7 +140,7 @@
 
     &--login.form-row-layout {
         .form-signin__footer {
-            padding-#{$start}: 0;
+            padding-left: 0;
         }
     }
 }

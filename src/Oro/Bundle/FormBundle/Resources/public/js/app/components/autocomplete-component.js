@@ -177,13 +177,20 @@ define(function(require) {
             });
 
             const $autocomplete = this.$holder.length ? this.$holder : this.$menu;
+            const direction = {};
+
+            if (_.isRTL()) {
+                direction.right = this._calculateRightPosition();
+            } else {
+                direction.left = pos.left;
+            }
 
             if (this.$holder.length) {
                 this.$holder
                     .insertAfter(this.$element)
                     .css({
                         top: pos.top + pos.height,
-                        left: pos.left
+                        ...direction
                     })
                     .append(this.$menu)
                     .show();
@@ -192,7 +199,7 @@ define(function(require) {
                     .insertAfter(this.$element)
                     .css({
                         top: pos.top + pos.height,
-                        left: pos.left
+                        ...direction
                     })
                     .show();
             }

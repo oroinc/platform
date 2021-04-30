@@ -27,7 +27,7 @@
             padding: $content-sidebar-jstree-wrapper-mobile-inner-offset;
 
             .jstree {
-                margin: side-values($content-sidebar-jstree-wrapper-jstree-mobile-inner-offset);
+                margin: $content-sidebar-jstree-wrapper-jstree-mobile-inner-offset;
             }
         }
     }

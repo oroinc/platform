@@ -32,7 +32,7 @@
     width: $oro-datagrid-action-size;
     padding: $oro-datagrid-action-inner-offset;
 
-    text-align: #{$end};
+    text-align: right;
 
     @extend %header-cell-dropdown;
 
@@ -53,7 +53,7 @@
     padding: $oro-datagrid-action-cell-offset;
 
     line-height: 0;
-    text-align: #{$end};
+    text-align: right;
 
     vertical-align: top;
 }
@@ -82,7 +82,7 @@
 
     .icon {
         height: $oro-datagrid-action-font-size;
-        margin-#{$start}: $oro-datagrid-all-header-cell-icon-offset;
+        margin-left: $oro-datagrid-all-header-cell-icon-offset;
 
         vertical-align: middle;
 
@@ -96,7 +96,7 @@
 }
 
 .select-row-cell {
-    padding-#{$start}: $oro-grid-first-cell-offset;
+    padding-left: $oro-grid-first-cell-offset;
 
     .checkbox-view {
         vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;

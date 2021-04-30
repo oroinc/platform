@@ -83,19 +83,19 @@
 
                 max-width: 148px;
 
-                padding-#{$start}: 16px;
-                padding-#{$end}: 0;
+                padding-left: 16px;
+                padding-right: 0;
             }
 
             &.visibility-cell {
                 text-align: left;
-                padding-#{$start}: 16px;
-                padding-#{$end}: 16px;
+                padding-left: 16px;
+                padding-right: 16px;
             }
 
             &.sort-cell {
-                padding-#{$start}: 16px;
-                padding-#{$end}: 16px;
+                padding-left: 16px;
+                padding-right: 16px;
                 white-space: nowrap;
                 text-align: left;
 

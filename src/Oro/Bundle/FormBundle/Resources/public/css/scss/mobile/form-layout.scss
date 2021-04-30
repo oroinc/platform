@@ -11,7 +11,7 @@
 
         &.is-label {
             padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
-            padding-#{$end}: $content-padding;
+            padding-right: $content-padding;
 
             line-height: $form-horizontal-control-label-inner-line-height;
         }

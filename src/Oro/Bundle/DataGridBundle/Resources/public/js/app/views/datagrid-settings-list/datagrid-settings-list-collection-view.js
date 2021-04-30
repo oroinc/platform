@@ -226,10 +226,13 @@ define(function(require, exports, module) {
             const $table = $wrapper.children('table');
             const tableThs = $table.find('thead th');
             const headerThs = this.$('[data-role="datagrid-settings-table-header-wrapper"] tr th');
-            $wrapper.css('padding-right', 0);
+            $wrapper.css(`padding-${_.isRTL() ? 'left' : 'right'}`, 0);
             const clientWidth = $wrapper[0].clientWidth;
             if (clientWidth > 0) {
-                $wrapper.css('padding-right', $table.width() - $wrapper[0].clientWidth + 'px');
+                $wrapper.css(
+                    `padding-${_.isRTL() ? 'left' : 'right'}`,
+                    $table.width() - $wrapper[0].clientWidth + 'px'
+                );
             }
             for (i = 0; i < tableThs.length - 1; i += 1) {
                 $(headerThs[i]).width($(tableThs[i]).width());
