@@ -343,7 +343,7 @@ define(function(require) {
             }, this);
             scrollStateModel.on('change:clientWidth', function(model, val) {
                 otherScroll.css({
-                    marginLeft: val - scrollBarWidth
+                    [`margin${_.isRTL() ? 'Right' : 'Left'}`]: val - scrollBarWidth
                 });
             }, this);
             scrollStateModel.on('change:scrollHeight', function(model, val) {
