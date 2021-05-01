@@ -219,23 +219,21 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $schema = $this->getExtendSchema();
         $extension = $this->getExtendExtension();
 
-        $this->entityMetadataHelper->expects($this->at(0))
+        $this->entityMetadataHelper->expects($this->exactly(3))
             ->method('registerEntityClass')
-            ->with(
-                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity_1',
-                ExtendHelper::ENTITY_NAMESPACE . 'Entity_1'
-            );
-        $this->entityMetadataHelper->expects($this->at(1))
-            ->method('registerEntityClass')
-            ->with(
-                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity2',
-                ExtendHelper::ENTITY_NAMESPACE . 'Entity2'
-            );
-        $this->entityMetadataHelper->expects($this->at(2))
-            ->method('registerEntityClass')
-            ->with(
-                ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity3',
-                ExtendHelper::ENTITY_NAMESPACE . 'Entity3'
+            ->withConsecutive(
+                [
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity_1',
+                    ExtendHelper::ENTITY_NAMESPACE . 'Entity_1'
+                ],
+                [
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity2',
+                    ExtendHelper::ENTITY_NAMESPACE . 'Entity2'
+                ],
+                [
+                    ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity3',
+                    ExtendHelper::ENTITY_NAMESPACE . 'Entity3'
+                ]
             );
 
         $extension->createCustomEntityTable(

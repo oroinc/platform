@@ -19,11 +19,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
  */
 class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var IndexEntityConfigDumperExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -64,10 +64,10 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->once())
             ->method('getConfigs')
-            ->will($this->returnValue([$config]));
+            ->willReturn([$config]);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -89,31 +89,23 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($config->getId()->getClassName(), 'field1')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -134,27 +126,19 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -176,31 +160,23 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($config->getId()->getClassName(), 'field1')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -236,27 +212,19 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig, $fieldConfig2) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig, $fieldConfig2) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig, $fieldConfig2];
-                    }
-                )
-            );
+                return [$fieldConfig, $fieldConfig2];
+            });
         $datagridConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
             ->willReturnMap([
@@ -311,20 +279,16 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->with('extend')
-            ->will($this->returnValue($extendConfigProvider));
+            ->willReturn($extendConfigProvider);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $this->configManager->expects($this->never())
             ->method('persist');
@@ -361,36 +325,28 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(3))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig];
-                    }
-                )
-            );
+                return [$fieldConfig];
+            });
 
         $datagridConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $datagridConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($datagridFieldConfig->getId()->getClassName(), $datagridFieldConfig->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig));
+            ->willReturn($datagridFieldConfig);
 
         $this->configManager->expects($this->once())
             ->method('persist')
@@ -427,44 +383,40 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(4))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['datagrid', $datagridConfigProvider],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['datagrid', $datagridConfigProvider],
+            ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will(
-                $this->returnCallback(
-                    function ($className) use ($config, $fieldConfig1, $fieldConfig2) {
-                        if (empty($className)) {
-                            return [$config];
-                        }
+            ->willReturnCallback(function ($className) use ($config, $fieldConfig1, $fieldConfig2) {
+                if (empty($className)) {
+                    return [$config];
+                }
 
-                        return [$fieldConfig1, $fieldConfig2];
-                    }
-                )
-            );
+                return [$fieldConfig1, $fieldConfig2];
+            });
 
-        $datagridConfigProvider->expects($this->at(0))
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
-            ->with($datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName())
-            ->will($this->returnValue(true));
-        $datagridConfigProvider->expects($this->at(1))
+            ->willReturnMap([
+                [$datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName(), true],
+                [$datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName(), true]
+            ]);
+        $datagridConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->with($datagridFieldConfig1->getId()->getClassName(), $datagridFieldConfig1->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig1));
-        $datagridConfigProvider->expects($this->at(2))
-            ->method('hasConfig')
-            ->with($datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName())
-            ->will($this->returnValue(true));
-        $datagridConfigProvider->expects($this->at(3))
-            ->method('getConfig')
-            ->with($datagridFieldConfig2->getId()->getClassName(), $datagridFieldConfig2->getId()->getFieldName())
-            ->will($this->returnValue($datagridFieldConfig2));
+            ->willReturnMap([
+                [
+                    $datagridFieldConfig1->getId()->getClassName(),
+                    $datagridFieldConfig1->getId()->getFieldName(),
+                    $datagridFieldConfig1
+                ],
+                [
+                    $datagridFieldConfig2->getId()->getClassName(),
+                    $datagridFieldConfig2->getId()->getFieldName(),
+                    $datagridFieldConfig2
+                ]
+            ]);
 
         $this->configManager->expects($this->never())
             ->method('persist');

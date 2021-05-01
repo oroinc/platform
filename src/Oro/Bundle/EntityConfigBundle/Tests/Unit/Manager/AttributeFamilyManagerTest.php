@@ -14,7 +14,7 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    const FAMILY_ID = 777;
+    private const FAMILY_ID = 777;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
@@ -33,27 +33,14 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->familyRepository = $this->getMockBuilder(AttributeFamilyRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->entityRepository = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->familyRepository = $this->createMock(AttributeFamilyRepository::class);
+        $this->entityRepository = $this->createMock(EntityRepository::class);
 
         $this->attributeFamily = $this->getEntity(AttributeFamily::class, [
             'id' => self::FAMILY_ID,
             'entityClass' => 'SomeClass'
         ]);
-
-        $this->doctrineHelper->expects($this->at(0))
-            ->method('getEntityRepository')
-            ->with(AttributeFamily::class)
-            ->willReturn($this->familyRepository);
 
         $this->familyRepository->expects($this->any())
             ->method('find')
@@ -85,10 +72,10 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
             ->with('SomeClass')
             ->willReturn(3);
 
-        $this->doctrineHelper->expects($this->at(1))
+        $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityRepository')
-            ->with('SomeClass')
-            ->willReturn($this->entityRepository);
+            ->withConsecutive([AttributeFamily::class], ['SomeClass'])
+            ->willReturnOnConsecutiveCalls($this->familyRepository, $this->entityRepository);
 
         $this->entityRepository->expects($this->once())
             ->method('findOneBy')
@@ -105,10 +92,10 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
             ->with('SomeClass')
             ->willReturn(3);
 
-        $this->doctrineHelper->expects($this->at(1))
+        $this->doctrineHelper->expects($this->exactly(2))
             ->method('getEntityRepository')
-            ->with('SomeClass')
-            ->willReturn($this->entityRepository);
+            ->withConsecutive([AttributeFamily::class], ['SomeClass'])
+            ->willReturnOnConsecutiveCalls($this->familyRepository, $this->entityRepository);
 
         $this->entityRepository->expects($this->once())
             ->method('findOneBy')
@@ -123,7 +110,11 @@ class AttributeFamilyManagerTest extends \PHPUnit\Framework\TestCase
         $aclHelper = $this->createMock(AclHelper::class);
 
         $this->familyManager->setAclHelper($aclHelper);
-        
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with(AttributeFamily::class)
+            ->willReturn($this->familyRepository);
         $this->familyRepository->expects($this->once())
             ->method('getFamilyByCode')
             ->with('test', $aclHelper)
