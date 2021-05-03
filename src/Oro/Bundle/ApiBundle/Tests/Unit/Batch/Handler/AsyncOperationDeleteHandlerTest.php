@@ -11,13 +11,11 @@ use Oro\Bundle\EntityBundle\Handler\EntityDeleteAccessDeniedExceptionFactory;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtension;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry;
 use Oro\Bundle\GaufretteBundle\FileManager;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\LoggerInterface;
 
 class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
     private $fileManager;
 
@@ -58,15 +56,22 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->deleteHandler->setExtensionRegistry($extensionRegistry);
     }
 
+    private function getAsyncOperation(int $id): AsyncOperation
+    {
+        $operation = new AsyncOperation();
+        ReflectionUtil::setId($operation, $id);
+
+        return $operation;
+    }
     public function testIsDeleteGranted()
     {
-        $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
+        $operation = $this->getAsyncOperation(234);
         self::assertTrue($this->deleteHandler->isDeleteGranted($operation));
     }
 
     public function testHandleDelete()
     {
-        $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
+        $operation = $this->getAsyncOperation(234);
 
         $this->fileManager->expects(self::once())
             ->method('findFiles')
@@ -95,7 +100,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
 
-        $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
+        $operation = $this->getAsyncOperation(234);
 
         $exception = new \Exception('fail');
         $this->fileManager->expects(self::once())
@@ -127,7 +132,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
 
-        $operation = $this->getEntity(AsyncOperation::class, ['id' => 234]);
+        $operation = $this->getAsyncOperation(234);
 
         $exception = new \Exception('fail');
         $this->fileManager->expects(self::once())

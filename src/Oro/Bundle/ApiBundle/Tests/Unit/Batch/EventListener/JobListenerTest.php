@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -127,10 +128,9 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setJobId(123);
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         // now - 10 min
-        $createdAtProperty = new \ReflectionProperty(AsyncOperation::class, 'createdAt');
-        $createdAtProperty->setAccessible(true);
-        $createdAtProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $operation,
+            'createdAt',
             (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT10M'))
         );
 
@@ -164,10 +164,9 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setJobId(123);
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         // now - 10 min
-        $createdAtProperty = new \ReflectionProperty(AsyncOperation::class, 'createdAt');
-        $createdAtProperty->setAccessible(true);
-        $createdAtProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $operation,
+            'createdAt',
             (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT10M'))
         );
         $operation->setProgress(0.5);
@@ -202,10 +201,9 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setJobId(123);
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         // now - 10 min
-        $createdAtProperty = new \ReflectionProperty(AsyncOperation::class, 'createdAt');
-        $createdAtProperty->setAccessible(true);
-        $createdAtProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $operation,
+            'createdAt',
             (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT10M'))
         );
         $operation->setProgress(0.5);

@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\PathProvider;
 
 use Oro\Component\Layout\Extension\Theme\PathProvider\ChainPathProvider;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,11 +29,10 @@ class ChainPathProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->addProvider($provider2, -10);
         $this->provider->addProvider($provider3);
 
-        $ref    = new \ReflectionClass($this->provider);
-        $method = $ref->getMethod('getProviders');
-        $method->setAccessible(true);
-
-        $this->assertSame([$provider1, $provider3, $provider2], $method->invoke($this->provider));
+        $this->assertSame(
+            [$provider1, $provider3, $provider2],
+            ReflectionUtil::callMethod($this->provider, 'getProviders', [])
+        );
     }
 
     public function testSetContext()

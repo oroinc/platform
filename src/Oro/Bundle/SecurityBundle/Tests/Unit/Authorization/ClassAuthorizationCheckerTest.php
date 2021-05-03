@@ -14,16 +14,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var ClassAuthorizationChecker */
@@ -55,25 +55,25 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation = $this->createMock(AclAnnotation::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
 
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
             ->with('TestClass', 'TestMethod')
-            ->will($this->returnValue($annotation));
+            ->willReturn($annotation);
         $this->logger->expects($this->once())
             ->method('debug');
         $this->objectIdentityFactory->expects($this->once())
             ->method('get')
             ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
+            ->willReturn($oid);
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(false));
+            ->with('TEST_PERMISSION', $this->identicalTo($oid))
+            ->willReturn(false);
 
         $result = $this->classAuthorizationChecker->isClassMethodGranted('TestClass', 'TestMethod');
         $this->assertFalse($result);
@@ -85,32 +85,30 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation = $this->createMock(AclAnnotation::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $annotation->expects($this->once())
             ->method('getIgnoreClassAcl')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->exactly(2))
             ->method('findAnnotation')
-            ->with('TestClass', 'TestMethod')
-            ->will($this->returnValue($annotation));
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with('TestClass')
-            ->will($this->returnValue(null));
+            ->willReturnMap([
+                ['TestClass', 'TestMethod', $annotation],
+                ['TestClass', null, null]
+            ]);
         $this->logger->expects($this->once())
             ->method('debug');
         $this->objectIdentityFactory->expects($this->once())
             ->method('get')
             ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
+            ->willReturn($oid);
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($oid))
+            ->willReturn(true);
 
         $result = $this->classAuthorizationChecker->isClassMethodGranted('TestClass', 'TestMethod');
         $this->assertTrue($result);
@@ -122,28 +120,28 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation = $this->createMock(AclAnnotation::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $annotation->expects($this->once())
             ->method('getIgnoreClassAcl')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
             ->with('TestClass', 'TestMethod')
-            ->will($this->returnValue($annotation));
+            ->willReturn($annotation);
         $this->logger->expects($this->once())
             ->method('debug');
         $this->objectIdentityFactory->expects($this->once())
             ->method('get')
             ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
+            ->willReturn($oid);
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($oid))
+            ->willReturn(true);
 
         $result = $this->classAuthorizationChecker->isClassMethodGranted('TestClass', 'TestMethod');
         $this->assertTrue($result);
@@ -155,49 +153,51 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation = $this->createMock(AclAnnotation::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $annotation->expects($this->once())
             ->method('getIgnoreClassAcl')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $classOid = new ObjectIdentity('2', 'TestType');
         $classAnnotation = $this->createMock(AclAnnotation::class);
         $classAnnotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('class_annotation'));
+            ->willReturn('class_annotation');
         $classAnnotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION_CLASS'));
+            ->willReturn('TEST_PERMISSION_CLASS');
 
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->exactly(2))
             ->method('findAnnotation')
-            ->with('TestClass', 'TestMethod')
-            ->will($this->returnValue($annotation));
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with('TestClass')
-            ->will($this->returnValue($classAnnotation));
+            ->willReturnMap([
+                ['TestClass', 'TestMethod', $annotation],
+                ['TestClass', null, $classAnnotation]
+            ]);
         $this->logger->expects($this->exactly(2))
             ->method('debug');
-        $this->objectIdentityFactory->expects($this->at(0))
+        $this->objectIdentityFactory->expects($this->exactly(2))
             ->method('get')
-            ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
-        $this->objectIdentityFactory->expects($this->at(1))
-            ->method('get')
-            ->with($this->identicalTo($classAnnotation))
-            ->will($this->returnValue($classOid));
-        $this->authorizationChecker->expects($this->at(0))
+            ->withConsecutive(
+                [$this->identicalTo($annotation)],
+                [$this->identicalTo($classAnnotation)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $oid,
+                $classOid
+            );
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION_CLASS'), $this->identicalTo($classOid))
-            ->will($this->returnValue(false));
+            ->withConsecutive(
+                ['TEST_PERMISSION', $this->identicalTo($oid)],
+                ['TEST_PERMISSION_CLASS', $this->identicalTo($classOid)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
 
         $result = $this->classAuthorizationChecker->isClassMethodGranted('TestClass', 'TestMethod');
         $this->assertFalse($result);
@@ -209,49 +209,48 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation = $this->createMock(AclAnnotation::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $annotation->expects($this->once())
             ->method('getIgnoreClassAcl')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $classOid = new ObjectIdentity('2', 'TestType');
         $classAnnotation = $this->createMock(AclAnnotation::class);
         $classAnnotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('class_annotation'));
+            ->willReturn('class_annotation');
         $classAnnotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION_CLASS'));
+            ->willReturn('TEST_PERMISSION_CLASS');
 
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->exactly(2))
             ->method('findAnnotation')
-            ->with('TestClass', 'TestMethod')
-            ->will($this->returnValue($annotation));
-        $this->annotationProvider->expects($this->at(1))
-            ->method('findAnnotation')
-            ->with('TestClass')
-            ->will($this->returnValue($classAnnotation));
+            ->willReturnMap([
+                ['TestClass', 'TestMethod', $annotation],
+                ['TestClass', null, $classAnnotation]
+            ]);
         $this->logger->expects($this->exactly(2))
             ->method('debug');
-        $this->objectIdentityFactory->expects($this->at(0))
+        $this->objectIdentityFactory->expects($this->exactly(2))
             ->method('get')
-            ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
-        $this->objectIdentityFactory->expects($this->at(1))
-            ->method('get')
-            ->with($this->identicalTo($classAnnotation))
-            ->will($this->returnValue($classOid));
-        $this->authorizationChecker->expects($this->at(0))
+            ->withConsecutive(
+                [$this->identicalTo($annotation)],
+                [$this->identicalTo($classAnnotation)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $oid,
+                $classOid
+            );
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION_CLASS'), $this->identicalTo($classOid))
-            ->will($this->returnValue(true));
+            ->withConsecutive(
+                ['TEST_PERMISSION', $this->identicalTo($oid)],
+                ['TEST_PERMISSION_CLASS', $this->identicalTo($classOid)]
+            )
+            ->willReturn(true);
 
         $result = $this->classAuthorizationChecker->isClassMethodGranted('TestClass', 'TestMethod');
         $this->assertTrue($result);
@@ -263,7 +262,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $method = 'TestMethod';
         $annotation = $this->createMock(AclAnnotation::class);
 
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
             ->with($class, $method)
             ->willReturn($annotation);
@@ -279,7 +278,7 @@ class ClassAuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $class = 'TestClass';
         $method = 'TestMethod';
 
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->once())
             ->method('findAnnotation')
             ->with($class, $method)
             ->willReturn(null);

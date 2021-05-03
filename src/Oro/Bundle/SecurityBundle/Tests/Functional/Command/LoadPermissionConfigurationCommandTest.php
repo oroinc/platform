@@ -10,7 +10,7 @@ use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Config\Definition\Processor;
 
 class LoadPermissionConfigurationCommandTest extends WebTestCase
@@ -147,11 +147,10 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     {
         $provider->ensureCacheWarmedUp();
 
-        $configProp = ReflectionUtil::getProperty(new \ReflectionClass($provider), 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue(
+        ReflectionUtil::setPropertyValue(
             $provider,
-            array_merge($configProp->getValue($provider), $newPermissions)
+            'config',
+            array_merge(ReflectionUtil::getPropertyValue($provider, 'config'), $newPermissions)
         );
     }
 

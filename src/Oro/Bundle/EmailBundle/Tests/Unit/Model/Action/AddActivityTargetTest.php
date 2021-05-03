@@ -9,6 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 {
@@ -69,18 +70,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $activityEntity = $reflection->getProperty('activityEntity');
-        $activityEntity->setAccessible(true);
-        $targetEntity = $reflection->getProperty('targetEntity');
-        $targetEntity->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($activityEntity->getValue($this->action), '$.email');
-        $this->assertEquals($targetEntity->getValue($this->action), '$.target_entity');
-        $this->assertEquals($attribute->getValue($this->action), '$.attribute');
+        $this->assertEquals('$.email', ReflectionUtil::getPropertyValue($this->action, 'activityEntity'));
+        $this->assertEquals('$.target_entity', ReflectionUtil::getPropertyValue($this->action, 'targetEntity'));
+        $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithArrayOptions()
@@ -93,18 +85,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $activityEntity = $reflection->getProperty('activityEntity');
-        $activityEntity->setAccessible(true);
-        $targetEntity = $reflection->getProperty('targetEntity');
-        $targetEntity->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($activityEntity->getValue($this->action), '$.email');
-        $this->assertEquals($targetEntity->getValue($this->action), '$.target_entity');
-        $this->assertEquals($attribute->getValue($this->action), '$.attribute');
+        $this->assertEquals('$.email', ReflectionUtil::getPropertyValue($this->action, 'activityEntity'));
+        $this->assertEquals('$.target_entity', ReflectionUtil::getPropertyValue($this->action, 'targetEntity'));
+        $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithNamedOptionsAndMissingAttribute()
@@ -116,18 +99,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $activityEntity = $reflection->getProperty('activityEntity');
-        $activityEntity->setAccessible(true);
-        $targetEntity = $reflection->getProperty('targetEntity');
-        $targetEntity->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($activityEntity->getValue($this->action), '$.email');
-        $this->assertEquals($targetEntity->getValue($this->action), '$.target_entity');
-        $this->assertEquals($attribute->getValue($this->action), null);
+        $this->assertEquals('$.email', ReflectionUtil::getPropertyValue($this->action, 'activityEntity'));
+        $this->assertEquals('$.target_entity', ReflectionUtil::getPropertyValue($this->action, 'targetEntity'));
+        $this->assertNull(ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithArrayOptionsAndMissingAttribute()
@@ -139,18 +113,9 @@ class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $activityEntity = $reflection->getProperty('activityEntity');
-        $activityEntity->setAccessible(true);
-        $targetEntity = $reflection->getProperty('targetEntity');
-        $targetEntity->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($activityEntity->getValue($this->action), '$.email');
-        $this->assertEquals($targetEntity->getValue($this->action), '$.target_entity');
-        $this->assertEquals($attribute->getValue($this->action), null);
+        $this->assertEquals('$.email', ReflectionUtil::getPropertyValue($this->action, 'activityEntity'));
+        $this->assertEquals('$.target_entity', ReflectionUtil::getPropertyValue($this->action, 'targetEntity'));
+        $this->assertNull(ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithMissingRequiredOption()

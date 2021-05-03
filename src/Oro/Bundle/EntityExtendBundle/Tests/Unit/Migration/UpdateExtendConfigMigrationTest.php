@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendCacheMigrationQuery;
 use Oro\Bundle\EntityExtendBundle\Migration\RefreshExtendConfigMigrationQuery;
+use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension;
+use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,9 +22,7 @@ class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
 
         $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
         $initialStatePath = realpath(__DIR__ . '/../Fixtures') . '/initial_state.yml';
-        $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $commandExecutor = $this->createMock(CommandExecutor::class);
 
         $migration = new UpdateExtendConfigMigration(
             $commandExecutor,
@@ -28,17 +30,10 @@ class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
             $initialStatePath
         );
 
-        $schema = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $queries = $this->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\QueryBag')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schema = $this->createMock(ExtendSchema::class);
+        $queries = $this->createMock(QueryBag::class);
 
-        $dataStorageExtension = $this
-            ->getMockBuilder('Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $dataStorageExtension = $this->createMock(DataStorageExtension::class);
         $dataStorageExtension->expects($this->once())
             ->method('get')
             ->with('initial_entity_config_state', [])
@@ -47,32 +42,14 @@ class UpdateExtendConfigMigrationTest extends \PHPUnit\Framework\TestCase
 
         $schema->expects($this->once())
             ->method('getExtendOptions')
-            ->will($this->returnValue($extendOptions));
+            ->willReturn($extendOptions);
 
-        $queries->expects($this->at(0))
+        $queries->expects($this->exactly(3))
             ->method('addQuery')
-            ->with(
-                new UpdateExtendConfigMigrationQuery(
-                    $extendOptions,
-                    $commandExecutor,
-                    $optionsPath
-                )
-            );
-        $queries->expects($this->at(1))
-            ->method('addQuery')
-            ->with(
-                new RefreshExtendConfigMigrationQuery(
-                    $commandExecutor,
-                    $initialState,
-                    $initialStatePath
-                )
-            );
-        $queries->expects($this->at(2))
-            ->method('addQuery')
-            ->with(
-                new RefreshExtendCacheMigrationQuery(
-                    $commandExecutor
-                )
+            ->withConsecutive(
+                [new UpdateExtendConfigMigrationQuery($extendOptions, $commandExecutor, $optionsPath)],
+                [new RefreshExtendConfigMigrationQuery($commandExecutor, $initialState, $initialStatePath)],
+                [new RefreshExtendCacheMigrationQuery($commandExecutor)]
             );
 
         $migration->up($schema, $queries);

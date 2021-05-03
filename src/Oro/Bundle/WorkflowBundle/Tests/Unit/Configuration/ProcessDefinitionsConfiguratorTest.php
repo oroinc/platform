@@ -8,6 +8,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -202,10 +203,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getDirtyPropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'dirty');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processDefinitionsConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processDefinitionsConfigurator, 'dirty');
     }
 
     /**
@@ -213,10 +211,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getToRemovePropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'toRemove');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processDefinitionsConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processDefinitionsConfigurator, 'toRemove');
     }
 
     /**
@@ -224,9 +219,6 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getToPersistPropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessDefinitionsConfigurator::class, 'toPersist');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processDefinitionsConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processDefinitionsConfigurator, 'toPersist');
     }
 }

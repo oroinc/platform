@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Config\FileLocatorInterface;
 
 class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
@@ -88,25 +89,9 @@ class WorkflowFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(WorkflowFileImportProcessor::class, $instance);
 
-        $this->assertSame($resource, $this->getPrivateProperty($instance, 'file'));
-        $this->assertSame($workflowForImport, $this->getPrivateProperty($instance, 'resource'));
-        $this->assertSame($target, $this->getPrivateProperty($instance, 'target'));
-        $this->assertSame($replace, $this->getPrivateProperty($instance, 'replacements'));
-    }
-
-    /**
-     * @param object $object
-     * @param string $property
-     * @return mixed
-     */
-    protected function getPrivateProperty($object, string $property)
-    {
-        return \Closure::bind(
-            function ($property) {
-                return $this->{$property};
-            },
-            $object,
-            $object
-        )($property);
+        $this->assertSame($resource, ReflectionUtil::getPropertyValue($instance, 'file'));
+        $this->assertSame($workflowForImport, ReflectionUtil::getPropertyValue($instance, 'resource'));
+        $this->assertSame($target, ReflectionUtil::getPropertyValue($instance, 'target'));
+        $this->assertSame($replace, ReflectionUtil::getPropertyValue($instance, 'replacements'));
     }
 }

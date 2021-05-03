@@ -3,7 +3,9 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -171,26 +173,19 @@ class ChangePasswordSubscriberTest extends FormIntegrationTestCase
      */
     public function testIsCurrentUserFalse()
     {
-        $reflection = new \ReflectionMethod($this->subscriber, 'isCurrentUser');
-        $reflection->setAccessible(true);
-
-        $userMock = $this
-            ->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $userMock = $this->createMock(User::class);
         $userMock->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue(1));
+            ->willReturn(1);
 
         $this->token->expects($this->any())
             ->method('getUser')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->tokenAccessor->expects($this->once())
             ->method('getToken')
-            ->will($this->returnValue($this->token));
+            ->willReturn($this->token);
 
-        return $reflection->invoke($this->subscriber, $userMock);
+        ReflectionUtil::callMethod($this->subscriber, 'isCurrentUser', [$userMock]);
     }
 }

@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Filter\LanguageFilter;
 use Oro\Bundle\TranslationBundle\Form\Type\Filter\LanguageFilterType;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class LanguageFilterTest extends \PHPUnit\Framework\TestCase
@@ -32,9 +33,7 @@ class LanguageFilterTest extends \PHPUnit\Framework\TestCase
     {
         $this->filter->init('test', []);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [

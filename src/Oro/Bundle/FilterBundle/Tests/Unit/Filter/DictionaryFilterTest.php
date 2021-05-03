@@ -11,6 +11,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -54,9 +55,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $this->filter->init('test', []);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
@@ -68,9 +67,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'null_value' => ':empty:', 'options' => []],
@@ -82,9 +79,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['class' => 'Test\EnumValue']],
@@ -96,9 +91,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['dictionary_code' => 'test_dictionary']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['dictionary_code' => 'test_dictionary']],

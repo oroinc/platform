@@ -186,29 +186,25 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('text.foo bar as  ');
         $query->addSelect('  as bar');
 
-        $reflectionObject = new \ReflectionObject($query);
-
-        $selectFieldsProperty = $reflectionObject->getProperty('select');
-        $selectFieldsProperty->setAccessible(true);
-
-        $aliasesProperty = $reflectionObject->getProperty('selectAliases');
-        $aliasesProperty->setAccessible(true);
-
-        $fields = $selectFieldsProperty->getValue($query);
-        $aliases = $aliasesProperty->getValue($query);
-
-        $this->assertContains('text.foo', $fields);
-        $this->assertContains('text.fooNoAlias', $fields);
-        $this->assertContains('bar', $aliases);
-
-        $this->assertTrue(count($aliases) < 2);
-
-        foreach ($selectFieldsProperty as $field) {
-            $this->assertNotTrue(strpos($field, ' ') > 0);
-        }
+        $this->assertEquals(
+            ['text.foo', 'text.fooNoAlias', 'text.foo bar as  ', 'text.  as bar'],
+            $query->getSelect()
+        );
+        $this->assertEquals(
+            [
+                'text.foo' => 'bar',
+                'text.fooNoAlias' => 'fooNoAlias',
+                'text.foo bar as  ' => 'foo bar as  ',
+                'text.  as bar' => '  as bar'
+            ],
+            $query->getSelectDataFields()
+        );
+        $this->assertEquals(['text.foo' => 'bar'], $query->getSelectAliases());
 
         $query->select('newField');
-        $this->assertEmpty($query->getSelectAliases());
+        $this->assertSame(['text.newField'], $query->getSelect());
+        $this->assertSame(['text.newField' => 'newField'], $query->getSelectDataFields());
+        $this->assertSame([], $query->getSelectAliases());
     }
 
     public function testGetSelectWithAliases()
@@ -229,9 +225,7 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('faa as bor');
         $query->addSelect('text.bar');
 
-        $aliases = $query->getSelectAliases();
-
-        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $aliases);
+        $this->assertSame(['text.foo' => 'bar', 'text.faa' => 'bor'], $query->getSelectAliases());
     }
 
     public function testGetSelectDataFields()
@@ -245,9 +239,10 @@ class QueryTest extends \PHPUnit\Framework\TestCase
         $query->addSelect('text.foo as name');
         $query->addSelect('text.faa as surname');
 
-        $fields = $query->getSelectDataFields();
-
-        $this->assertSame(['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'], $fields);
+        $this->assertSame(
+            ['text.notes' => 'notes', 'text.foo' => 'name', 'text.faa' => 'surname'],
+            $query->getSelectDataFields()
+        );
     }
 
     public function testAggregateAccessors()

@@ -4,29 +4,21 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\OwnershipDecisionMakerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder
-     */
-    protected $container;
+    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var OwnershipDecisionMakerPass
-     */
-    protected $compilerPass;
+    /** @var OwnershipDecisionMakerPass */
+    private $compilerPass;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerBuilder');
+        $this->container = $this->createMock(ContainerBuilder::class);
         $this->compilerPass = new OwnershipDecisionMakerPass();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->container, $this->compilerPass);
     }
 
     public function testProcessNotRegisterOwnershipDecisionMaker()
@@ -45,14 +37,14 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock(Definition::class);
 
-        $definition->expects($this->at(0))
+        $definition->expects($this->exactly(2))
             ->method('addMethodCall')
-            ->with('addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker')]);
-        $definition->expects($this->at(1))
-            ->method('addMethodCall')
-            ->with('addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker2')]);
+            ->withConsecutive(
+                ['addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker')]],
+                ['addOwnershipDecisionMaker', [new Reference('ownershipDecisionMaker2')]]
+            );
 
         $this->container->expects($this->once())
             ->method('has')
@@ -75,7 +67,7 @@ class OwnershipDecisionMakerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessEmptyOwnershipDecisionMakers()
     {
-        $definition = $this->createMock('Symfony\Component\DependencyInjection\Definition');
+        $definition = $this->createMock(Definition::class);
 
         $definition->expects($this->never())
             ->method('addMethodCall');

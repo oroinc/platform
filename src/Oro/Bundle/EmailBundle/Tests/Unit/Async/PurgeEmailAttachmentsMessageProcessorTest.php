@@ -6,9 +6,9 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\Testing\ReflectionUtil;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -52,7 +52,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
             $configManager
         );
 
-        $actualResult = ReflectionUtil::callProtectedMethod($processor, 'getSize', [$payload]);
+        $actualResult = ReflectionUtil::callMethod($processor, 'getSize', [$payload]);
 
         $this->assertEquals($expectedResult, $actualResult);
     }

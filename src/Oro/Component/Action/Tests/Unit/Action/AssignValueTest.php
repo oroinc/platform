@@ -2,25 +2,23 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
-use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\AssignValue;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AssignValueTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActionInterface */
-    protected $action;
+    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextAccessor;
 
-    /** @var MockObject|ContextAccessor */
-    protected $contextAccessor;
+    /** @var AssignValue */
+    private $action;
 
     protected function setUp(): void
     {
-        $this->contextAccessor = $this->getMockBuilder(ContextAccessor::class)->disableOriginalConstructor()->getMock();
+        $this->contextAccessor = $this->createMock(ContextAccessor::class);
 
         $this->action = new class($this->contextAccessor) extends AssignValue {
             public function xgetAssigns(): array
@@ -30,7 +28,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         };
 
         /** @var EventDispatcher $dispatcher */
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)->disableOriginalConstructor()->getMock();
+        $dispatcher = $this->createMock(EventDispatcher::class);
         $this->action->setDispatcher($dispatcher);
     }
 
@@ -99,7 +97,7 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitialize($options)
     {
-        static::assertInstanceOf(ActionInterface::class, $this->action->initialize($options));
+        self::assertInstanceOf(AssignValue::class, $this->action->initialize($options));
 
         if (\is_array(\current($options))) {
             $expectedAssigns = \array_values($options);
@@ -107,23 +105,23 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
             $expectedAssigns[] = $options;
         }
 
-        static::assertEquals($expectedAssigns, $this->action->xgetAssigns());
+        self::assertEquals($expectedAssigns, $this->action->xgetAssigns());
     }
 
     public function optionsDataProvider()
     {
         $assigns = [
             'numeric arguments' => [
-                'options' => [$this->getPropertyPath(), 'value']
+                'options' => [$this->createMock(PropertyPath::class), 'value']
             ],
             'string arguments' => [
-                'options' => ['attribute' => $this->getPropertyPath(), 'value' => 'value']
+                'options' => ['attribute' => $this->createMock(PropertyPath::class), 'value' => 'value']
             ],
             'numeric null value' => [
-                'options' => [$this->getPropertyPath(), null]
+                'options' => [$this->createMock(PropertyPath::class), null]
             ],
             'string null value' => [
-                'options' => ['attribute' => $this->getPropertyPath(), 'value' => null]
+                'options' => ['attribute' => $this->createMock(PropertyPath::class), 'value' => null]
             ],
         ];
 
@@ -142,28 +140,22 @@ class AssignValueTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $optionsData = array_values($options);
         if (is_array(current($optionsData))) {
-            for ($i = 0; $i < count($optionsData); $i++) {
-                $assignData = array_values($optionsData[$i]);
-                $attribute = $assignData[0];
-                $value = $assignData[1];
-                $this->contextAccessor->expects(static::at($i))
-                    ->method('setValue')
-                    ->with($context, $attribute, $value);
+            $with = [];
+            foreach ($optionsData as $item) {
+                [$attribute, $value] = array_values($item);
+                $with[] = [$context, $attribute, $value];
             }
+            $this->contextAccessor->expects(self::exactly(count($optionsData)))
+                ->method('setValue')
+                ->withConsecutive(...$with);
         } else {
-            $attribute = $optionsData[0];
-            $value = $optionsData[1];
-            $this->contextAccessor->expects(static::once())
+            [$attribute, $value] = $optionsData;
+            $this->contextAccessor->expects(self::once())
                 ->method('setValue')
                 ->with($context, $attribute, $value);
         }
 
         $this->action->initialize($options);
         $this->action->execute($context);
-    }
-
-    protected function getPropertyPath()
-    {
-        return $this->getMockBuilder(PropertyPath::class)->disableOriginalConstructor()->getMock();
     }
 }

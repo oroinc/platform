@@ -7,7 +7,7 @@ use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 use Oro\Bundle\NavigationBundle\Tests\Unit\DependencyInjection\Fixtures\FooBundle\Controller\TestController;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
-use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 
 class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
@@ -68,9 +68,7 @@ class AnnotationsReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->annotationReader->getTitle('unknown_route'));
 
         // test load data from cache file
-        $refl = ReflectionUtil::getProperty(new \ReflectionClass($this->annotationReader), 'config');
-        $refl->setAccessible(true);
-        $refl->setValue($this->annotationReader, null);
+        ReflectionUtil::setPropertyValue($this->annotationReader, 'config', null);
         $this->assertEquals('test1 title', $this->annotationReader->getTitle('test1_route'));
         $this->assertNull($this->annotationReader->getTitle('test2_route'));
         $this->assertNull($this->annotationReader->getTitle('unknown_route'));

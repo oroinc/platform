@@ -15,6 +15,7 @@ use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 
 class PermissionManagerTest extends \PHPUnit\Framework\TestCase
@@ -545,12 +546,7 @@ class PermissionManagerTest extends \PHPUnit\Framework\TestCase
     protected function getPermission($id, $name, $applyToAll, $applyEntities, $excludeEntities, $groups): Permission
     {
         $permission = new Permission();
-
-        $reflection = new \ReflectionClass(Permission::class);
-        $reflectionProperty = $reflection->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($permission, $id);
-
+        ReflectionUtil::setId($permission, $id);
         $permission
             ->setName($name)
             ->setApplyToAll($applyToAll)

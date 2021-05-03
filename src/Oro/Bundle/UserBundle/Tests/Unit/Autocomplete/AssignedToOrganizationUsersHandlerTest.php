@@ -19,53 +19,54 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
+    private $searchIndexer;
+
+    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
+
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $manager;
+
     /** @var AssignedToOrganizationUsersHandler */
-    protected $handler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $searchIndexer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $repository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $manager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $handler;
 
     protected function setUp(): void
     {
-        $attachmentManager = $this->createMock(AttachmentManager::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->searchIndexer = $this->createMock(Indexer::class);
         $this->repository = $this->createMock(EntityRepository::class);
-        $metadata = $this->createMock(ClassMetadata::class);
 
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->any())
             ->method('getMetadataFor')
             ->with(User::class)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         $this->manager = $this->createMock(ObjectManager::class);
         $this->manager->expects($this->any())
             ->method('getRepository')
             ->with(User::class)
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
         $this->manager->expects($this->any())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($metadataFactory));
+            ->willReturn($metadataFactory);
 
         $searchMappingProvider = $this->createMock(SearchMappingProvider::class);
         $searchMappingProvider->expects($this->once())
             ->method('getEntityAlias')
             ->with(User::class)
             ->willReturn('user');
+
+        $attachmentManager = $this->createMock(AttachmentManager::class);
 
         $this->handler = new AssignedToOrganizationUsersHandler($attachmentManager, User::class, []);
         $this->handler->setTokenAccessor($this->tokenAccessor);
@@ -85,12 +86,9 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getSimpleSearchQuery')
             ->with('test', 0, 11, 'user')
             ->willReturn($query);
-        $this->searchIndexer->expects($this->at(1))
+        $this->searchIndexer->expects($this->exactly(2))
             ->method('setIsAllowedApplyAcl')
-            ->with(false);
-        $this->searchIndexer->expects($this->at(3))
-            ->method('setIsAllowedApplyAcl')
-            ->with(true);
+            ->withConsecutive([false], [true]);
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($query)
@@ -115,12 +113,9 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getSimpleSearchQuery')
             ->with('test', 0, 11, 'user')
             ->willReturn($query);
-        $this->searchIndexer->expects($this->at(1))
+        $this->searchIndexer->expects($this->exactly(2))
             ->method('setIsAllowedApplyAcl')
-            ->with(false);
-        $this->searchIndexer->expects($this->at(3))
-            ->method('setIsAllowedApplyAcl')
-            ->with(true);
+            ->withConsecutive([false], [true]);
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($query)

@@ -12,8 +12,8 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Test\OwnerTreeWrappingPropertiesAccessor;
-use Oro\Bundle\SecurityBundle\Tests\Util\ReflectionUtil;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -867,7 +867,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
         $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
-        $subordinateBusinessUnitIds = ReflectionUtil::callProtectedMethod(
+        $subordinateBusinessUnitIds = ReflectionUtil::callMethod(
             $this->treeProvider,
             'buildTree',
             [$src, $businessUnitClass]
@@ -910,7 +910,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
         $businessUnitClass = $this->ownershipMetadataProvider->getBusinessUnitClass();
-        $subordinateBusinessUnitIds = ReflectionUtil::callProtectedMethod(
+        $subordinateBusinessUnitIds = ReflectionUtil::callMethod(
             $this->treeProvider,
             'buildTree',
             [$src, $businessUnitClass]

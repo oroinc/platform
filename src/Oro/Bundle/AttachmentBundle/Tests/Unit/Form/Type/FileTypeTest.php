@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormConfigInterface;
@@ -238,9 +239,7 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
     {
-        $reflectionProperty = new \ReflectionProperty($allOptions, 'locked');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($allOptions, true);
+        ReflectionUtil::setPropertyValue($allOptions, 'locked', true);
 
         $this->assertEquals(
             $expectedOption,

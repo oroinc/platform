@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use PHPUnit\Framework\TestCase;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UserEmailOriginTest extends TestCase
+class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetId()
     {

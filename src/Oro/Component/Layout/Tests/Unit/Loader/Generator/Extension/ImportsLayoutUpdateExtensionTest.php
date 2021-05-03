@@ -11,7 +11,7 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImportsLayoutUpdateExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -141,12 +141,12 @@ class ImportsLayoutUpdateExtensionTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $collection = $this->createMock(VisitorCollection::class);
-        $collection->expects($this->at(0))
+        $collection->expects($this->exactly(2))
             ->method('append')
-            ->with(new ImportsAwareLayoutUpdateVisitor($imports));
-        $collection->expects($this->at(1))
-            ->method('append')
-            ->with(new ImportLayoutUpdateVisitor());
+            ->withConsecutive(
+                [new ImportsAwareLayoutUpdateVisitor($imports)],
+                [new ImportLayoutUpdateVisitor()]
+            );
 
         $this->extension->prepare(new GeneratorData($source, $filename), $collection);
     }

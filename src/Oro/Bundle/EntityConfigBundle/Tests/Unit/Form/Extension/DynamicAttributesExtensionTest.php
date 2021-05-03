@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Util\DynamicFieldsHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
@@ -287,7 +288,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $entity = $this->getEntityWithFamily();
         $form = $this->getForm();
 
-        $this->setSecurityValue($this->extension, 'fields', [get_class($entity) => $fields]);
+        ReflectionUtil::setPropertyValue($this->extension, 'fields', [get_class($entity) => $fields]);
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByFamily')
@@ -317,7 +318,7 @@ class DynamicAttributesExtensionTest extends TypeTestCase
         $form->expects($this->exactly($expectAdds))
             ->method('add');
 
-        $this->setSecurityValue($this->extension, 'fields', [get_class($entity) => $fields]);
+        ReflectionUtil::setPropertyValue($this->extension, 'fields', [get_class($entity) => $fields]);
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributesByFamily')
@@ -486,18 +487,6 @@ class DynamicAttributesExtensionTest extends TypeTestCase
             ->getMock();
 
         return $formView;
-    }
-
-    /**
-     * @param object $object
-     * @param string $property
-     * @param mixed $value
-     */
-    private function setSecurityValue($object, $property, $value)
-    {
-        $reflection = new \ReflectionProperty(get_class($object), $property);
-        $reflection->setAccessible(true);
-        $reflection->setValue($object, $value);
     }
 
     /**

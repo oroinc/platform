@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
-use Oro\Component\ChainProcessor\MatchApplicableChecker as BaseMatchApplicableChecker;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ProcessorApplicableCheckerFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -17,16 +17,10 @@ class ProcessorApplicableCheckerFactoryTest extends \PHPUnit\Framework\TestCase
         $applicableCheckers = iterator_to_array($chainApplicableChecker);
         self::assertCount(1, $applicableCheckers);
         self::assertInstanceOf(MatchApplicableChecker::class, $applicableCheckers[0]);
-
-        $ignoredAttributesProperty = new \ReflectionProperty(BaseMatchApplicableChecker::class, 'ignoredAttributes');
-        $ignoredAttributesProperty->setAccessible(true);
-        static::assertEquals([], $ignoredAttributesProperty->getValue($applicableCheckers[0]));
-
-        $classAttributesProperty = new \ReflectionProperty(MatchApplicableChecker::class, 'classAttributes');
-        $classAttributesProperty->setAccessible(true);
-        static::assertEquals(
+        self::assertEquals([], ReflectionUtil::getPropertyValue($applicableCheckers[0], 'ignoredAttributes'));
+        self::assertEquals(
             ['class' => true, 'parentClass' => true],
-            $classAttributesProperty->getValue($applicableCheckers[0])
+            ReflectionUtil::getPropertyValue($applicableCheckers[0], 'classAttributes')
         );
     }
 }

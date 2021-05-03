@@ -5,6 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTestCase;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Component\Testing\ReflectionUtil;
 
 class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
 {
@@ -22,12 +23,9 @@ class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
     public function getSegment(array $definition = null, string $entity = null, bool $identifier = null)
     {
         $segment = new Segment();
+        ReflectionUtil::setId($segment, $identifier ?? self::TEST_IDENTIFIER);
         $segment->setEntity($entity ?? self::TEST_ENTITY);
         $segment->setDefinition(QueryDefinitionUtil::encodeDefinition($definition ?? $this->getDefaultDefinition()));
-
-        $refProperty = new \ReflectionProperty(get_class($segment), 'id');
-        $refProperty->setAccessible(true);
-        $refProperty->setValue($segment, $identifier ?? self::TEST_IDENTIFIER);
 
         return $segment;
     }

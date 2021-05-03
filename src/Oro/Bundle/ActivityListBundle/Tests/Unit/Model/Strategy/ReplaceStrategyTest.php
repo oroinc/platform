@@ -12,6 +12,7 @@ use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
@@ -72,8 +73,8 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     {
         $account1 = new User();
         $account2 = new User();
-        $this->setId($account1, 1);
-        $this->setId($account2, 2);
+        ReflectionUtil::setId($account1, 1);
+        ReflectionUtil::setId($account2, 2);
         $entityMetadata = new EntityMetadata(['type' => ClassUtils::getRealClass($account1)]);
         $entityData = new EntityData($entityMetadata, [$account1, $account2]);
         $entityData->setMasterEntity($account1);
@@ -120,18 +121,5 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
     public function testGetName()
     {
         $this->assertEquals('activity_replace', $this->strategy->getName());
-    }
-
-    /**
-     * @param $object
-     * @param $value
-     */
-    protected function setId($object, $value)
-    {
-        $class = new \ReflectionClass($object);
-        $property  = $class->getProperty('id');
-        $property->setAccessible(true);
-
-        $property->setValue($object, $value);
     }
 }

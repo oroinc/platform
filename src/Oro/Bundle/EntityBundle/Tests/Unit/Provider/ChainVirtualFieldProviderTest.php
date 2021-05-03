@@ -8,17 +8,18 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ChainVirtualFieldProvider */
-    private $chainProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var VirtualFieldProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $providers = [];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
+
+    /** @var ChainVirtualFieldProvider */
+    private $chainProvider;
 
     protected function setUp(): void
     {
@@ -28,7 +29,6 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $lowPriorityProvider = $this->getMockBuilder(VirtualFieldProviderInterface::class)
             ->setMockClassName('LowPriorityVirtualFieldProvider')
             ->getMock();
-
         $this->providers = [$highPriorityProvider, $lowPriorityProvider];
         $this->configProvider = $this->createMock(ConfigProvider::class);
 
@@ -37,13 +37,11 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsVirtualFieldByLowPriorityProvider()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(true));
-        $this->providers[1]
-            ->expects($this->never())
+            ->willReturn(true);
+        $this->providers[1]->expects($this->never())
             ->method('isVirtualField');
 
         $this->assertTrue($this->chainProvider->isVirtualField('testClass', 'testField'));
@@ -51,32 +49,28 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsVirtualFieldByHighPriorityProvider()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects($this->once())
             ->method('isVirtualField')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
 
     public function testIsVirtualFieldNone()
     {
-        $this->providers[0]
-            ->expects($this->once())
+        $this->providers[0]->expects($this->once())
             ->method('isVirtualField')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
-        $this->providers[1]
-            ->expects($this->once())
+            ->willReturn(false);
+        $this->providers[1]->expects($this->once())
             ->method('isVirtualField')
             ->with('testClass', 'testField')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->assertFalse($this->chainProvider->isVirtualField('testClass', 'testField'));
     }
@@ -101,11 +95,11 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $this->providers[0]->expects($this->once())
             ->method('getVirtualFields')
             ->with($entityClass)
-            ->will($this->returnValue(['testField1', 'testField2']));
+            ->willReturn(['testField1', 'testField2']);
         $this->providers[1]->expects($this->once())
             ->method('getVirtualFields')
             ->with($entityClass)
-            ->will($this->returnValue(['testField1', 'testField3']));
+            ->willReturn(['testField1', 'testField3']);
 
         $this->assertEquals(
             ['testField1', 'testField2', 'testField3'],
@@ -178,7 +172,7 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 
         try {
             $this->chainProvider->getVirtualFieldQuery('testClass1', 'testField1-2');
-            $this->fail("Expected exception not thrown");
+            $this->fail('Expected exception not thrown');
         } catch (\Exception $e) {
             $this->assertEquals(0, $e->getCode());
             $this->assertEquals(
@@ -195,30 +189,27 @@ class ChainVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     protected function addQueryMock($fieldsConfig)
     {
         $providers = $this->providers;
-        foreach ($providers as $idx => &$provider) {
+        foreach ($providers as $idx => $provider) {
             $fields = $fieldsConfig['testClass' . $idx];
 
-            $i = 0;
+            $with = [];
+            $willForIsVirtualField = [];
+            $willForGetVirtualFieldQuery = [];
             foreach ($fields as $fieldName => $fieldConfig) {
-                $provider
-                    ->expects($this->at($i))
-                    ->method('isVirtualField')
-                    ->with('testClass' . $idx, $fieldName)
-                    ->will(
-                        $this->returnCallback(
-                            function () use ($fieldsConfig, $idx, $fieldName) {
-                                return isset($fieldsConfig['testClass' . $idx][$fieldName]);
-                            }
-                        )
-                    );
-                $provider
-                    ->expects($this->at(++$i))
-                    ->method('getVirtualFieldQuery')
-                    ->with('testClass' . $idx, $fieldName)
-                    ->will($this->returnValue($fieldsConfig['testClass' . $idx][$fieldName]));
-
-                $i++;
+                $with[] = ['testClass' . $idx, $fieldName];
+                $willForIsVirtualField[] = new ReturnCallback(function () use ($fieldsConfig, $idx, $fieldName) {
+                    return isset($fieldsConfig['testClass' . $idx][$fieldName]);
+                });
+                $willForGetVirtualFieldQuery[] = $fieldsConfig['testClass' . $idx][$fieldName];
             }
+            $provider->expects($this->atLeastOnce())
+                ->method('isVirtualField')
+                ->withConsecutive(...$with)
+                ->willReturnOnConsecutiveCalls(...$willForIsVirtualField);
+            $provider->expects($this->atLeastOnce())
+                ->method('getVirtualFieldQuery')
+                ->withConsecutive(...$with)
+                ->willReturnOnConsecutiveCalls(...$willForGetVirtualFieldQuery);
         }
     }
 

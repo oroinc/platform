@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\CreateAsyncOperation;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class CreateAsyncOperationTest extends UpdateListProcessorTestCase
@@ -122,10 +123,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
                     self::assertEquals($targetFileName, $entity->getDataFileName());
                     self::assertEquals(AsyncOperation::STATUS_NEW, $entity->getStatus());
 
-                    $reflectionClass = new \ReflectionClass(AsyncOperation::class);
-                    $property = $reflectionClass->getProperty('id');
-                    $property->setAccessible(true);
-                    $property->setValue($entity, $operationId);
+                    ReflectionUtil::setId($entity, $operationId);
                 }
             );
         $em->expects(self::once())

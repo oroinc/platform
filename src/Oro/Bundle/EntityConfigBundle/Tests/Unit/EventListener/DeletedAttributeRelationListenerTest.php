@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\TestUtils\ORM\Mocks\UnitOfWork;
 
@@ -73,10 +74,9 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $event = new OnFlushEventArgs($entityManager);
         $this->listener->onFlush($event);
 
-        $reflectionProperty = $this->getDeletedAttributesReflectionProperty();
         $this->assertEquals(
             [$attributeFamilyId => ['fieldName']],
-            $reflectionProperty->getValue($this->listener)
+            ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes')
         );
     }
 
@@ -87,9 +87,9 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $filledFamilyAttributeNames = ['name'];
         $topicName = 'topic';
 
-        $reflectionProperty = $this->getDeletedAttributesReflectionProperty();
-        $reflectionProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $this->listener,
+            'deletedAttributes',
             [
                 $emptyFamilyId => [],
                 $filledFamilyId => $filledFamilyAttributeNames,
@@ -108,7 +108,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->listener->postFlush();
-        $this->assertEmpty($reflectionProperty->getValue($this->listener));
+        $this->assertEmpty(ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes'));
     }
 
     /**
@@ -146,17 +146,5 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $attributeGroupRelation->setAttributeGroup($attributeGroup);
 
         return $attributeGroupRelation;
-    }
-
-    /**
-     * @return \ReflectionProperty
-     */
-    protected function getDeletedAttributesReflectionProperty()
-    {
-        $reflectionClass = new \ReflectionClass($this->listener);
-        $reflectionProperty = $reflectionClass->getProperty('deletedAttributes');
-        $reflectionProperty->setAccessible(true);
-
-        return $reflectionProperty;
     }
 }

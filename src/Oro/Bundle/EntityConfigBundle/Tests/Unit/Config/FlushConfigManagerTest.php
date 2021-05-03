@@ -15,11 +15,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
+use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
@@ -55,12 +57,12 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
         $this->entityConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
-            ->will($this->returnValue('entity'));
+            ->willReturn('entity');
 
         $this->testConfigProvider = $this->createMock(ConfigProvider::class);
         $this->testConfigProvider->expects($this->atLeast(1))
             ->method('getScope')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->metadataFactory = $this->createMock(MetadataFactory::class);
@@ -153,23 +155,30 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->setFlushExpectations($em, [$model, $fieldModel]);
 
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with(
-                new PreFlushConfigEvent(
-                    ['entity' => $entityConfig, 'test' => $testConfig],
-                    $this->configManager
-                ),
-                Events::PRE_FLUSH
-            );
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(
-                new PreFlushConfigEvent(
-                    ['entity' => $entityFieldConfig, 'test' => $testFieldConfig],
-                    $this->configManager
-                ),
-                Events::PRE_FLUSH
+            ->withConsecutive(
+                [
+                    new PreFlushConfigEvent(
+                        ['entity' => $entityConfig, 'test' => $testConfig],
+                        $this->configManager
+                    ),
+                    Events::PRE_FLUSH
+                ],
+                [
+                    new PreFlushConfigEvent(
+                        ['entity' => $entityFieldConfig, 'test' => $testFieldConfig],
+                        $this->configManager
+                    ),
+                    Events::PRE_FLUSH
+                ],
+                [
+                    new PostFlushConfigEvent(
+                        [self::ENTITY_CLASS => $model, 'Test\AnotherEntity.field1' => $fieldModel],
+                        $this->configManager
+                    ),
+                    Events::POST_FLUSH
+                ]
             );
 
         $this->configCache->expects($this->once())
@@ -272,18 +281,42 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityManager')
             ->willReturn($em);
 
-        $configs = [
-            'entity' => $entityConfig,
-        ];
-
-        $this->eventDispatcher->expects(self::at(0))
+        $this->eventDispatcher->expects(self::exactly(3))
             ->method('dispatch')
-            ->with(new PreFlushConfigEvent($configs, $this->configManager), Events::PRE_FLUSH)
-            ->willReturnCallback(function (PreFlushConfigEvent $event, string $eventName) use ($testConfig) {
-                $configManager = $event->getConfigManager();
-                $configManager->persist($testConfig);
-                $configManager->calculateConfigChangeSet($testConfig);
-            });
+            ->withConsecutive(
+                [
+                    new PreFlushConfigEvent(
+                        ['entity' => $entityConfig],
+                        $this->configManager
+                    ),
+                    Events::PRE_FLUSH
+                ],
+                [
+                    new PreFlushConfigEvent(
+                        ['entity' => $entityConfig, 'test' => $testConfig],
+                        $this->configManager
+                    ),
+                    Events::PRE_FLUSH
+                ],
+                [
+                    new PostFlushConfigEvent(
+                        [self::ENTITY_CLASS => $model],
+                        $this->configManager
+                    ),
+                    Events::POST_FLUSH
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (PreFlushConfigEvent $event) use ($testConfig) {
+                    $configManager = $event->getConfigManager();
+                    $configManager->persist($testConfig);
+                    $configManager->calculateConfigChangeSet($testConfig);
+                }),
+                new ReturnCallback(function (PreFlushConfigEvent $event) {
+                }),
+                new ReturnCallback(function (PostFlushConfigEvent $event) {
+                })
+            );
 
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
@@ -304,24 +337,20 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $em->expects($this->exactly(count($models)))
             ->method('persist')
-            ->will(
-                $this->returnCallback(
-                    function ($obj) use (&$models) {
-                        foreach ($models as $model) {
-                            if ($model == $obj) {
-                                return;
-                            }
-                        }
-                        $this->fail(
-                            sprintf(
-                                'Expected that $em->persist(%s[%s]) is called.',
-                                get_class($obj),
-                                $obj instanceof FieldConfigModel ? $obj->getFieldName() : $obj->getClassName()
-                            )
-                        );
+            ->willReturnCallback(function ($obj) use (&$models) {
+                foreach ($models as $model) {
+                    if ($model == $obj) {
+                        return;
                     }
-                )
-            );
+                }
+                $this->fail(
+                    sprintf(
+                        'Expected that $em->persist(%s[%s]) is called.',
+                        get_class($obj),
+                        $obj instanceof FieldConfigModel ? $obj->getFieldName() : $obj->getClassName()
+                    )
+                );
+            });
         $em->expects($this->once())
             ->method('flush');
     }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -55,7 +56,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         array $expected
     ) {
         if (!empty($prevValues)) {
-            $this->setProtectedProperty($this->manager, 'options', $prevValues);
+            ReflectionUtil::setPropertyValue($this->manager, 'options', $prevValues);
         }
         $this->manager->setTableOptions($tableName, $options);
         $this->assertEquals($expected, $this->manager->getExtendOptions());
@@ -72,7 +73,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         array $expected
     ) {
         if (!empty($prevValues)) {
-            $this->setProtectedProperty($this->manager, 'options', $prevValues);
+            ReflectionUtil::setPropertyValue($this->manager, 'options', $prevValues);
         }
         $this->manager->setColumnOptions($tableName, $columnName, $options);
         $this->assertEquals($expected, $this->manager->getExtendOptions());
@@ -93,7 +94,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
     public function testMergeColumnOptions(array $existingOptions, array $newOptions, array $expectedOptions)
     {
         $objectKey = sprintf(ExtendOptionsManager::COLUMN_OPTION_FORMAT, 'test_table', 'test_column');
-        $this->setProtectedProperty($this->manager, 'options', [$objectKey => $existingOptions]);
+        ReflectionUtil::setPropertyValue($this->manager, 'options', [$objectKey => $existingOptions]);
 
         $this->manager->mergeColumnOptions('test_table', 'test_column', $newOptions);
         $this->assertEquals([$objectKey => $expectedOptions], $this->manager->getExtendOptions());
@@ -375,20 +376,6 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
         $options->append($scope, $code, $val);
 
         return $options->toArray();
-    }
-
-    /**
-     * @param mixed  $obj
-     * @param string $propName
-     * @param mixed  $val
-     */
-    protected function setProtectedProperty($obj, $propName, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop  = $class->getProperty($propName);
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
     }
 
     public function testHasColumnOptionsWhenNoOptionsExist()

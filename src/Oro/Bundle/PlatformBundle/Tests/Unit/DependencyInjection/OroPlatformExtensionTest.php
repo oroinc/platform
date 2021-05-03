@@ -4,6 +4,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use Oro\Component\Testing\ReflectionUtil;
 
 class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -77,13 +78,11 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->setExtensionConfig('security', $originalConfig);
 
         $platformExtension = new OroPlatformExtension();
-        $mergeConfigurationIntoOne = new \ReflectionMethod(
-            OroPlatformExtension::class,
-            'mergeConfigIntoOne'
+        ReflectionUtil::callMethod(
+            $platformExtension,
+            'mergeConfigIntoOne',
+            [$containerBuilder, 'security', $additionalConfig]
         );
-        $mergeConfigurationIntoOne->setAccessible(true);
-
-        $mergeConfigurationIntoOne->invoke($platformExtension, $containerBuilder, 'security', $additionalConfig);
 
         $this->assertEquals($expectedConfig, $containerBuilder->getExtensionConfig('security'));
     }

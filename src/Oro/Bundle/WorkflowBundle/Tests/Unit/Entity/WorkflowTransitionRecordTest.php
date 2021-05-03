@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
+use Oro\Component\Testing\ReflectionUtil;
 
 class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,10 +28,8 @@ class WorkflowTransitionRecordTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->transitionRecord->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->transitionRecord, $value);
-        $this->assertEquals($value, $this->transitionRecord->getId());
+        ReflectionUtil::setId($this->transitionRecord, $value);
+        $this->assertSame($value, $this->transitionRecord->getId());
     }
 
     public function testGetSetWorkflowItem()

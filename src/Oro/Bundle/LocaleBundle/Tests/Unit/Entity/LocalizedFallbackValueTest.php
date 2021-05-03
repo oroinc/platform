@@ -6,6 +6,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
@@ -44,10 +45,7 @@ class LocalizedFallbackValueTest extends \PHPUnit\Framework\TestCase
     {
         $id = 123;
         $value = new LocalizedFallbackValue();
-
-        $reflection = new \ReflectionProperty(get_class($value), 'id');
-        $reflection->setAccessible(true);
-        $reflection->setValue($value, $id);
+        ReflectionUtil::setId($value, $id);
 
         $clonedValue = clone $value;
         $this->assertEquals($id, $value->getId());
