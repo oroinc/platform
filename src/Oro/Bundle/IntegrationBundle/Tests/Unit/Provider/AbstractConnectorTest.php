@@ -16,6 +16,7 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 
@@ -160,27 +161,14 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
         $connector = $this->getConnector($this->transportMock, $this->stepExecutionMock);
         $connector->setStepExecution($this->stepExecutionMock);
 
-        $reflection = new \ReflectionMethod(
-            TestConnector::class,
-            'addStatusData'
-        );
-        $reflection->setAccessible(true);
-        $reflection->invoke($connector, 'key', 'value');
+        ReflectionUtil::callMethod($connector, 'addStatusData', ['key', 'value']);
 
         $context = $this->stepExecutionMock->getExecutionContext();
-        $date    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+        $date = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
 
         $this->assertArrayHasKey('key', $date);
         $this->assertSame('value', $date['key']);
 
-        $reflection1 = new \ReflectionMethod(
-            TestConnector::class,
-            'getStatusData'
-        );
-
-        $reflection1->setAccessible(true);
-        $result = $reflection1->invoke($connector, 'key', 'value');
-
-        $this->assertSame('value', $result);
+        $this->assertSame('value', ReflectionUtil::callMethod($connector, 'getStatusData', ['key', 'value']));
     }
 }

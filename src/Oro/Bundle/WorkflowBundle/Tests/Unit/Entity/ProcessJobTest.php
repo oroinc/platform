@@ -7,6 +7,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class ProcessJobTest extends \PHPUnit\Framework\TestCase
@@ -29,11 +30,8 @@ class ProcessJobTest extends \PHPUnit\Framework\TestCase
         static::assertNull($this->entity->getId());
 
         $testValue = 1;
-        $reflectionProperty = new \ReflectionProperty(ProcessJob::class, 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->entity, $testValue);
-
-        static::assertEquals($testValue, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $testValue);
+        self::assertSame($testValue, $this->entity->getId());
     }
 
     /**

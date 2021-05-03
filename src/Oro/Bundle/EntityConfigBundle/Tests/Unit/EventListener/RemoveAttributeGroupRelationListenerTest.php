@@ -10,7 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeGroupRelationRepository;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\EventListener\RemoveAttributeGroupRelationListener;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class RemoveAttributeGroupRelationListenerTest extends \PHPUnit\Framework\TestCase
 {

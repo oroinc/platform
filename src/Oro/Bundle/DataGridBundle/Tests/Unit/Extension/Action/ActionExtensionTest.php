@@ -18,6 +18,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\DatagridActionProviderInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -498,9 +499,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->visitDatasource($config, $datasource);
 
-        $ownershipFieldsProperty = new \ReflectionProperty(ActionExtension::class, 'ownershipFields');
-        $ownershipFieldsProperty->setAccessible(true);
-        self::assertEquals($ownershipFields, $ownershipFieldsProperty->getValue($this->extension));
+        self::assertEquals($ownershipFields, ReflectionUtil::getPropertyValue($this->extension, 'ownershipFields'));
     }
 
     public function testVisitDatasourceForOrmDatasourceButNoAclProtectedActions()
@@ -525,17 +524,10 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
      */
     private function setOwnershipFields(array $ownershipFields)
     {
-        $refl = new \ReflectionClass($this->extension);
-
         // set ownership fields
-        $ownershipFieldsProperty = $refl->getProperty('ownershipFields');
-        $ownershipFieldsProperty->setAccessible(true);
-        $ownershipFieldsProperty->setValue($this->extension, $ownershipFields);
-
+        ReflectionUtil::setPropertyValue($this->extension, 'ownershipFields', $ownershipFields);
         // skip load actions metadata
-        $isMetadataVisitedProperty = $refl->getProperty('isMetadataVisited');
-        $isMetadataVisitedProperty->setAccessible(true);
-        $isMetadataVisitedProperty->setValue($this->extension, true);
+        ReflectionUtil::setPropertyValue($this->extension, 'isMetadataVisited', true);
     }
 
     /**

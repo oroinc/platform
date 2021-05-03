@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\RoleStub;
+use Oro\Component\Testing\ReflectionUtil;
 
 class RoleTest extends \PHPUnit\Framework\TestCase
 {
@@ -48,11 +49,7 @@ class RoleTest extends \PHPUnit\Framework\TestCase
     public function testClone()
     {
         $role = new Role();
-
-        $class = new \ReflectionClass($role);
-        $prop  = $class->getProperty('id');
-        $prop->setAccessible(true);
-        $prop->setValue($role, 1);
+        ReflectionUtil::setId($role, 1);
 
         $copy = clone $role;
         $this->assertEmpty($copy->getId());

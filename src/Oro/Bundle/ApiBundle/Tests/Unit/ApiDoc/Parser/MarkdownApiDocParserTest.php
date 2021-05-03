@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
@@ -48,10 +49,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
      */
     private function assertLoadedData(array $expected, MarkdownApiDocParser $apiDocParser): void
     {
-        $reflectionClass = new \ReflectionClass($apiDocParser);
-        $property = $reflectionClass->getProperty('loadedData');
-        $property->setAccessible(true);
-        $actualValue = $property->getValue($apiDocParser);
+        $actualValue = ReflectionUtil::getPropertyValue($apiDocParser, 'loadedData');
 
         $normalizer = static function (&$val): void {
             if (\is_string($val)) {

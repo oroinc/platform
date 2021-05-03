@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
 
 class FileCacheTest extends \PHPUnit\Framework\TestCase
@@ -30,7 +31,7 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
             ->method('getNamespace')
             ->will($this->returnValue($namespace));
 
-        $result = self::callProtectedMethod($cache, 'getFilename', [$id]);
+        $result = ReflectionUtil::callMethod($cache, 'getFilename', [$id]);
         $this->assertEquals(
             $directory . DIRECTORY_SEPARATOR . $expectedFileName,
             str_replace(realpath($directory), $directory, $result)
@@ -116,20 +117,5 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
             ['Oro\Bundle\CacheBundle\Provider\FilesystemCache'],
             ['Oro\Bundle\CacheBundle\Provider\PhpFileCache'],
         ];
-    }
-
-    /**
-     * @param  mixed  $obj
-     * @param  string $methodName
-     * @param  array  $args
-     * @return mixed
-     */
-    public static function callProtectedMethod($obj, $methodName, array $args)
-    {
-        $class = new \ReflectionClass($obj);
-        $method = $class->getMethod($methodName);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($obj, $args);
     }
 }

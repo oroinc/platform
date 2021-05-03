@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Form\Extension\AttributeConfigExtension;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\SerializedFieldProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -325,13 +326,8 @@ class AttributeConfigExtensionTest extends TypeTestCase
     {
         $entityConfigModel = new EntityConfigModel('class');
         $fieldConfigModel = new FieldConfigModel('test', 'string');
+        ReflectionUtil::setId($fieldConfigModel, $id);
         $fieldConfigModel->setEntity($entityConfigModel);
-
-        if ($id) {
-            $reflectionProperty = new \ReflectionProperty(FieldConfigModel::class, 'id');
-            $reflectionProperty->setAccessible(true);
-            $reflectionProperty->setValue($fieldConfigModel, $id);
-        }
 
         return $fieldConfigModel;
     }

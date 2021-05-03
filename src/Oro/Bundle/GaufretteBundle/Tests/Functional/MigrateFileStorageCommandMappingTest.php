@@ -4,6 +4,7 @@ namespace Oro\Bundle\GaufretteBundle\Tests\Functional;
 
 use Oro\Bundle\GaufretteBundle\Command\MigrateFileStorageCommand;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\ReflectionUtil;
 
 class MigrateFileStorageCommandMappingTest extends WebTestCase
 {
@@ -12,8 +13,8 @@ class MigrateFileStorageCommandMappingTest extends WebTestCase
         self::bootKernel();
 
         $command = self::$container->get(MigrateFileStorageCommand::class);
-        $mappings = $this->getProperty($command, 'mappings');
-        $fileManagers = $this->getProperty($command, 'fileManagers');
+        $mappings = ReflectionUtil::getPropertyValue($command, 'mappings');
+        $fileManagers = ReflectionUtil::getPropertyValue($command, 'fileManagers');
 
         $skippedFilesystemsProvider = self::$container->get('oro_gaufrette.tests.skipped_file_systems');
 
@@ -35,8 +36,9 @@ class MigrateFileStorageCommandMappingTest extends WebTestCase
                     $fileSystemName
                 )
             );
-            self::assertTrue(
-                in_array($fileSystemName, $mappings, true),
+            self::assertContains(
+                $fileSystemName,
+                $mappings,
                 sprintf(
                     'Gaufrette filesystem "%s" was not added to the list of mapping paths should be processed in
                     oro:gaufrette:migrate-filestorages command. 
@@ -46,13 +48,5 @@ class MigrateFileStorageCommandMappingTest extends WebTestCase
                 )
             );
         }
-    }
-
-    protected function getProperty(MigrateFileStorageCommand $object, string $property): array
-    {
-        $reflection = new \ReflectionProperty(MigrateFileStorageCommand::class, $property);
-        $reflection->setAccessible(true);
-
-        return $reflection->getValue($object);
     }
 }

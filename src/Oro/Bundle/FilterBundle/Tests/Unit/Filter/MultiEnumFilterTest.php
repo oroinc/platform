@@ -13,6 +13,7 @@ use Oro\Bundle\FilterBundle\Filter\MultiEnumFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -64,9 +65,7 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', []);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
@@ -78,9 +77,7 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [
@@ -96,9 +93,7 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [
@@ -115,9 +110,7 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['enum_code' => 'test_enum']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [

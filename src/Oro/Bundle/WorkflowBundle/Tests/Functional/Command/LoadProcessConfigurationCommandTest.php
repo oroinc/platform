@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Component\Testing\ReflectionUtil;
 
 class LoadProcessConfigurationCommandTest extends WebTestCase
 {
@@ -15,12 +16,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         $this->initClient();
 
         $provider = $this->getContainer()->get('oro_workflow.configuration.provider.process_config');
-
-        $reflectionClass = new \ReflectionClass('Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider');
-
-        $reflectionProperty = $reflectionClass->getProperty('configDirectory');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($provider, '/Tests/Functional/Command/DataFixtures/');
+        ReflectionUtil::setPropertyValue($provider, 'configDirectory', '/Tests/Functional/Command/DataFixtures/');
     }
 
     /**

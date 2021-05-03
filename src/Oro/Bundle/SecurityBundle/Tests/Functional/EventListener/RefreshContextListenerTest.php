@@ -7,6 +7,7 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class RefreshContextListenerTest extends WebTestCase
@@ -80,9 +81,7 @@ class RefreshContextListenerTest extends WebTestCase
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
         $user = new User();
-        $reflection = new \ReflectionProperty(get_class($user), 'id');
-        $reflection->setAccessible(true);
-        $reflection->setValue($user, 999);
+        ReflectionUtil::setId($user, 999);
 
         $this->getContainer()->get('security.token_storage')->getToken()->setUser($user);
 

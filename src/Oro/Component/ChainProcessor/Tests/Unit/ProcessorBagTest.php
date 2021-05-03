@@ -622,11 +622,10 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
      */
     private function callCalculatePriority($processorPriority, $groupPriority = null)
     {
-        $class  = new \ReflectionClass($this->builder);
-        $method = $class->getMethod('calculatePriority');
+        $method = new \ReflectionMethod($this->builder, 'calculatePriority');
         $method->setAccessible(true);
 
-        return $method->invokeArgs($this->processorBag, [$processorPriority, $groupPriority]);
+        return $method->invokeArgs(null, [$processorPriority, $groupPriority]);
     }
 
     /**

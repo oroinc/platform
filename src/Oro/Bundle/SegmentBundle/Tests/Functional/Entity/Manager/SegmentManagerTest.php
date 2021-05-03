@@ -15,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -78,12 +78,8 @@ class SegmentManagerTest extends WebTestCase
     {
         $cache = $this->getSegmentQueryConverterCache();
         // unfortunately the reflection is only way to reset the cache stats
-        $hitsCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'hitsCount');
-        $hitsCountProperty->setAccessible(true);
-        $hitsCountProperty->setValue($cache, 0);
-        $missesCountProperty = ReflectionUtil::getProperty(new \ReflectionClass($cache), 'missesCount');
-        $missesCountProperty->setAccessible(true);
-        $missesCountProperty->setValue($cache, 0);
+        ReflectionUtil::setPropertyValue($cache, 'hitsCount', 0);
+        ReflectionUtil::setPropertyValue($cache, 'missesCount', 0);
     }
 
     private function getSegmentQueryConverterCache(): ArrayCache

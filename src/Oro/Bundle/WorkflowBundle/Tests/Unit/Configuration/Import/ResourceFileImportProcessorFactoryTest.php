@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Config\FileLocatorInterface;
 
 class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
@@ -103,27 +104,8 @@ class ResourceFileImportProcessorFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $processor = $this->factory->create($import);
 
-        $this->assertEquals($expectedPath, $this->getPrivateProperty($processor, 'importResource'));
-
-        $this->assertSame($this->reader, $this->getPrivateProperty($processor, 'reader'));
-    }
-
-    /**
-     * @param object $object
-     * @param string $property
-     * @return mixed
-     */
-    protected function getPrivateProperty($object, string $property)
-    {
-        $get = \Closure::bind(
-            function ($property) {
-                return $this->{$property};
-            },
-            $object,
-            $object
-        );
-
-        return $get($property);
+        $this->assertEquals($expectedPath, ReflectionUtil::getPropertyValue($processor, 'importResource'));
+        $this->assertSame($this->reader, ReflectionUtil::getPropertyValue($processor, 'reader'));
     }
 
     /**

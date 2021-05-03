@@ -6,6 +6,7 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
@@ -33,10 +34,8 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty(get_class($this->entity), 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->entity, $value);
-        $this->assertEquals($value, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $value);
+        $this->assertSame($value, $this->entity->getId());
     }
 
     /**

@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
@@ -30,8 +31,8 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->aclIdentity->getId());
 
         $value = 42;
-        $this->setEntityId($value);
-        $this->assertEquals($value, $this->aclIdentity->getId());
+        ReflectionUtil::setId($this->aclIdentity, $value);
+        $this->assertSame($value, $this->aclIdentity->getId());
     }
 
     /**
@@ -81,17 +82,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
         $this->expectExceptionMessage("Workflow ACL identity with ID 1 doesn't have entity ACL");
 
-        $this->setEntityId(1);
+        ReflectionUtil::setId($this->aclIdentity, 1);
         $this->aclIdentity->getAclAttributeStepKey();
-    }
-
-    /**
-     * @param int $value
-     */
-    protected function setEntityId($value)
-    {
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->aclIdentity, $value);
     }
 }

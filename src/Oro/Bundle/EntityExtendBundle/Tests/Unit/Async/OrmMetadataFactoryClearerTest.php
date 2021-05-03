@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping\EntityListenerResolver;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityBundle\ORM\Repository\EntityRepositoryFactory;
 use Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer;
-use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
@@ -36,18 +36,6 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
     {
         $this->container = $this->createMock(Container::class);
         $this->clearer = new OrmMetadataFactoryClearer($this->container, 'foo_metadata_factory');
-    }
-
-    /**
-     * @param object $object
-     * @param string $propertyName
-     * @param mixed  $propertyValue
-     */
-    private function setPrivateProperty($object, $propertyName, $propertyValue)
-    {
-        $property = ReflectionUtil::getProperty(new \ReflectionClass($object), $propertyName);
-        $property->setAccessible(true);
-        $property->setValue($object, $propertyValue);
     }
 
     public function testShouldNotGetUninitializedMetadataFactoryFromContainer()
@@ -247,7 +235,7 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
             [OrmEvents::onFlush, OrmEvents::loadClassMetadata, OrmEvents::onClassMetadataNotFound],
             'foo_listener'
         );
-        $this->setPrivateProperty(
+        ReflectionUtil::setPropertyValue(
             $eventManager,
             'initialized',
             [
@@ -276,24 +264,19 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
 
         $this->clearer->clear($logger);
 
-        $listenersProperty = new \ReflectionProperty(ContainerAwareEventManager::class, 'listeners');
-        $listenersProperty->setAccessible(true);
-        $initializedProperty = new \ReflectionProperty(ContainerAwareEventManager::class, 'initialized');
-        $initializedProperty->setAccessible(true);
-
         static::assertEquals(
             [
                 OrmEvents::loadClassMetadata       => ['_service_foo_listener' => 'foo_listener'],
                 OrmEvents::onClassMetadataNotFound => ['_service_foo_listener' => 'foo_listener']
             ],
-            $listenersProperty->getValue($eventManager)
+            ReflectionUtil::getPropertyValue($eventManager, 'listeners')
         );
         static::assertEquals(
             [
                 OrmEvents::loadClassMetadata       => true,
                 OrmEvents::onClassMetadataNotFound => true
             ],
-            $initializedProperty->getValue($eventManager)
+            ReflectionUtil::getPropertyValue($eventManager, 'initialized')
         );
     }
 
@@ -314,8 +297,8 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         self::assertObjectHasAttribute('listeners', $eventManager);
         self::assertObjectHasAttribute('initialized', $eventManager);
 
-        $this->setPrivateProperty($eventManager, 'listeners', new ArrayCollection());
-        $this->setPrivateProperty($eventManager, 'initialized', []);
+        ReflectionUtil::setPropertyValue($eventManager, 'listeners', new ArrayCollection());
+        ReflectionUtil::setPropertyValue($eventManager, 'initialized', []);
 
         $logger->expects(self::once())->method('info')->with('Disconnect ORM metadata factory');
         $logger->expects(self::once())
@@ -356,8 +339,8 @@ class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
         self::assertObjectHasAttribute('listeners', $eventManager);
         self::assertObjectHasAttribute('initialized', $eventManager);
 
-        $this->setPrivateProperty($eventManager, 'listeners', []);
-        $this->setPrivateProperty($eventManager, 'initialized', new ArrayCollection());
+        ReflectionUtil::setPropertyValue($eventManager, 'listeners', []);
+        ReflectionUtil::setPropertyValue($eventManager, 'initialized', new ArrayCollection());
 
         $logger->expects(self::once())->method('info')->with('Disconnect ORM metadata factory');
         $logger->expects(self::once())

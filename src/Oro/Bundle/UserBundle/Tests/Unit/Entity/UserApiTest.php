@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
-use Oro\Component\PhpUtils\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class UserApiTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,10 +15,8 @@ class UserApiTest extends \PHPUnit\Framework\TestCase
         self::assertNull($entity->getId());
 
         $id = 1;
-        $idProperty = ReflectionUtil::getProperty(new \ReflectionClass($entity), 'id');
-        $idProperty->setAccessible(true);
-        $idProperty->setValue($entity, $id);
-        self::assertEquals($id, $entity->getId());
+        ReflectionUtil::setId($entity, $id);
+        self::assertSame($id, $entity->getId());
     }
 
     public function testApiKey()

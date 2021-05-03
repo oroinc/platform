@@ -9,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\Extension\Configuration;
+use Oro\Component\Testing\ReflectionUtil;
 
 class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -80,10 +81,9 @@ class AbstractExtensionTest extends \PHPUnit\Framework\TestCase
         $configBody = [Configuration::NODE => 'test'];
         $config     = [Configuration::ROOT => $configBody];
 
-        $method = new \ReflectionMethod($this->extension, 'validateConfiguration');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->extension, new Configuration(), $config);
-        $this->assertSame($configBody, $result);
+        $this->assertSame(
+            $configBody,
+            ReflectionUtil::callMethod($this->extension, 'validateConfiguration', [new Configuration(), $config])
+        );
     }
 }

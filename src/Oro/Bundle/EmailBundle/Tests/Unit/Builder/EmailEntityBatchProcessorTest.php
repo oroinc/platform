@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
@@ -48,13 +48,13 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
     public function testAddEmail()
     {
         $this->batch->addEmailUser(new EmailUser());
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'emailUsers'));
+        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'emailUsers'));
     }
 
     public function testAddAddress()
     {
         $this->batch->addAddress($this->addrManager->newEmailAddress()->setEmail('Test@example.com'));
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'addresses'));
+        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'addresses'));
 
         $this->assertEquals('Test@example.com', $this->batch->getAddress('TeST@example.com')->getEmail());
         $this->assertNull($this->batch->getAddress('Another@example.com'));
@@ -70,7 +70,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $folder->setName('Test');
         $folder->setFullName('Test');
         $this->batch->addFolder($folder);
-        $this->assertCount(1, ReflectionUtil::getProtectedProperty($this->batch, 'folders'));
+        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
 
         $this->assertEquals('Test', $this->batch->getFolder('sent', 'TeST')->getFullName());
         $this->assertNull($this->batch->getFolder('sent', 'Another'));
@@ -80,7 +80,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit\Framework\TestCase
         $folder1->setName('Test');
         $folder1->setFullName('Test');
         $this->batch->addFolder($folder1);
-        $this->assertCount(2, ReflectionUtil::getProtectedProperty($this->batch, 'folders'));
+        $this->assertCount(2, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
 
         $this->assertEquals('Test', $this->batch->getFolder('trash', 'TeST')->getFullName());
         $this->assertNull($this->batch->getFolder('trash', 'Another'));

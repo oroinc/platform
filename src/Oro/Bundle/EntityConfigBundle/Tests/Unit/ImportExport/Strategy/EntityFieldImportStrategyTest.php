@@ -10,83 +10,65 @@ use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DatabaseHelper */
-    protected $databaseHelper;
+    private $databaseHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldTypeProvider */
-    protected $fieldTypeProvider;
+    private $fieldTypeProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityFieldImportStrategy */
-    protected $strategy;
+    private $strategy;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldHelper */
-    protected $fieldHelper;
+    private $fieldHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ImportStrategyHelper */
-    protected $strategyHelper;
+    private $strategyHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FieldNameValidationHelper */
-    protected $validationHelper;
+    private $validationHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContextInterface */
-    protected $context;
+    private $context;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->fieldTypeProvider = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->fieldHelper = $this->createMock(FieldHelper::class);
+        $this->strategyHelper = $this->createMock(ImportStrategyHelper::class);
+        $this->databaseHelper = $this->createMock(DatabaseHelper::class);
+        $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
+        $this->context = $this->createMock(ContextInterface::class);
 
-        $this->fieldTypeProvider->expects(static::any())
+        $this->fieldTypeProvider->expects(self::any())
             ->method('getFieldProperties')
             ->willReturn([]);
 
-        $this->translator = $this->createMock('Symfony\Contracts\Translation\TranslatorInterface');
-        $this->translator
-            ->expects(static::any())
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($value) {
-                    return $value;
-                }
-            );
-
-        /** @var FieldHelper $fieldHelper */
-        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Helper\FieldHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var ImportStrategyHelper $strategyHelper */
-        $this->strategyHelper = $this
-            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->databaseHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\DatabaseHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
+            ->willReturnCallback(function ($value) {
+                return $value;
+            });
 
         $this->strategy = $this->createStrategy();
-
-        $this->context = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
-
         $this->strategy->setImportExportContext($this->context);
-        $this->strategy->setEntityName('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
+        $this->strategy->setEntityName(FieldConfigModel::class);
         $this->strategy->setFieldTypeProvider($this->fieldTypeProvider);
         $this->strategy->setTranslator($this->translator);
         $this->strategy->setFieldValidationHelper($this->validationHelper);
@@ -95,32 +77,31 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     public function testSetTranslator()
     {
         $strategy = $this->createStrategy();
-        static::assertNull($this->getProperty($strategy, 'translator'));
+        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'translator'));
         $strategy->setTranslator($this->translator);
-        static::assertEquals($this->translator, $this->getProperty($strategy, 'translator'));
+        self::assertSame($this->translator, ReflectionUtil::getPropertyValue($strategy, 'translator'));
     }
 
     public function testSetConstraintFactory()
     {
-        /** @var ConstraintFactory $factory */
-        $factory = $this->createMock('Oro\Bundle\FormBundle\Validator\ConstraintFactory');
+        $factory = $this->createMock(ConstraintFactory::class);
         $strategy = $this->createStrategy();
-        static::assertNull($this->getProperty($strategy, 'constraintFactory'));
+        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'constraintFactory'));
         $strategy->setConstraintFactory($factory);
-        static::assertEquals($factory, $this->getProperty($strategy, 'constraintFactory'));
+        self::assertSame($factory, ReflectionUtil::getPropertyValue($strategy, 'constraintFactory'));
     }
 
     public function testSetFieldTypeProvider()
     {
         $strategy = $this->createStrategy();
-        static::assertNull($this->getProperty($strategy, 'fieldTypeProvider'));
+        self::assertNull(ReflectionUtil::getPropertyValue($strategy, 'fieldTypeProvider'));
         $strategy->setFieldTypeProvider($this->fieldTypeProvider);
-        static::assertEquals($this->fieldTypeProvider, $this->getProperty($strategy, 'fieldTypeProvider'));
+        self::assertSame($this->fieldTypeProvider, ReflectionUtil::getPropertyValue($strategy, 'fieldTypeProvider'));
     }
 
     public function testProcessWrongType()
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $field = new \stdClass();
         $this->strategy->process($field);
     }
@@ -211,7 +192,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     /**
      * @return EntityFieldImportStrategy
      */
-    protected function createStrategy()
+    private function createStrategy()
     {
         return new EntityFieldImportStrategy(
             new EventDispatcher(),
@@ -219,17 +200,5 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
             $this->fieldHelper,
             $this->databaseHelper
         );
-    }
-
-    /**
-     * @param object $object
-     * @param string $property
-     * @return mixed $value
-     */
-    protected function getProperty($object, $property)
-    {
-        $reflection = new \ReflectionProperty(get_class($object), $property);
-        $reflection->setAccessible(true);
-        return $reflection->getValue($object);
     }
 }

@@ -11,6 +11,7 @@ use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManagerTest extends \PHPUnit\Framework\TestCase
@@ -119,7 +120,7 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
         $updatedBy->expects($this->once())->method('getAvatar')->will($this->returnValue(null));
 
         $note = new Note();
-        $this->setId($note, 123);
+        ReflectionUtil::setId($note, 123);
         $note
             ->setMessage('test message')
             ->setCreatedAt(new \DateTime('2014-01-20 10:30:40', new \DateTimeZone('UTC')))
@@ -180,18 +181,5 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             ],
             $this->manager->getEntityViewModels([$note])
         );
-    }
-
-    /**
-     * @param mixed $obj
-     * @param mixed $val
-     */
-    protected function setId($obj, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop  = $class->getProperty('id');
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
     }
 }
