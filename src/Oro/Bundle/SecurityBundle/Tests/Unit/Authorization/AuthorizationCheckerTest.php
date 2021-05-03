@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -14,16 +15,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerAuthorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectIdentityFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $objectIdentityFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
     /** @var AuthorizationChecker */
@@ -53,29 +54,27 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedWithAclAnnotationIdAndNoObject()
     {
         $oid = new ObjectIdentity('1', 'TestType');
-        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $annotation = $this->createMock(Acl::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $this->objectIdentityFactory->expects($this->once())
             ->method('get')
             ->with($this->identicalTo($annotation))
-            ->will($this->returnValue($oid));
-        $this->annotationProvider->expects($this->at(0))
+            ->willReturn($oid);
+        $this->annotationProvider->expects($this->once())
             ->method('findAnnotationById')
             ->with('TestAnnotation')
-            ->will($this->returnValue($annotation));
+            ->willReturn($annotation);
         $this->logger->expects($this->once())
             ->method('debug');
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($oid))
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestAnnotation');
         $this->assertTrue($result);
@@ -84,27 +83,25 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedWithAclAnnotationIdAndWithObject()
     {
         $obj = new \stdClass();
-        $annotation = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Annotation\Acl')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $annotation = $this->createMock(Acl::class);
         $annotation->expects($this->once())
             ->method('getId')
-            ->will($this->returnValue('method_annotation'));
+            ->willReturn('method_annotation');
         $annotation->expects($this->once())
             ->method('getPermission')
-            ->will($this->returnValue('TEST_PERMISSION'));
+            ->willReturn('TEST_PERMISSION');
         $this->objectIdentityFactory->expects($this->never())
             ->method('get');
-        $this->annotationProvider->expects($this->at(0))
+        $this->annotationProvider->expects($this->once())
             ->method('findAnnotationById')
             ->with('TestAnnotation')
-            ->will($this->returnValue($annotation));
+            ->willReturn($annotation);
         $this->logger->expects($this->once())
             ->method('debug');
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TEST_PERMISSION'), $this->identicalTo($obj))
-            ->will($this->returnValue(true));
+            ->with('TEST_PERMISSION', $this->identicalTo($obj))
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestAnnotation', $obj);
         $this->assertTrue($result);
@@ -122,7 +119,7 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('', self::identicalTo($oid))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue(
             $this->authorizationChecker->isGranted('', $oid)
@@ -134,11 +131,11 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotationById')
             ->with('TestRole')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('TestRole'), $this->equalTo(null))
-            ->will($this->returnValue(true));
+            ->with('TestRole', $this->isNull())
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('TestRole');
         $this->assertTrue($result);
@@ -150,10 +147,10 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('findAnnotationById');
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo(array('TestRole1', 'TestRole2')), $this->equalTo(null))
-            ->will($this->returnValue(true));
+            ->with(['TestRole1', 'TestRole2'], $this->isNull())
+            ->willReturn(true);
 
-        $result = $this->authorizationChecker->isGranted(array('TestRole1', 'TestRole2'));
+        $result = $this->authorizationChecker->isGranted(['TestRole1', 'TestRole2']);
         $this->assertTrue($result);
     }
 
@@ -164,15 +161,15 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotationById')
             ->with('PERMISSION')
-            ->will($this->returnValue(null));
-        $this->objectIdentityFactory->expects($this->at(0))
+            ->willReturn(null);
+        $this->objectIdentityFactory->expects($this->once())
             ->method('get')
-            ->with($this->equalTo($obj))
-            ->will($this->returnValue($oid));
+            ->with($obj)
+            ->willReturn($oid);
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('PERMISSION'), $oid)
-            ->will($this->returnValue(true));
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
         $this->assertTrue($result);
@@ -182,8 +179,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('VIEW'), 'entity:AcmeDemoBundle:Test')
-            ->will($this->returnValue(true));
+            ->with('VIEW', 'entity:AcmeDemoBundle:Test')
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('VIEW;entity:AcmeDemoBundle:Test');
         $this->assertTrue($result);
@@ -195,11 +192,11 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->annotationProvider->expects($this->once())
             ->method('findAnnotationById')
             ->with('PERMISSION')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
         $this->innerAuthorizationChecker->expects($this->once())
             ->method('isGranted')
-            ->with($this->equalTo('PERMISSION'), $this->equalTo($obj))
-            ->will($this->returnValue(true));
+            ->with('PERMISSION', $obj)
+            ->willReturn(true);
 
         $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
         $this->assertTrue($result);

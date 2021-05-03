@@ -153,20 +153,21 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
-        $this->fieldProvider->expects(self::at(0))
+        $this->fieldProvider->expects(self::exactly(2))
             ->method('getFields')
-            ->with($rootEntityClass, true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
-                ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
-            ]);
-
-        $this->fieldProvider->expects(self::at(1))
-            ->method('getFields')
-            ->with('Acme\ParentEntity', true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
-            ]);
+            ->withConsecutive(
+                [$rootEntityClass, true, true],
+                ['Acme\ParentEntity', true, true]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
+                    ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
+                ],
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
+                ]
+            );
 
         $this->validator->validate($value, new QueryDefinition());
         $this->assertNoViolation();
@@ -189,18 +190,19 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
-        $this->fieldProvider->expects(self::at(0))
+        $this->fieldProvider->expects(self::exactly(2))
             ->method('getFields')
-            ->with($rootEntityClass, true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
-                ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
-            ]);
-
-        $this->fieldProvider->expects(self::at(1))
-            ->method('getFields')
-            ->with('Acme\ParentNonSupportedEntity', true, true)
-            ->willReturn([]);
+            ->withConsecutive(
+                [$rootEntityClass, true, true],
+                ['Acme\ParentNonSupportedEntity', true, true]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
+                    ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
+                ],
+                []
+            );
 
         $constraint = new QueryDefinition();
         $this->validator->validate($value, $constraint);
@@ -226,19 +228,20 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
-        $this->fieldProvider->expects(self::at(0))
+        $this->fieldProvider->expects(self::exactly(2))
             ->method('getFields')
-            ->with($rootEntityClass, true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
-            ]);
-
-        $this->fieldProvider->expects(self::at(1))
-            ->method('getFields')
-            ->with('Acme\ParentEntity', true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
-            ]);
+            ->withConsecutive(
+                [$rootEntityClass, true, true],
+                ['Acme\ParentEntity', true, true]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
+                ],
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
+                ]
+            );
 
         $constraint = new QueryDefinition();
         $this->validator->validate($value, $constraint);
@@ -264,20 +267,21 @@ class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
             ->with($rootEntityClass)
             ->willReturn(true);
 
-        $this->fieldProvider->expects(self::at(0))
+        $this->fieldProvider->expects(self::exactly(2))
             ->method('getFields')
-            ->with($rootEntityClass, true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
-                ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
-            ]);
-
-        $this->fieldProvider->expects(self::at(1))
-            ->method('getFields')
-            ->with('Acme\ParentEntity', true, true)
-            ->willReturn([
-                ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
-            ]);
+            ->withConsecutive(
+                [$rootEntityClass, true, true],
+                ['Acme\ParentEntity', true, true]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id'],
+                    ['name' => 'parent', 'type' => 'integer', 'label' => 'Parent']
+                ],
+                [
+                    ['name' => 'id', 'type' => 'integer', 'label' => 'Id']
+                ]
+            );
 
         $constraint = new QueryDefinition();
         $this->validator->validate($value, $constraint);
