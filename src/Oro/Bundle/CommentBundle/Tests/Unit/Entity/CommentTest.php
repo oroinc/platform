@@ -3,52 +3,56 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class CommentTest extends AbstractEntityTestCase
+class CommentTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Comment */
-    protected $entity;
+    use EntityTestCaseTrait;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getEntityFQCN()
+    public function testProperties()
     {
-        return 'Oro\Bundle\CommentBundle\Entity\Comment';
+        $properties = [
+            'id'           => ['id', 1],
+            'message'      => ['message', 'some test message'],
+            'updatedBy'    => ['updatedBy', $this->createMock(User::class)],
+            'owner'        => ['owner', $this->createMock(User::class)],
+            'organization' => ['organization', $this->createMock(Organization::class)],
+            'createdAt'    => ['createdAt', new \DateTime()],
+            'updatedAt'    => ['updatedAt', new \DateTime()],
+        ];
+
+        $entity = new Comment();
+        self::assertPropertyAccessors($entity, $properties);
     }
 
     public function testPrePersist()
     {
-        $this->entity->prePersist();
+        $entity = new Comment();
+        $entity->prePersist();
 
-        $this->assertNotNull($this->entity->getCreatedAt());
-        $this->assertNotNull($this->entity->getUpdatedAt());
+        self::assertNotNull($entity->getCreatedAt());
+        self::assertNotNull($entity->getUpdatedAt());
+        self::assertEquals($entity->getCreatedAt(), $entity->getUpdatedAt());
+        self::assertNotSame($entity->getCreatedAt(), $entity->getUpdatedAt());
+
+        $existingCreatedAt = $entity->getCreatedAt();
+        $existingUpdatedAt = $entity->getUpdatedAt();
+        $entity->prePersist();
+        self::assertSame($existingCreatedAt, $entity->getCreatedAt());
+        self::assertNotSame($existingUpdatedAt, $entity->getUpdatedAt());
     }
 
     public function testPreUpdate()
     {
-        $this->entity->preUpdate();
+        $entity = new Comment();
+        $entity->preUpdate();
 
-        $this->assertNotNull($this->entity->getUpdatedAt());
-    }
+        self::assertNotNull($entity->getUpdatedAt());
 
-    /**
-     * @return array
-     */
-    public function getSetDataProvider()
-    {
-        $owner        = $this->createMock('Oro\Bundle\UserBundle\Entity\User');
-        $organization = $this->createMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
-        $createdAt    = new \DateTime('now');
-        $updatedAt    = new \DateTime('now');
-
-        return [
-            'message'      => ['message', 'some test message', 'some test message'],
-            'updatedBy'    => ['updatedBy', $owner, $owner],
-            'owner'        => ['owner', $owner, $owner],
-            'organization' => ['organization', $organization, $organization],
-            'createdAt'    => ['createdAt', $createdAt, $createdAt],
-            'updatedAt'    => ['updatedAt', $updatedAt, $updatedAt],
-        ];
+        $existingUpdatedAt = $entity->getUpdatedAt();
+        $entity->preUpdate();
+        self::assertNotSame($existingUpdatedAt, $entity->getUpdatedAt());
     }
 }

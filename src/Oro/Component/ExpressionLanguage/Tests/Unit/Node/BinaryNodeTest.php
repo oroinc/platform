@@ -2,17 +2,16 @@
 
 namespace Oro\Component\ExpressionLanguage\Tests\Unit\Node;
 
-use Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree\AbstractNodeDefinitionTest;
 use Oro\Component\ExpressionLanguage\Node\BinaryNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 
-class BinaryNodeTest extends AbstractNodeDefinitionTest
+class BinaryNodeTest extends AbstractNodeTest
 {
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    public function getEvaluateData()
+    public function getEvaluateData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -59,9 +58,9 @@ class BinaryNodeTest extends AbstractNodeDefinitionTest
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    public function getCompileData()
+    public function getCompileData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
@@ -111,9 +110,9 @@ class BinaryNodeTest extends AbstractNodeDefinitionTest
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
-    public function getDumpData()
+    public function getDumpData(): array
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('a'));
