@@ -1,32 +1,49 @@
 <?php
+
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
 class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAME  = 'testNodeName';
-    const TEST_LEVEL = 2;
+    private const TEST_NAME  = 'testNodeName';
 
-    /**
-     * @return GroupNodeDefinition
-     */
-    protected static function getTestGroup()
+    private static function getTestGroup(): GroupNodeDefinition
     {
-        $node1 = new GroupNodeDefinition('node1', array('priority' => 255), array());
-        $node3 = new GroupNodeDefinition('node3', array('priority' => 250), array());
+        $node1 = new GroupNodeDefinition('node1', ['priority' => 255], []);
+        $node3 = new GroupNodeDefinition('node3', ['priority' => 250], []);
 
-        return new GroupNodeDefinition('node4', array(), array($node1, $node3));
+        return new GroupNodeDefinition('node4', [], [$node1, $node3]);
+    }
+
+    public function testGetName()
+    {
+        $node = new GroupNodeDefinition(self::TEST_NAME);
+        $this->assertEquals(self::TEST_NAME, $node->getName());
+    }
+
+    public function testPriority()
+    {
+        $node = new GroupNodeDefinition(self::TEST_NAME);
+        $this->assertSame(0, $node->getPriority());
+
+        $priority = 100;
+        $node = new GroupNodeDefinition(self::TEST_NAME, ['priority' => $priority]);
+        $this->assertSame($priority, $node->getPriority());
+
+        $priority = 255;
+        $node->setPriority($priority);
+        $this->assertSame($priority, $node->getPriority());
     }
 
     public function testGetSetLevel()
     {
         $node = new GroupNodeDefinition(self::TEST_NAME);
+        $this->assertSame(0, $node->getLevel());
 
-        $this->assertEquals(0, $node->getLevel());
-
-        $node->setLevel(self::TEST_LEVEL);
-        $this->assertEquals(self::TEST_LEVEL, $node->getLevel());
+        $level = 2;
+        $node->setLevel($level);
+        $this->assertSame($level, $node->getLevel());
     }
 
     public function testCount()
@@ -64,8 +81,6 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider nodeDefinitionProvider
-     *
-     * @param GroupNodeDefinition $node
      */
     public function testToBlockConfig(GroupNodeDefinition $node)
     {
@@ -89,8 +104,6 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider nodeDefinitionProvider
-     *
-     * @param GroupNodeDefinition $node
      */
     public function testToViewData(GroupNodeDefinition $node)
     {
@@ -109,14 +122,11 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(6, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function nodeDefinitionProvider()
+    public function nodeDefinitionProvider(): array
     {
         $node = new GroupNodeDefinition(
             self::TEST_NAME,
-            array(
+            [
                 'title'        => 'some title',
                 'priority'     => 123,
                 'description'  => 'some desc',
@@ -127,11 +137,11 @@ class GroupNodeDefinitionTest extends \PHPUnit\Framework\TestCase
                 'handler'      => ['Test\Class::method'],
                 'some_another' => '',
                 'tooltip'      => 'some tooltip'
-            )
+            ]
         );
 
-        return array(
-            array($node)
-        );
+        return [
+            [$node]
+        ];
     }
 }
