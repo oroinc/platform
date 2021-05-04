@@ -20,7 +20,7 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
     /** @var IdentityConfigChoiceType */
     protected $type;
 
-    /** @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     protected function setUp(): void
@@ -101,7 +101,6 @@ class IdentityConfigChoiceTypeTest extends AbstractConfigTypeTestCase
             ->method('getOptions')
             ->willReturn($options);
 
-        /** @var FormInterface|\PHPUnit_Framework_MockObject_MockObject $form */
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())
             ->method('getConfig')

@@ -6,7 +6,7 @@ use Oro\Bundle\SyncBundle\Content\SimpleTagGenerator;
 
 class SimpleTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  SimpleTagGenerator */
+    /** @var SimpleTagGenerator */
     protected $generator;
 
     protected function setUp(): void

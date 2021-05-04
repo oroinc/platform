@@ -13,7 +13,7 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class MergeListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var string $fieldPrefix */
+    /** @var string */
     private $fieldPrefix;
 
     protected function setUp(): void

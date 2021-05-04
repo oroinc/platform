@@ -6,7 +6,7 @@ use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
 
 class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  DecodeFolderSubscriber */
+    /** @var DecodeFolderSubscriber */
     protected $listener;
 
     protected function setUp(): void

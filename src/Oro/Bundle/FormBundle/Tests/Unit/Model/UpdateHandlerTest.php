@@ -23,52 +23,34 @@ class UpdateHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Request
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Request */
     protected $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Session
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Session */
     protected $session;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Router
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|Router */
     protected $router;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $form
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface */
     protected $form;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $resultCallbackInvoked;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     protected $requestStack;
 
-    /**
-     * @var FormHandler
-     */
+    /** @var FormHandler */
     protected $formHandler;
 
-    /**
-     * @var UpdateHandler
-     */
+    /** @var UpdateHandler */
     protected $handler;
 
     protected function setUp(): void

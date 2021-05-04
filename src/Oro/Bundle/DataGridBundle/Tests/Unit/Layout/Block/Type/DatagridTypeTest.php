@@ -19,7 +19,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     /** @var NameStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameStrategy;
 
-    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var ManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */

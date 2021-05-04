@@ -11,16 +11,16 @@ use Symfony\Component\Form\FormRegistryInterface;
 
 class FormOptionsConfigurationAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  FormOptionsConfigurationAssembler */
+    /** @var FormOptionsConfigurationAssembler */
     protected $assembler;
 
-    /** @var  FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRegistry;
 
-    /** @var  FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $formHandlerRegistry;
 
-    /** @var  FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $formTemplateDataProviderRegistry;
 
     /** @var array */

@@ -176,7 +176,6 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnBeforeViewRender()
     {
-        /** @var $twig \Twig\Environment|\PHPUnit\Framework\MockObject\MockObject */
         $twig = $this->createMock(\Twig\Environment::class);
 
         $entity = new TestEntity1();

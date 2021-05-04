@@ -12,13 +12,13 @@ class RemoveFieldQueryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $commandExecutor;
 
-    /** @var  LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var  Connection|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     protected $connector;
 
-    /** @var  Statement|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Statement|\PHPUnit\Framework\MockObject\MockObject */
     protected $statement;
 
     protected function setUp(): void

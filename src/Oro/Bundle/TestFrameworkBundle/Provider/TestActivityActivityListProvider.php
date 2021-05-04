@@ -49,7 +49,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getSubject($entity)
     {
-        /** @var $entity TestActivity */
+        /** @var TestActivity $entity */
         return $entity->getMessage();
     }
 
@@ -58,7 +58,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getDescription($entity)
     {
-        /** @var $entity TestActivity */
+        /** @var TestActivity $entity */
         return $entity->getDescription();
     }
 
@@ -83,7 +83,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getOrganization($activityEntity)
     {
-        /** @var $activityEntity TestActivity */
+        /** @var TestActivity $activityEntity */
         return $activityEntity->getOrganization();
     }
 

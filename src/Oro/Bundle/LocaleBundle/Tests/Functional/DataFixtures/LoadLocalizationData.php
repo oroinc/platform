@@ -51,7 +51,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
             $this->processLanguage($item, $manager);
         }
 
-        /* @var $repository LocalizationRepository */
+        /* @var LocalizationRepository $repository */
         $repository = $manager->getRepository(Localization::class);
         $defaultEnUsLocalization = $repository->findOneBy(['formattingCode' => self::DEFAULT_LOCALIZATION_CODE]);
         if (!$defaultEnUsLocalization) {
@@ -101,7 +101,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function processLanguage($langCode, ObjectManager $manager)
     {
-        /* @var $repository LanguageRepository */
+        /* @var LanguageRepository $repository */
         $repository = $manager->getRepository(Language::class);
         $language = $repository->findOneBy(['code' => $langCode]);
         if (!$language) {
@@ -124,10 +124,10 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
      */
     protected function updateEnabledLocalizations(ObjectManager $manager)
     {
-        /* @var $configManager ConfigManager */
+        /* @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
 
-        /* @var $localizations Localization[] */
+        /* @var Localization[] $localizations */
         $localizations = $manager->getRepository(Localization::class)->findAll();
 
         $enabledLocalizations = [];

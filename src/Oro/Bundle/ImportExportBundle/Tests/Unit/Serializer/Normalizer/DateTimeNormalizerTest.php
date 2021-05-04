@@ -8,10 +8,10 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DateTimeNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  DateTimeNormalizer */
+    /** @var DateTimeNormalizer */
     protected $normalizer;
 
-    /** @var  LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $localeSettings;
 
     protected function setUp(): void

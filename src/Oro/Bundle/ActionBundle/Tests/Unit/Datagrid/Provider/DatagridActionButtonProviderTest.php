@@ -77,10 +77,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
             ->with(self::PROVIDER_ALIAS)
             ->willReturn($massActionProvider);
 
-        /* @var $optionsHelper OptionsHelper|\PHPUnit\Framework\MockObject\MockObject */
-        $optionsHelper = $this->getMockBuilder(OptionsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $optionsHelper = $this->createMock(OptionsHelper::class);
         $optionsHelper->expects($this->any())
             ->method('getFrontendOptions')
             ->willReturn([

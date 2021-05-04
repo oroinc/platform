@@ -27,7 +27,7 @@ class Department
     /**
      * @ORM\ManyToOne(targetEntity="Person")
      * @ORM\JoinColumn(name="manager_id", referencedColumnName="id")
-     **/
+     */
     protected $manager;
 
     /**
@@ -38,7 +38,7 @@ class Department
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     **/
+     */
     protected $owner;
 
     public function __construct()

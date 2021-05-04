@@ -31,7 +31,7 @@ class EmailOriginHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var  EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailAddressHelper;
 
     protected function setUp(): void

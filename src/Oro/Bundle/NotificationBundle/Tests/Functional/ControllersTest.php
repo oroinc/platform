@@ -15,7 +15,7 @@ class ControllersTest extends WebTestCase
 
     const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\User';
 
-    /** @var  Registry */
+    /** @var Registry */
     protected $doctrine;
 
     protected function setUp(): void

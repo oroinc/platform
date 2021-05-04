@@ -40,10 +40,10 @@ class WorkflowReplacementTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $optionsResolver OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
         $optionsResolver = $this->createMock(OptionsResolver::class);
-
-        $optionsResolver->expects($this->once())->method('setDefault')->with('workflow', null);
+        $optionsResolver->expects($this->once())
+            ->method('setDefault')
+            ->with('workflow', null);
         $optionsResolver->expects($this->once())
             ->method('setAllowedTypes')
             ->with('workflow', [WorkflowDefinition::class]);

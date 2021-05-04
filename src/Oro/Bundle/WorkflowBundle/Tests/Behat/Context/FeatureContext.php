@@ -69,10 +69,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      */
     protected function getWorkflowByTitle($title)
     {
-        /* @var $translationHelper WorkflowTranslationHelper */
+        /* @var WorkflowTranslationHelper $translationHelper */
         $translationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
 
-        /* @var $workflowRegistry WorkflowRegistry */
+        /* @var WorkflowRegistry $workflowRegistry */
         $workflowRegistry = $this->getContainer()->get('oro_workflow.registry');
 
         $workflows = $workflowRegistry->getActiveWorkflows()->filter(
@@ -91,10 +91,10 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware, Ke
      */
     private function getWorkflowDefinitionByTitle(string $title): ?WorkflowDefinition
     {
-        /* @var $translationHelper WorkflowTranslationHelper */
+        /* @var WorkflowTranslationHelper $translationHelper */
         $translationHelper = $this->getContainer()->get('oro_workflow.helper.translation');
 
-        /* @var $workflowRegistry WorkflowRegistry */
+        /* @var WorkflowRegistry $workflowRegistry */
         $doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
         $workflowDefinitionRepository = $doctrineHelper->getEntityRepositoryForClass(WorkflowDefinition::class);
 

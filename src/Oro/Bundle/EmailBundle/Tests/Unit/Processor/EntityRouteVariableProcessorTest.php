@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var UrlProvider|\PHPUnit\Framework\MockObject\MockObject */

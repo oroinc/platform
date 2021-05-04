@@ -30,7 +30,7 @@ class CompositeKeyEntity
     /**
      * @ORM\ManyToMany(targetEntity="CompositeKeyEntity")
      * @ORM\JoinTable(name="composite_key_entity_children")
-     **/
+     */
     protected $children;
 
     public function __construct()

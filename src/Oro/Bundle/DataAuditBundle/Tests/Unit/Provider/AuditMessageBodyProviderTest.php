@@ -23,20 +23,17 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->entityNameResolver = self::createMock(EntityNameResolver::class);
+        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
     }
 
     public function testPrepareMessageBodyEmptyParameters()
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
-
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::never())
             ->method('getUser')
             ->willReturn(null);
-
         $securityToken->expects(self::never())
             ->method('hasAttribute');
 
@@ -55,20 +52,17 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
-
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-
-        $this->entityNameResolver->expects(self::never())
-            ->method('getName');
-
         $securityToken->expects(self::exactly(2))
             ->method('hasAttribute')
             ->withConsecutive(['IMPERSONATION'], ['owner_description'])
             ->willReturnOnConsecutiveCalls(false, false);
+
+        $this->entityNameResolver->expects(self::never())
+            ->method('getName');
 
         $body = $provider->prepareMessageBody(
             ['insertions'],
@@ -98,15 +92,12 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
+        $user = $this->createMock(UserInterface::class);
 
-        $user = self::createMock(UserInterface::class);
-
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-
         $securityToken->expects(self::exactly(2))
             ->method('hasAttribute')
             ->withConsecutive(['IMPERSONATION'], ['owner_description'])
@@ -140,23 +131,20 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
-
         $user = $this->getEntity(AbstractUserStub::class, ['id' => 23]);
 
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::atLeastOnce())
             ->method('getUser')
             ->willReturn($user);
+        $securityToken->expects(self::any())
+            ->method('hasAttribute')
+            ->willReturn(false);
 
         $this->entityNameResolver->expects(self::atLeastOnce())
             ->method('getName')
             ->with($user, 'email')
             ->willReturn('user@name.com');
-
-        $securityToken->expects(self::any())
-            ->method('hasAttribute')
-            ->willReturn(false);
 
         $body = $provider->prepareMessageBody(
             [],
@@ -253,25 +241,21 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
-
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-
-        $this->entityNameResolver->expects(self::never())
-            ->method('getName');
-
         $securityToken->expects(self::exactly(2))
             ->method('hasAttribute')
             ->withConsecutive(['IMPERSONATION'], ['owner_description'])
             ->willReturnOnConsecutiveCalls(true, false);
-
         $securityToken->expects(self::once())
             ->method('getAttribute')
             ->with('IMPERSONATION')
             ->willReturn('impersonation_attribute');
+
+        $this->entityNameResolver->expects(self::never())
+            ->method('getName');
 
         $body = $provider->prepareMessageBody(
             ['insertions'],
@@ -304,25 +288,21 @@ class AuditMessageBodyProviderTest extends \PHPUnit\Framework\TestCase
     {
         $provider = new AuditMessageBodyProvider($this->entityNameResolver);
 
-        /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject $securityToken */
-        $securityToken = self::createMock(TokenInterface::class);
-
+        $securityToken = $this->createMock(TokenInterface::class);
         $securityToken->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
-
-        $this->entityNameResolver->expects(self::never())
-            ->method('getName');
-
         $securityToken->expects(self::exactly(2))
             ->method('hasAttribute')
             ->withConsecutive(['IMPERSONATION'], ['owner_description'])
             ->willReturnOnConsecutiveCalls(false, true);
-
         $securityToken->expects(self::once())
             ->method('getAttribute')
             ->with('owner_description')
             ->willReturn('owner_description_attribute');
+
+        $this->entityNameResolver->expects(self::never())
+            ->method('getName');
 
         $body = $provider->prepareMessageBody(
             ['insertions'],

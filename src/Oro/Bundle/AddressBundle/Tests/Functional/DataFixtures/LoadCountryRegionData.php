@@ -33,10 +33,10 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
     public function load(ObjectManager $manager)
     {
         foreach ($this->data as $regionReference => $countryReference) {
-            /** @var $region Region */
+            /** @var Region $region */
             $region = $this->getRegion($manager, $regionReference);
 
-            /** @var $country Country */
+            /** @var Country $country */
             $country = $this->getReference($countryReference);
             $country->addRegion($region);
         }

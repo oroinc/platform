@@ -10,13 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  OAuthSubscriber */
+    /** @var OAuthSubscriber */
     protected $listener;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|OAuth2ManagerRegistry */
+    /** @var OAuth2ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $oauthManagerRegistry;
 
     protected function setUp(): void

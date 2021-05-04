@@ -58,7 +58,7 @@ class LoadLanguages extends AbstractFixture implements DependentFixtureInterface
      */
     protected function createLanguage(ObjectManager $manager, $code, array $options)
     {
-        /* @var $user User */
+        /* @var User $user */
         $user = $manager->getRepository(User::class)->findOneBy(['username' => $options['user']]);
 
         $language = new Language();

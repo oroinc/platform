@@ -7,7 +7,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslatorProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     /** @var TranslatorProvider */

@@ -14,7 +14,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
 
-    /** @var  MenuUpdateRepository */
+    /** @var MenuUpdateRepository */
     protected $repository;
 
     protected function setUp(): void

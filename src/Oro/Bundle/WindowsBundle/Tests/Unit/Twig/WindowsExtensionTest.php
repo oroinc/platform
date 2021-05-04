@@ -34,7 +34,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|WindowsStateRequestManager */
     private $requestStateManager;
 
-    /** @var  FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FragmentHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $fragmentHandler;
 
     protected function setUp(): void

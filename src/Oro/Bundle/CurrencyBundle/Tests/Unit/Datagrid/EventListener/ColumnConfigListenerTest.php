@@ -13,12 +13,10 @@ class ColumnConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
     const ENTITY = 'Test:Entity';
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityClassResolver;
 
-    /** @var ColumnConfigListener  */
+    /** @var ColumnConfigListener */
     protected $columnListener;
 
     protected function setUp(): void

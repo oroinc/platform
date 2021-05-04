@@ -14,7 +14,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
 {
     const TEST_EVENT_NAME = 'test.event';
 
-    /** @var  EventDispatcherInterface */
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */

@@ -24,7 +24,7 @@ class UserControllerACLTest extends WebTestCase
     public function testACLInfoAction($resource, $user, $status)
     {
         $this->loginUser($user);
-        /* @var $resource User */
+        /* @var User $resource */
         $resource = $this->getReference($resource);
 
         $this->client->request(

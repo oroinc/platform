@@ -27,7 +27,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var OriginalUrlProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $originalUrlProvider;
 
-    /** @var  CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $applicationProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TransitionOptionsResolver */

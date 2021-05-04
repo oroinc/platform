@@ -255,8 +255,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
      */
     protected function getConstraintValidatorFactory()
     {
-        /* @var $factory \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface */
-        $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
+        $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
         $factory->expects($this->any())
             ->method('getInstance')
             ->willReturnCallback(

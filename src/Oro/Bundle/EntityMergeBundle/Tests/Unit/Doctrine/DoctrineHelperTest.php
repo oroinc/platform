@@ -10,44 +10,28 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
  */
 class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DoctrineHelper $target
-     */
+    /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadataFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject $fakeEntityManager
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $queryBuilder;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $query;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $expression;
 
     protected function setUp(): void
