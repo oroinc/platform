@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .big-numbers-items {
-    margin: side-values(-15px -15px 0);
+    margin: -15px -15px 0;
 
     display: flex;
     flex-wrap: wrap;
@@ -12,21 +12,21 @@
         position: relative;
 
         width: 33.3%;
-        padding: side-values(0 15px);
-        margin: side-values(15px 0 15px -1px);
+        padding: 0 15px;
+        margin: 15px 0 15px -1px;
 
         text-align: center;
 
         background: none;
-        border-#{$start}: 1px solid $dashboard-big-numbers-separator-color;
+        border-left: 1px solid $dashboard-big-numbers-separator-color;
 
-        float: #{$start};
+        float: left;
         display: block;
         vertical-align: middle;
 
         &:after {
             position: absolute;
-            #{$end}: 15px;
+            right: 15px;
             bottom: -15px;
 
             width: calc(300% - 30px);
@@ -59,7 +59,7 @@
 
             font-weight: normal;
             font-size: $base-font-size;
-            text-align: #{$start};
+            text-align: left;
             color: $primary-400;
 
             display: inherit;
@@ -69,7 +69,7 @@
         & > .value {
             margin-bottom: 15px;
 
-            text-align: #{$start};
+            text-align: left;
             font-weight: normal;
             color: $primary-100;
         }
@@ -80,7 +80,7 @@
             overflow: hidden;
 
             & > .deviation {
-                float: #{$start};
+                float: left;
 
                 &.positive {
                     color: $dashboard-big-numbers-positive-color;
@@ -97,7 +97,7 @@
                 text-overflow: ellipsis;
                 white-space: nowrap;
 
-                float: #{$end};
+                float: right;
                 overflow: hidden;
             }
         }

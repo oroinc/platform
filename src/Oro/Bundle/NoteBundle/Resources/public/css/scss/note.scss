@@ -11,7 +11,7 @@
             display: inline-block;
 
             .visual {
-                margin-#{$start}: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
+                margin-left: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
                 display: block;
 
                 img {
@@ -24,10 +24,10 @@
                     border-radius: $note-avatar-size / 2;
                     overflow: hidden;
                     display: inline-block;
-                    float: #{$start};
+                    float: left;
                     width: $note-avatar-size;
                     font-size: $note-avatar-size;
-                    margin-#{$end}: $note-avatar-margin-horizontal;
+                    margin-right: $note-avatar-margin-horizontal;
                     margin-top: $note-avatar-margin-vertical;
                     text-align: center;
                     line-height: $note-avatar-size;
@@ -56,7 +56,7 @@
                 white-space: nowrap;
 
                 .details {
-                    padding-#{$start}: 7px;
+                    padding-left: 7px;
                 }
             }
 
@@ -79,7 +79,7 @@
             }
 
             .labels {
-                text-align: #{$end};
+                text-align: right;
             }
 
             .label {
@@ -118,7 +118,7 @@
                     display: table-cell;
 
                     &:not(:first-child) {
-                        padding-#{$start}: $note-heading-margin;
+                        padding-left: $note-heading-margin;
                     }
                 }
 
@@ -132,8 +132,8 @@
                     display: inline-block;
                     padding: 0;
                     min-width: $note-accordion-icon-size + 1;
-                    margin-#{$end}: -($note-accordion-icon-size + 1);
-                    float: #{$start};
+                    margin-right: -($note-accordion-icon-size + 1);
+                    float: left;
                     position: relative;
 
                     @include fa-icon($note-accordion-icon, before, true) {
@@ -170,7 +170,7 @@
 
             .accordion-body.in .message {
                 display: block;
-                padding-#{$start}: $note-message-padding;
+                padding-left: $note-message-padding;
             }
         }
     }
@@ -181,7 +181,7 @@
     width: 100%;
 
     .attachment-item {
-        margin-#{$start}: 15px;
+        margin-left: 15px;
     }
 
     .thumbnail {
@@ -201,7 +201,7 @@
         .fa {
             color: $additional-dark;
             font-size: 15px;
-            margin: side-values(0 1px 0 0);
+            margin: 0 1px 0 0;
         }
     }
 }

@@ -125,5 +125,54 @@ define(function(require) {
         }
     };
 
+    function swapPlacement(placement) {
+        const placementRTLMap = {
+            left: 'right',
+            right: 'left',
+            start: 'end',
+            end: 'start'
+        };
+
+        if (placement.search(/right|left/g) !== -1) {
+            placement = placement.replace(
+                /right|left/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        if (placement.search(/top|bottom/g) !== -1) {
+            placement = placement.replace(
+                /start|end/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        return placement;
+    }
+
+    Popper.Defaults.modifiers.rtl = {
+        order: 650,
+        enabled: _.isRTL(),
+        fn(data, options) {
+            if (data.originalPlacement) {
+                data.originalPlacement = swapPlacement(data.originalPlacement);
+            }
+
+            if (data.placement) {
+                data.placement = swapPlacement(data.placement);
+                data.instance.options.placement = swapPlacement(data.instance.options.placement);
+            }
+
+            if (data.attributes['x-placement']) {
+                data.attributes['x-placement'] = swapPlacement(data.attributes['x-placement']);
+            }
+
+            data.instance.scheduleUpdate();
+
+            options.enabled = false;
+            return data;
+        }
+    };
+
     return Popper;
 });

@@ -19,9 +19,9 @@
     }
 
     &__label {
-        padding-#{$end}: $email-detail-info-label-offset;
+        padding-right: $email-detail-info-label-offset;
 
-        text-align: $end;
+        text-align: right;
 
         color: $email-detail-info-label-color;
     }

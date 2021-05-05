@@ -97,7 +97,7 @@ $selector-select-color: $primary-200 !default;
 
 $selector-uniform-display: block !default;
 $selector-uniform-box-sizing: border-box !default;
-$selector-uniform-inner-offset: side-values(0 $content-padding 0 $content-padding-small) !default;
+$selector-uniform-inner-offset: 0 $content-padding 0 $content-padding-small !default;
 $selector-uniform-white-space: nowrap !default;
 $selector-uniform-overflow: hidden !default;
 $selector-uniform-text-overflow: ellipsis !default;
@@ -105,7 +105,7 @@ $selector-uniform-position: relative !default;
 $selector-uniform-font-size: 100% !default;
 $selector-uniform-width: 100% !default;
 
-$selector-uniform-arrow-outer-offset: side-values(2px 0 0 0) !default;
+$selector-uniform-arrow-outer-offset: 2px 0 0 0 !default;
 $selector-uniform-arrow-display: inline-block !default;
 $selector-uniform-arrow-font-family: FontAwesome !default;
 $selector-uniform-arrow-position: absolute !default;

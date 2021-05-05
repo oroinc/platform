@@ -7,7 +7,7 @@
         > .digital-asset-filename {
             @include text-line-truncate($dam-section-width);
             display: inline-block;
-            padding: side-values($dam-file-inner-offset);
+            padding: $dam-file-inner-offset;
 
             > img {
                 display: inline-block;
@@ -19,7 +19,7 @@
 
         [class^="fa-"],
         [class*="fa-"] {
-            margin-#{$start}: $dam-item-fa-right;
+            margin-left: $dam-item-fa-right;
             margin-top: $content-padding-small;
 
             &.fa-edit {

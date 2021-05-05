@@ -61,7 +61,8 @@ define(function(require) {
             map: {},
             allowToRemovePrimary: false,
             confirmRemove: false,
-            addressDeleteUrl: null
+            addressDeleteUrl: null,
+            isAddressHtmlFormatted: false
         },
 
         /**
@@ -162,10 +163,12 @@ define(function(require) {
         },
 
         render: function() {
+            const isAddressHtmlFormatted = this.options.isAddressHtmlFormatted;
             const data = this.model.toJSON();
             const mappedData = this.prepareData(data);
-            data.formatted_address = addressFormatter.format(mappedData, null, '\n');
+            data.formatted_address = addressFormatter.format(mappedData, null, '\n', isAddressHtmlFormatted);
             data.searchable_string = this.model.getSearchableString();
+            data.isAddressHtmlFormatted = isAddressHtmlFormatted;
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();

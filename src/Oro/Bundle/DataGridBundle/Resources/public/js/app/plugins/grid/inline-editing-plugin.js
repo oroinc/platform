@@ -58,7 +58,8 @@ define(function(require) {
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
                 'openLink:before': this.beforePageChange,
-                'page:beforeRedirectTo': this.beforeRedirectTo
+                'page:beforeRedirectTo': this.beforeRedirectTo,
+                'page:beforeRefresh': this.beforeRefresh
             });
             if (!this.options.metadata.inline_editing.save_api_accessor) {
                 throw new Error('"save_api_accessor" option is required');
@@ -71,7 +72,7 @@ define(function(require) {
             }
             pageStateChecker.registerChecker(this.hasChanges);
             InlineEditingPlugin.__super__.enable.call(this);
-            $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
+            $(window).on('beforeunload.' + this.cid, this.onWindowUnload.bind(this));
         },
 
         processColumnsAndListenEvents: function() {
@@ -122,7 +123,8 @@ define(function(require) {
             this.listenTo(confirmModal, 'cancel close', function() {
                 deferredConfirmation.reject(deferredConfirmation.promise(), 'abort');
             });
-
+            // once navigation is confirmed, set changes to be ignored
+            deferredConfirmation.then(() => pageStateChecker.ignoreChanges());
             confirmModal.open();
 
             return deferredConfirmation;
@@ -138,7 +140,15 @@ define(function(require) {
             }
         },
 
-        beforeRedirectTo: function(queue) {
+        beforeRefresh(queue) {
+            return this.beforeNavigation(queue);
+        },
+
+        beforeRedirectTo(queue) {
+            return this.beforeNavigation(queue);
+        },
+
+        beforeNavigation: function(queue) {
             if (this.hasChanges()) {
                 const deferredConfirmation = this.confirmNavigation();
                 queue.push(deferredConfirmation.promise());

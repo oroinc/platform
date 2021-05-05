@@ -1,5 +1,7 @@
 {% import '@OroAsset/Asset.html.twig' as Asset %}
 
+{{ Asset.css('build/admin/css/oro-rtl-ready.css', 'media="all"')}}
+
 {% set extension = oro_is_rtl_mode() ? 'rtl.css' : 'css' %}
 
 {{ Asset.css('build/admin/css/oro.' ~ extension, 'media="all"')}}

@@ -26,13 +26,13 @@
 
             li {
                 display: $jstree-actions-menu-inline-li-display;
-                padding-#{$end}: $jstree-actions-menu-item-gap;
+                padding-right: $jstree-actions-menu-item-gap;
 
                 &:not(:first-child):before {
                     content: $jstree-actions-menu-inline-li-before-content;
                     height: $jstree-actions-menu-inline-li-before-height;
-                    border-#{$start}: 1px solid $jstree-actions-menu-separator-color;
-                    margin-#{$end}: $jstree-actions-menu-item-gap;
+                    border-left: 1px solid $jstree-actions-menu-separator-color;
+                    margin-right: $jstree-actions-menu-item-gap;
                     align-self: center;
                 }
 

@@ -89,7 +89,7 @@ input[type="text"].hasDatepicker {
     }
 
     &__container > input {
-        padding-#{$end}: $field-size;
+        padding-right: $field-size;
     }
 }
 
@@ -102,11 +102,11 @@ input[type="text"].hasDatepicker {
         padding: 0 8px;
 
         &:first-child {
-            padding-#{$start}: 0;
+            padding-left: 0;
         }
 
         &:last-child {
-            padding-#{$end}: 0;
+            padding-right: 0;
         }
     }
 

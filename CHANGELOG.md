@@ -251,7 +251,7 @@ The current file describes significant changes in the code that may affect the u
 
 #### MessageQueueBundle
 * Added a possibility to filter messages before they are sent to the message queue.
-  See [Filtering Messages in the Message Producer](./src/Oro/Bundle/MessageQueueBundle/Resources/doc/filtering_messages.md).
+  See [Filtering Messages in the Message Producer](https://doc.oroinc.com/backend/mq/filtering-messages/).
 
 ### Removed
 

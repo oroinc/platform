@@ -25,7 +25,7 @@
 
     .jstree-anchor {
         font-size: $jstree-mobile-anchor-font-size;
-        padding: side-values($jstree-mobile-anchor-inner-offset);
+        padding: $jstree-mobile-anchor-inner-offset;
         line-height: $jstree-mobile-anchor-line-height;
         height: $jstree-mobile-wholerow-height;
 
@@ -45,4 +45,3 @@
         max-width: 100%;
     }
 }
-

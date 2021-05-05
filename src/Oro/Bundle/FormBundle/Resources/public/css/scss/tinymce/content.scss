@@ -66,9 +66,9 @@ td.mce-item-selected, th.mce-item-selected {
 }
 
 .email-prev-body {
-    margin-#{$start}: 10px;
-    padding-#{$start}: 10px;
-    border-#{$start}: 1px solid $primary;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-left: 1px solid $primary;
 }
 
 @media print {

@@ -37,7 +37,7 @@
     .control-group {
         .controls, &.controls {
             .control-subgroup {
-                margin-#{$end}: $content-padding-medium;;
+                margin-right: $content-padding-medium;;
             }
         }
     }
@@ -45,8 +45,8 @@
     .controls {
         &.control-subgroup {
             width: auto;
-            margin: side-values( 0 $content-padding-medium 0 0);
-            float: #{$start};
+            margin: 0 $content-padding-medium 0 0;
+            float: left;
 
             input,
             textarea {
@@ -69,10 +69,10 @@
 
     .control-subgroup.parent-scope-checkbox {
         margin-top: ($content-padding-small / 2);
-        margin-#{$end}: $content-padding-small;
+        margin-right: $content-padding-small;
 
         label, .checkbox-view__text {
-            margin: side-values(0 $content-padding-small 0 0);
+            margin: 0 $content-padding-small 0 0;
             line-height: 1.75;
             white-space: nowrap;
         }
@@ -132,7 +132,7 @@
 
 .system-configuration-content {
     &-wrapper {
-        padding-#{$start}: $content-padding-medium;
+        padding-left: $content-padding-medium;
         margin-bottom: 15px;
     }
 
@@ -155,4 +155,3 @@
         font-weight: bold;
     }
 }
-

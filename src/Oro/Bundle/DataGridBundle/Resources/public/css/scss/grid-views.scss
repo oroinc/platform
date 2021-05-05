@@ -62,7 +62,7 @@
     }
 
     .grid-views-choice-icon {
-        float: #{$start};
+        float: left;
 
         line-height: $font-size-base * $line-height-base;
     }
@@ -81,11 +81,11 @@
 
     @at-root .has-icons {
         .grid-views-choice {
-            margin-#{$start}: $dropdown-item-icon-fa-size + $dropdown-item-icon-fa-offset;
+            margin-left: $dropdown-item-icon-fa-size + $dropdown-item-icon-fa-offset;
         }
 
         .grid-views-choice-icon + .grid-views-choice {
-            margin-#{$start}: 0;
+            margin-left: 0;
         }
     }
 

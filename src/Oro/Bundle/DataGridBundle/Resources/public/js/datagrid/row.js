@@ -125,12 +125,14 @@ define([
 
         getConfiguredCellOptions: function(column) {
             let cellOptions = column.get('cellOptions');
+            const bodyCellClassName = column.get('cellClassName') || '';
+
             if (!cellOptions) {
                 cellOptions = {
                     column: column,
                     themeOptions: {
                         optionPrefix: 'cell',
-                        className: 'grid-cell grid-body-cell'
+                        className: `${bodyCellClassName.trim()} grid-cell grid-body-cell`
                     }
                 };
                 if (column.get('name')) {

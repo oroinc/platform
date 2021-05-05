@@ -131,7 +131,7 @@
             cursor: default;
 
             > .dropdown-menu {
-                text-align: $start;
+                text-align: left;
             }
         }
 
@@ -166,11 +166,11 @@
         }
 
         &.dropdown .dropdown-toggle {
-            padding-#{$end}: $flowchart-step-h-padding;
+            padding-right: $flowchart-step-h-padding;
 
             &:before {
-                #{$end}: $flowchart-step-h-padding;
-                background-image: linear-gradient(to #{$start}, $flowchart-step-bg-color, rgba($flowchart-step-bg-color, 0.2));
+                right: $flowchart-step-h-padding;
+                background-image: linear-gradient(to left, $flowchart-step-bg-color, rgba($flowchart-step-bg-color, 0.2));
             }
         }
 
@@ -191,7 +191,7 @@
             background-color: $flowchart-step-hover-bg-color;
 
             .dropdown-toggle:before {
-                background-image: linear-gradient(to #{$start}, $flowchart-step-hover-bg-color, rgba($flowchart-step-hover-bg-color, 0.2));
+                background-image: linear-gradient(to left, $flowchart-step-hover-bg-color, rgba($flowchart-step-hover-bg-color, 0.2));
             }
         }
 
@@ -245,7 +245,7 @@
             background-color: $flowchart-final-step-bg-color;
 
             .dropdown-toggle:before {
-                background-image: linear-gradient(to #{$start}, $flowchart-final-step-bg-color, rgba($flowchart-final-step-bg-color, 0.2));
+                background-image: linear-gradient(to left, $flowchart-final-step-bg-color, rgba($flowchart-final-step-bg-color, 0.2));
             }
 
             &._jsPlumb_hover,
@@ -256,7 +256,7 @@
                 background-color: $flowchart-final-step-hover-bg-color;
 
                 .dropdown-toggle:before {
-                    background-image: linear-gradient(to #{$start}, $flowchart-final-step-hover-bg-color, rgba($flowchart-final-step-hover-bg-color, 0.2));
+                    background-image: linear-gradient(to left, $flowchart-final-step-hover-bg-color, rgba($flowchart-final-step-hover-bg-color, 0.2));
                 }
             }
         }
@@ -293,11 +293,11 @@
         }
 
         &.dropdown .dropdown-toggle {
-            padding-#{$end}: $flowchart-transition-h-padding;
+            padding-right: $flowchart-transition-h-padding;
 
             &:before {
-                #{$end}: $flowchart-transition-h-padding;
-                background-image: linear-gradient(to #{$start}, $flowchart-transition-bg-color, rgba($flowchart-transition-bg-color, 0.3));
+                right: $flowchart-transition-h-padding;
+                background-image: linear-gradient(to left, $flowchart-transition-bg-color, rgba($flowchart-transition-bg-color, 0.3));
             }
         }
 
@@ -313,7 +313,7 @@
             z-index: $flowchart-transition-hover-z-index;
 
             .dropdown-toggle:before {
-                background-image: linear-gradient(to #{$start}, $flowchart-transition-hover-bg-color, rgba($flowchart-transition-hover-bg-color, 0.3));
+                background-image: linear-gradient(to left, $flowchart-transition-hover-bg-color, rgba($flowchart-transition-hover-bg-color, 0.3));
             }
         }
     }
@@ -341,13 +341,13 @@
                 display: none;
                 position: absolute;
                 cursor: pointer;
-                #{$end}: 0;
+                right: 0;
 
                 &:before {
                     content: '';
                     display: block;
                     position: absolute;
-                    #{$start}: 0;
+                    left: 0;
                     height: 100%;
                 }
 

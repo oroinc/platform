@@ -53,14 +53,14 @@
 
     .app-logo {
         width: $app-header-app-logo-width;
-        margin-#{$end}: $app-header-app-logo-margin-end;
+        margin-right: $app-header-app-logo-margin-end;
         flex-shrink: 0;
     }
 
     .logo-wrapper {
         display: flex;
-        margin-#{$start}: 0;
-        margin-#{$end}: $app-header-logo-wrapper-margin-end;
+        margin-left: 0;
+        margin-right: $app-header-logo-wrapper-margin-end;
         flex-wrap: nowrap;
         position: static;   //  necessary for showing menu outside of overflow hidden block
         height: 100%;
@@ -91,7 +91,7 @@
         padding: $app-header-search-and-shortcuts-container-padding;
         margin: 0;
         flex-shrink: 0;
-        order: if-ltr(0, auto);
+        order: 0;
 
         > .dropdown {
             margin: $app-header-search-and-shortcuts-margin;
@@ -122,14 +122,10 @@
 
         .dropdown-menu {
             padding: $desktop-app-header-dropdown-menu-padding;
-            #{$start}: $app-header-search-and-shortcuts-dropdown-start;
-
-            @include if-rtl() {
-                #{$end}: auto;
-            }
+            left: $app-header-search-and-shortcuts-dropdown-start;
 
             &:before {
-                #{$start}: $app-header-search-and-shortcuts-arrow-start;
+                left: $app-header-search-and-shortcuts-arrow-start;
             }
         }
 
@@ -155,7 +151,7 @@
 
         .search-field-container {
             min-width: $app-header-search-input-min-width;
-            margin-#{$start}: -$input-border-width;
+            margin-left: -$input-border-width;
         }
 
         .search-suggestion-list {
@@ -183,7 +179,7 @@
         flex-shrink: 0;
         float: none;
         background-color: inherit;
-        margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+        margin-left: $desktop-app-header-user-menu-margin-start;
         height: 100%;
 
         .avatar {
@@ -195,7 +191,7 @@
             margin: $desktop-app-header-user-menu-item-margin;
 
             &:last-of-type {
-                margin-#{$end}: $desktop-app-header-user-menu-last-item-margin-end;
+                margin-right: $desktop-app-header-user-menu-last-item-margin-end;
             }
 
             > .dropdown-toggle,
@@ -223,13 +219,13 @@
 
         .dropdown {
             > .dropdown-menu {
-                #{$end}: $desktop-app-header-user-menu-offset;
-                #{$start}: auto;
+                right: $desktop-app-header-user-menu-offset;
+                left: auto;
                 z-index: $zindex-dropdown;
 
                 &:before {
-                    #{$end}: -$desktop-app-header-user-menu-offset;
-                    #{$start}: auto;
+                    right: -$desktop-app-header-user-menu-offset;
+                    left: auto;
                     margin-right: 2px;
                 }
             }
@@ -240,13 +236,13 @@
         &:before {
             content: '';
             display: inline-block;
-            border-#{$start}: $app-header-divider-width solid $app-header-divider-color;
+            border-left: $app-header-divider-width solid $app-header-divider-color;
             height: $app-header-font-size;
         }
 
         > .dropdown-toggle {
             display: inline-block;
-            margin-#{$start}: $desktop-app-header-user-menu-margin-start;
+            margin-left: $desktop-app-header-user-menu-margin-start;
         }
 
         > .dropdown-menu {

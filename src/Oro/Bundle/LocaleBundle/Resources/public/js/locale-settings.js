@@ -61,7 +61,8 @@ define(function(require, exports, module) {
                     }
                 },
                 address: {
-                    US: '%name%\n%organization%\n%street%\n%CITY% %REGION% %COUNTRY% %postal_code%'
+                    US: '%name%\n%organization%\n%street%\n%CITY% %REGION% %COUNTRY% %postal_code%',
+                    ltrParts: ['phone', 'postal_code', 'region_code']
                 },
                 name: {
                     en_US: '%prefix% %first_name% %middle_name% %last_name% %suffix%'
@@ -283,6 +284,10 @@ define(function(require, exports, module) {
 
         getAddressFormats: function() {
             return this.settings.format.address;
+        },
+
+        getAddressLTRParts: function() {
+            return this.settings.format.address.ltrParts;
         },
 
         getNumberFormats: function(style) {

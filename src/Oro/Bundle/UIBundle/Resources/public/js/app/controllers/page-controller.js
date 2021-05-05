@@ -329,11 +329,11 @@ define(function(require, exports, module) {
                 mediator.trigger('page:beforeRefresh', queue);
                 options = options || {};
                 _.defaults(options, {forceStartup: true, force: true});
-                $.when(...queue).done(_.bind(function(customOptions) {
+                return $.when(...queue).done(customOptions => {
                     _.extend(options, customOptions || {});
                     this._processRedirect({url: location.href}, options);
                     mediator.trigger('page:afterRefresh');
-                }, this));
+                });
             }, this);
 
             mediator.setHandler('submitPage', this._submitPage, this);

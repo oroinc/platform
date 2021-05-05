@@ -4,14 +4,14 @@
 .integer-cell,
 .align-right,
 .editable {
-    padding-#{$end}: $oro-datagrid-editable-cell-offset;
+    padding-right: $oro-datagrid-editable-cell-offset;
 }
 
 .number-cell,
 .integer-cell,
 .align-right {
     .inline-editor__inner {
-        margin-#{$end}: $oro-datagrid-editable-inner-offset;
+        margin-right: $oro-datagrid-editable-inner-offset;
     }
 }
 
@@ -24,7 +24,7 @@
         .inline-editor-edit-action {
             position: absolute;
             top: $oro-datagrid-editable-action-offset-top;
-            #{$end}: $oro-datagrid-editable-action-offset-end;
+            right: $oro-datagrid-editable-action-offset-end;
 
             display: block;
 
@@ -43,11 +43,11 @@
         &:before {
             position: absolute;
             top: 0;
-            #{$start}: 0;
+            left: 0;
 
             display: inline-block;
 
-            border-#{$end}: 10px solid transparent;
+            border-right: 10px solid transparent;
             border-top: 10px solid $oro-datagrid-editable-error;
 
             content: '';
@@ -79,9 +79,9 @@
     &:before {
         position: absolute;
         top: 0;
-        #{$end}: 0;
+        right: 0;
         bottom: 0;
-        #{$start}: 0;
+        left: 0;
 
         background-color: $inline-action-background;
 
@@ -103,7 +103,7 @@
     &:before {
         position: absolute;
         top: $oro-datagrid-editable-loader-top;
-        #{$end}: $oro-datagrid-editable-loader-end;
+        right: $oro-datagrid-editable-loader-end;
 
         display: block;
 
@@ -121,7 +121,7 @@
 
 .inline-editor {
     &__inner {
-        margin-#{$end}: $oro-datagrid-editable-inner-offset;
+        margin-right: $oro-datagrid-editable-inner-offset;
     }
 
     &__actions {
@@ -140,7 +140,7 @@
             padding: $oro-datagrid-editable-action-input-offset;
 
             &:last-child {
-                padding-#{$end}: $oro-datagrid-editable-action-input-last-offset;
+                padding-right: $oro-datagrid-editable-action-input-last-offset;
             }
         }
     }
@@ -149,8 +149,8 @@
         display: block;
         position: absolute;
         top: 0;
-        #{$end}: 100%;
-        margin-#{$end}: -$input-border-width;
+        right: 100%;
+        margin-right: -$input-border-width;
         height: 100%;
     }
 
@@ -176,11 +176,11 @@
             }
 
             .select2-arrow {
-                #{$end}: $oro-datagrid-select-icon-arrow-offset;
+                right: $oro-datagrid-select-icon-arrow-offset;
             }
 
             .select2-search-choice-close {
-                #{$end}: $oro-datagrid-select-icon-close-offset;
+                right: $oro-datagrid-select-icon-close-offset;
             }
         }
 
@@ -199,7 +199,7 @@
         }
 
         .select2-allowclear .select2-chosen {
-            padding-#{$end}: $oro-datagrid-select-inner-offset-allow-clear-end;
+            padding-right: $oro-datagrid-select-inner-offset-allow-clear-end;
         }
 
         .select2-choice {

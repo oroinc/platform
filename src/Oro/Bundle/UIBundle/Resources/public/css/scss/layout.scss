@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 @mixin responsive-inline-position() {
-    float: #{$start};
+    float: left;
     width: 50%;
 }
 
@@ -27,7 +27,7 @@
         ul,
         dl {
             &:not(.extra-list) {
-                margin: side-values(0 0 $content-padding-medium $content-padding);
+                margin: 0 0 $content-padding-medium $content-padding;
 
                 word-break: break-word;
             }
@@ -104,13 +104,13 @@
     }
 
     .cms-page__figure_right {
-        float: #{$end};
-        margin-#{$start}: 20px;
+        float: right;
+        margin-left: 20px;
     }
 
     .cms-page__figure_left {
-        float: #{$start};
-        margin-#{$end}: 20px;
+        float: left;
+        margin-right: 20px;
     }
 }
 
@@ -119,16 +119,16 @@
         &:not(.responsive-small) {
             .responsive-cell {
                 &:first-child {
-                    padding-#{$end}: $horizontal-padding;
+                    padding-right: $horizontal-padding;
                 }
 
                 &:last-child {
-                    padding-#{$start}: $horizontal-padding;
+                    padding-left: $horizontal-padding;
                 }
 
                 &:only-child {
-                    padding-#{$end}: 0;
-                    padding-#{$start}: 0;
+                    padding-right: 0;
+                    padding-left: 0;
                     padding-bottom: 0;
                 }
             }
@@ -147,15 +147,15 @@
         &.responsive-medium {
             &:not(.responsive-section-no-blocks) {
                 .responsive-cell {
-                    padding-#{$start}: 0;
-                    padding-#{$end}: 0;
+                    padding-left: 0;
+                    padding-right: 0;
                 }
             }
         }
 
         &.responsive-small {
             .responsive-cell {
-                padding-#{$end}: 0;
+                padding-right: 0;
 
                 &:not(:last-child) {
                     margin-bottom: 16px;
@@ -165,7 +165,7 @@
 
         .responsive-cell {
             &:only-child {
-                padding-#{$end}: 0;
+                padding-right: 0;
             }
         }
     }
@@ -184,7 +184,7 @@ body.backdrop {
         width: 100%;
         height: 100%;
         top: 0;
-        #{$start}: 0;
+        left: 0;
         background: rgba(0, 0, 0, .1);
         z-index: 9999;
     }
@@ -226,7 +226,7 @@ body.backdrop {
             @include fa-icon($fa-var-chevron-right, after, true) {
                 position: absolute;
                 top: 50%;
-                #{$end}: 8px;
+                right: 8px;
 
                 margin-top: -$base-font-size--m / 2;
                 font-size: $base-font-size--m;
@@ -234,7 +234,7 @@ body.backdrop {
             }
 
             a {
-                padding-#{$end}: 24px;
+                padding-right: 24px;
                 font-weight: bold;
                 background-color: $primary-800;
                 color: $primary-100;
@@ -258,17 +258,17 @@ body.backdrop {
 
     .oro-page-sidebar {
         width: 236px;
-        margin-#{$end}: -1px;
-        float: #{$start};
-        border-#{$end}: 1px solid $page-border-color;
+        margin-right: -1px;
+        float: left;
+        border-right: 1px solid $page-border-color;
         border-bottom: 1px solid $page-border-color;
         background: $page-sidebar-background-color;
     }
 
     .oro-page-body {
-        float: #{$end};
+        float: right;
         width: calc(100% - 235px);
-        border-#{$start}: 1px solid $page-border-color;
+        border-left: 1px solid $page-border-color;
         padding: 10px;
         background-color: #fff;
         overflow: hidden;
@@ -285,7 +285,7 @@ body.backdrop {
                 @include oro-page-menu-items;
 
                 top: auto;
-                #{$start}: none;
+                left: none;
                 position: relative;
                 border: none;
                 box-shadow: none;

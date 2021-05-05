@@ -44,7 +44,7 @@
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
-                    margin-#{$end}: 8px;
+                    margin-right: 8px;
 
                     font-weight: normal;
                     line-height: 1;
@@ -59,14 +59,20 @@
             .accordion-toggle {
                 font-weight: bold;
 
-                @include fa-icon(if-ltr($menu-icon-right, $menu-icon-left), before, true) {
-                    transform: if-ltr(rotate(90deg), rotate(-90deg));
+                @include fa-icon($menu-icon-right, before, true) {
+                    transform: rotate(90deg);
+                }
+
+                [dir="rtl"] & {
+                    @include fa-icon($menu-icon-left, before) {
+                        transform: rotate(90deg);
+                    }
                 }
 
                 &.collapsed {
                     font-weight: normal;
 
-                    &:before {
+                    &::before {
                         transform: rotate(0);
                     }
                 }
@@ -85,7 +91,7 @@
                     $selector: '&-level-' + $i;
 
                     #{$selector} {
-                        padding-#{$start}: $menu-title-offset *1px;
+                        padding-left: $menu-title-offset * 1px;
                     }
 
                     $menu-title-offset: $menu-title-offset + 24;
@@ -117,14 +123,14 @@
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-        padding: side-values(12px 22px 12px 24px);
+        padding: 12px 22px 12px 24px;
 
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
             min-width: 16px;
-            margin-#{$end}: 8px;
+            margin-right: 8px;
             margin-left: 0;
 
             text-align: center;
