@@ -10,14 +10,14 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CreateQueuesCommand */
-    private $command;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DestinationMetaRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $driver;
+
+    /** @var CreateQueuesCommand */
+    private $command;
 
     protected function setUp(): void
     {
@@ -39,14 +39,11 @@ class CreateQueuesCommandTest extends \PHPUnit\Framework\TestCase
 
         $this->registry->expects($this->once())
             ->method('getDestinationsMeta')
-            ->will($this->returnValue([$destinationMeta1, $destinationMeta2]));
+            ->willReturn([$destinationMeta1, $destinationMeta2]);
 
-        $this->driver->expects($this->at(0))
+        $this->driver->expects($this->exactly(2))
             ->method('createQueue')
-            ->with('queue1');
-        $this->driver->expects($this->at(1))
-            ->method('createQueue')
-            ->with('queue2');
+            ->withConsecutive(['queue1'], ['queue2']);
 
         $tester = new CommandTester($this->command);
         $tester->execute([]);

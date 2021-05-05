@@ -9,13 +9,13 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 
 class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ContextNormalizer */
+    /** @var ContextNormalizer */
     protected $contextNormalizer;
 
-    /** @var  ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var  ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $scopeManager;
 
     protected function setUp(): void

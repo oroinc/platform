@@ -20,6 +20,7 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -212,9 +213,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
      */
     public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
     {
-        $reflectionProperty = new \ReflectionProperty($allOptions, 'locked');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($allOptions, true);
+        ReflectionUtil::setPropertyValue($allOptions, 'locked', true);
 
         $this->assertEquals(
             $expectedOption,

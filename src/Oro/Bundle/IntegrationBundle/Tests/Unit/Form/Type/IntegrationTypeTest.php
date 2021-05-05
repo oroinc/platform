@@ -10,7 +10,7 @@ class IntegrationTypeTest extends \PHPUnit\Framework\TestCase
     /** @var IntegrationType */
     protected $type;
 
-    /** @var  FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
     protected $builder;
 
     protected function setUp(): void

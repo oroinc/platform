@@ -7,7 +7,7 @@
     &__clear-default {
         position: absolute;
         bottom: $content-padding-small;
-        #{$end}: 0;
+        right: 0;
 
         &.disabled {
             display: none;
@@ -22,12 +22,12 @@
     .tooltip-icon-container {
         position: absolute;
         top: 0;
-        #{$end}: -$tooltip-icon-container-size;
+        right: -$tooltip-icon-container-size;
     }
 
     .oro-item-collection {
-        padding-#{$end}: $tooltip-icon-container-size;
-        margin-#{$end}: -$tooltip-icon-container-size;
+        padding-right: $tooltip-icon-container-size;
+        margin-right: -$tooltip-icon-container-size;
     }
 
     .tooltip-icon-container {

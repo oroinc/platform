@@ -6,7 +6,7 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridView;
 use Oro\Bundle\DataGridBundle\Entity\AbstractGridViewUser;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-use Oro\Bundle\SecurityProBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 

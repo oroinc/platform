@@ -11,10 +11,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class UsernamePasswordOrganizationTokenTest extends WebTestCase
 {
-    /** @var Session $session */
+    /** @var Session */
     protected $session;
 
-    /** {@inheritdoc} */
     protected function setUp(): void
     {
         $this->initClient();

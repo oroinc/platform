@@ -198,9 +198,9 @@ main {
 
     &:after {
         position: absolute;
-        #{$end}: 0;
+        right: 0;
         bottom: $view-switcher-after-bottom;
-        #{$start}: 0;
+        left: 0;
         z-index: 1;
         height: $view-switcher-after-size;
         content: '';

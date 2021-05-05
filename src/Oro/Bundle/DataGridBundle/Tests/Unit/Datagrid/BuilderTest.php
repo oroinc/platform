@@ -15,6 +15,7 @@ use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 use Oro\Bundle\DataGridBundle\Event\PreBuild;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -80,7 +81,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         }
 
         foreach ($raisedEvents as $at => $eventDetails) {
-            list($name, $eventType) = $eventDetails;
+            [$name, $eventType] = $eventDetails;
             $this->eventDispatcher->expects($this->at($at))->method('dispatch')
                 ->with(
                     $this->callback(
@@ -199,15 +200,13 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         }
 
         if ($expectedException !== null) {
-            list($name, $message) = $expectedException;
+            [$name, $message] = $expectedException;
 
             $this->expectException($name);
             $this->expectExceptionMessage($message);
         }
 
-        $method = new \ReflectionMethod($builder, 'buildDataSource');
-        $method->setAccessible(true);
-        $method->invoke($builder, $grid, $config);
+        ReflectionUtil::callMethod($builder, 'buildDataSource', [$grid, $config]);
     }
 
     /**

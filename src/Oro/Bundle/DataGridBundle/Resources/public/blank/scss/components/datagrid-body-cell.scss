@@ -16,7 +16,7 @@
     }
 
     &.select-row-cell {
-        padding-#{$start}: $datagrid-body-select-row-cell-offset-start;
+        padding-left: $datagrid-body-select-row-cell-offset-start;
     }
 
     &.action-cell {

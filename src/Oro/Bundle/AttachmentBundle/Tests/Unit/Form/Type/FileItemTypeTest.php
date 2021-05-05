@@ -24,13 +24,11 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm()
     {
-        /* @var $builder FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::at(0))
             ->method('add')
             ->with('sortOrder', NumberType::class, ['block_prefix' => 'oro_attachment_file_item_sortOrder'])
             ->willReturnSelf();
-
         $builder->expects(self::at(1))
             ->method('add')
             ->with('file', FileType::class, [
@@ -44,7 +42,6 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver OptionsResolver|\PHPUnit\Framework\MockObject\MockObject */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects(self::once())
             ->method('setDefaults')

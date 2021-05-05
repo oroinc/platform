@@ -105,16 +105,12 @@ class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver
-            ->expects($this->once())
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->with(['browser_autocomplete' => false])
             ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
+        $resolver->expects($this->once())
             ->method('setAllowedTypes')
             ->with('browser_autocomplete', 'bool')
             ->will($this->returnSelf());

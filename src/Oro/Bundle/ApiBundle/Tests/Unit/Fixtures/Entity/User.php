@@ -27,7 +27,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name", nullable=false)
-     **/
+     */
     protected $category;
 
     /**
@@ -47,7 +47,7 @@ class User implements UserInterface
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", nullable=false)
-     **/
+     */
     protected $owner;
 
     public function __construct()

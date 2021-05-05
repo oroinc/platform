@@ -15,7 +15,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $treeBuilder = $configuration->getConfigTreeBuilder();
         $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
 
-        /** @var $root ArrayNode */
         $root = $treeBuilder->buildTree();
         $this->assertInstanceOf(ArrayNode::class, $root);
         $this->assertEquals('oro_navigation', $root->getName());

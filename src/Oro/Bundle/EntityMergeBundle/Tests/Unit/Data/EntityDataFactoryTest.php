@@ -7,44 +7,28 @@ use Oro\Bundle\EntityMergeBundle\MergeEvents;
 
 class EntityDataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EntityDataFactory
-     */
+    /** @var EntityDataFactory */
     private $factory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadataRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $metadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject[]
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
     private $entities = array();
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $fieldsMetadata = array();
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /**
-     * @var string $entitiesClassName Class name for entities
-     */
+    /** @var string */
     private $entitiesClassName;
 
     protected function setUp(): void

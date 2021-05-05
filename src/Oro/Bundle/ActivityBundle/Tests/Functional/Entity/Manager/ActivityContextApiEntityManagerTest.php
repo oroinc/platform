@@ -6,6 +6,7 @@ use Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @dbIsolationPerTest
@@ -34,10 +35,7 @@ class ActivityContextApiEntityManagerTest extends WebTestCase
 
         $manager = self::getContainer()->get('oro_activity.manager.activity_context.api');
 
-        $managerReflection = new \ReflectionObject($manager);
-        $property = $managerReflection->getProperty('authorizationChecker');
-        $property->setAccessible(true);
-        $property->setValue($manager, $this->authorizationChecker);
+        ReflectionUtil::setPropertyValue($manager, 'authorizationChecker', $this->authorizationChecker);
     }
 
     public function testGetActivityContext(): void

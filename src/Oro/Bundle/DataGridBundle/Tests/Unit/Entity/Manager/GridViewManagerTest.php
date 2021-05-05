@@ -31,7 +31,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridViewUserRepository;
 
-    /** @var  User */
+    /** @var User */
     protected $user;
 
     /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
@@ -40,7 +40,7 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
     /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $restrictionManager;
 
-    /** @var  GridViewApiEntityManager */
+    /** @var GridViewApiEntityManager */
     protected $gridViewApiEntityManager;
 
     protected function setUp(): void

@@ -17,7 +17,7 @@ class TranslationControllerTest extends WebTestCase
     const DATAGRID_NAME = 'oro-translation-translations-grid';
     const RESET_ACTION_NAME = 'oro_translation_translation_reset';
 
-    /** @var  ManagerRegistry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /**

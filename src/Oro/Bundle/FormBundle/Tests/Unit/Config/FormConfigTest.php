@@ -8,12 +8,10 @@ use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 
 class FormConfigTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  FormConfig  */
+    /** @var FormConfig */
     private $formConfig;
 
     private $blocks = array();
-
-    private $reportingLevel;
 
     private $testSubBlocksConfig = array(
         'common' => array(

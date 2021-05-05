@@ -701,11 +701,11 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('acquireLock')
             ->with(sprintf('api_%s_info.lock', $operationId))
             ->willReturn(true);
-        $this->fileManager->expects(self::at(0))
+        $this->fileManager->expects(self::once())
             ->method('getFileContent')
             ->with(sprintf('api_%s_info', $operationId))
             ->willReturn('{"chunkCount":10}');
-        $this->fileManager->expects(self::at(1))
+        $this->fileManager->expects(self::once())
             ->method('writeToStorage')
             ->with('{"chunkCount":11}', sprintf('api_%s_info', $operationId))
             ->willThrowException($exception);
@@ -803,13 +803,10 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('acquireLock')
             ->with(sprintf('api_%s_info.lock', $operationId))
             ->willReturn(true);
-        $this->fileManager->expects(self::at(0))
+        $this->fileManager->expects(self::once())
             ->method('getFileContent')
             ->with(sprintf('api_%s_info', $operationId))
             ->willReturn(sprintf('{"chunkCount":%d}', $chunkCount));
-        $this->fileManager->expects(self::at(1))
-            ->method('writeToStorage')
-            ->with(sprintf('{"chunkCount":%d}', $chunkCount + 1), sprintf('api_%s_info', $operationId));
         $this->fileLockManager->expects(self::once())
             ->method('releaseLock')
             ->with(sprintf('api_%s_info.lock', $operationId));
@@ -817,9 +814,12 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('encodeItems')
             ->with([$rawItems[0]])
             ->willReturn('[{"key":"val1"}]');
-        $this->fileManager->expects(self::at(2))
+        $this->fileManager->expects(self::exactly(2))
             ->method('writeToStorage')
-            ->with('[{"key":"val1"}]', $fileName . '_0');
+            ->withConsecutive(
+                [sprintf('{"chunkCount":%d}', $chunkCount + 1), sprintf('api_%s_info', $operationId)],
+                ['[{"key":"val1"}]', $fileName . '_0']
+            );
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with('oro:batch_api:123:chunk:1:1')
@@ -989,11 +989,11 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('acquireLock')
             ->with(sprintf('api_%s_info.lock', $operationId))
             ->willReturn(true);
-        $this->fileManager->expects(self::at(0))
+        $this->fileManager->expects(self::once())
             ->method('getFileContent')
             ->with(sprintf('api_%s_info', $operationId))
             ->willReturn(sprintf('{"chunkCount":%d}', $chunkCount));
-        $this->fileManager->expects(self::at(1))
+        $this->fileManager->expects(self::once())
             ->method('writeToStorage')
             ->with(sprintf('{"chunkCount":%d}', $chunkCount + 1), sprintf('api_%s_info', $operationId));
         $this->fileLockManager->expects(self::once())

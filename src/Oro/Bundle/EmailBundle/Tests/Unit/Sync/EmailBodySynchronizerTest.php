@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 {

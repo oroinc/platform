@@ -1,3 +1,7 @@
 css:
     inputs:
-      - 'bundles/oroaddress/css/scss/main.scss'
+        # Variables
+        - 'bundles/oroaddress/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroaddress/css/scss/main.scss'

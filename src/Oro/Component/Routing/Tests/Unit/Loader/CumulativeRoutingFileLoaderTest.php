@@ -3,18 +3,24 @@
 namespace Oro\Component\Routing\Tests\Unit\Loader;
 
 use Oro\Component\Routing\Loader\CumulativeRoutingFileLoader;
+use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
+use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Loader\LoaderResolverInterface;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $kernel;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RouteOptionsResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $routeOptionsResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoaderResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $loaderResolver;
 
     /** @var CumulativeRoutingFileLoader */
@@ -22,11 +28,9 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
-
-        $this->routeOptionsResolver = $this->createMock('Oro\Component\Routing\Resolver\RouteOptionsResolverInterface');
-
-        $this->loaderResolver = $this->createMock('Symfony\Component\Config\Loader\LoaderResolverInterface');
+        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->routeOptionsResolver = $this->createMock(RouteOptionsResolverInterface::class);
+        $this->loaderResolver = $this->createMock(LoaderResolverInterface::class);
 
         $this->loader = new CumulativeRoutingFileLoader(
             $this->kernel,
@@ -53,9 +57,9 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
 
         /** @var \PHPUnit\Framework\MockObject\MockObject[] $bundles */
         $bundles = [
-            'bundle1' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),
-            'bundle2' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface'),
-            'bundle3' => $this->createMock('Symfony\Component\HttpKernel\Bundle\BundleInterface')
+            'bundle1' => $this->createMock(BundleInterface::class),
+            'bundle2' => $this->createMock(BundleInterface::class),
+            'bundle3' => $this->createMock(BundleInterface::class)
         ];
 
         $bundles['bundle1']->expects($this->any())
@@ -72,7 +76,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('getBundles')
             ->willReturn($bundles);
 
-        $yamlLoader = $this->createMock('Symfony\Component\Config\Loader\LoaderInterface');
+        $yamlLoader = $this->createMock(LoaderInterface::class);
 
         $this->loaderResolver->expects($this->exactly(2))
             ->method('resolve')
@@ -106,17 +110,17 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $this->routeOptionsResolver->expects($this->at(0))
+        $this->routeOptionsResolver->expects($this->exactly(2))
             ->method('resolve')
-            ->with(
-                $this->identicalTo($loadedRoutes->get('route1')),
-                $this->isInstanceOf('Oro\Component\Routing\Resolver\RouteCollectionAccessor')
-            );
-        $this->routeOptionsResolver->expects($this->at(1))
-            ->method('resolve')
-            ->with(
-                $this->identicalTo($loadedRoutes->get('route2')),
-                $this->isInstanceOf('Oro\Component\Routing\Resolver\RouteCollectionAccessor')
+            ->withConsecutive(
+                [
+                    $this->identicalTo($loadedRoutes->get('route1')),
+                    $this->isInstanceOf(RouteCollectionAccessor::class)
+                ],
+                [
+                    $this->identicalTo($loadedRoutes->get('route2')),
+                    $this->isInstanceOf(RouteCollectionAccessor::class)
+                ]
             );
 
         $routes = $this->loader->load(null, 'auto');

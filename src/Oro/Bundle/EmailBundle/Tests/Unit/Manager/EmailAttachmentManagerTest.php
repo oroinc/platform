@@ -14,7 +14,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\RouterInterface;

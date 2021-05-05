@@ -16,10 +16,9 @@ class EntityReaderByIdTest extends WebTestCase
     /** @var EntityReaderById */
     private $reader;
 
-    /** @var  EntityManagerInterface */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** {@inheritdoc} */
     protected function setUp(): void
     {
         $this->initClient();

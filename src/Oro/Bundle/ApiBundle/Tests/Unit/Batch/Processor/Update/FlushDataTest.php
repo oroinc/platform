@@ -77,6 +77,67 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $context->setProcessedItemStatuses($processedItemStatuses);
     }
 
+    /**
+     * @param bool|null                                                               $finished
+     * @param BatchFlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $flushDataHandler
+     * @param array                                                                   $items
+     * @param bool                                                                    $flushDataCall
+     * @param \Exception|null                                                         $flushDataError
+     *
+     * @return bool|null
+     */
+    private function expectFlushData(
+        ?bool &$finished,
+        $flushDataHandler,
+        array $items,
+        bool $flushDataCall = true,
+        \Exception $flushDataError = null
+    ): void {
+        $finished = null;
+
+        $flushDataHandler->expects(self::once())
+            ->method('startFlushData')
+            ->with($items)
+            ->willReturnCallback(function () use (&$finished) {
+                self::assertNull($finished, 'The "startFlushData" should be called before "finishFlushData".');
+                $finished = false;
+            });
+
+        if (!$flushDataCall) {
+            $flushDataHandler->expects(self::never())
+                ->method('flushData');
+        } elseif (null !== $flushDataError) {
+            $flushDataHandler->expects(self::once())
+                ->method('flushData')
+                ->with($items)
+                ->willReturnCallback(function () use (&$finished, $flushDataError) {
+                    self::assertFalse(
+                        $finished,
+                        'The "flushData" should be called after "startFlushData" and before "finishFlushData".'
+                    );
+                    throw $flushDataError;
+                });
+        } else {
+            $flushDataHandler->expects(self::once())
+                ->method('flushData')
+                ->with($items)
+                ->willReturnCallback(function () use (&$finished) {
+                    self::assertFalse(
+                        $finished,
+                        'The "flushData" should be called after "startFlushData" and before "finishFlushData".'
+                    );
+                });
+        }
+
+        $flushDataHandler->expects(self::once())
+            ->method('finishFlushData')
+            ->with($items)
+            ->willReturnCallback(function () use (&$finished) {
+                self::assertFalse($finished, 'The "finishFlushData" should be called after "startFlushData".');
+                $finished = true;
+            });
+    }
+
     public function testProcessWhenDataAlreadyFlushed()
     {
         $this->flushDataHandlerFactoryRegistry->expects(self::never())
@@ -125,18 +186,13 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::never())
-            ->method('flushData');
-        $flushDataHandler->expects(self::at(1))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items, false);
 
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -226,19 +282,13 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items);
 
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -275,16 +325,8 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($items)
-            ->willThrowException($exception);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items, true, $exception);
 
         $this->logger->expects(self::once())
             ->method('error')
@@ -298,6 +340,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -332,16 +375,8 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($items)
-            ->willThrowException($exception);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items, true, $exception);
 
         $this->logger->expects(self::never())
             ->method('error');
@@ -349,6 +384,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -381,16 +417,8 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($items)
-            ->willThrowException($exception);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items, true, $exception);
 
         $this->logger->expects(self::once())
             ->method('error')
@@ -404,6 +432,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -439,20 +468,13 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($items);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($items)
-            ->willThrowException($exception);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($items);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $items, true, $exception);
 
         $this->context->setBatchItems($items);
         $this->initializeProcessedItemStatuses($this->context);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals(
@@ -494,19 +516,13 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
             ->with(self::ENTITY_CLASS)
             ->willReturn($flushDataHandler);
 
-        $flushDataHandler->expects(self::at(0))
-            ->method('startFlushData')
-            ->with($itemsToProcess);
-        $flushDataHandler->expects(self::at(1))
-            ->method('flushData')
-            ->with($itemsToProcess);
-        $flushDataHandler->expects(self::at(2))
-            ->method('finishFlushData')
-            ->with($itemsToProcess);
+        $flushDataFinished = null;
+        $this->expectFlushData($flushDataFinished, $flushDataHandler, $itemsToProcess);
 
         $this->context->setBatchItems($items);
         $this->context->setProcessedItemStatuses($processedItemStatuses);
         $this->processor->process($this->context);
+        self::assertTrue($flushDataFinished);
         self::assertTrue($this->context->isProcessed(FlushData::OPERATION_NAME));
         self::assertSame($flushDataHandler, $this->context->getFlushDataHandler());
         self::assertEquals($expectedProcessedItemStatuses, $this->context->getProcessedItemStatuses());

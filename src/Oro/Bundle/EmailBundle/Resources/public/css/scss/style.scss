@@ -45,7 +45,7 @@
     }
 
     .new-entity {
-        margin-#{$start}: -154px;
+        margin-left: -154px;
         margin-top: $content-padding-medium;
         position: relative;
     }
@@ -53,10 +53,10 @@
     .emailtemplate-translatation {
         width: 360px;
         .oro-tabs__content {
-            margin-#{$start}: -154px;
+            margin-left: -154px;
 
             .tab-content {
-                padding-#{$end}: 0;
+                padding-right: 0;
                 padding-bottom: 0;
             }
 
@@ -76,7 +76,7 @@
         width: 435px;
         position: absolute;
         top: 0;
-        #{$end}: 0;
+        right: 0;
     }
 }
 
@@ -164,7 +164,7 @@
 
 .modal-body {
     .loading-content {
-        background: #fff url(../../img/loader.gif) no-repeat center left;
+        background: #fff url('#{$global-url}/oroemail/img/loader.gif') no-repeat center left;
         padding-left: 30px;
     }
 }
@@ -200,7 +200,7 @@
                         margin-bottom: 0;
 
                         &:not(:last-child) {
-                            margin-#{$end}: 5px;
+                            margin-right: 5px;
                         }
                     }
 
@@ -214,9 +214,18 @@
                     }
 
                     .divider {
-                        padding-left: 6px;
+                        display: inline-block;
 
-                        border-left: 1px solid $primary-700;
+                        &:before {
+                            content: '';
+                            display: inline-block;
+                            vertical-align: middle;
+                            padding-left: 6px;
+                            height: 16px;
+                            width: 1px;
+                            line-height: 1;
+                            border-left: 1px solid $primary-700;
+                        }
                     }
                 }
 
@@ -235,7 +244,7 @@
 .taggable-field {
     .select2-container.select2-container-multi.taggable-email {
         ul.select2-choices {
-            padding-#{$end}: 70px;
+            padding-right: 70px;
         }
     }
 }
@@ -244,7 +253,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    #{$end}: $content-padding-small;
+    right: $content-padding-small;
     line-height: 18px;
     height: 18px;
     margin: auto;
@@ -293,7 +302,7 @@ span.icon.grid .fa-paperclip {
     }
 
     .email-actions {
-        float: $end;
+        float: right;
 
         display: flex;
         justify-content: flex-end;
@@ -303,18 +312,18 @@ span.icon.grid .fa-paperclip {
     }
 
     .email-contexts-targets {
-        float: $start;
-        padding-#{$end}: $email-actions-offset;
+        float: left;
+        padding-right: $email-actions-offset;
     }
 
     .comment-count {
-        margin-#{$end}: $email-comment-count-offset;
+        margin-right: $email-comment-count-offset;
 
         @include fa-icon($email-comment-count-icon);
     }
 
     .email-has-attachment {
-        margin-#{$end}: $email-attachmen-offset;
+        margin-right: $email-attachmen-offset;
 
         @include fa-icon($email-attachment-icon)
     }
@@ -353,7 +362,7 @@ span.icon.grid .fa-paperclip {
         }
 
         .comment-date {
-            float: $end;
+            float: right;
 
             font-size: $email-short-comment-date-font-size;
         }
@@ -382,7 +391,7 @@ span.icon.grid .fa-paperclip {
         }
 
         .email-sent-date {
-            padding-#{$end}: $email-sent-date-offset;
+            padding-right: $email-sent-date-offset;
         }
     }
 
@@ -572,7 +581,7 @@ a.attachment .icon .fa-link {
 }
 
 .control-group .email-body-action {
-    margin-#{$end}: $content-padding-medium;
+    margin-right: $content-padding-medium;
 }
 
 .attachment-list-popup {

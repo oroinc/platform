@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Category
 {
     /**
-     * @var integer $id
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -22,7 +22,7 @@ class Category
     private $id;
 
     /**
-     * @var string $name
+     * @var string
      *
      * @ORM\Column(name="name", type="string", length=255)
      */

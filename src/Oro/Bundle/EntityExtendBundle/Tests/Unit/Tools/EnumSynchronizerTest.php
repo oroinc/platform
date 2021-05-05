@@ -30,23 +30,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $dbTranslationMetadataCache;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translationHelper;
+    private $translationHelper;
 
     /** @var EnumSynchronizer */
-    protected $synchronizer;
+    private $synchronizer;
 
     protected function setUp(): void
     {
@@ -94,25 +91,18 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider]
-                    ]
-                )
-            );
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider]
+            ]);
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will($this->returnValue($configs));
-        $extendConfigProvider->expects($this->at(1))
-            ->method('getConfigs')
-            ->with($config1->getId()->getClassName())
-            ->will($this->returnValue($fieldConfigs));
+            ->withConsecutive([null], [$config1->getId()->getClassName()])
+            ->willReturnOnConsecutiveCalls($configs, $fieldConfigs);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
-            ->will($this->returnValue($enumFieldConfig1));
+            ->willReturn($enumFieldConfig1);
 
         /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
@@ -148,25 +138,18 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider]
-                    ]
-                )
-            );
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider]
+            ]);
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will($this->returnValue([$entityConfig]));
-        $extendConfigProvider->expects($this->at(1))
-            ->method('getConfigs')
-            ->with($entityConfig->getId()->getClassName())
-            ->will($this->returnValue([$fieldConfig]));
+            ->withConsecutive([null], [$entityConfig->getId()->getClassName()])
+            ->willReturnOnConsecutiveCalls([$entityConfig], [$fieldConfig]);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
-            ->will($this->returnValue($enumFieldConfig));
+            ->willReturn($enumFieldConfig);
         $this->configManager->expects($this->never())
             ->method('persist');
 
@@ -222,25 +205,18 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['extend', $extendConfigProvider],
-                        ['enum', $enumConfigProvider]
-                    ]
-                )
-            );
-        $extendConfigProvider->expects($this->at(0))
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['enum', $enumConfigProvider]
+            ]);
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
-            ->will($this->returnValue([$entityConfig]));
-        $extendConfigProvider->expects($this->at(1))
-            ->method('getConfigs')
-            ->with($entityConfig->getId()->getClassName())
-            ->will($this->returnValue([$fieldConfig]));
+            ->withConsecutive([null], [$entityConfig->getId()->getClassName()])
+            ->willReturnOnConsecutiveCalls([$entityConfig], [$fieldConfig]);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
-            ->will($this->returnValue($enumFieldConfig));
+            ->willReturn($enumFieldConfig);
         $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($enumFieldConfig));
@@ -295,7 +271,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 null,
                 $locale
             )
-            ->will($this->returnValue($enumName));
+            ->willReturn($enumName);
 
         $this->doctrine->expects($this->never())
             ->method('getManagerForClass');
@@ -322,7 +298,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 null,
                 $locale
             )
-            ->will($this->returnValue($oldEnumName));
+            ->willReturn($oldEnumName);
 
         $this->translationHelper->expects($this->once())
             ->method('saveTranslations')
@@ -349,7 +325,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 null,
                 $locale
             )
-            ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
+            ->willReturn(ExtendHelper::getEnumTranslationKey('label', $enumCode));
 
         $this->translationHelper->expects($this->once())
             ->method('saveTranslations')
@@ -376,7 +352,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 null,
                 $locale
             )
-            ->will($this->returnValue(ExtendHelper::getEnumTranslationKey('label', $enumCode)));
+            ->willReturn(ExtendHelper::getEnumTranslationKey('label', $enumCode));
 
         $this->translationHelper->expects($this->once())
             ->method('saveTranslations')
@@ -409,11 +385,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumConfig));
+            ->willReturn($enumConfig);
         $this->configManager->expects($this->never())
             ->method('persist');
 
@@ -432,11 +408,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumConfig));
+            ->willReturn($enumConfig);
         $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($enumConfig));
@@ -462,11 +438,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('getProvider')
             ->with('enum')
-            ->will($this->returnValue($enumConfigProvider));
+            ->willReturn($enumConfigProvider);
         $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumConfig));
+            ->willReturn($enumConfig);
         $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($enumConfig));
@@ -513,7 +489,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
@@ -545,7 +521,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $em->expects($this->once())
             ->method('flush')
@@ -580,7 +556,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
@@ -621,7 +597,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
@@ -631,7 +607,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumRepo->expects($this->once())
             ->method('createEnumValue')
             ->with('Option 4', 4, true, 'option_4')
-            ->will($this->returnValue($newValue));
+            ->willReturn($newValue);
         $em->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($newValue));
@@ -682,7 +658,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
@@ -691,7 +667,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumRepo->expects($this->once())
             ->method('createEnumValue')
             ->with('OPTION 1', 2, false, 'option_1_1')
-            ->will($this->returnValue($newValue));
+            ->willReturn($newValue);
         $em->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($newValue));
@@ -740,7 +716,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
@@ -812,7 +788,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, []);
 
@@ -901,12 +877,12 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumRepo->expects($this->once())
             ->method('createEnumValue')
             ->with('Option 1', 2, true, 'option_1_3')
-            ->will($this->returnValue($newValue));
+            ->willReturn($newValue);
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->translationHelper->expects($this->once())
             ->method('invalidateCache')
@@ -962,7 +938,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
 
         $this->translationHelper->expects($this->once())
             ->method('invalidateCache')
@@ -983,17 +959,17 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
-            ->will($this->returnValue($em));
+            ->willReturn($em);
         $enumRepo = $this->createMock(EnumValueRepository::class);
         $em->expects($this->once())
             ->method('getRepository')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumRepo));
+            ->willReturn($enumRepo);
         $qb = $this->createMock(QueryBuilder::class);
         $enumRepo->expects($this->once())
             ->method('createQueryBuilder')
             ->with('e')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHint', 'getArrayResult'])
@@ -1001,14 +977,14 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $qb->expects($this->once())
             ->method('select')
             ->with('e.id, e.priority, e.name as label, e.default as is_default')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('orderBy')
             ->with('e.priority')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
         $query->expects($this->exactly(2))
             ->method('setHint')
             ->withConsecutive(
@@ -1021,10 +997,10 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                     $locale
                 ]
             )
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $query->expects($this->once())
             ->method('getArrayResult')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         $translatableListener = $this->createMock(TranslatableListener::class);
         $translatableListener->expects($this->once())
@@ -1053,32 +1029,32 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
      *
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values)
+    private function setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values)
     {
         $enumRepo = $this->createMock(EnumValueRepository::class);
         $em->expects($this->once())
             ->method('getRepository')
             ->with($enumValueClassName)
-            ->will($this->returnValue($enumRepo));
+            ->willReturn($enumRepo);
         $qb = $this->createMock(QueryBuilder::class);
         $enumRepo->expects($this->once())
             ->method('createQueryBuilder')
             ->with('o')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
             ->setMethods(['setHint', 'getResult'])
             ->getMockForAbstractClass();
         $qb->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
         $query->expects($this->once())
             ->method('setHint')
             ->with(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($values));
+            ->willReturn($values);
 
         return $enumRepo;
     }

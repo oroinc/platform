@@ -111,14 +111,11 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         $error->setDetail(new Label('detail'));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects(self::at(0))
+        $translator->expects(self::exactly(2))
             ->method('trans')
-            ->with('title')
-            ->willReturn('translated_title');
-        $translator->expects(self::at(1))
-            ->method('trans')
-            ->with('detail')
-            ->willReturn('translated_detail');
+            ->willReturnCallback(function ($id) {
+                return 'translated_' . $id;
+            });
 
         $error->trans($translator);
         self::assertEquals('translated_title', $error->getTitle());

@@ -30,7 +30,7 @@
 
     .user-menu-dropdown {
         &:before {
-            border-#{$start}-color: $app-header-divider-color;
+            border-left-color: $app-header-divider-color;
         }
     }
 }

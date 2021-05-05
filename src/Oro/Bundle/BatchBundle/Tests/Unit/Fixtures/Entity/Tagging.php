@@ -19,7 +19,7 @@ class Tagging
     /**
      * @ORM\ManyToOne(targetEntity="Tag", inversedBy="tagging")
      * @ORM\JoinColumn(name="tag_id", referencedColumnName="id")
-     **/
+     */
     protected $tag;
 
     /**

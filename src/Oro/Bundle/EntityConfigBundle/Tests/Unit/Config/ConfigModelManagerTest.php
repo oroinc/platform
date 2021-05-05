@@ -8,8 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Config\LockObject;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ReflectionUtil;
 use Oro\Component\DependencyInjection\ServiceLink;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)

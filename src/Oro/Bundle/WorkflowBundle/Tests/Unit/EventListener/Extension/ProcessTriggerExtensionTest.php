@@ -17,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -646,9 +647,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
             ->willReturnCallback(function () use (&$createdProcessJob, $triggerConfig) {
                 // emulate triggering of postFlush event during the call of flush method in the process method
                 $this->extension->process($this->entityManager);
-                $idReflection = new \ReflectionProperty(ProcessJob::class, 'id');
-                $idReflection->setAccessible(true);
-                $idReflection->setValue($createdProcessJob, $triggerConfig['id']);
+                ReflectionUtil::setId($createdProcessJob, $triggerConfig['id']);
             });
 
         $this->logger->expects($this->once())
@@ -800,15 +799,10 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     {
         $entityManager->expects($this->at($callOrder))->method('persist')
             ->with($this->isInstanceOf(ProcessJob::class))
-            ->willReturnCallback(
-                function (ProcessJob $processJob) use ($entityParams) {
-                    $event = $processJob->getProcessTrigger()->getEvent();
-
-                    $idReflection = new \ReflectionProperty(ProcessJob::class, 'id');
-                    $idReflection->setAccessible(true);
-                    $idReflection->setValue($processJob, $entityParams[$event]['id']);
-                }
-            );
+            ->willReturnCallback(function (ProcessJob $processJob) use ($entityParams) {
+                $event = $processJob->getProcessTrigger()->getEvent();
+                ReflectionUtil::setId($processJob, $entityParams[$event]['id']);
+            });
     }
 
     /**

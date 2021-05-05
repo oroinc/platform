@@ -13,7 +13,7 @@
     }
 
     &__description {
-        margin-#{$start}: $attribute-item-description-offset-start;
+        margin-left: $attribute-item-description-offset-start;
         text-align: $attribute-item-description-text-align;
         flex-grow: 1;
         width: 100%;

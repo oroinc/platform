@@ -6,7 +6,7 @@ use Oro\Bundle\CurrencyBundle\Entity\Price;
 
 class PriceAwareEntityStub
 {
-    /** @var Price|null  */
+    /** @var Price|null */
     private $price;
 
     /**

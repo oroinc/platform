@@ -4,11 +4,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Processor;
 
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
-use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use stdClass;
+use Oro\Component\Testing\ReflectionUtil;
 
-class ContentProcessorTest extends TestCase
+class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $part;
@@ -39,7 +37,7 @@ class ContentProcessorTest extends TestCase
             ->method('getHeaders')
             ->will($this->returnValue($headers));
 
-        $header = new stdClass();
+        $header = new \stdClass();
 
         $this->part
             ->expects($this->once())
@@ -47,7 +45,7 @@ class ContentProcessorTest extends TestCase
             ->with($this->equalTo('Content-Type'))
             ->will($this->returnValue($header));
 
-        $result = $this->callProtectedMethod($this->processor, 'getPartContentType', [$this->part]);
+        $result = ReflectionUtil::callMethod($this->processor, 'getPartContentType', [$this->part]);
 
         $this->assertTrue($header === $result);
     }
@@ -67,7 +65,7 @@ class ContentProcessorTest extends TestCase
             ->will($this->returnValue($headers));
 
 
-        $result = $this->callProtectedMethod($this->processor, 'getPartContentType', [$this->part]);
+        $result = ReflectionUtil::callMethod($this->processor, 'getPartContentType', [$this->part]);
 
         $this->assertNull($result);
     }
@@ -150,26 +148,10 @@ class ContentProcessorTest extends TestCase
             ->method('getContent')
             ->will($this->returnValue($contentValue));
 
-        $result = $this->callProtectedMethod($this->processor, 'extractContent', [$this->part]);
+        $result = ReflectionUtil::callMethod($this->processor, 'extractContent', [$this->part]);
 
         $this->assertEquals($expected, $result);
         $this->assertEquals($decodedValue, $result->getDecodedContent());
-    }
-
-    /**
-     * @param       $obj
-     * @param       $methodName
-     * @param array $args
-     * @return mixed
-     * @throws \ReflectionException
-     */
-    private function callProtectedMethod($obj, $methodName, array $args)
-    {
-        $class = new ReflectionClass($obj);
-        $method = $class->getMethod($methodName);
-        $method->setAccessible(true);
-
-        return $method->invokeArgs($obj, $args);
     }
 
     /**

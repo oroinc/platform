@@ -1,0 +1,48 @@
+/* @theme: admin.oro; */
+
+@import '~font-awesome/scss/bordered-pulled';
+@import '~font-awesome/scss/icons';
+@import 'icons-rtl';
+@import 'font-awesome/scss/animated';
+@import 'animated-rtl';
+
+[class^="fa-"],
+[class*=" fa-"] {
+    display: inline-block;
+    font-family: 'FontAwesome';
+    font-size: inherit;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    &.hide-text {
+        @include hide-text();
+
+        color: inherit;
+
+        &:after,
+        &:before {
+            padding: 0;
+            text-indent: 0;
+            font-size: $icon-font-size;
+            line-height: 1;
+            font-family: 'FontAwesome';
+        }
+    }
+}
+
+.fa-arrows-v {
+    // because resize-vertical icon is too thin
+    padding: 0 3px;
+}
+
+.icon-empty:before {
+    content: ' ';
+}
+
+.fa-offset-none {
+    margin: 0 !important;
+}

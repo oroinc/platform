@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityDataAccessor;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\EntityVariableComputer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -182,22 +183,25 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
-        $this->entityDataAccessor->expects(self::at(0))
+        $this->entityDataAccessor->expects(self::exactly(2))
             ->method('tryGetValue')
-            ->with(self::identicalTo($entity), 'entity1')
-            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
-                $value = $entity1;
+            ->withConsecutive(
+                [self::identicalTo($entity), 'entity1'],
+                [self::identicalTo($entity1), 'entity2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
+                    $value = $entity1;
 
-                return true;
-            });
-        $this->entityDataAccessor->expects(self::at(1))
-            ->method('tryGetValue')
-            ->with(self::identicalTo($entity1), 'entity2')
-            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity2) {
-                $value = $entity2;
+                    return true;
+                }),
+                new ReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity2) {
+                    $value = $entity2;
 
-                return true;
-            });
+                    return true;
+                })
+            );
+
         self::assertSame($entity2, $templateData->getEntityVariable('entity.entity1.entity2'));
     }
 
@@ -217,18 +221,21 @@ class TemplateDataTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $entity1 = new \stdClass();
         $templateData = $this->getTemplateData(['entity' => $entity]);
-        $this->entityDataAccessor->expects(self::at(0))
+        $this->entityDataAccessor->expects(self::exactly(2))
             ->method('tryGetValue')
-            ->with(self::identicalTo($entity), 'entity1')
-            ->willReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
-                $value = $entity1;
+            ->withConsecutive(
+                [self::identicalTo($entity), 'entity1'],
+                [self::identicalTo($entity1), 'entity2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($parentValue, $propertyName, &$value) use ($entity1) {
+                    $value = $entity1;
 
-                return true;
-            });
-        $this->entityDataAccessor->expects(self::at(1))
-            ->method('tryGetValue')
-            ->with(self::identicalTo($entity1), 'entity2')
-            ->willReturn(false);
+                    return true;
+                }),
+                false
+            );
+
         self::assertNull($templateData->getEntityVariable('entity.entity1.entity2'));
     }
 

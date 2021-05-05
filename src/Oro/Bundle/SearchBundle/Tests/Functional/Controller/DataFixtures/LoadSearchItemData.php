@@ -21,7 +21,6 @@ class LoadSearchItemData extends LoadOrganization implements OrderedFixtureInter
 
         for ($ind = 1; $ind <= static::COUNT; $ind++) {
             //create item
-            /** @var $item Item */
             $item = new Item();
             //string value
             $item->stringValue  = 'item' . $ind . '@mail.com';

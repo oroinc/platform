@@ -9,12 +9,12 @@
         }
         &__line {
             margin-top: 0;
-            margin-#{$start}: $content-padding;
+            margin-left: $content-padding;
             min-width: 40%;
         }
 
         &__use {
-            padding-#{$end}: $content-padding;
+            padding-right: $content-padding;
         }
     }
 }
@@ -26,4 +26,3 @@
         }
     }
 }
-

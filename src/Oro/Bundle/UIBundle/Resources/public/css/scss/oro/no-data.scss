@@ -23,7 +23,7 @@
         @include fa-icon($no-data-icon, before, true) {
             display: inline-block;
 
-            margin-#{$end}: $no-data-icon-offset;
+            margin-right: $no-data-icon-offset;
         }
 
         &:first-child {

@@ -37,7 +37,7 @@ abstract class Person
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     **/
+     */
     protected $owner;
 
     /**

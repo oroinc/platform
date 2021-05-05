@@ -9,7 +9,7 @@
     &__part {
         margin-bottom: $oro-datagrid-toolbar-offset;
 
-        text-align: $start;
+        text-align: left;
 
         &:empty {
             display: none;
@@ -21,11 +21,11 @@
         }
 
         &--center {
-            float: $start;
+            float: left;
         }
 
         &--end {
-            float: $end;
+            float: right;
         }
     }
 
@@ -40,16 +40,8 @@
         color: $primary-200;
     }
 
-    @include if-rtl() {
-        .pagination-trigger {
-            position: relative;
-
-            transform: rotate(180deg);
-        }
-    }
-
     .totals-label {
-        padding-#{$start}: $oro-datagrid-toolbar-label-offset;
+        padding-left: $oro-datagrid-toolbar-label-offset;
     }
 
     .sorting {

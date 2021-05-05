@@ -7,6 +7,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * The base class for entities that represent a comment.
+ */
 abstract class BaseComment
 {
     /**

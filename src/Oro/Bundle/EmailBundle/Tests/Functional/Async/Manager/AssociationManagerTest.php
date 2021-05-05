@@ -64,7 +64,7 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->processUpdateAllEmailOwners();
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $this->assertMessageSent(
@@ -82,7 +82,7 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->setQueued(false);
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $activityManager = $this->getActivityManager();
@@ -110,7 +110,7 @@ class AssociationManagerTest extends WebTestCase
 
     public function testProcessUpdateEmailOwnerAsync()
     {
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $ids = [];
@@ -136,7 +136,7 @@ class AssociationManagerTest extends WebTestCase
     {
         $this->manager->setQueued(false);
 
-        /* @var $user User */
+        /* @var User $user */
         $owner = $this->getReference('simple_user');
 
         $activityManager = $this->getActivityManager();

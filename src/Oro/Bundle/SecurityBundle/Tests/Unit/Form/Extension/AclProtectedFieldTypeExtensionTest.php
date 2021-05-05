@@ -51,7 +51,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     public function testBuildFormWithCorrectData()
     {
         $options = $this->prepareCorrectOptions('Acme\Demo\TestEntity');
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(2, $listeners);
@@ -62,7 +62,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
     public function testBuildFormWithoutDataClassInOptions()
     {
         $options = [];
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, $options);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(0, $listeners);
@@ -79,7 +79,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
         $this->fieldAclHelper->expects(self::never())
             ->method('isRestrictedFieldsVisible');
 
-        list($dispatcher, $builder) = $this->getFormBuilderWithEventDispatcher();
+        [$dispatcher, $builder] = $this->getFormBuilderWithEventDispatcher();
         $this->extension->buildForm($builder, ['data_class' => $className]);
         $listeners = $dispatcher->getListeners();
         $this->assertCount(0, $listeners);
@@ -87,8 +87,8 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     public function testFinishView()
     {
-        list($view, $form, $options) = $this->getTestFormAndFormView(true);
-        /** @var $view FormView */
+        /** @var FormView $view */
+        [$view, $form, $options] = $this->getTestFormAndFormView(true);
         $view->children['broken'] = new \stdClass();
 
         $this->fieldAclHelper->expects(self::exactly(3))
@@ -126,7 +126,7 @@ class AclProtectedFieldTypeExtensionTest extends FormIntegrationTestCase
 
     public function testFinishViewWithShowRestricted()
     {
-        list($view, $form, $options) = $this->getTestFormAndFormView(true);
+        [$view, $form, $options] = $this->getTestFormAndFormView(true);
         $this->fieldAclHelper->expects(self::exactly(3))
             ->method('isFieldViewGranted')
             ->willReturnCallback(

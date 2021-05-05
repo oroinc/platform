@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\LayoutBundle\Cache\ExpressionLanguageDoctrineAdapter;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Cache\CacheItem;
 
 class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
@@ -88,19 +89,10 @@ class ExpressionLanguageDoctrineAdapterTest extends \PHPUnit\Framework\TestCase
         $key = 'test_item';
         $expectedId = 'orv1thlk24gwoo0k8o0cs8go382qua26l8owcssk04gokso48oooscs';
 
-        $createCacheItem = \Closure::bind(
-            static function ($key, $value) {
-                $item = new CacheItem();
-                $item->key = $key;
-                $item->value = $value;
+        $item = new CacheItem();
+        ReflectionUtil::setPropertyValue($item, 'key', $key);
+        ReflectionUtil::setPropertyValue($item, 'value', $data);
 
-                return $item;
-            },
-            null,
-            CacheItem::class
-        );
-
-        $item = $createCacheItem($key, $data);
         $this->provider->expects(self::once())
             ->method('saveMultiple')
             ->with([$expectedId => $data], 0)

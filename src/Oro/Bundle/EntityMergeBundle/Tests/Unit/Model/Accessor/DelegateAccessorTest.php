@@ -10,7 +10,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class DelegateAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DelegateAccessor $merger */
+    /** @var DelegateAccessor */
     protected $accessor;
 
     /** @var FieldMetadata|MockObject */

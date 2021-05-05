@@ -44,7 +44,7 @@ class ActivityContextApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject $entityClassNameHelper */
+    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $entityClassNameHelper;
 
     /** @var ActivityContextApiEntityManager */

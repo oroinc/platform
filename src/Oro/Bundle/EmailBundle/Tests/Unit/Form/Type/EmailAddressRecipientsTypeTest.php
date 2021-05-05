@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailAddressRecipientsTypeTest extends TypeTestCase
 {
-    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
     protected function setUp(): void
@@ -56,7 +56,6 @@ class EmailAddressRecipientsTypeTest extends TypeTestCase
 
     public function testConfigureOptions(): void
     {
-        /** @var OptionsResolver|\PHPUnit_Framework_MockObject_MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')

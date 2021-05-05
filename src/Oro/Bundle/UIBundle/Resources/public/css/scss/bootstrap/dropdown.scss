@@ -29,10 +29,10 @@
         &:after {
             position: absolute;
             top: 0;
-            #{$end}: 0;
+            right: 0;
             bottom: 0;
             border: 0 none;
-            #{$start}: 0;
+            left: 0;
             z-index: -1;
 
             background: inherit;
@@ -67,19 +67,19 @@
             }
         }
 
-        &[x-placement^="#{$end}"] {
-            margin-#{$start}: $placeholder;
+        &[x-placement^="right"] {
+            margin-left: $placeholder;
 
             &:before {
                 top: 0;
-                #{$end}: 100%;
+                right: 100%;
 
                 height: 100%;
                 width: $placeholder;
             }
 
             .arrow {
-                #{$start}: $arrow-offset;
+                left: $arrow-offset;
 
                 transform: rotate(145deg) skewX(15deg);
             }
@@ -97,23 +97,29 @@
             }
         }
 
-        &[x-placement^="#{$start}"] {
+        &[x-placement^="left"] {
             margin-right: $placeholder;
 
             &:before {
                 top: 0;
-                #{$start}: 100%;
+                left: 100%;
 
                 width: $placeholder;
                 height: 100%;
             }
 
             .arrow {
-                #{$end}: $arrow-offset;
+                right: $arrow-offset;
 
                 transform: rotate(145deg) skewX(15deg);
             }
         }
+    }
+
+    &[x-placement] {
+        /*rtl:ignore*/
+        right: auto;
+        /*rtl:ignore*/
     }
 
     // Support of old markup
@@ -134,7 +140,7 @@
     &:after {
         vertical-align: $caret-width / 2;
 
-        margin-#{$start}: $content-padding-small;
+        margin-left: $content-padding-small;
 
         border-top-width: 5px;
         border-right-width: 5px;
@@ -163,7 +169,7 @@
 
         min-width: $dropdown-item-icon-fa-size;
         height: $dropdown-item-icon-fa-size;
-        margin-#{$end}: $dropdown-item-icon-fa-offset;
+        margin-right: $dropdown-item-icon-fa-offset;
 
         text-align: center;
         line-height: 1;

@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -625,10 +626,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testScheduleSyncOriginsJobShouldThrowExceptionIfMessageProducerIsNotSet()
     {
-        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
-        $refProp->setAccessible(true);
-        $refProp->setValue($this->sync, 'topic-name');
-        $refProp->setAccessible(false);
+        ReflectionUtil::setPropertyValue($this->sync, 'messageQueueTopic', 'topic-name');
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Message producer is not set');
@@ -638,10 +636,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
     public function testScheduleSyncOriginsJobShouldSendMessageToTopicWithIds()
     {
-        $refProp = new \ReflectionProperty(TestEmailSynchronizer::class, 'messageQueueTopic');
-        $refProp->setAccessible(true);
-        $refProp->setValue($this->sync, 'topic-name');
-        $refProp->setAccessible(false);
+        ReflectionUtil::setPropertyValue($this->sync, 'messageQueueTopic', 'topic-name');
 
         $producer = $this->createMessageProducerMock();
         $producer

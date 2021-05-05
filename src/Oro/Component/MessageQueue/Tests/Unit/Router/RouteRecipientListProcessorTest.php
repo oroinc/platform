@@ -34,31 +34,23 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
         $originalMessage = new Message();
 
         $routerMock = $this->createRecipientListRouterMock();
-        $routerMock
-            ->expects($this->once())
+        $routerMock->expects($this->once())
             ->method('route')
             ->with($this->identicalTo($originalMessage))
-            ->willReturn([$fooRecipient, $barRecipient])
-        ;
+            ->willReturn([$fooRecipient, $barRecipient]);
 
         $producerMock = $this->createProducerMock();
-        $producerMock
-            ->expects($this->at(0))
+        $producerMock->expects($this->exactly(2))
             ->method('send')
-            ->with($this->identicalTo($fooRecipient->getQueue()), $this->identicalTo($fooRecipient->getMessage()))
-        ;
-        $producerMock
-            ->expects($this->at(1))
-            ->method('send')
-            ->with($this->identicalTo($barRecipient->getQueue()), $this->identicalTo($barRecipient->getMessage()))
-        ;
+            ->withConsecutive(
+                [$this->identicalTo($fooRecipient->getQueue()), $this->identicalTo($fooRecipient->getMessage())],
+                [$this->identicalTo($barRecipient->getQueue()), $this->identicalTo($barRecipient->getMessage())]
+            );
 
         $sessionMock = $this->createSessionMock();
-        $sessionMock
-            ->expects($this->once())
+        $sessionMock->expects($this->once())
             ->method('createProducer')
-            ->willReturn($producerMock)
-        ;
+            ->willReturn($producerMock);
 
         $processor = new RouteRecipientListProcessor($routerMock);
 
@@ -70,7 +62,7 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
      */
-    protected function createProducerMock()
+    private function createProducerMock()
     {
         return $this->createMock(MessageProducerInterface::class);
     }
@@ -78,7 +70,7 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
      */
-    protected function createSessionMock()
+    private function createSessionMock()
     {
         return $this->createMock(SessionInterface::class);
     }
@@ -86,7 +78,7 @@ class RouteRecipientListProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @return \PHPUnit\Framework\MockObject\MockObject|RecipientListRouterInterface
      */
-    protected function createRecipientListRouterMock()
+    private function createRecipientListRouterMock()
     {
         return $this->createMock(RecipientListRouterInterface::class);
     }

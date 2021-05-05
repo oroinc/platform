@@ -36,7 +36,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->will($this->returnValueMap($inputData['translates']));
 
-        /* @var $transition Transition */
+        /* @var Transition $transition */
         $transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
             ->setMethods(['__construct'])

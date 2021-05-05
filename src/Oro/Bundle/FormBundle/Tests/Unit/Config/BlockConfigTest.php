@@ -7,7 +7,7 @@ use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 
 class BlockConfigTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  BlockConfig */
+    /** @var BlockConfig */
     private $blockConfig;
 
     /** @var string form DataBlock code */

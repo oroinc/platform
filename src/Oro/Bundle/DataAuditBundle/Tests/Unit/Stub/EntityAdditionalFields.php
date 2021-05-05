@@ -6,7 +6,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AuditAdditionalFieldsInterface;
 
 class EntityAdditionalFields implements AuditAdditionalFieldsInterface
 {
-    /** @var array  */
+    /** @var array */
     private $fields;
 
     /**

@@ -16,10 +16,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
@@ -36,9 +33,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0,'
             . ' g1_.id AS id_1, g1_.name AS name_2, g1_.label AS label_3, g1_.public AS public_4'
             . ' FROM user_table u0_'
@@ -64,6 +59,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -122,10 +118,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id IN (?, ?)',
@@ -142,9 +135,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 123, 2 => 456],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
             . ' FROM (('
             . 'SELECT u0_.id AS id_0, g1_.id AS id_1'
@@ -170,9 +161,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
+        $this->addQueryExpectation(
             'SELECT g0_.id AS id_0, g0_.name AS name_1, g0_.label AS label_2, g0_.public AS public_3'
             . ' FROM group_table g0_'
             . ' WHERE g0_.id IN (?, ?)',
@@ -193,6 +182,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -249,10 +239,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.code IN (:ids)')
             ->setParameter('ids', ['id1', 'id2']);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT r0_.code AS code_0, c1_.name AS name_1'
             . ' FROM role_table r0_'
             . ' LEFT JOIN category_table c1_ ON r0_.category_name = c1_.name'
@@ -270,9 +257,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 'id1', 2 => 'id2'],
             [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT entity.code_0 AS entityId, entity.id_1 AS relatedEntityId'
             . ' FROM (('
             . 'SELECT r0_.code AS code_0, g1_.id AS id_1'
@@ -298,6 +283,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                 ]
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -339,10 +325,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
@@ -355,9 +338,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, g1_.id AS id_1'
             . ' FROM user_table u0_'
             . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
@@ -376,6 +357,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -409,10 +391,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
@@ -425,9 +404,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0,'
             . ' p1_.id AS id_1'
             . ' FROM product_table p1_'
@@ -447,6 +424,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -484,10 +462,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
@@ -500,9 +475,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0,'
             . ' p1_.id AS id_1'
             . ' FROM product_table p1_'
@@ -521,9 +494,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
             . ' c1_.name AS name_2'
             . ' FROM product_table p0_'
@@ -544,6 +515,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -598,10 +570,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0, u0_.name AS name_1'
             . ' FROM user_table u0_'
             . ' WHERE u0_.id = ?',
@@ -614,9 +583,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT u0_.id AS id_0,'
             . ' p1_.id AS id_1'
             . ' FROM product_table p1_'
@@ -635,9 +602,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, p0_.name AS name_1'
             . ' FROM product_table p0_'
             . ' WHERE p0_.id IN (?, ?)',
@@ -654,9 +619,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            3,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, g1_.id AS id_1'
             . ' FROM product_table p0_'
             . ' INNER JOIN rel_product_to_group_table r2_ ON p0_.id = r2_.product_id'
@@ -679,6 +642,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 10, 2 => 20],
             [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
             $qb,
@@ -731,10 +695,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, p0_.name AS name_1,'
             . ' u1_.id AS id_2'
             . ' FROM product_table p0_'
@@ -750,10 +711,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT p0_.id AS id_0, g1_.id AS id_1'
             . ' FROM product_table p0_'
             . ' INNER JOIN rel_product_to_group_table r2_ ON p0_.id = r2_.product_id'
@@ -772,6 +730,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $this->serializer->setFieldFilter($this->getFieldFilter([
             'name'  => false,

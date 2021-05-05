@@ -8,10 +8,10 @@ use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 
 class ConfigLogTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ConfigLog */
+    /** @var ConfigLog */
     private $configLog;
 
-    /** @var  ConfigLogDiff */
+    /** @var ConfigLogDiff */
     private $configLogDiff;
 
     protected function setUp(): void

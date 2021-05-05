@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationSelectTypeTest extends OrmTestCase
 {
-    /** @var  IntegrationSelectType */
+    /** @var IntegrationSelectType */
     protected $type;
 
     /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
@@ -26,7 +26,7 @@ class IntegrationSelectTypeTest extends OrmTestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp(): void

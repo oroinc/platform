@@ -205,23 +205,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
@@ -268,23 +268,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
@@ -332,23 +332,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
             ->with(self::identicalTo($classMetadata))
             ->willReturn($entityMetadata);
 
-        $this->entityMetadataFactory->expects(self::at(0))
+        $this->entityMetadataFactory->expects(self::exactly(2))
             ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'id',
-                self::identicalTo($field2),
-                $targetAction
-            );
-        $this->entityMetadataFactory->expects(self::at(1))
-            ->method('createAndAddFieldMetadata')
-            ->with(
-                self::identicalTo($entityMetadata),
-                self::identicalTo($classMetadata),
-                'field1',
-                self::identicalTo($field1),
-                $targetAction
+            ->withConsecutive(
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'id',
+                    self::identicalTo($field2),
+                    $targetAction
+                ],
+                [
+                    self::identicalTo($entityMetadata),
+                    self::identicalTo($classMetadata),
+                    'field1',
+                    self::identicalTo($field1),
+                    $targetAction
+                ]
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(

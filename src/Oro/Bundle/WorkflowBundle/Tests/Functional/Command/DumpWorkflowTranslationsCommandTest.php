@@ -20,7 +20,7 @@ class DumpWorkflowTranslationsCommandTest extends WebTestCase
 
         $this->loadFixtures([LoadWorkflowTranslations::class]);
 
-        /* @var $provider WorkflowConfigFinderBuilder */
+        /* @var WorkflowConfigFinderBuilder $provider */
         $builder = $this->getContainer()->get('oro_workflow.configuration.workflow_config_finder.builder');
         $builder->setSubDirectory('/Tests/Functional/Command/DataFixtures/ValidDefinitions');
 

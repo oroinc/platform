@@ -16,10 +16,10 @@ class ArrayPagerExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayPager|\PHPUnit\Framework\MockObject\MockObject */
     protected $pager;
 
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject $config **/
+    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
     protected $config;
 
-    /** @var  ArrayDatasource */
+    /** @var ArrayDatasource */
     protected $arrayDatasource;
 
     /** @var ArrayPagerExtension */

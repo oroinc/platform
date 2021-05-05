@@ -33,7 +33,7 @@ class LoadItemsValues extends AbstractFixture implements DependentFixtureInterfa
     public function load(ObjectManager $manager)
     {
         foreach ($this->values as $reference) {
-            /* @var $item Item */
+            /* @var Item $item */
             $item = $this->getReference($reference);
 
             $value = new ItemValue();

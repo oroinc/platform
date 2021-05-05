@@ -2,7 +2,7 @@
 
 .scope-collection {
     .small-row > div > div {
-        float: #{$start};
+        float: left;
     }
 
     .grouped-fields {
@@ -17,11 +17,11 @@
 
     .col-widget {
         width: 100px;
-        margin-#{$end}: 22px;
+        margin-right: 22px;
     }
 
     .oro-multiselect-holder {
-        padding-#{$start}: 10px;
+        padding-left: 10px;
     }
 
     .oro-item-collection {
@@ -42,7 +42,7 @@
         .removeRow {
             position: absolute;
             top: 4px;
-            #{$end}: 4px;
+            right: 4px;
             text-decoration: none;
         }
     }
@@ -50,20 +50,20 @@
     .form-horizontal {
         max-width: none;
         display: block;
-        margin-#{$start}: -20px;
+        margin-left: -20px;
 
         @include clearfix();
 
         .control-group-container {
-            float: #{$start};
+            float: left;
             width: 100%;
             margin-bottom: -$content-padding-medium;
         }
 
         .control-group {
             display: block;
-            padding-#{$start}: 20px;
-            float: #{$start};
+            padding-left: 20px;
+            float: left;
             margin-bottom: $content-padding-medium;
             width: 50%;
 
@@ -76,26 +76,26 @@
             }
 
             .controls {
-                margin-#{$start}: 0;
+                margin-left: 0;
             }
 
             &:not(.attribute-row) > .control-label {
                 width: auto;
                 padding-top: 0;
                 padding-bottom: 4px;
-                margin-#{$end}: $btn-icon-mobile-width + 4 - $content-padding-medium;
+                margin-right: $btn-icon-mobile-width + 4 - $content-padding-medium;
                 line-height: 1.25;
-                text-align: #{$start};
+                text-align: left;
 
                 .desktop-version & {
-                    margin-#{$end}: $btn-icon-width + 4 - $content-padding;
+                    margin-right: $btn-icon-width + 4 - $content-padding;
                 }
             }
 
             &:nth-child(2n + 1) {
                 .responsive-section.responsive-small &,
                 .responsive-section.responsive-medium & {
-                    clear: #{$start};
+                    clear: left;
                 }
             }
         }
@@ -110,7 +110,7 @@
 
         .col-widget {
             width: auto;
-            margin-#{$end}: 5px;
+            margin-right: 5px;
         }
 
         .group-label {
@@ -118,7 +118,7 @@
         }
 
         .grouped-fields {
-            margin-#{$start}: 25px;
+            margin-left: 25px;
         }
     }
 }

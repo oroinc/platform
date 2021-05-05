@@ -12,6 +12,7 @@ use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Manager\DTO\TokenInfo;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -139,16 +140,15 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
 
     public function testGetResourceOwnerName(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'getResourceOwnerName');
-        $reflection->setAccessible(true);
-        $this->assertEquals('google', $reflection->invoke($this->manager));
+        $this->assertEquals(
+            'google',
+            ReflectionUtil::callMethod($this->manager, 'getResourceOwnerName', [])
+        );
     }
 
     public function testBuildParameters(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'buildParameters');
-        $reflection->setAccessible(true);
-        $parameters = $reflection->invoke($this->manager, 'sample_code');
+        $parameters = ReflectionUtil::callMethod($this->manager, 'buildParameters', ['sample_code']);
 
         $this->assertSame([
             'redirect_uri' => 'postmessage',
@@ -160,9 +160,6 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
 
     public function testGetConfigParameters(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'getConfigParameters');
-        $reflection->setAccessible(true);
-
         $this
             ->configManager
             ->expects($this->exactly(2))
@@ -184,7 +181,7 @@ class ImapEmailGoogleOauth2ManagerTest extends TestCase
                 ]
             ]);
 
-        $configParameters = $reflection->invoke($this->manager);
+        $configParameters = ReflectionUtil::callMethod($this->manager, 'getConfigParameters', []);
 
         $this->assertSame([
             'client_id' => 'sampleClientId',

@@ -1,3 +1,7 @@
 css:
     inputs:
-      - 'bundles/orotag/css/scss/main.scss'
+        # Settings
+        - 'bundles/orotag/css/scss/settings/global-settings.scss'
+
+        # Styles
+        - 'bundles/orotag/css/scss/main.scss'

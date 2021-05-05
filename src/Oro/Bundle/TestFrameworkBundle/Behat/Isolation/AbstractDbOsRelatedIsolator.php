@@ -18,7 +18,7 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
     /** @var string */
     protected $dbHost;
 
-    /** @var  string */
+    /** @var string */
     protected $dbPort;
 
     /** @var string */

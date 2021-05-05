@@ -19,7 +19,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $formBuilder;
 
-    /**  @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $entityRoutingHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */

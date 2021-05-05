@@ -9,6 +9,7 @@ use Oro\Bundle\IntegrationBundle\Event\IntegrationUpdateEvent;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler as IntegrationHandler;
 use Oro\Bundle\IntegrationBundle\Form\Type\ChannelType;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -197,18 +198,16 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $newIntegration = new Integration();
         $newOwner = $this->createMock(User::class);
 
-        $idProperty = new \ReflectionProperty(Integration::class, 'id');
-        $idProperty->setAccessible(true);
-
         $existingIntegration = new Integration();
-        $idProperty->setValue($existingIntegration, 100);
+        ReflectionUtil::setId($existingIntegration, 100);
 
         $someOwner = $this->createMock(User::class);
         $existingIntegrationWithOwner = clone $existingIntegration;
         $existingIntegrationWithOwner->setDefaultUserOwner($someOwner);
 
         $integration = new Integration();
-        $idProperty->setValue($integration, 200);
+        ReflectionUtil::setId($integration, 200);
+
         return [
             'new entity, should not dispatch' => [
                 $newIntegration,

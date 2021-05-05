@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
@@ -21,11 +22,11 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('settings', $children);
-        $this->assertArrayHasKey('greeting', $this->getField($children['settings'], 'children'));
+        $this->assertArrayHasKey('greeting', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
     public function testAppendScalar()
@@ -42,11 +43,11 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('settings', $children);
-        $this->assertArrayHasKey('level', $this->getField($children['settings'], 'children'));
+        $this->assertArrayHasKey('level', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
     public function testAppendScalarWhenTypeIsNotSpecified()
@@ -62,11 +63,11 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('settings', $children);
-        $this->assertArrayHasKey('level', $this->getField($children['settings'], 'children'));
+        $this->assertArrayHasKey('level', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
     public function testAppendString()
@@ -83,11 +84,11 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('settings', $children);
-        $this->assertArrayHasKey('name', $this->getField($children['settings'], 'children'));
+        $this->assertArrayHasKey('name', ReflectionUtil::getPropertyValue($children['settings'], 'children'));
     }
 
     public function testAppendArray()
@@ -104,9 +105,9 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
-        $settings = $this->getField($children['settings'], 'children');
-        $list = $this->getField($settings['list'], 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
+        $settings = ReflectionUtil::getPropertyValue($children['settings'], 'children');
+        $list = ReflectionUtil::getPropertyValue($settings['list'], 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('value', $list);
@@ -126,9 +127,9 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $children = $this->getField($root, 'children');
-        $settings = $this->getField($children['settings'], 'children');
-        $list = $this->getField($settings['list'], 'children');
+        $children = ReflectionUtil::getPropertyValue($root, 'children');
+        $settings = ReflectionUtil::getPropertyValue($children['settings'], 'children');
+        $list = ReflectionUtil::getPropertyValue($settings['list'], 'children');
 
         $this->assertCount(2, $children);
         $this->assertArrayHasKey('value', $list);
@@ -147,19 +148,5 @@ class SettingsBuilderTest extends \PHPUnit\Framework\TestCase
             ->end();
 
         return $root;
-    }
-
-    /**
-     * @param object $object
-     * @param string $field
-     *
-     * @return mixed
-     */
-    private function getField($object, $field)
-    {
-        $reflection = new \ReflectionProperty($object, $field);
-        $reflection->setAccessible(true);
-
-        return $reflection->getValue($object);
     }
 }

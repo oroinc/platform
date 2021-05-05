@@ -73,7 +73,7 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function loadUsers(ObjectManager $manager)
     {
-        /* @var $userManager UserManager */
+        /* @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
 
         $defaultUser = $this->getUser($manager);
@@ -144,7 +144,7 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
      */
     protected function getUser(ObjectManager $manager)
     {
-        /* @var $user User */
+        /* @var User $user */
         $user = $manager->getRepository(User::class)->findOneBy([
             'email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL
         ]);

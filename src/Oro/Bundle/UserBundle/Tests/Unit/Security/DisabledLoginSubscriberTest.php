@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class DisabledLoginSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $token;
 
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */

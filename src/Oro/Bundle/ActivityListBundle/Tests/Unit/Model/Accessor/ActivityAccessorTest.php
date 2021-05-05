@@ -10,7 +10,7 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class ActivityAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityAccessor $fieldAccessor */
+    /** @var ActivityAccessor */
     protected $accessor;
 
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */

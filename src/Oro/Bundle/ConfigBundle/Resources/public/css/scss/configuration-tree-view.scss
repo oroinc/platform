@@ -15,12 +15,12 @@
         }
 
         &-node {
-            margin: side-values(0 0 0 28px);
+            margin: 0 0 0 28px;
         }
 
         &-anchor {
-            padding: side-values(0 8px 8px 6px);
-            text-align: $start;
+            padding: 0 8px 8px 6px;
+            text-align: left;
         }
 
         &-actions {
@@ -35,7 +35,7 @@
 
         &-icon:empty {
             width: 20px;
-            margin-#{$end}: 4px;
+            margin-right: 4px;
         }
 
         &-ocl {
@@ -60,7 +60,7 @@
         [class*=" fa-"] {
             display: inline-block;
             text-align: center;
-            margin: side-values(0 12px 0 -4px);
+            margin: 0 12px 0 -4px;
             color: $primary-550;
         }
     }

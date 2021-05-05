@@ -47,7 +47,7 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
 
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->findOneBy([]);
 
-        /* @var $user User */
+        /* @var User $user */
         $user = $userManager->createUser();
         $user
             ->setOwner($this->getReference('business_unit'))

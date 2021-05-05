@@ -9,6 +9,7 @@ use Oro\Component\Action\Action\TreeExecutor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayAction;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
@@ -235,8 +236,6 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     public function addPostAction(TreeExecutor $treeExecutor, ActionInterface $action, $breakOnFailure)
     {
-        $actionsReflection = $this->getTreeExecutorActionReflection();
-
         $actionData = array();
         if ($action instanceof TreeExecutor) {
             $actionData = array(
@@ -252,13 +251,13 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
             $actionData['condition'] = $conditionData;
         }
 
-        $treeActions = $actionsReflection->getValue($treeExecutor);
+        $treeActions = $this->getActions($treeExecutor);
         $treeActions[] = array(
             'instance'       => $actionData,
             'breakOnFailure' => $breakOnFailure
         );
 
-        $actionsReflection->setValue($treeExecutor, $treeActions);
+        ReflectionUtil::setPropertyValue($treeExecutor, 'actions', $treeActions);
     }
 
     /**
@@ -267,20 +266,7 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
      */
     protected function getActions(TreeExecutor $action)
     {
-        $actionsReflection = $this->getTreeExecutorActionReflection();
-
-        return $actionsReflection->getValue($action);
-    }
-
-    /**
-     * @return \ReflectionProperty
-     */
-    protected function getTreeExecutorActionReflection()
-    {
-        $reflection = new \ReflectionProperty('Oro\Component\Action\Action\TreeExecutor', 'actions');
-        $reflection->setAccessible(true);
-
-        return $reflection;
+        return ReflectionUtil::getPropertyValue($action, 'actions');
     }
 
     /**
@@ -316,12 +302,7 @@ class ActionAssemblerTest extends \PHPUnit\Framework\TestCase
         /** @var ArrayCondition $condition */
         $condition = null;
         if ($postAction instanceof TreeExecutor) {
-            $reflection = new \ReflectionProperty(
-                'Oro\Component\Action\Action\TreeExecutor',
-                'condition'
-            );
-            $reflection->setAccessible(true);
-            $condition = $reflection->getValue($postAction);
+            $condition = ReflectionUtil::getPropertyValue($postAction, 'condition');
         } elseif ($postAction instanceof ArrayAction) {
             $condition = $postAction->getCondition();
         }

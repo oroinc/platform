@@ -35,11 +35,11 @@ class LanguageRepositoryTest extends WebTestCase
         $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Language::class);
         $this->repository = $this->em->getRepository(Language::class);
 
-        /* @var $userRepository UserRepository */
+        /* @var UserRepository $userRepository */
         $userRepository = $this->getContainer()->get('doctrine')->getManagerForClass(User::class)
             ->getRepository(User::class);
 
-        /* @var $user User */
+        /* @var User $user */
         $user = $userRepository->findOneBy(['username' => LoadTranslationUsers::TRANSLATOR_USERNAME]);
 
         $token = new UsernamePasswordOrganizationToken($user, false, 'k', $user->getOrganization(), $user->getRoles());
@@ -61,7 +61,7 @@ class LanguageRepositoryTest extends WebTestCase
 
     public function testGetAvailableLanguagesByCurrentUser()
     {
-        /* @var $aclHelper AclHelper */
+        /* @var AclHelper $aclHelper */
         $aclHelper = $this->getContainer()->get('oro_security.acl_helper');
 
         $this->assertEquals(

@@ -12,7 +12,7 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $action;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
     private $metadata;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDefinitionConfig */

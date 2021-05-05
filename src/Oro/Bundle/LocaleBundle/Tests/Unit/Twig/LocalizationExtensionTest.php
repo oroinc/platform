@@ -12,7 +12,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /**  @var LocalizationExtension */
+    /** @var LocalizationExtension */
     protected $extension;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageCodeFormatter */

@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 
@@ -443,17 +444,23 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
             ->method('acquireLock')
             ->with($lockFileName)
             ->willReturn(true);
-        $this->fileManager->expects(self::at(0))
+        $this->fileManager->expects(self::once())
             ->method('getFile')
             ->with($indexFileName, false)
             ->willReturn(null);
-        $this->fileManager->expects(self::at(1))
+        $this->fileManager->expects(self::exactly(2))
             ->method('writeToStorage')
-            ->with($serializedErrors, sprintf('%s_errors', $chunkFileName));
-        $this->fileManager->expects(self::at(2))
-            ->method('writeToStorage')
-            ->with('[["api_chunk_file_name_1_errors",1,1]]', $indexFileName)
-            ->willThrowException($exception);
+            ->withConsecutive(
+                [$serializedErrors, sprintf('%s_errors', $chunkFileName)],
+                ['[["api_chunk_file_name_1_errors",1,1]]', $indexFileName]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () {
+                }),
+                new ReturnCallback(function () use ($exception) {
+                    throw $exception;
+                })
+            );
         $this->fileLockManager->expects(self::once())
             ->method('releaseLock')
             ->with($lockFileName);

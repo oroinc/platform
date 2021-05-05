@@ -12,10 +12,10 @@
         min-width: 40%;
         @include text-line-truncate($max-width: 40%);
 
-        padding-#{$end}: $content-padding-small;
+        padding-right: $content-padding-small;
 
         .checkbox-view {
-            margin-#{$end}: $content-padding-small;
+            margin-right: $content-padding-small;
         }
     }
 

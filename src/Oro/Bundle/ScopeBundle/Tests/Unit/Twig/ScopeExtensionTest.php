@@ -36,7 +36,6 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
     public function testIsScopesEmptyWithMoreThanOneScope()
     {
         $scopeEntities = [];
-        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes **/
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())
@@ -53,7 +52,6 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
     public function testIsScopesEmptyWithOneNotEmptyScope()
     {
         $scopeEntities = ['firstField' => 'FirstClass', 'secondField' => 'SecondClass'];
-        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes **/
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())
@@ -78,7 +76,6 @@ class ScopeExtensionTest extends \PHPUnit\Framework\TestCase
     public function testIsScopesEmptyWithOneEmptyScope()
     {
         $scopeEntities = ['firstField' => 'FirstClass', 'secondField' => 'SecondClass'];
-        /** @var Collection|\PHPUnit\Framework\MockObject\MockObject $scopes * */
         $scopes = $this->createMock(Collection::class);
         $scopes
             ->expects($this->once())

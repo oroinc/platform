@@ -1,0 +1,127 @@
+/* @theme: admin.oro; */
+
+$dialog-border-radius: 4px !default;
+$dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$dialog-background: none !default;
+$dialog-z-index: $zindex-fixed !default;
+$dialog-outline: none !default;
+$dialog-border: none !default;
+$dialog-position: absolute !default;
+
+$dialog-resizable-width: auto !important !default;
+
+$dialog-buttonpane-background: none !default;
+$dialog-buttonpane-flex-shrink: 0 !default;
+
+$dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
+$dialog-buttonpane-action-wrapper-offset-left: 8px !default;
+
+$dialog-ui-dialog-messages-inner-offset: 18px 18px 0 !default;
+
+$dialog-titlebar-inner-offset: 10px 18px 10px 18px !default;
+$dialog-titlebar-width: 100% !default;
+$dialog-titlebar-cursor: move !default;
+$dialog-titlebar-start: 1px !default;
+$dialog-titlebar-top: 0 !default;
+$dialog-titlebar-flex-shrink: 0 !default;
+$dialog-titlebar-falign-items: center !default;
+$dialog-titlebar-display: flex !default;
+
+$dialog-titlebar-min-cursor: auto !default;
+
+$dialog-titlebar-close-icon: '\f00d' !default;
+$dialog-titlebar-maximize-icon: '\f2d0' !default;
+$dialog-titlebar-minimize-icon: '\f2d1' !default;
+$dialog-titlebar-restore-icon: '\f2d2' !default;
+
+$dialog-titlebar-min-background: none !default;
+$dialog-titlebar-min-border: none !default;
+$dialog-titlebar-min-end: 11px !default;
+$dialog-titlebar-min-top: 5px !default;
+
+$dialog-titlebar-min-button-outer-offset: 8px !default;
+
+$dialog-minimized-outer-offset: 0 4px !default;
+$dialog-minimized-box-shadow: none !default;
+
+$dialog-minimized-titlebar-inner-offset: 3px 11px 3px 12px !default;
+$dialog-minimized-titlebar-outer-bottom-offset: 0 !default;
+
+$dialog-title-font-weight: bold !default;
+$dialog-title-display: block !default;
+$dialog-title-white-space: nowrap !default;
+$dialog-title-overflow: hidden !default;
+$dialog-title-text-overflow: ellipsis !default;
+
+$dialog-titlebar-minimize-position: relative !default;
+
+$dialog-titlebar-close-position: absolute !default;
+$dialog-titlebar-close-end: 10px !default;
+$dialog-titlebar-close-top: 10px !default;
+
+$dialog-titlebar-buttonpane-outer-offset: 0 !default;
+$dialog-titlebar-buttonpane-height: auto !default;
+$dialog-titlebar-buttonpane-min-width: 18px !default;
+$dialog-titlebar-buttonpane-top: 16px !default;
+$dialog-titlebar-buttonpane-end: 16px !default;
+
+$dialog-content-inner-offset: 28px !default;
+$dialog-content-outer-offset: 0 auto !default;
+$dialog-content-position: relative !default;
+$dialog-content-min-width: 250px !default;
+$dialog-content-width: 100% !default;
+$dialog-content-min-height: 118px !default;
+$dialog-content-overflow: auto !default;
+$dialog-content-flex-shrink: 1 !default;
+$dialog-content-flex-grow: 1 !default;
+
+$dialog-body-overflow-y: auto !default;
+$dialog-body-max-height: 400px !default;
+$dialog-body-inner-offset: 15px !default;
+
+$dialog-content-not-button-height: calc(100% - 50px) !default;
+
+$dialog-widget-header-border: none !default;
+$dialog-widget-content-border: none !default;
+$dialog-widget-content-color: $primary-200 !default;
+
+$dialog-resizable-handle-cursor: move !default;
+
+$dialog-resizable-se-size: 10px !default;
+$dialog-resizable-se-outer-offset: 2px !default;
+$dialog-resizable-se-position: absolute !default;
+$dialog-resizable-se-bottom: -1px !default;
+$dialog-resizable-se-end: 0 !default;
+$dialog-resizable-se-cursor: se-resize !default;
+
+$dialog-resizable-se-presudo-border-top: 2px solid $primary-700 !default;
+$dialog-resizable-se-presudo-display: block !default;
+$dialog-resizable-se-presudo-position: absolute !default;
+$dialog-resizable-se-presudo-top: 0 !default;
+$dialog-resizable-se-presudo-end: -4px !default;
+$dialog-resizable-se-presudo-bottom: 0 !default;
+$dialog-resizable-se-presudo-start: -4px !default;
+$dialog-resizable-se-presudo-height: 0 !default;
+$dialog-resizable-se-presudo-margin: auto !default;
+$dialog-resizable-se-presudo-transform: rotate(-45deg) !default;
+
+$dialog-resizable-se-presudo-db-top: 10px !default;
+
+$dialog-widget-actions-outer-offset: 0 !default;
+$dialog-widget-actions-inner-offset: 14px 24px !default;
+$dialog-widget-actions-border: none !default;
+
+$dialog-bottom-action-overflow: hidden !default;
+
+$dialog-buttons-float: right !default;
+$dialog-buttons-minimized-float: right !default;
+$dialog-buttons-outer-offset: 0 0 0 7px !default;
+$dialog-buttons-inner-offset: 0 !default;
+$dialog-buttons-inner-font-size: 0 !default;
+$dialog-buttons-inner-line-height: 0 !default;
+$dialog-buttons-inner-background: none !default;
+$dialog-buttons-inner-cursor: pointer !default;
+$dialog-buttons-inner-border: 0 !default;
+
+$ui-widget-overlay-z-index: 150 !default;
+$ui-widget-overlay-background-color: rgba(255, 255, 255, .5) !default;

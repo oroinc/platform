@@ -9,7 +9,7 @@
     &__labels {
         padding: 0;
         list-style: none;
-        margin: side-values(0 0 $address-box-item-offset-vertical);
+        margin: 0 0 $address-box-item-offset-vertical;
     }
 
     &__label-container {
@@ -38,20 +38,20 @@
         &.label-info {
             background: $info;
             color: $primary-inverse;
-            padding: side-values($address-box-item-label-info-padding-vertical $address-box-item-label-info-padding-horizontal);
-            margin: side-values(0 $address-box-item-label-info-offset-horizontal 0 0);
+            padding: $address-box-item-label-info-padding-vertical $address-box-item-label-info-padding-horizontal;
+            margin: 0 $address-box-item-label-info-offset-horizontal 0 0;
         }
     }
 
     &__actions {
-        float: #{$end};
-        margin-#{$end}: -6px;
+        float: right;
+        margin-right: -6px;
     }
 
     &__title {
         font-size: $font-size-base;
         font-weight: bold;
-        margin: side-values(0 0 $address-box-item-title-offset-vertical);
+        margin: 0 0 $address-box-item-title-offset-vertical;
     }
 }
 
@@ -64,8 +64,8 @@
         width: 40%;
         overflow: hidden;
         max-height: inherit;
-        margin-#{$end}: $address-box-margin-small/2;
-        padding-#{$end}: $address-box-margin-small/2;
+        margin-right: $address-box-margin-small/2;
+        padding-right: $address-box-margin-small/2;
 
         &:hover {
             overflow-y: auto;
@@ -78,7 +78,7 @@
         .alert,
         .loader-overlay {
             width: auto;
-            margin: side-values(0 $address-box-margin-medium 0 $address-box-margin-small);
+            margin: 0 $address-box-margin-medium 0 $address-box-margin-small;
         }
     }
 
@@ -168,8 +168,8 @@
 
         .map-address-list {
             width: 100%;
-            margin: side-values( 0 0 $address-box-margin-small 0);
-            padding-#{$end}: 0;
+            margin: 0 0 $address-box-margin-small 0;
+            padding-right: 0;
 
             &:hover {
                 overflow: inherit;

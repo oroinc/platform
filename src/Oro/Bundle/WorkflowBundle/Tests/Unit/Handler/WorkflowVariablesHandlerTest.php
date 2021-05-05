@@ -21,7 +21,7 @@ class WorkflowVariablesHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $managerRegistry */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     protected $managerRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */

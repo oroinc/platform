@@ -9,9 +9,7 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReplaceStrategy $strategy
-     */
+    /** @var ReplaceStrategy */
     protected $strategy;
 
     protected function setUp(): void

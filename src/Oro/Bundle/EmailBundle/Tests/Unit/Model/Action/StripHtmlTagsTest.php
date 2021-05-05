@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 use Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\ReflectionUtil;
 
 class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 {
@@ -39,15 +40,8 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $html = $reflection->getProperty('html');
-        $html->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($html->getValue($this->action), '$.html');
-        $this->assertEquals($attribute->getValue($this->action), '$.attribute');
+        $this->assertEquals('$.html', ReflectionUtil::getPropertyValue($this->action, 'html'));
+        $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithArrayOptions()
@@ -59,15 +53,8 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
 
         $this->action->initialize($options);
 
-        $reflection = new \ReflectionClass($this->action);
-
-        $html = $reflection->getProperty('html');
-        $html->setAccessible(true);
-        $attribute = $reflection->getProperty('attribute');
-        $attribute->setAccessible(true);
-
-        $this->assertEquals($html->getValue($this->action), '$.html');
-        $this->assertEquals($attribute->getValue($this->action), '$.attribute');
+        $this->assertEquals('$.html', ReflectionUtil::getPropertyValue($this->action, 'html'));
+        $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
     public function testInitializeWithMissingOption()

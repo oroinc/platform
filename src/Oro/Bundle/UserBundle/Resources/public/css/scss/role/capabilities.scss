@@ -35,7 +35,7 @@
         position: relative;
 
         display: inline-block;
-        padding-#{$start}: $role-capability-label-offset;
+        padding-left: $role-capability-label-offset;
 
         line-height: $role-capability-label-line-height;
     }
@@ -49,7 +49,7 @@
     }
 
     &__select-all {
-        float: #{$end};
+        float: right;
 
         &.disabled {
             color: $role-capability-item-disabled;

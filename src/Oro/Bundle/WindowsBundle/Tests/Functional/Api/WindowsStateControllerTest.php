@@ -38,7 +38,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 201);
@@ -70,7 +69,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -97,7 +95,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -126,7 +123,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
@@ -149,7 +145,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);
 
@@ -163,7 +158,6 @@ class WindowsStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 404);
@@ -188,7 +182,6 @@ class WindowsStateControllerTest extends WebTestCase
         foreach ($requests as $requestType => $url) {
             $this->client->request($requestType, $url);
 
-            /** @var $result Response */
             $response = $this->client->getResponse();
 
             $this->assertEquals(401, $response->getStatusCode());
@@ -220,7 +213,6 @@ class WindowsStateControllerTest extends WebTestCase
                 $this->generateWsseAuthHeader()
             );
 
-            /** @var $response Response */
             $response = $this->client->getResponse();
 
             $this->assertJsonResponseStatusCodeEquals($response, 400);

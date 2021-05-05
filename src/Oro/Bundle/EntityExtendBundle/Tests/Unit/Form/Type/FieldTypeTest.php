@@ -37,7 +37,7 @@ class FieldTypeTest extends TypeTestCase
     const FIELDS_GROUP = 'oro.entity_extend.form.data_type_group.fields';
     const RELATIONS_GROUP = 'oro.entity_extend.form.data_type_group.relations';
 
-    /** @var FieldType $type */
+    /** @var FieldType */
     protected $type;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
@@ -203,7 +203,6 @@ class FieldTypeTest extends TypeTestCase
         $view = new FormView();
         $view->children['fieldName'] = $fieldNameView;
 
-        /** @var $form FormInterface|\PHPUnit\Framework\MockObject\MockObject */
         $form = $this->createMock(FormInterface::class);
         $this->type->finishView($view, $form, ['excludeTypes' => []]);
 

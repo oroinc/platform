@@ -13,17 +13,45 @@ define(function(require) {
     const origFnTypeahead = $.fn.typeahead;
 
     const typeaheadPatches = {
+        _calculateRightPosition: function() {
+            if (!this.$element.length) {
+                return 0;
+            }
+
+            let $relativeParent = this.$element.parents().filter((index, el) => {
+                return $(el).css('position') !== 'static';
+            });
+
+            if ($relativeParent.length === 0) {
+                $relativeParent = $('body');
+            }
+
+            const relativeParentRight = $relativeParent.offset().left + $relativeParent.outerWidth();
+            const elementRight = this.$element.offset().left + this.$element.outerWidth();
+            const right = relativeParentRight - elementRight;
+
+            return right < 0 ? 0 : right;
+        },
+
         show: function() {
             // fix for dropdown menu position that placed inside scrollable containers
             const pos = $.extend({}, this.$element.position(), {
                 height: this.$element[0].offsetHeight
             });
 
+            const direction = {};
+
+            if (_.isRTL()) {
+                direction.right = this._calculateRightPosition();
+            } else {
+                direction.left = pos.left;
+            }
+
             this.$menu
                 .insertAfter(this.$element)
                 .css({
                     top: pos.top + pos.height + this.scrollOffset(this.$element),
-                    left: pos.left
+                    ...direction
                 })
                 .show();
 
@@ -46,6 +74,12 @@ define(function(require) {
         },
         keypress: function() {
             // do nothing;
+        },
+        highlighter: function(item) {
+            if (!this.query) {
+                return item;
+            }
+            return origTypeahead.prototype.highlighter.call(this, item);
         }
     };
 
@@ -59,6 +93,10 @@ define(function(require) {
         this.$holder = $(opts.holder || '');
 
         origTypeahead.call(this, element, options);
+        this.$element
+            .add(this.$holder)
+            .add(this.$menu)
+            .addClass(`typeahead-direction-${_.isRTL() ? 'end' : 'start'}`);
     };
 
     Typeahead.prototype = origTypeahead.prototype;
