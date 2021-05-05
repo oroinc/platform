@@ -17,12 +17,10 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
     /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject **/
     protected $config;
 
-    /** @var  ArrayDatasource */
+    /** @var ArrayDatasource */
     protected $arrayDatasource;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $arraySource = [
         [
             'priceListId' => 256,

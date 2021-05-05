@@ -13,7 +13,7 @@ class EmailNotificationHandlerTest extends \PHPUnit\Framework\TestCase
 {
     const FORM_DATA = ['field' => 'value'];
 
-    /** @var FormInterface |\PHPUnit\Framework\MockObject\MockObject*/
+    /** @var FormInterface |\PHPUnit\Framework\MockObject\MockObject */
     protected $form;
 
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */

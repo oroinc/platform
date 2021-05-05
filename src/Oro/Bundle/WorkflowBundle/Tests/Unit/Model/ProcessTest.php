@@ -10,24 +10,16 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ProcessTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ProcessDefinition $processDefinition
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessDefinition */
     protected $processDefinition;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory $conditionFactory
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionFactory */
     protected $conditionFactory;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler $actionAssembler
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionAssembler */
     protected $actionAssembler;
 
-    /**
-     * @var Process
-     */
+    /** @var Process */
     protected $process;
 
     protected function setUp(): void

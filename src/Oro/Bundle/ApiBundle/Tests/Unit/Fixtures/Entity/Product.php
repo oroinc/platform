@@ -25,13 +25,13 @@ class Product
     /**
      * @ORM\ManyToOne(targetEntity="Category")
      * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
-     **/
+     */
     protected $category;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="products")
      * @ORM\JoinColumn(name="owner_id", referencedColumnName="id")
-     **/
+     */
     protected $owner;
 
     /**

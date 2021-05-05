@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\BrowserKit\Response;
 
 class RestApiTest extends WebTestCase
 {
@@ -148,7 +147,6 @@ class RestApiTest extends WebTestCase
             $this->getUrl('oro_api_delete_businessunit', array('id' => $id))
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 

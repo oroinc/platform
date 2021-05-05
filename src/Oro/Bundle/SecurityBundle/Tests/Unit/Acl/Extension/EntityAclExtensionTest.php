@@ -493,7 +493,6 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'UNKNOWN' => 7
             ]);
 
-        /* @var $entityClassResolver EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject  */
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $fieldAclExtension = $this->createMock(FieldAclExtension::class);

@@ -10,13 +10,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbstractTranslatableEntityFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerInterface|MockObject $container */
+    /** @var ContainerInterface|MockObject */
     private $container;
 
     /** @var TranslatorInterface|MockObject */
     private $translator;
 
-    /** @var ObjectManager|MockObject $objectManager */
+    /** @var ObjectManager|MockObject */
     private $objectManager;
 
     protected function setUp(): void

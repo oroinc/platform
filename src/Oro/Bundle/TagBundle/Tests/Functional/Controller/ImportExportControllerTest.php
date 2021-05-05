@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImportExportControllerTest extends WebTestCase
@@ -27,10 +26,10 @@ class ImportExportControllerTest extends WebTestCase
             $this->getUrl('oro_importexport_export_template', ['processorAlias' => 'oro_user'])
         );
 
-        /* @var $response BinaryFileResponse */
+        /* @var BinaryFileResponse $response */
         $response = $this->getClientInstance()->getResponse();
         $this->assertResponseStatusCodeEquals($response, 200);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\BinaryFileResponse', $response);
+        $this->assertInstanceOf(BinaryFileResponse::class, $response);
 
         $handle = fopen($response->getFile()->getPathname(), 'r');
         $lines = [];
@@ -61,7 +60,6 @@ class ImportExportControllerTest extends WebTestCase
         $file = $this->getImportTemplate();
         $this->assertTrue(file_exists($file));
 
-        /* @var $form Form */
         $form = $crawler->selectButton('Submit')->form();
         $form->getFormNode()->setAttribute(
             'action',

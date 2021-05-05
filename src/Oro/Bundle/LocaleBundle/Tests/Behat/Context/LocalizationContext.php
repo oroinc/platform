@@ -18,13 +18,12 @@ class LocalizationContext extends OroFeatureContext implements KernelAwareContex
      */
     public function loadFixtures()
     {
-        /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
-        /* @var $configManager ConfigManager */
+        /* @var ConfigManager $configManager */
         $configManager = $container->get('oro_config.global');
 
-        /* @var $localizations Localization[] */
+        /* @var Localization[] $localizations */
         $localizations = $container
             ->get('oro_entity.doctrine_helper')
             ->getEntityRepository(Localization::class)

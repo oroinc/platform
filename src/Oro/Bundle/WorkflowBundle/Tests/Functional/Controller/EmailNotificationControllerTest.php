@@ -20,7 +20,7 @@ class EmailNotificationControllerTest extends WebTestCase
     const EVENT_NAME = 'oro.workflow.event.notification.workflow_transition';
     const TRANSITION_NAME = 'starting_point_transition';
 
-    /** @var  Registry */
+    /** @var Registry */
     protected $doctrine;
 
     protected function setUp(): void

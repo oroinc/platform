@@ -17,9 +17,7 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ReplaceStrategy $strategy
-     */
+    /** @var ReplaceStrategy */
     protected $strategy;
 
     /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */

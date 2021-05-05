@@ -6,10 +6,10 @@ use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider;
 
 class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ChainExclusionProvider */
+    /** @var ChainExclusionProvider */
     protected $chainProvider;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var \PHPUnit\Framework\MockObject\MockObject[] */
     protected $providers = [];
 
     protected function setUp(): void

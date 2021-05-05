@@ -25,7 +25,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attachmentManager;
 
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
     protected function setUp(): void

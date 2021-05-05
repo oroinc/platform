@@ -16,21 +16,19 @@ use Symfony\Component\HttpFoundation\File\File as ComponentFile;
  */
 class FileListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileListener  */
+    /** @var FileListener */
     protected $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $em;
 
-    /**
-     * @var File
-     */
+    /** @var File */
     protected $attachment;
 
     protected function setUp(): void

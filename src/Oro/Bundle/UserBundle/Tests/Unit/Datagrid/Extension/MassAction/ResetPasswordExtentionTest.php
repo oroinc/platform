@@ -8,10 +8,10 @@ use Oro\Bundle\UserBundle\Datagrid\Extension\MassAction\ResetPasswordExtension;
 
 class ResetPasswordExtentionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|DatagridConfiguration */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DatagridConfiguration */
     protected $configuration;
 
-    /** @var  ResetPasswordExtension */
+    /** @var ResetPasswordExtension */
     protected $resetExtension;
 
     protected function setUp(): void

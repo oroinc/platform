@@ -11,7 +11,7 @@ class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
     private ConsumerState $consumerState;
 
-    /** @var TestHandler|\PHPUnit\Framework\MockObject\MockObject  */
+    /** @var TestHandler|\PHPUnit\Framework\MockObject\MockObject */
     private TestHandler $innerHandler;
 
     private ConsoleErrorHandler $handler;

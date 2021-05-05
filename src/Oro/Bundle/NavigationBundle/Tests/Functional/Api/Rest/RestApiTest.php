@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\NavigationBundle\Entity\PinbarTab;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -87,7 +86,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 422);
@@ -123,7 +121,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -151,7 +148,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -177,7 +173,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -209,7 +204,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
@@ -236,7 +230,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);
 
@@ -252,7 +245,6 @@ class RestApiTest extends WebTestCase
             array(),
             $this->generateWsseAuthHeader()
         );
-        /** @var $result Response */
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
@@ -289,7 +281,6 @@ class RestApiTest extends WebTestCase
         foreach ($requests as $requestType => $url) {
             $this->client->request($requestType, $url);
 
-            /** @var $result Response */
             $response = $this->client->getResponse();
 
             $this->assertEquals(401, $response->getStatusCode());
@@ -328,7 +319,6 @@ class RestApiTest extends WebTestCase
                 $this->generateWsseAuthHeader()
             );
 
-            /** @var $response Response */
             $response = $this->client->getResponse();
 
             $this->assertJsonResponseStatusCodeEquals($response, 400);
@@ -357,7 +347,6 @@ class RestApiTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 201);

@@ -13,7 +13,7 @@ use Symfony\Component\Form\FormView;
 
 class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  CommonTemplateDataProcessor */
+    /** @var CommonTemplateDataProcessor */
     protected $processor;
 
     protected function setUp(): void

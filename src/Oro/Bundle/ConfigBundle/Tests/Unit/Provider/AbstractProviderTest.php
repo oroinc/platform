@@ -48,7 +48,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var ChainSearchProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchProvider;
 
-    /** @var  FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRegistry;
 
     /**

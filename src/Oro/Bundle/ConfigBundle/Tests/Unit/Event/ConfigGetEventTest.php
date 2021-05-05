@@ -7,7 +7,7 @@ use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigGetEventTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject*/
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
     protected function setUp(): void

@@ -41,7 +41,7 @@ class LoadRegionData extends AbstractFixture
         $repository = $manager->getRepository(Region::class);
 
         foreach ($this->regions as $reference => $data) {
-            /** @var $region Region */
+            /** @var Region $region */
             $region = $repository->find($data['combinedCode']);
             if (!$region) {
                 $region = new Region($data['combinedCode']);

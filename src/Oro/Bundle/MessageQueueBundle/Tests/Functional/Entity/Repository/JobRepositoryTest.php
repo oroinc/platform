@@ -61,9 +61,7 @@ class JobRepositoryTest extends WebTestCase
 
     public function testGetChildJobIdsByRootJobAndStatus(): void
     {
-        /**
-         * @var $job Job
-         */
+        /** @var Job $job */
         $job = $this->getReference(LoadJobData::JOB_5);
 
         $expectedResult = [

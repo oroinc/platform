@@ -53,7 +53,6 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
 
     public function testProcess()
     {
-        /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject $grid * */
         $grid = $this->createMock(DatagridInterface::class);
         $grid->expects($this->once())->method('setDatasource')->with(clone $this->arrayDatasource);
         $this->arrayDatasource->process($grid, []);

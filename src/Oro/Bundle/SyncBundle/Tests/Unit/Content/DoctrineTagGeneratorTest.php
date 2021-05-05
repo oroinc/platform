@@ -22,7 +22,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
     const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub';
     const TEST_ASSOCIATION_FIELD = 'testField';
 
-    /** @var  DoctrineTagGenerator */
+    /** @var DoctrineTagGenerator */
     protected $generator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */

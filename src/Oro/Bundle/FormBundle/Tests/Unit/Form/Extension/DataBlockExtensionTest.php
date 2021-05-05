@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DataBlockExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  DataBlockExtension */
+    /** @var DataBlockExtension */
     private $formExtension;
 
     /** @var array */

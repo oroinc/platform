@@ -23,7 +23,7 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var OptionsHelper */
     protected $helper;
 
-    /** @var HtmlTagHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
 
     /**
@@ -31,10 +31,10 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->router = self::createMock(Router::class);
+        $this->router = $this->createMock(Router::class);
         $this->router->expects(self::any())->method('generate')->willReturn('generated-url');
 
-        $this->translator = self::createMock(TranslatorInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($id, $parameters) {
@@ -42,8 +42,8 @@ class OptionsHelperTest extends \PHPUnit\Framework\TestCase
                 return sprintf('[trans]%s[%s][/trans]', $id, $parameters);
             });
 
-        $this->formProvider = self::createMock(FormProvider::class);
-        $this->htmlTagHelper = self::createMock(HtmlTagHelper::class);
+        $this->formProvider = $this->createMock(FormProvider::class);
+        $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
 
         $this->helper = new OptionsHelper(
             $this->router,

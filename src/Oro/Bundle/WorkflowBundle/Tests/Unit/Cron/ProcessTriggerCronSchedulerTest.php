@@ -33,7 +33,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $processDefinitionMock->expects($this->once())->method('getName')->willReturn('process-definition-name');
 
-        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $trigger * */
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->any())->method('getCron')->willReturn($cronExpression);
 
@@ -85,7 +84,6 @@ class ProcessTriggerCronSchedulerTest extends \PHPUnit\Framework\TestCase
 
     public function testAddException()
     {
-        /** @var ProcessTrigger|\PHPUnit\Framework\MockObject\MockObject $trigger * */
         $trigger = $this->createMock(ProcessTrigger::class);
         $trigger->expects($this->once())->method('getCron')->willReturn(null);
 

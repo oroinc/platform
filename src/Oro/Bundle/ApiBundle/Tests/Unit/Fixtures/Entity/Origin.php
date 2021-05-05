@@ -31,13 +31,13 @@ class Origin
     /**
      * @ORM\ManyToOne(targetEntity="User")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     **/
+     */
     protected $user;
 
     /**
      * @ORM\ManyToMany(targetEntity="User")
      * @ORM\JoinTable(name="origin_to_user")
-     **/
+     */
     protected $users;
 
     public function __construct()

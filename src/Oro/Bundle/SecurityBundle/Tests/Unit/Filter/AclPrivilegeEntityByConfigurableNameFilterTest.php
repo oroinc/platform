@@ -48,7 +48,6 @@ class AclPrivilegeEntityByConfigurableNameFilterTest extends AbstractAclPrivileg
      */
     public function testFilter(string $configurableName, bool $expected): void
     {
-        /** @var ConfigurablePermission|\PHPUnit_Framework_MockObject_MockObject $configurablePermission */
         $configurablePermission = $this->createMock(ConfigurablePermission::class);
         $configurablePermission->expects($this->any())
             ->method('getName')

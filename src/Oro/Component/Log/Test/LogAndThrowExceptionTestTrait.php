@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
  */
 trait LogAndThrowExceptionTestTrait
 {
-    /** @var LoggerInterface|MockObject  */
+    /** @var LoggerInterface|MockObject */
     private LoggerInterface $logger;
 
     /**

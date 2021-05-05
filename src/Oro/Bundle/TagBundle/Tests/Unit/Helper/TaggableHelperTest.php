@@ -13,7 +13,7 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TaggableHelper */
     private $helper;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     private $configProvider;
 
     protected function setUp(): void

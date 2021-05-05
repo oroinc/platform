@@ -15,7 +15,7 @@ class ChangePasswordSubscriberTest extends FormIntegrationTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $tokenAccessor;
 
-    /** @var  ChangePasswordSubscriber */
+    /** @var ChangePasswordSubscriber */
     protected $subscriber;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */

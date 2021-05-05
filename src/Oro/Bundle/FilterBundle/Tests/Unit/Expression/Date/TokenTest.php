@@ -9,7 +9,7 @@ class TokenTest extends \PHPUnit\Framework\TestCase
     protected $testType;
     protected $testValue;
 
-    /** @var  Token */
+    /** @var Token */
     protected $token;
 
     protected function setUp(): void

@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
 
 class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $finderBuilder;
 
     /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */

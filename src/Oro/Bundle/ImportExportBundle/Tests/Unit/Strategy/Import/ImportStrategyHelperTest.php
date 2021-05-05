@@ -38,7 +38,7 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject | FieldHelper */
     protected $fieldHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigProvider  */
+    /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigProvider */
     protected $extendConfigProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject | ConfigurableTableDataConverter */

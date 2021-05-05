@@ -3,12 +3,15 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
@@ -30,16 +33,9 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->actionFactory = $this->createMock('Oro\Component\Action\Action\ActionFactoryInterface');
-
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ActionGroup\ParametersResolver $parametersResolver */
-        $parametersResolver = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver'
-        )->disableOriginalConstructor()->getMock();
+        $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->conditionFactory = $this->createMock(ExpressionFactory::class);
+        $parametersResolver = $this->createMock(ParametersResolver::class);
 
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
@@ -90,7 +86,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         $errors = new ArrayCollection();
 
         if ($exceptionMessage) {
-            $this->expectException(\Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException::class);
+            $this->expectException(ForbiddenActionGroupException::class);
             $this->expectExceptionMessage($exceptionMessage);
         }
 
@@ -211,9 +207,10 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
      */
     protected function createActionGroup(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects, ActionData $data)
     {
-        /* @var $action ActionInterface|\PHPUnit\Framework\MockObject\MockObject */
-        $action = $this->createMock('Oro\Component\Action\Action\ActionInterface');
-        $action->expects($expects)->method('execute')->with($data);
+        $action = $this->createMock(ActionInterface::class);
+        $action->expects($expects)
+            ->method('execute')
+            ->with($data);
 
         return $action;
     }
@@ -229,11 +226,11 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
         ActionData $data,
         $returnValue
     ) {
-        /* @var $condition ConfigurableCondition|\PHPUnit\Framework\MockObject\MockObject */
-        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $condition->expects($expects)->method('evaluate')->with($data)->willReturn($returnValue);
+        $condition = $this->createMock(ConfigurableCondition::class);
+        $condition->expects($expects)
+            ->method('evaluate')
+            ->with($data)
+            ->willReturn($returnValue);
 
         return $condition;
     }

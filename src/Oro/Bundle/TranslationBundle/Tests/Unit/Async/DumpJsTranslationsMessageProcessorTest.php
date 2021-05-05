@@ -13,7 +13,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DumpJsTranslationsMessageProcessor  */
+    /** @var DumpJsTranslationsMessageProcessor */
     private $processor;
 
     /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */

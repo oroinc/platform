@@ -50,7 +50,7 @@ class ItemControllerTest extends WebTestCase
 
     public function testViewPage()
     {
-        /* @var $item Item */
+        /* @var Item $item */
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_view', ['id' => $item->getId()]));
@@ -80,7 +80,7 @@ class ItemControllerTest extends WebTestCase
 
     public function testUpdatePage()
     {
-        /* @var $item Item */
+        /* @var Item $item */
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_update', ['id' => $item->getId()]));

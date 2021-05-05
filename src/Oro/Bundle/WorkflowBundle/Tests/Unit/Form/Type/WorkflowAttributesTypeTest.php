@@ -129,7 +129,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 }
             );
 
-        /* @var $builder FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->at(1))
             ->method('add')

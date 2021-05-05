@@ -10,13 +10,13 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
 
 class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|EmailThreadProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     protected $em;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject|EmailThreadManager */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailThreadManager */
     protected $emailThreadManager;
 
     /** @var array */

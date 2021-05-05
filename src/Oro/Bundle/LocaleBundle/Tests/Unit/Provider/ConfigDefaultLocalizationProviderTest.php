@@ -11,7 +11,7 @@ class ConfigDefaultLocalizationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
     private $localizationManager;
 
-    /** @var ConfigDefaultLocalizationProvider $provider */
+    /** @var ConfigDefaultLocalizationProvider */
     private $provider;
 
     /**

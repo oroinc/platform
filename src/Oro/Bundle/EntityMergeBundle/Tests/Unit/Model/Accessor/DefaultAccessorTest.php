@@ -8,9 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class DefaultAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DefaultAccessor $fieldAccessor;
-     */
+    /** @var DefaultAccessor */
     protected $accessor;
 
     protected function setUp(): void

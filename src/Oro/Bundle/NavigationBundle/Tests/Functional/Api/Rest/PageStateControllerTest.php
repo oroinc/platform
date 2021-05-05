@@ -4,7 +4,6 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\PageStateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\Response;
 
 class PageStateControllerTest extends WebTestCase
 {
@@ -44,7 +43,6 @@ class PageStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 201);
@@ -77,7 +75,6 @@ class PageStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 204);
@@ -100,7 +97,6 @@ class PageStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
@@ -127,7 +123,6 @@ class PageStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 404);
@@ -150,7 +145,6 @@ class PageStateControllerTest extends WebTestCase
             $this->generateWsseAuthHeader()
         );
 
-        /** @var $result Response */
         $result = $this->client->getResponse();
 
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
