@@ -236,6 +236,29 @@ define(function(require) {
         }
     }
 
+    function preventOverlapSelectResults() {
+        const dropMask = document.getElementById('select2-drop-mask');
+        const container = this.container.get(0);
+        const dropdown = this.dropdown.get(0);
+
+        const {x: containerX, y: containerY, width: containerWidth} = container.getBoundingClientRect();
+        const {x: dropdownX, y: dropdownY, width: dropdownWidth} = dropdown.getBoundingClientRect();
+
+        dropMask.style.display = 'none';
+        const foundContainer = document.elementsFromPoint(containerX + containerWidth / 2, containerY);
+        const foundDropdown = document.elementsFromPoint(dropdownX + dropdownWidth / 2, dropdownY);
+
+        const foundOverlapFixed = [...foundContainer, ...foundDropdown].find(
+            element => getComputedStyle(element, null).getPropertyValue('position') === 'fixed'
+        );
+
+        if (foundOverlapFixed) {
+            this.close();
+            return;
+        }
+        dropMask.style.display = '';
+    }
+
     const overrideMethods = {
         moveHighlight: function(original, ...rest) {
             if (this.highlight() === -1) {
@@ -449,6 +472,10 @@ define(function(require) {
             this.results.attr('aria-expanded', true);
             this.results.attr('aria-hidden', false);
 
+            if (this.opts.closeOnOverlap && !this.dropdownFixedMode) {
+                $(window).on('scroll.select2Overlaps', preventOverlapSelectResults.bind(this));
+            }
+
             return open.call(this);
         };
 
@@ -461,6 +488,10 @@ define(function(require) {
             this.results.attr('aria-expanded', false);
             this.results.attr('aria-hidden', true);
             this._activedescendantElements.removeAttr('aria-activedescendant');
+
+            if (this.opts.closeOnOverlap && !this.dropdownFixedMode) {
+                $(window).off('scroll.select2Overlaps');
+            }
         };
 
         prototype.init = function(opts) {
