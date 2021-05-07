@@ -62,6 +62,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
      */
     public function clearOidCache(ObjectIdentityInterface $oid)
     {
+        unset($this->notFoundAcls[$this->getOidKey($oid->getType(), $oid->getIdentifier())]);
         $this->cache->evictFromCacheByIdentity($oid);
     }
 
@@ -223,6 +224,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         }
 
         // re-read the ACL from the database to ensure proper caching, etc.
+        unset($this->notFoundAcls[$this->getOidKey($oid->getType(), $oid->getIdentifier())]);
         return $this->findAcl($oid);
     }
 
@@ -252,6 +254,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
 
         // evict the ACL from the in-memory identity map
         $oidKey = $this->getOidKey($oid->getType(), $oid->getIdentifier());
+        unset($this->notFoundAcls[$oidKey]);
         if (isset($this->loadedAcls[$oidKey])) {
             foreach ($this->loadedAcls[$oidKey] as $acl) {
                 $this->propertyChanges->offsetUnset($acl);
@@ -483,6 +486,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
                 $acl->getObjectIdentity()->getType(),
                 $acl->getObjectIdentity()->getIdentifier()
             );
+            unset($this->notFoundAcls[$oidKey]);
             $emptySidKey = $this->getSidKey([]);
             foreach ($this->loadedAcls[$oidKey] as $sidKey => $sameTypeAcl) {
                 if ($sidKey !== $emptySidKey) {

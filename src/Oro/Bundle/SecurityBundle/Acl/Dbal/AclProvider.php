@@ -59,6 +59,9 @@ class AclProvider implements AclProviderInterface
     /** @var \SplObjectStorage[] [ace id => SplObjectStorage (acl => ace, ...), ...] */
     protected $loadedAces = [];
 
+    /** @var array [oid key => [sid key => bool, ...], ...] */
+    protected $notFoundAcls = [];
+
     /**
      * @param Connection                          $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
@@ -186,7 +189,7 @@ class AclProvider implements AclProviderInterface
             }
 
             // looks like we have to load the ACL from the database
-            if (!$aclFound) {
+            if (!$aclFound && empty($this->notFoundAcls[$oidKey][$sidKey])) {
                 $currentBatch[] = $oid;
             }
 
@@ -196,6 +199,7 @@ class AclProvider implements AclProviderInterface
                 try {
                     $loadedBatch = $this->lookupObjectIdentities($currentBatch, $sids, $oidLookup);
                 } catch (AclNotFoundException $e) {
+                    $this->notFoundAcls[$oidKey][$sidKey] = true;
                     if ($result->count()) {
                         $partialResultException = new NotAllAclsFoundException(
                             'The provider could not find ACLs for all object identities.'
@@ -225,6 +229,9 @@ class AclProvider implements AclProviderInterface
         // check that we got ACLs for all the identities
         foreach ($oids as $oid) {
             if (!$result->contains($oid)) {
+                $oidKey = $this->getOidKey($oid->getType(), $oid->getIdentifier());
+                $this->notFoundAcls[$oidKey][$sidKey] = true;
+
                 if (1 === count($oids)) {
                     $objectName = method_exists($oid, '__toString') ? $oid : get_class($oid);
                     throw new AclNotFoundException(sprintf('No ACL found for %s.', $objectName));
