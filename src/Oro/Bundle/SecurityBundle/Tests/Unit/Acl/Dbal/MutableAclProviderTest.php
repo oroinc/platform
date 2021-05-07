@@ -3,14 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Dbal;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Statement;
 use Oro\Bundle\SecurityBundle\Acl\Cache\AclCache;
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
@@ -27,6 +31,9 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var PermissionGrantingStrategyInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $permissionGrantingStrategy;
+
+    /** @var SecurityIdentityToStringConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $sidConverter;
 
     /** @var AclCache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
@@ -54,13 +61,21 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->permissionGrantingStrategy = $this->createMock(PermissionGrantingStrategyInterface::class);
         $this->cache = $this->createMock(AclCache::class);
+        $this->sidConverter = $this->createMock(SecurityIdentityToStringConverterInterface::class);
 
         $this->provider = new MutableAclProvider(
             $this->connection,
             $this->permissionGrantingStrategy,
-            ['sid_table_name' => 'acl_security_identities'],
+            [
+                'sid_table_name' => 'acl_security_identities',
+                'oid_table_name' => 'acl_oid_table',
+                'class_table_name' => 'acl_class_table',
+                'oid_ancestors_table_name' => 'acl_oid_ancestors_table',
+                'entry_table_name' => 'acl_entry_table'
+            ],
             $this->cache
         );
+        $this->provider->setSecurityIdentityToStringConverter($this->sidConverter);
     }
 
     public function testBeginTransaction()
@@ -246,5 +261,97 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
             ->with($oid);
 
         $this->provider->clearOidCache($oid);
+    }
+
+    public function testFindAclsAclNotFoundExceptionThrownForEmptyAncestorIdsAndDbQueriesExecutedOnlyOnce()
+    {
+        $oid = new ObjectIdentity('(root)', 'entity');
+        $sid = new RoleSecurityIdentity('ROLE_TEST');
+
+        $stmt = $this->createMock(ResultStatement::class);
+        $stmt->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->with(
+                'SELECT a.ancestor_id FROM acl_oid_table o INNER JOIN acl_class_table c ON c.id = o.class_id'
+                . ' INNER JOIN acl_oid_ancestors_table a ON a.object_identity_id = o.id'
+                . ' WHERE (o.object_identifier IN (?) AND c.class_type = ?)',
+                [['(root)'], 'entity'],
+                [Connection::PARAM_STR_ARRAY, ParameterType::STRING]
+            )
+            ->willReturn($stmt);
+
+        $exceptionCount = 0;
+        try {
+            $this->provider->findAcls([$oid], [$sid]);
+        } catch (AclNotFoundException $e) {
+            $exceptionCount++;
+        }
+        try {
+            $this->provider->findAcls([$oid], [$sid]);
+        } catch (AclNotFoundException $e) {
+            $exceptionCount++;
+        }
+
+        $this->assertEquals(2, $exceptionCount);
+    }
+
+    public function testFindAclsAclNotFoundExceptionThrownForNonEmptyAncestorIdsAndDbQueriesExecutedOnlyOnce()
+    {
+        $oid = new ObjectIdentity('(root)', 'entity');
+        $sid = new RoleSecurityIdentity('ROLE_TEST');
+
+        $stmtAncestors = $this->createMock(Statement::class);
+        $stmtAncestors->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([[1]]);
+
+        $stmtIdentities = $this->createMock(Statement::class);
+        $stmtIdentities->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);
+        $this->connection->expects($this->exactly(2))
+            ->method('executeQuery')
+            ->withConsecutive(
+                [
+                    'SELECT a.ancestor_id FROM acl_oid_table o INNER JOIN acl_class_table c ON c.id = o.class_id'
+                    . ' INNER JOIN acl_oid_ancestors_table a ON a.object_identity_id = o.id'
+                    . ' WHERE (o.object_identifier IN (?) AND c.class_type = ?)',
+                    [['(root)'], 'entity'],
+                    [Connection::PARAM_STR_ARRAY, ParameterType::STRING]
+                ],
+                [
+                    'SELECT o.id as acl_id, o.object_identifier, o.parent_object_identity_id, o.entries_inheriting,'
+                    . ' c.class_type, e.id as ace_id, e.object_identity_id, e.field_name, e.ace_order, e.mask,'
+                    . ' e.granting, e.granting_strategy, e.audit_success, e.audit_failure, s.username,'
+                    . ' s.identifier as security_identifier FROM acl_oid_table o INNER JOIN acl_class_table c '
+                    . 'ON c.id = o.class_id LEFT JOIN acl_entry_table e ON e.class_id = o.class_id '
+                    . 'AND (e.object_identity_id = o.id OR e.object_identity_id IS NULL) LEFT JOIN '
+                    . 'acl_security_identities s ON s.id = e.security_identity_id '
+                    . 'WHERE o.id in (?) AND s.identifier in (?)',
+                    [[1], ['ROLE_TEST']],
+                    [Connection::PARAM_INT_ARRAY, Connection::PARAM_STR_ARRAY]
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $stmtAncestors,
+                $stmtIdentities
+            );
+
+        $exceptionCount = 0;
+        try {
+            $this->provider->findAcls([$oid], [$sid]);
+        } catch (AclNotFoundException $e) {
+            $exceptionCount++;
+        }
+        try {
+            $this->provider->findAcls([$oid], [$sid]);
+        } catch (AclNotFoundException $e) {
+            $exceptionCount++;
+        }
+
+        $this->assertEquals(2, $exceptionCount);
     }
 }
