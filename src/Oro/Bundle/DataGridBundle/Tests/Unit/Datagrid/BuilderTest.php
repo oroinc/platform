@@ -17,6 +17,7 @@ use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BuilderTest extends \PHPUnit\Framework\TestCase
@@ -69,7 +70,7 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $parameters->expects($this->once())
             ->method('get')
             ->with(ParameterBag::MINIFIED_PARAMETERS)
-            ->will($this->returnValue($minifiedParams));
+            ->willReturn($minifiedParams);
 
         if (is_array($minifiedParams) && array_key_exists('g', $minifiedParams) && is_array($minifiedParams['g'])) {
             $parameters->expects($this->once())
@@ -80,25 +81,24 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
                 ->method('add');
         }
 
-        foreach ($raisedEvents as $at => $eventDetails) {
-            [$name, $eventType] = $eventDetails;
-            $this->eventDispatcher->expects($this->at($at))->method('dispatch')
-                ->with(
-                    $this->callback(
-                        function ($event) use ($eventType, $resultFQCN) {
-                            $this->assertInstanceOf($eventType, $event);
-                            if ($event instanceof GridEventInterface) {
-                                $this->assertInstanceOf($resultFQCN, $event->getDatagrid());
-                            }
+        $with = [];
+        $will = [];
+        foreach ($raisedEvents as [$name, $eventType]) {
+            $with[] = [$this->anything(), $name];
+            $will[] = new ReturnCallback(function ($event) use ($eventType, $resultFQCN) {
+                $this->assertInstanceOf($eventType, $event);
+                if ($event instanceof GridEventInterface) {
+                    $this->assertInstanceOf($resultFQCN, $event->getDatagrid());
+                }
 
-                            return true;
-                        }
-                    ),
-                    $this->equalTo($name)
-                );
+                return true;
+            });
         }
+        $this->eventDispatcher->expects($this->exactly(count($raisedEvents)))
+            ->method('dispatch')
+            ->withConsecutive(...$with)
+            ->willReturnOnConsecutiveCalls(...$will);
 
-        /** @var DatagridInterface $result */
         $result = $builder->build($config, $parameters, $additionalParams);
         $this->assertInstanceOf($resultFQCN, $result);
 
@@ -193,9 +193,11 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         $builder = $this->getBuilder($dataSources);
         $grid = $this->createMock(DatagridInterface::class);
 
-        foreach ($dataSources as $type => $obj) {
+        foreach ($dataSources as $obj) {
             if ($processCallExpects) {
-                $obj->expects($this->once())->method('process')->with($grid);
+                $obj->expects($this->once())
+                    ->method('process')
+                    ->with($grid);
             }
         }
 
@@ -214,8 +216,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
      */
     public function buildDatasourceProvider()
     {
-        $datasourceMock = $this->createMock(DatasourceInterface::class);
-
         return [
             'Datasource not configured, exceptions should be thrown' => [
                 DatagridConfiguration::create([]),
@@ -229,20 +229,14 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
             ],
             'Configured correct and allowed'                         => [
                 DatagridConfiguration::create(['source' => ['type' => self::TEST_DATASOURCE_TYPE]]),
-                [self::TEST_DATASOURCE_TYPE => clone $datasourceMock],
+                [self::TEST_DATASOURCE_TYPE => $this->createMock(DatasourceInterface::class)],
                 null,
                 true
             ]
         ];
     }
 
-    /**
-     * @param array $dataSources
-     * @param array $extensions
-     *
-     * @return Builder
-     */
-    private function getBuilder(array $dataSources = [], array $extensions = [])
+    private function getBuilder(array $dataSources = [], array $extensions = []): Builder
     {
         $dataSourceContainerBuilder = TestContainerBuilder::create();
         foreach ($dataSources as $name => $dataSource) {
@@ -256,7 +250,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
             $dataSourceContainerBuilder->getContainer($this),
             $extensions
         );
-
         $builder->setMemoryCacheProvider($this->memoryCacheProvider);
 
         return $builder;
@@ -264,17 +257,15 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
 
 
     /**
-     * @param bool $isApplicable
-     *
      * @return ExtensionVisitorInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getExtensionVisitorMock(bool $isApplicable = true)
     {
-        $extMock = $this->createMock(ExtensionVisitorInterface::class);
-        $extMock->expects($this->any())
+        $extension = $this->createMock(ExtensionVisitorInterface::class);
+        $extension->expects($this->any())
             ->method('isApplicable')
             ->willReturn($isApplicable);
 
-        return $extMock;
+        return $extension;
     }
 }
