@@ -7,18 +7,19 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
     /** @var DataFixturesExecutor */
-    protected $dataFixturesExecutor;
+    private $dataFixturesExecutor;
 
     protected function setUp(): void
     {
@@ -40,28 +41,30 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
             $logMessages[] = $message;
         };
 
-        $this->eventDispatcher->expects(self::at(0))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
-            ->with(
-                self::isInstanceOf(MigrationDataFixturesEvent::class),
-                MigrationEvents::DATA_FIXTURES_PRE_LOAD
+            ->withConsecutive(
+                [
+                    self::isInstanceOf(MigrationDataFixturesEvent::class),
+                    MigrationEvents::DATA_FIXTURES_PRE_LOAD
+                ],
+                [
+                    self::isInstanceOf(MigrationDataFixturesEvent::class),
+                    MigrationEvents::DATA_FIXTURES_POST_LOAD
+                ]
             )
-            ->willReturnCallback(function (MigrationDataFixturesEvent $event, $eventName) {
-                self::assertSame($this->em, $event->getObjectManager());
-                self::assertEquals('test', $event->getFixturesType());
-                $event->log('pre load');
-            });
-        $this->eventDispatcher->expects(self::at(1))
-            ->method('dispatch')
-            ->with(
-                self::isInstanceOf(MigrationDataFixturesEvent::class),
-                MigrationEvents::DATA_FIXTURES_POST_LOAD
-            )
-            ->willReturnCallback(function (MigrationDataFixturesEvent $event, $eventName) {
-                self::assertSame($this->em, $event->getObjectManager());
-                self::assertEquals('test', $event->getFixturesType());
-                $event->log('post load');
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function (MigrationDataFixturesEvent $event) {
+                    self::assertSame($this->em, $event->getObjectManager());
+                    self::assertEquals('test', $event->getFixturesType());
+                    $event->log('pre load');
+                }),
+                new ReturnCallback(function (MigrationDataFixturesEvent $event) {
+                    self::assertSame($this->em, $event->getObjectManager());
+                    self::assertEquals('test', $event->getFixturesType());
+                    $event->log('post load');
+                })
+            );
 
         $this->em->expects(self::once())
             ->method('transactional');

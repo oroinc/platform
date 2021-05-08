@@ -18,21 +18,19 @@ class AssetsVersionHandlerTest extends \PHPUnit\Framework\TestCase
     ) {
         $io = $this->createMock('Composer\IO\IOInterface');
 
-        $writeIndex = 0;
+        $writes = [];
         if ($isAssetsVersionChanged) {
-            $io->expects($this->at($writeIndex))
-                ->method('write')
-                ->with('<info>Updating the "assets_version" parameter</info>');
-            $writeIndex++;
+            $writes[] = ['<info>Updating the "assets_version" parameter</info>'];
         }
         if ($isAssetsVersionStrategyChanged) {
-            $io->expects($this->at($writeIndex))
-                ->method('write')
-                ->with('<info>Initializing the "assets_version_strategy" parameter</info>');
+            $writes[] = ['<info>Initializing the "assets_version_strategy" parameter</info>'];
         }
+        $io->expects($this->exactly(count($writes)))
+            ->method('write')
+            ->withConsecutive(...$writes);
 
-        $handler        = new AssetsVersionHandler($io);
-        $result         = $handler->setAssetsVersion($parameters, $options);
+        $handler = new AssetsVersionHandler($io);
+        $result = $handler->setAssetsVersion($parameters, $options);
         $expectedResult = $isAssetsVersionChanged || $isAssetsVersionStrategyChanged;
 
         // set expected assets_version for the time_hash strategy
