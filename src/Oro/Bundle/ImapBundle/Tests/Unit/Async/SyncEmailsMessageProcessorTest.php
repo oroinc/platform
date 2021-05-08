@@ -15,56 +15,48 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new SyncEmailsMessageProcessor(
-            $this->createMessageProducerMock(),
-            $this->createLoggerMock()
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectMessageIfInvalidMessage()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode(['key' => 'value']));
 
-        $processor = new SyncEmailsMessageProcessor($this->createMessageProducerMock(), $logger);
+        $processor = new SyncEmailsMessageProcessor($this->createMock(MessageProducerInterface::class), $logger);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldSendMessagesToSyncEmailTopic()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('critical')
-        ;
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('critical');
 
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->at(0))
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->exactly(2))
             ->method('send')
-            ->with($this->equalTo(Topics::SYNC_EMAIL), $this->identicalTo(['id' => 1]))
-        ;
-        $producer
-            ->expects($this->at(1))
-            ->method('send')
-            ->with($this->equalTo(Topics::SYNC_EMAIL), $this->identicalTo(['id' => 2]))
-        ;
+            ->withConsecutive(
+                [Topics::SYNC_EMAIL, $this->identicalTo(['id' => 1])],
+                [Topics::SYNC_EMAIL, $this->identicalTo(['id' => 2])]
+            );
 
         $message = new Message();
         $message->setBody(json_encode(['ids' => [1,2]]));
 
         $processor = new SyncEmailsMessageProcessor($producer, $logger);
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -75,29 +67,5 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
             [Topics::SYNC_EMAILS],
             SyncEmailsMessageProcessor::getSubscribedTopics()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
     }
 }
