@@ -50,12 +50,9 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->contentProviderManager->expects($this->exactly(2))
             ->method('enableContentProvider');
-        $this->contentProviderManager->expects($this->at(0))
+        $this->contentProviderManager->expects($this->exactly(2))
             ->method('enableContentProvider')
-            ->with('test1');
-        $this->contentProviderManager->expects($this->at(1))
-            ->method('enableContentProvider')
-            ->with('test2');
+            ->withConsecutive(['test1'], ['test2']);
 
         $request = $this->createMock(Request::class);
 

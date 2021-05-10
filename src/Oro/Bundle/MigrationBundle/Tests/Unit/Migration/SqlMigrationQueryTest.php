@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $connection;
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
+    private $connection;
 
     protected function setUp(): void
     {
-        $this->connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connection = $this->createMock(Connection::class);
         $this->connection->expects($this->any())
             ->method('getDatabasePlatform')
-            ->will($this->returnValue(new MySqlPlatform()));
+            ->willReturn(new MySqlPlatform());
     }
 
     public function testConstructorWithString()
@@ -92,15 +91,13 @@ class SqlMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
         $logger = new ArrayLogger();
 
-        $this->connection->expects($this->at(0))
+        $this->connection->expects($this->exactly(3))
             ->method('executeStatement')
-            ->with('INSERT INTO test_table (name) VALUES (\'name\')');
-        $this->connection->expects($this->at(1))
-            ->method('executeStatement')
-            ->with('INSERT INTO test_table (name) VALUES (\'name\')');
-        $this->connection->expects($this->at(2))
-            ->method('executeStatement')
-            ->with('INSERT INTO test_table (test) VALUES (1)');
+            ->withConsecutive(
+                ['INSERT INTO test_table (name) VALUES (\'name\')'],
+                ['INSERT INTO test_table (name) VALUES (\'name\')'],
+                ['INSERT INTO test_table (test) VALUES (1)']
+            );
 
         $query->addSql('INSERT INTO test_table (name) VALUES (\'name\')');
         $query->execute($logger);

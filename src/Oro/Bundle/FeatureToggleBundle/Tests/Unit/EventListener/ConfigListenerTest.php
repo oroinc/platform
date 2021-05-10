@@ -14,35 +14,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventDispatcher;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    /**
-     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureConfigManager;
+    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureConfigManager;
 
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var ConfigListener
-     */
-    protected $configListener;
+    /** @var ConfigListener */
+    private $configListener;
 
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->featureConfigManager = $this->getMockBuilder(ConfigurationManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureConfigManager = $this->createMock(ConfigurationManager::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->configListener = new ConfigListener(
             $this->eventDispatcher,
             $this->featureConfigManager,
@@ -67,11 +56,6 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
             ->with($feature1)
             ->willReturn([$feature2, $feature3]);
 
-        /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager */
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->featureConfigManager->expects($this->once())
             ->method('getFeatureByToggle')
             ->with($configKey)
@@ -85,6 +69,7 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
                 ['feature3', null, true],
             ]);
 
+        $configManager = $this->createMock(ConfigManager::class);
         $event = new ConfigSettingsUpdateEvent($configManager, [$configKey => []]);
         $this->configListener->onSettingsSaveBefore($event);
 
@@ -134,12 +119,12 @@ class ConfigListenerTest extends \PHPUnit\Framework\TestCase
         $this->featureChecker->expects($this->once())
             ->method('resetCache');
 
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->with(new FeaturesChange(['feature2' => true]), FeaturesChange::NAME);
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(new FeatureChange('feature2', true), FeatureChange::NAME . '.feature2');
+            ->withConsecutive(
+                [new FeaturesChange(['feature2' => true]), FeaturesChange::NAME],
+                [new FeatureChange('feature2', true), FeatureChange::NAME . '.feature2']
+            );
 
         $this->configListener->onUpdateAfter();
     }

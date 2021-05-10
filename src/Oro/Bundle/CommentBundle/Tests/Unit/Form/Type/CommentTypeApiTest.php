@@ -4,69 +4,66 @@ namespace Oro\Bundle\CommentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 use Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
-use Symfony\Component\Form\FormBuilderInterface;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testBuildForm()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject | FormBuilderInterface $builder */
-        $builder = $this->createMock('\Symfony\Component\Form\FormBuilder');
-        $builder->expects($this->at(0))
+        $builder = $this->createMock(FormBuilder::class);
+        $builder->expects($this->exactly(2))
             ->method('add')
-            ->with(
-                'message',
-                OroResizeableRichTextType::class,
+            ->withConsecutive(
                 [
-                    'required' => true,
-                    'label'    => 'oro.comment.message.label',
-                    'attr'     => [
-                        'class'       => 'comment-text-field',
-                        'placeholder' => 'oro.comment.message.placeholder'
-                    ],
-                    'constraints' => [ new HtmlNotBlank() ]
+                    'message',
+                    OroResizeableRichTextType::class,
+                    [
+                        'required' => true,
+                        'label'    => 'oro.comment.message.label',
+                        'attr'     => [
+                            'class'       => 'comment-text-field',
+                            'placeholder' => 'oro.comment.message.placeholder'
+                        ],
+                        'constraints' => [ new HtmlNotBlank() ]
+                    ]
+                ],
+                [
+                    'attachment',
+                    ImageType::class,
+                    ['label' => 'oro.comment.attachment.label', 'required' => false]
                 ]
             )
-            ->will($this->returnSelf());
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'attachment',
-                ImageType::class,
-                ['label' => 'oro.comment.attachment.label', 'required' => false]
+            ->willReturnSelf();
+        $builder->expects($this->exactly(2))
+            ->method('addEventSubscriber')
+            ->withConsecutive(
+                [$this->isInstanceOf(PatchSubscriber::class)],
+                [$this->isInstanceOf(CommentSubscriber::class)]
             )
-            ->will($this->returnSelf());
-        $builder->expects($this->at(2))
-            ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'))
-            ->will($this->returnSelf());
-        $builder->expects($this->at(3))
-            ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber'))
-            ->will($this->returnSelf());
+            ->willReturnSelf();
+
         $formType = new CommentTypeApi($this->configManager);
         $formType->buildForm($builder, []);
     }
 
     public function testConfigureOptions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject | OptionsResolver $resolver */
-        $resolver = $this->createMock('\Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([

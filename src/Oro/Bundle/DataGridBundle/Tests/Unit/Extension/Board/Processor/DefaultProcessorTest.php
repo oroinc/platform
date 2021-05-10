@@ -59,48 +59,46 @@ class DefaultProcessorTest extends \PHPUnit\Framework\TestCase
         $this->entityClassResolver->expects($this->once())
             ->method('getEntityClass')
             ->with('Test:Entity')
-            ->will($this->returnValue('Test\Entity'));
+            ->willReturn('Test\Entity');
         $entityMetaData = $this->createMock(ClassMetadata::class);
         $entityMetaData->expects($this->once())
             ->method('hasAssociation')
             ->with('group_field')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $entityMetaData->expects($this->once())
             ->method('getAssociationMapping')
             ->with('group_field')
-            ->will($this->returnValue(['type' => ClassMetadata::MANY_TO_ONE]));
+            ->willReturn(['type' => ClassMetadata::MANY_TO_ONE]);
         $entityMetaData->expects($this->once())
             ->method('getAssociationTargetClass')
             ->with('group_field')
-            ->will($this->returnValue('target_entity'));
-        $this->em->expects($this->at(0))
-            ->method('getClassMetadata')
-            ->with('Test\Entity')
-            ->will($this->returnValue($entityMetaData));
+            ->willReturn('target_entity');
 
         $targetMetaData = $this->createMock(ClassMetadata::class);
         $targetMetaData->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
 
-        $this->em->expects($this->at(1))
+        $this->em->expects($this->exactly(2))
             ->method('getClassMetadata')
-            ->with('target_entity')
-            ->will($this->returnValue($targetMetaData));
+            ->willReturnMap([
+                ['Test\Entity', $entityMetaData],
+                ['target_entity', $targetMetaData]
+            ]);
 
         $this->choiceHelper->expects($this->once())
             ->method('guessLabelField')
             ->with($targetMetaData, 'group_field')
-            ->will($this->returnValue('label'));
+            ->willReturn('label');
         $choices = [
             'Identification Alignment' => 'identification_alignment',
-            'In Progress' => 'in_progress',
-            'Lost' => 'lost',
+            'In Progress'              => 'in_progress',
+            'Lost'                     => 'lost',
         ];
         $this->choiceHelper->expects($this->once())
             ->method('getChoices')
             ->with('target_entity', 'id', 'label')
-            ->will($this->returnValue($choices));
+            ->willReturn($choices);
 
         $boardConfig = [
             Configuration::GROUP_KEY => [

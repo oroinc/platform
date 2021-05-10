@@ -41,11 +41,8 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getTitlesDataProvider
-     *
-     * @param int $duplicatedCount
-     * @param array $expectedTitles
      */
-    public function testGetTitles(int $duplicatedCount, array $expectedTitles): void
+    public function testGetTitles(array $duplicatedCount, array $expectedTitles): void
     {
         $navigationItem = new NavigationItemStub([
             'title' => self::TITLE_TEMPLATE,
@@ -53,47 +50,47 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
             'user' => $user = $this->createMock(AbstractUser::class),
         ]);
 
-        $this->titleService
-            ->expects(self::exactly(2))
+        $this->titleService->expects(self::exactly(2))
             ->method('render')
             ->willReturnMap([
-                [[], self::TITLE_TEMPLATE, null, null, true, false, $title = 'sample-title'],
-                [[], self::TITLE_TEMPLATE, null, null, true, true, $titleShort = 'sample-title-short'],
+                [[], self::TITLE_TEMPLATE, null, null, true, false, 'sample-title'],
+                [[], self::TITLE_TEMPLATE, null, null, true, true, 'sample-title-short']
             ]);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $pinbarTabRepository = $this->createMock(PinbarTabRepository::class);
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(PinbarTab::class)
-            ->willReturn($pinbarTabRepository = $this->createMock(PinbarTabRepository::class));
-
-        $pinbarTabRepository
-            ->expects(self::at(0))
+            ->willReturn($pinbarTabRepository);
+        $with = [];
+        $will = [];
+        foreach ($duplicatedCount as [$title, $count]) {
+            $with[] = [$title, $user, $organization];
+            $will[] = $count;
+        }
+        $pinbarTabRepository->expects(self::exactly(count($duplicatedCount)))
             ->method('countPinbarTabDuplicatedTitles')
-            ->with($titleShort, $user, $organization)
-            ->willReturn($duplicatedCount);
+            ->withConsecutive(...$with)
+            ->willReturnOnConsecutiveCalls(...$will);
 
         $titles = $this->provider->getTitles($navigationItem);
 
         self::assertEquals($expectedTitles, $titles);
     }
 
-    /**
-     * @return array
-     */
     public function getTitlesDataProvider(): array
     {
         return [
             'no duplicated titles' => [
-                'duplicatedCount' => 0,
+                'duplicatedCount' => [['sample-title-short', 0]],
                 'expectedTitles' => ['sample-title', 'sample-title-short'],
             ],
             '1 duplicated title' => [
-                'duplicatedCount' => 1,
+                'duplicatedCount' => [['sample-title-short', 1], ['sample-title-short (2)', 0]],
                 'expectedTitles' => ['sample-title (2)', 'sample-title-short (2)'],
             ],
             '2 duplicated title' => [
-                'duplicatedCount' => 2,
+                'duplicatedCount' => [['sample-title-short', 2], ['sample-title-short (3)', 0]],
                 'expectedTitles' => ['sample-title (3)', 'sample-title-short (3)'],
             ],
         ];
@@ -107,37 +104,30 @@ class PinbarTabTitleProviderTest extends \PHPUnit\Framework\TestCase
             'user' => $user = $this->createMock(AbstractUser::class),
         ]);
 
-        $this->titleService
-            ->expects(self::exactly(2))
+        $this->titleService->expects(self::exactly(2))
             ->method('render')
             ->willReturnMap([
-                [[], self::TITLE_TEMPLATE, null, null, true, false, $title = 'sample-title'],
-                [[], self::TITLE_TEMPLATE, null, null, true, true, $titleShort = 'sample-title-short'],
+                [[], self::TITLE_TEMPLATE, null, null, true, false, 'sample-title'],
+                [[], self::TITLE_TEMPLATE, null, null, true, true, 'sample-title-short']
             ]);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $pinbarTabRepository = $this->createMock(PinbarTabRepository::class);
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(PinbarTab::class)
-            ->willReturn($pinbarTabRepository = $this->createMock(PinbarTabRepository::class));
-
-        $pinbarTabRepository
-            ->expects(self::at(0))
+            ->willReturn($pinbarTabRepository);
+        $pinbarTabRepository->expects(self::exactly(3))
             ->method('countPinbarTabDuplicatedTitles')
-            ->with($titleShort, $user, $organization)
-            ->willReturn(1);
-
-        $pinbarTabRepository
-            ->expects(self::at(1))
-            ->method('countPinbarTabDuplicatedTitles')
-            ->with('sample-title-short (2)', $user, $organization)
-            ->willReturn(1);
-
-        $pinbarTabRepository
-            ->expects(self::at(2))
-            ->method('countPinbarTabDuplicatedTitles')
-            ->with('sample-title-short (3)', $user, $organization)
-            ->willReturn(0);
+            ->withConsecutive(
+                ['sample-title-short', $user, $organization],
+                ['sample-title-short (2)', $user, $organization],
+                ['sample-title-short (3)', $user, $organization]
+            )
+            ->willReturnOnConsecutiveCalls(
+                1,
+                1,
+                0
+            );
 
         $titles = $this->provider->getTitles($navigationItem);
 

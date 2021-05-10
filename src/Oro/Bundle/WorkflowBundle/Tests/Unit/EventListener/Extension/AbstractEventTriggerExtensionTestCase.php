@@ -38,16 +38,9 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)->disableOriginalConstructor()->getMock();
-
-        $this->triggerCache = $this->getMockBuilder(EventTriggerCache::class)->disableOriginalConstructor()->getMock();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->extension, $this->doctrineHelper, $this->triggerCache, $this->entityManager, $this->triggers);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->triggerCache = $this->createMock(EventTriggerCache::class);
     }
 
     protected function callPreFunctionByEventName(
@@ -139,12 +132,4 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
             array_merge(['id' => $id], $fields)
         );
     }
-
-    /**
-     * Creates a mock of a descendant of the trigger extension that provides additional getters
-     * to access its internal state.
-     *
-     * @return AbstractEventTriggerExtension
-     */
-    abstract protected function mockTriggerExtensionDescendant();
 }

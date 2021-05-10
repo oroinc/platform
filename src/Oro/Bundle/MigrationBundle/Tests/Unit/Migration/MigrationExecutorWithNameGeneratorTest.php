@@ -13,10 +13,10 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecutor
 {
     /** @var MigrationExecutorWithNameGenerator */
-    protected $executor;
+    private $executor;
 
     /** @var DbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     protected function setUp(): void
     {
@@ -38,18 +38,16 @@ class MigrationExecutorWithNameGeneratorTest extends AbstractTestMigrationExecut
             new MigrationState($migration11)
         ];
 
-        $this->connection->expects($this->at(3))
+        $this->connection->expects($this->exactly(3))
             ->method('executeQuery')
-            ->with('CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)');
-        $this->connection->expects($this->at(4))
-            ->method('executeQuery')
-            ->with(
-                'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
-                . 'COLLATE `utf8_unicode_ci` ENGINE = InnoDB'
+            ->withConsecutive(
+                ['CREATE TABLE TEST (id INT AUTO_INCREMENT NOT NULL)'],
+                [
+                    'CREATE TABLE test1table (id INT NOT NULL) DEFAULT CHARACTER SET utf8 '
+                    . 'COLLATE `utf8_unicode_ci` ENGINE = InnoDB'
+                ],
+                ['ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL']
             );
-        $this->connection->expects($this->at(5))
-            ->method('executeQuery')
-            ->with('ALTER TABLE TEST ADD COLUMN test_column INT NOT NULL');
 
         $this->executor->executeUp($migrations);
         $messages = $this->logger->getMessages();

@@ -11,19 +11,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $activityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityIdAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdAccessor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $entityRoutingHelper;
 
     /** @var ActivityWidgetProvider */
@@ -33,14 +30,20 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->activityManager = $this->createMock(ActivityManager::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->entityIdAccessor = $this->createMock(EntityIdAccessor::class);
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($id) {
+                return $id . '_translated';
+            });
 
         $this->provider = new ActivityWidgetProvider(
             $this->activityManager,
             $this->authorizationChecker,
-            $this->translator,
+            $translator,
             $this->entityIdAccessor,
             $this->entityRoutingHelper
         );
@@ -48,7 +51,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnTrueOnSupportsIfActivityHasAssociations()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
@@ -60,7 +63,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnFalseOnSupportsIfActivityHasNoAssociations()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $this->activityManager->expects($this->once())
             ->method('hasActivityAssociations')
@@ -72,7 +75,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldFindActivitiesAssociatedWithEntityClassAndConvertThemToWidgets()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -108,7 +111,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldKeepWidgetsWithAclIfAccessGranted()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -131,14 +134,12 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getActivityAssociations')
             ->willReturn($activities);
 
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->with('theFooAcl')
-            ->willReturn(true);
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with('theBarAcl')
-            ->willReturn(true);
+            ->willReturnMap([
+                ['theFooAcl', null, true],
+                ['theBarAcl', null, true]
+            ]);
 
         $widgets = $this->provider->getWidgets($entity);
 
@@ -148,7 +149,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldSkipWidgetsWithAclIfAccessDenied()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -171,14 +172,12 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getActivityAssociations')
             ->willReturn($activities);
 
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->with('theFooAcl')
-            ->willReturn(false);
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with('theBarAcl')
-            ->willReturn(false);
+            ->willReturnMap([
+                ['theFooAcl', null, false],
+                ['theBarAcl', null, false]
+            ]);
 
         $widgets = $this->provider->getWidgets($entity);
 
@@ -188,7 +187,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldGenerateEntityUrlAndSetItToEachWidget()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -213,14 +212,12 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifier')
             ->willReturn('theEntityId');
 
-        $this->entityRoutingHelper->expects($this->at(0))
+        $this->entityRoutingHelper->expects($this->exactly(2))
             ->method('generateUrl')
-            ->with('theFooRoute', \stdClass::class, 'theEntityId')
-            ->willReturn('theFooUrl');
-        $this->entityRoutingHelper->expects($this->at(1))
-            ->method('generateUrl')
-            ->with('theBarRoute', \stdClass::class, 'theEntityId')
-            ->willReturn('theBarUrl');
+            ->willReturnMap([
+                ['theFooRoute', \stdClass::class, 'theEntityId', [], 'theFooUrl'],
+                ['theBarRoute', \stdClass::class, 'theEntityId', [], 'theBarUrl']
+            ]);
 
         $widgets = $this->provider->getWidgets($entity);
 
@@ -234,7 +231,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldTranslateActivityLabelAndSetItToEachWidget()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -255,28 +252,19 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getActivityAssociations')
             ->willReturn($activities);
 
-        $this->translator->expects($this->at(0))
-            ->method('trans')
-            ->with('theFooLabel')
-            ->willReturn('theFooLabelTranslated');
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('theBarLabel')
-            ->willReturn('theBarLabelTranslated');
-
         $widgets = $this->provider->getWidgets($entity);
 
         //guard
         $this->assertIsArray($widgets);
         $this->assertCount(2, $widgets);
 
-        $this->assertEquals('theFooLabelTranslated', $widgets[0]['label']);
-        $this->assertEquals('theBarLabelTranslated', $widgets[1]['label']);
+        $this->assertEquals('theFooLabel_translated', $widgets[0]['label']);
+        $this->assertEquals('theBarLabel_translated', $widgets[1]['label']);
     }
 
     public function testMustAlwaysSetBlockWidgetTypeToEachWidget()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -309,7 +297,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAddPriorityToWidgetIfSetInActivity()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [
@@ -345,7 +333,7 @@ class ActivityWidgetProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldAddWidgetAliasBasedOnEntityClassAndAssociationNameToEachWidget()
     {
-        $entity = new \stdClass;
+        $entity = new \stdClass();
 
         $activities = [
             [

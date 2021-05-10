@@ -12,11 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FileItemTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FileItemType */
-    protected $type;
+    private $type;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->type = new FileItemType();
@@ -25,16 +22,19 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
     public function testBuildForm()
     {
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects(self::at(0))
+        $builder->expects(self::exactly(2))
             ->method('add')
-            ->with('sortOrder', NumberType::class, ['block_prefix' => 'oro_attachment_file_item_sortOrder'])
-            ->willReturnSelf();
-        $builder->expects(self::at(1))
-            ->method('add')
-            ->with('file', FileType::class, [
-                'allowDelete' => false,
-                'block_prefix' => 'oro_attachment_file_item_file'
-            ])
+            ->withConsecutive(
+                ['sortOrder', NumberType::class, ['block_prefix' => 'oro_attachment_file_item_sortOrder']],
+                [
+                    'file',
+                    FileType::class,
+                    [
+                        'allowDelete'  => false,
+                        'block_prefix' => 'oro_attachment_file_item_file'
+                    ]
+                ]
+            )
             ->willReturnSelf();
 
         $this->type->buildForm($builder, ['file_type' => FileType::class]);
