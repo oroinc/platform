@@ -91,6 +91,36 @@ define(function(require) {
                 }
 
                 return formattedNumber.replace(options.currency_symbol, currencyLayout);
+            },
+            dynamicPrecision: function(formattedNumber, options, originalNumber) {
+                const originFractionDigits = getFractionDigits(originalNumber, options.min_fraction_digits);
+                const formattedFractionDigits = getFractionDigits(formattedNumber, options.min_fraction_digits);
+
+                if (originFractionDigits > formattedFractionDigits) {
+                    originalNumber = String(originalNumber).replace(/0+$/, '');
+                    const originalSplittedValue = originalNumber.split('.');
+
+                    const originStyle = options.style;
+                    const originMinFractionDigits = options.min_fraction_digits;
+                    options.style = 'decimal';
+                    options.min_fraction_digits = 0;
+                    const formattedIntegralPart = doFormat(
+                        originalSplittedValue[0],
+                        options,
+                        [formatters.numeralFormat]
+                    );
+                    options.style = originStyle;
+                    options.min_fraction_digits = originMinFractionDigits;
+
+                    if (originalSplittedValue[1]) {
+                        return formattedIntegralPart.concat(
+                            options.decimal_separator_symbol,
+                            originalSplittedValue[1]
+                        );
+                    }
+                }
+
+                return formattedNumber;
             }
         };
 
@@ -109,7 +139,8 @@ define(function(require) {
         const allowedCustomOptions = [
             'grouping_used',
             'min_fraction_digits',
-            'max_fraction_digits'
+            'max_fraction_digits',
+            'scale_percent_by_100'
         ];
 
         const prepareCustomOptions = function(opts) {
@@ -121,10 +152,13 @@ define(function(require) {
         };
 
         const currencyFractionDigits = function(value) {
-            const defaultFractionDigits = localeSettings.getCurrencyMinFractionDigits();
+            return getFractionDigits(Number(value), localeSettings.getCurrencyMinFractionDigits());
+        };
+
+        const getFractionDigits = function(value, defaultFractionDigits) {
             const numberValue = Number(value);
-            const digits = numberValue % 1 !== 0
-                ? numberValue.toString().split('.')[1].length || 0
+            const digits = !Number.isNaN(numberValue) && numberValue % 1 !== 0
+                ? value.toString().split('.')[1].length || 0
                 : 0;
 
             return digits > defaultFractionDigits ? digits : defaultFractionDigits;
@@ -139,6 +173,7 @@ define(function(require) {
                 options.style = 'decimal';
                 const formattersChain = [
                     formatters.numeralFormat,
+                    formatters.dynamicPrecision,
                     formatters.addPrefixSuffix
                 ];
                 return doFormat(value, options, formattersChain);
@@ -167,15 +202,26 @@ define(function(require) {
                 ];
                 return doFormat(value, options, formattersChain);
             },
-            formatPercent: function(value) {
-                const options = localeSettings.getNumberFormats('percent');
+            formatPercent: function(value, opts) {
+                const customOptions = prepareCustomOptions(opts);
+                const percentOptions = localeSettings.getNumberFormats('percent');
+                const options = _.extend({}, percentOptions, customOptions);
                 options.style = 'percent';
                 const formattersChain = [
                     formatters.numeralFormat,
-                    formatters.clearPercent,
-                    formatters.addPrefixSuffix
+                    formatters.clearPercent
                 ];
-                return doFormat(value, options, formattersChain);
+                const originScalePercentBy100 = numeral.options.scalePercentBy100;
+                if (options.scale_percent_by_100 === false) {
+                    numeral.options.scalePercentBy100 = false;
+                    formattersChain.push(formatters.dynamicPrecision);
+                } else {
+                    options.max_fraction_digits = getFractionDigits(value, percentOptions.max_fraction_digits);
+                }
+                formattersChain.push(formatters.addPrefixSuffix);
+                const result = doFormat(value, options, formattersChain);
+                numeral.options.scalePercentBy100 = originScalePercentBy100;
+                return result;
             },
             formatCurrency: function(value, currency, opts) {
                 const customOptions = prepareCustomOptions(opts);

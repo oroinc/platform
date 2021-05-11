@@ -131,7 +131,6 @@ class IntlNumberFormatterFactory
         // Need to manually set percent fraction same to decimal
         if ($style === IntlNumberFormatter::PERCENT) {
             $overriddenDecimalAttributes = [
-                IntlNumberFormatter::FRACTION_DIGITS,
                 IntlNumberFormatter::MIN_FRACTION_DIGITS,
                 IntlNumberFormatter::MAX_FRACTION_DIGITS,
             ];

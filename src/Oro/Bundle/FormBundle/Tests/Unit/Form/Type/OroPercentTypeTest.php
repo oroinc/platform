@@ -68,9 +68,9 @@ class OroPercentTypeTest extends FormIntegrationTestCase
     {
         return array(
             'default' => array(
-                'data'     => 0.1122,
+                'data'     => 0.1123,
                 'viewData' => array(
-                    'value' => '11.22'
+                    'value' => '11.23'
                 ),
             ),
             'custom precision' => array(
