@@ -539,3 +539,13 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
         public: true
+
+    oro_entity_config.validator.field_config_constraints_factory:
+        class: Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory
+        arguments:
+            - !tagged { tag: 'oro_entity_config.field_config_constraints_provider', index_by: 'type' }
+
+    oro_entity_config.validator.constraints.provider.string:
+        class: Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider
+        tags:
+            - { name: oro_entity_config.field_config_constraints_provider, type: string }
