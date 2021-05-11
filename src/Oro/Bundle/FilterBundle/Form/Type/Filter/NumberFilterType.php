@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,27 +20,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 {
-    const NAME = 'oro_type_number_filter';
-    const ARRAY_SEPARATOR = ',';
+    public const NAME = 'oro_type_number_filter';
+    public const ARRAY_SEPARATOR = ',';
+    public const OPTION_KEY_FORMATTER_OPTION = 'formatter_options';
 
     /**
      * @var TranslatorInterface
      */
     protected $translator;
 
-    /**
-     * @var LocaleSettings
-     */
-    private $localeSettings;
+    private NumberFormatter $numberFormatter;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LocaleSettings $localeSettings
-     */
-    public function __construct(TranslatorInterface $translator, LocaleSettings $localeSettings)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        NumberFormatter $numberFormatter
+    ) {
         $this->translator = $translator;
-        $this->localeSettings = $localeSettings;
+        $this->numberFormatter = $numberFormatter;
     }
 
     /**
@@ -108,12 +104,12 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         ];
 
         $resolver->setDefaults(
-            array(
+            [
                 'field_type'        => NumberType::class,
                 'operator_choices'  => $operatorChoices,
                 'data_type'         => self::DATA_INTEGER,
-                'formatter_options' => array()
-            )
+                self::OPTION_KEY_FORMATTER_OPTION => []
+            ]
         );
     }
 
@@ -129,16 +125,13 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
             $dataType = $options['data_type'];
         }
 
-        $formatterOptions = array();
-
+        $formatterOptions = [];
         switch ($dataType) {
             case self::PERCENT:
-                $formatterOptions['decimals'] = 2;
-                $formatterOptions['grouping'] = false;
+                $formatterOptions['grouping'] = true;
                 $formatterOptions['percent'] = true;
                 break;
             case self::DATA_DECIMAL:
-                $formatterOptions['decimals'] = 2;
                 $formatterOptions['grouping'] = true;
                 break;
             case self::DATA_INTEGER:
@@ -147,13 +140,14 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 $formatterOptions['grouping'] = false;
         }
 
-        $formatter = new \NumberFormatter($this->localeSettings->getLocale(), \NumberFormatter::DECIMAL);
-
         $formatterOptions['orderSeparator'] = $formatterOptions['grouping']
-            ? $formatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL)
+            ? $this->numberFormatter->getSymbol(\NumberFormatter::GROUPING_SEPARATOR_SYMBOL, \NumberFormatter::DECIMAL)
             : '';
 
-        $formatterOptions['decimalSeparator'] = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+        $formatterOptions['decimalSeparator'] = $this->numberFormatter->getSymbol(
+            \NumberFormatter::DECIMAL_SEPARATOR_SYMBOL,
+            \NumberFormatter::DECIMAL
+        );
 
         $view->vars['formatter_options'] = array_merge($formatterOptions, $options['formatter_options']);
         $view->vars['array_separator'] = self::ARRAY_SEPARATOR;

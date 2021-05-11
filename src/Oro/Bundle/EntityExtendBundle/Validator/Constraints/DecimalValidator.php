@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Brick\Math\BigDecimal;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validates given value to be correct decimal number with expected precision and scale
@@ -21,14 +21,15 @@ class DecimalValidator extends ConstraintValidator
         }
 
         if (!is_numeric($value) || $value >= PHP_INT_MAX || $value <= -PHP_INT_MAX) {
-            throw new UnexpectedTypeException($value, 'numeric');
+            $this->context->addViolation($constraint->messageNotNumeric);
+            return;
         }
 
-        $intPart = (int)floor(abs($value));
-        $fractionPart = substr(strrchr((string)$value, '.'), 1);
+        $bigDecimalValue = BigDecimal::of($value)->abs();
+        $intPart = $bigDecimalValue->getIntegralPart();
 
-        if (($intPart > 0 && \strlen((string)$intPart) > ($constraint->precision - $constraint->scale))
-            || ($fractionPart && \strlen($fractionPart) > $constraint->scale)
+        if (($intPart > 0 && \strlen($intPart) > ($constraint->precision - $constraint->scale))
+            || ($bigDecimalValue->getScale() > $constraint->scale)
         ) {
             $this->context->addViolation(
                 $constraint->message,

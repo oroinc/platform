@@ -6,6 +6,8 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ *
+ * Constraint to check is given value correct decimal number with expected precision and scale
  */
 class Decimal extends Constraint
 {
@@ -13,6 +15,11 @@ class Decimal extends Constraint
      * @var string
      */
     public $message = 'This value should be decimal with valid precision ({{ precision }}) and scale ({{ scale }}).';
+
+    /**
+     * @var string
+     */
+    public $messageNotNumeric = 'This value should be of type numeric.';
 
     /**
      * For more info look here: \Doctrine\DBAL\Platforms\AbstractPlatform::getDecimalTypeDeclarationSQL

@@ -36,7 +36,7 @@ class DecimalValidatorTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidate(array $options, $value, $violation)
+    public function testValidate(array $options, $value, $violation): void
     {
         $this->context->expects(($violation ? $this->once() : $this->never()))
             ->method('addViolation');
@@ -46,29 +46,27 @@ class DecimalValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($value, $constraint);
     }
 
-    /**
-     * @return array
-     */
-    public function validateDataProvider()
+    public function validateDataProvider(): array
     {
         return [
-            [['precision' => 10,    'scale' => 4  ], 171.9,       false],
-            [['precision' => 4,    'scale' => 2   ], 42,          false],
-            [['precision' => 4,    'scale' => 2   ], 142,         true ],
-            [['precision' => 4,    'scale' => 2   ], 42.42,       false],
-            [['precision' => 4,    'scale' => 2   ], 42.423,      true ],
-            [['precision' => 4,    'scale' => null], 42,          false],
-            [['precision' => 4,    'scale' => null], 14214,       true ],
-            [['precision' => 4,    'scale' => null], 42.42,       true ],
-            [['precision' => 4,    'scale' => null], 42.423,      true ],
-            [['precision' => null, 'scale' => 2   ], 42424242,    false],
-            [['precision' => null, 'scale' => 2   ], 424242424,   true ],
-            [['precision' => null, 'scale' => 2   ], 42.42,       false],
-            [['precision' => null, 'scale' => 2   ], 42.423,      true ],
-            [['precision' => null, 'scale' => null], 42,          false],
-            [['precision' => null, 'scale' => null], 2147483646,  false],
-            [['precision' => null, 'scale' => null], 42.42,       true ],
-            [['precision' => null, 'scale' => null], 42.423,      true ],
+            [['precision' => 10,    'scale' => 4  ], 171.9,                false],
+            [['precision' => 4,    'scale' => 2   ], 42,                   false],
+            [['precision' => 4,    'scale' => 2   ], 142,                  true ],
+            [['precision' => 4,    'scale' => 2   ], 42.42,                false],
+            [['precision' => 4,    'scale' => 2   ], 42.423,               true ],
+            [['precision' => 4,    'scale' => null], 42,                   false],
+            [['precision' => 4,    'scale' => null], 14214,                true ],
+            [['precision' => 4,    'scale' => null], 42.42,                true ],
+            [['precision' => 4,    'scale' => null], 42.423,               true ],
+            [['precision' => null, 'scale' => 2   ], 42424242,             false],
+            [['precision' => null, 'scale' => 2   ], 424242424,            true ],
+            [['precision' => null, 'scale' => 2   ], 42.42,                false],
+            [['precision' => null, 'scale' => 2   ], 42.423,               true ],
+            [['precision' => null, 'scale' => null], 42,                   false],
+            [['precision' => null, 'scale' => null], 2147483646,           false],
+            [['precision' => null, 'scale' => null], 42.42,                true ],
+            [['precision' => null, 'scale' => null], 42.423,               true ],
+            [['precision' => 2,    'scale' => 2   ], 12345678912345789123, true ],
         ];
     }
 }

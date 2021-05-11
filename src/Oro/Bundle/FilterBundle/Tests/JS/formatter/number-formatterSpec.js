@@ -8,8 +8,8 @@ define(function(require) {
             it('check default formatter', function() {
                 const formatter = new NumberFormatter();
 
-                expect(formatter.fromRaw(123456.789)).toEqual('123456.79');
-                expect(formatter.toRaw('123456.789')).toEqual(123456.79);
+                expect(formatter.fromRaw(123456.789)).toEqual('123456.789');
+                expect(formatter.toRaw('123456.789')).toEqual(123456.789);
             });
 
             it('check custom formatter', function() {
@@ -17,8 +17,8 @@ define(function(require) {
                     orderSeparator: ','
                 });
 
-                expect(formatter.fromRaw(123456.789)).toEqual('123,456.79');
-                expect(formatter.toRaw('123,456.789')).toEqual(123456.79);
+                expect(formatter.fromRaw(123456.789)).toEqual('123,456.789');
+                expect(formatter.toRaw('123,456.789')).toEqual(123456.789);
             });
 
             it('check percent numbers', function() {
