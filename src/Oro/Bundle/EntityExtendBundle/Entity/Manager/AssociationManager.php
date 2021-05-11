@@ -18,7 +18,8 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 
 /**
- * Provides a set of methods to manage extended associations (see "Resources/doc/associations.md").
+ * Provides a set of methods to manage multi-target associations.
+ * @link https://doc.oroinc.com/backend/entities/extend-entities/multi-target-associations
  */
 class AssociationManager
 {
