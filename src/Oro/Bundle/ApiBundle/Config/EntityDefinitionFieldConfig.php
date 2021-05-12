@@ -352,12 +352,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function getFormConstraints()
     {
-        $formOptions = $this->getFormOptions();
-        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
-            return null;
-        }
-
-        return $formOptions['constraints'];
+        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
     }
 
     /**
@@ -367,44 +362,17 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
      */
     public function addFormConstraint(Constraint $constraint)
     {
-        $formOptions = $this->getFormOptions();
-        $formOptions['constraints'][] = $constraint;
-        $this->setFormOptions($formOptions);
+        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
     }
 
     /**
      * Removes a validation constraint from the form options by its class.
      *
      * @param string $constraintClass
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function removeFormConstraint($constraintClass)
     {
-        $formOptions = $this->getFormOptions();
-        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
-            return;
-        }
-
-        $resultConstraints = [];
-        foreach ($formOptions['constraints'] as $formConstraint) {
-            if (is_array($formConstraint)) {
-                $subConstraints = [];
-                foreach ($formConstraint as $className => $options) {
-                    if ($className === $constraintClass) {
-                        continue;
-                    }
-                    $subConstraints[$className] = $options;
-                }
-                if (!empty($subConstraints)) {
-                    $resultConstraints[] = $subConstraints;
-                }
-            } elseif ($formConstraint instanceof Constraint && !is_a($formConstraint, $constraintClass)) {
-                $resultConstraints[] = $formConstraint;
-            }
-        }
-
-        $formOptions['constraints'] = $resultConstraints;
-        $this->setFormOptions($formOptions);
+        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
     }
 
     /**
