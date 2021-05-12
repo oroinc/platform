@@ -455,7 +455,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
                 ['type' => 'testType', 'id' => 'testId', 'meta' => ['update' => true]]
             ]
         ];
-        $error = Error::createValidationError(Constraint::ENTITY_TYPE)
+        $error = Error::createValidationError(Constraint::ENTITY_TYPE, 'Unknown entity type: testType.')
             ->setSource(ErrorSource::createByPointer('/included/0/type'));
 
         $this->valueNormalizer->expects(self::once())

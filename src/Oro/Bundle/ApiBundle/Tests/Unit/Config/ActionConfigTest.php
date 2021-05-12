@@ -351,6 +351,32 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
+    public function testRemoveFormConstraint()
+    {
+        $config = new ActionConfig();
+
+        self::assertNull($config->getFormOptions());
+        self::assertNull($config->getFormConstraints());
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertNull($config->getFormConstraints());
+
+        $config->setFormOption(
+            'constraints',
+            [
+                new NotNull(),
+                new NotBlank(),
+                [NotNull::class => ['message' => 'test']]
+            ]
+        );
+
+        $config->removeFormConstraint(NotNull::class);
+        self::assertEquals(['constraints' => [new NotBlank()]], $config->getFormOptions());
+
+        $config->removeFormConstraint(NotBlank::class);
+        self::assertNull($config->getFormOptions());
+    }
+
     public function testFormEventSubscribers()
     {
         $config = new ActionConfig();
