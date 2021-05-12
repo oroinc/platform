@@ -38,6 +38,10 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
+        $idReader
+            ->expects(self::any())
+            ->method('isSingleId')
+            ->willReturn(true);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
@@ -66,6 +70,10 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
+        $idReader
+            ->expects(self::any())
+            ->method('isSingleId')
+            ->willReturn(true);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 

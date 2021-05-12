@@ -53,7 +53,7 @@ abstract class AbstractTestGenerator
         $this->twig = $twig;
         $this->kernel = $kernelInterface;
         $this->usedClasses = [];
-        $this->rootPathData =  explode(DIRECTORY_SEPARATOR, $this->kernel->getRootDir());
+        $this->rootPathData =  explode(DIRECTORY_SEPARATOR, $this->kernel->getProjectDir());
     }
 
     /**

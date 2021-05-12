@@ -42,6 +42,14 @@ class OroKernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
+    public function getFixturesDir()
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProjectDir()
     {
         $dir =  __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixtures';
@@ -76,9 +84,9 @@ class OroKernelStub extends OroKernel
     protected function findBundles($roots = [])
     {
         return [
-            $this->getRootDir() . 'bundles1.yml',
-            $this->getRootDir() . 'bundles2.yml',
-            $this->getRootDir() . 'bundles3.yml',
+            $this->getFixturesDir() . '/bundles1.yml',
+            $this->getFixturesDir() . '/bundles2.yml',
+            $this->getFixturesDir() . '/bundles3.yml',
         ];
     }
 

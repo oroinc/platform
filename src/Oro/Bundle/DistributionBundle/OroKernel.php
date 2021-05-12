@@ -12,7 +12,6 @@ use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Debug\DebugClassLoader as LegacyDebugClassLoader;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -386,7 +385,7 @@ abstract class OroKernel extends Kernel
                 }
                 // Remove frames added by DebugClassLoader.
                 for ($i = \count($backtrace) - 2; 0 < $i; --$i) {
-                    if (\in_array($backtrace[$i]['class'] ?? null, [DebugClassLoader::class, LegacyDebugClassLoader::class], true)) {
+                    if (($backtrace[$i]['class'] ?? '') === DebugClassLoader::class) {
                         $backtrace = [$backtrace[$i + 1]];
                         break;
                     }

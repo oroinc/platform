@@ -58,7 +58,7 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
 
     oro_api.tests.request_type_logger:
-        class: Symfony\Component\Debug\BufferingLogger
+        class: Symfony\Component\ErrorHandler\BufferingLogger
         public: true
 
     oro_api.tests.log_request_type:
