@@ -187,11 +187,12 @@ class NumberFormatter
     /**
      * Format decimal
      *
-     * @param float $value
+     * @param float|string|null $value
      * @param array $attributes Set of attributes of IntlNumberFormatter
      * @param array $textAttributes Set of text attributes of IntlNumberFormatter
      * @param array $symbols Set of symbols of IntlNumberFormatter
      * @param string|null $locale Locale of formatting
+     *
      * @return string
      */
     public function formatDecimal(
@@ -201,7 +202,63 @@ class NumberFormatter
         array $symbols = [],
         $locale = null
     ) {
-        return $this->format($value, IntlNumberFormatter::DECIMAL, $attributes, $textAttributes, $symbols, $locale);
+        $formatter = $this->getFormatter($locale, IntlNumberFormatter::DECIMAL, $attributes, $textAttributes, $symbols);
+        $formattedValue = $formatter->format($value);
+
+        if ($value === null) {
+            return $formattedValue;
+        }
+
+        return $this->formatDecimalWithDynamicScale(
+            $formatter,
+            $value,
+            $formattedValue
+        );
+    }
+
+    /**
+     * We should leave fractional part of the number "as is"
+     * in case this part has bigger scale than localized formatted value.
+     *
+     * @param IntlNumberFormatter $formatter
+     * @param float|string $originValue
+     * @param string $formattedValue
+     *
+     * @return string
+     */
+    private function formatDecimalWithDynamicScale(
+        IntlNumberFormatter $formatter,
+        $originValue,
+        string $formattedValue
+    ): string {
+        $decimalSeparator = $formatter->getSymbol(\NumberFormatter::DECIMAL_SEPARATOR_SYMBOL);
+
+        $explodedValue = explode($decimalSeparator, $formattedValue);
+        $formattedValueScale = isset($explodedValue[1]) ? strlen($explodedValue[1]) : 0;
+        $originValueBigDecimal = BigDecimal::of($originValue)->stripTrailingZeros();
+
+        if ($originValueBigDecimal->getScale() > $formattedValueScale) {
+            // Saved origin attribute value.
+            $originalAttribute = $formatter->getAttribute(IntlNumberFormatter::MIN_FRACTION_DIGITS);
+
+            // Formats integral part.
+            $formatter->setAttribute(IntlNumberFormatter::MIN_FRACTION_DIGITS, 0);
+            $sign = $originValueBigDecimal->getSign() === -1 ? '-' : '';
+            $formattedValueIntegralPart = $formatter->format($originValueBigDecimal->abs()->getIntegralPart());
+
+            // Restores original attribute value.
+            $formatter->setAttribute(IntlNumberFormatter::MIN_FRACTION_DIGITS, $originalAttribute);
+
+            $formattedValue = sprintf(
+                '%s%s%s%s',
+                $sign,
+                $formattedValueIntegralPart,
+                $decimalSeparator,
+                $originValueBigDecimal->getFractionalPart()
+            );
+        }
+
+        return $formattedValue;
     }
 
     /**
@@ -248,6 +305,10 @@ class NumberFormatter
         array $symbols = [],
         $locale = null
     ) {
+        if (!isset($attributes[IntlNumberFormatter::MAX_FRACTION_DIGITS])) {
+            $attributes[IntlNumberFormatter::MAX_FRACTION_DIGITS] = BigDecimal::of($value)->getScale() - 2;
+        }
+
         return $this->format($value, IntlNumberFormatter::PERCENT, $attributes, $textAttributes, $symbols, $locale);
     }
 

@@ -261,6 +261,13 @@ services:
         tags:
             - { name: form.type_extension, extended_type: Symfony\Component\Form\Extension\Core\Type\CollectionType }
 
+    oro_form.extension.number_type:
+        class: Oro\Bundle\FormBundle\Form\Extension\NumberTypeExtension
+        arguments:
+            - '@oro_locale.formatter.number'
+        tags:
+            - { name: form.type_extension }
+
     oro_form.type.encoded_placeholder_password:
         class: Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType
         arguments:

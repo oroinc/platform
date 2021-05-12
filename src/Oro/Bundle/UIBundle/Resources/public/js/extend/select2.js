@@ -10,6 +10,7 @@ define(function(require) {
     const multipleChoiceTpl = require('tpl-loader!oroui/templates/select2/multiple-choice.html');
 
     require('oroui/js/select2-l10n');
+    require('jquery-ui/position');
 
     // disable scroll on IOS when select2 drop is visible
     if (tools.isIOS()) {
@@ -235,6 +236,29 @@ define(function(require) {
         }
     }
 
+    function preventOverlapSelectResults() {
+        const dropMask = document.getElementById('select2-drop-mask');
+        const container = this.container.get(0);
+        const dropdown = this.dropdown.get(0);
+
+        const {x: containerX, y: containerY, width: containerWidth} = container.getBoundingClientRect();
+        const {x: dropdownX, y: dropdownY, width: dropdownWidth} = dropdown.getBoundingClientRect();
+
+        dropMask.style.display = 'none';
+        const foundContainer = document.elementsFromPoint(containerX + containerWidth / 2, containerY);
+        const foundDropdown = document.elementsFromPoint(dropdownX + dropdownWidth / 2, dropdownY);
+
+        const foundOverlapFixed = [...foundContainer, ...foundDropdown].find(
+            element => getComputedStyle(element, null).getPropertyValue('position') === 'fixed'
+        );
+
+        if (foundOverlapFixed) {
+            this.close();
+            return;
+        }
+        dropMask.style.display = '';
+    }
+
     const overrideMethods = {
         moveHighlight: function(original, ...rest) {
             if (this.highlight() === -1) {
@@ -336,6 +360,8 @@ define(function(require) {
         prototype.dropdownFixedMode = false;
 
         prototype.prepareOpts = function(options) {
+            options.isRTL = _.isRTL();
+
             if (options.collapsibleResults) {
                 options.populateResults = populateCollapsibleResults;
                 const matcher = options.matcher || $.fn.select2.defaults.matcher;
@@ -413,6 +439,30 @@ define(function(require) {
                 $container.parent().toggleClass(select2DropBelowClassName, dialogIsBelow);
                 this.opts.element.trigger('select2:dialogReposition', dialogIsBelow ? 'below' : 'top');
             }
+
+            if (this.opts.isRTL) {
+                const $dropdown = this.dropdown;
+                const containerOffset = this.container.offset();
+                const bodyWidth = $('body').outerWidth(true);
+                const containerOffsetRight = containerOffset.left + this.container.outerWidth(false);
+                let dropdownRight = bodyWidth - containerOffsetRight;
+                let enoughRoomOnLeft = bodyWidth - containerOffsetRight > 0;
+                let $resultsEl;
+
+                if (this.opts.dropdownAutoWidth) {
+                    $resultsEl = $('.select2-results', $dropdown);
+                    enoughRoomOnLeft = $resultsEl.offset().left >= 0;
+                }
+
+                if (!enoughRoomOnLeft) {
+                    dropdownRight = dropdownRight - Math.abs($resultsEl.offset().left) - $.position.scrollbarWidth();
+                }
+
+                $dropdown.css({
+                    right: dropdownRight,
+                    left: ''
+                });
+            }
         };
 
         prototype.open = function() {
@@ -421,6 +471,10 @@ define(function(require) {
             this.selection.attr('aria-expanded', true);
             this.results.attr('aria-expanded', true);
             this.results.attr('aria-hidden', false);
+
+            if (this.opts.closeOnOverlap && !this.dropdownFixedMode) {
+                $(window).on('scroll.select2Overlaps', preventOverlapSelectResults.bind(this));
+            }
 
             return open.call(this);
         };
@@ -434,6 +488,10 @@ define(function(require) {
             this.results.attr('aria-expanded', false);
             this.results.attr('aria-hidden', true);
             this._activedescendantElements.removeAttr('aria-activedescendant');
+
+            if (this.opts.closeOnOverlap && !this.dropdownFixedMode) {
+                $(window).off('scroll.select2Overlaps');
+            }
         };
 
         prototype.init = function(opts) {
@@ -460,6 +518,10 @@ define(function(require) {
             this.opts.element
                 .attr('aria-hidden', true)
                 .trigger($.Event('select2-init'));
+
+            this.container
+                .add(this.dropdown)
+                .addClass(`select2-direction-${_.isRTL() ? 'end': 'start'}`);
         };
 
 

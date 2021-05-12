@@ -202,18 +202,12 @@ class FileManager
      */
     public function getAdapterDescription(): string
     {
-        $adapter = $this->filesystem->getAdapter();
-
-        if ($adapter instanceof LocalAdapter) {
-            $directory = $adapter->getDirectory();
-            $subDirectory = $this->getSubDirectory();
-            if ($subDirectory) {
-                $directory .= DIRECTORY_SEPARATOR . $subDirectory;
-            }
-
+        $directory = $this->getLocalPath();
+        if (null !== $directory) {
             return $directory;
         }
 
+        $adapter = $this->filesystem->getAdapter();
         $className = \get_class($adapter);
         $lastSeparatorPos = strrpos($className, '\\');
         if (false !== $lastSeparatorPos) {
@@ -221,6 +215,28 @@ class FileManager
         }
 
         return $className;
+    }
+
+    /**
+     * Returns the full path to the directory for Local adapter.
+     *
+     * @return string|null
+     */
+    public function getLocalPath(): ?string
+    {
+        $adapter = $this->filesystem->getAdapter();
+
+        if (!$adapter instanceof LocalAdapter) {
+            return null;
+        }
+
+        $directory = $adapter->getDirectory();
+        $subDirectory = $this->getSubDirectory();
+        if ($subDirectory) {
+            $directory .= DIRECTORY_SEPARATOR . $subDirectory;
+        }
+
+        return $directory;
     }
 
     /**

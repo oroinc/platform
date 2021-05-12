@@ -302,7 +302,7 @@ define(function(require) {
                             const submitReplacement = $('<input type="submit" tabindex="-1" aria-hidden="true"/>');
                             submitReplacement.css({
                                 position: 'absolute',
-                                left: '-9999px',
+                                [_.isRTL() ? 'right' : 'left']: '-9999px',
                                 top: '-9999px',
                                 width: '1px',
                                 height: '1px'

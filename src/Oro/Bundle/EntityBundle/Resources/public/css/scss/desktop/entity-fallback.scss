@@ -10,7 +10,7 @@
             max-width: 25%;
 
             @include selector-width(100%);
-            padding-#{$end}: $content-padding-small;
+            padding-right: $content-padding-small;
         }
 
         &__line {

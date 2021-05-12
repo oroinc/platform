@@ -17,7 +17,7 @@
 
         .my-emails {
             width: 50%;
-            padding-#{$end}: $content-padding-small / 2;
+            padding-right: $content-padding-small / 2;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
@@ -32,13 +32,13 @@
         line-height: 15px;
         width: 50%;
         display: block;
-        padding: side-values(0 0 0 $content-padding-small / 2);
+        padding: 0 0 0 ($content-padding-small / 2);
         text-overflow: ellipsis;
         overflow: hidden;
 
         [class^="fa-"] {
             float: left;
-            margin-#{$end}: 5px;
+            margin-right: 5px;
             font-size: 13px;
             line-height: inherit;
 
@@ -69,7 +69,7 @@
                 line-height: 1;
                 cursor: pointer;
                 position: absolute;
-                #{$end}: 16px;
+                right: 16px;
                 top: 16px;
             }
 
@@ -83,7 +83,7 @@
             }
 
             .body {
-                padding-#{$end}: 20px;
+                padding-right: 20px;
 
                 font-size: $base-font-size--s + 1px;
             }
@@ -115,7 +115,7 @@
                 .reply-all-action,
                 .forward-action {
                     display: none;
-                    margin-#{$start}: 12px;
+                    margin-left: 12px;
                 }
             }
 
@@ -159,13 +159,13 @@
 
     .my-emails,
     .from-name {
-        float: #{$start};
+        float: left;
     }
 
     .mark-as-read,
     .mark-visible-as-read,
     .forward-action-wrapper {
-        float: #{$end};
+        float: right;
         text-transform: none;
     }
 }
@@ -177,6 +177,6 @@
 }
 
 .widget-setup .recent-emails-setup {
-    padding: side-values(15px 15px 15px 20px);
-    margin: side-values(-15px -15px -15px -20px);
+    padding: 15px 15px 15px 20px;
+    margin: -15px -15px -15px -20px;
 }

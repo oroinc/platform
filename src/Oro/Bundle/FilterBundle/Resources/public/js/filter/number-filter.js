@@ -114,15 +114,10 @@ define(function(require) {
             if (value) {
                 if (this._isArrayTypeSelected()) {
                     return this._formatArray(value);
-                } else if (_.isString(value)) {
-                    value = parseFloat(value);
                 }
             }
 
-            if (_.isNumber(value)) {
-                value = this.formatter.fromRaw(value);
-            }
-            return value;
+            return this.formatter.fromRaw(value);
         },
 
         /**
@@ -195,28 +190,12 @@ define(function(require) {
 
             let result = true;
 
-            if (!_.isNumber(value) || _.isNaN(value)) {
+            if (_.isNaN(value)) {
                 this._showNumberWarning();
                 result = false;
             }
 
-            if (this.formatter.percent && value > 100) {
-                this._showMaxPercentWarning();
-                result = false;
-            }
-
             return result;
-        },
-
-        /**
-         * @private
-         */
-        _showNumberWarning: function() {
-            mediator.execute(
-                'showFlashMessage',
-                'warning',
-                __('oro.form.number.nan')
-            );
         },
 
         /**
@@ -231,9 +210,9 @@ define(function(require) {
         },
 
         _initInputWidget: function() {
-            if (this.formatterOptions.decimals) {
+            if (this.formatter.decimals) {
                 _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
-                    $(field).attr('data-precision', this.formatterOptions.decimals);
+                    $(field).attr('data-precision', this.formatter.decimals);
                 }, this);
             }
 

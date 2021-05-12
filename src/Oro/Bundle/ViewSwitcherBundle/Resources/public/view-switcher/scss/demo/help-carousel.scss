@@ -182,11 +182,11 @@
     }
 
     .slick-prev {
-        #{$start}: 24px;
+        left: 24px;
     }
 
     .slick-next {
-        #{$end}: 24px;
+        right: 24px;
     }
 
     .slick-prev,
@@ -250,4 +250,3 @@
         }
     }
 }
-

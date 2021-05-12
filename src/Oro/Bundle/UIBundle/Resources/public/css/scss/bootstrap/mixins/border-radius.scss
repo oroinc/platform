@@ -2,14 +2,14 @@
 
 @mixin border-start-radius($radius) {
     @if $enable-rounded {
-        border-top-#{$start}-radius: $radius;
-        border-bottom-#{$start}-radius: $radius;
+        border-top-left-radius: $radius;
+        border-bottom-left-radius: $radius;
     }
 }
 
 @mixin border-end-radius($radius) {
     @if $enable-rounded {
-        border-top-#{$end}-radius: $radius;
-        border-bottom-#{$end}-radius: $radius;
+        border-top-right-radius: $radius;
+        border-bottom-right-radius: $radius;
     }
 }

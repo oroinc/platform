@@ -13,7 +13,7 @@
   &-google {
     @include button-custom-variant($btn-brand-google...);
 
-    padding-#{$start}: 40px;
+    padding-left: 40px;
     position: relative;
 
     &:before {
@@ -22,7 +22,7 @@
       font-size: 16px;
       position: absolute;
       top: 50%;
-      #{$start}: 16px;
+      left: 16px;
       transform: translate(0, -50%);
     }
   }

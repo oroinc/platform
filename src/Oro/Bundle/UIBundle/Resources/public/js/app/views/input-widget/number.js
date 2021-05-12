@@ -85,6 +85,7 @@ define(function(require) {
                     value = NumberFormatter.unformatStrict(value);
                 }
                 const localizedFloat = NumberFormatter.formatDecimal(value, {
+                    min_fraction_digits: 0,
                     max_fraction_digits: this.precision
                 });
                 this.$el.val(localizedFloat);
@@ -158,7 +159,7 @@ define(function(require) {
 
             // Prevent multi zero value
             if (this.allowZero) {
-                field.value = field.value.replace(/^0(\d)*/g, '0');
+                field.value = field.value.replace(/^([+-]?)0(\d)*/g, '$10');
             }
 
             // filter value start
@@ -167,7 +168,7 @@ define(function(require) {
             }
 
             // clear not allowed symbols
-            field.value = field.value.replace(new RegExp('(?!\\' + decimalSeparator + ')[?:\\D+]', 'g'), '');
+            field.value = field.value.replace(new RegExp('(?!\\' + decimalSeparator + '|\\+|-)[?:\\D]', 'g'), '');
 
             if (field.value[0] === decimalSeparator && this.precision > 0) {
                 field.value = '0' + field.value;
@@ -175,9 +176,9 @@ define(function(require) {
             // filter value end
 
             // validate value start
-            let regExpString = '^([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
+            let regExpString = '^[+-]?([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
             if (this.precision > 0) {
-                regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
+                regExpString += '(\\' + decimalSeparator + '{1})?([0-9]*)?';
             }
 
             const regExp = new RegExp(regExpString, 'g');

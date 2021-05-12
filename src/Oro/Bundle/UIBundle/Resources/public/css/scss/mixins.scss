@@ -39,21 +39,21 @@ $enable-safe-area: true;
 
 @mixin accordion-toggle() {
     font-weight: bold;
-    padding-#{$start}: 15px;
+    padding-left: 15px;
     background: $accordion-heading-background-color;
 }
 
 @mixin accordion-toggle-before() {
     content: "\f107";
     font-family: FontAwesome;
-    margin: side-values(0 7px 0 -7px);
+    margin: 0 7px 0 -7px;
     width: 10px;
     display: inline-block;
 }
 
 @mixin accordion-toggle-collapsed-before() {
     content: "\f105";
-    margin: side-values(0 5px 0 -5px);
+    margin: 0 5px 0 -5px;
 }
 
 @mixin accordion-group() {
@@ -64,7 +64,7 @@ $enable-safe-area: true;
 
 @mixin header-cell-dropdown() {
     > .dropdown {
-        margin-#{$start}: -5px;
+        margin-left: -5px;
 
         > .dropdown-toggle {
             padding: 4px;
@@ -93,7 +93,7 @@ $enable-safe-area: true;
             padding: 0;
 
             > li:first-child > a {
-                margin-#{$start}: 2px;
+                margin-left: 2px;
             }
         }
     }
@@ -115,7 +115,7 @@ $enable-safe-area: true;
         width: 12px;
         height: 12px;
         background-size: 12px 12px;
-        #{$end}: -20px;
+        right: -20px;
         top: 50%;
         margin-top: -6px;
     }
@@ -145,7 +145,7 @@ $enable-safe-area: true;
         position: absolute;
         top: 100%;
         margin-top: -($field-size + $arrow-height);
-        #{$start}: 10px;
+        left: 10px;
         border-style: solid;
         border-color: $danger-lighten transparent;
         border-width: $arrow-height ($arrow-height - 1) 0;
@@ -159,7 +159,7 @@ $enable-safe-area: true;
         > span {
             position: absolute;
             bottom: 0;
-            padding: side-values(5px 8px 6px 30px);
+            padding: 5px 8px 6px 30px;
             border-radius: $input-field-border-radius;
             font-size: $base-font-size - 1;
             background-color: $danger-lighten;
@@ -167,7 +167,7 @@ $enable-safe-area: true;
 
             @include fa-icon($fa-var-times, before, true) {
                 position: absolute;
-                #{$start}: 9px;
+                left: 9px;
                 top: 3px;
                 font-size: $icon-font-size;
                 color: $danger-darken;
@@ -287,10 +287,18 @@ $enable-safe-area: true;
 // Use:  @include fa-icon($view-product-gallery-icon, before, true) {
 //  extra rules
 // }
-@mixin fa-icon($icon: null, $state: before, $extra-rules: false) {
+@mixin fa-icon($icon: null, $state: before, $extra-rules: false, $rawIcon: false) {
     @if ($icon) {
+        $content: $icon;
+
+        @if ($rawIcon) {
+            $content: $icon;
+        } @else {
+            $content: '#{$icon}';
+        }
+
         &:#{$state} {
-            content: '#{$icon}';
+            content: $content;
             font-family: 'FontAwesome', $font-family-sans-serif;
 
             @if ($extra-rules) {

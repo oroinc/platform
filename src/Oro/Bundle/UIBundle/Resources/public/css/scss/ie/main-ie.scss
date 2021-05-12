@@ -8,8 +8,8 @@
 }
 
 .datagrid-settings .dropdown-menu {
-    #{$start}: auto;
-    #{$end}: 100%;
+    left: auto;
+    right: 100%;
     transform: none;
 }
 

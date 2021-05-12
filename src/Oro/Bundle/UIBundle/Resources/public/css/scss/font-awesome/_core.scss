@@ -3,8 +3,11 @@
 [class^="fa-"],
 [class*=" fa-"] {
     display: inline-block;
-    font: normal normal normal $base-font-size/1 FontAwesome;
+    font-family: 'FontAwesome';
     font-size: inherit;
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -20,7 +23,7 @@
             text-indent: 0;
             font-size: $icon-font-size;
             line-height: 1;
-            font-family: FontAwesome;
+            font-family: 'FontAwesome';
         }
     }
 }

@@ -8,7 +8,7 @@ $oro-datagrid-grid-views-color: $primary-500 !default;
 $oro-datagrid-grid-views-vertical-align: -1px !default;
 $oro-datagrid-grid-views-font-size: $base-font-size - 1px !default;
 $oro-datagrid-grid-views-icon-close: $fa-var-caret-down !default;
-$oro-datagrid-grid-views-icon-offset: side-values(0 12px 0 8px) !default;
+$oro-datagrid-grid-views-icon-offset: 0 12px 0 8px !default;
 $oro-datagrid-grid-views-title-width: 500px !default;
 
 $oro-datagrid-grid-view-btn-font-size: $font-size-base !default;
@@ -20,7 +20,7 @@ $oro-datagrid-grid-views-dropdown-width: 300px !default;
 
 $oro-datagrid-grid-views-item-offset: 4px $dropdown-item-padding-x 3px !default;
 
-$oro-datagrid-inner-grid-views-offset: side-values(0 0 14px 16px) !default;
+$oro-datagrid-inner-grid-views-offset: 0 0 14px 16px !default;
 
 // Mobile
 

@@ -105,7 +105,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         }
 
         $options = $this->getOptions($extendConfig, $fieldConfigId);
-        $options = $this->addConstraintsToOptions($options, $extendConfig, $fieldConfigId);
 
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
 

@@ -1,8 +1,8 @@
 /* @theme: admin.oro; */
 
 .container-fluid.page-title {
-    padding-#{$end}: 0;
-    padding-#{$start}: $content-padding;
+    padding-right: 0;
+    padding-left: $content-padding;
 
     .navbar-extra {
         margin-bottom: 10px;
@@ -14,11 +14,11 @@
 
             // All children should have a own font-size
             font-size: 0;
-            text-align: #{$end};
+            text-align: right;
 
             > .pull-left,
             > .btn-group {
-                text-align: #{$start};
+                text-align: left;
                 display: inline-block;
                 vertical-align: top;
 
@@ -28,11 +28,11 @@
             }
 
             > .pinned-dropdown > .btn-group {
-                text-align: #{$start};
+                text-align: left;
             }
 
             .separator-btn {
-                margin: side-values(0 0 0 $content-padding-small);
+                margin: 0 0 0 $content-padding-small;
             }
         }
     }
@@ -80,8 +80,8 @@
 
             > .pull-left-extra {
                 flex-grow: 1;
-                margin-#{$start}: 0;
-                text-align: $start;
+                margin-left: 0;
+                text-align: left;
             }
 
             > .pull-right {

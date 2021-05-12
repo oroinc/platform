@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Validator\AbstractFieldConfigBasedValidationLoader;
+use Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -17,6 +18,9 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
+    /** @var FieldConfigConstraintsFactory */
+    private $fieldConfigConstraintsFactory;
+
     /**
      * @param ConfigProvider $extendConfigProvider
      * @param ConfigProvider $fieldConfigProvider
@@ -27,6 +31,11 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
     ) {
         $this->extendConfigProvider = $extendConfigProvider;
         $this->fieldConfigProvider   = $fieldConfigProvider;
+    }
+
+    public function setFieldConfigConstraintsFactory(FieldConfigConstraintsFactory $fieldConfigConstraintsFactory): void
+    {
+        $this->fieldConfigConstraintsFactory = $fieldConfigConstraintsFactory;
     }
 
     /**
@@ -47,6 +56,13 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
         }
 
         $constraints = $this->getConstraintsByFieldType($fieldConfigId->getFieldType());
+        if ($this->fieldConfigConstraintsFactory) {
+            $extendConfig = $this->extendConfigProvider->getConfig($metadata->getClassName(), $fieldName);
+            $constraints = \array_merge(
+                $constraints,
+                $this->fieldConfigConstraintsFactory->create($extendConfig)
+            );
+        }
         foreach ($constraints as $constraint) {
             $metadata->addPropertyConstraint($fieldName, $constraint);
         }
@@ -65,7 +81,7 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
         $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
 
         return !$extendConfig->is('is_deleted') &&
-        !$extendConfig->is('state', ExtendScope::STATE_NEW) &&
-        $extendConfig->is('is_extend');
+            !$extendConfig->is('state', ExtendScope::STATE_NEW) &&
+            $extendConfig->is('is_extend');
     }
 }

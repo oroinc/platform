@@ -5,7 +5,7 @@
 
     .dropdown-toggle {
         display: inline-block;
-        margin-#{$end}: 0;
+        margin-right: 0;
 
         line-height: $toolbar-mass-actions-toggle-line-height;
     }
@@ -15,25 +15,25 @@
             display: block;
             margin: 0;
             padding: $dropdown-item-padding-y $dropdown-item-padding-x;
-            
+
             font-weight: $font-weight-normal;
             font-size: $dropdown-item-font-size;
             line-height: $dropdown-item-line-height;
-            
+
             color: $dropdown-link-color;
-    
+
             white-space: nowrap;
-    
+
             [class^="fa-"],
             [class*=" fa-"] {
-                margin-#{$end}: $dropdown-item-icon-fa-offset;
+                margin-right: $dropdown-item-icon-fa-offset;
             }
-            
+
             @include hover-focus {
                 color: $dropdown-link-hover-color;
                 @include gradient-bg($dropdown-link-hover-bg);
             }
-    
+
             &.active,
             &:active {
                 color: $dropdown-link-active-color;

@@ -15,7 +15,7 @@
     &__part {
         &--start {
             display: flex;
-            float: #{$end};
+            float: right;
         }
     }
 
@@ -29,14 +29,6 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto;
-    }
-
-    @include if-rtl() {
-        .pagination-trigger {
-            position: relative;
-
-            transform: rotate(180deg);
-        }
     }
 
     @media only screen and (max-width: $small-devices-media-breakpoint) {

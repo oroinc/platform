@@ -1,11 +1,11 @@
 /* @theme: admin.oro; */
 
 .dashboard-selector-container {
-    text-align: $start !important;
+    text-align: left !important;
 
     label {
         padding-top: 6px;
-        padding-#{$end}: 10px;
+        padding-right: 10px;
         margin-bottom: 0;
     }
 
@@ -16,7 +16,7 @@
     label,
     select,
     .selector {
-        float: #{$start};
+        float: left;
     }
 
     @include selector-width();
@@ -25,7 +25,7 @@
 .ui-dialog .form-horizontal {
     .widget-sort-by {
         .control-group .controls {
-            margin-#{$start}: 0;
+            margin-left: 0;
 
             select {
                 max-width: 280px;
@@ -45,11 +45,11 @@
     .responsive-section:not(.responsive-small) {
         .dashboard-column {
             &:first-child {
-                padding-#{$end}: $content-padding-small;
+                padding-right: $content-padding-small;
             }
 
             &:last-child {
-                padding-#{$start}: $content-padding-small;
+                padding-left: $content-padding-small;
             }
         }
     }
@@ -134,7 +134,7 @@
         .widget-actions-container {
             .action-wrapper {
                 padding: $dashboard-action-padding;
-                margin-#{$start}: 14px;
+                margin-left: 14px;
             }
         }
 
@@ -144,7 +144,7 @@
 
         .default-actions-container {
             .action-wrapper:last-child {
-                border-#{$end}: none;
+                border-right: none;
             }
         }
 
@@ -185,7 +185,7 @@
         }
 
         .widget-config-data {
-            margin-#{$end}: 10px;
+            margin-right: 10px;
             position: relative;
             top: $dashboard-widget-config-data-shift;
 
@@ -261,7 +261,7 @@
                 bottom: 0;
                 right: 0;
 
-                margin: side-values(auto 0 auto 30px);
+                margin: auto 0 auto 30px;
                 width: 90%;
                 height: auto;
 
@@ -302,7 +302,7 @@
     }
 
     .flotr-legend-label {
-        padding-#{$start}: 10px;
+        padding-left: 10px;
     }
 }
 
@@ -315,7 +315,7 @@
 .funnel-data {
     h5 {
         margin-bottom: 5px;
-        margin-#{$start}: 25px;
+        margin-left: 25px;
 
         &:first-letter {
             text-transform: uppercase;
@@ -333,7 +333,7 @@
 
 .widget-configuration {
     .items-selector-widget {
-        margin-#{$end}: $content-padding;
+        margin-right: $content-padding;
     }
 
     .widget-title-container {
@@ -347,7 +347,7 @@
                 }
 
                 > .controls {
-                    margin-#{$start}: $dashboard-widget-title-widget-controls-offset-start;
+                    margin-left: $dashboard-widget-title-widget-controls-offset-start;
                 }
             }
         }
@@ -355,7 +355,7 @@
 
     .widget-title-widget {
         width: $dashboard-widget-title-widget-width;
-        margin-#{$end}: $content-padding;
+        margin-right: $content-padding;
         flex-grow: 1;
         flex-shrink: 1;
     }
@@ -403,7 +403,7 @@
             tbody {
                 height: 120px;
 
-                border-#{$start}: $dashboard-widget-configuration-border;
+                border-left: $dashboard-widget-configuration-border;
 
                 display: block;
             }
@@ -417,13 +417,13 @@
             }
 
             &.table-bordered td:first-child {
-                border-#{$start}: none;
+                border-left: none;
             }
         }
     }
 
     .widget-date-widget {
-        margin: side-values(4px 0 10px);
+        margin: 4px 0 10px;
     }
 
     .widget-date-input-widget {
@@ -452,7 +452,7 @@
 
 .widget-content.widget-configuration {
     .table input[type="checkbox"] {
-        margin: side-values(0 0 1px 0);
+        margin: 0 0 1px 0;
     }
 }
 
@@ -466,7 +466,7 @@
             margin-bottom: $dashboard-configuration-items-table-margin-y / 2;
         }
         .actions-wrap {
-            float: #{$start};
+            float: left;
             margin-bottom: $dashboard-configuration-items-table-margin-y;
 
             @include clearfix();
@@ -475,7 +475,7 @@
     }
 
     .btn-group + .btn-group {
-        margin-#{$start}: $dashboard-widget-configuration-buttons-space;
+        margin-left: $dashboard-widget-configuration-buttons-space;
     }
 
     .widget-items-item-row .action-cell {
@@ -484,7 +484,7 @@
         .btn-icon:not(.btn) {
             display: block;
             color: $dashboard-configuration-items-btn-color;
-            float: $start;
+            float: left;
 
             &:active,
             &:hover {
@@ -495,5 +495,5 @@
 }
 
 .ui-dialog .form-horizontal .control-group .conditions-group .controls {
-    margin-#{$start}: 0;
+    margin-left: 0;
 }

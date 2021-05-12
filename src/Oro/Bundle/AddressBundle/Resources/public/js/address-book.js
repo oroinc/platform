@@ -212,7 +212,8 @@ define([
                     confirmRemove: this.options.confirmRemove,
                     confirmRemoveComponent: this.options.confirmRemoveComponent,
                     addressDeleteUrl: this._getUrl('addressDeleteUrl', address),
-                    tagName: this.options.addressTagName
+                    tagName: this.options.addressTagName,
+                    isAddressHtmlFormatted: this.options.isAddressHtmlFormatted
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

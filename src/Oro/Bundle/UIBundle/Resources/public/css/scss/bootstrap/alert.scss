@@ -18,7 +18,7 @@
         color: $alert-close-color;
         padding: $alert-close-inner-offset;
         position: $alert-close-position;
-        #{$end}: $alert-close-right;
+        right: $alert-close-right;
         opacity: $alert-close-opacity;
 
         &:hover {
@@ -35,7 +35,7 @@
             line-height: $alert-icon-line-height;
             position: $alert-icon-position;
             top: $alert-icon-top;
-            #{$start}: $alert-icon-left;
+            left: $alert-icon-left;
         }
     }
 

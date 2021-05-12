@@ -61,7 +61,8 @@ define(function(require, exports, module) {
                     }
                 },
                 address: {
-                    US: '%name%\n%organization%\n%street%\n%CITY% %REGION% %COUNTRY% %postal_code%'
+                    US: '%name%\n%organization%\n%street%\n%CITY% %REGION% %COUNTRY% %postal_code%',
+                    ltrParts: ['phone', 'postal_code', 'region_code']
                 },
                 name: {
                     en_US: '%prefix% %first_name% %middle_name% %last_name% %suffix%'
@@ -70,7 +71,7 @@ define(function(require, exports, module) {
                     decimal: {
                         grouping_size: 3,
                         grouping_used: 1,
-                        max_fraction_digits: 3,
+                        max_fraction_digits: 14,
                         min_fraction_digits: 0,
                         negative_prefix: '-',
                         negative_suffix: '',
@@ -88,7 +89,7 @@ define(function(require, exports, module) {
                     percent: {
                         grouping_size: 3,
                         grouping_used: 1,
-                        max_fraction_digits: 3,
+                        max_fraction_digits: 14,
                         min_fraction_digits: 0,
                         negative_prefix: '-',
                         negative_suffix: '%',
@@ -283,6 +284,10 @@ define(function(require, exports, module) {
 
         getAddressFormats: function() {
             return this.settings.format.address;
+        },
+
+        getAddressLTRParts: function() {
+            return this.settings.format.address.ltrParts;
         },
 
         getNumberFormats: function(style) {

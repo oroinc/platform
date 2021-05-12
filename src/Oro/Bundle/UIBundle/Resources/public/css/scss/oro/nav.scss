@@ -59,7 +59,7 @@
     }
 
     &-extra-right {
-        padding-#{$end}: $content-padding;
+        padding-right: $content-padding;
     }
 }
 
@@ -124,9 +124,9 @@
 
         &.pull-right {
             flex-grow: 1;
-            text-align: #{$end};
+            text-align: right;
         }
-    
+
         &:not(.dropdown-menu) {
             &.active .nav-link,
             &.show .nav-link,
@@ -135,38 +135,38 @@
                 border-bottom-color: $nav-link-active-border-bottom-color;
             }
         };
-        
+
         &.active .nav-link,
         &.show .nav-link,
         .nav-link.active {
             background: $nav-link-active-background;
             color: $nav-link-active-color;
-        
+
             &:hover,
             &:active,
             &:focus {
                 background: $nav-link-active-background;
             }
         }
-    
+
         .dropdown-menu {
             .nav-link,
             .nav-item {
                 margin-bottom: 0;
             }
-            
+
             .nav-link {
                 border-width: 0;
-    
+
                 padding: $dropdown-item-padding-y $dropdown-item-padding-x;
                 font-weight: $font-weight-normal;
                 color: $dropdown-link-color;
-    
+
                 @include hover-focus {
                     color: $dropdown-link-hover-color;
                     @include gradient-bg($dropdown-link-hover-bg);
                 }
-    
+
                 &.active,
                 &:active {
                     color: $dropdown-link-active-color;
@@ -186,15 +186,15 @@
             border-bottom-color: $nav-tabs-dropdown-toggle-caret-color;
         }
     }
-    
+
     .active.dropdown-toggle:after,
     .active > .dropdown-toggle:after {
         content: '';
     }
-    
+
     &.flex-column {
         flex-direction: column;
-        
+
         .nav-item.active .nav-link,
         .nav-item.show .nav-link,
         .nav-item .nav-link.active {
@@ -204,7 +204,7 @@
             border-bottom-color: $nav-link-column-active-border-bottom-color;
         }
     }
-    
+
     &.sub-tabs {
         .nav-link {
             padding-top: $nav-link-padding-y / 2;

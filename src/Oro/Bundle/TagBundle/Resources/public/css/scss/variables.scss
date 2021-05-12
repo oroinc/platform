@@ -26,26 +26,26 @@ $tag-selector-item-input-inner-offset-start:
 $tag-selector-actions-width: 65px !default;
 $tag-selector-actions-font-size: $base-font-size--m !default;
 
-$tag-item-color:                        $secondary;
-$tag-item-background:                   $secondary-300;
-$tag-my-item-background:                $secondary;
-$tag-item-editable-hover-background:    $secondary;
-$tag-item-edit-hover-alt-background:    $secondary-dark;
-$tag-item-editable-hover-color:         $primary-inverse;
-$tag-item-height:                       24px !default;
-$tag-item-font-size:                    12px !default;
-$tag-item-offset-vertical:              $content-padding-small / 2 !default;
-$tag-item-offset-horizontal:            $content-padding-small / 2 !default;
-$tag-item-offset:                       side-values($tag-item-offset-vertical $tag-item-offset-horizontal 0 0) !default;
-$tag-item-line-height:                  1.2 !default;
-$tag-item-inner-offset-horizontal:      12px !default;
-$tag-item-inner-offset-vertical:        5px !default;
-$tag-item-inner-offset:                 side-values($tag-item-inner-offset-vertical $tag-item-inner-offset-horizontal) !default;
-$tag-item-border-radius:                ($tag-item-height / 2) !default;
+$tag-item-color: $secondary;
+$tag-item-background: $secondary-300;
+$tag-my-item-background: $secondary;
+$tag-item-editable-hover-background: $secondary;
+$tag-item-edit-hover-alt-background: $secondary-dark;
+$tag-item-editable-hover-color: $primary-inverse;
+$tag-item-height: 24px !default;
+$tag-item-font-size: 12px !default;
+$tag-item-offset-vertical: $content-padding-small / 2 !default;
+$tag-item-offset-horizontal: $content-padding-small / 2 !default;
+$tag-item-offset: $tag-item-offset-vertical $tag-item-offset-horizontal 0 0 !default;
+$tag-item-line-height: 1.2 !default;
+$tag-item-inner-offset-horizontal: 12px !default;
+$tag-item-inner-offset-vertical: 5px !default;
+$tag-item-inner-offset: $tag-item-inner-offset-vertical $tag-item-inner-offset-horizontal !default;
+$tag-item-border-radius: ($tag-item-height / 2) !default;
 
-$tag-item-icon-offset-end:              $content-padding-small !default;
+$tag-item-icon-offset-end: $content-padding-small !default;
 
-$tag-item-na-inner-offset:              2px 0 !default;
+$tag-item-na-inner-offset: 2px 0 !default;
 
 $tag-selector-action-height: $select2-search-field-line-height + ($tag-selector-item-offset-vertical * 2) !default;
 $tag-selector-action-width: $tag-selector-action-height !default;
@@ -56,9 +56,8 @@ $tag-cell-container-inner-offset-top: $oro-datagrid-body-cell-inner-top -
 $tag-cell-container-inner-offset-bottom: $oro-datagrid-body-cell-inner-bottom -
     $tag-item-offset-vertical -
     $tag-cell-container-height-delta !default;
-$tag-cell-container-inner-offset: side-values(
+$tag-cell-container-inner-offset:
         $tag-cell-container-inner-offset-top
         $oro-datagrid-editable-cell-offset
         $tag-cell-container-inner-offset-bottom
-        $oro-datagrid-body-cell-inner-horizontal
-) !default;
+        $oro-datagrid-body-cell-inner-horizontal !default;

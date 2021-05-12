@@ -50,17 +50,20 @@ class OrmDatasourceExtensionTest extends OrmTestCase
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
         $this->localeSettings = $this->createMock(LocaleSettings::class);
-        $this->localeSettings->expects($this->any())
+        $this->localeSettings->expects(self::any())
             ->method('getTimeZone')
             ->willReturn('America/Los_Angeles');
-        $this->localeSettings->expects($this->any())
+        $this->localeSettings->expects(self::any())
             ->method('getTimeZone')
             ->willReturn('UTC');
+        $this->localeSettings->expects(self::any())
+            ->method('getLocale')
+            ->willReturn('en');
 
         $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
 
@@ -108,14 +111,14 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             ->join('user.shippingAddresses', 'shippingAddresses');
 
         $manager = $this->createMock(Manager::class);
-        $manager->expects($this->any())
+        $manager->expects(self::any())
             ->method('createFilter')
             ->willReturnCallback(function ($name, $params) {
                 return $this->createFilter($name, $params);
             });
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('get')
             ->with('oro_query_designer.conditions_group_merge_same_entity_conditions')
             ->willReturn($enableGrouping);
@@ -127,7 +130,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         );
 
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->once())
+        $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
@@ -147,9 +150,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
 
         $expected = str_replace([PHP_EOL, '( ', ' )'], [' ', '(', ')'], preg_replace('/\s+/', ' ', $expected));
         // Check that generated DQL is valid and may be converted to SQL
-        $this->assertNotEmpty($qb->getQuery()->getSQL());
+        self::assertNotEmpty($qb->getQuery()->getSQL());
         // Check that generated DQL is expected
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function visitDatasourceProvider(): array

@@ -39,7 +39,7 @@
     }
 
     .filename {
-        padding: side-values($uploader-filename-inner-offset);
+        padding: $uploader-filename-inner-offset;
         flex-grow: 1;
 
         @include text-line-truncate($uploader-filename-width);
@@ -47,8 +47,8 @@
 
     .action {
         width: $uploader-action-width;
-        padding: side-values($uploader-action-inner-offset);
-        border-#{$start}: $input-border-width solid $input-border-color;
+        padding: $uploader-action-inner-offset;
+        border-left: $input-border-width solid $input-border-color;
         flex-shrink: 0;
         text-overflow: ellipsis;
         overflow: hidden;
@@ -208,7 +208,7 @@ select[multiple] {
             font-size: $base-font-size--m;
             font-family: $selector-uniform-arrow-font-family;
             position: $selector-uniform-arrow-position;
-            #{$end}: $selector-uniform-arrow-right;
+            right: $selector-uniform-arrow-right;
             color: $selector-uniform-arrow-color;
             line-height: $selector-uniform-line-height;
         }
@@ -293,23 +293,23 @@ select[multiple] {
 
     .input-append & {
         border-radius: $add-on-append-border-radius;
-        margin-#{$start}: $add-on-append-offset-left;
+        margin-left: $add-on-append-offset-left;
 
         &:not(:first-of-type) {
-            margin-#{$start}: $add-on-append-outer-offset-left;
+            margin-left: $add-on-append-outer-offset-left;
         }
 
         &:first-child {
-            margin-#{$start}: 0;
+            margin-left: 0;
         }
     }
 
     .input-prepend & {
         border-radius: $add-on-prepend-border-radius;
-        margin-#{$end}: $add-on-prepend-offset-right;
+        margin-right: $add-on-prepend-offset-right;
 
         &:not(:last-of-type) {
-            margin-#{$end}: $add-on-prepend-outer-offset-right;
+            margin-right: $add-on-prepend-outer-offset-right;
         }
     }
 }
@@ -373,8 +373,8 @@ select[multiple] {
 .form-horizontal {
     > .span6 {
         max-width: $form-container-column-max-width;
-        margin-#{$end}: $form-container-column-offset-right;
-        float: $start;
+        margin-right: $form-container-column-offset-right;
+        float: left;
 
         &:not(:last-of-type) {
             margin-bottom: $form-container-control-row-space;
@@ -492,7 +492,7 @@ input[type='number'] {
         color: $btn-text-color;
         display: block;
         position: absolute;
-        #{$end}: 0;
+        right: 0;
         text-align: center;
         pointer-events: none;
     }
@@ -503,7 +503,7 @@ input[type='number'] {
         }
 
         position: absolute;
-        #{$end}: 0;
+        right: 0;
     }
 
     &__container--clear .clearable-input__clear {
@@ -515,7 +515,7 @@ input[type='number'] {
     > .control-group {
         .control-label {
             .tooltip-icon {
-                margin-#{$end}: 8px;
+                margin-right: 8px;
             }
         }
     }
@@ -526,7 +526,7 @@ input[type='number'] {
 
         .btn {
             + .btn {
-                margin-#{$start}: 8px;
+                margin-left: 8px;
             }
         }
     }

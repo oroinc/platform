@@ -49,7 +49,7 @@
     }
 
     .filename {
-        padding: side-values(0 12px 0 12px 0);
+        padding: 0 12px 0 12px 0;
     }
 }
 
@@ -70,7 +70,7 @@
             width: $controls-fields-row-input-small-width;
 
             &:first-child {
-                margin-#{$end}: $controls-fields-row-input-small-gap;
+                margin-right: $controls-fields-row-input-small-gap;
             }
         }
     }
@@ -83,7 +83,7 @@
         margin-right: 0;
 
         &:not(:last-of-type) {
-            margin: side-values(0 0 $form-container-control-row-space 0);
+            margin: 0 0 $form-container-control-row-space 0;
         }
     }
 
@@ -96,15 +96,15 @@
             padding-top: $form-horizontal-control-label-inner-offset-top;
             padding-bottom: $form-horizontal-control-label-inner-offset-bottom;
             line-height: $form-horizontal-control-label-inner-line-height;
-            text-align: #{$start};
+            text-align: left;
         }
 
         .controls {
-            margin-#{$start}: $form-horizontal-controls-offset-left;
+            margin-left: $form-horizontal-controls-offset-left;
             min-width: 0;
 
             &:first-child {
-                margin-#{$start}: $form-horizontal-controls-offset-left;
+                margin-left: $form-horizontal-controls-offset-left;
             }
 
             .control-group-checkbox {
@@ -172,7 +172,7 @@
     }
 
     &__container > input {
-        padding-#{$end}: $input-size;
+        padding-right: $input-size;
     }
 }
 

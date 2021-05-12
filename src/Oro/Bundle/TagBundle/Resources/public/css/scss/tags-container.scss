@@ -6,7 +6,7 @@
     margin-top: -$tag-item-offset-vertical;
 
     &__icon {
-        margin-#{$end}: $tag-item-icon-offset-end;
+        margin-right: $tag-item-icon-offset-end;
     }
 
     &.grid-body-cell-tags {

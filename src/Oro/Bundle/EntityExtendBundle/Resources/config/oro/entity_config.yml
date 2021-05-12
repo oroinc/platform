@@ -260,7 +260,7 @@ entity_config:
                     options:
                         require_schema_update: true
                         value_type:         integer
-                        default_value:      2
+                        default_value:      10
                         allowed_type:       [decimal]
                         required_property:
                             config_id:
@@ -294,6 +294,8 @@ entity_config:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
                             min:            0
+                            maxPropertyPath: parent[precision].data
+                            notInRangeMessage: oro.entity_extend.validator.scale.range.not_in_range
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:

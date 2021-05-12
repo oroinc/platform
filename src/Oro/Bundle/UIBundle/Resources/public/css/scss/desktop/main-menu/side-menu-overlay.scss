@@ -8,7 +8,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    #{$start}: 100%;
+    left: 100%;
     z-index: -1;
 
     width: 100vw;
@@ -37,7 +37,7 @@
     &__header {
         position: relative;
 
-        padding: side-values(24px $overlay-header-offset-start 18px $overlay-header-offset-end);
+        padding: 24px $overlay-header-offset-start 18px $overlay-header-offset-end;
         height: $side-menu-overlay-header-height;
     }
 
@@ -50,7 +50,7 @@
     &__search-icon {
         position: absolute;
         top: 0;
-        #{$end}: 8px;
+        right: 8px;
         padding: 4px;
 
         background-color: transparent;
@@ -69,7 +69,7 @@
 
     &__field {
         width: 100%;
-        padding-#{$end}: 24px;
+        padding-right: 24px;
         margin: 0;
 
         box-sizing: border-box;
@@ -97,7 +97,7 @@
         top: 10px;
         z-index: 1;
 
-        margin-#{$end}: $side-menu-overlay-button-offset;
+        margin-right: $side-menu-overlay-button-offset;
 
         font-size: $side-menu-overlay-button-font-size;
 
@@ -111,10 +111,6 @@
         &:focus {
             color: $menu-minimized-item-first-level-text-color-active;
         }
-    }
-
-    &__ui-helper {
-        direction: $side-menu-overlay-ui-helper-direction;
     }
 
     &__fill,
@@ -148,16 +144,12 @@
     &__fill-blur::after {
         width: $side-menu-fill-blur-width;
 
-        margin-#{$end}: $side-menu-overlay-ui-fill-blur-offset;
-
         background-color: $menu-dropdown-background-color;
         box-shadow: $side-menu-overlay-ui-fill-blur-box-shadow;
     }
 
     &__fill-blur-inner::after {
         background-color: rgba($primary-inverse, .5);
-
-        transform: $side-menu-overlay-ui-fill-blur-inner-transform;
     }
 
     .menu {
@@ -223,7 +215,7 @@
             $selector: '&-level-' + $i;
 
             #{$selector} {
-                padding-#{$start}: $menu-overlay-title-offset * 1px;
+                padding-left: $menu-overlay-title-offset * 1px;
 
                 @if $i == 2 {
                     font-size: ($menu-font-size + 2);
