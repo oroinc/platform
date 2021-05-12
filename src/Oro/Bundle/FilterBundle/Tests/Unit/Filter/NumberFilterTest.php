@@ -12,6 +12,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\NumberFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterTypeInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -132,9 +133,10 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
      */
     public function testParseData($data, $expected)
     {
-        $parseDataMethod = new \ReflectionMethod($this->filter, 'parseData');
-        $parseDataMethod->setAccessible(true);
-        $this->assertEquals($expected, $parseDataMethod->invoke($this->filter, $data));
+        $this->assertEquals(
+            $expected,
+            ReflectionUtil::callMethod($this->filter, 'parseData', [$data])
+        );
     }
 
     /**

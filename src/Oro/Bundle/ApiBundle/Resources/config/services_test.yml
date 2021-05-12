@@ -58,7 +58,7 @@ services:
             - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 250 }
 
     oro_api.tests.request_type_logger:
-        class: Symfony\Component\Debug\BufferingLogger
+        class: Symfony\Component\ErrorHandler\BufferingLogger
         public: true
 
     oro_api.tests.log_request_type:
@@ -348,3 +348,10 @@ services:
             - '@oro_api.tests.test_flash_bag_depended_service'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment }
+
+    oro_api.tests.skipped_file_systems:
+        class: Oro\Bundle\GaufretteBundle\Tests\Functional\Environment\SkippedGaufretteFileSystemProvider
+        decorates: oro_gaufrette.tests.skipped_file_systems
+        arguments:
+            - '@oro_api.tests.skipped_file_systems.inner'
+            - ['api', 'api_source_data']

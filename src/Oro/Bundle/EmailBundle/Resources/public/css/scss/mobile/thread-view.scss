@@ -7,11 +7,11 @@
         justify-content: flex-end;
 
         .btn-group {
-            margin-#{$start}: $email-actions-btn-group-mobile-offset;
+            margin-left: $email-actions-btn-group-mobile-offset;
             margin-bottom: $email-actions-btn-group-mobile-offset;
 
             &:first-child {
-                margin-#{$start}:  $email-actions-btn-group-first-mobile-offset;;
+                margin-left:  $email-actions-btn-group-first-mobile-offset;;
             }
         }
     }

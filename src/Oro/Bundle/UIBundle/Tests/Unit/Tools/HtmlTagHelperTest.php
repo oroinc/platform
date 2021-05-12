@@ -141,10 +141,15 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLastErrorCollectorWithErrors($htmlValue, array $allowedElements, array $expectedResult): void
     {
-        $this->translator->expects($this->at(18))
+        $this->translator->expects($this->atLeastOnce())
             ->method('trans')
-            ->with($this->stringContains('oro.htmlpurifier.messages'))
-            ->willReturn('Unrecognized $CurrentToken.Serialized tag removed');
+            ->willReturnCallback(function ($id) {
+                if (strpos($id, 'oro.htmlpurifier.messages') !== -1) {
+                    return 'Unrecognized $CurrentToken.Serialized tag removed';
+                }
+
+                return $id;
+            });
 
         $this->helper->setTranslator($this->translator);
 

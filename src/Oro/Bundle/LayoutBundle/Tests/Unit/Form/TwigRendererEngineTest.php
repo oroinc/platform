@@ -3,8 +3,8 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Form;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\LayoutBundle\Form\BaseTwigRendererEngine;
 use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
 
@@ -46,14 +46,8 @@ class TwigRendererEngineTest extends RendererEngineTest
             ->method('getTemplateName')
             ->will($this->returnValue('theme'));
 
-        $class = new \ReflectionClass(BaseTwigRendererEngine::class);
-        $property = $class->getProperty('template');
-        $property->setAccessible(true);
-        $property->setValue($this->twigRendererEngine, $template);
-
-        $property = $class->getProperty('resources');
-        $property->setAccessible(true);
-        $property->setValue($this->twigRendererEngine, ['cache_key' => []]);
+        ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'template', $template);
+        ReflectionUtil::setPropertyValue($this->twigRendererEngine, 'resources', ['cache_key' => []]);
 
         $variables = ['id' => 'root'];
         $result = array_merge(

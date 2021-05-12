@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Cron\ProcessTriggerCronScheduler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -278,10 +279,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getDirtyPropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'dirty');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processTriggersConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'dirty');
     }
 
     /**
@@ -289,10 +287,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getForRemovePropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'forRemove');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processTriggersConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'forRemove');
     }
 
     /**
@@ -300,9 +295,6 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
      */
     private function getForPersistPropertyValue()
     {
-        $property = new \ReflectionProperty(ProcessTriggersConfigurator::class, 'forPersist');
-        $property->setAccessible(true);
-
-        return $property->getValue($this->processTriggersConfigurator);
+        return ReflectionUtil::getPropertyValue($this->processTriggersConfigurator, 'forPersist');
     }
 }

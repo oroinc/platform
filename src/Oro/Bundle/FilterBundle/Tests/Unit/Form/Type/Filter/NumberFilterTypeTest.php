@@ -7,6 +7,9 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\FilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
+use Oro\Bundle\FormBundle\Form\Extension\NumberTypeExtension;
+use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -15,25 +18,35 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
-    /**
-     * @var NumberFilterType
-     */
+    /** @var NumberFilterType */
     protected $type;
 
-    /**
-     * @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
+
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    private $numberFormatter;
 
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
         $this->localeSettings = $this->createMock(LocaleSettings::class);
-        $this->type = new NumberFilterType($translator, $this->localeSettings);
+        $this->numberFormatter = new NumberFormatter(
+            $this->localeSettings,
+            new IntlNumberFormatterFactory($this->localeSettings)
+        );
+        $this->type = new NumberFilterType($translator, $this->numberFormatter);
         $this->formExtensions[] = new CustomFormExtension(array(new FilterType($translator)));
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
+    }
+
+    protected function getTypeExtensions(): array
+    {
+        return [
+            new NumberTypeExtension($this->numberFormatter),
+        ];
     }
 
     /**
@@ -88,10 +101,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     ) {
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
+        $locale = 'en';
         $this->localeSettings
-            ->expects($this->once())
+            ->expects(self::atLeastOnce())
             ->method('getLocale')
-            ->willReturn('en');
+            ->willReturn($locale);
+
+        \Locale::setDefault($locale);
 
         parent::testBindData($bindData, $formData, $viewData, $customOptions);
     }
@@ -105,9 +121,9 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         return array(
             'not formatted number' => array(
                 'bindData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'),
-                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68),
+                'formData'      => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789),
                 'viewData'      => array(
-                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'),
+                    'value' => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.6789'),
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
@@ -195,9 +211,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'viewData'      => array(
                     'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'),
                     'formatter_options' => array(
-                        'decimals'         => 2,
-                        'grouping'         => false,
-                        'orderSeparator' => '',
+                        'grouping'         => true,
+                        'orderSeparator' => ',',
                         'decimalSeparator' => '.',
                         'percent'          => true
                     ),
@@ -215,9 +230,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'viewData'      => array(
                     'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'),
                     'formatter_options' => array(
-                        'decimals'         => 2,
-                        'grouping'         => false,
-                        'orderSeparator' => '',
+                        'grouping'         => true,
+                        'orderSeparator' => ',',
                         'decimalSeparator' => '.',
                         'percent'          => true
                     ),
@@ -238,7 +252,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'viewData'      => array(
                     'value'             => array('type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'),
                     'formatter_options' => array(
-                        'decimals'         => 4,
                         'grouping'         => true,
                         'orderSeparator'   => ' ',
                         'decimalSeparator' => '.',
@@ -251,7 +264,6 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'field_type'        => MoneyType::class,
                     'data_type'         => NumberFilterType::DATA_DECIMAL,
                     'formatter_options' => array(
-                        'decimals'       => 4,
                         'orderSeparator' => ' '
                     )
                 ),
@@ -288,10 +300,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     ) {
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
+        $locale = 'de_DE';
         $this->localeSettings
-            ->expects($this->once())
+            ->expects(self::atLeastOnce())
             ->method('getLocale')
-            ->willReturn('de_DE');
+            ->willReturn($locale);
+
+        \Locale::setDefault($locale);
 
         parent::testBindData($bindData, $formData, $viewData, $customOptions);
     }
@@ -303,10 +318,10 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     {
         return array(
             'not formatted number' => [
-                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
-                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68],
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345,67890'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789],
                 'viewData' => [
-                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.345,6789'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
@@ -316,10 +331,10 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
             'formatted number' => [
-                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.345,68'],
                 'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68],
                 'viewData' => [
-                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.345,68'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::DATA_INTEGER
@@ -389,14 +404,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
             'percent_float' => [
-                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,34'],
                 'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
                 'viewData' => [
-                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,34'],
                     'formatter_options' => [
-                        'decimals' => 2,
-                        'grouping' => false,
-                        'orderSeparator' => '',
+                        'grouping' => true,
+                        'orderSeparator' => '.',
                         'decimalSeparator' => ',',
                         'percent' => true
                     ],
@@ -414,9 +428,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'viewData' => [
                     'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
                     'formatter_options' => [
-                        'decimals' => 2,
-                        'grouping' => false,
-                        'orderSeparator' => '',
+                        'grouping' => true,
+                        'orderSeparator' => '.',
                         'decimalSeparator' => ',',
                         'percent' => true
                     ],
@@ -429,13 +442,13 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
             ],
             'money' => [
-                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345,67890'],
                 'formData' => [
                     'type' => NumberFilterType::TYPE_EQUAL,
                     'value' => 12345.68
                 ],
                 'viewData' => [
-                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'],
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345,68'],
                     'formatter_options' => [
                         'decimals' => 4,
                         'grouping' => true,

@@ -21,7 +21,7 @@ class CommentPlaceholderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $authorizationChecker;
 
-    /** @var  CommentPlaceholderFilter */
+    /** @var CommentPlaceholderFilter */
     protected $filter;
 
     protected function setUp(): void

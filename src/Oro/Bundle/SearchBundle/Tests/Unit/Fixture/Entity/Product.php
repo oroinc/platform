@@ -14,7 +14,7 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Attribute;
 class Product
 {
     /**
-     * @var int|null $id
+     * @var int|null
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -23,35 +23,35 @@ class Product
     private $id;
 
     /**
-     * @var string|null $name
+     * @var string|null
      *
      * @ORM\Column(name="name", type="string", length=255)
      */
     private $name;
 
     /**
-     * @var float|null $price
+     * @var float|null
      *
      * @ORM\Column(name="price", type="decimal")
      */
     private $price;
 
     /**
-     * @var int|null $count
+     * @var int|null
      *
      * @ORM\Column(name="count", type="integer")
      */
     private $count;
 
     /**
-     * @var \DateTime $createDate
+     * @var \DateTime
      *
      * @ORM\Column(name="create_date", type="datetime")
      */
     private $createDate;
 
     /**
-     * @var string|null $description
+     * @var string|null
      *
      * @ORM\Column(name="description", type="text")
      */

@@ -27,7 +27,7 @@
 
     .select2-arrow {
         top: $sorting-select-arrow-top;
-        #{$end}: $sorting-select-arrow-end;
+        right: $sorting-select-arrow-end;
 
         color: $sorting-select-toggle-color;
     }

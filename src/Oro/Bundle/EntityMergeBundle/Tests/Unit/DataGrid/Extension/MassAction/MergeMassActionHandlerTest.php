@@ -6,64 +6,40 @@ use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHa
 
 class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeMassActionHandler $target
-     */
+    /** @var MergeMassActionHandler */
     private $target;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $args;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $options;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $optionsArray;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $iteratedResult;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $firstResultRecord;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $secondResultRecord;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $firstEntity;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $secondEntity;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $firstResultRecordId;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $secondResultRecordId;
 
     protected function setUp(): void

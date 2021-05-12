@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValue;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValueValidator;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -26,10 +27,7 @@ class NotLessThanOriginalValueValidatorTest extends ConstraintValidatorTestCase
     private function getModel(int $id): FieldConfigModel
     {
         $model = new FieldConfigModel();
-        $reflectionClass = new \ReflectionClass($model);
-        $method = $reflectionClass->getProperty('id');
-        $method->setAccessible(true);
-        $method->setValue($model, $id);
+        ReflectionUtil::setId($model, $id);
 
         return $model;
     }

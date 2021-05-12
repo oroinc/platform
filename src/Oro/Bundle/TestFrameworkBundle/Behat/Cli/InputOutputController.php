@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class InputOutputController implements Controller
 {
-    /** @var  TestIsolationSubscriber */
+    /** @var TestIsolationSubscriber */
     protected $testIsolationSubscriber;
 
     /** @var MessageQueueIsolationSubscriber */

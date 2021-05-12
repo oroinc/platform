@@ -3,34 +3,19 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EmailSynchronizationManagerTest extends \PHPUnit\Framework\TestCase
 {
     public function testSyncOrigins()
     {
-        $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $container = $this->createMock(ContainerInterface::class);
 
-        $sync1 = $this->getMockForAbstractClass(
-            'Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer',
-            [],
-            '',
-            false,
-            true,
-            true,
-            ['supports', 'syncOrigins']
-        );
-        $sync2 = $this->getMockForAbstractClass(
-            'Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer',
-            [],
-            '',
-            false,
-            true,
-            true,
-            ['supports', 'syncOrigins']
-        );
+        $sync1 = $this->createMock(AbstractEmailSynchronizer::class);
+        $sync2 = $this->createMock(AbstractEmailSynchronizer::class);
 
         $origin1 = new InternalEmailOrigin();
         $origin1->setName('origin1');
@@ -42,48 +27,34 @@ class EmailSynchronizationManagerTest extends \PHPUnit\Framework\TestCase
         $origin3->setName('origin3');
         ReflectionUtil::setId($origin3, 3);
 
-        $sync1->expects($this->at(0))
+        $sync1->expects($this->exactly(3))
             ->method('supports')
-            ->with($origin1)
-            ->will($this->returnValue(false));
-        $sync1->expects($this->at(1))
-            ->method('supports')
-            ->with($origin2)
-            ->will($this->returnValue(true));
-        $sync1->expects($this->at(2))
-            ->method('supports')
-            ->with($origin3)
-            ->will($this->returnValue(false));
-        $sync1->expects($this->at(3))
+            ->willReturnMap([
+                [$origin1, false],
+                [$origin2, true],
+                [$origin3, false]
+            ]);
+        $sync1->expects($this->once())
             ->method('syncOrigins')
             ->with([2]);
 
-        $sync2->expects($this->at(0))
+        $sync2->expects($this->exactly(3))
             ->method('supports')
-            ->with($origin1)
-            ->will($this->returnValue(false));
-        $sync2->expects($this->at(1))
-            ->method('supports')
-            ->with($origin2)
-            ->will($this->returnValue(false));
-        $sync2->expects($this->at(2))
-            ->method('supports')
-            ->with($origin3)
-            ->will($this->returnValue(true));
-        $sync2->expects($this->at(3))
+            ->willReturnMap([
+                [$origin1, false],
+                [$origin2, false],
+                [$origin3, true]
+            ]);
+        $sync2->expects($this->once())
             ->method('syncOrigins')
             ->with([3]);
 
         $container->expects($this->any())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['sync1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $sync1],
-                        ['sync2', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $sync2],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['sync1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $sync1],
+                ['sync2', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $sync2],
+            ]);
 
         $manager = new EmailSynchronizationManager($container);
         $manager->addSynchronizer('sync1');

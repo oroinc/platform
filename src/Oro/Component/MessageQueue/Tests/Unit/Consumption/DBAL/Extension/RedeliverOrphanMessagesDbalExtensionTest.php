@@ -27,25 +27,19 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
     public function testShouldCreatePidFileOnlyOnce()
     {
         $consumer = $this->createDbalMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer->expects($this->once())
             ->method('getConsumerId')
-            ->will($this->returnValue('consumer-id'))
-        ;
+            ->willReturn('consumer-id');
 
         $session = $this->createSessionMock();
 
         $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $pidFileManager->expects($this->once())
             ->method('createPidFile')
-            ->with('consumer-id')
-        ;
-        $pidFileManager
-            ->expects($this->once())
+            ->with('consumer-id');
+        $pidFileManager->expects($this->once())
             ->method('getListOfPidsFileInfo')
-            ->will($this->returnValue([]))
-        ;
+            ->willReturn([]);
 
         $context = new Context($session);
         $context->setMessageConsumer($consumer);
@@ -63,8 +57,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
     public function testShouldRedeliverOrphanMessages()
     {
         $dbalConnection = $this->createDBALConnection();
-        $dbalConnection
-            ->expects($this->once())
+        $dbalConnection->expects($this->once())
             ->method('executeStatement')
             ->with(
                 'UPDATE  SET consumer_id=NULL, redelivered=:isRedelivered '.
@@ -77,56 +70,38 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
                     'isRedelivered' => Types::BOOLEAN,
                     'consumerIds' => Connection::PARAM_STR_ARRAY,
                 ]
-            )
-        ;
+            );
 
         $connection = $this->createConnectionMock();
-        $connection
-            ->expects($this->once())
+        $connection->expects($this->once())
             ->method('getDBALConnection')
-            ->will($this->returnValue($dbalConnection))
-        ;
+            ->willReturn($dbalConnection);
 
         $session = $this->createSessionMock();
-        $session
-            ->expects($this->once())
+        $session->expects($this->once())
             ->method('getConnection')
-            ->will($this->returnValue($connection))
-        ;
+            ->willReturn($connection);
 
         $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $pidFileManager->expects($this->once())
             ->method('getListOfPidsFileInfo')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['pid' => 123, 'consumerId' => 'consumer-id-1'],
                 ['pid' => 456, 'consumerId' => 'consumer-id-2'],
-            ]))
-        ;
-        $pidFileManager
-            ->expects($this->at(2))
+            ]);
+        $pidFileManager->expects($this->exactly(2))
             ->method('removePidFile')
-            ->with('consumer-id-1')
-        ;
-        $pidFileManager
-            ->expects($this->at(3))
-            ->method('removePidFile')
-            ->with('consumer-id-2')
-        ;
+            ->withConsecutive(['consumer-id-1'], ['consumer-id-2']);
 
         $cliProcessManager = $this->createDbalCliProcessManagerMock();
-        $cliProcessManager
-            ->expects($this->once())
+        $cliProcessManager->expects($this->once())
             ->method('getListOfProcessesPids')
-            ->will($this->returnValue([]))
-        ;
+            ->willReturn([]);
 
         $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Orphans were found and redelivered. consumerIds: "consumer-id-1, consumer-id-2"')
-        ;
+            ->with('Orphans were found and redelivered. consumerIds: "consumer-id-1, consumer-id-2"');
 
         $context = new Context($session);
         $context->setMessageConsumer($this->createDbalMessageConsumerMock());
@@ -145,11 +120,9 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
     public function testOnInterruptedShouldRemovePidFile()
     {
         $consumer = $this->createDbalMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer->expects($this->once())
             ->method('getConsumerId')
-            ->will($this->returnValue('consumer-id'))
-        ;
+            ->willReturn('consumer-id');
 
         $session = $this->createSessionMock();
 
@@ -157,11 +130,9 @@ class RedeliverOrphanMessagesDbalExtensionTest extends \PHPUnit\Framework\TestCa
         $context->setMessageConsumer($consumer);
 
         $pidFileManager = $this->createDbalPidFileManagerMock();
-        $pidFileManager
-            ->expects($this->once())
+        $pidFileManager->expects($this->once())
             ->method('removePidFile')
-            ->with('consumer-id')
-        ;
+            ->with('consumer-id');
 
         $extension = new RedeliverOrphanMessagesDbalExtension(
             $pidFileManager,

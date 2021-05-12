@@ -12,10 +12,10 @@ class TagSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var TagSubscriber */
     protected $subscriber;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $manager;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $taggableHelper;
 
     protected function setUp(): void

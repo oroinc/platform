@@ -11,8 +11,6 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
-use Symfony\Component\Validator\Constraints\Length;
 
 /**
  * Based on the configuration, it determines the field type, parameters and constraints
@@ -105,7 +103,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         }
 
         $options = $this->getOptions($extendConfig, $fieldConfigId);
-        $options = $this->addConstraintsToOptions($options, $extendConfig, $fieldConfigId);
 
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
 
@@ -184,36 +181,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 if (!$extendConfig->is('without_default')) {
                     $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
                 }
-                break;
-        }
-
-        return $options;
-    }
-
-    /**
-     * @param array $options
-     * @param ConfigInterface $extendConfig
-     * @param FieldConfigId $fieldConfigId
-     *
-     * @return array
-     */
-    protected function addConstraintsToOptions(
-        array $options,
-        ConfigInterface $extendConfig,
-        FieldConfigId $fieldConfigId
-    ) {
-        switch ($fieldConfigId->getFieldType()) {
-            case 'decimal':
-                $options['constraints'] = [new Decimal([
-                    'precision' => $extendConfig->get('precision'),
-                    'scale'     => $extendConfig->get('scale')
-                ])];
-                break;
-            case 'string':
-                $length = $extendConfig->get('length') ?: 255;
-                $options['constraints'] = [new Length([
-                    'max' => $length
-                ])];
                 break;
         }
 

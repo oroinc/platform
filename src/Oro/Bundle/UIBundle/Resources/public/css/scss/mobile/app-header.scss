@@ -45,7 +45,7 @@
     height: $app-header-height;
     max-height: $app-header-height;
     top: 0;
-    #{$start}: 0;
+    left: 0;
 
     .navbar .nav {
         position: static;
@@ -63,12 +63,12 @@
         @include safe-area-offset(padding, 0);
 
         .dropdown-menu {
-            #{$start}: 0;
+            left: 0;
 
             color: $app-header-dropdown-menu-color;
 
             .nav-header {
-                margin-#{$end}: $mobile-app-header-header-margin-end;
+                margin-right: $mobile-app-header-header-margin-end;
                 margin-bottom: $mobile-app-header-header-margin-bottom;
 
                 font-size: $mobile-app-header-header-font-size;
@@ -82,8 +82,8 @@
             .btn-close {
                 position: absolute;
                 top: 0;
-                #{$start}: auto;
-                #{$end}: 0;
+                left: auto;
+                right: 0;
                 z-index: $zindex-dropdown + 1;
 
                 margin: $app-header-dropdown-close-icon-margin;
@@ -110,14 +110,14 @@
     .main-menu-toggler {
         @extend %header-button;
 
-        float: #{$start};
+        float: left;
         padding: 0 $mobile-app-header-main-menu-toggler-h-padding;
         color: $app-header-logo-text-color;
     }
 
     .organization-logo-wrapper {
-        margin-#{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
-        margin-#{$end}: $mobile-app-header-organization-logo-wrapper-margin-end;
+        margin-left: $mobile-app-header-organization-logo-wrapper-margin-start;
+        margin-right: $mobile-app-header-organization-logo-wrapper-margin-end;
 
         .organization-switcher,
         .organization-switcher > * {
@@ -126,7 +126,7 @@
 
         .organization-switcher {
             margin: 0;
-            float: $start;
+            float: left;
         }
 
         .logo {
@@ -134,7 +134,7 @@
             color: $app-header-logo-text-color;
             font-weight: bold;
             margin: 0;
-            float: $start;
+            float: left;
             line-height: $app-header-height;
             height: $app-header-height;
             white-space: nowrap;
@@ -149,12 +149,12 @@
             }
 
             &.dropdown-toggle {
-                padding-#{$end}: 32px;
+                padding-right: 32px;
                 position: relative;
 
                 &:after {
                     position: absolute;
-                    #{$end}: 10px;
+                    right: 10px;
                     top: ($app-header-height - 5)/ 2;
                 }
             }
@@ -171,13 +171,13 @@
     }
 
     .dropdown-menu {
-        #{$start}: 0;
+        left: 0;
         max-width: $mobile-app-header-dropdown-menu-max-width;
     }
 
     &__search-and-shortcuts {
         position: relative;
-        float: #{$end};
+        float: right;
         margin: 0;
         height: $app-header-height;
 
@@ -198,12 +198,12 @@
 
         .header-dropdown-shortcut {
             .dropdown-menu {
-                #{$start}: auto;
-                #{$end}: 0;
+                left: auto;
+                right: 0;
 
                 &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-shortcuts-arrow-end;
+                    left: auto;
+                    right: $tablet-app-header-shortcuts-arrow-end;
                 }
             }
 
@@ -221,8 +221,8 @@
 
         .header-dropdown-search {
             .dropdown-menu {
-                #{$start}: auto;
-                #{$end}: 0;
+                left: auto;
+                right: 0;
                 max-width: none;
 
                 .nav-content {
@@ -230,16 +230,16 @@
                 }
 
                 .dropdown-menu {
-                    #{$start}: 0;
-                    #{$end}: auto;
+                    left: 0;
+                    right: auto;
                     max-height: $mobile-app-header-search-dropdown-menu-max-height;
                     overflow-y: auto;
                     overflow-x: visible;
                 }
 
                 &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-search-arrow-end;
+                    left: auto;
+                    right: $tablet-app-header-search-arrow-end;
                 }
 
                 .search-suggestion-list {
@@ -277,22 +277,22 @@
     }
 
     .user-menu {
-        float: $end;
+        float: right;
         margin: 0;
 
         .dropdown {
             > .dropdown-toggle {
                 @extend %header-button;
-                padding-#{$end}: $mobile-app-header-user-menu-toggler-padding-end;
+                padding-right: $mobile-app-header-user-menu-toggler-padding-end;
             }
 
             .dropdown-menu {
                 padding: $mobile-app-header-dropdown-menu-padding;
-                #{$start}: auto;
-                #{$end}: $tablet-app-header-user-menu-offset;
+                left: auto;
+                right: $tablet-app-header-user-menu-offset;
 
                 .nav-header {
-                    margin-#{$end}: $mobile-app-header-header-margin-end;
+                    margin-right: $mobile-app-header-header-margin-end;
                     margin-bottom: $mobile-app-header-title-margin-bottom;
                 }
 
@@ -309,8 +309,8 @@
                 }
 
                 &:before {
-                    #{$start}: auto;
-                    #{$end}: $tablet-app-header-user-menu-arrow-end;
+                    left: auto;
+                    right: $tablet-app-header-user-menu-arrow-end;
                 }
             }
         }
@@ -323,8 +323,8 @@
         .organization-logo-wrapper {
             > .dropdown > .dropdown-menu {
                 position: fixed;
-                #{$start}: 0;
-                #{$end}: 0;
+                left: 0;
+                right: 0;
                 top: $app-header-height;
                 bottom: 0;
                 margin-top: 0;
@@ -341,21 +341,21 @@
         }
 
         .organization-logo-wrapper .dropdown .dropdown-menu:before {
-            #{$start}: $mobile-app-header-organization-logo-wrapper-margin-start;
+            left: $mobile-app-header-organization-logo-wrapper-margin-start;
         }
 
         .user-menu .dropdown .dropdown-menu:before {
-            #{$end}: $phone-app-header-user-menu-arrow-end;
+            right: $phone-app-header-user-menu-arrow-end;
         }
 
         &__search-and-shortcuts {
             .header-dropdown-search .dropdown-menu:before {
-                #{$end}: $phone-app-header-search-arrow-end;
+                right: $phone-app-header-search-arrow-end;
             }
 
             .header-dropdown-shortcut .dropdown-menu {
                 &:before {
-                    #{$end}: $phone-app-header-shortcuts-arrow-end;
+                    right: $phone-app-header-shortcuts-arrow-end;
                 }
 
                 .shortcut-search-input {

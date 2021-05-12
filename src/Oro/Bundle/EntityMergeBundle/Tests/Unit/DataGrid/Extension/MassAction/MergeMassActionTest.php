@@ -10,9 +10,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 {
     const MAX_ENTITIES_COUNT = 1;
 
-    /**
-     * @var MergeMassAction $target
-     */
+    /** @var MergeMassAction */
     private $target;
 
     protected function setUp(): void

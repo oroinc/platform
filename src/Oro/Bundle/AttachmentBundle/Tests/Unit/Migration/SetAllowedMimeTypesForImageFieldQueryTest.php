@@ -10,37 +10,25 @@ use Psr\Log\LoggerInterface;
 
 class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $className = 'Oro\Bundle\CatalogBundle\Tests\Unit\Stub\TestEntity1';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $fieldName = 'testField';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $mimeTypes = [
         'testType1',
         'testType2'
     ];
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
 
-    /**
-     * @var SetAllowedMimeTypesForImageFieldQuery
-     */
+    /** @var SetAllowedMimeTypesForImageFieldQuery */
     private $updateAttachmentOptionQuery;
 
     protected function setUp(): void

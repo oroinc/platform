@@ -1022,7 +1022,7 @@ class OroMainContext extends MinkContext implements
         self::assertNotNull($dialog, 'There is no modal on page at this moment');
 
         foreach ($table->getRows() as $row) {
-            list($elementName, $expectedTitle) = $row;
+            [$elementName, $expectedTitle] = $row;
 
             $element = $dialog->findElementContains(sprintf('%s %s', $dialogName, $elementName), $expectedTitle);
             self::assertTrue($element->isValid(), sprintf('Element with "%s" text not found', $expectedTitle));
@@ -1069,14 +1069,14 @@ class OroMainContext extends MinkContext implements
             $button = $this->getSession()->getPage()->findLink($buttonName);
         }
         if (null === $button) {
-            /* @var $driver OroSelenium2Driver */
+            /* @var OroSelenium2Driver $driver */
             $driver = $this->getSession()->getDriver();
 
             throw new ElementNotFoundException($driver, 'button', 'id|name|title|alt|value', $buttonName);
         }
 
         foreach ($table->getRows() as $row) {
-            list($attributeName, $expectedValue) = $row;
+            [$attributeName, $expectedValue] = $row;
             $attribute = $button->getAttribute($attributeName);
 
             if ($expectedValue !== '~') {
@@ -1200,6 +1200,46 @@ class OroMainContext extends MinkContext implements
         $message = sprintf('Failed asserting that "%s" does not contain "%s"', $text, $actual);
 
         self::assertTrue(!preg_match($regex, $actual), $message, $element);
+    }
+
+    /**
+     * Checks, that element's inner text complies to the specified text exactly
+     * Example: Then I should see exact "Batman" in the "heroes_list" element
+     * Example: And I should see exact "Batman" in the "heroes_list" element
+     *
+     * @Then /^(?:|I )should see exact "(?P<text>(?:[^"]|\\")*)" in the "(?P<element>[^"]*)" element$/
+     */
+    public function assertElementContainsExactText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+
+        $actual = trim($elementObject->getText());
+        $text = $this->fixStepArgument($text);
+
+        $message = sprintf('Failed asserting that "%s" complies to "%s" exactly', $text, $actual);
+
+        self::assertTrue($actual === $text, $message, $element);
+    }
+
+    /**
+     * Checks, that element's inner text doesn't comply to the specified text exactly
+     * Example: Then I should not see exact "Batman" in the "heroes_list" element
+     * Example: And I should not see exact "Batman" in the "heroes_list" element
+     *
+     * @Then /^(?:|I )should not see exact "(?P<text>(?:[^"]|\\")*)" in the "(?P<element>[^"]*)" element$/
+     */
+    public function assertElementNotContainsExactText($element, $text)
+    {
+        $elementObject = $this->createElement($element);
+        self::assertTrue($elementObject->isIsset(), sprintf('Element "%s" not found', $element));
+
+        $actual = trim($elementObject->getText());
+        $text = $this->fixStepArgument($text);
+
+        $message = sprintf('Failed asserting that "%s" doesn\'t comply to "%s" exactly', $text, $actual);
+
+        self::assertTrue($actual !== $text, $message, $element);
     }
 
     /**
@@ -1418,7 +1458,7 @@ JS;
         $page = $this->getSession()->getPage();
 
         foreach ($table->getRows() as $row) {
-            list($label, $value) = $row;
+            [$label, $value] = $row;
             $labelElement = $this->findElementContains('Label', $label);
             $labels = $page->findAll('xpath', $labelElement->getXpath());
 
@@ -1749,7 +1789,7 @@ JS;
     public function sessionsInit(TableNode $table)
     {
         $mink = $this->getMink();
-        foreach ($table->getRows() as list($alias, $name)) {
+        foreach ($table->getRows() as [$alias, $name]) {
             $this->sessionAliasProvider->setSessionAlias($mink, $name, $alias);
         }
     }

@@ -40,12 +40,12 @@
         }
 
         &__item.loading .widget-picker__actions-column:after {
-            margin-#{$end}: $content-padding;
+            margin-right: $content-padding;
         }
 
         &__toggler-column {
             width: auto;
-            padding-#{$end}: $content-padding;
+            padding-right: $content-padding;
             padding-bottom: 0;
             border-bottom: 0 none;
         }
@@ -66,7 +66,7 @@
         &__info-column {
             flex-grow: 1;
             flex-basis: 0;
-            padding-#{$end}: 0;
+            padding-right: 0;
             padding-bottom: 0;
             padding-top: $content-padding;
             border-bottom: 0 none;
@@ -92,7 +92,7 @@
             flex-basis: 100%;
             text-align: right;
             padding-top: 0;
-            padding-#{$end}: 0;
+            padding-right: 0;
         }
     }
 }

@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Form\Type\OperationExecutionType;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Operation\Execution\FormProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -40,9 +41,7 @@ class FormProviderTest extends \PHPUnit\Framework\TestCase
         $formView = new FormView();
         $tokenView = new FormView();
 
-        $reflection = new \ReflectionProperty(FormView::class, 'children');
-        $reflection->setAccessible(true);
-        $reflection->setValue($formView, [FormProvider::CSRF_TOKEN_FIELD => $tokenView]);
+        ReflectionUtil::setPropertyValue($formView, 'children', [FormProvider::CSRF_TOKEN_FIELD => $tokenView]);
 
         $operation->expects($this->once())
             ->method('getName')

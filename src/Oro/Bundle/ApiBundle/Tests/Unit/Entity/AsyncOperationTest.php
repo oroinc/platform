@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Entity;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AsyncOperationTest extends \PHPUnit\Framework\TestCase
@@ -42,12 +43,7 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
     public function testId()
     {
         $entity = new AsyncOperation();
-
-        $reflectionClass = new \ReflectionClass(AsyncOperation::class);
-        $property = $reflectionClass->getProperty('id');
-        $property->setAccessible(true);
-        $property->setValue($entity, 100);
-
+        ReflectionUtil::setId($entity, 100);
         self::assertEquals(100, $entity->getId());
     }
 
@@ -89,10 +85,9 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
         $entity->beforeSave();
 
         // now - 5 min 10 sec
-        $createdAtProperty = new \ReflectionProperty(AsyncOperation::class, 'createdAt');
-        $createdAtProperty->setAccessible(true);
-        $createdAtProperty->setValue(
+        ReflectionUtil::setPropertyValue(
             $entity,
+            'createdAt',
             (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT5M10S'))
         );
         $entity->preUpdate();

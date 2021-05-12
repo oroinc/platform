@@ -280,15 +280,17 @@ class CumulativeConfigLoaderTest extends \PHPUnit\Framework\TestCase
         $resourceLoader = $this->createMock(CumulativeResourceLoader::class);
         $resource1 = new CumulativeResourceInfo(get_class($bundle1), 'res1', 'res1', []);
         $resource2 = new CumulativeResourceInfo(get_class($bundle1), 'res2', 'res2', []);
-        $resourceLoader->expects($this->at(0))
-            ->method('load')
-            ->with(get_class($bundle1), $bundle1Dir)
-            ->willReturn([$resource1, $resource2]);
         $resource3 = new CumulativeResourceInfo(get_class($bundle2), 'res3', 'res3', []);
-        $resourceLoader->expects($this->at(1))
+        $resourceLoader->expects($this->exactly(2))
             ->method('load')
-            ->with(get_class($bundle2), $bundle2Dir)
-            ->willReturn($resource3);
+            ->withConsecutive(
+                [get_class($bundle1), $bundle1Dir],
+                [get_class($bundle2), $bundle2Dir]
+            )
+            ->willReturnOnConsecutiveCalls(
+                [$resource1, $resource2],
+                $resource3
+            );
 
         CumulativeResourceManager::getInstance()
             ->clear()

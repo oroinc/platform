@@ -9,7 +9,8 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessTriggersConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Psr\Log\AbstractLogger;
+use Oro\Component\Testing\ReflectionUtil;
+use Psr\Log\LoggerInterface;
 
 class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -79,14 +80,10 @@ class ProcessConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetLogger()
     {
-        $reflection = new \ReflectionClass('Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurator');
-        $property = $reflection->getProperty('logger');
-        $property->setAccessible(true);
-        /** @var AbstractLogger $logger */
-        $logger = $this->getMockForAbstractClass('Psr\Log\AbstractLogger');
-        $this->assertNotEquals($logger, $property->getValue($this->processConfigurator));
+        $logger = $this->createMock(LoggerInterface::class);
+        $this->assertNotSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
         $this->processConfigurator->setLogger($logger);
-        $this->assertEquals($logger, $property->getValue($this->processConfigurator));
+        $this->assertSame($logger, ReflectionUtil::getPropertyValue($this->processConfigurator, 'logger'));
     }
 
     public function testRemoveProcesses()

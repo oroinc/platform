@@ -21,8 +21,6 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->provider = new AuditConfigProvider($this->configManager);
-
-        parent::setUp();
     }
 
     public function testIsAuditableEntityWhenEnum(): void
@@ -111,16 +109,10 @@ class AuditConfigProviderTest extends \PHPUnit\Framework\TestCase
 
         $config = $this->createMock(ConfigInterface::class);
         $config
-            ->expects($this->at(0))
+            ->expects($this->exactly(2))
             ->method('is')
             ->with('auditable')
-            ->willReturn(true);
-
-        $config
-            ->expects($this->at(1))
-            ->method('is')
-            ->with('auditable')
-            ->willReturn(false);
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $this->configManager
             ->expects($this->once())

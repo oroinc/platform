@@ -45,7 +45,7 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $configProvider;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
     /** @var EmailNotificationType */

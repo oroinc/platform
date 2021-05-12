@@ -2,6 +2,10 @@ This file includes only the most important items that should be addressed before
 
 Please refer to [CHANGELOG.md](CHANGELOG.md) for a list of significant changes in the code that may affect the upgrade of some customizations.
 
+## FROM 4.2.0 to 5.0.0
+
+* The minimum required PHP version is 8.0.0.
+
 ## FROM 4.1.0 to 4.2.0
 
 * The minimum required PHP version is 7.4.14.
@@ -14,9 +18,10 @@ The `var/attachment` and `var/import_export` directories are no longer used for 
 All files from these directories must be moved to the new locations:
 - from `var/attachment/protected_mediacache` to `var/data/protected_mediacache`;
 - from `var/attachment` to `var/data/attachments`;
-- from `var/import_export` to `var/data/importexport`.
+- from `var/import_export` to `var/data/importexport`;
+- from `var/import_export/files` to `var/data/import_files`.
 
-Files for standard import should be placed into `var/data/import_files` instead of `var/import_export/files`.
+The console command `oro:gaufrette:migrate-filestorages` will help to migrate the files to new structure.
 
 ## FROM 4.1.0-rc to 4.1.0
 

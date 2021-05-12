@@ -8,6 +8,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Entity for testing search engine
+ *
  * @ORM\Table(name="test_search_item")
  * @ORM\Entity
  * @Config(
@@ -36,70 +38,70 @@ class Item implements TestFrameworkEntityInterface
     protected $id;
 
     /**
-     * @var string $stringValue
+     * @var string
      *
      * @ORM\Column(name="stringValue", type="string", nullable=true)
      */
     protected $stringValue;
 
     /**
-     * @var integer $integerValue
+     * @var int
      *
      * @ORM\Column(name="integerValue", type="integer", nullable=true)
      */
     protected $integerValue;
 
     /**
-     * @var float $decimalValue
+     * @var float
      *
      * @ORM\Column(name="decimalValue", type="decimal", scale=2, nullable=true)
      */
     protected $decimalValue;
 
     /**
-     * @var float $floatValue
+     * @var float
      *
      * @ORM\Column(name="floatValue", type="float", nullable=true)
      */
     protected $floatValue;
 
     /**
-     * @var boolean $booleanValue
+     * @var bool
      *
      * @ORM\Column(name="booleanValue", type="boolean", nullable=true)
      */
     protected $booleanValue;
 
     /**
-     * @var string $blobValue
+     * @var string
      *
      * @ORM\Column(name="blobValue", type="blob", nullable=true)
      */
     protected $blobValue;
 
     /**
-     * @var array $arrayValue
+     * @var array
      *
      * @ORM\Column(name="arrayValue", type="array", nullable=true)
      */
     protected $arrayValue;
 
     /**
-     * @var \DateTime $arrayValue
+     * @var \DateTime
      *
      * @ORM\Column(name="datetimeValue", type="datetime", nullable=true)
      */
     protected $datetimeValue;
 
     /**
-     * @var string $arrayValue
+     * @var string
      *
      * @ORM\Column(name="guidValue", type="guid", nullable=true)
      */
     protected $guidValue;
 
     /**
-     * @var object $objectValue
+     * @var object
      *
      * @ORM\Column(name="objectValue", type="object", nullable=true)
      */

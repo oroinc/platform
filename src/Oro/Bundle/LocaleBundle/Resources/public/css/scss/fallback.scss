@@ -7,7 +7,7 @@
         float: $oro-quarter-float;
 
         &:not(:last-child) {
-            margin-#{$end}: $oro-quarter-offset-right;
+            margin-right: $oro-quarter-offset-right;
         }
 
         span {
@@ -109,10 +109,10 @@
     min-width: $fallback-item-use-fallback-width;
     @include text-line-truncate($max-width: $fallback-item-use-fallback-max-width);
 
-    padding-#{$end}: $content-padding-small;
+    padding-right: $content-padding-small;
 
     .checkbox-view {
-        margin-#{$end}: $content-padding-small;
+        margin-right: $content-padding-small;
     }
 
     .oro-checkbox-view {
@@ -144,7 +144,7 @@
     .input-append {
         .input-group {
             display: block;
-            margin-#{$end}: $fallback-item-value--first-input-group-offset-end;
+            margin-right: $fallback-item-value--first-input-group-offset-end;
         }
     }
 }

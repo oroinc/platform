@@ -40,66 +40,43 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
+
     private const USER_ID = 32;
 
-    /**
-     * @var JobRunner|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
     private $jobRunner;
 
-    /**
-     * @var MessageProducerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $messageProducer;
 
-    /**
-     * @var DependentJobService|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var DependentJobService|\PHPUnit\Framework\MockObject\MockObject */
     private $dependentJob;
 
-    /**
-     * @var FileManager|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
     private $fileManager;
 
-    /**
-     * @var ImportHandler|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ImportHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $importHandler;
 
-    /**
-     * @var WriterChain|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var WriterChain|\PHPUnit\Framework\MockObject\MockObject */
     private $writerChain;
 
-    /**
-     * @var NotificationSettings|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $notificationSettings;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
-    /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /**
-     * @var PreImportMessageProcessor
-     */
+    /** @var PreImportMessageProcessor */
     private $preImportMessageProcessor;
 
-    /**
-     * @var FileStreamWriter|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var FileStreamWriter|\PHPUnit\Framework\MockObject\MockObject */
     private $writer;
 
     protected function setUp(): void

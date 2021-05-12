@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Oro\Component\Testing\ReflectionUtil;
 
 class PermissionEntityTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,10 +25,7 @@ class PermissionEntityTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->object->getId());
 
         $testValue = 42;
-        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\SecurityBundle\Entity\PermissionEntity', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->object, $testValue);
-
+        ReflectionUtil::setId($this->object, $testValue);
         $this->assertEquals($testValue, $this->object->getId());
     }
 

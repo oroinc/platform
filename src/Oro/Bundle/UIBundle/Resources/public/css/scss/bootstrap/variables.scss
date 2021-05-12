@@ -1,28 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "~font-awesome/scss/_variables";
-@import "../mixins/direction";
-@import "../colors";
-
-// Global variables
-$content-padding: 24px;
-$content-padding-medium: 16px;
-$content-padding-small: $content-padding-medium / 2;
-$horizontal-padding: $content-padding;
-$vertical-padding: $content-padding;
-$top-padding: $content-padding;
-$bottom-padding: $content-padding;
-$margin-bottom-box: $content-padding;
-
-$base-font-size:                        14px;
-$base-font-size--xxl:                   32px;
-$base-font-size--xl:                    24px;
-$base-font-size--l:                     18px;
-$base-font-size--m:                     16px;
-$base-font-size--sm:                    13px;
-$base-font-size--s:                     12px;
-$base-font-size--xs:                    11px;
-
 // Your variable overrides
 $border-radius: 4px;
 $btn-border-radius: 16px;
@@ -162,7 +139,7 @@ $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
 $modal-content-border-radius: 4px;
 $modal-header-bg: $primary-200;
-$modal-header-padding: side-values(16px 18px 14px 20px);
+$modal-header-padding: 16px 18px 14px 20px;
 $modal-header-color: $primary-inverse;
 $modal-header-close-padding: 0;
 $modal-header-close-margin: 0;

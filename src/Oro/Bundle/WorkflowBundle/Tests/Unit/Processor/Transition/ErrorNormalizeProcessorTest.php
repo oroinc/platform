@@ -20,10 +20,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
  */
 class ErrorNormalizeProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $logger;
 
-    /** @var  ErrorNormalizeProcessor */
+    /** @var ErrorNormalizeProcessor */
     protected $processor;
 
     protected function setUp(): void

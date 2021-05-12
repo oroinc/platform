@@ -10,9 +10,9 @@
         flex-wrap: wrap;
 
         .control-group {
-            float: #{$start};
+            float: left;
             flex-direction: column;
-            margin-#{$end}: $query-designer-controls-group-margin-start;
+            margin-right: $query-designer-controls-group-margin-start;
             margin-bottom: $query-designer-controls-group-margin-start;
 
             .control-label {
@@ -20,12 +20,12 @@
                 padding-top: 0;
                 padding-bottom: $form-horizontal-control-label-offset;
 
-                text-align: #{$start};
+                text-align: left;
             }
 
             .controls {
-                float: #{$start};
-                margin-#{$start}: 0;
+                float: left;
+                margin-left: 0;
                 min-width: 0;
 
                 .select2-container {
@@ -66,7 +66,7 @@
         @include selector-width($query-designer-sorting-selector-width);
 
         .submit-cancel-buttons {
-            margin-#{$start}: auto;
+            margin-left: auto;
             margin-bottom: $query-designer-controls-group-margin-start;
 
             @include clearfix();
@@ -83,7 +83,7 @@
             }
 
             .btn {
-                margin-#{$start}: $query-designer-submit-cancel-buttons-margin-start;
+                margin-left: $query-designer-submit-cancel-buttons-margin-start;
             }
         }
 
@@ -99,8 +99,8 @@
                 padding: 0;
 
                 > .btn {
-                    border-top-#{$end}-radius: $query-designer-filter-item-border-radius;
-                    border-bottom-#{$end}-radius: $query-designer-filter-item-border-radius;
+                    border-top-right-radius: $query-designer-filter-item-border-radius;
+                    border-bottom-right-radius: $query-designer-filter-item-border-radius;
                 }
 
                 .filter-select .select-filter-widget,
@@ -145,11 +145,11 @@
         }
 
         .action-column {
-            text-align: #{$end};
+            text-align: right;
         }
 
         .action-cell {
-            padding-#{$end}: 0;
+            padding-right: 0;
 
             white-space: nowrap;
         }

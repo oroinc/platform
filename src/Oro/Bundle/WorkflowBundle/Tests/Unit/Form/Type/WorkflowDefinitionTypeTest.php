@@ -115,9 +115,10 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /* @var $resolver \PHPUnit\Framework\MockObject\MockObject|OptionsResolver */
-        $resolver = $this->getMockBuilder(OptionsResolver::class)->disableOriginalConstructor()->getMock();
-        $resolver->expects($this->once())->method('setDefaults')->with(['data_class' => WorkflowDefinition::class]);
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
+            ->method('setDefaults')
+            ->with(['data_class' => WorkflowDefinition::class]);
 
         $this->formType->configureOptions($resolver);
     }

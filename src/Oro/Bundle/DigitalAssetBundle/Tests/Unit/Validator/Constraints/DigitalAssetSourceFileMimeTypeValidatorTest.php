@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -173,10 +174,7 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
             $this->createMock(DigitalAssetSourceFileMimeType::class)
         );
 
-        $reflection = new \ReflectionClass(PersistentCollection::class);
-        $reflectionProperty = $reflection->getProperty('initialized');
-        $reflectionProperty->setAccessible(true);
-        $this->assertTrue($reflectionProperty->getValue($childFiles));
+        $this->assertTrue(ReflectionUtil::getPropertyValue($childFiles, 'initialized'));
     }
 
     /**

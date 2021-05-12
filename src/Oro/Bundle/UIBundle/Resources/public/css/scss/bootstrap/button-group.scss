@@ -31,22 +31,22 @@
     .btn + .btn-group,
     .btn-group + .btn,
     .btn-group + .btn-group {
-        margin-#{$start}: -$btn-group-divider-width;
+        margin-left: -$btn-group-divider-width;
     }
 
     @each $color, $value in $btn-group-square-divider-keys {
         .btn + .btn-square-#{$color},
         .btn-group + .btn-square-#{$color} {
-            margin-#{$start}: -$btn-group-square-divider-width;
+            margin-left: -$btn-group-square-divider-width;
         }
     }
 
     > .btn-sm:first-child {
-        padding-#{$end}: $btn-in-group-padding-x-sm;
+        padding-right: $btn-in-group-padding-x-sm;
     }
 
     .btn-sm + .btn-sm {
-        padding-#{$start}: $btn-in-group-padding-x-sm;
+        padding-left: $btn-in-group-padding-x-sm;
     }
 }
 
@@ -63,7 +63,7 @@
 
 .btn-group {
     > .btn:first-child {
-        margin-#{$start}: 0;
+        margin-left: 0;
     }
 
     // Reset rounded corners
@@ -71,13 +71,13 @@
     > .btn-group:not(:last-child) > .btn {
         @include border-end-radius(0);
 
-        border-#{$end}-width: $btn-group-divider-width;
+        border-right-width: $btn-group-divider-width;
 
         &,
         &:hover,
         &:focus,
         &:active {
-            border-#{$end}-color: $btn-group-divider-color;
+            border-right-color: $btn-group-divider-color;
         }
     }
 
@@ -85,13 +85,13 @@
     > .btn-group:not(:first-child) > .btn {
         @include border-start-radius(0);
 
-        border-#{$start}-width: $btn-group-divider-width;
+        border-left-width: $btn-group-divider-width;
 
         &,
         &:hover,
         &:focus,
         &:active {
-            border-#{$start}-color: $btn-group-divider-color;
+            border-left-color: $btn-group-divider-color;
         }
     }
 
@@ -102,7 +102,7 @@
             &:hover,
             &:focus,
             &:active {
-                border-#{$end}-color: $value;
+                border-right-color: $value;
             }
         }
 
@@ -112,7 +112,7 @@
             &:hover,
             &:focus,
             &:active {
-                border-#{$start}-color: $value;
+                border-left-color: $value;
             }
         }
     }
@@ -120,31 +120,31 @@
     @each $color, $value in $btn-group-square-divider-keys {
         > .btn-square-#{$color}:not(:last-child):not(.dropdown-toggle),
         > .btn-group:not(:last-child) > .btn-square-#{$color} {
-            border-#{$end}-width: $btn-group-square-divider-width;
+            border-right-width: $btn-group-square-divider-width;
 
             &,
             &:hover,
             &:active {
-                border-#{$end}-color: $value;
+                border-right-color: $value;
             }
 
             &:focus {
-                border-#{$end}-color: $secondary-100;
+                border-right-color: $secondary-100;
             }
         }
 
         > .btn-square-#{$color}:not(:first-child),
         > .btn-group:not(:first-child) > .btn-square-#{$color} {
-            border-#{$start}-width: $btn-group-square-divider-width;
+            border-left-width: $btn-group-square-divider-width;
 
             &,
             &:hover,
             &:active {
-                border-#{$start}-color: $value;
+                border-left-color: $value;
             }
 
             &:focus {
-                border-#{$start}-color: $secondary-100;
+                border-left-color: $secondary-100;
             }
         }
     }

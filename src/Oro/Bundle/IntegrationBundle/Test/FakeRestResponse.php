@@ -16,12 +16,10 @@ class FakeRestResponse implements RestResponseInterface
     /** @var array */
     protected $headers;
 
-    /** @var string  */
+    /** @var string */
     protected $body;
 
     /**
-     * FakeRestResponse constructor.
-     *
      * @param int $statusCode HTTP status code
      * @param array $headers list of response headers
      * @param string $body raw response body

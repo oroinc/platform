@@ -15,7 +15,6 @@ use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
 use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
-use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -49,7 +48,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var ChainSearchProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $searchProvider;
 
-    /** @var  FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $formRegistry;
 
     /**
@@ -140,7 +139,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     public function testGetApiTreeForUndefinedSection()
     {
-        $this->expectException(\Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException::class);
+        $this->expectException(ItemNotFoundException::class);
         $this->expectExceptionMessage('Config API section "undefined.sub_section" is not defined.');
 
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
@@ -314,10 +313,10 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         // check good_definition_with_acl_check.yml for further details
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition_with_acl_check.yml'));
 
-        $this->authorizationChecker->expects($this->at(0))->method('isGranted')->with($this->equalTo('ALLOWED'))
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(1))->method('isGranted')->with($this->equalTo('DENIED'))
-            ->will($this->returnValue(false));
+        $this->authorizationChecker->expects($this->exactly(2))
+            ->method('isGranted')
+            ->withConsecutive(['ALLOWED'], ['DENIED'])
+            ->willReturnOnConsecutiveCalls(true, false);
 
         $form = $provider->getForm('third_group');
         $this->assertInstanceOf(FormInterface::class, $form);
@@ -341,7 +340,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     public function testChooseActiveGroups($activeGroup, $activeSubGroup, $expectedGroup, $expectedSubGroup)
     {
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
+        [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
         $this->assertEquals($expectedGroup, $activeGroup);
         $this->assertEquals($expectedSubGroup, $activeSubGroup);
     }
@@ -395,7 +394,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /**
      * @param string $configPath
      *
-     * @return SystemConfigurationFormProvider
+     * @return AbstractProvider
      */
     protected function getProviderWithConfigLoaded($configPath)
     {
@@ -406,7 +405,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         $configBag = new ConfigBag($config, $container);
 
-        $provider = $this->getProvider(
+        return $this->getProvider(
             $configBag,
             $this->translator,
             $this->factory,
@@ -414,8 +413,6 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             $this->searchProvider,
             $this->formRegistry
         );
-
-        return $provider;
     }
 
     /**

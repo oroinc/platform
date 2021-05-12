@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Filter\SortFilter;
 
 class FilterCollectionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  FilterCollection */
+    /** @var FilterCollection */
     private $filterCollection;
 
     /**

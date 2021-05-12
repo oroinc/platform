@@ -143,14 +143,4 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($this->handler->process($this->entity));
     }
-
-    /**
-     * @param int|null $id
-     */
-    protected function setEntityId($id)
-    {
-        $ref = new \ReflectionProperty(get_class($this->entity), 'id');
-        $ref->setAccessible(true);
-        $ref->setValue($this->entity, $id);
-    }
 }

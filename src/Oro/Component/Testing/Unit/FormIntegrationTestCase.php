@@ -59,14 +59,12 @@ class FormIntegrationTestCase extends BaseTestCase
      */
     protected function getValidator()
     {
-        /* @var $loader \PHPUnit\Framework\MockObject\MockObject|LoaderInterface */
-        $loader = $this->createMock('Symfony\Component\Validator\Mapping\Loader\LoaderInterface');
-        $loader
-            ->expects($this->any())
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->any())
             ->method('loadClassMetadata')
-            ->will($this->returnCallback(function (ClassMetadata $meta) {
+            ->willReturnCallback(function (ClassMetadata $meta) {
                 $this->loadMetadata($meta);
-            }));
+            });
 
         $validator = new RecursiveValidator(
             new ExecutionContextFactory($this->getTranslator()),
@@ -154,12 +152,10 @@ class FormIntegrationTestCase extends BaseTestCase
      */
     protected function getConstraintValidatorFactory()
     {
-        /* @var $factory \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface */
-        $factory = $this->createMock('Symfony\Component\Validator\ConstraintValidatorFactoryInterface');
-
+        $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
         $factory->expects($this->any())
             ->method('getInstance')
-            ->will($this->returnCallback(function (Constraint $constraint) {
+            ->willReturnCallback(function (Constraint $constraint) {
                 $className = $constraint->validatedBy();
 
                 if (!isset($this->validators[$className])
@@ -169,8 +165,7 @@ class FormIntegrationTestCase extends BaseTestCase
                 }
 
                 return $this->validators[$className];
-            }))
-        ;
+            });
 
         return $factory;
     }
@@ -180,15 +175,12 @@ class FormIntegrationTestCase extends BaseTestCase
      */
     protected function getTranslator()
     {
-        /* @var $translator \PHPUnit\Framework\MockObject\MockObject|Translator */
-        $translator = $this->createMock('Symfony\Component\Translation\Translator');
-
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnCallback(function ($id) {
+            ->willReturnCallback(function ($id) {
                 return $id;
-            }))
-        ;
+            });
 
         return $translator;
     }

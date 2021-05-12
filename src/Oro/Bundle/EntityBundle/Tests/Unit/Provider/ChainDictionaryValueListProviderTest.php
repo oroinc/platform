@@ -8,7 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\DictionaryValueListProviderInterface;
 
 class ChainDictionaryValueListProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  ChainDictionaryValueListProvider */
+    /** @var ChainDictionaryValueListProvider */
     protected $chainProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */

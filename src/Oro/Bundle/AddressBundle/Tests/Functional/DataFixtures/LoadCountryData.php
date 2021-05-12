@@ -44,7 +44,7 @@ class LoadCountryData extends AbstractFixture
         $repository = $manager->getRepository(Country::class);
 
         foreach ($this->countries as $reference => $data) {
-            /** @var $country Country */
+            /** @var Country $country */
             $country = $repository->find($data['iso2Code']);
             if (!$country) {
                 $country = new Country($data['iso2Code']);

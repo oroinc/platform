@@ -40,8 +40,7 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testRunCommand(): void
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Logger $logger */
-        $logger = self::createMock(Logger::class);
+        $logger = $this->createMock(Logger::class);
         $logger->expects(self::once())->method('warning');
         $logger->expects(self::once())->method('error');
         $logger->expects(self::once())->method('info');
@@ -49,7 +48,7 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(0, $this->commandExecutor->runCommand('echo "acme";', []));
         $this->commandExecutor->runCommand('error command', ['--ignore-errors' => true], $logger);
 
-        self::expectException(ProcessTimedOutException::class);
+        $this->expectException(ProcessTimedOutException::class);
         $this->commandExecutor->runCommand('sleep(2);', ['--process-timeout' => 1]);
     }
 }

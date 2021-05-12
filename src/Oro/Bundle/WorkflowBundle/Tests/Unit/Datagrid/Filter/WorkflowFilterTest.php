@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\WorkflowBundle\Datagrid\Filter\WorkflowFilter;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
@@ -41,9 +42,7 @@ class WorkflowFilterTest extends \PHPUnit\Framework\TestCase
     {
         $this->filter->init('test', []);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         $choiceLabel = $params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label'];
         unset($params[FilterUtility::FORM_OPTIONS_KEY]['field_options']['choice_label']);

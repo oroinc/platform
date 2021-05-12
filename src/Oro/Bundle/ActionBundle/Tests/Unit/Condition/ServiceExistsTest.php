@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Condition;
 
 use Oro\Bundle\ActionBundle\Condition\ServiceExists;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -75,10 +76,10 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
 
         $this->serviceExists->setContextAccessor($contextAccessor);
 
-        $reflection = new \ReflectionProperty(get_class($this->serviceExists), 'contextAccessor');
-        $reflection->setAccessible(true);
-
-        $this->assertInstanceOf(get_class($contextAccessor), $reflection->getValue($this->serviceExists));
+        $this->assertInstanceOf(
+            get_class($contextAccessor),
+            ReflectionUtil::getPropertyValue($this->serviceExists, 'contextAccessor')
+        );
     }
 
 

@@ -13,6 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SyncBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub;
+use Oro\Component\Testing\ReflectionUtil;
 
 class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,7 +22,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
     const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub\NewEntityStub';
     const TEST_ASSOCIATION_FIELD = 'testField';
 
-    /** @var  DoctrineTagGenerator */
+    /** @var DoctrineTagGenerator */
     protected $generator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
@@ -229,23 +230,23 @@ class DoctrineTagGeneratorTest extends \PHPUnit\Framework\TestCase
      */
     public function testCollectNestingData($associations, $mappings, $expectedCount)
     {
-        $testData   = new EntityStub();
-        $reflection = new \ReflectionMethod($this->generator, 'collectNestedDataTags');
-        $reflection->setAccessible(true);
-        $this->uow->expects($this->any())->method('getEntityIdentifier')
-            ->will($this->returnValue(['someIdentifierValue']));
+        $testData = new EntityStub();
+        $this->uow->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->willReturn(['someIdentifierValue']);
 
         $metadata = new ClassMetadata(self::TEST_ENTITY_NAME);
         $metadata->associationMappings = $mappings;
         foreach ($associations as $name => $dataValue) {
-            $field = $this->getMockBuilder('\ReflectionProperty')
-                ->disableOriginalConstructor()->getMock();
-            $field->expects($this->once())->method('getValue')->with($testData)
-                ->will($this->returnValue($dataValue));
+            $field = $this->createMock(\ReflectionProperty::class);
+            $field->expects($this->once())
+                ->method('getValue')
+                ->with($testData)
+                ->willReturn($dataValue);
             $metadata->reflFields[$name] = $field;
         }
 
-        $result = $reflection->invoke($this->generator, $testData, $metadata);
+        $result = ReflectionUtil::callMethod($this->generator, 'collectNestedDataTags', [$testData, $metadata]);
 
         $this->assertIsArray($result, 'Should always return array');
         $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');

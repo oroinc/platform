@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowStepTest extends \PHPUnit\Framework\TestCase
@@ -27,10 +28,8 @@ class WorkflowStepTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->step->getId());
 
         $value = 42;
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->step, $value);
-        $this->assertEquals($value, $this->step->getId());
+        ReflectionUtil::setId($this->step, $value);
+        $this->assertSame($value, $this->step->getId());
     }
 
     /**

@@ -10,7 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
     protected $entityConnector;
 
     /** @var ApplicableEntitiesType */

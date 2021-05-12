@@ -46,22 +46,24 @@ class CreateQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldCreateSameQueueOnlyOnce()
     {
-        $this->driver->expects($this->at(0))
+        $this->driver->expects($this->exactly(2))
             ->method('createQueue')
-            ->with('theQueueName1')
-            ->willReturn($this->createMock(QueueInterface::class));
-        $this->driver->expects($this->at(1))
-            ->method('createQueue')
-            ->with('theQueueName2')
-            ->willReturn($this->createMock(QueueInterface::class));
+            ->withConsecutive(
+                ['theQueueName1'],
+                ['theQueueName2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createMock(QueueInterface::class),
+                $this->createMock(QueueInterface::class)
+            );
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->at(0))
+        $logger->expects($this->exactly(2))
             ->method('debug')
-            ->with('Make sure the queue "theQueueName1" exists on a broker side.');
-        $logger->expects($this->at(1))
-            ->method('debug')
-            ->with('Make sure the queue "theQueueName2" exists on a broker side.');
+            ->withConsecutive(
+                ['Make sure the queue "theQueueName1" exists on a broker side.'],
+                ['Make sure the queue "theQueueName2" exists on a broker side.']
+            );
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($logger);

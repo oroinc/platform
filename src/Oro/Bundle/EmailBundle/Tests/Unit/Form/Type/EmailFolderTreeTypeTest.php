@@ -4,13 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var EmailFolderTreeType
-     */
-    protected $emailFolderTreeType;
+    /** @var EmailFolderTreeType */
+    private $emailFolderTreeType;
 
     /**
      * {@inheritDoc}
@@ -24,11 +23,8 @@ class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        $resolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $resolver->expects($this->at(0))
+        $resolver = $this->createMock(OptionsResolver::class);
+        $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
                 'allow_extra_fields' => true

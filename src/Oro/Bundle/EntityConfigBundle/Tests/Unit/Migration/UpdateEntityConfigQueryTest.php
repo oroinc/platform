@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
 {
-    const FIELD_NAME = 'fieldName';
+    private const FIELD_NAME = 'fieldName';
 
     /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
     private $connection;
@@ -124,7 +124,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     public function testNoRelationAlert($key, $value)
     {
         $this->initializeQuery($key, $value);
-        $this->connection->expects($this->at(1))
+        $this->connection->expects($this->once())
             ->method('convertToPHPValue')
             ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn([
@@ -136,13 +136,14 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
         /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
 
-        $logger->expects($this->at(0))
-            ->method('info')->with('SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1');
-        $logger->expects($this->at(1))
-            ->method('info')->with('Parameters:');
-        $logger->expects($this->at(2))
-            ->method('info')->with('[1] = Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1');
-        $logger->expects($this->at(3))
+        $logger->expects($this->exactly(3))
+            ->method('info')
+            ->withConsecutive(
+                ['SELECT id, data FROM oro_entity_config WHERE class_name = ? LIMIT 1'],
+                ['Parameters:'],
+                ['[1] = Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1']
+            );
+        $logger->expects($this->once())
             ->method('warning')
             ->with(
                 '{key} value for entity `{entity}` config field `{field}`' .
@@ -166,7 +167,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUpConnection($key, $value)
     {
-        $this->connection->expects($this->at(1))
+        $this->connection->expects($this->once())
             ->method('convertToPHPValue')
             ->with('data persisted payload serialized', Types::ARRAY)
             ->willReturn(
@@ -179,7 +180,8 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->connection->expects($this->at(2))->method('convertToDatabaseValue')
+        $this->connection->expects($this->once())
+            ->method('convertToDatabaseValue')
             ->with(
                 [
                     'extend' => [
@@ -193,7 +195,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
 
         $statement = $this->createMock(Statement::class);
 
-        $this->connection->expects($this->at(3))
+        $this->connection->expects($this->once())
             ->method('prepare')
             ->with('UPDATE oro_entity_config SET data = ? WHERE id = ?')
             ->willReturn($statement);
@@ -222,7 +224,7 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
      * @param string $key
      * @param string $value
      */
-    protected function initializeQuery($key, $value)
+    private function initializeQuery($key, $value)
     {
         $this->query = new UpdateEntityConfigQuery(
             TestEntity1::class,

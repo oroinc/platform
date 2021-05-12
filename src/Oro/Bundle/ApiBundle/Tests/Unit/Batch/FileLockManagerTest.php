@@ -8,6 +8,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\Persistence\ManagerRegistry;
 use Gaufrette\Util\Checksum;
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class FileLockManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -77,24 +78,24 @@ class FileLockManagerTest extends \PHPUnit\Framework\TestCase
         $lockFileName = 'test.lock';
         $connection = $this->expectGetConnection();
         $connection->expects(self::exactly(3))
-            ->method('insert');
-        $connection->expects(self::at(0))
             ->method('insert')
             ->with('oro_api_async_data')
-            ->willThrowException(new UniqueConstraintViolationException(
-                'already exist',
-                $this->createMock(DriverException::class)
-            ));
-        $connection->expects(self::at(1))
-            ->method('insert')
-            ->with('oro_api_async_data')
-            ->willThrowException(new UniqueConstraintViolationException(
-                'already exist',
-                $this->createMock(DriverException::class)
-            ));
-        $connection->expects(self::at(2))
-            ->method('insert')
-            ->with('oro_api_async_data');
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () {
+                    throw new UniqueConstraintViolationException(
+                        'already exist',
+                        $this->createMock(DriverException::class)
+                    );
+                }),
+                new ReturnCallback(function () {
+                    throw new UniqueConstraintViolationException(
+                        'already exist',
+                        $this->createMock(DriverException::class)
+                    );
+                }),
+                new ReturnCallback(function () {
+                })
+            );
 
         self::assertTrue($this->fileLockManager->acquireLock($lockFileName, 10, 1));
     }

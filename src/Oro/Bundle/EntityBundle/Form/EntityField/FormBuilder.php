@@ -20,6 +20,9 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 
+/**
+ * Builds form for logic that do update entity data through API
+ */
 class FormBuilder
 {
     /** @var array */

@@ -14,7 +14,7 @@
         </p>
         <p>{{ 'oro.email.sent_at.label'|trans }}: {{ email.sentAt|oro_format_datetime }}</p>
         <p>{{ 'Subject'|trans }}: {{ email.subject }}</p>
-        <p>{{ 'To'|trans }}: {{ EA.recipient_email_addresses(email.toCc, false, false) }}</p>
+        <p>{{ 'To'|trans }}: <bdo dir="ltr">{{ EA.recipient_email_addresses(email.toCc, false, false) }}</bdo></p>
     </div>
     <br>
     <div class="email-prev-body">

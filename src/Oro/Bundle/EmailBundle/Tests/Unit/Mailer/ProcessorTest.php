@@ -34,7 +34,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emailEntityBuilder;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $emailActivityManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */

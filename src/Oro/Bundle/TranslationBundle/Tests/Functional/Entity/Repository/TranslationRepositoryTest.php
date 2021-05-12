@@ -61,7 +61,7 @@ class TranslationRepositoryTest extends WebTestCase
 
     public function testDeleteByLanguage()
     {
-        /* @var $language Language */
+        /* @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
         $this->repository->deleteByLanguage($language);

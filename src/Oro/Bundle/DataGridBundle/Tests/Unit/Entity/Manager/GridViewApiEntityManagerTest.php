@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
@@ -11,29 +12,26 @@ use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
 class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
     const CLASS_NAME = "Oro\\Bundle\\DataGridBundle\\Entity\\GridView";
-    /** @var   */
+
+    /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $gridViewManager;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $om;
 
-    /** @var  GridViewApiEntityManager */
+    /** @var GridViewApiEntityManager */
     protected $gridViewApiEntityManager;
 
     protected function setUp(): void
     {
-        $this->om = $this->getMockBuilder('Doctrine\Persistence\ObjectManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->om = $this->createMock(ObjectManager::class);
 
         $metadata = new ClassMetadata(self::CLASS_NAME);
         $this->om->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->gridViewManager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->gridViewManager = $this->createMock(GridViewManager::class);
 
         $this->gridViewApiEntityManager = new GridViewApiEntityManager(
             self::CLASS_NAME,

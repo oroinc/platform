@@ -11,7 +11,7 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
     protected $query;
 
-    /** @var  WidgetEntitySelectConverter */
+    /** @var WidgetEntitySelectConverter */
     protected $converter;
 
     protected function setUp(): void

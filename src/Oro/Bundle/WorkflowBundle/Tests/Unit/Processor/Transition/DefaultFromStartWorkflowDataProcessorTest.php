@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
 
 class DefaultFromStartWorkflowDataProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  DefaultFormStartHandleProcessor */
+    /** @var DefaultFormStartHandleProcessor */
     protected $processor;
 
     protected function setUp(): void

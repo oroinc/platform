@@ -12,10 +12,10 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
  */
 class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $provider1;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $provider2;
 
     /** @var EntityNameResolver */
@@ -123,14 +123,16 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
             ->with($format, $locale, $this->identicalTo($entity))
             ->willReturn(false);
 
-        $this->provider2->expects($this->at(0))
+        $this->provider2->expects($this->exactly(2))
             ->method('getName')
-            ->with($format, $locale, $this->identicalTo($entity))
-            ->willReturn(false);
-        $this->provider2->expects($this->at(1))
-            ->method('getName')
-            ->with('short', $locale, $this->identicalTo($entity))
-            ->willReturn($expected);
+            ->withConsecutive(
+                [$format, $locale, $this->identicalTo($entity)],
+                ['short', $locale, $this->identicalTo($entity)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                $expected
+            );
 
         $result = $this->entityNameResolver->getName($entity, $format, $locale);
         $this->assertEquals($expected, $result);
@@ -185,14 +187,16 @@ class EntityNameResolverTest extends \PHPUnit\Framework\TestCase
             ->with($format, $locale, $className, $alias)
             ->willReturn(false);
 
-        $this->provider2->expects($this->at(0))
+        $this->provider2->expects($this->exactly(2))
             ->method('getNameDQL')
-            ->with($format, $locale, $className, $alias)
-            ->willReturn(false);
-        $this->provider2->expects($this->at(1))
-            ->method('getNameDQL')
-            ->with('short', $locale, $className, $alias)
-            ->willReturn($expected);
+            ->withConsecutive(
+                [$format, $locale, $className, $alias],
+                ['short', $locale, $className, $alias]
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                $expected
+            );
 
         $result = $this->entityNameResolver->getNameDQL($className, $alias, $format, $locale);
         $this->assertEquals($expected, $result);

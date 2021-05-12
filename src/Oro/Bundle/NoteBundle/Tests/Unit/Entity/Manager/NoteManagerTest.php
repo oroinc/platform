@@ -2,39 +2,44 @@
 
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
+use Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser;
 use Oro\Bundle\NoteBundle\Tests\Unit\Stub\AttachmentProviderStub;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $attachmentManager;
+    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $attachmentAssociationHelper;
+    /** @var AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentAssociationHelper;
 
     /** @var NoteManager */
-    protected $manager;
+    private $manager;
 
     protected function setUp(): void
     {
@@ -68,35 +73,28 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
         $sorting     = 'DESC';
         $result      = ['result'];
 
-        $qb    = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
-        $repo  = $this->getMockBuilder('Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
+        $repo = $this->createMock(NoteRepository::class);
         $this->em->expects($this->once())
             ->method('getRepository')
             ->with('OroNoteBundle:Note')
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
         $repo->expects($this->once())
             ->method('getAssociatedNotesQueryBuilder')
             ->with($entityClass, $entityId)
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
         $qb->expects($this->once())
             ->method('orderBy')
             ->with('note.createdAt', $sorting)
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $this->aclHelper->expects($this->once())
             ->method('apply')
             ->with($this->identicalTo($qb), 'VIEW', ['checkRelations' => false])
-            ->will($this->returnValue($query));
+            ->willReturn($query);
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($result));
+            ->willReturn($result);
 
         $this->assertEquals(
             $result,
@@ -107,19 +105,23 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityViewModels()
     {
         $createdByAvatar = new File();
-        $createdBy       = $this->getMockBuilder('Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $createdBy->expects($this->once())->method('getId')->will($this->returnValue(100));
-        $createdBy->expects($this->once())->method('getAvatar')->will($this->returnValue($createdByAvatar));
-        $updatedBy = $this->getMockBuilder('Oro\Bundle\NoteBundle\Tests\Unit\Fixtures\TestUser')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $updatedBy->expects($this->once())->method('getId')->will($this->returnValue(100));
-        $updatedBy->expects($this->once())->method('getAvatar')->will($this->returnValue(null));
+        $createdBy = $this->createMock(TestUser::class);
+        $createdBy->expects($this->once())
+            ->method('getId')
+            ->willReturn(100);
+        $createdBy->expects($this->once())
+            ->method('getAvatar')
+            ->willReturn($createdByAvatar);
+        $updatedBy = $this->createMock(TestUser::class);
+        $updatedBy->expects($this->once())
+            ->method('getId')
+            ->willReturn(100);
+        $updatedBy->expects($this->once())
+            ->method('getAvatar')
+            ->willReturn(null);
 
         $note = new Note();
-        $this->setId($note, 123);
+        ReflectionUtil::setId($note, 123);
         $note
             ->setMessage('test message')
             ->setCreatedAt(new \DateTime('2014-01-20 10:30:40', new \DateTimeZone('UTC')))
@@ -127,36 +129,26 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             ->setOwner($createdBy)
             ->setUpdatedBy($updatedBy);
 
-        $this->authorizationChecker->expects($this->at(0))
+        $this->authorizationChecker->expects($this->exactly(4))
             ->method('isGranted')
-            ->with('EDIT', $this->identicalTo($note))
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(1))
-            ->method('isGranted')
-            ->with('DELETE', $this->identicalTo($note))
-            ->will($this->returnValue(false));
-        $this->authorizationChecker->expects($this->at(2))
-            ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($createdBy))
-            ->will($this->returnValue(true));
-        $this->authorizationChecker->expects($this->at(3))
-            ->method('isGranted')
-            ->with('VIEW', $this->identicalTo($updatedBy))
-            ->will($this->returnValue(false));
+            ->willReturnMap([
+                ['EDIT', $note, true],
+                ['DELETE', $note, false],
+                ['VIEW', $createdBy, true],
+                ['VIEW', $updatedBy, false]
+            ]);
 
-        $this->entityNameResolver->expects($this->at(0))
+        $this->entityNameResolver->expects($this->exactly(2))
             ->method('getName')
-            ->with($this->identicalTo($createdBy))
-            ->will($this->returnValue('User1'));
-        $this->entityNameResolver->expects($this->at(1))
-            ->method('getName')
-            ->with($this->identicalTo($updatedBy))
-            ->will($this->returnValue('User2'));
+            ->willReturnMap([
+                [$createdBy, null, null, 'User1'],
+                [$updatedBy, null, null, 'User2']
+            ]);
 
         $this->attachmentManager->expects($this->once())
             ->method('getFilteredImageUrl')
             ->with($this->identicalTo($createdByAvatar), 'avatar_xsmall')
-            ->will($this->returnValue('image1_xsmall'));
+            ->willReturn('image1_xsmall');
 
         $this->assertEquals(
             [
@@ -180,18 +172,5 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             ],
             $this->manager->getEntityViewModels([$note])
         );
-    }
-
-    /**
-     * @param mixed $obj
-     * @param mixed $val
-     */
-    protected function setId($obj, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop  = $class->getProperty('id');
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
     }
 }

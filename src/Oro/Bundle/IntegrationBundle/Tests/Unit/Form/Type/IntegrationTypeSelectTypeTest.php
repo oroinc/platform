@@ -9,13 +9,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class IntegrationTypeSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  IntegrationTypeSelectType */
+    /** @var IntegrationTypeSelectType */
     protected $type;
 
     /** @var TypesRegistry|\PHPUnit\Framework\MockObject\MockObject */
     protected $registry;
 
-    /** @var  \PHPUnit\Framework\MockObject\MockObject */
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
     protected $assetHelper;
 
     protected function setUp(): void

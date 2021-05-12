@@ -11,6 +11,7 @@ use Oro\Bundle\LocaleBundle\Form\DataTransformer\LocalizedFallbackValueCollectio
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
@@ -496,9 +497,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $text = null
     ) {
         if ($id) {
-            $reflection = new \ReflectionProperty(get_class($value), 'id');
-            $reflection->setAccessible(true);
-            $reflection->setValue($value, $id);
+            ReflectionUtil::setId($value, $id);
         }
 
         $value->setFallback($fallback)

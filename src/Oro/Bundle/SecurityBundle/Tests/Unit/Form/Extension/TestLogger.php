@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
 use Psr\Log\Test\TestLogger as BaseTestLogger;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
 class TestLogger extends BaseTestLogger implements DebugLoggerInterface
@@ -10,7 +11,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function countErrors()
+    public function countErrors(Request $request = null)
     {
         return count($this->recordsByLevel['error'] ?? []);
     }
@@ -18,7 +19,7 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs()
+    public function getLogs(Request $request = null)
     {
         return $this->records;
     }

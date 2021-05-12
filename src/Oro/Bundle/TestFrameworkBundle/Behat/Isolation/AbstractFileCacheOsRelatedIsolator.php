@@ -26,16 +26,16 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** @var array */
     protected $cacheFiles;
 
-    /** @var  string */
+    /** @var string */
     protected $cacheDir;
 
-    /** @var  string */
+    /** @var string */
     protected $cacheDumpDir;
 
-    /** @var  string */
+    /** @var string */
     protected $cacheTempDir;
 
-    /** @var  Process */
+    /** @var Process */
     protected $copyDumpToTempDirProcess;
 
     /**

@@ -5,6 +5,9 @@ namespace Oro\Bundle\ImportExportBundle\Handler;
 use Symfony\Component\HttpFoundation\File\File as SymfonyComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Normalizes line endings in a file.
+ */
 class CsvFileHandler
 {
     const CRLF_LINE_ENDING = "\r\n";
@@ -30,8 +33,7 @@ class CsvFileHandler
         $formattedFile = new UploadedFile(
             $tempName,
             $file->getClientOriginalName(),
-            'text/csv',
-            filesize($tempName)
+            'text/csv'
         );
         fclose($handle);
         fclose($formattedHandle);

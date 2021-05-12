@@ -6,7 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class WidgetTest extends WebTestCase
 {
-    /** @var array  */
+    /** @var array */
     protected $widget = array(
         'position' => 0,
         'widgetName' => "hello_world",

@@ -12,7 +12,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyInjectionExtension */
     protected $extension;
 
-    /** @var  array */
+    /** @var array */
     protected $serviceIds;
 
     protected function setUp(): void

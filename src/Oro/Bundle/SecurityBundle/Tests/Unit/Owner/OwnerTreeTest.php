@@ -10,7 +10,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeBuilderInterface;
  */
 class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OwnerTreeBuilderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var OwnerTreeBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $tree;
 
     protected function setUp(): void

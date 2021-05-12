@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -19,11 +20,11 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 class QueryBuilderUtilTest extends OrmTestCase
 {
     /** @var EntityManager */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
+        $reader = new AnnotationReader();
         $metadataDriver = new AnnotationDriver(
             $reader,
             'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
@@ -41,7 +42,7 @@ class QueryBuilderUtilTest extends OrmTestCase
     /**
      * @return QueryBuilder
      */
-    protected function getQueryBuilder()
+    private function getQueryBuilder()
     {
         return new QueryBuilder($this->createMock(EntityManager::class));
     }
@@ -50,17 +51,15 @@ class QueryBuilderUtilTest extends OrmTestCase
      * @param string $name
      * @return \PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getParameterMock($name)
+    private function getParameterMock($name)
     {
-        $parameter = $this->getMockBuilder('\Doctrine\ORM\Query\Parameter')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $parameter = $this->createMock(Parameter::class);
         $parameter->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
         $parameter->expects($this->any())
             ->method('getValue')
-            ->will($this->returnValue($name . '_value'));
+            ->willReturn($name . '_value');
 
         return $parameter;
     }
@@ -380,40 +379,21 @@ class QueryBuilderUtilTest extends OrmTestCase
         ];
 
         $qb = $this->createMock(QueryBuilder::class);
-
         $qb->expects($this->once())
             ->method('distinct')
             ->with(true);
         $qb->expects($this->once())
             ->method('getRootAliases')
             ->willReturn(['root_alias']);
-        $qb->expects($this->at(2))
+        $qb->expects($this->exactly(6))
             ->method('leftJoin')
-            ->with('root_alias.emails', 'emails');
-        $qb->expects($this->at(3))
-            ->method('leftJoin')
-            ->with('root_alias.phones', 'phones');
-        $qb->expects($this->at(4))
-            ->method('leftJoin')
-            ->with('root_alias.contacts', 'contacts');
-        $qb->expects($this->at(5))
-            ->method('leftJoin')
-            ->with('root_alias.accounts_field', 'accounts');
-        $qb->expects($this->at(6))
-            ->method('leftJoin')
-            ->with(
-                'accounts.users_field',
-                'users',
-                'WITH',
-                'users.active = true'
-            );
-        $qb->expects($this->at(7))
-            ->method('leftJoin')
-            ->with(
-                'root_alias.products',
-                'products',
-                'WITH',
-                'products.active = true'
+            ->withConsecutive(
+                ['root_alias.emails', 'emails'],
+                ['root_alias.phones', 'phones'],
+                ['root_alias.contacts', 'contacts'],
+                ['root_alias.accounts_field', 'accounts'],
+                ['accounts.users_field', 'users', 'WITH', 'users.active = true'],
+                ['root_alias.products', 'products', 'WITH', 'products.active = true']
             );
 
         QueryBuilderUtil::applyJoins($qb, $joins);
@@ -439,10 +419,10 @@ class QueryBuilderUtilTest extends OrmTestCase
         $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('getDql')
-            ->will($this->returnValue($dql));
+            ->willReturn($dql);
         $qb->expects($this->once())
             ->method('getParameters')
-            ->will($this->returnValue($parameters));
+            ->willReturn($parameters);
         $qb->expects($this->once())
             ->method('setParameters')
             ->with($expectedParameters);

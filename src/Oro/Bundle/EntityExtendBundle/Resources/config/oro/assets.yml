@@ -1,3 +1,7 @@
 css:
     inputs:
-      - 'bundles/oroentityextend/css/scss/main.scss'
+        # Variables
+        - 'bundles/oroentityextend/css/scss/variables/variables.scss'
+
+        # Styles
+        - 'bundles/oroentityextend/css/scss/main.scss'

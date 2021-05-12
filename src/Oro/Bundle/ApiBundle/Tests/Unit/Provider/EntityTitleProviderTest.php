@@ -242,10 +242,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             );
 
-        $conn = $this->getDriverConnectionMock($this->em);
-        $this->setQueryExpectationAt(
-            $conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT entity.id_2 AS id, entity.sclr_0 AS entity, entity.name_1 AS title'
             . ' FROM ('
             . '(SELECT \'' . Entity\Product::class . '\' AS sclr_0, p0_.name AS name_1, p0_.id AS id_2'
@@ -269,9 +266,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ]
         );
-        $this->setQueryExpectationAt(
-            $conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT \'' . Entity\Category::class . '\' AS sclr_0, c0_.label AS label_1, c0_.name AS name_2'
             . ' FROM category_table c0_'
             . ' WHERE c0_.name IN (\'category1\')',
@@ -283,6 +278,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
                 ]
             ]
         );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         self::assertEquals(
             [

@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
+use Oro\Component\Testing\ReflectionUtil;
 
 class ImapEmailFolderTest extends \PHPUnit\Framework\TestCase
 {

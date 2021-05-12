@@ -72,7 +72,6 @@ define(function(require) {
         return offsets;
     }
 
-    Popper.Defaults.rtl = _.isRTL();
     Popper.Defaults.modifiers.adjustHeight = {
         order: 550,
         enabled: false,
@@ -101,26 +100,51 @@ define(function(require) {
         }
     };
 
-    Popper.Defaults.modifiers.flip = {
-        behavior: 'flip',
-        boundariesElement: 'viewport',
-        enabled: true,
-        order: 600,
-        padding: 5,
-        fn: function flip(data, options) {
-            if (
-                ['left', 'right'].includes(data.placement) &&
-                data.instance.options.rtl
-            ) {
-                const placementRTLMap = {
-                    left: 'right',
-                    right: 'left'
-                };
-                data.placement = data.placement.replace(
-                    /right|left/g,
-                    matched => placementRTLMap[matched]
-                );
+    function swapPlacement(placement) {
+        const placementRTLMap = {
+            left: 'right',
+            right: 'left',
+            start: 'end',
+            end: 'start'
+        };
+
+        if (placement.search(/right|left/g) !== -1) {
+            placement = placement.replace(
+                /right|left/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        if (placement.search(/top|bottom/g) !== -1) {
+            placement = placement.replace(
+                /start|end/g,
+                matched => placementRTLMap[matched]
+            );
+        }
+
+        return placement;
+    }
+
+    Popper.Defaults.modifiers.rtl = {
+        order: 650,
+        enabled: _.isRTL(),
+        fn(data, options) {
+            if (data.originalPlacement) {
+                data.originalPlacement = swapPlacement(data.originalPlacement);
             }
+
+            if (data.placement) {
+                data.placement = swapPlacement(data.placement);
+                data.instance.options.placement = swapPlacement(data.instance.options.placement);
+            }
+
+            if (data.attributes['x-placement']) {
+                data.attributes['x-placement'] = swapPlacement(data.attributes['x-placement']);
+            }
+
+            data.instance.scheduleUpdate();
+
+            options.enabled = false;
             return data;
         }
     };

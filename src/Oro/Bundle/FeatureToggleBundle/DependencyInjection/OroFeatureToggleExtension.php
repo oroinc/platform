@@ -19,16 +19,13 @@ class OroFeatureToggleExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        // load services
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container
-            ->getDefinition('oro_featuretoggle.checker.feature_checker')
+        $container->getDefinition('oro_featuretoggle.checker.feature_checker')
             ->addArgument($config['strategy'])
             ->addArgument($config['allow_if_all_abstain'])
-            ->addArgument($config['allow_if_equal_granted_denied'])
-        ;
+            ->addArgument($config['allow_if_equal_granted_denied']);
     }
 
     /**

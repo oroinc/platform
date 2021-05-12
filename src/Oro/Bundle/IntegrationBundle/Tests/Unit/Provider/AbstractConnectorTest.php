@@ -16,84 +16,83 @@ use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 use Psr\Log\NullLogger;
 
 class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|StepExecution */
-    protected $stepExecutionMock;
+    /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
+    private $stepExecution;
 
-    /** @var MockObject|Transport */
-    protected $transportSettings;
+    /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
+    private $transportSettings;
 
-    /** @var TransportInterface|MockObject */
-    protected $transportMock;
+    /** @var TransportInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $transport;
 
     protected function setUp(): void
     {
-        $this->stepExecutionMock = $this->getMockBuilder(StepExecution::class)
-            ->onlyMethods(['getExecutionContext', 'getJobExecution'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stepExecution = $this->createMock(StepExecution::class);
 
         $jobInstance = $this->createMock(JobInstance::class);
-        $jobInstance->method('getAlias')->willReturn('alias');
+        $jobInstance->expects($this->any())
+            ->method('getAlias')
+            ->willReturn('alias');
 
         $jobExecution = $this->createMock(JobExecution::class);
-        $jobExecution->method('getJobInstance')->willReturn($jobInstance);
-        $this->stepExecutionMock->method('getJobExecution')->willReturn($jobExecution);
+        $jobExecution->expects($this->any())
+            ->method('getJobInstance')
+            ->willReturn($jobInstance);
+        $this->stepExecution->expects($this->any())
+            ->method('getJobExecution')
+            ->willReturn($jobExecution);
 
-        $this->transportSettings = $this->getMockForAbstractClass(Transport::class);
-        $this->transportMock = $this->createMock(TransportInterface::class);
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->transportMock, $this->stepExecutionMock);
+        $this->transportSettings = $this->createMock(Transport::class);
+        $this->transport = $this->createMock(TransportInterface::class);
     }
 
     /**
      * @dataProvider initializationDataProvider
      *
-     * @param MockObject|mixed $transport
-     * @param null                                           $source
-     * @param bool|string                                    $expectedException
+     * @param Transport|\PHPUnit\Framework\MockObject\MockObject $transport
+     * @param null                                               $source
+     * @param bool|string                                        $expectedException
      */
     public function testInitialization($transport, $source = null, $expectedException = false)
     {
-        $logger              = new LoggerStrategy(new NullLogger());
-        $contextRegistry     = new ContextRegistry();
-        $contextMediatorMock = $this->getMockBuilder(ConnectorContextMediator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $integration             = new Integration();
+        $logger = new LoggerStrategy(new NullLogger());
+        $contextRegistry = new ContextRegistry();
+        $contextMediator = $this->createMock(ConnectorContextMediator::class);
+        $integration = new Integration();
         $integration->setTransport($this->transportSettings);
 
-        $context = $contextRegistry->getByStepExecution($this->stepExecutionMock);
-        $contextMediatorMock->expects($this->at(0))
-            ->method('getTransport')->with($this->equalTo($context))
+        $context = $contextRegistry->getByStepExecution($this->stepExecution);
+        $contextMediator->expects($this->once())
+            ->method('getTransport')
+            ->with($this->identicalTo($context))
             ->willReturn($transport);
-        $contextMediatorMock->expects($this->at(1))
-            ->method('getChannel')->with($this->equalTo($context))
+        $contextMediator->expects($this->once())
+            ->method('getChannel')
+            ->with($this->identicalTo($context))
             ->willReturn($integration);
 
-        /** @var AbstractConnector|MockObject $connector */
         $connector = $this->getMockBuilder(AbstractConnector::class)
             ->onlyMethods(['getConnectorSource'])
-            ->setConstructorArgs([$contextRegistry, $logger, $contextMediatorMock])
+            ->setConstructorArgs([$contextRegistry, $logger, $contextMediator])
             ->getMockForAbstractClass();
 
         if (false !== $expectedException) {
             $this->expectException($expectedException);
         } else {
-            $transport->expects($this->once())->method('init')
-                ->with($this->equalTo($this->transportSettings));
-            $connector->expects($this->once())->method('getConnectorSource')
+            $transport->expects($this->once())
+                ->method('init')
+                ->with($this->identicalTo($this->transportSettings));
+            $connector->expects($this->once())
+                ->method('getConnectorSource')
                 ->willReturn($source);
         }
 
-        $connector->setStepExecution($this->stepExecutionMock);
+        $connector->setStepExecution($this->stepExecution);
     }
 
     public function initializationDataProvider()
@@ -117,70 +116,60 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed            $transport
-     * @param mixed            $stepExecutionMock
+     * @param mixed            $stepExecution
      * @param null|Integration $channel
-     *
      * @param null             $context
      *
      * @return AbstractConnector
      */
-    protected function getConnector($transport, $stepExecutionMock, $channel = null, $context = null)
+    private function getConnector($transport, $stepExecution, $channel = null, $context = null)
     {
-        $contextRegistryMock = $this->createMock(\Oro\Bundle\ImportExportBundle\Context\ContextRegistry::class);
-        $contextMediatorMock = $this
-            ->getMockBuilder(ConnectorContextMediator::class)
-            ->disableOriginalConstructor()->getMock();
+        $contextRegistry = $this->createMock(ContextRegistry::class);
+        $contextMediator = $this->createMock(ConnectorContextMediator::class);
 
-        $transportSettings = $this->getMockForAbstractClass(Transport::class);
-        $channel           = $channel ? : new Integration();
+        $transportSettings = $this->createMock(Transport::class);
+        $channel = $channel ?: new Integration();
         $channel->setTransport($transportSettings);
 
-        $contextMock = $context ? : new Context([]);
+        if (null === $context) {
+            $context = new Context([]);
+        }
 
         $executionContext = new ExecutionContext();
-        $stepExecutionMock->expects($this->any())
-            ->method('getExecutionContext')->willReturn($executionContext);
+        $stepExecution->expects($this->any())
+            ->method('getExecutionContext')
+            ->willReturn($executionContext);
 
-        $contextRegistryMock->expects($this->any())->method('getByStepExecution')
-            ->willReturn($contextMock);
-        $contextMediatorMock->expects($this->once())
-            ->method('getTransport')->with($this->equalTo($contextMock))
+        $contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->willReturn($context);
+        $contextMediator->expects($this->once())
+            ->method('getTransport')
+            ->with($this->identicalTo($context))
             ->willReturn($transport);
-        $contextMediatorMock->expects($this->once())
-            ->method('getChannel')->with($this->equalTo($contextMock))
+        $contextMediator->expects($this->once())
+            ->method('getChannel')
+            ->with($this->identicalTo($context))
             ->willReturn($channel);
 
         $logger = new LoggerStrategy(new NullLogger());
 
-        return new TestConnector($contextRegistryMock, $logger, $contextMediatorMock);
+        return new TestConnector($contextRegistry, $logger, $contextMediator);
     }
 
     public function testGetStatusData()
     {
-        $connector = $this->getConnector($this->transportMock, $this->stepExecutionMock);
-        $connector->setStepExecution($this->stepExecutionMock);
+        $connector = $this->getConnector($this->transport, $this->stepExecution);
+        $connector->setStepExecution($this->stepExecution);
 
-        $reflection = new \ReflectionMethod(
-            TestConnector::class,
-            'addStatusData'
-        );
-        $reflection->setAccessible(true);
-        $reflection->invoke($connector, 'key', 'value');
+        ReflectionUtil::callMethod($connector, 'addStatusData', ['key', 'value']);
 
-        $context = $this->stepExecutionMock->getExecutionContext();
-        $date    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+        $context = $this->stepExecution->getExecutionContext();
+        $date = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
 
         $this->assertArrayHasKey('key', $date);
         $this->assertSame('value', $date['key']);
 
-        $reflection1 = new \ReflectionMethod(
-            TestConnector::class,
-            'getStatusData'
-        );
-
-        $reflection1->setAccessible(true);
-        $result = $reflection1->invoke($connector, 'key', 'value');
-
-        $this->assertSame('value', $result);
+        $this->assertSame('value', ReflectionUtil::callMethod($connector, 'getStatusData', ['key', 'value']));
     }
 }

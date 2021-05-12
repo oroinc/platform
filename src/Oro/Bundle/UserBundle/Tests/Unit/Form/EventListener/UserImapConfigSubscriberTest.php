@@ -26,7 +26,7 @@ class UserImapConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject */
     protected $eventMock;
 
-    /** @var  UserImapConfigSubscriber */
+    /** @var UserImapConfigSubscriber */
     protected $subscriber;
 
     protected function setUp(): void

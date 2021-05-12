@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 class EmailRecipientTest extends \PHPUnit\Framework\TestCase
 {

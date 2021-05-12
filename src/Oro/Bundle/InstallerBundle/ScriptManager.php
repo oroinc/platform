@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle;
 
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Manage cli scripts while installing from package manager
@@ -11,13 +11,10 @@ class ScriptManager
 {
     const ORO_INSTALLER_SCRIPT_FILE_NAME = 'install.php';
 
-    /**
-     * @var Kernel
-     */
-    protected $kernel;
+    protected KernelInterface $kernel;
 
     /**
-     * @var array
+     * @var array|null
      *      key   -> script md5 key
      *      value -> array
      *                  'index' - script index (used for execute scripts in properly order)
@@ -25,14 +22,9 @@ class ScriptManager
      *                  'file'  - script file name
      *                  'label' - script label
      */
-    protected $scripts = null;
+    protected ?array $scripts = null;
 
-    /**
-     * Constructor
-     *
-     * @param Kernel $kernel
-     */
-    public function __construct(Kernel $kernel)
+    public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
     }
@@ -111,24 +103,24 @@ class ScriptManager
      */
     protected function loadScripts()
     {
-        $index         = 0;
-        $scripts       = [];
+        $index = 0;
+        $scripts = [];
         $this->scripts = [];
-        $rootDir       = realpath(
-            $this->kernel->getRootDir() . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR
+        $projectDir = realpath(
+            $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR
         );
-        $bundles       = $this->kernel->getBundles();
+        $bundles = $this->kernel->getBundles();
         foreach ($bundles as $bundle) {
             $bundleDirName = $bundle->getPath();
             $this->getScriptInfo($bundleDirName, $index, $scripts);
 
-            $relativePathArray = explode(DIRECTORY_SEPARATOR, str_replace($rootDir, '', $bundleDirName));
+            $relativePathArray = explode(DIRECTORY_SEPARATOR, str_replace($projectDir, '', $bundleDirName));
             if ($relativePathArray[0] == '') {
                 unset($relativePathArray[0]);
             }
             for ($i = count($relativePathArray); $i >= 0; $i--) {
                 unset($relativePathArray[$i]);
-                $checkPath = $rootDir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $relativePathArray);
+                $checkPath = $projectDir . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $relativePathArray);
                 if ($this->getScriptInfo($checkPath, $index, $scripts)) {
                     break;
                 }

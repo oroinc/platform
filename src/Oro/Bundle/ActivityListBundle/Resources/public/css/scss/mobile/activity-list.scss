@@ -4,7 +4,7 @@
     .grid-toolbar {
         display: flex;
         flex-wrap: wrap;
-        padding: side-values(0 0 $content-padding-small);
+        padding: 0 0 $content-padding-small;
     }
 
     .filter-box {
@@ -34,7 +34,7 @@
     }
 
     .activity-actions {
-        margin-#{$start}: 0;
+        margin-left: 0;
     }
 
     .accordion-heading {
@@ -53,7 +53,7 @@
         }
 
         .message-item {
-            padding-#{$end}: 0;
+            padding-right: 0;
         }
     }
 
@@ -81,8 +81,8 @@
 @include media-breakpoint-down(sm) {
     .activity-list-widget {
         .accordion-heading {
-            padding-#{$start}: 0;
-            padding-#{$end}: 0;
+            padding-left: 0;
+            padding-right: 0;
 
             .details {
                 max-width: $activity-mobile-details-small-width;

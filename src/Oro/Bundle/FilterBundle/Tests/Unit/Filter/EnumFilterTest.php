@@ -8,6 +8,7 @@ use Oro\Bundle\FilterBundle\Filter\EnumFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Test\FormInterface;
@@ -36,9 +37,7 @@ class EnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', []);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => []],
@@ -50,9 +49,7 @@ class EnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['null_value' => ':empty:']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'null_value' => ':empty:', 'options' => []],
@@ -64,9 +61,7 @@ class EnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['class' => 'Test\EnumValue']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [FilterUtility::FRONTEND_TYPE_KEY => 'dictionary', 'options' => ['class' => 'Test\EnumValue']],
@@ -78,9 +73,7 @@ class EnumFilterTest extends OrmTestCase
     {
         $this->filter->init('test', ['enum_code' => 'test_enum']);
 
-        $paramsProperty = new \ReflectionProperty($this->filter, 'params');
-        $paramsProperty->setAccessible(true);
-        $params = $paramsProperty->getValue($this->filter);
+        $params = ReflectionUtil::getPropertyValue($this->filter, 'params');
 
         self::assertEquals(
             [
@@ -129,9 +122,11 @@ class EnumFilterTest extends OrmTestCase
         $fieldName = 'o.testField';
         $parameterName = 'param1';
 
-        $buildComparisonExprMethod = new \ReflectionMethod($this->filter, 'buildComparisonExpr');
-        $buildComparisonExprMethod->setAccessible(true);
-        $expr = $buildComparisonExprMethod->invoke($this->filter, $ds, $filterType, $fieldName, $parameterName);
+        $expr = ReflectionUtil::callMethod(
+            $this->filter,
+            'buildComparisonExpr',
+            [$ds, $filterType, $fieldName, $parameterName]
+        );
 
         $qb->where($expr);
         $result = $qb->getDQL();

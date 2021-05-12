@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
@@ -29,8 +30,8 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entityAcl->getId());
 
         $value = 42;
-        $this->setEntityId($value);
-        $this->assertEquals($value, $this->entityAcl->getId());
+        ReflectionUtil::setId($this->entityAcl, $value);
+        $this->assertSame($value, $this->entityAcl->getId());
     }
 
     /**
@@ -88,17 +89,7 @@ class WorkflowEntityAclTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
         $this->expectExceptionMessage("Workflow entity ACL with ID 1 doesn't have workflow step");
 
-        $this->setEntityId(1);
+        ReflectionUtil::setId($this->entityAcl, 1);
         $this->entityAcl->getAttributeStepKey();
-    }
-
-    /**
-     * @param int $value
-     */
-    protected function setEntityId($value)
-    {
-        $idReflection = new \ReflectionProperty('Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl', 'id');
-        $idReflection->setAccessible(true);
-        $idReflection->setValue($this->entityAcl, $value);
     }
 }

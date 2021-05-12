@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
@@ -176,10 +177,7 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetResultUnserialized()
     {
-        $reflection = new \ReflectionObject($this->workflowItem);
-        $resultProperty = $reflection->getProperty('result');
-        $resultProperty->setAccessible(true);
-        $resultProperty->setValue($this->workflowItem, null);
+        ReflectionUtil::setPropertyValue($this->workflowItem, 'result', null);
         $this->assertInstanceOf(WorkflowResult::class, $this->workflowItem->getResult());
         $this->assertTrue($this->workflowItem->getResult()->isEmpty());
     }

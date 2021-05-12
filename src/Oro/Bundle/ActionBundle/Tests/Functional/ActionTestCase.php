@@ -73,14 +73,14 @@ abstract class ActionTestCase extends WebTestCase
             ContextHelper::ENTITY_ID_PARAM => $entityId,
         ], $data);
 
-        /* @var $requestStack RequestStack */
+        /* @var RequestStack $requestStack */
         $requestStack = $this->getContainer()->get('request_stack');
         $requestStack->push(new Request($request));
 
-        /* @var $provider ButtonProvider */
+        /* @var ButtonProvider $provider */
         $provider = $this->getContainer()->get('oro_action.provider.button');
 
-        /* @var $contextProvider ButtonSearchContextProvider */
+        /* @var ButtonSearchContextProvider $contextProvider */
         $contextProvider = $this->getContainer()->get('oro_action.provider.button_search_context');
         $context = $contextProvider->getButtonSearchContext();
 

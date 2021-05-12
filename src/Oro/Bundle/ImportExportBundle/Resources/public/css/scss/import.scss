@@ -44,7 +44,7 @@
         > li {
             > a:hover {
                 > .icon-download-alt {
-                    background-image: url(../../img/glyphicons-halflings.png) !important;
+                    background-image: url('#{$global-url}/oroimportexport/img/glyphicons-halflings.png') !important;
                 }
             }
         }

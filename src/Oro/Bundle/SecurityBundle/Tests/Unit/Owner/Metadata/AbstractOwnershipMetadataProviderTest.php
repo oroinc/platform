@@ -118,14 +118,10 @@ class AbstractOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('getEntityConfig');
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->exactly(2))
             ->method('fetch')
             ->with(self::UNDEFINED_CLASS)
-            ->willReturn(false);
-        $this->cache->expects($this->at(2))
-            ->method('fetch')
-            ->with(self::UNDEFINED_CLASS)
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(false, true);
         $this->cache->expects($this->once())
             ->method('save')
             ->with(self::UNDEFINED_CLASS, true);

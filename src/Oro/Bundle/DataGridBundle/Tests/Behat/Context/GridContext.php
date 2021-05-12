@@ -106,7 +106,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     public function iEditFirstRecordFromGrid(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            list($field, $value) = $row;
+            [$field, $value] = $row;
             $this->inlineEditField($field, $value);
             $this->waitForAjax();
         }
@@ -780,7 +780,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             return $td;
         });
 
-        foreach ($table->getRows() as list($header, $value)) {
+        foreach ($table->getRows() as [$header, $value]) {
             $columnNumber = $gridHeader->getColumnNumber($header);
             $actualValue = trim($columns[$columnNumber]->text());
             // removing multiple spaces, newlines, tabs
@@ -1505,7 +1505,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         );
 
         foreach ($table->getRows() as $row) {
-            list($hint) = $row;
+            [$hint] = $row;
 
             $this->assertTrue(
                 in_array($hint, $hints, true),
@@ -1538,7 +1538,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         );
 
         foreach ($table->getRows() as $row) {
-            list($hint) = $row;
+            [$hint] = $row;
 
             $this->assertTrue(
                 in_array($hint, $hints, true),
@@ -1997,7 +1997,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
 TEXT;
 
         self::assertCount(1, $table->getRow(0), $errorMessage);
-        foreach ($table->getRows() as list($value)) {
+        foreach ($table->getRows() as [$value]) {
             $this->iShouldSeeRecordInGrid($value, $gridName);
         }
     }
@@ -2580,11 +2580,11 @@ TEXT;
      */
     private function getGridColumnManager($grid)
     {
-        /** @var $colunmManager GridColumnManager $colunmManager */
-        $colunmManager = $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
-        $colunmManager->setGrid($grid);
+        /** @var GridColumnManager $columnManager */
+        $columnManager = $this->createElement($grid->getMappedChildElementName('GridColumnManager'), $grid);
+        $columnManager->setGrid($grid);
 
-        return $colunmManager;
+        return $columnManager;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\Batch\BatchItem;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\AclNotFoundException;
 use Symfony\Component\Security\Acl\Model\MutableAclInterface;
@@ -131,7 +132,8 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->manager->deleteAcl($oid);
 
-        $items = $this->getItems();
+        /** @var BatchItem[] $items */
+        $items = ReflectionUtil::getPropertyValue($this->manager, 'items');
         $this->assertCount(1, $items);
         $this->assertEquals(BatchItem::STATE_DELETE, current($items)->getState());
     }
@@ -958,29 +960,14 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->flush();
     }
 
-    /**
-     * @return BatchItem[]
-     */
-    private function getItems()
-    {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        return $prop->getValue($this->manager);
-    }
-
     private function setItem(ObjectIdentity $oid, $state, MutableAclInterface $acl = null)
     {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        $getKeyMtd = $class->getMethod('getKey');
-        $getKeyMtd->setAccessible(true);
-        $key = $getKeyMtd->invoke($this->manager, $oid);
-
-        $prop->setValue($this->manager, array($key => new BatchItem($oid, $state, $acl)));
+        $key = ReflectionUtil::callMethod($this->manager, 'getKey', [$oid]);
+        ReflectionUtil::setPropertyValue(
+            $this->manager,
+            'items',
+            [$key => new BatchItem($oid, $state, $acl)]
+        );
     }
 
     /**
@@ -988,18 +975,11 @@ class AclManagerTest extends \PHPUnit\Framework\TestCase
      */
     private function setItems($items)
     {
-        $class = new \ReflectionClass($this->manager);
-        $prop = $class->getProperty('items');
-        $prop->setAccessible(true);
-
-        $getKeyMtd = $class->getMethod('getKey');
-        $getKeyMtd->setAccessible(true);
-
-        $val = array();
+        $val = [];
         foreach ($items as $item) {
-            $val[$getKeyMtd->invoke($this->manager, $item->getOid())] = $item;
+            $key = ReflectionUtil::callMethod($this->manager, 'getKey', [$item->getOid()]);
+            $val[$key] = $item;
         }
-
-        $prop->setValue($this->manager, $val);
+        ReflectionUtil::setPropertyValue($this->manager, 'items', $val);
     }
 }

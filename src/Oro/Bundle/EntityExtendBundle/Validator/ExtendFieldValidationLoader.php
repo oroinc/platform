@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Validator\AbstractFieldConfigBasedValidationLoader;
+use Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -17,16 +18,16 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
     /** @var ConfigProvider */
     protected $extendConfigProvider;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @param ConfigProvider $fieldConfigProvider
-     */
+    private FieldConfigConstraintsFactory $fieldConfigConstraintsFactory;
+
     public function __construct(
         ConfigProvider $extendConfigProvider,
-        ConfigProvider $fieldConfigProvider
+        ConfigProvider $fieldConfigProvider,
+        FieldConfigConstraintsFactory $fieldConfigConstraintsFactory
     ) {
         $this->extendConfigProvider = $extendConfigProvider;
-        $this->fieldConfigProvider   = $fieldConfigProvider;
+        $this->fieldConfigProvider = $fieldConfigProvider;
+        $this->fieldConfigConstraintsFactory = $fieldConfigConstraintsFactory;
     }
 
     /**
@@ -42,11 +43,17 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
         $fieldConfigId = $fieldConfig->getId();
         $fieldName     = $fieldConfigId->getFieldName();
 
-        if (!$this->isApplicable($metadata->getClassName(), $fieldName)) {
+        $extendConfig = $this->extendConfigProvider->getConfig($metadata->getClassName(), $fieldName);
+        if (!$this->isApplicable($extendConfig)) {
             return;
         }
 
-        $constraints = $this->getConstraintsByFieldType($fieldConfigId->getFieldType());
+        $fieldType = $fieldConfigId->getFieldType();
+        $constraints = \array_merge(
+            $this->getConstraintsByFieldType($fieldType),
+            $this->fieldConfigConstraintsFactory->create($extendConfig)
+        );
+
         foreach ($constraints as $constraint) {
             $metadata->addPropertyConstraint($fieldName, $constraint);
         }
@@ -55,17 +62,14 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
     /**
      * Check if field applicable to add constraint
      *
-     * @param string $className
-     * @param string $fieldName
+     * @param ConfigInterface $extendConfig
      *
      * @return bool
      */
-    protected function isApplicable($className, $fieldName)
+    protected function isApplicable(ConfigInterface $extendConfig): bool
     {
-        $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
-
         return !$extendConfig->is('is_deleted') &&
-        !$extendConfig->is('state', ExtendScope::STATE_NEW) &&
-        $extendConfig->is('is_extend');
+            !$extendConfig->is('state', ExtendScope::STATE_NEW) &&
+            $extendConfig->is('is_extend');
     }
 }

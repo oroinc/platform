@@ -5,6 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Entity;
 use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -131,10 +132,7 @@ class LocalizationValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $localization = new Entity\Localization();
         $localization->setName($name);
-        $reflection = new \ReflectionClass('Oro\Bundle\LocaleBundle\Entity\Localization');
-        $reflectionProperty = $reflection->getProperty('id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($localization, $id);
+        ReflectionUtil::setId($localization, $id);
 
         return $localization;
     }

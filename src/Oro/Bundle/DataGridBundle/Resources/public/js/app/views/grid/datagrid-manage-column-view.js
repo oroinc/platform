@@ -95,7 +95,7 @@ define(function(require) {
          * @protected
          */
         _pushState: function() {
-            if (this._applyingState) {
+            if (this._applyingState || this._isStateSynced()) {
                 return;
             }
 
@@ -110,12 +110,10 @@ define(function(require) {
          *
          * @protected
          */
-        _applyState: function(collection, state) {
-            state = state || collection.state;
-            const columnsState = state.columns;
-            let attrs;
+        _applyState: function(collection, gridCollectionState) {
+            const {columns: columnsState} = gridCollectionState || this.grid.collection.state;
 
-            if (tools.isEqualsLoosely(this._createState(), columnsState)) {
+            if (this._isStateSynced(gridCollectionState)) {
                 // nothing to apply, state is the same
                 return;
             }
@@ -123,6 +121,7 @@ define(function(require) {
             this._applyingState = true;
 
             this.collection.each(function(column, i) {
+                let attrs;
                 const name = column.get('name');
                 if (columnsState[name]) {
                     attrs = _.defaults(_.pick(columnsState[name], ['renderable', 'order']), {renderable: true});
@@ -137,13 +136,27 @@ define(function(require) {
         },
 
         /**
+         * Check if state in columns collection complies to the columns state in grid collection
+         *
+         * @param {Object=} gridCollectionState preserved in grid collection
+         * @return {boolean}
+         * @protected
+         */
+        _isStateSynced(gridCollectionState) {
+            const {columns: preservedColumnsState} = gridCollectionState || this.grid.collection.state;
+            const currentColumnsState = this._createState();
+
+            return tools.isEqualsLoosely(currentColumnsState, preservedColumnsState);
+        },
+
+        /**
          * Create state according to column parameters
          * (iterates manageable columns and collects their state)
          *
          * @return {Object}
          * @protected
          */
-        _createState: function(collection) {
+        _createState: function() {
             const state = {};
 
             this.collection.each(function(column) {
@@ -177,6 +190,8 @@ define(function(require) {
          * @protected
          */
         _onDatagridSettingsHide: function() {
+            this._pushState();
+
             if (!this._isRefreshNeeded(this.defaultState)) {
                 // do not refresh collection if no new columns were added.
                 return;

@@ -37,11 +37,11 @@
         }
 
         .ui-datepicker-prev {
-            #{$start}: $datepicker-header-nav-buttons-indent;
+            left: $datepicker-header-nav-buttons-indent;
         }
 
         .ui-datepicker-next {
-            #{$end}: $datepicker-header-nav-buttons-indent;
+            right: $datepicker-header-nav-buttons-indent;
         }
 
         .ui-icon {
@@ -71,7 +71,7 @@
         }
 
         .input-widget-select {
-            text-align: $start;
+            text-align: left;
             margin: $datepicker-input-widget-select-margin;
         }
 
@@ -114,7 +114,7 @@
                 position: absolute;
                 width: $datepicker-calendar-active-dot-size;
                 height: $datepicker-calendar-active-dot-size;
-                #{$start}: 50%;
+                left: 50%;
                 bottom: 0;
                 margin-left: $datepicker-calendar-active-dot-size / -2;
                 margin-bottom: $datepicker-calendar-active-dot-v-shift;
@@ -215,7 +215,7 @@
     }
 
     ul {
-        padding-#{$start}: $datepicker-datevariables-list-padding-start;
+        padding-left: $datepicker-datevariables-list-padding-start;
         list-style-type: $datepicker-datevariables-list-list-style-type;
     }
 
@@ -232,7 +232,7 @@
     }
 
     .datepicker-input {
-        margin-#{$end}: $fields-row-datepicker-input-margin-end;
+        margin-right: $fields-row-datepicker-input-margin-end;
     }
 
     .timepicker-input {
@@ -241,11 +241,10 @@
 }
 
 .ui-timepicker-input:first-child {
-    margin-#{$start}: 0;
+    margin-left: 0;
 }
 
 
 .hasDatepicker.tab-pane {
     overflow: hidden;
 }
-

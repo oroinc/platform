@@ -6,6 +6,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\NumberRangeFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterTypeInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
@@ -33,9 +34,10 @@ class NumberRangeFilterTest extends NumberFilterTest
      */
     public function testParseData($data, $expected)
     {
-        $parseDataMethod = new \ReflectionMethod($this->filter, 'parseData');
-        $parseDataMethod->setAccessible(true);
-        $this->assertEquals($expected, $parseDataMethod->invoke($this->filter, $data));
+        $this->assertEquals(
+            $expected,
+            ReflectionUtil::callMethod($this->filter, 'parseData', [$data])
+        );
     }
 
     /**

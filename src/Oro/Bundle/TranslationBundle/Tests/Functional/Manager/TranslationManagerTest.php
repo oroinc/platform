@@ -175,7 +175,7 @@ class TranslationManagerTest extends WebTestCase
         $key = LoadTranslations::TRANSLATION_KEY_1;
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        /* @var $repository TranslationKeyRepository */
+        /* @var TranslationKeyRepository $repository */
         $repository = $this->getRepository(TranslationKey::class);
 
         $existingKey = $repository->findOneBy(['key' => $key, 'domain' => $domain]);
@@ -190,7 +190,7 @@ class TranslationManagerTest extends WebTestCase
         $key = 'translation.key1';
         $domain = LoadTranslations::TRANSLATION_KEY_DOMAIN;
 
-        /* @var $repository TranslationKeyRepository */
+        /* @var TranslationKeyRepository $repository */
         $repository = $this->getRepository(TranslationKey::class);
 
         $this->assertNull($repository->findOneBy(['key' => $key, 'domain' => $domain]));
@@ -205,7 +205,7 @@ class TranslationManagerTest extends WebTestCase
 
     public function testRemoveTranslationKey()
     {
-        /* @var $repository TranslationKeyRepository */
+        /* @var TranslationKeyRepository $repository */
         $repository = $this->getRepository(TranslationKey::class);
 
         $this->assertNotNull(

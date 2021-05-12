@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -31,11 +32,8 @@ class ProcessTriggerTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($this->entity->getId());
 
         $testValue = 1;
-        $reflectionProperty = new \ReflectionProperty('\Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger', 'id');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($this->entity, $testValue);
-
-        $this->assertEquals($testValue, $this->entity->getId());
+        ReflectionUtil::setId($this->entity, $testValue);
+        $this->assertSame($testValue, $this->entity->getId());
     }
 
     /**

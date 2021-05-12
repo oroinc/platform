@@ -22,7 +22,7 @@
             display: flex;
             align-items: flex-start;
 
-            text-align: $start;
+            text-align: left;
         }
 
         .filter-box {
@@ -42,7 +42,7 @@
             }
 
             &:last-child {
-                margin-#{$end}: 0;
+                margin-right: 0;
             }
         }
 
@@ -89,7 +89,7 @@
         color: $activity-count-color;
 
         .count {
-            margin-#{$start}: $activity-actions-offset;
+            margin-left: $activity-actions-offset;
         }
     }
 
@@ -128,8 +128,8 @@
         }
 
         .actions {
-            margin-#{$start}: auto;
-            padding-#{$start}: $content-padding-small;
+            margin-left: auto;
+            padding-left: $content-padding-small;
 
             overflow: visible;
         }
@@ -160,7 +160,7 @@
         .message-item {
             display: flex;
             align-items: center;
-            padding-#{$end}: $activity-message-item-offset;
+            padding-right: $activity-message-item-offset;
 
             color: $activity-icon-color;
 
@@ -208,17 +208,17 @@
         border: none;
         background: none transparent;
         font-weight: normal;
-        padding-#{$start}: 0;
-        padding-#{$end}: 0;
+        padding-left: 0;
+        padding-right: 0;
         color: $activity-filter-select-color;
         box-shadow: none;
     }
 
     .filter-item {
-        margin-#{$end}: 0;
+        margin-right: 0;
 
         .fa-close {
-            margin-#{$end}: 0;
+            margin-right: 0;
         }
     }
 
@@ -234,13 +234,13 @@
 
         > .responsive-cell {
             &:first-child {
-                padding-#{$end}: $activity-item-content-offset;
+                padding-right: $activity-item-content-offset;
 
-                border-#{$end}: 1px solid $activity-item-content-border-color;
+                border-right: 1px solid $activity-item-content-border-color;
             }
 
             &:last-child {
-                padding-#{$start}: $activity-item-content-offset;
+                padding-left: $activity-item-content-offset;
             }
         }
     }

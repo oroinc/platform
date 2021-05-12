@@ -19,17 +19,14 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldTypeHelper;
+    private $fieldTypeHelper;
 
     /** @var FileEntityConfigDumperExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -77,23 +74,12 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $fieldConfig = new Config(new FieldConfigId('extend', TestEntity1::class, 'testField'));
         $fieldConfig->set('state', 'unsupported state');
 
-        $this->configManager->expects(self::at(0))
-            ->method('getConfigs')
-            ->with('extend')
-            ->willReturn([
-                $entityConfig,
-            ]);
-
-        $this->configManager->expects(self::at(1))
-            ->method('getConfigs')
-            ->with('extend', TestEntity1::class)
-            ->willReturn([
-                $fieldConfig,
-            ]);
-
         $this->configManager->expects(self::exactly(2))
-            ->method('getConfigs');
-
+            ->method('getConfigs')
+            ->willReturnMap([
+                ['extend', null, false, [$entityConfig]],
+                ['extend', TestEntity1::class, false, [$fieldConfig]]
+            ]);
         $this->configManager->expects(self::never())
             ->method('persist');
 
@@ -122,41 +108,44 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects(self::exactly(4))
             ->method('getConfigs')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['extend', null, false, [$entityConfig, $imageEntityConfig, $fileEntityConfig]],
                 ['extend', TestEntity1::class, false, [$fieldConfig]],
                 ['extend', TestEntity2::class, false, [$imageFieldConfig]],
                 ['extend', TestEntity3::class, false, [$fileFieldConfig]],
-            ]));
+            ]);
 
         $this->configManager->expects(self::exactly(2))
             ->method('getFieldConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['importexport', TestEntity2::class, 'imageFieldName', $imageImportFieldConfig],
                 ['importexport', TestEntity3::class, 'fileFieldName', $fileImportFieldConfig],
-            ]));
+            ]);
 
         $this->configManager->expects(self::exactly(4))
             ->method('getEntityConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['extend', TestEntity2::class, $imageEntityConfig],
                 ['extend', TestEntity3::class, $fileEntityConfig],
-            ]));
+            ]);
 
         $this->fieldTypeHelper->expects(self::exactly(4))
             ->method('getUnderlyingType')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['image', 'manyToOne'],
                 ['file', 'manyToOne'],
-            ]));
+            ]);
 
-        $this->configManager->expects(self::at(4))
+        $this->configManager->expects(self::exactly(6))
             ->method('persist')
-            ->with($imageImportFieldConfig);
-
-        $this->configManager->expects(self::at(11))
-            ->method('persist')
-            ->with($fileImportFieldConfig);
+            ->withConsecutive(
+                [$imageImportFieldConfig],
+                [$imageFieldConfig],
+                [$imageEntityConfig],
+                [$fileImportFieldConfig],
+                [$fileFieldConfig],
+                [$fileEntityConfig]
+            );
 
         $this->extension->preUpdate();
 
@@ -266,34 +255,34 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects(self::exactly(4))
             ->method('getConfigs')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['extend', null, false, [$entityConfig, $imagesEntityConfig, $filesEntityConfig]],
                 ['extend', TestEntity1::class, false, [$fieldConfig]],
                 ['extend', TestEntity2::class, false, [$imagesFieldConfig]],
                 ['extend', TestEntity3::class, false, [$filesFieldConfig]],
-            ]));
+            ]);
 
         $this->configManager->expects(self::exactly(2))
             ->method('getFieldConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['importexport', TestEntity2::class, 'imagesFieldName', $imagesFieldConfig],
                 ['importexport', TestEntity3::class, 'filesFieldName', $filesFieldConfig],
-            ]));
+            ]);
 
         $this->configManager->expects(self::exactly(8))
             ->method('getEntityConfig')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['extend', TestEntity2::class, $imagesEntityConfig],
                 ['extend', TestEntity3::class, $filesEntityConfig],
                 ['extend', FileItem::class, $fileItemEntityConfig],
-            ]));
+            ]);
 
         $this->fieldTypeHelper->expects(self::exactly(6))
             ->method('getUnderlyingType')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['multiImage', 'oneToMany'],
                 ['multiFile', 'oneToMany'],
-            ]));
+            ]);
 
         $this->extension->preUpdate();
 
@@ -407,11 +396,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @return Config
-     */
-    protected function createExtendEntityConfig(string $className): Config
+    private function createExtendEntityConfig(string $className): Config
     {
         $entityConfig = new Config(new EntityConfigId('extend', $className));
         $entityConfig->set('is_extend', true);
@@ -419,13 +404,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         return $entityConfig;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $fieldType
-     * @return Config
-     */
-    protected function createExtendFieldConfig(string $className, string $fieldName, string $fieldType): Config
+    private function createExtendFieldConfig(string $className, string $fieldName, string $fieldType): Config
     {
         $fieldConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
         $fieldConfig->set('state', ExtendScope::STATE_NEW);
@@ -433,12 +412,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         return $fieldConfig;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @return Config
-     */
-    protected function createImportExportFieldConfig(string $className, string $fieldName): Config
+    private function createImportExportFieldConfig(string $className, string $fieldName): Config
     {
         $fieldConfig = new Config(new FieldConfigId('importexport', $className, $fieldName));
         $fieldConfig->set('state', ExtendScope::STATE_NEW);

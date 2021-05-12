@@ -776,19 +776,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
         $this->cache->expects($this->exactly(4))
-            ->method('delete');
-        $this->cache->expects($this->at(0))
             ->method('delete')
-            ->with(self::ENTITY_CLASSES_KEY);
-        $this->cache->expects($this->at(1))
-            ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(2))
-            ->method('delete')
-            ->with(self::SCOPE);
-        $this->cache->expects($this->at(3))
-            ->method('delete')
-            ->with(self::ANOTHER_SCOPE);
+            ->withConsecutive(
+                [self::ENTITY_CLASSES_KEY],
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::SCOPE],
+                [self::ANOTHER_SCOPE]
+            );
 
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
@@ -800,19 +794,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveConfig(new Config($configId), true);
 
         $this->cache->expects($this->exactly(4))
-            ->method('delete');
-        $this->cache->expects($this->at(0))
             ->method('delete')
-            ->with(self::ENTITY_CLASSES_KEY);
-        $this->cache->expects($this->at(1))
-            ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(2))
-            ->method('delete')
-            ->with(self::SCOPE);
-        $this->cache->expects($this->at(3))
-            ->method('delete')
-            ->with(self::ANOTHER_SCOPE);
+            ->withConsecutive(
+                [self::ENTITY_CLASSES_KEY],
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::SCOPE],
+                [self::ANOTHER_SCOPE]
+            );
 
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
@@ -827,19 +815,15 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveConfig($anotherConfig, true);
 
         $this->cache->expects($this->exactly(3))
-            ->method('delete');
-        $this->cache->expects($this->at(0))
             ->method('delete')
-            ->with(self::ENTITY_CLASSES_KEY);
-        $this->cache->expects($this->at(1))
-            ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(2))
+            ->withConsecutive(
+                [self::ENTITY_CLASSES_KEY],
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::ANOTHER_SCOPE]
+            );
+        $this->cache->expects($this->once())
             ->method('save')
             ->with(self::SCOPE, [$anotherConfigId->getClassName() => $anotherConfig->getValues()]);
-        $this->cache->expects($this->at(3))
-            ->method('delete')
-            ->with(self::ANOTHER_SCOPE);
 
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
@@ -848,15 +832,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->exactly(3))
             ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(1))
-            ->method('delete')
-            ->with(self::ENTITY_CLASS . '.' . self::SCOPE);
-        $this->cache->expects($this->at(2))
-            ->method('delete')
-            ->with(self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE);
+            ->withConsecutive(
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::ENTITY_CLASS . '.' . self::SCOPE],
+                [self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE]
+            );
 
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }
@@ -867,15 +849,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
         $this->configCache->saveConfig(new Config($configId), true);
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->exactly(3))
             ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(1))
-            ->method('delete')
-            ->with(self::ENTITY_CLASS . '.' . self::SCOPE);
-        $this->cache->expects($this->at(2))
-            ->method('delete')
-            ->with(self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE);
+            ->withConsecutive(
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::ENTITY_CLASS . '.' . self::SCOPE],
+                [self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE]
+            );
 
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }
@@ -894,10 +874,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveConfig(new Config($configId), true);
         $this->configCache->saveConfig($anotherConfig, true);
 
-        $this->cache->expects($this->at(0))
+        $this->cache->expects($this->exactly(2))
             ->method('delete')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
-        $this->cache->expects($this->at(1))
+            ->withConsecutive(
+                [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
+                [self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE]
+            );
+        $this->cache->expects($this->once())
             ->method('save')
             ->with(
                 self::ENTITY_CLASS . '.' . self::SCOPE,
@@ -908,9 +891,6 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             );
-        $this->cache->expects($this->at(2))
-            ->method('delete')
-            ->with(self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE);
 
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
     }

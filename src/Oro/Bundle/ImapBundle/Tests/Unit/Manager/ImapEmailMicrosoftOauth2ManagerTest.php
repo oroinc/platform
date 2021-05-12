@@ -14,6 +14,7 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailMicrosoftOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
@@ -159,22 +160,17 @@ class ImapEmailMicrosoftOauth2ManagerTest extends TestCase
 
     public function testGetResourceOwnerName(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'getResourceOwnerName');
-        $reflection->setAccessible(true);
-        $this->assertEquals('office365', $reflection->invoke($this->manager));
+        $this->assertEquals('office365', ReflectionUtil::callMethod($this->manager, 'getResourceOwnerName', []));
     }
 
     public function testBuildParameters(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'buildParameters');
-        $reflection->setAccessible(true);
-
         $this->router->expects($this->once())
             ->method('generate')
             ->with('oro_imap_microsoft_access_token', [], 0)
             ->willReturn('https://return.example.com/');
 
-        $parameters = $reflection->invoke($this->manager, 'sample_code');
+        $parameters = ReflectionUtil::callMethod($this->manager, 'buildParameters', ['sample_code']);
 
         $this->assertSame([
             'redirect_uri' => 'https://return.example.com/',
@@ -186,9 +182,6 @@ class ImapEmailMicrosoftOauth2ManagerTest extends TestCase
 
     public function testGetConfigParameters(): void
     {
-        $reflection = new \ReflectionMethod(get_class($this->manager), 'getConfigParameters');
-        $reflection->setAccessible(true);
-
         $this
             ->configManager
             ->expects($this->exactly(2))
@@ -210,7 +203,7 @@ class ImapEmailMicrosoftOauth2ManagerTest extends TestCase
                 ]
             ]);
 
-        $configParameters = $reflection->invoke($this->manager);
+        $configParameters = ReflectionUtil::callMethod($this->manager, 'getConfigParameters', []);
 
         $this->assertSame([
             'client_id' => 'sampleClientId',

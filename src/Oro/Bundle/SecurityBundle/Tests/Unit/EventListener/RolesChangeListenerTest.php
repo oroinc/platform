@@ -99,25 +99,21 @@ class RolesChangeListenerTest extends OrmTestCase
         $this->cache->expects(self::once())
             ->method('deleteAll');
 
-        $this->setQueryExpectationAt(
-            $this->conn,
-            0,
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'
             . ' FROM tbl_user t0 WHERE t0.id = ?',
             [['id_1' => 1, 'username_2' => 'test', 'owner_id_3' => 12]],
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-
-        $this->setQueryExpectationAt(
-            $this->conn,
-            1,
+        $this->addQueryExpectation(
             'SELECT t0.id AS id_1 FROM tbl_organization t0 INNER JOIN tbl_user_to_organization'
             . ' ON t0.id = tbl_user_to_organization.organization_id WHERE tbl_user_to_organization.user_id = ?',
             [],
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
+        $this->applyQueryExpectations($this->conn);
 
         $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $organization = $this->em->getReference(self::ENTITY_NAMESPACE . '\TestOrganization', 10);

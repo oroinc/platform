@@ -113,7 +113,7 @@ class ImpersonateUserCommandTest extends TestCase
         $userStub = null
     ) {
         if (null === $userStub && true !== $nullUserStub) {
-            /** @var User|\PHPUnit\Framework\MockObject\MockObject $userStub*/
+            /** @var User|\PHPUnit\Framework\MockObject\MockObject $userStub */
             $userStub = $this->getMockBuilder($userClass ?? User::class)
                 ->disableOriginalConstructor()
                 ->setMethods(['getAuthStatus', 'isEnabled'])

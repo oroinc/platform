@@ -76,10 +76,7 @@ class DateGroupingActionRemoverExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testVisitResult($inputRows, $expectedRows)
     {
-        /** @var ResultsObject|\PHPUnit\Framework\MockObject\MockObject $result * */
-        $result = $this->getMockBuilder(ResultsObject::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $result = $this->createMock(ResultsObject::class);
         $result->expects($this->once())
             ->method('getData')
             ->willReturn($inputRows);

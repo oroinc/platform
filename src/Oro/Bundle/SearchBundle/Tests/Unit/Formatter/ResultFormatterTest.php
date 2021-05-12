@@ -265,7 +265,6 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->prepareEntityManager();
         $expectedResult = $this->prepareStubEntities();
 
-        /** @var $indexer Indexer */
         $indexer = $this->createMock(Indexer::class);
         $indexerRows = $this->getIndexerRows();
 
@@ -280,7 +279,6 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $this->prepareEntityManager();
         $this->prepareStubEntities();
 
-        /** @var $indexer Indexer */
         $indexer = $this->createMock(Indexer::class);
         $indexerRows = $this->getIndexerRows();
 

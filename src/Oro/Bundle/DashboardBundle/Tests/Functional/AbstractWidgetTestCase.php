@@ -4,7 +4,6 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\InputFormField;
 use Symfony\Component\DomCrawler\Form;
 
@@ -44,12 +43,7 @@ class AbstractWidgetTestCase extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertEquals($response->getStatusCode(), 200, 'Failed in getting configure widget dialog window !');
 
-        /**
-         * @var $crawler Crawler
-         * @var $form Form
-         */
         $crawler = $this->client->getCrawler();
-        /** @var Form $form */
         $form = $crawler->selectButton('Save')->form();
 
         foreach ($configFields as $fieldsName => $value) {
@@ -59,7 +53,7 @@ class AbstractWidgetTestCase extends WebTestCase
         $this->client->submit($form);
 
         $response = $this->client->getResponse();
-        $this->assertEquals($response->getStatusCode(), 200, "Failed in submit widget configuration options !");
+        $this->assertEquals($response->getStatusCode(), 200, 'Failed in submit widget configuration options !');
     }
 
     /**

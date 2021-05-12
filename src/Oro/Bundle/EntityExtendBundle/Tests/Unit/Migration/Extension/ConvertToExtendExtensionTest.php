@@ -30,7 +30,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var QueryBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $queries;
 
-    /** @var  Schema|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var Schema|\PHPUnit\Framework\MockObject\MockObject */
     protected $schema;
 
     protected function setUp(): void

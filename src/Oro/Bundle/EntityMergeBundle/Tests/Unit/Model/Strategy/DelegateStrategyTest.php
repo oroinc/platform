@@ -6,9 +6,7 @@ use Oro\Bundle\EntityMergeBundle\Model\Strategy\DelegateStrategy;
 
 class DelegateStrategyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var DelegateStrategy $strategy
-     */
+    /** @var DelegateStrategy */
     protected $strategy;
 
     protected function setUp(): void
