@@ -308,16 +308,11 @@ class ActionFieldConfig implements FieldConfigInterface
     /**
      * Gets existing validation constraints from the form options.
      *
-     * @return Constraint[]|null
+     * @return array|null [Constraint object or [constraint name or class => constraint options, ...], ...]
      */
     public function getFormConstraints()
     {
-        $formOptions = $this->getFormOptions();
-        if (empty($formOptions) || !\array_key_exists('constraints', $formOptions)) {
-            return null;
-        }
-
-        return $formOptions['constraints'];
+        return FormConstraintUtil::getFormConstraints($this->getFormOptions());
     }
 
     /**
@@ -327,9 +322,17 @@ class ActionFieldConfig implements FieldConfigInterface
      */
     public function addFormConstraint(Constraint $constraint)
     {
-        $formOptions = $this->getFormOptions();
-        $formOptions['constraints'][] = $constraint;
-        $this->setFormOptions($formOptions);
+        $this->setFormOptions(FormConstraintUtil::addFormConstraint($this->getFormOptions(), $constraint));
+    }
+
+    /**
+     * Removes a validation constraint from the form options by its class.
+     *
+     * @param string $constraintClass
+     */
+    public function removeFormConstraint($constraintClass)
+    {
+        $this->setFormOptions(FormConstraintUtil::removeFormConstraint($this->getFormOptions(), $constraintClass));
     }
 
     /**

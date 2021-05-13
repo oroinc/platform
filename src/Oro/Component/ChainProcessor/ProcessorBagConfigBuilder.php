@@ -250,9 +250,10 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
                     $group = $processor[1][self::GROUP_ATTRIBUTE];
                     if (!isset($groups[$action][$group])) {
                         throw new \RuntimeException(sprintf(
-                            'The group "%s" is not defined. Processor: "%s".',
+                            'The group "%s" is not defined. Processor: "%s". Action: "%s".',
                             $group,
-                            $processor[0]
+                            $processor[0],
+                            $action
                         ));
                     }
                     $groupPriority = $groups[$action][$group];

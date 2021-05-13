@@ -327,11 +327,11 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertEquals(
             [
-                Error::createValidationError('entity type constraint')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: users.')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toOneRelation/data/type')),
-                Error::createValidationError('entity type constraint')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: groups.')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/0/type')),
-                Error::createValidationError('entity type constraint')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: groups.')
                     ->setSource(ErrorSource::createByPointer('/data/relationships/toManyRelation/data/1/type'))
             ],
             $this->context->getErrors()
