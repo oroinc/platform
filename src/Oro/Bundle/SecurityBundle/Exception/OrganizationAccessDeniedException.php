@@ -48,20 +48,14 @@ class OrganizationAccessDeniedException extends AuthenticationException
         return ['%organization_name%' => $this->organizationName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([parent::serialize(), $this->organizationName]);
+        return [parent::__serialize(), $this->organizationName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($str)
+    public function __unserialize(array $data): void
     {
-        list($parentData, $this->organizationName) = unserialize($str);
-        parent::unserialize($parentData);
+        [$parentData, $this->organizationName] = $data;
+        parent::__unserialize($parentData);
     }
 }
