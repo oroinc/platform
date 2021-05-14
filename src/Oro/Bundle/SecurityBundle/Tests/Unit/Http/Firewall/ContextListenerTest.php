@@ -23,16 +23,15 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var ContextListener */
-    private $listener;
+    private ContextListener $listener;
 
     protected function setUp(): void
     {
@@ -52,25 +51,22 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @param mixed $token
      */
-    public function testOnKernelRequestUnsupportedTokenInstance($token)
+    public function testOnKernelRequestUnsupportedTokenInstance($token): void
     {
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->never())
-            ->method($this->anything());
-        $this->doctrine->expects($this->never())
-            ->method($this->anything());
+        $event->expects(self::never())
+            ->method(self::anything());
+        $this->doctrine->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->onKernelRequest($event);
     }
 
-    /**
-     * @return array
-     */
-    public function unsupportedTokenDataProvider()
+    public function unsupportedTokenDataProvider(): array
     {
         return [
             'invalid interface'       => [$this->createMock(TokenInterface::class)],
@@ -78,52 +74,55 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnKernelRequestCannotSetOrganizationForNotSupportedUserException()
+    public function testOnKernelRequestCannotSetOrganizationForNotSupportedUserException(): void
     {
         $user = null;
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage->expects($this->atLeastOnce())
+        $this->tokenStorage->expects(self::atLeastOnce())
             ->method('getToken')
             ->willReturn($token);
         /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->never())
-            ->method($this->anything());
+        $event->expects(self::never())
+            ->method(self::anything());
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(Organization::class)
             ->willReturn($em);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('find')
             ->with(Organization::class, $organization->getId())
             ->willReturn(null);
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $this->isInstanceOf(OrganizationAccessDeniedException::class));
+            ->with(Security::AUTHENTICATION_ERROR, self::isInstanceOf(OrganizationAccessDeniedException::class));
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->any())
+        $request->expects(self::any())
+            ->method('hasSession')
+            ->willReturn(true);
+        $request->expects(self::any())
             ->method('getSession')
             ->willReturn($session);
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with('Could not find organization by id 1');
 
@@ -131,36 +130,36 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestCannotSetOrganizationForNotSupportedUser()
+    public function testOnKernelRequestCannotSetOrganizationForNotSupportedUser(): void
     {
         $user = null;
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('setOrganization')
             ->with($organization);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->never())
-            ->method($this->anything());
+        $event->expects(self::never())
+            ->method(self::anything());
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(Organization::class)
             ->willReturn($em);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('find')
             ->with(Organization::class, $organization->getId())
             ->willReturn($organization);
@@ -168,42 +167,42 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestOrganizationAccessAllowed()
+    public function testOnKernelRequestOrganizationAccessAllowed(): void
     {
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1]);
 
         $user = $this->createMock(AbstractUser::class);
-        $user->expects($this->once())
+        $user->expects(self::once())
             ->method('isBelongToOrganization')
-            ->with($this->identicalTo($organization), $this->isTrue())
+            ->with(self::identicalTo($organization), self::isTrue())
             ->willReturn(true);
 
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('setOrganization')
             ->with($organization);
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->never())
-            ->method($this->anything());
+        $event->expects(self::never())
+            ->method(self::anything());
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(Organization::class)
             ->willReturn($em);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('find')
             ->with(Organization::class, $organization->getId())
             ->willReturn($organization);
@@ -211,56 +210,59 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestOrganizationAccessDenied()
+    public function testOnKernelRequestOrganizationAccessDenied(): void
     {
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 1, 'name' => 'from context']);
 
         $user = $this->createMock(AbstractUser::class);
-        $user->expects($this->once())
+        $user->expects(self::once())
             ->method('isBelongToOrganization')
-            ->with($this->identicalTo($organization), $this->isTrue())
+            ->with(self::identicalTo($organization), self::isTrue())
             ->willReturn(false);
 
         $token = $this->createMock(OrganizationAwareTokenInterface::class);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
-        $token->expects($this->once())
+        $token->expects(self::once())
             ->method('setOrganization');
 
-        $this->tokenStorage->expects($this->atLeastOnce())
+        $this->tokenStorage->expects(self::atLeastOnce())
             ->method('getToken')
             ->willReturn($token);
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('setToken')
             ->with(null);
 
         $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(Organization::class)
             ->willReturn($em);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('find')
             ->with(Organization::class, $organization->getId())
             ->willReturn($organization);
 
         $session = $this->createMock(SessionInterface::class);
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('set')
-            ->with(Security::AUTHENTICATION_ERROR, $this->isInstanceOf(OrganizationAccessDeniedException::class));
+            ->with(Security::AUTHENTICATION_ERROR, self::isInstanceOf(OrganizationAccessDeniedException::class));
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->any())
+        $request->expects(self::any())
+            ->method('hasSession')
+            ->willReturn(true);
+        $request->expects(self::any())
             ->method('getSession')
             ->willReturn($session);
         /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
         $event = $this->createMock(GetResponseEvent::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 

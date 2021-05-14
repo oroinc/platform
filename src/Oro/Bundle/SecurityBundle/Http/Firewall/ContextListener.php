@@ -109,9 +109,9 @@ class ContextListener
         $exception->setOrganizationName($token->getOrganization()->getName());
         $exception->setToken($token);
 
-        $session = $event->getRequest()->getSession();
-        if ($session) {
-            $session->set(Security::AUTHENTICATION_ERROR, $exception);
+        $request = $event->getRequest();
+        if ($request->hasSession()) {
+            $request->getSession()->set(Security::AUTHENTICATION_ERROR, $exception);
         }
 
         throw $exception;

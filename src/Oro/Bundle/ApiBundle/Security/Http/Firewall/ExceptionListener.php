@@ -17,8 +17,8 @@ class ExceptionListener extends BaseExceptionListener
      */
     protected function setTargetPath(Request $request): void
     {
-        $session = $request->getSession();
-        if (null !== $session && $request->cookies->has($session->getName())) {
+        $session = $request->hasSession() ? $request->getSession() : null;
+        if ($session && $request->cookies->has($session->getName())) {
             parent::setTargetPath($request);
         }
     }

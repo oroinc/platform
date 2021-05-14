@@ -387,7 +387,7 @@ class AclPrivilegeRepository
         // add default permission for not found in db privileges. By default it should be the maximum access level.
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
-                $accessLevels = $extension->getAccessLevelNames($oid, $permission);
+                $accessLevels = $extension->getAccessLevelNames($privilege->getIdentity()->getId(), $permission);
                 $maxAccessLevel = max(array_keys($accessLevels));
                 $privilege->addPermission(new AclPermission($permission, $maxAccessLevel));
             }
