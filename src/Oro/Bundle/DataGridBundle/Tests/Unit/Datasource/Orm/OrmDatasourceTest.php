@@ -17,13 +17,11 @@ use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OrmDatasource */
-    private $datasource;
-
     /** @var YamlProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
@@ -38,6 +36,9 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 
     /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $queryExecutor;
+
+    /** @var OrmDatasource */
+    private $datasource;
 
     protected function setUp(): void
     {
@@ -56,10 +57,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    private function getConfig()
+    private function getConfig(): array
     {
         return [
             'query' => [
@@ -71,14 +69,11 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return Query
-     */
-    private function getQuery()
+    private function getQuery(): Query
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $configuration = new Configuration();
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
@@ -92,32 +87,32 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $countQb = $this->createMock(QueryBuilder::class);
 
-        $this->processor->expects(static::once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->with($config)
             ->willReturn($qb);
-        $this->processor->expects(static::once())
+        $this->processor->expects(self::once())
             ->method('processCountQuery')
             ->with($config)
             ->willReturn($countQb);
 
-        $datagrid->expects(static::once())
+        $datagrid->expects(self::once())
             ->method('setDatasource')
             ->with(
-                static::logicalAnd(
-                    static::equalTo($this->datasource),
-                    static::logicalNot(static::identicalTo($this->datasource))
+                self::logicalAnd(
+                    self::equalTo($this->datasource),
+                    self::logicalNot(self::identicalTo($this->datasource))
                 )
             )
             ->willReturnSelf();
 
         $this->datasource->process($datagrid, $config);
 
-        static::assertSame($datagrid, $this->datasource->getDatagrid());
-        static::assertSame($qb, $this->datasource->getQueryBuilder());
-        static::assertSame($countQb, $this->datasource->getCountQb());
-        static::assertSame([], $this->datasource->getQueryHints());
-        static::assertSame([], $this->datasource->getCountQueryHints());
+        self::assertSame($datagrid, $this->datasource->getDatagrid());
+        self::assertSame($qb, $this->datasource->getQueryBuilder());
+        self::assertSame($countQb, $this->datasource->getCountQb());
+        self::assertSame([], $this->datasource->getQueryHints());
+        self::assertSame([], $this->datasource->getCountQueryHints());
     }
 
     public function testProcessWithHints()
@@ -130,32 +125,32 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $countQb = $this->createMock(QueryBuilder::class);
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->with($config)
             ->willReturn($qb);
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processCountQuery')
             ->with($config)
             ->willReturn($countQb);
 
-        $datagrid->expects($this->once())
+        $datagrid->expects(self::once())
             ->method('setDatasource')
             ->with(
-                static::logicalAnd(
-                    static::equalTo($this->datasource),
-                    static::logicalNot(static::identicalTo($this->datasource))
+                self::logicalAnd(
+                    self::equalTo($this->datasource),
+                    self::logicalNot(self::identicalTo($this->datasource))
                 )
             )
             ->willReturnSelf();
 
         $this->datasource->process($datagrid, $config);
 
-        static::assertSame($datagrid, $this->datasource->getDatagrid());
-        static::assertSame($qb, $this->datasource->getQueryBuilder());
-        static::assertSame($countQb, $this->datasource->getCountQb());
-        static::assertSame($config['hints'], $this->datasource->getQueryHints());
-        static::assertSame($config['count_hints'], $this->datasource->getCountQueryHints());
+        self::assertSame($datagrid, $this->datasource->getDatagrid());
+        self::assertSame($qb, $this->datasource->getQueryBuilder());
+        self::assertSame($countQb, $this->datasource->getCountQb());
+        self::assertSame($config['hints'], $this->datasource->getQueryHints());
+        self::assertSame($config['count_hints'], $this->datasource->getCountQueryHints());
     }
 
     public function testGetResults()
@@ -170,39 +165,44 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $records = [new ResultRecord($rows[0])];
         $recordsAfterEvent = [new ResultRecord(['key' => 'updated_value'])];
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->with($config)
             ->willReturn($qb);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $this->queryHintResolver->expects($this->once())
+        $this->queryHintResolver->expects(self::once())
             ->method('resolveHints')
-            ->with($this->identicalTo($query), $config['hints']);
-        $this->queryExecutor->expects($this->once())
+            ->with(self::identicalTo($query), $config['hints']);
+        $this->queryExecutor->expects(self::once())
             ->method('execute')
-            ->with($this->identicalTo($datagrid), $this->identicalTo($query), $this->isNull())
+            ->with(self::identicalTo($datagrid), self::identicalTo($query), self::isNull())
             ->willReturn($rows);
 
-        $this->eventDispatcher->expects($this->at(0))
+        $this->eventDispatcher->expects(self::exactly(3))
             ->method('dispatch')
-            ->with(new OrmResultBeforeQuery($datagrid, $qb), OrmResultBeforeQuery::NAME);
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(new OrmResultBefore($datagrid, $query), OrmResultBefore::NAME);
-        $this->eventDispatcher->expects($this->at(2))
-            ->method('dispatch')
-            ->with(new OrmResultAfter($datagrid, $records, $query), OrmResultAfter::NAME)
-            ->willReturnCallback(function (OrmResultAfter $event, $name) use ($recordsAfterEvent) {
-                $event->setRecords($recordsAfterEvent);
-            });
+            ->withConsecutive(
+                [self::isInstanceOf(OrmResultBeforeQuery::class), OrmResultBeforeQuery::NAME],
+                [self::isInstanceOf(OrmResultBefore::class), OrmResultBefore::NAME],
+                [self::isInstanceOf(OrmResultAfter::class), OrmResultAfter::NAME]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () {
+                }),
+                new ReturnCallback(function () {
+                }),
+                new ReturnCallback(function (OrmResultAfter $event) use ($records, $recordsAfterEvent) {
+                    self::assertEquals($records, $event->getRecords());
+                    $event->setRecords($recordsAfterEvent);
+                })
+            );
 
         $this->datasource->process($datagrid, $config);
         $resultRecords = $this->datasource->getResults();
 
-        $this->assertSame($recordsAfterEvent, $resultRecords);
+        self::assertSame($recordsAfterEvent, $resultRecords);
     }
 
     public function testBindParametersWorks()
@@ -214,11 +214,11 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $datagrid = $this->createMock(DatagridInterface::class);
         $qb = $this->createMock(QueryBuilder::class);
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->willReturn($qb);
 
-        $this->parameterBinder->expects($this->once())
+        $this->parameterBinder->expects(self::once())
             ->method('bindParameters')
             ->with($datagrid, $parameters, $append);
 
@@ -245,21 +245,21 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $countQb = new QueryBuilder($em);
         $qb->from(SomeClass::class, 't')->select('COUNT(t)');
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->willReturn($qb);
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processCountQuery')
             ->willReturn($countQb);
 
         $this->datasource->process($datagrid, $config);
         $this->datasource = clone $this->datasource;
 
-        $this->assertEquals($qb, $this->datasource->getQueryBuilder());
-        $this->assertNotSame($qb, $this->datasource->getQueryBuilder());
+        self::assertEquals($qb, $this->datasource->getQueryBuilder());
+        self::assertNotSame($qb, $this->datasource->getQueryBuilder());
 
-        $this->assertEquals($countQb, $this->datasource->getCountQb());
-        $this->assertNotSame($countQb, $this->datasource->getCountQb());
+        self::assertEquals($countQb, $this->datasource->getCountQb());
+        self::assertNotSame($countQb, $this->datasource->getCountQb());
     }
 
     public function testCloneWithoutCountQueryBuilder()
@@ -271,19 +271,19 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         $qb = new QueryBuilder($em);
         $qb->from(SomeClass::class, 't')->select('t');
 
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processQuery')
             ->willReturn($qb);
-        $this->processor->expects($this->once())
+        $this->processor->expects(self::once())
             ->method('processCountQuery')
             ->willReturn(null);
 
         $this->datasource->process($datagrid, $config);
         $this->datasource = clone $this->datasource;
 
-        $this->assertEquals($qb, $this->datasource->getQueryBuilder());
-        $this->assertNotSame($qb, $this->datasource->getQueryBuilder());
+        self::assertEquals($qb, $this->datasource->getQueryBuilder());
+        self::assertNotSame($qb, $this->datasource->getQueryBuilder());
 
-        $this->assertNull($this->datasource->getCountQb());
+        self::assertNull($this->datasource->getCountQb());
     }
 }

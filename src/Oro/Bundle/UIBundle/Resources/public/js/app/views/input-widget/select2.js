@@ -27,6 +27,8 @@ define(function(require) {
             }
         },
 
+        closeOnOverlap: false,
+
         events: {
             'select2-opening': 'disableKeyboard'
         },
@@ -71,6 +73,8 @@ define(function(require) {
                     this
                 );
             }
+
+            this.initializeOptions.closeOnOverlap = this.closeOnOverlap;
         },
 
         isInitialized: function() {

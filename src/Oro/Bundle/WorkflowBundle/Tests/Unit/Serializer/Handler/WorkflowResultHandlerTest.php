@@ -3,158 +3,125 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Handler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use JMS\Serializer\Context;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\Handler\WorkflowResultHandler;
 
 class WorkflowResultHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    /**
-     * @var WorkflowResultHandler
-     */
-    protected $handler;
+    /** @var WorkflowResultHandler */
+    private $handler;
 
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->setMethods(array('isManageableEntity', 'getEntityIdentifier'))
-            ->getMock();
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $this->handler = new WorkflowResultHandler($this->doctrineHelper);
     }
 
-    /**
-     * @dataProvider workflowResultToJsonDataProvider
-     *
-     * @param WorkflowResult $result
-     * @param array $doctrineHelperExpectedCalls
-     * @param mixed $expectedResult
-     */
-    public function testWorkflowResultToJson(
-        WorkflowResult $result,
-        array $doctrineHelperExpectedCalls,
-        $expectedResult
-    ) {
-        $visitor = $this->createMock(SerializationVisitorInterface::class);
-        $visitor->expects($this->never())->method($this->anything());
-        $context = $this->getMockBuilder('JMS\Serializer\Context')
-            ->disableOriginalConstructor()->getMock();
-        $context->expects($this->never())->method($this->anything());
-
-        if (!$doctrineHelperExpectedCalls) {
-            $this->doctrineHelper->expects($this->never())->method($this->anything());
-        } else {
-            $index = 0;
-            foreach ($doctrineHelperExpectedCalls as $expectedCall) {
-                [$method, $arguments, $stub] = array_values($expectedCall);
-                $mock = $this->doctrineHelper->expects($this->at($index++))->method($method);
-                $mock = call_user_func_array(array($mock, 'with'), $arguments);
-                $mock->will($stub);
-            }
-        }
-
-        $type = array();
-        $this->assertEquals($expectedResult, $this->handler->workflowResultToJson($visitor, $result, $type, $context));
-    }
-
-    public function workflowResultToJsonDataProvider()
+    public function testWorkflowResultToJsonForScalar()
     {
-        $object = $this->createMock(\stdClass::class);
-        $entity = $this->createMock(\stdClass::class);
-        return array(
-            'plain' => array(
-                new WorkflowResult(
-                    array(
-                        'foo' => 'bar'
-                    )
-                ),
-                array(),
-                $this->createObjectFromArray(
-                    array(
-                        'foo' => 'bar'
-                    )
-                )
-            ),
-            'collection' => array(
-                new WorkflowResult(
-                    array(
-                        'foo' => new ArrayCollection(
-                            array(
-                                'bar' => 'baz'
-                            )
-                        )
-                    )
-                ),
-                'doctrineHelperExpectedCalls' => array(
-                    array(
-                        'method' => 'isManageableEntity',
-                        'with' => array($this->isInstanceOf('Doctrine\Common\Collections\ArrayCollection')),
-                        'will' => $this->returnValue(false)
-                    )
-                ),
-                $this->createObjectFromArray(
-                    array(
-                        'foo' => array(
-                            'bar' => 'baz'
-                        )
-                    )
-                )
-            ),
-            'object' => array(
-                new WorkflowResult(
-                    array(
-                        'foo' => $object,
-                    )
-                ),
-                'doctrineHelperExpectedCalls' => array(
-                    array(
-                        'method' => 'isManageableEntity',
-                        'with' => array($object),
-                        'will' => $this->returnValue(false)
-                    )
-                ),
-                $this->createObjectFromArray(
-                    array(
-                        'foo' => $object
-                    )
-                )
-            ),
-            'entity' => array(
-                new WorkflowResult(
-                    array(
-                        'foo' => $entity
-                    )
-                ),
-                'doctrineHelperExpectedCalls' => array(
-                    array(
-                        'method' => 'isManageableEntity',
-                        'with' => array($entity),
-                        'will' => $this->returnValue(true)
-                    ),
-                    array(
-                        'method' => 'getEntityIdentifier',
-                        'with' => array($entity),
-                        'will' => $this->returnValue(array('id' => 100))
-                    ),
-                ),
-                $this->createObjectFromArray(
-                    array(
-                        'foo' => array(
-                            'id' => 100
-                        )
-                    )
-                )
-            ),
+        $workflowResult = new WorkflowResult(['foo' => 'bar']);
+        $expectedResult = (object)['foo' => 'bar'];
+
+        $visitor = $this->createMock(SerializationVisitorInterface::class);
+        $visitor->expects($this->never())
+            ->method($this->anything());
+
+        $context = $this->createMock(Context::class);
+        $context->expects($this->never())
+            ->method($this->anything());
+
+        $this->doctrineHelper->expects($this->never())
+            ->method($this->anything());
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->handler->workflowResultToJson($visitor, $workflowResult, [], $context)
         );
     }
 
-    protected function createObjectFromArray(array $data)
+    public function testWorkflowResultToJsonForCollection()
     {
-        return (object)$data;
+        $collection = new ArrayCollection(['bar' => 'baz']);
+        $workflowResult = new WorkflowResult(['foo' => $collection]);
+        $expectedResult = (object)['foo' => ['bar' => 'baz']];
+
+        $visitor = $this->createMock(SerializationVisitorInterface::class);
+        $visitor->expects($this->never())
+            ->method($this->anything());
+
+        $context = $this->createMock(Context::class);
+        $context->expects($this->never())
+            ->method($this->anything());
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($this->identicalTo($collection))
+            ->willReturn(false);
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->handler->workflowResultToJson($visitor, $workflowResult, [], $context)
+        );
+    }
+
+    public function testWorkflowResultToJsonForObject()
+    {
+        $object = $this->createMock(\stdClass::class);
+        $workflowResult = new WorkflowResult(['foo' => $object]);
+        $expectedResult = (object)['foo' => $object];
+
+        $visitor = $this->createMock(SerializationVisitorInterface::class);
+        $visitor->expects($this->never())
+            ->method($this->anything());
+
+        $context = $this->createMock(Context::class);
+        $context->expects($this->never())
+            ->method($this->anything());
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($this->identicalTo($object))
+            ->willReturn(false);
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->handler->workflowResultToJson($visitor, $workflowResult, [], $context)
+        );
+    }
+
+    public function testWorkflowResultToJsonForEntity()
+    {
+        $entity = $this->createMock(\stdClass::class);
+        $workflowResult = new WorkflowResult(['foo' => $entity]);
+        $expectedResult = (object)['foo' => ['id' => 100]];
+
+        $visitor = $this->createMock(SerializationVisitorInterface::class);
+        $visitor->expects($this->never())
+            ->method($this->anything());
+
+        $context = $this->createMock(Context::class);
+        $context->expects($this->never())
+            ->method($this->anything());
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with($this->identicalTo($entity))
+            ->willReturn(true);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityIdentifier')
+            ->with($this->identicalTo($entity))
+            ->willReturn(['id' => 100]);
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->handler->workflowResultToJson($visitor, $workflowResult, [], $context)
+        );
     }
 }

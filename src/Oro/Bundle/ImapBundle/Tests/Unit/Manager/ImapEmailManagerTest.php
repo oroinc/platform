@@ -3,28 +3,31 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use DateTime;
+use Laminas\Mail\Address\AddressInterface;
+use Laminas\Mail\Header\AbstractAddressList;
 use Laminas\Mail\Header\HeaderInterface;
 use Laminas\Mail\Header\MultipleHeadersInterface;
 use Laminas\Mail\Headers;
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapMessageIterator;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
+use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ImapEmailManagerTest extends TestCase
 {
+    /** @var ImapConnector|\PHPUnit\Framework\MockObject\MockObject */
+    private $connector;
+
     /** @var ImapEmailManager */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
-
     protected function setUp(): void
     {
-        $this->connector = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\ImapConnector')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->connector = $this->createMock(ImapConnector::class);
+
         $this->manager = new ImapEmailManager($this->connector);
     }
 
@@ -35,7 +38,7 @@ class ImapEmailManagerTest extends TestCase
             ->with('test');
         $this->connector->expects($this->once())
             ->method('getSelectedFolder')
-            ->will($this->returnValue('test'));
+            ->willReturn('test');
 
         $this->manager->selectFolder('test');
         $this->assertEquals('test', $this->manager->getSelectedFolder());
@@ -44,15 +47,15 @@ class ImapEmailManagerTest extends TestCase
     /**
      * @dataProvider getEmailsDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @param $strDate
-     * @throws \Exception
      */
-    public function testGetEmails($strDate)
+    public function testGetEmails(string $strDate)
     {
-        $toAddress = $this->createMock('Laminas\Mail\Address\AddressInterface');
-        $toAddress->expects($this->once())->method('toString')->will($this->returnValue('toEmail'));
+        $toAddress = $this->createMock(AddressInterface::class);
+        $toAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('toEmail');
         $toAddressList = $this->getMockForAbstractClass(
-            'Laminas\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
@@ -60,13 +63,19 @@ class ImapEmailManagerTest extends TestCase
             true,
             ['getAddressList', 'getFieldName']
         );
-        $toAddressList->expects($this->once())->method('getFieldName')->willReturn('To');
-        $toAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$toAddress]));
+        $toAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('To');
+        $toAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$toAddress]);
 
-        $ccAddress = $this->createMock('Laminas\Mail\Address\AddressInterface');
-        $ccAddress->expects($this->once())->method('toString')->will($this->returnValue('ccEmail'));
+        $ccAddress = $this->createMock(AddressInterface::class);
+        $ccAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('ccEmail');
         $ccAddressList = $this->getMockForAbstractClass(
-            'Laminas\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
@@ -74,13 +83,19 @@ class ImapEmailManagerTest extends TestCase
             true,
             ['getAddressList', 'getFieldName']
         );
-        $ccAddressList->expects($this->once())->method('getFieldName')->willReturn('Cc');
-        $ccAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$ccAddress]));
+        $ccAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('Cc');
+        $ccAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$ccAddress]);
 
-        $bccAddress = $this->createMock('Laminas\Mail\Address\AddressInterface');
-        $bccAddress->expects($this->once())->method('toString')->will($this->returnValue('bccEmail'));
+        $bccAddress = $this->createMock(AddressInterface::class);
+        $bccAddress->expects($this->once())
+            ->method('toString')
+            ->willReturn('bccEmail');
         $bccAddressList = $this->getMockForAbstractClass(
-            'Laminas\Mail\Header\AbstractAddressList',
+            AbstractAddressList::class,
             [],
             '',
             false,
@@ -88,12 +103,16 @@ class ImapEmailManagerTest extends TestCase
             true,
             ['getAddressList', 'getFieldName']
         );
-        $bccAddressList->expects($this->once())->method('getFieldName')->willReturn('Bcc');
-        $bccAddressList->expects($this->once())->method('getAddressList')->will($this->returnValue([$bccAddress]));
+        $bccAddressList->expects($this->once())
+            ->method('getFieldName')
+            ->willReturn('Bcc');
+        $bccAddressList->expects($this->once())
+            ->method('getAddressList')
+            ->willReturn([$bccAddress]);
 
         $this->connector->expects($this->once())
             ->method('getUidValidity')
-            ->will($this->returnValue(456));
+            ->willReturn(456);
         $msg = $this->getMessageMock(
             [
                 $this->getHeader('UID', '123'),
@@ -115,22 +134,20 @@ class ImapEmailManagerTest extends TestCase
 
         $msg->expects($this->exactly(2))
             ->method('getFlags')
-            ->will($this->returnValue(['test1', 'test2']));
+            ->willReturn(['test1', 'test2']);
 
 
-        $query = $this->getMockBuilder('Oro\Bundle\ImapBundle\Connector\Search\SearchQuery')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $query = $this->createMock(SearchQuery::class);
 
-        $imap = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Imap')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $imap->expects($this->any())->method('getMessage')->will($this->returnValue($msg));
+        $imap = $this->createMock(Imap::class);
+        $imap->expects($this->any())
+            ->method('getMessage')
+            ->willReturn($msg);
         $messageIterator = new ImapMessageIterator($imap, [1]);
         $this->connector->expects($this->once())
             ->method('findItems')
             ->with($this->identicalTo($query))
-            ->will($this->returnValue($messageIterator));
+            ->willReturn($messageIterator);
 
         $this->manager->selectFolder('Test Folder');
         $emails = $this->manager->getEmails($query);
@@ -175,7 +192,7 @@ class ImapEmailManagerTest extends TestCase
     {
         $startDate = new DateTime('29-05-2015');
 
-        $this->connector->expects($this->at(0))
+        $this->connector->expects($this->once())
             ->method('findUIDs')
             ->with('UNSEEN SINCE 29-May-2015');
 
@@ -329,15 +346,9 @@ class ImapEmailManagerTest extends TestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     *
-     * @return HeaderInterface|MockObject
-     */
-    protected function getHeader($name, $value)
+    private function getHeader(string $name, $value): HeaderInterface
     {
-        $header = $this->createMock('Laminas\Mail\Header\HeaderInterface');
+        $header = $this->createMock(HeaderInterface::class);
         $header->expects($this->atLeastOnce())
             ->method('getFieldName')
             ->willReturn($name);
@@ -348,15 +359,9 @@ class ImapEmailManagerTest extends TestCase
         return $header;
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     *
-     * @return MultipleHeadersInterface|MockObject
-     */
-    protected function getMultiValueHeader($name, $value)
+    private function getMultiValueHeader(string $name, $value): MultipleHeadersInterface
     {
-        $header = $this->createMock('Laminas\Mail\Header\MultipleHeadersInterface');
+        $header = $this->createMock(MultipleHeadersInterface::class);
         $header->expects($this->any())
             ->method('getFieldName')
             ->willReturn($name);
@@ -367,14 +372,9 @@ class ImapEmailManagerTest extends TestCase
         return $header;
     }
 
-    /**
-     * @param string $name
-     * @param mixed $value
-     * @return MultipleHeadersInterface|MockObject
-     */
-    protected function getMultiValueHeaderMessageId($name, $value)
+    private function getMultiValueHeaderMessageId(string $name, $value): MultipleHeadersInterface
     {
-        $header = $this->createMock('Laminas\Mail\Header\MultipleHeadersInterface');
+        $header = $this->createMock(MultipleHeadersInterface::class);
         $header->expects($this->atLeastOnce())
             ->method('getFieldName')
             ->willReturn($name);
@@ -389,16 +389,15 @@ class ImapEmailManagerTest extends TestCase
      * Returns mock of Message object with injected headers
      *
      * @param array $headers headers array which will be injected into message mock
-     * @return Message|MockObject
+     *
+     * @return Message|\PHPUnit\Framework\MockObject\MockObject
      */
     private function getMessageMock(array $headers)
     {
-        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
-            ->disableOriginalConstructor()
-            ->getMock();
         $messageHeaders = new Headers();
         $messageHeaders->addHeaders($headers);
 
+        $msg = $this->createMock(Message::class);
         $msg->expects($this->once())
             ->method('getHeaders')
             ->willReturn($messageHeaders);

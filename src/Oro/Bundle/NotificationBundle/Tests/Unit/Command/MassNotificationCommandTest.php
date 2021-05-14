@@ -14,30 +14,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $sender;
+    /** @var MassNotificationSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $sender;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    protected $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /**
-     * @var MassNotificationCommand
-     */
-    protected $command;
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $in;
 
-    /**
-     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $in;
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $out;
 
-    /**
-     * @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $out;
+    /** @var MassNotificationCommand */
+    private $command;
 
     protected function setUp(): void
     {
@@ -52,7 +42,7 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
     public function testConfigure()
     {
         $this->command->configure();
-        $this->assertEquals($this->command->getName(), 'oro:maintenance-notification');
+        $this->assertEquals('oro:maintenance-notification', $this->command->getName());
         $definition = $this->command->getDefinition();
         $this->assertTrue($definition->hasOption('subject'));
         $this->assertTrue($definition->hasOption('message'));
@@ -64,51 +54,55 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
     public function testExecuteWithMessage()
     {
         $count = 2;
-        $this->out->expects($this->at(0))->method('writeln')->with(
-            sprintf('%s notifications have been added to the queue', $count)
-        );
+        $this->out->expects($this->once())
+            ->method('writeln')
+            ->with(sprintf('%s notifications have been added to the queue', $count));
 
-        $this->in->expects($this->any())->method('getOption')->will(
-            $this->returnValueMap(
-                [
-                    ['message', 'test message'],
-                    ['subject', 'test subject'],
-                    ['sender_email', 'test@test.com'],
-                    ['sender_name', 'test name'],
-                    ['file', null]
-                ]
+        $this->in->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['message', 'test message'],
+                ['subject', 'test subject'],
+                ['sender_email', 'test@test.com'],
+                ['sender_name', 'test name'],
+                ['file', null]
+            ]);
+
+        $this->sender->expects($this->once())
+            ->method('send')
+            ->with(
+                'test message',
+                'test subject',
+                From::emailAddress('test@test.com', 'test name')
             )
-        );
-
-        $this->sender->expects($this->once())->method('send')->with(
-            'test message',
-            'test subject',
-            From::emailAddress('test@test.com', 'test name')
-        )->will($this->returnValue($count));
+            ->willReturn($count);
 
         $this->command->execute($this->in, $this->out);
     }
 
     public function testExecuteWithMessageWhenCouldNotSendNotification()
     {
-        $this->out->expects($this->at(0))->method('writeln')->with('An error occurred while sending mass notification');
+        $this->out->expects($this->once())
+            ->method('writeln')
+            ->with('An error occurred while sending mass notification');
 
-        $this->in->expects($this->any())->method('getOption')->will(
-            $this->returnValueMap(
-                [
-                    ['message', 'test message'],
-                    ['subject', 'test subject'],
-                    ['sender_email', 'test@test.com'],
-                    ['sender_name', 'test name'],
-                    ['file', null]
-                ]
-            )
-        );
+        $this->in->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['message', 'test message'],
+                ['subject', 'test subject'],
+                ['sender_email', 'test@test.com'],
+                ['sender_name', 'test name'],
+                ['file', null]
+            ]);
 
         $notification = new TemplateEmailNotification(new EmailTemplateCriteria('template'), []);
         $exception = new NotificationSendException($notification);
-        $this->sender->expects($this->once())->method('send')->willThrowException($exception);
-        $this->logger->expects($this->once())->method('error')
+        $this->sender->expects($this->once())
+            ->method('send')
+            ->willThrowException($exception);
+        $this->logger->expects($this->once())
+            ->method('error')
             ->with('An error occurred while sending mass notification');
 
         $this->command->execute($this->in, $this->out);
@@ -118,26 +112,23 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
     {
         $count = 2;
 
-        $this->out->expects($this->at(0))->method('writeln')->with(
-            sprintf('%s notifications have been added to the queue', $count)
-        );
-        $this->in->expects($this->any())->method('getOption')->will(
-            $this->returnValueMap(
-                [
-                    ['message', null],
-                    ['subject', null],
-                    ['sender_email', null],
-                    ['sender_name', null],
-                    ['file', __DIR__.'/File/message.txt']
-                ]
-            )
-        );
+        $this->out->expects($this->once())
+            ->method('writeln')
+            ->with(sprintf('%s notifications have been added to the queue', $count));
+        $this->in->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['message', null],
+                ['subject', null],
+                ['sender_email', null],
+                ['sender_name', null],
+                ['file', __DIR__ . '/File/message.txt']
+            ]);
 
-        $this->sender->expects($this->once())->method('send')->with(
-            'file test message',
-            null,
-            null
-        )->will($this->returnValue($count));
+        $this->sender->expects($this->once())
+            ->method('send')
+            ->with('file test message', null, null)
+            ->willReturn($count);
 
         $this->command->execute($this->in, $this->out);
     }
@@ -147,13 +138,11 @@ class MassNotificationCommandTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Could not read notfoundpath file');
 
-        $this->in->expects($this->any())->method('getOption')->will(
-            $this->returnValueMap(
-                [
-                    ['file', 'notfoundpath']
-                ]
-            )
-        );
+        $this->in->expects($this->any())
+            ->method('getOption')
+            ->willReturnMap([
+                ['file', 'notfoundpath']
+            ]);
 
         $this->command->execute($this->in, $this->out);
     }

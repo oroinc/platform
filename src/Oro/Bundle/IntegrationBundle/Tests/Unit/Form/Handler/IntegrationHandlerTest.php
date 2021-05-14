@@ -19,22 +19,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_NAME = 'form_name';
-    const FORM_DATA = ['field' => 'data'];
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface */
-    private $form;
+    private const FORM_NAME = 'form_name';
+    private const FORM_DATA = ['field' => 'data'];
 
     /** @var Request */
     private $request;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $form;
+
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
+    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formFactory;
 
     /** @var IntegrationHandler */
@@ -64,10 +64,12 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessUnsupportedRequest()
     {
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
 
-        $this->form->expects($this->never())->method('submit');
+        $this->form->expects($this->never())
+            ->method('submit');
 
         $this->assertFalse($this->handler->process($this->entity));
     }
@@ -82,10 +84,14 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod($method);
 
-        $this->form->expects($this->atLeastOnce())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once())->method('setData')
+        $this->form->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
             ->with($this->entity);
-        $this->form->expects($this->once())->method('submit')
+        $this->form->expects($this->once())
+            ->method('submit')
             ->with(self::FORM_DATA);
 
         $this->assertFalse($this->handler->process($this->entity));
@@ -104,14 +110,24 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
-        $this->form->expects($this->atLeastOnce())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once())->method('setData')->with($this->entity);
-        $this->form->expects($this->once())->method('submit')->with(self::FORM_DATA);
-        $this->form->expects($this->once())->method('isValid')
-            ->will($this->returnValue(true));
+        $this->form->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($this->entity);
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
-        $this->em->expects($this->once())->method('persist')->with($this->entity);
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($this->entity);
+        $this->em->expects($this->once())
+            ->method('flush');
 
         $this->assertTrue($this->handler->process($this->entity));
     }
@@ -135,56 +151,61 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         $this->request->initialize([], [self::FORM_NAME => self::FORM_DATA]);
         $this->request->setMethod('POST');
 
-        $this->form->expects($this->any())->method('getName')->willReturn(self::FORM_NAME);
-        $this->form->expects($this->once())->method('setData')->with($entity)
-            ->will(
-                $this->returnCallback(
-                    function ($entity) use ($newOwner) {
-                        $entity->setDefaultUserOwner($newOwner);
-                    }
-                )
-            );
-        $this->form->expects($this->once())->method('submit')->with(self::FORM_DATA);
-        $this->form->expects($this->once())->method('isValid')
-            ->will($this->returnValue(true));
+        $this->form->expects($this->any())
+            ->method('getName')
+            ->willReturn(self::FORM_NAME);
+        $this->form->expects($this->once())
+            ->method('setData')
+            ->with($entity)
+            ->willReturnCallback(function ($entity) use ($newOwner) {
+                $entity->setDefaultUserOwner($newOwner);
+            });
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with(self::FORM_DATA);
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
 
-        $this->em->expects($this->once())->method('persist')->with($entity);
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects($this->once())
+            ->method('persist')
+            ->with($entity);
+        $this->em->expects($this->once())
+            ->method('flush');
 
         if ($entity->getId()) {
             $this->em->expects($this->once())
                 ->method('find')
                 ->with('OroIntegrationBundle:Channel', $entity->getId())
-                ->will($this->returnValue($existingIntegration));
+                ->willReturn($existingIntegration);
         }
 
-        $dispatchCallIndex = 0;
+        $events = [];
         if ($expectOwnerSetEvent) {
-            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
-                ->method('dispatch')
-                ->with(
-                    $this->isInstanceOf(DefaultOwnerSetEvent::class),
-                    $this->equalTo(DefaultOwnerSetEvent::NAME)
-                );
+            $events[] = [
+                $this->isInstanceOf(DefaultOwnerSetEvent::class),
+                DefaultOwnerSetEvent::NAME
+            ];
         }
         if ($expectIntegrationUpdateEvent) {
-            $this->eventDispatcher->expects($this->at($dispatchCallIndex++))
+            $events[] = [
+                $this->callback(function ($event) use ($entity, $existingIntegration) {
+                    $this->assertInstanceOf(IntegrationUpdateEvent::class, $event);
+                    $this->assertSame($entity, $event->getIntegration());
+                    $this->assertEquals($existingIntegration, $event->getOldState());
+
+                    return true;
+                }),
+                IntegrationUpdateEvent::NAME
+            ];
+        }
+        if ($events) {
+            $this->eventDispatcher->expects($this->exactly(count($events)))
                 ->method('dispatch')
-                ->with(
-                    $this->callback(
-                        function ($event) use ($entity, $existingIntegration) {
-                            $this->assertInstanceOf(IntegrationUpdateEvent::class, $event);
-
-                            $this->assertSame($entity, $event->getIntegration());
-                            $this->assertEquals($existingIntegration, $event->getOldState());
-
-                            return true;
-                        }
-                    ),
-                    $this->equalTo(IntegrationUpdateEvent::NAME)
-                );
-        } elseif (!$expectOwnerSetEvent) {
-            $this->eventDispatcher->expects($this->never())->method('dispatch');
+                ->withConsecutive(...$events);
+        } else {
+            $this->eventDispatcher->expects($this->never())
+                ->method('dispatch');
         }
 
         $this->assertTrue($this->handler->process($entity));
@@ -209,14 +230,14 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
         ReflectionUtil::setId($integration, 200);
 
         return [
-            'new entity, should not dispatch' => [
+            'new entity, should not dispatch'                     => [
                 $newIntegration,
                 $newOwner,
                 $integration,
                 false,
                 false
             ],
-            'integration is not new, but owner existed before' => [
+            'integration is not new, but owner existed before'    => [
                 $existingIntegrationWithOwner,
                 $newOwner,
                 $integration,
@@ -228,9 +249,9 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
                 $newOwner,
                 $integration,
                 true,
-                false
+                true
             ],
-            'should not dispatch if integration not found' => [
+            'should not dispatch if integration not found'        => [
                 $existingIntegrationWithOwner,
                 $newOwner,
                 null,
@@ -248,18 +269,14 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testUpdateForm()
     {
         $this->request->initialize([], [
-            self::FORM_NAME => self::FORM_DATA,
+            self::FORM_NAME                   => self::FORM_DATA,
             IntegrationHandler::UPDATE_MARKER => true,
         ]);
         $this->request->setMethod('POST');
 
         $this->formFactory->expects(self::once())
             ->method('createNamed')
-            ->with(
-                self::FORM_NAME,
-                ChannelType::class,
-                $this->entity
-            )
+            ->with(self::FORM_NAME, ChannelType::class, $this->entity)
             ->willReturn($this->form);
 
         $this->form->expects(self::atLeastOnce())
@@ -282,7 +299,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
     public function testUpdateFormOnTransportTypeChanged()
     {
         $this->request->initialize([], [
-            self::FORM_NAME => self::FORM_DATA,
+            self::FORM_NAME                   => self::FORM_DATA,
             IntegrationHandler::UPDATE_MARKER => sprintf(
                 '%s[%s]',
                 self::FORM_NAME,
@@ -293,11 +310,7 @@ class IntegrationHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->formFactory->expects(self::once())
             ->method('createNamed')
-            ->with(
-                self::FORM_NAME,
-                ChannelType::class,
-                $this->entity
-            )
+            ->with(self::FORM_NAME, ChannelType::class, $this->entity)
             ->willReturn($this->form);
 
         $this->form->expects(self::atLeastOnce())

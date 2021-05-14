@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessJobRepository;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtension;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\ProcessTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
@@ -26,34 +27,30 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
     use MessageQueueExtension;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessTriggerRepository */
+    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessJobRepository */
-    protected $processJobRepository;
+    /** @var ProcessJobRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $processJobRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessHandler */
-    protected $handler;
+    /** @var ProcessHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $handler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessLogger */
-    protected $logger;
+    /** @var ProcessLogger|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessSchedulePolicy */
-    protected $schedulePolicy;
+    /** @var ProcessSchedulePolicy|\PHPUnit\Framework\MockObject\MockObject */
+    private $schedulePolicy;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repository = $this->getMockBuilder(ProcessTriggerRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['findAllWithDefinitions'])
-            ->getMock();
-
-        $this->processJobRepository = $this->getMockBuilder(ProcessJobRepository::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['deleteByHashes'])
-            ->getMock();
+        $this->repository = $this->createMock(ProcessTriggerRepository::class);
+        $this->processJobRepository = $this->createMock(ProcessJobRepository::class);
+        $this->handler = $this->createMock(ProcessHandler::class);
+        $this->logger = $this->createMock(ProcessLogger::class);
+        $this->schedulePolicy = $this->createMock(ProcessSchedulePolicy::class);
 
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepositoryForClass')
@@ -62,55 +59,27 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
                 [ProcessJob::class, $this->processJobRepository]
             ]);
 
-        $this->handler = $this->getMockBuilder(ProcessHandler::class)->disableOriginalConstructor()->getMock();
-
-        $this->logger = $this->getMockBuilder(ProcessLogger::class)->disableOriginalConstructor()->getMock();
-
-        $this->schedulePolicy = $this->createMock(ProcessSchedulePolicy::class);
-
         $this->extension = new ProcessTriggerExtension(
             $this->doctrineHelper,
             $this->handler,
             $this->logger,
             $this->triggerCache,
             $this->schedulePolicy,
-            static::getMessageProducer()
+            self::getMessageProducer()
         );
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        unset($this->handler, $this->logger, $this->schedulePolicy, $this->repository, $this->processJobRepository);
     }
 
     public function testSetForceQueued()
     {
-        $extension = new class(
-            $this->doctrineHelper,
-            $this->handler,
-            $this->logger,
-            $this->triggerCache,
-            $this->schedulePolicy,
-            static::getMessageProducer()
-        ) extends ProcessTriggerExtension {
-            public function xisForceQueued(): bool
-            {
-                return $this->forceQueued;
-            }
-        };
+        self::assertFalse(ReflectionUtil::getPropertyValue($this->extension, 'forceQueued'));
 
-        static::assertFalse($extension->xisForceQueued());
-
-        $extension->setForceQueued(true);
-
-        static::assertTrue($extension->xisForceQueued());
+        $this->extension->setForceQueued(true);
+        self::assertTrue(ReflectionUtil::getPropertyValue($this->extension, 'forceQueued'));
     }
 
     public function testHasTriggers()
     {
-        $this->triggerCache->expects(static::once())
+        $this->triggerCache->expects(self::once())
             ->method('hasTrigger')
             ->with(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
@@ -124,12 +93,14 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $createTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($createTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
 
-        $extension = $this->mockTriggerExtensionDescendant();
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($createTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity, [], $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity, [], $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
         $expectedScheduledProcessed = [
@@ -141,8 +112,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
             ]
         ];
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEquals($expectedScheduledProcessed, $extension->xgetScheduledProcesses());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEquals($expectedScheduledProcessed, $this->getExtensionScheduledProcesses($this->extension));
     }
 
     public function testScheduleCreateEventNotAllowSchedule()
@@ -152,25 +123,27 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $createTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($createTrigger, false);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($createTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(false);
 
         $this->logger->expects($this->once())
             ->method('debug')
             ->with(
                 'Policy declined process scheduling',
                 $createTrigger,
-                $this->isInstanceOf('Oro\Bundle\WorkflowBundle\Model\ProcessData')
+                $this->isInstanceOf(ProcessData::class)
             );
 
-        $extension = $this->mockTriggerExtensionDescendant();
-
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity, [], $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity, [], $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEmpty($extension->xgetScheduledProcesses());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEmpty($this->getExtensionScheduledProcesses($this->extension));
     }
 
     public function testScheduleUpdateEvent()
@@ -184,12 +157,17 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $updateFieldTrigger = $this->getTriggers('updateField');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy([$updateEntityTrigger, $updateFieldTrigger], true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_UPDATE);
 
-        $extension = $this->mockTriggerExtensionDescendant();
+        $this->schedulePolicy->expects($this->exactly(2))
+            ->method('isScheduleAllowed')
+            ->withConsecutive(
+                [$updateEntityTrigger, $this->isInstanceOf(ProcessData::class)],
+                [$updateFieldTrigger, $this->isInstanceOf(ProcessData::class)]
+            )
+            ->willReturn(true);
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_UPDATE, $entity, $changeSet, $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_UPDATE, $entity, $changeSet, $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
         $expectedScheduledProcessed = [
@@ -227,8 +205,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
             ],
         ];
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEquals($expectedScheduledProcessed, $extension->xgetScheduledProcesses());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEquals($expectedScheduledProcessed, $this->getExtensionScheduledProcesses($this->extension));
     }
 
     public function testScheduleUpdateEventNotAllowSchedule()
@@ -242,17 +220,22 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $updateFieldTrigger = $this->getTriggers('updateField');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy([$updateEntityTrigger, $updateFieldTrigger], false);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_UPDATE);
 
-        $extension = $this->mockTriggerExtensionDescendant();
+        $this->schedulePolicy->expects($this->exactly(2))
+            ->method('isScheduleAllowed')
+            ->withConsecutive(
+                [$updateEntityTrigger, $this->isInstanceOf(ProcessData::class)],
+                [$updateFieldTrigger, $this->isInstanceOf(ProcessData::class)]
+            )
+            ->willReturn(false);
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_UPDATE, $entity, $changeSet, $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_UPDATE, $entity, $changeSet, $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEmpty($extension->xgetScheduledProcesses());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEmpty($this->getExtensionScheduledProcesses($this->extension));
     }
 
     public function testScheduleDeleteEvent()
@@ -262,17 +245,19 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $deleteTrigger = $this->getTriggers('delete');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($deleteTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_DELETE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($deleteTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity, false)
             ->willReturn($entity->getId());
 
-        $extension = $this->mockTriggerExtensionDescendant();
-
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_DELETE, $entity, [], $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_DELETE, $entity, [], $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
         $expectedScheduledProcessed = [
@@ -285,9 +270,9 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         ];
         $expectedEntityHashes = [ProcessJob::generateEntityHash(self::ENTITY_CLASS, $entity->getId())];
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEquals($expectedScheduledProcessed, $extension->xgetScheduledProcesses());
-        static::assertEquals($expectedEntityHashes, $extension->xgetRemovedEntityHashes());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEquals($expectedScheduledProcessed, $this->getExtensionScheduledProcesses($this->extension));
+        self::assertEquals($expectedEntityHashes, $this->getExtensionRemovedEntityHashes($this->extension));
     }
 
     public function testScheduleDeleteEventNotAllowSchedule()
@@ -297,65 +282,68 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $deleteTrigger = $this->getTriggers('delete');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($deleteTrigger, false);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_DELETE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($deleteTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(false);
 
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity, false)
             ->willReturn($entity->getId());
 
-        $extension = $this->mockTriggerExtensionDescendant();
-
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_DELETE, $entity, [], $extension);
+        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_DELETE, $entity, [], $this->extension);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
         $expectedEntityHashes = [ProcessJob::generateEntityHash(self::ENTITY_CLASS, $entity->getId())];
 
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertEmpty($extension->xgetScheduledProcesses());
-        static::assertEquals($expectedEntityHashes, $extension->xgetRemovedEntityHashes());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertEmpty($this->getExtensionScheduledProcesses($this->extension));
+        self::assertEquals($expectedEntityHashes, $this->getExtensionRemovedEntityHashes($this->extension));
     }
 
     /**
      * @dataProvider clearDataProvider
-     *
-     * @param string $className
-     * @param bool $hasScheduledProcesses
      */
-    public function testClear($className, $hasScheduledProcesses)
+    public function testClear(?string $className, bool $hasScheduledProcesses)
     {
         $createTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($createTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($createTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
         $expectedTriggers = $this->getExpectedTriggers($this->getTriggers());
 
-        $extension = $this->mockTriggerExtensionDescendant();
+        $this->callPreFunctionByEventName(
+            EventTriggerInterface::EVENT_CREATE,
+            $this->getMainEntity(),
+            [],
+            $this->extension
+        );
 
-        $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $this->getMainEntity(), [], $extension);
-
-        static::assertEquals($expectedTriggers, $extension->xgetTriggers());
-        static::assertNotEmpty($extension->xgetScheduledProcesses());
+        self::assertEquals($expectedTriggers, $this->getExtensionTriggers($this->extension));
+        self::assertNotEmpty($this->getExtensionScheduledProcesses($this->extension));
 
         // test
-        $extension->clear($className);
+        $this->extension->clear($className);
 
-        static::assertNull($extension->xgetTriggers());
+        self::assertNull($this->getExtensionTriggers($this->extension));
 
         if ($hasScheduledProcesses) {
-            static::assertNotEmpty($extension->xgetScheduledProcesses());
+            self::assertNotEmpty($this->getExtensionScheduledProcesses($this->extension));
         } else {
-            static::assertEmpty($extension->xgetScheduledProcesses());
+            self::assertEmpty($this->getExtensionScheduledProcesses($this->extension));
         }
     }
 
-    /**
-     * @return array
-     */
-    public function clearDataProvider()
+    public function clearDataProvider(): array
     {
         return [
             'clear all' => [
@@ -377,26 +365,37 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     {
         $entity = $this->getMainEntity();
 
-        $this->handler->expects($this->once())->method('isTriggerApplicable')->willReturn(true);
+        $this->handler->expects($this->once())
+            ->method('isTriggerApplicable')
+            ->willReturn(true);
 
         $expectedTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($expectedTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($expectedTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $expectedData = $this->createProcessData(['data' => $entity]);
 
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('debug')
             ->with('Process handled', $expectedTrigger, $expectedData);
 
-        $this->handler->expects($this->once())->method('handleTrigger')->with($expectedTrigger, $expectedData);
-        $this->handler->expects($this->once())->method('finishTrigger')->with($expectedTrigger, $expectedData);
+        $this->handler->expects($this->once())
+            ->method('handleTrigger')
+            ->with($expectedTrigger, $expectedData);
+        $this->handler->expects($this->once())
+            ->method('finishTrigger')
+            ->with($expectedTrigger, $expectedData);
 
         $this->extension->process($this->entityManager);
 
@@ -407,26 +406,37 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     {
         $entity = $this->getMainEntity();
 
-        $this->handler->expects($this->any())->method('isTriggerApplicable')->willReturn(false);
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->willReturn(false);
 
         $expectedTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($expectedTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, EventTriggerInterface::EVENT_CREATE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($expectedTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
 
         $expectedData = $this->createProcessData(['data' => $entity]);
 
-        $this->entityManager->expects($this->never())->method('flush');
+        $this->entityManager->expects($this->never())
+            ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('debug')
             ->with('Process trigger is not applicable', $expectedTrigger, $expectedData);
 
-        $this->handler->expects($this->never())->method('handleTrigger')->with($expectedTrigger, $expectedData);
-        $this->handler->expects($this->never())->method('finishTrigger')->with($expectedTrigger, $expectedData);
+        $this->handler->expects($this->never())
+            ->method('handleTrigger')
+            ->with($expectedTrigger, $expectedData);
+        $this->handler->expects($this->never())
+            ->method('finishTrigger')
+            ->with($expectedTrigger, $expectedData);
 
         $this->extension->process($this->entityManager);
 
@@ -435,39 +445,54 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 
     /**
      * @dataProvider postFlushQueuedProcessJobProvider
-     * @param array $entityParams
      */
-    public function testProcessQueuedProcessJob($entityParams)
+    public function testProcessQueuedProcessJob(array $entityParams)
     {
-        $callOrder    = 0;
         $expectedData = $this->createProcessData(['data' => $this->getMainEntity()]);
-        $triggers     = [];
 
-        $this->handler->expects($this->any())->method('isTriggerApplicable')->willReturn(true);
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->willReturn(true);
 
+        /** @var ProcessTrigger[] $triggers */
+        $triggers = [];
+        $isScheduleAllowedParameters = [];
+        $loggerParameters = [];
         foreach ($entityParams as $entityParam) {
-            $expectedTrigger = $this->getCustomQueuedTrigger($entityParam);
-            $triggers[]      = $expectedTrigger;
+            $trigger = $this->getCustomQueuedTrigger($entityParam);
+            $triggers[] = $trigger;
+            $isScheduleAllowedParameters[] = [$trigger, $this->isInstanceOf(ProcessData::class)];
+            $loggerParameters[] = ['Process queued', $trigger, $expectedData];
         }
 
         $this->prepareRepository($triggers);
-        $this->prepareSchedulePolicy($triggers, true);
 
-        /** @var ProcessTrigger $trigger */
-        foreach ($triggers as $iteration => $trigger) {
-            $this->logger->expects($this->at($iteration))
-                ->method('debug')
-                ->with('Process queued', $trigger, $expectedData);
+        $this->schedulePolicy->expects($this->exactly(count($isScheduleAllowedParameters)))
+            ->method('isScheduleAllowed')
+            ->withConsecutive(...$isScheduleAllowedParameters)
+            ->willReturn(true);
 
+        $this->logger->expects($this->exactly(count($loggerParameters)))
+            ->method('debug')
+            ->withConsecutive(...$loggerParameters);
+
+        $this->entityManager->expects($this->exactly(count($triggers)))
+            ->method('persist')
+            ->with($this->isInstanceOf(ProcessJob::class))
+            ->willReturnCallback(function (ProcessJob $processJob) use ($entityParams) {
+                $event = $processJob->getProcessTrigger()->getEvent();
+                ReflectionUtil::setId($processJob, $entityParams[$event]['id']);
+            });
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->handler->expects($this->never())
+            ->method('handleTrigger');
+
+        foreach ($triggers as $trigger) {
             $this->callPreFunctionByEventName($trigger->getEvent(), $this->getMainEntity());
-
-            $this->assertProcessJobPersist($this->entityManager, $entityParams, $iteration);
-            $callOrder = $iteration;
         }
-
-        $this->entityManager->expects($this->at(++$callOrder))->method('flush');
-
-        $this->handler->expects($this->never())->method('handleTrigger');
 
         $this->extension->process($this->entityManager);
 
@@ -477,7 +502,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function postFlushQueuedProcessJobProvider()
+    public function postFlushQueuedProcessJobProvider(): array
     {
         return [
             'all with same priority and timeShift (1 batch)' => [
@@ -575,22 +600,31 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     {
         $this->extension->setForceQueued(true);
 
-        $this->handler->expects($this->any())->method('isTriggerApplicable')->willReturn(true);
+        $this->handler->expects($this->any())
+            ->method('isTriggerApplicable')
+            ->willReturn(true);
 
         $expectedTrigger = $this->getTriggers('create');
 
         $this->prepareRepository();
-        $this->prepareSchedulePolicy($expectedTrigger, true);
         $this->prepareTriggerCache(self::ENTITY_CLASS, ProcessTrigger::EVENT_CREATE);
+
+        $this->schedulePolicy->expects($this->once())
+            ->method('isScheduleAllowed')
+            ->with($expectedTrigger, $this->isInstanceOf(ProcessData::class))
+            ->willReturn(true);
 
         // persist trigger is not queued
         $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $this->getMainEntity());
 
         // there is no need to check all trace - just ensure that job was queued
-        $this->entityManager->expects($this->exactly(1))->method('persist');
-        $this->entityManager->expects($this->exactly(1))->method('flush');
+        $this->entityManager->expects($this->once())
+            ->method('persist');
+        $this->entityManager->expects($this->once())
+            ->method('flush');
 
-        $this->handler->expects($this->never())->method('handleTrigger');
+        $this->handler->expects($this->never())
+            ->method('handleTrigger');
 
         $this->extension->process($this->entityManager);
 
@@ -625,10 +659,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
             ->method('isTriggerApplicable')
             ->willReturn(true);
 
-        $this->repository->expects($this->once())
-            ->method('findAllWithDefinitions')
-            ->with(true)
-            ->willReturn([$trigger]);
+        $this->prepareRepository([$trigger]);
+
         $this->schedulePolicy->expects($this->once())
             ->method('isScheduleAllowed')
             ->with($trigger, $this->isInstanceOf(ProcessData::class))
@@ -681,19 +713,19 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
             ->with($entity, false)
             ->willReturn($entity->getId());
 
-        $this->processJobRepository->expects($this->once())->method('deleteByHashes');
-
-        $extension = $this->mockTriggerExtensionDescendant();
+        $this->processJobRepository->expects($this->once())
+            ->method('deleteByHashes');
 
         // test
-        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, [], $extension);
-        static::assertEquals($expectedEntityHashes, $extension->xgetRemovedEntityHashes());
+        $this->callPreFunctionByEventName(ProcessTrigger::EVENT_DELETE, $entity, [], $this->extension);
+        self::assertEquals($expectedEntityHashes, $this->getExtensionRemovedEntityHashes($this->extension));
 
-        $this->handler->expects($this->never())->method($this->anything());
+        $this->handler->expects($this->never())
+            ->method($this->anything());
 
-        $extension->process($this->entityManager);
+        $this->extension->process($this->entityManager);
 
-        static::assertEmpty($extension->xgetRemovedEntityHashes());
+        self::assertEmpty($this->getExtensionRemovedEntityHashes($this->extension));
         self::assertMessagesEmpty(Topics::EXECUTE_PROCESS_JOB);
     }
 
@@ -743,27 +775,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         return $triggerName ? $this->triggers[$triggerName] : $this->triggers;
     }
 
-    /**
-     * @param array|ProcessTrigger $triggers
-     * @param bool $allow
-     */
-    protected function prepareSchedulePolicy($triggers, $allow)
-    {
-        $triggers = $triggers instanceof ProcessTrigger ? [$triggers] : $triggers;
-        foreach (array_values($triggers) as $index => $trigger) {
-            $this->schedulePolicy->expects($this->at($index))
-                ->method('isScheduleAllowed')
-                ->with($trigger, $this->isInstanceOf(ProcessData::class))
-                ->willReturn($allow);
-        }
-    }
-
-    /**
-     * @param array $data
-     * @param bool $modified
-     * @return ProcessData
-     */
-    protected function createProcessData(array $data, $modified = true)
+    private function createProcessData(array $data, bool $modified = true): ProcessData
     {
         $processData = new ProcessData($data);
         $processData->setModified($modified);
@@ -771,11 +783,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         return $processData;
     }
 
-    /**
-     * @param array $config
-     * @return ProcessTrigger
-     */
-    protected function getCustomQueuedTrigger(array $config)
+    private function getCustomQueuedTrigger(array $config): ProcessTrigger
     {
         $definition = new ProcessDefinition();
         $definition->setName('test-' . uniqid('test', true))->setRelatedEntity(self::ENTITY_CLASS);
@@ -791,50 +799,26 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $entityManager
-     * @param array $entityParams
-     * @param int $callOrder
+     * @return mixed
      */
-    protected function assertProcessJobPersist($entityManager, array $entityParams, $callOrder)
+    private function getExtensionTriggers(AbstractEventTriggerExtension $extension)
     {
-        $entityManager->expects($this->at($callOrder))->method('persist')
-            ->with($this->isInstanceOf(ProcessJob::class))
-            ->willReturnCallback(function (ProcessJob $processJob) use ($entityParams) {
-                $event = $processJob->getProcessTrigger()->getEvent();
-                ReflectionUtil::setId($processJob, $entityParams[$event]['id']);
-            });
+        return ReflectionUtil::getPropertyValue($extension, 'triggers');
     }
 
     /**
-     * Creates a mock of a descendant of ProcessTriggerExtension that provides additional getters
-     * to access its internal state.
-     *
-     * @return ProcessTriggerExtension
+     * @return mixed
      */
-    protected function mockTriggerExtensionDescendant()
+    private function getExtensionScheduledProcesses(AbstractEventTriggerExtension $extension)
     {
-        return new class(
-            $this->doctrineHelper,
-            $this->handler,
-            $this->logger,
-            $this->triggerCache,
-            $this->schedulePolicy,
-            static::getMessageProducer()
-        ) extends ProcessTriggerExtension {
-            public function xgetTriggers(): ?array
-            {
-                return $this->triggers;
-            }
+        return ReflectionUtil::getPropertyValue($extension, 'scheduledProcesses');
+    }
 
-            public function xgetScheduledProcesses(): array
-            {
-                return $this->scheduledProcesses;
-            }
-
-            public function xgetRemovedEntityHashes(): array
-            {
-                return $this->removedEntityHashes;
-            }
-        };
+    /**
+     * @return mixed
+     */
+    private function getExtensionRemovedEntityHashes(AbstractEventTriggerExtension $extension)
+    {
+        return ReflectionUtil::getPropertyValue($extension, 'removedEntityHashes');
     }
 }

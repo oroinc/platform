@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Psr\Log\LoggerInterface;
 
 class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -17,20 +18,18 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
     public function testCouldBeConstructedWithRequiredArguments()
     {
         new AddEmailAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
-            $this->createLoggerMock()
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testShouldRejectMessageIfEmailIdsIsMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode([
@@ -39,24 +38,22 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         ]));
 
         $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfTargetClassMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode([
@@ -65,24 +62,22 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         ]));
 
         $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfTargetIdMissing()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
-            ->with('Got invalid message')
-        ;
+            ->with('Got invalid message');
 
         $message = new Message();
         $message->setBody(json_encode([
@@ -91,50 +86,48 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         ]));
 
         $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMessageProducerMock(),
-            $this->createJobRunnerMock(),
+            $this->createMock(MessageProducerInterface::class),
+            $this->createMock(JobRunner::class),
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldProcessAddAssociation()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->never())
-            ->method('critical')
-        ;
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->never())
+            ->method('critical');
+        $logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Sent "2" messages'))
-        ;
+            ->with($this->equalTo('Sent "2" messages'));
 
-        $producer = $this->createMessageProducerMock();
-        $producer
-            ->expects($this->at(0))
+        $producer = $this->createMock(MessageProducerInterface::class);
+        $producer->expects($this->exactly(2))
             ->method('send')
-            ->with('oro.email.add_association_to_email', [
-                'emailId' => 1,
-                'targetClass' => 'class',
-                'targetId' => 123,
-                'jobId' => 12345
-            ])
-        ;
-        $producer
-            ->expects($this->at(1))
-            ->method('send')
-            ->with('oro.email.add_association_to_email', [
-                'emailId' => 2,
-                'targetClass' => 'class',
-                'targetId' => 123,
-                'jobId' => 54321
-            ])
-        ;
+            ->withConsecutive(
+                [
+                    'oro.email.add_association_to_email',
+                    [
+                        'emailId'     => 1,
+                        'targetClass' => 'class',
+                        'targetId'    => 123,
+                        'jobId'       => 12345
+                    ]
+                ],
+                [
+                    'oro.email.add_association_to_email',
+                    [
+                        'emailId'     => 2,
+                        'targetClass' => 'class',
+                        'targetId'    => 123,
+                        'jobId'       => 54321
+                    ]
+                ]
+            );
 
         $body = [
             'emailIds' => [1,2],
@@ -146,41 +139,36 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $message->setBody(json_encode($body));
         $message->setMessageId('message-id');
 
-        $jobRunner = $this->createJobRunnerMock();
-        $jobRunner
-            ->expects($this->once())
+        $jobRunner = $this->createMock(JobRunner::class);
+        $jobRunner->expects($this->once())
             ->method('runUnique')
             ->with('message-id', 'oro.email.add_association_to_emails' . ':class:123:'.md5('1,2'))
-            ->will($this->returnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
+            ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
                 return true;
-            }))
-        ;
+            });
 
-        $jobRunner
-            ->expects($this->at(0))
+        $jobRunner->expects($this->exactly(2))
             ->method('createDelayed')
-            ->with('oro.email.add_association_to_email'.':class:123:1')
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
-                $job = new Job();
-                $job->setId(12345);
+            ->withConsecutive(
+                ['oro.email.add_association_to_email'.':class:123:1'],
+                ['oro.email.add_association_to_email'.':class:123:2']
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($name, $callback) use ($jobRunner) {
+                    $job = new Job();
+                    $job->setId(12345);
 
-                $callback($jobRunner, $job);
-            }))
-        ;
+                    $callback($jobRunner, $job);
+                }),
+                new ReturnCallback(function ($name, $callback) use ($jobRunner) {
+                    $job = new Job();
+                    $job->setId(54321);
 
-        $jobRunner
-            ->expects($this->at(1))
-            ->method('createDelayed')
-            ->with('oro.email.add_association_to_email'.':class:123:2')
-            ->will($this->returnCallback(function ($name, $callback) use ($jobRunner) {
-                $job = new Job();
-                $job->setId(54321);
-
-                $callback($jobRunner, $job);
-            }))
-        ;
+                    $callback($jobRunner, $job);
+                })
+            );
 
         $processor = new AddEmailAssociationsMessageProcessor(
             $producer,
@@ -188,7 +176,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
             $logger
         );
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -199,38 +187,5 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
             [Topics::ADD_ASSOCIATION_TO_EMAILS],
             AddEmailAssociationsMessageProcessor::getSubscribedTopics()
         );
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|JobRunner
-     */
-    private function createJobRunnerMock()
-    {
-        return $this->getMockBuilder(JobRunner::class)->disableOriginalConstructor()->getMock();
-    }
-
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface
-     */
-    private function createMessageProducerMock()
-    {
-        return $this->createMock(MessageProducerInterface::class);
     }
 }
