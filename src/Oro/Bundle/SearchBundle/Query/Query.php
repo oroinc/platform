@@ -263,20 +263,13 @@ class Query
          *
          * /[\s]{2,}/ <-- returns all multi-spaces
          */
-        $string = trim(
+        return trim(
             preg_replace(
                 '/[\s]{2,}/',
                 self::DELIMITER,
                 preg_replace('/[^\p{L}\d\s]/u', self::DELIMITER, $inputString)
             )
         );
-
-        $fullString = str_replace(self::DELIMITER, '', $string);
-        if (filter_var($fullString, FILTER_VALIDATE_INT)) {
-            return $fullString;
-        }
-
-        return $string;
     }
 
     /**
