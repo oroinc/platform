@@ -18,7 +18,7 @@ define(function(require) {
         options = options ? _.clone(options) : {};
         _.extend(this, this.defaults, options);
 
-        if (typeof this.decimals !== 'number' || isNaN(this.decimals)) {
+        if (this.decimals !== null && (typeof this.decimals !== 'number' || isNaN(this.decimals))) {
             throw new TypeError('decimals must be a number');
         }
 
@@ -71,14 +71,23 @@ define(function(require) {
             }
 
             if (this.percent) {
-                return formatter.formatPercent(number / 100);
+                return formatter.formatPercent(number, {scale_percent_by_100: false});
             } else {
-                number = number.toFixed(this.decimals);
+                if (number === '') {
+                    return number;
+                }
 
-                const parts = number.split('.');
+                const numberString = number.toString();
+
+                const parts = numberString.split('.');
                 const integerPart = parts[0];
-                const isPercentValueTrim = parts[1] && parts[1] === this.EMPTY_DECIMAL && this.percent;
-                const decimalPart = parts[1] && !isPercentValueTrim ? (this.decimalSeparator || '.') + parts[1] : '';
+                let decimalPart = !_.isEmpty(parts[1]) ? parts[1] : '';
+                if (decimalPart.length < this.decimals) {
+                    const fixedParts = Number(number).toFixed(this.decimals).split('.');
+                    decimalPart = (this.decimalSeparator || '.') + fixedParts[1];
+                } else {
+                    decimalPart = decimalPart ? (this.decimalSeparator || '.') + decimalPart : '';
+                }
 
                 return integerPart.replace(this.HUMANIZED_NUM_RE, '$1' + this.orderSeparator) + decimalPart;
             }
@@ -119,13 +128,15 @@ define(function(require) {
                 rawData = rawData.slice(0, rawData.length - 1);
             }
 
-            let result = rawData * 1;
-            if (!this.percent) {
-                result = result.toFixed(this.decimals) * 1;
-            }
+            const maxFractionDigits = localeSettings.getNumberFormats('decimal').max_fraction_digits;
+            if (!_.isEmpty(decimalParts[1]) && decimalParts[1].length > maxFractionDigits) {
+                return rawData;
+            } else {
+                const result = rawData * 1;
 
-            if (_.isNumber(result) && !_.isNaN(result)) {
-                return result;
+                if (_.isNumber(result) && !_.isNaN(result)) {
+                    return result;
+                }
             }
         }
     });

@@ -22,6 +22,7 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 {
     const NAME = 'oro_type_number_filter';
     const ARRAY_SEPARATOR = ',';
+    public const OPTION_KEY_FORMATTER_OPTION = 'formatter_options';
 
     /**
      * @var TranslatorInterface
@@ -108,12 +109,12 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         ];
 
         $resolver->setDefaults(
-            array(
+            [
                 'field_type'        => NumberType::class,
                 'operator_choices'  => $operatorChoices,
                 'data_type'         => self::DATA_INTEGER,
-                'formatter_options' => array()
-            )
+                self::OPTION_KEY_FORMATTER_OPTION => []
+            ]
         );
     }
 
@@ -129,16 +130,14 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
             $dataType = $options['data_type'];
         }
 
-        $formatterOptions = array();
+        $formatterOptions = [];
 
         switch ($dataType) {
             case self::PERCENT:
-                $formatterOptions['decimals'] = 2;
-                $formatterOptions['grouping'] = false;
+                $formatterOptions['grouping'] = true;
                 $formatterOptions['percent'] = true;
                 break;
             case self::DATA_DECIMAL:
-                $formatterOptions['decimals'] = 2;
                 $formatterOptions['grouping'] = true;
                 break;
             case self::DATA_INTEGER:

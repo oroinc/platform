@@ -211,7 +211,8 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             false
         );
         if (null === $entityClass) {
-            $this->addValidationError(Constraint::ENTITY_TYPE, $pointer);
+            $this->addValidationError(Constraint::ENTITY_TYPE, $pointer)
+                ->setDetail(sprintf('Unknown entity type: %s.', $entityType));
             $entityClass = $entityType;
         }
 
