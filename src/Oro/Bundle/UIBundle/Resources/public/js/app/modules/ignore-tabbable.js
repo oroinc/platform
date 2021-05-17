@@ -26,6 +26,9 @@ $(document).on('keydown', function(event) {
 
     if (nextTabbable) {
         $(nextTabbable).focus();
+        if (typeof nextTabbable.select !== 'undefined') {
+            nextTabbable.select();
+        }
         event.preventDefault();
     }
 });
