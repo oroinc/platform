@@ -103,7 +103,7 @@
             font-family: $control-group-collapsible-collapse-action-font-family;
             font-weight: $control-group-collapsible-collapse-action-font-weight;
 
-            &:before {
+            &::before {
                 content: $control-group-collapsible-collapse-action-icon-content;
                 display: $control-group-collapsible-collapse-action-icon-display;
                 width: $control-group-collapsible-collapse-action-icon-width;
@@ -119,7 +119,7 @@
                 background: $control-group-collapsible-collapse-action-icon-background;
             }
 
-            &.collapsed:before {
+            &.collapsed::before {
                 content: $control-group-collapsible-collapse-action-icon-collapsed-content;
             }
         }
@@ -130,7 +130,7 @@
     }
 
     &.collapsed {
-        .collapse-expand-action-container .collapse-action:before {
+        .collapse-expand-action-container .collapse-action::before {
             content: $control-group-collapsible-collapsed-content;
         }
     }
@@ -222,7 +222,7 @@
         top: 100%;
         width: 0;
 
-        &:after {
+        &::after {
             content: '';
             display: block;
             position: absolute;

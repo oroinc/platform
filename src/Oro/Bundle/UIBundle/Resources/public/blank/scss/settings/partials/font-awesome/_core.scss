@@ -1,11 +1,11 @@
 /* @theme: blank; */
 
-[class^="fa-"],
-[class*=" fa-"] {
+[class^='fa-'],
+[class*=' fa-'] {
     display: inline-block;
 
-    font-family: 'FontAwesome';
-    font-weight: normal;
+    font-family: $fa-font-family;
+    font-weight: font-weight('light');
     font-style: normal;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -15,9 +15,9 @@
     margin-right: $font-icon-offset-end;
 
     &.hide-text {
-        &:before,
-        &:after {
-            font-family: 'FontAwesome';
+        &::before,
+        &::after {
+            font-family: $fa-font-family;
         }
     }
 }

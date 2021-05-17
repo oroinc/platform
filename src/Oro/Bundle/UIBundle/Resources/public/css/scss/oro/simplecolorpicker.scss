@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .simplecolorpicker span.color {
     &[data-selected] {
         border: 1px solid transparent;
@@ -37,14 +39,14 @@
     span.color {
         position: relative;
 
-        &[data-selected]:after {
+        &[data-selected]::after {
             margin: 0;
 
             line-height: 1;
-
         }
     }
 }
+
 .simplecolorpicker.inline {
     padding: 8px 12px;
 }
@@ -129,7 +131,7 @@
     &[data-selected] {
         @include fa-icon($checkbox-checked-icon, before, true) {
             color: $primary-inverse;
-        };
+        }
     }
 }
 

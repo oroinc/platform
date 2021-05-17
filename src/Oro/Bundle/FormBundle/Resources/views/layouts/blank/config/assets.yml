@@ -9,6 +9,7 @@ styles:
         - 'bundles/oroform/blank/scss/variables/form-row-config.scss'
         - 'bundles/oroform/blank/scss/variables/focus-visible-config.scss'
         - 'bundles/oroform/blank/scss/variables/floating-validation-message-config.scss'
+        - 'bundles/oroform/blank/scss/variables/validation-failed-config.scss'
 
         - 'bundles/oroform/blank/scss/styles.scss'
         - 'bundles/oroform/blank/scss/components/focus-visible.scss'

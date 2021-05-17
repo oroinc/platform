@@ -69,7 +69,8 @@
 
     .grid-views-choice {
         display: inline-block;
-        max-height: ($font-size-base * $line-height-base) * 2; // two rows
+        // two rows
+        max-height: ($font-size-base * $line-height-base) * 2;
 
         font-size: $font-size-base;
         line-height: $line-height-base;
@@ -91,13 +92,14 @@
 
     @supports (-webkit-line-clamp: 2) {
         .grid-views-choice {
-            display: -webkit-box;
+            display: box;
             max-height: inherit;
 
             text-overflow: ellipsis;
 
             -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+            // stylelint-disable-next-line property-no-unknown
+            box-orient: vertical;
         }
     }
 

@@ -5,6 +5,15 @@
 }
 
 // Container that the modal scrolls within
+
+.modal,
+.modal-backdrop {
+    &.suspend-mode {
+        // stylelint-disable-next-line declaration-no-important
+        display: none !important;
+    }
+}
+
 .modal {
     position: fixed;
     top: 0;
@@ -28,7 +37,6 @@
         overflow-y: auto;
     }
 }
-
 // Shell div to position the modal with bottom padding
 .modal-dialog {
     position: relative;
@@ -61,7 +69,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 100%; // Ensure `.modal-content` extends the full width of the parent `.modal-dialog`
+    // Ensure `.modal-content` extends the full width of the parent `.modal-dialog`
+    width: 100%;
     // counteract the pointer-events: none; in the .modal-dialog
     pointer-events: auto;
     background-color: $modal-content-bg;
@@ -94,8 +103,10 @@
 // Top section of the modal w/ title and dismiss
 .modal-header {
     display: flex;
-    align-items: flex-start; // so the close btn always stays on the upper right corner
-    justify-content: space-between; // Put modal header elements (title and dismiss) on opposite ends
+    // so the close btn always stays on the upper right corner
+    align-items: flex-start;
+    // Put modal header elements (title and dismiss) on opposite ends
+    justify-content: space-between;
     padding: $modal-header-padding;
     border-bottom: $modal-header-border-width solid $modal-header-border-color;
     background-color: $modal-header-bg;
@@ -141,8 +152,10 @@
 // Footer (for actions)
 .modal-footer {
     display: flex;
-    align-items: center; // vertically center
-    justify-content: flex-end; // Right align buttons with flex property because text-align doesn't work on flex items
+    // vertically center
+    align-items: center;
+    // Right align buttons with flex property because text-align doesn't work on flex items
+    justify-content: flex-end;
     border-top: $modal-footer-border-width solid $modal-footer-border-color;
     background-color: $modal-footer-bg;
     padding: $modal-footer-padding;
@@ -202,13 +215,6 @@
     width: 50px;
     height: 50px;
     overflow: scroll;
-}
-
-.modal,
-.modal-backdrop {
-    &.suspend-mode {
-        display: none !important;
-    }
 }
 
 // Scale up the modal

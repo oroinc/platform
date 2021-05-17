@@ -1,3 +1,5 @@
+/* stylelint-disable */
+
 html,
 body {
     margin: 0;
@@ -32,10 +34,10 @@ body {
     background-color: #d8d8d8;
     border-color: #cdcdcd;
     color: #000;
-    font-weight: bold;
+    font-weight: 700;
 }
 
-.email-extra-body-toggle:before {
+.email-extra-body-toggle::before {
     content: '...';
 }
 

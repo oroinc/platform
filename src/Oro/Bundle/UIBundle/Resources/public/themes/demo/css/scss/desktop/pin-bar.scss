@@ -1,5 +1,21 @@
 /* @theme: admin.demo; */
 
+.list-bar {
+    .pin-holder {
+        a {
+            &:hover,
+            &:active,
+            &:focus {
+                color: $app-header-text-hover-color;
+            }
+        }
+
+        &.active {
+            background-color: $pin-item-active-bg-color;
+        }
+    }
+}
+
 .list-bar-wrapper {
     .pin-holder {
         &.outdated a {
@@ -14,18 +30,18 @@
     }
 
     .btn-close {
-        &:before {
+        &::before {
             color: $pin-item-close-color;
         }
 
-        &:hover:before {
+        &:hover::before {
             color: $pin-item-close-hover-color;
         }
     }
 }
 
 .show-more {
-    &:before {
+    &::before {
         background-image: $pin-show-more-gradient;
     }
 
@@ -35,22 +51,6 @@
 
         &:hover {
             color: $pin-item-close-hover-color;
-        }
-    }
-}
-
-.list-bar {
-    .pin-holder {
-        &.active {
-            background-color: $pin-item-active-bg-color;
-        }
-
-        a {
-            &:hover,
-            &:active,
-            &:focus {
-                color: $app-header-text-hover-color;
-            }
         }
     }
 }

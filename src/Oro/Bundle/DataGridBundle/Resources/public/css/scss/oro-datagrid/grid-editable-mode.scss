@@ -1,5 +1,103 @@
 /* @theme: admin.oro; */
 
+.inline-editor {
+    &__inner {
+        margin-right: $oro-datagrid-editable-inner-offset;
+    }
+
+    &__actions {
+        display: flex;
+        padding: $oro-datagrid-editable-action-offset;
+
+        bottom: auto;
+
+        line-height: $oro-datagrid-editable-cell-line-height;
+    }
+
+    &__fields {
+        input[type='text'] {
+            height: $oro-datagrid-editable-action-item-size;
+            line-height: $oro-datagrid-editable-action-item-line-height;
+            padding: $oro-datagrid-editable-action-input-offset;
+
+            &:last-child {
+                padding-right: $oro-datagrid-editable-action-input-last-offset;
+            }
+        }
+    }
+
+    &__prefix {
+        display: block;
+        position: absolute;
+        top: 0;
+        right: 100%;
+        margin-right: -$input-border-width;
+        height: 100%;
+    }
+
+    &-edit-action {
+        display: none;
+    }
+
+    &-wrapper {
+        &.tags-select-editor {
+            .select2-container {
+                min-height: $oro-datagrid-editable-cell-min-height;
+            }
+        }
+
+        .select2-chosen {
+            min-height: $oro-datagrid-select-chosen-min-height;
+            line-height: $oro-datagrid-editable-action-item-line-height;
+            padding: $oro-datagrid-select-inner-offset;
+            height: $oro-datagrid-select-chosen-height;
+            min-width: $oro-datagrid-select-chosen-min-width;
+        }
+
+        .select2-allowclear .select2-chosen {
+            padding-right: $oro-datagrid-select-inner-offset-allow-clear-end;
+        }
+
+        .select2-choice {
+            height: auto;
+        }
+
+        .select2-search-choice-close,
+        .select2-arrow {
+            top: $oro-datagrid-select-icon-top;
+        }
+
+        .inline-editor__fields .select2-choice {
+            width: calc(100% - #{$oro-datagrid-editable-action-input-last-offset});
+        }
+
+        &:not(.tags-select-editor) {
+            .inline-editor__actions .btn {
+                padding: $oro-datagrid-editable-action-item-inner-offset;
+                font-size: $oro-datagrid-action-font-size;
+                line-height: $oro-datagrid-editable-cell-line-height;
+                height: $oro-datagrid-editable-action-height;
+                width: $oro-datagrid-editable-action-width;
+            }
+
+            .select2-container {
+                min-height: auto;
+                padding: $oro-datagrid-select-container-offset;
+                height: $oro-datagrid-select-container-height;
+                border-radius: $oro-datagrid-select-container-border-radius;
+            }
+
+            .select2-arrow {
+                right: $oro-datagrid-select-icon-arrow-offset;
+            }
+
+            .select2-search-choice-close {
+                right: $oro-datagrid-select-icon-close-offset;
+            }
+        }
+    }
+}
+
 .number-cell,
 .integer-cell,
 .align-right,
@@ -12,6 +110,40 @@
 .align-right {
     .inline-editor__inner {
         margin-right: $oro-datagrid-editable-inner-offset;
+    }
+}
+
+.save-success {
+    position: relative;
+
+    background: $cell-success-background;
+
+    &:hover::before {
+        display: none;
+    }
+}
+
+.save-fail {
+    background: $cell-error-background;
+}
+
+.edit-mode {
+    position: relative;
+
+    &::before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        background-color: $inline-action-background;
+
+        content: '';
+    }
+
+    .inline-editor-edit-action {
+        display: none;
     }
 }
 
@@ -40,7 +172,7 @@
 
         background: $cell-error-background;
 
-        &:before {
+        &::before {
             position: absolute;
             top: 0;
             left: 0;
@@ -59,40 +191,6 @@
     }
 }
 
-.save-success {
-    position: relative;
-
-    background: $cell-success-background;
-
-    &:hover:before {
-        display: none;
-    }
-}
-
-.save-fail {
-    background: $cell-error-background;
-}
-
-.edit-mode {
-    position: relative;
-
-    &:before {
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-
-        background-color: $inline-action-background;
-
-        content: '';
-    }
-
-    .inline-editor-edit-action {
-        display: none;
-    }
-}
-
 .grid-body-cell.loading {
     background: $cell-loading-background;
 
@@ -100,7 +198,7 @@
         display: none;
     }
 
-    &:before {
+    &::before {
         position: absolute;
         top: $oro-datagrid-editable-loader-top;
         right: $oro-datagrid-editable-loader-end;
@@ -115,104 +213,6 @@
     &:hover {
         .inline-editor-edit-action {
             display: none;
-        }
-    }
-}
-
-.inline-editor {
-    &__inner {
-        margin-right: $oro-datagrid-editable-inner-offset;
-    }
-
-    &__actions {
-        display: flex;
-        padding: $oro-datagrid-editable-action-offset;
-
-        bottom: auto;
-
-        line-height: $oro-datagrid-editable-cell-line-height;
-    }
-
-    &__fields {
-        input[type="text"] {
-            height: $oro-datagrid-editable-action-item-size;
-            line-height: $oro-datagrid-editable-action-item-line-height;
-            padding: $oro-datagrid-editable-action-input-offset;
-
-            &:last-child {
-                padding-right: $oro-datagrid-editable-action-input-last-offset;
-            }
-        }
-    }
-
-    &__prefix {
-        display: block;
-        position: absolute;
-        top: 0;
-        right: 100%;
-        margin-right: -$input-border-width;
-        height: 100%;
-    }
-
-    &-edit-action {
-        display: none;
-    }
-
-    &-wrapper {
-        &:not(.tags-select-editor) {
-            .inline-editor__actions .btn {
-                padding: $oro-datagrid-editable-action-item-inner-offset;
-                font-size: $oro-datagrid-action-font-size;
-                line-height: $oro-datagrid-editable-cell-line-height;
-                height: $oro-datagrid-editable-action-height;
-                width: $oro-datagrid-editable-action-width;
-            }
-
-            .select2-container {
-                min-height: auto;
-                padding: $oro-datagrid-select-container-offset;
-                height: $oro-datagrid-select-container-height;
-                border-radius: $oro-datagrid-select-container-border-radius;
-            }
-
-            .select2-arrow {
-                right: $oro-datagrid-select-icon-arrow-offset;
-            }
-
-            .select2-search-choice-close {
-                right: $oro-datagrid-select-icon-close-offset;
-            }
-        }
-
-        &.tags-select-editor {
-            .select2-container {
-                min-height: $oro-datagrid-editable-cell-min-height;
-            }
-        }
-
-        .select2-chosen {
-            min-height: $oro-datagrid-select-chosen-min-height;
-            line-height: $oro-datagrid-editable-action-item-line-height;
-            padding: $oro-datagrid-select-inner-offset;
-            height: $oro-datagrid-select-chosen-height;
-            min-width: $oro-datagrid-select-chosen-min-width;
-        }
-
-        .select2-allowclear .select2-chosen {
-            padding-right: $oro-datagrid-select-inner-offset-allow-clear-end;
-        }
-
-        .select2-choice {
-            height: auto;
-        }
-
-        .inline-editor__fields .select2-choice {
-            width: calc(100% - #{$oro-datagrid-editable-action-input-last-offset});
-        }
-
-        .select2-search-choice-close,
-        .select2-arrow {
-            top: $oro-datagrid-select-icon-top;
         }
     }
 }

@@ -1,19 +1,17 @@
 /* @theme: admin.oro; */
 
 // add all lib
-@import "layout";
-@import "uniform";
-@import "oro";
-
-@import "utilites";
-
-@import "oro/main";
+@import 'layout';
+@import 'uniform';
+@import 'oro';
+@import 'utilites';
+@import 'oro/main';
 
 // desktop resolution
-@import "desktop/main";
+@import 'desktop/main';
 
 // mobile resolution
-@import "mobile/main";
+@import 'mobile/main';
 
 // printing rules
-@import "print/main";
+@import 'print/main';

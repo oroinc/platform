@@ -9,6 +9,7 @@
 
 @include breakpoint('print') {
     .page-footer {
+        // stylelint-disable-next-line declaration-no-important
         display: none !important;
     }
 }

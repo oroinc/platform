@@ -1,6 +1,50 @@
 /* @theme: admin.oro; */
 
-@import "~bootstrap/scss/pagination";
+@import '~bootstrap/scss/pagination';
+
+.page-link {
+    border: none;
+
+    [class^='fa-'],
+    [class*=' fa-'] {
+        &.hide-text {
+            color: $pagination-fa-color;
+
+            &::before,
+            &::after {
+                font-size: px2rem(16px);
+            }
+        }
+    }
+
+    &:hover {
+        [class^='fa-'],
+        [class*=' fa-'] {
+            &.hide-text {
+                color: $pagination-fa-hover-color;
+            }
+        }
+    }
+
+    &:active {
+        [class^='fa-'],
+        [class*=' fa-'] {
+            &.hide-text {
+                color: $pagination-fa-active-color;
+            }
+        }
+    }
+
+    &:disabled,
+    &.disabled {
+        [class^='fa-'],
+        [class*=' fa-'] {
+            &.hide-text {
+                color: $pagination-fa-disabled-color;
+            }
+        }
+    }
+}
 
 .pagination {
     margin: 0;
@@ -12,11 +56,11 @@
         .page-link {
             padding: $pagination-mini-padding-y $pagination-mini-padding-x;
 
-            [class^="fa-"],
-            [class*=" fa-"] {
+            [class^='fa-'],
+            [class*=' fa-'] {
                 &.hide-text {
-                    &:before,
-                    &:after {
+                    &::before,
+                    &::after {
                         font-size: px2rem(14px);
                     }
                 }
@@ -36,50 +80,6 @@
 .page-item {
     &.disabled .page-link {
         opacity: .5;
-    }
-}
-
-.page-link {
-    border: none;
-
-    [class^="fa-"],
-    [class*=" fa-"] {
-        &.hide-text {
-            color: $pagination-fa-color;
-
-            &:before,
-            &:after {
-                font-size: px2rem(16px);
-            }
-        }
-    }
-
-    &:hover {
-        [class^="fa-"],
-        [class*=" fa-"] {
-            &.hide-text {
-                color: $pagination-fa-hover-color;
-            }
-        }
-    }
-
-    &:active {
-        [class^="fa-"],
-        [class*=" fa-"] {
-            &.hide-text {
-                color: $pagination-fa-active-color;
-            }
-        }
-    }
-
-    &:disabled,
-    &.disabled {
-        [class^="fa-"],
-        [class*=" fa-"] {
-            &.hide-text {
-                color: $pagination-fa-disabled-color;
-            }
-        }
     }
 }
 

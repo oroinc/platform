@@ -28,7 +28,7 @@
                 display: $jstree-actions-menu-inline-li-display;
                 padding-right: $jstree-actions-menu-item-gap;
 
-                &:not(:first-child):before {
+                &:not(:first-child)::before {
                     content: $jstree-actions-menu-inline-li-before-content;
                     height: $jstree-actions-menu-inline-li-before-height;
                     border-left: 1px solid $jstree-actions-menu-separator-color;
@@ -40,7 +40,7 @@
                     padding: 0;
                 }
 
-                [class*="fa-"] {
+                [class*='fa-'] {
                     display: none;
                 }
             }

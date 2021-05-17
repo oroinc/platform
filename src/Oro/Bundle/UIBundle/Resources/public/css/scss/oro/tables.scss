@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, max-nesting-depth */
+
 .table {
     width: 100%;
     max-width: 100%;
@@ -196,8 +198,8 @@
 
         @include header-cell-dropdown();
 
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             font-size: $base-font-size;
             margin: 0 2px 0 0;
         }
@@ -282,11 +284,11 @@
 
     .multi-select-cell,
     .multi-relation-cell {
-        .value-item:after {
+        .value-item::after {
             content: ', ';
         }
 
-        .value-item:last-child:after {
+        .value-item:last-child::after {
             content: '';
         }
     }
@@ -314,7 +316,7 @@
 
     .tags-cell {
         .tags-item {
-            border: 1px solid #ccc;
+            border: 1px solid $additional-extra-light;
             border-radius: 4px;
             padding: 2px 4px;
         }
@@ -370,6 +372,7 @@
                     }
                 }
             }
+
             &:last-child {
                 tr {
                     &:last-child {
@@ -399,8 +402,8 @@
     height: 0;
     overflow: hidden;
 
-    &:before,
-    &:after {
-        content: '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ';
+    &::before,
+    &::after {
+        content: $table-td-expander-content;
     }
 }

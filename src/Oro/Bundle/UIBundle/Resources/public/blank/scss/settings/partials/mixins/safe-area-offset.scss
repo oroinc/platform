@@ -33,7 +33,7 @@
 }
 
 // Set any property with left safe-area zone
-@mixin safe-area-property-left($property, $value: 0px, $default: true) {
+@mixin safe-area-property-left($property, $value: 0, $default: true) {
     @if ($property != null or $value != null) {
         @if ($default) {
             #{$property}: #{$value};
@@ -58,7 +58,7 @@
 }
 
 // Set any property with right safe-area zone
-@mixin safe-area-property-right($property, $value: 0px, $default: true) {
+@mixin safe-area-property-right($property, $value: 0, $default: true) {
     @if ($property != null or $value != null) {
         @if ($default) {
             #{$property}: #{$value};

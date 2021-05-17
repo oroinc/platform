@@ -7,8 +7,8 @@ $sidebar-color: $primary-400 !default;
 $sidebar-active-color: $secondary-200 !default;
 $sidebar-resize-border-color-hover: $secondary !default;
 
-$sidebar-scroll-bar-background-color: rgba($primary-400, 0.2) !default;
-$sidebar-scroll-bar-background-color-hover: rgba($primary-400, 0.7) !default;
+$sidebar-scroll-bar-background-color: rgba($primary-400, .2) !default;
+$sidebar-scroll-bar-background-color-hover: rgba($primary-400, .7) !default;
 
 $sidebar-widget-header-padding: 10px 7px 10px 13px !default;
 $sidebar-widget-header-bg-color: $sidebar-bg-color !default;
@@ -18,6 +18,10 @@ $sidebar-widget-actions-width: 30px !default;
 $sidebar-widget-actions-color: $primary-700 !default;
 $sidebar-widget-content-bg-color: $primary-900 !default;
 $sidebar-widget-setup-modal-margin-top: 20% !default;
+
+$sidebar-widget-minimized-popover-shadow: 0 5px 10px rgba(0, 0, 0, .2) !default;
+$sidebar-widget-minimized-right-popover-shadow: 1px 2px 13px 1px rgba(0, 0, 0, .13) !default;
+$sidebar-widget-minimized-left-popover-shadow: -2px -2px 13px 1px rgba(0, 0, 0, .13) !default;
 
 $sidebar-icon-actions-widget: $fa-var-ellipsis-h !default;
 $sidebar-icon-add-widget: $fa-var-plus !default;

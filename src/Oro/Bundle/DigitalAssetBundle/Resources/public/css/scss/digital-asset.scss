@@ -6,6 +6,7 @@
 
         > .digital-asset-filename {
             @include text-line-truncate($dam-section-width);
+
             display: inline-block;
             padding: $dam-file-inner-offset;
 
@@ -17,8 +18,8 @@
             }
         }
 
-        [class^="fa-"],
-        [class*="fa-"] {
+        [class^='fa-'],
+        [class*='fa-'] {
             margin-left: $dam-item-fa-right;
             margin-top: $content-padding-small;
 
@@ -27,7 +28,7 @@
             }
 
             &:hover {
-                &:after {
+                &::after {
                     color: $primary-550;
                 }
             }
@@ -55,7 +56,7 @@
 
     &-image-grid {
         .grid-body-cell-originalFilename {
-            [class*="fa-"] {
+            [class*='fa-'] {
                 display: none;
             }
         }

@@ -13,4 +13,8 @@ $line-clamp-polyfill-after-top: ceil($base-font-size * $base-line-height * ($lin
 $line-clamp-polyfill-after-right: 0 !default;
 $line-clamp-polyfill-after-width: 12% !default;
 $line-clamp-polyfill-after-height: ceil($base-font-size * $base-line-height) !default;
-$line-clamp-polyfill-after-background: linear-gradient(to right, rgba(get-color('additional', 'ultra'), 0), rgba(get-color('additional', 'ultra'), 1) 50%) !default;
+$line-clamp-polyfill-after-background: linear-gradient(
+    to right,
+    rgba(get-color('additional', 'ultra'), 0),
+    rgba(get-color('additional', 'ultra'), 1) 50%
+) !default;

@@ -1,14 +1,15 @@
 /* @theme: admin.oro; */
 
 .lg-backdrop.in {
-    opacity: 0.3;
+    opacity: .3;
 }
+
 .lg-toolbar {
     background: $primary;
 }
 
 .lg-toolbar .lg-print {
-    font-family: FontAwesome;
+    font-family: $fa-font-family;
 }
 
 .lg-outer {
@@ -18,7 +19,7 @@
     .lg-item {
         background: transparent;
 
-        &:after {
+        &::after {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -33,7 +34,7 @@
             @include loader($loader-size, $loader-width, $primary-inverse);
         }
 
-        &.lg-complete:after {
+        &.lg-complete::after {
             content: none;
         }
     }
@@ -44,5 +45,6 @@
 }
 
 .mobile-version .lg-print {
+    // stylelint-disable-next-line declaration-no-important
     display: none !important;
 }

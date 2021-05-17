@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
-@import "base-button";
+/* stylelint-disable no-descending-specificity */
+
+@import 'base-button';
 
 button {
     // Opinionated: add "hand" cursor to non-disabled .btn elements
@@ -13,16 +15,15 @@ button {
     @extend %base-button;
 }
 
-
 // Future-proof disabling of clicks on `<a>` elements
 a.btn.disabled,
 fieldset:disabled a.btn {
     pointer-events: none;
 }
 
-//
-// Alternate buttons
-//
+/*
+  Alternate buttons
+*/
 @each $color, $values in $btn-theme-keys {
     .btn-#{$color} {
         @include button-custom-variant($values...);
@@ -32,6 +33,7 @@ fieldset:disabled a.btn {
 @each $color, $values in $btn-theme-square-keys {
     .btn-square-#{$color} {
         @extend %btn-square;
+
         @include button-custom-variant($values...);
     }
 }
@@ -44,8 +46,8 @@ fieldset:disabled a.btn {
     position: $btn-icon-position;
     text-indent: $btn-icon-text-indent;
 
-    [class^="fa-"],
-    [class*=" fa-"] {
+    [class^='fa-'],
+    [class*=' fa-'] {
         margin: $btn-icon-fa-offset;
         text-indent: $btn-icon-fa-text-indent;
         line-height: $btn-icon-fa-line-height;
@@ -58,13 +60,13 @@ fieldset:disabled a.btn {
     &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
         width: $btn-icon-dropdown-toggle-width;
 
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             left: $btn-icon-dropdown-toggle-fa-left;
             transform: $btn-icon-dropdown-toggle-fa-transform;
         }
 
-        &:after {
+        &::after {
             position: $btn-icon-dropdown-toggle-after-position;
             top: $btn-icon-dropdown-toggle-after-top;
             right: $btn-icon-dropdown-toggle-after-right;
@@ -80,21 +82,22 @@ fieldset:disabled a.btn {
         &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
             width: $btn-square-icon-dropdown-toggle-width;
 
-            [class^="fa-"],
-            [class*=" fa-"] {
+            [class^='fa-'],
+            [class*=' fa-'] {
                 left: $btn-square-icon-dropdown-toggle-fa-left;
             }
 
-            &:after {
+            &::after {
                 right: $btn-square-icon-dropdown-toggle-after-right;
             }
         }
     }
 }
 
-//
-// Link buttons
-//
+/*
+  Link buttons
+*/
+
 // Make a button look and behave like a link
 .btn-link {
     font-weight: $btn-link-font-weight;
@@ -133,6 +136,7 @@ fieldset:disabled a.btn {
 }
 
 .btn-action {
+    /* stylelint-disable declaration-no-important */
     color: $primary-700 !important;
     font-size: 20px;
     padding: 0 5px !important;
@@ -140,12 +144,13 @@ fieldset:disabled a.btn {
     &:hover {
         text-decoration: none !important;
     }
+    /* stylelint-enable declaration-no-important */
 }
 
 .btn-process {
     position: relative;
 
-    &:after {
+    &::after {
         content: '';
         background: transparent url('#{$global-url}/oroui/img/loader-16.gif') no-repeat center left;
         position: absolute;
@@ -158,26 +163,38 @@ fieldset:disabled a.btn {
     }
 }
 
-//
-// Button Sizes
-//
+/*
+  Button Sizes
+*/
 .btn-lg {
-    @include button-size($btn-padding-y-lg, $btn-padding-x-lg, $font-size-lg, $btn-line-height-lg, $btn-border-radius-lg);
+    @include button-size(
+        $btn-padding-y-lg,
+        $btn-padding-x-lg,
+        $font-size-lg,
+        $btn-line-height-lg,
+        $btn-border-radius-lg
+    );
 }
 
 .btn-sm {
-    @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+    @include button-size(
+        $btn-padding-y-sm,
+        $btn-padding-x-sm,
+        $btn-font-size-sm,
+        $btn-line-height-sm,
+        $btn-border-radius-sm
+    );
 
-    [class^="fa-"],
-    [class*=" fa-"] {
+    [class^='fa-'],
+    [class*=' fa-'] {
         font-size: $btn-icon-font-size-sm;
         line-height: $btn-icon-line-height-sm;
     }
 }
 
-//
-// Block button
-//
+/*
+  Block button
+*/
 .btn-block {
     display: block;
     width: 100%;
@@ -195,9 +212,9 @@ fieldset:disabled a.btn {
 }
 
 // Specificity overrides
-input[type="submit"],
-input[type="reset"],
-input[type="button"] {
+input[type='submit'],
+input[type='reset'],
+input[type='button'] {
     &.btn-block {
         width: 100%;
     }
@@ -219,19 +236,25 @@ input[type="button"] {
         height: $btn-icon-mobile-height;
         padding: $btn-icon-inner-offset;
 
-        [class^="fa-"],
-        [class*=" fa-"] {
-            &:before {
+        [class^='fa-'],
+        [class*=' fa-'] {
+            &::before {
                 font-size: $btn-icon-mobile-fa-icon-font-size;
             }
         }
     }
 
     .btn-sm {
-        @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $btn-font-size-sm, $btn-line-height-sm, $btn-border-radius-sm);
+        @include button-size(
+            $btn-padding-y-sm,
+            $btn-padding-x-sm,
+            $btn-font-size-sm,
+            $btn-line-height-sm,
+            $btn-border-radius-sm
+        );
 
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             font-size: $btn-icon-font-size-sm;
             line-height: $btn-icon-line-height-sm;
         }

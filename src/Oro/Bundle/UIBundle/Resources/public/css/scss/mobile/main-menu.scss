@@ -34,8 +34,10 @@
         height: 100%;
         margin-bottom: 0;
         margin-left: 0;
+
         /* iOS 11 */
         margin-left: constant(safe-area-inset-left);
+
         /* iOS 11.2+ */
         margin-left: env(safe-area-inset-left);
         width: $main-menu-mobile-width;
@@ -49,7 +51,7 @@
             margin: 0;
 
             font-size: $menu-font-size + 2;
-            font-weight: normal;
+            font-weight: font-weight('light');
 
             background-color: transparent;
 
@@ -74,13 +76,13 @@
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &:before {
+                &::before {
                     content: '';
                     display: inline-block;
                     height: 16px;
                     min-width: 16px;
                     margin-right: 8px;
-                    font-weight: normal;
+                    font-weight: font-weight('light');
                     line-height: 1;
                     text-align: center;
                     color: $menu-accordion-icon-color;
@@ -89,18 +91,18 @@
             }
 
             .accordion-toggle {
-                font-weight: bold;
+                font-weight: font-weight('bold');
 
                 @include fa-icon($fa-var-angle-right);
 
-                &:before {
+                &::before {
                     transform: rotate(90deg);
                 }
 
                 &.collapsed {
-                    font-weight: normal;
+                    font-weight: font-weight('light');
 
-                    &:before {
+                    &::before {
                         transform: rotate(0);
                     }
                 }
@@ -126,7 +128,7 @@
     .accordion-body {
         background-color: $menu-dropdown-background-color;
 
-        & > a {
+        > a {
             display: none;
         }
 

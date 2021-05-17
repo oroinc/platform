@@ -1,14 +1,14 @@
 /* @theme: admin.oro; */
 
-@import "permissions-variables";
-@import "workflow";
+@import 'permissions-variables';
+@import 'workflow';
 
 $flowchart-bg-color: $primary-inverse !default;
 
 $flowchart-controls-padding: 10px 10px 0 !default;
 $flowchart-controls-min-height: 32px !default;
 $flowchart-controls-z-index: 600 !default;
-$flowchart-checkbox-group-bg-color: rgba($flowchart-bg-color, 0.7) !default;
+$flowchart-checkbox-group-bg-color: rgba($flowchart-bg-color, .7) !default;
 $flowchart-checkbox-group-padding: 5px 7px 2px !default;
 $flowchart-alert-margin-top: 30px !default;
 
@@ -50,7 +50,7 @@ $flowchart-transition-hover-color: $warning-darken !default;
 $flowchart-transition-bg-color: $primary-830 !default;
 $flowchart-transition-hover-bg-color: $extra-300 !default;
 $flowchart-transition-hover-z-index: 200 !default;
-$flowchart-transition-opacity: 0.8 !default;
+$flowchart-transition-opacity: .8 !default;
 $flowchart-transition-open-dropdown-z-index: 101 !default;
 $flowchart-transition-endpoint-box-shadow: 0 0 0 2px $primary-inverse !default;
 $flowchart-transition-endpoint-border-radius: 6px !default;

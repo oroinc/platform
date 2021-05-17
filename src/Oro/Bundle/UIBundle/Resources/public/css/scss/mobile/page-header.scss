@@ -13,6 +13,12 @@
     padding-left: 0;
 }
 
+.title-buttons-container {
+    .box-type1 {
+        margin: 0;
+    }
+}
+
 .container-fluid.page-title {
     margin-bottom: $mobile-page-title-margin-bottom;
 
@@ -21,6 +27,7 @@
     padding: 0 $content-padding;
 
     .navbar-extra {
+        /* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
         > .row {
             display: flex;
             align-items: center;
@@ -52,6 +59,7 @@
         > .pull-right {
             flex-shrink: 0;
         }
+        /* stylelint-enable no-descending-specificity, selector-max-compound-selectors */
     }
 }
 
@@ -64,7 +72,7 @@
         display: block;
         margin-bottom: 3px;
 
-        & + .separator {
+        + .separator {
             display: none;
         }
     }
@@ -80,7 +88,7 @@
 
     &__entity-title {
         font-size: $base-font-size--xl;
-        font-weight: normal;
+        font-weight: font-weight('light');
         display: inline;
     }
 
@@ -88,7 +96,7 @@
         top: 2px;
         width: $mobile-page-title-icon-offset;
 
-        &:empty:before {
+        &:empty::before {
             font-size: $mobile-page-title-icon-size;
             height: $mobile-page-title-icon-size;
         }
@@ -103,13 +111,13 @@
             @include fa-icon($page-title-btn-more-actions-icon, 'before', true) {
                 display: block;
                 font-size: $base-font-size--m;
-                font-weight: normal;
+                font-weight: font-weight('light');
                 text-indent: 0;
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-            };
+            }
 
             &.sticky {
                 background-color: $page-title-btn-more-actions-submittable-bg-color;
@@ -119,7 +127,7 @@
 
                 @include fa-icon($page-title-btn-more-actions-submittable-icon, 'before', true) {
                     margin-top: -2px;
-                };
+                }
 
                 &:not(:disabled):not(.disabled):active,
                 &:not(:disabled):not(.disabled).active {
@@ -142,11 +150,5 @@
         &:last-of-type {
             margin-bottom: 0;
         }
-    }
-}
-
-.title-buttons-container {
-    .box-type1 {
-        margin: 0;
     }
 }

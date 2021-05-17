@@ -17,6 +17,24 @@
     text-align: center;
 }
 
+.progress-bar {
+    &.success {
+        background-color: $success-lighten;
+    }
+
+    &.inverse {
+        background-color: $extra;
+    }
+
+    &.info {
+        background-color: $info;
+    }
+
+    &.warning {
+        background-color: $warning;
+    }
+}
+
 .progress {
     &.infinite {
         position: relative;
@@ -27,7 +45,7 @@
 
         background-color: $progressbar-infinite-background-color;
 
-        &:before {
+        &::before {
             position: absolute;
             bottom: 0;
             left: 0;
@@ -50,7 +68,7 @@
 
     &-title {
         font-size: $progress-font-size;
-        font-weight: 300;
+        font-weight: font-weight('light');
     }
 
     &-label {
@@ -59,23 +77,5 @@
 
         text-align: center;
         line-height: $progress-height;
-    }
-}
-
-.progress-bar {
-    &.success {
-        background-color: $success-lighten;
-    }
-
-    &.inverse {
-        background-color: $extra;
-    }
-
-    &.info {
-        background-color: $info;
-    }
-
-    &.warning {
-        background-color: $warning;
     }
 }

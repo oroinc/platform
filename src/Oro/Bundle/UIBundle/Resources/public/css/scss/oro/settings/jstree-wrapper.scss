@@ -24,7 +24,7 @@ $jstree-wrapper-label-offset-bottom: 8px !default;
 $jstree-wrapper-label-expanded-jstree-actions-display: inline-block !default;
 
 $jstree-wrapper-text-font-size: 18px !default;
-$jstree-wrapper-text-font-weight: bold !default;
+$jstree-wrapper-text-font-weight: font-weight('bold') !default;
 $jstree-wrapper-text-cursor: pointer !default;
 $jstree-wrapper-text-color: $primary-200 !default;
 

@@ -13,11 +13,11 @@
     &--size-s {
         padding: $input-padding--s;
 
-        &[type="date"],
-        &[type="time"] {
+        &[type='date'],
+        &[type='time'] {
             min-height: $input-date-size-s-height;
 
-            &::-webkit-calendar-picker-indicator{
+            &::-webkit-calendar-picker-indicator {
                 height: 1em;
                 padding: 0;
             }
@@ -33,8 +33,8 @@
         padding-left: 39px;
     }
 
-    &[type="number"] {
-        -moz-appearance: textfield;
+    &[type='number'] {
+        appearance: textfield;
 
         &::-webkit-outer-spin-button,
         &::-webkit-inner-spin-button {

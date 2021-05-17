@@ -1,5 +1,7 @@
 /* @theme: view-switcher; */
 
+/* stylelint-disable no-descending-specificity */
+
 html,
 body {
     font-family: $body-font-family;
@@ -82,6 +84,7 @@ main {
         z-index: $head-panel-logo-z-index;
 
         &.logo-hidden {
+            // stylelint-disable-next-line declaration-no-important
             background-image: none !important;
         }
 
@@ -185,6 +188,7 @@ main {
 
         &__trigger {
             padding-bottom: $head-panel-closed-head-panel-trigger-wrapper-trigger-inner-offset-bottom;
+
             @include fa-icon($head-panel-closed-head-panel-trigger-wrapper-fa-icon);
         }
     }
@@ -196,7 +200,7 @@ main {
     z-index: $view-switcher-z-index;
     box-sizing: $demo-page-box-sizing;
 
-    &:after {
+    &::after {
         position: absolute;
         right: 0;
         bottom: $view-switcher-after-bottom;
@@ -220,6 +224,7 @@ main {
         -moz-osx-font-smoothing: $view-switcher-item-osx-font-smoothing;
         -webkit-font-smoothing: $view-switcher-item-font-smoothing;
         text-decoration: $view-switcher-item-text-decoration;
+
         @include fa-icon($view-switcher-item-fa-icon);
 
         &.active,
@@ -237,13 +242,13 @@ main {
     }
 
     .pad {
-        &:before {
+        &::before {
             content: $view-switcher-item-pad-fa-icon;
         }
     }
 
     .phone {
-        &:before {
+        &::before {
             content: $view-switcher-item-phone-fa-icon;
         }
     }
@@ -267,16 +272,17 @@ main {
         background: $content-area-wrapper-background;
         height: $content-area-wrapper-height;
 
-        &[data-view-name="desktop"] {
+        &[data-view-name='desktop'] {
             background-color: $content-area-wrapper-desktop-background-color;
             height: $content-area-wrapper-desktop-height;
             overflow: $content-area-wrapper-desktop-overflow;
+
             iframe {
                 display: $content-area-wrapper-desktop-iframe-display;
             }
         }
 
-        &[data-view-name*="pad"] {
+        &[data-view-name*='pad'] {
             width: $content-area-wrapper-pad-width;
             height: $content-area-wrapper-pad-height;
             margin: $content-area-wrapper-pad-offset;
@@ -285,8 +291,8 @@ main {
             border-width: $content-area-wrapper-pad-border-width;
             transition: $content-area-wrapper-pad-transition;
 
-            &:before,
-            &:after {
+            &::before,
+            &::after {
                 content: $content-area-wrapper-pad-pseudo-content;
                 position: $content-area-wrapper-pad-pseudo-position;
                 width: $content-area-wrapper-pad-pseudo-width;
@@ -298,7 +304,7 @@ main {
                 background: $content-area-wrapper-pad-pseudo-background;
             }
 
-            &:after {
+            &::after {
                 width: $content-area-wrapper-pad-after-width;
                 height: $content-area-wrapper-pad-after-height;
                 margin-left: $content-area-wrapper-pad-after-offset-left;
@@ -307,7 +313,7 @@ main {
             }
         }
 
-        &[data-view-name*="phone"] {
+        &[data-view-name*='phone'] {
             width: $content-area-wrapper-phone-width;
             height: $content-area-wrapper-phone-height;
             margin: $content-area-wrapper-phone-offset;

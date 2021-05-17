@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 $tag-selector-min-width: 100px !default;
+// stylelint-disable-next-line declaration-no-important
 $tag-selector-items-width: 100% !important;
 $tag-selector-item-font-size: $base-font-size--s !default;
 $tag-selector-item-line-height: $select2-search-field-line-height !default;

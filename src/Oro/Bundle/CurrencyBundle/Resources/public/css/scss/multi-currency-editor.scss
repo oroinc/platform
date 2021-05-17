@@ -1,6 +1,32 @@
 /* @theme: admin.oro; */
 
 .multi-currency-editor {
+    .inline-editor__fields {
+        input[type='text'] {
+            text-align: right;
+        }
+    }
+
+    .form-control {
+        &.error,
+        &:focus {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
+    .select2-container {
+        margin-left: -$input-border-width;
+    }
+
+    .select2-container-active {
+        z-index: $multi-currency-editor-multi-choice-active-z-index;
+
+        &::before {
+            left: -$input-border-width;
+        }
+    }
+
     &.multi-currency-editor__single-currency {
         min-width: $multi-currency-editor-single-width;
 
@@ -26,8 +52,7 @@
         }
 
         .select2-choice {
-
-            &:after {
+            &::after {
                 display: none;
             }
         }
@@ -37,35 +62,9 @@
         }
 
         .select2-container-active {
-            &:after {
+            &::after {
                 left: $multi-currency-editor-multi-choice-offset;
             }
-        }
-    }
-
-    .inline-editor__fields {
-        input[type="text"] {
-            text-align: right;
-        }
-    }
-
-    .form-control {
-        &.error,
-        &:focus {
-            position: relative;
-            z-index: 1;
-        }
-    }
-
-    .select2-container {
-        margin-left: -$input-border-width;
-    }
-
-    .select2-container-active {
-        z-index: $multi-currency-editor-multi-choice-active-z-index;
-
-        &:before {
-            left: -$input-border-width;
         }
     }
 }

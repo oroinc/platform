@@ -7,7 +7,7 @@
     text-align: center;
     text-indent: 0;
 
-    &:before {
+    &::before {
         display: inline-block;
 
         content: '';

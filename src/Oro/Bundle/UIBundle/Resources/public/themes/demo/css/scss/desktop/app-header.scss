@@ -29,7 +29,7 @@
     }
 
     .user-menu-dropdown {
-        &:before {
+        &::before {
             border-left-color: $app-header-divider-color;
         }
     }

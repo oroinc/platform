@@ -10,6 +10,7 @@
 
         flex: 0 0 auto;
     }
+
     &__side {
         width: $page-footer-container-side-width;
         padding-left: $offset-x;
@@ -23,6 +24,7 @@
         &__base {
             width: $page-footer-container-base-tablet-small-width;
         }
+
         &__side {
             width: $page-footer-container-side-tablet-small-width;
         }
@@ -36,6 +38,7 @@
         &__base {
             width: $page-footer-container-base-mobile-landscape-width;
         }
+
         &__side {
             width: $page-footer-container-side-mobile-landscape-width;
             padding-left: 0;

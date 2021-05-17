@@ -3,8 +3,8 @@
 @import '~bootstrap/scss/badge';
 
 .badge {
-    [class^="icon-status-"],
-    [class*=" icon-status-"] {
+    [class^='icon-status-'],
+    [class*=' icon-status-'] {
         font-size: $badge-icon-height;
         margin-right: $badge-icon-offset;
     }

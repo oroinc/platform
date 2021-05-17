@@ -18,7 +18,7 @@
             display: none;
             height: $datagrid-header-cell-link-font-size;
 
-            &:before {
+            &::before {
                 position: absolute;
                 top: $datagrid-header-cell-link-font-size / 2;
                 left: $datagrid-header-cell-sortable-icon-left;
@@ -35,7 +35,7 @@
         .sortable-icon {
             display: inline-block;
 
-            &:before {
+            &::before {
                 border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
             }
         }
@@ -45,7 +45,7 @@
         .sortable-icon {
             display: inline-block;
 
-            &:before {
+            &::before {
                 border-bottom: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
             }
         }
@@ -59,7 +59,7 @@
 
         &:empty,
         &--disabled {
-            &:before {
+            &::before {
                 height: 10px;
 
                 display: inline-block;
@@ -68,7 +68,7 @@
                 font-size: $base-font-size--m;
                 line-height: 0;
 
-                color: get-color('additional', 'middle');
+                color: $datagrid-header-cell-action-column-disabled-color;
 
                 content: '...';
             }
@@ -105,7 +105,7 @@
     .grid-header-cell {
         &.action-column {
             &:empty {
-                &:before {
+                &::before {
                     display: none;
                 }
             }

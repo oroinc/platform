@@ -12,12 +12,12 @@ $margin-bottom-box: $content-padding;
 $base-font-size: 14px;
 $width-body-page-mobile: 320px;
 
-$base-font-size--xl: $base-font-size * 1.7145; // ~24px
-$base-font-size--l: $base-font-size * 1.25; // ~18px
-$base-font-size--s: $base-font-size * .85; // ~12px
-$base-font-size--m: $base-font-size * 1.15; // ~16px
+$base-font-size--xl: $base-font-size * 1.7145; /* ~24px */
+$base-font-size--l: $base-font-size * 1.25; /* ~18px */
+$base-font-size--s: $base-font-size * .85; /* ~12px */
+$base-font-size--m: $base-font-size * 1.15; /* ~16px */
 
-$headerHeight: 54px;
+$header-height: 54px;
 
 $oro-mobile-header-zindex: 9999;
 
@@ -26,3 +26,6 @@ $dropdown-item-inner-offset-top: 4px !default;
 $dropdown-item-inner-offset-bottom: 5px !default;
 $dropdown-item-line-height: 1.5;
 $dropdown-item-icon-fa-offset: 8px;
+
+$oro-page-sidebar-dropdown-menu-border: 1px solid rgba(0, 0, 0, .2) !default;
+$oro-page-sidebar-dropdown-menu-box-shadow: 0 5px 10px rgba(0, 0, 0, .2) !default;

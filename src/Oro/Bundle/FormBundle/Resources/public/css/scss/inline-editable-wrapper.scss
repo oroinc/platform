@@ -1,5 +1,29 @@
 /* @theme: admin.oro; */
 
+.inline-editable-wrapper {
+    &.loading {
+        min-height: auto;
+
+        .inline-actions-element {
+            &::before {
+                position: absolute;
+                top: $inline-editable-wrapper-loading-top;
+                right: $inline-editable-wrapper-loading-end;
+
+                display: block;
+
+                content: '';
+
+                @include loader($inline-editable-wrapper-loading-size, $inline-editable-wrapper-loading-width);
+            }
+
+            &:hover .inline-actions-element_actions {
+                visibility: hidden;
+            }
+        }
+    }
+}
+
 .inline-editable-wrapper:not(:hover) {
     &.save-success .inline-actions-element {
         &_wrapper {
@@ -16,30 +40,6 @@
     &.loading .inline-actions-element {
         &_wrapper {
             background: $cell-loading-background;
-        }
-    }
-}
-
-.inline-editable-wrapper {
-    &.loading {
-        min-height: auto;
-
-        .inline-actions-element {
-            &:before {
-                position: absolute;
-                top: $inline-editable-wrapper-loading-top;
-                right: $inline-editable-wrapper-loading-end;
-
-                display: block;
-
-                content: '';
-
-                @include loader($inline-editable-wrapper-loading-size, $inline-editable-wrapper-loading-width);
-            }
-
-            &:hover .inline-actions-element_actions {
-                visibility: hidden;
-            }
         }
     }
 }

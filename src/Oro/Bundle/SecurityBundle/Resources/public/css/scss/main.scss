@@ -1,11 +1,9 @@
 /* @theme: admin.oro; */
 
-@import "./styles";
-@import "./acl-table";
-@import "./security-row";
-@import "./field-acl";
-@import "./organization-modal-content";
-
-@import "./desktop/main";
-
-@import "./mobile/main";
+@import './styles';
+@import './acl-table';
+@import './security-row';
+@import './field-acl';
+@import './organization-modal-content';
+@import './desktop/main';
+@import './mobile/main';

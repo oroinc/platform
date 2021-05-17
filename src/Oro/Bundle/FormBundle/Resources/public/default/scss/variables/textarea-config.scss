@@ -4,6 +4,8 @@ $textarea-padding: 9px 11px 8px;
 $textarea-padding--m: 8px 9px 7px;
 $textarea-padding--s: 5px 9px 4px;
 
+$textarea-placeholder-color: get-color('additional', 'middle');
+
 // Hover
 $textarea-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
                                         0 0 8px transparentize(get-color('ui', 'focus'), .6);

@@ -32,26 +32,28 @@
             // .hide-on-strict-mobile-landscape,
             // .hide-on-strict-mobile-big
             .hide-on-#{$current-breakpoint-name} {
+                // stylelint-disable-next-line declaration-no-important
                 display: none !important;
             }
         }
     }
 
     // Breakpoint global variables
-    head:before {
+    head::before {
         $content: '';
-        $keyIndex: 0;
+        $key-index: 0;
         $sep: '|';
+
         @each $breakpoint, $value in $breakpoints {
-            @if ($keyIndex == 0) {
-                $sep: ''
+            @if ($key-index == 0) {
+                $sep: '';
             } @else {
-                $sep: '|'
+                $sep: '|';
             }
 
             $content: '#{$content}#{$sep}--breakpoints-#{$breakpoint}:#{$value}';
 
-            $keyIndex: $keyIndex + 1;
+            $key-index: $key-index + 1;
         }
 
         content: $content;
@@ -63,8 +65,7 @@
     html {
         font-size: $root-font-size;
         font-family: sans-serif;
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
+        text-size-adjust: 100%;
         -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
@@ -115,12 +116,13 @@
     }
 
     tr {
-        page-break-inside: avoid
+        page-break-inside: avoid;
     }
 
     img {
+        // stylelint-disable-next-line declaration-no-important
         max-width: 100% !important;
-        page-break-inside: avoid
+        page-break-inside: avoid;
     }
 
     @page {

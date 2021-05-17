@@ -1,12 +1,14 @@
 /* @theme: admin.oro; */
 
-@media only screen and (min-width: $small-landscape-devices-media-breakpoint) and (max-width: $tablet-devices-media-breakpoint) {
+@media only screen and (min-width: $small-landscape-devices-media-breakpoint)
+    and (max-width: $tablet-devices-media-breakpoint) {
     .entity-fallback-container {
         display: flex;
 
         &__value {
             width: 100%;
         }
+
         &__line {
             margin-top: 0;
             margin-left: $content-padding;

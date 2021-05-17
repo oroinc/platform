@@ -1,5 +1,7 @@
 /* @theme: admin.demo; */
 
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth */
+
 .app-header {
     &__search-and-shortcuts {
         .dropdown {
@@ -28,14 +30,15 @@
                             li.selected {
                                 background-color: $header-search-selected-suggestion-item-bg;
 
-                                .description, .entity-label {
+                                .description,
+                                .entity-label {
                                     color: $header-search-selected-suggestion-item-color;
                                 }
                             }
                         }
-                    } // Ends .header-search
-                } // Ends .search-form
-            } // Ends &:.header-dropdown-search
-        } // Ends .dropdown
-    } // Ends .top-search
+                    } /* Ends .header-search */
+                } /* Ends .search-form */
+            } /* Ends &:.header-dropdown-search */
+        } /* Ends .dropdown */
+    } /* Ends .top-search */
 }

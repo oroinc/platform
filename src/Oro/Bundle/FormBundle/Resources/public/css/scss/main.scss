@@ -1,13 +1,12 @@
 /* @theme: admin.oro; */
 
-@import "tinymce/tinymce";
-@import "multi-checkbox-editor";
-@import "inline-editing";
-@import "inline-editing-validation";
-@import "form";
-@import "form-layout";
-@import "inline-editable-wrapper";
-@import "expression-editor";
-
-@import "desktop/main";
-@import "mobile/main";
+@import 'tinymce/tinymce';
+@import 'multi-checkbox-editor';
+@import 'inline-editing';
+@import 'inline-editing-validation';
+@import 'form';
+@import 'form-layout';
+@import 'inline-editable-wrapper';
+@import 'expression-editor';
+@import 'desktop/main';
+@import 'mobile/main';

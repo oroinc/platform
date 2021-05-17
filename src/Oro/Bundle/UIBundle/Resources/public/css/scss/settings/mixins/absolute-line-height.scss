@@ -7,7 +7,6 @@
     @return $value / ($value * 0 + 1);
 }
 
-
 // Returns absolute value of line-height in font-size units, if it's given in relative units
 // @return number
 // Use: $value: absolute-line-height(10px, 1.5); -> 15px
@@ -18,9 +17,9 @@
     $line-unit: unit($line-height);
     $line-value: strip-units($line-height);
 
-    @if $line-unit == "" or $line-unit == "em" or $line-unit == "rem" {
+    @if $line-unit == '' or $line-unit == 'em' or $line-unit == 'rem' {
         @return $line-value * $font-size;
-    } @else if $line-unit == "%"  {
+    } @else if $line-unit == '%' {
         @return ($line-value / 100) * $font-size;
     } @else {
         @return $line-height;

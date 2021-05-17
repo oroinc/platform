@@ -1,7 +1,5 @@
 /* @theme: admin.oro; */
 
-@import "entity-fallback";
-
-@import "desktop/main";
-
-@import "mobile/main";
+@import 'entity-fallback';
+@import 'desktop/main';
+@import 'mobile/main';
