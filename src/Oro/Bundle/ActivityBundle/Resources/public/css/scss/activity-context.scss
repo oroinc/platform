@@ -31,6 +31,7 @@
 
     @at-root .page-title {
         .activity-context-activity-block {
+            // stylelint-disable-next-line declaration-no-important
             display: block !important;
 
             .activity-context-activity {

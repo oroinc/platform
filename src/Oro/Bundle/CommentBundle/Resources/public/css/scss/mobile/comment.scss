@@ -7,17 +7,14 @@
 
     .comment-attachments {
         @media only screen and (max-width: 500px) {
-            display: none; // hide thumbnails on mobile
+            // hide thumbnails on mobile
+            display: none;
         }
+    }
+}
 
-        .link-to-record {
-            .dropdown-menu {
-                @media only screen and (max-width: 500px) {
-                    .view-image {
-                        display: block;
-                    }
-                }
-            }
-        }
+@media only screen and (max-width: 500px) {
+    .comments-block .comment-attachments .dropdown-menu .view-image {
+        display: block;
     }
 }

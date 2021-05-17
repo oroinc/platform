@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "oroui/css/scss/mobile/variables";
-
-    @import "digital-asset";
+    @import 'oroui/css/scss/mobile/variables';
+    @import 'digital-asset';
 }

@@ -1,13 +1,14 @@
 /* @theme: admin.oro; */
 
-// stylelint-disable selector-no-qualifying-type
+/* stylelint-disable no-descending-specificity */
 
 // Make the div behave like a button
 .btn-group,
 .btn-group-vertical {
     position: relative;
     display: inline-flex;
-    vertical-align: middle; // match .btn alignment given font-size hack above
+    // match .btn alignment given font-size hack above
+    vertical-align: middle;
 
     > .btn {
         position: relative;
@@ -151,27 +152,31 @@
 }
 
 // Sizing
-//
 // Remix the default button sizing classes into new ones for easier manipulation.
 
-.btn-group-sm > .btn { @extend .btn-sm; }
-.btn-group-lg > .btn { @extend .btn-lg; }
+.btn-group-sm > .btn {
+    @extend .btn-sm;
+}
 
-//
-// Split button dropdowns
-//
+.btn-group-lg > .btn {
+    @extend .btn-lg;
+}
+
+/*
+   Split button dropdowns
+*/
 
 .dropdown-toggle-split {
     padding-right: $btn-padding-x * .75;
     padding-left: $btn-padding-x * .75;
 
-    &:after,
-    .dropup &:after,
-    .dropright &:after {
+    &::after,
+    .dropup &::after,
+    .dropright &::after {
         margin-left: 0;
     }
 
-    .dropleft &:before {
+    .dropleft &::before {
         margin-right: 0;
     }
 }
@@ -197,9 +202,9 @@
     }
 }
 
-//
-// Vertical button groups
-//
+/*
+   Vertical button groups
+*/
 
 .btn-group-vertical {
     flex-direction: column;
@@ -232,24 +237,23 @@
 }
 
 // Checkbox and radio options
-//
 // In order to support the browser's form validation feedback, powered by the
 // `required` attribute, we have to "hide" the inputs via `clip`. We cannot use
 // `display: none;` or `visibility: hidden;` as that also hides the popover.
 // Simply visually hiding the inputs via `opacity` would leave them clickable in
 // certain cases which is prevented by using `clip` and `pointer-events`.
 // This way, we ensure a DOM element is visible to position the popover from.
-//
 // See https://github.com/twbs/bootstrap/pull/12794 and
 // https://github.com/twbs/bootstrap/pull/14559 for more information.
 
 .btn-group-toggle {
     > .btn,
     > .btn-group > .btn {
-        margin-bottom: 0; // Override default `<label>` value
+        // Override default `<label>` value
+        margin-bottom: 0;
 
-        input[type="radio"],
-        input[type="checkbox"] {
+        input[type='radio'],
+        input[type='checkbox'] {
             position: absolute;
             clip: rect(0, 0, 0, 0);
             pointer-events: none;

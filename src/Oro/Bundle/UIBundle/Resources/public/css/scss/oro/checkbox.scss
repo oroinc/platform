@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .checkbox-view {
     line-height: $checkbox-line-height;
     display: $checkbox-display;
@@ -23,7 +25,7 @@
 
         color: $checkbox-icon-color;
 
-        &:before {
+        &::before {
             position: $checkbox-icon-marker-position;
             top: $checkbox-icon-marker-top;
             left: $checkbox-icon-marker-start;
@@ -37,8 +39,8 @@
         &--circle {
             border-radius: $checkbox-icon-circle-border-radius;
 
-            &:before {
-                content: "";
+            &::before {
+                content: '';
                 margin: $checkbox-icon-circle-marker-outer-offset;
                 display: $checkbox-icon-circle-marker-display;
                 width: $checkbox-icon-circle-marker-width;
@@ -51,17 +53,18 @@
             width: $checkbox-icon-size-l-width;
             height: $checkbox-icon-size-l-height;
 
-            &:before {
+            &::before {
                 font-size: $base-font-size;
             }
         }
     }
 
-    input[type="radio"],
-    input[type="checkbox"] {
+    input[type='radio'],
+    input[type='checkbox'] {
         position: $checkbox-input-position;
         width: 100%;
         height: 100%;
+        // stylelint-disable-next-line declaration-no-important
         margin: 0 !important;
         top: 0;
         left: 0;
@@ -76,8 +79,27 @@
 
         &:hover,
         &:focus {
-            & ~ .checkbox-view__icon {
+            ~ .checkbox-view__icon {
                 border-color: $checkbox-icon-border-color;
+            }
+        }
+
+        &:indeterminate {
+            ~ .checkbox-view__icon:not(.checkbox-view__icon--circle) {
+                background-color: $checkbox-icon-indeterminate-background-color;
+                border-color: $checkbox-icon-indeterminate-border-color;
+
+                &::before {
+                    content: $checkbox-indeterminate-icon;
+                }
+            }
+        }
+
+        &:disabled {
+            ~ .checkbox-view__icon {
+                opacity: $checkbox-disabled-opacity;
+                background-color: $checkbox-disabled-background-color;
+                pointer-events: $checkbox-disabled-pointer-events;
             }
         }
 
@@ -86,7 +108,7 @@
                 background-color: $checkbox-icon-checked-background-color;
                 border-color: $checkbox-icon-checked-border-color;
 
-                &:before {
+                &::before {
                     content: $checkbox-checked-icon;
                 }
             }
@@ -95,7 +117,7 @@
                 background-color: $checkbox-icon-circle-checked-background-color;
                 border-color: $checkbox-icon-circle-checked-border-color;
 
-                &:before {
+                &::before {
                     content: $checkbox-circle-checked-icon;
                     background-color: $checkbox-icon-circle-point-checked-background-color;
                 }
@@ -109,29 +131,10 @@
 
             &:hover,
             &:focus {
-                & ~ .checkbox-view__icon {
+                ~ .checkbox-view__icon {
                     border-color: $checkbox-icon-border-color;
-                    box-shadow: 0 0 $checkbox-icon-border-shadow-size $checkbox-icon-border-color;
+                    box-shadow: $checkbox-icon-box-shadow;
                 }
-            }
-        }
-
-        &:indeterminate {
-            ~ .checkbox-view__icon:not(.checkbox-view__icon--circle) {
-                background-color: $checkbox-icon-indeterminate-background-color;
-                border-color: $checkbox-icon-indeterminate-border-color;
-
-                &:before {
-                    content: $checkbox-indeterminate-icon;
-                }
-            }
-        }
-
-        &:disabled {
-            & ~ .checkbox-view__icon {
-                opacity: $checkbox-disabled-opacity;
-                background-color: $checkbox-disabled-background-color;
-                pointer-events: $checkbox-disabled-pointer-events;
             }
         }
     }

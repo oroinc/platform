@@ -5,7 +5,7 @@
 @mixin list-separator($enabled: true, $top: 1px, $bottom: 1px, $left: 0, $border: 1px solid) {
     @if ($enabled) {
         &:not(:first-child) {
-            &:before {
+            &::before {
                 top: $top;
                 left: $left;
                 bottom: $bottom;

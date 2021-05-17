@@ -33,8 +33,8 @@
     &__title {
         background: $primary-300;
         font-size: 17px;
-        font-weight: bold;
-        color: #fff;
+        font-weight: font-weight('bold');
+        color: $primary-inverse;
         text-transform: uppercase;
         display: block;
         margin-bottom: 16px;
@@ -93,13 +93,13 @@
         text-align: left;
         padding-right: 0;
 
-        & + input[type="text"],
-        & + input[type="email"],
-        & + input[type="password"] {
+        + input[type='text'],
+        + input[type='email'],
+        + input[type='password'] {
             width: 100%;
         }
 
-        & + select {
+        + select {
             width: 174px;
             height: 36px;
             box-sizing: border-box;
@@ -124,15 +124,16 @@
     }
 
     &--reset {
+        // stylelint-disable-next-line declaration-no-important
         max-width: 320px !important;
 
         .add-on {
             width: 120px;
             font-size: 12px;
 
-            & + input[type="text"],
-            & + input[type="email"],
-            & + input[type="password"] {
+            + input[type='text'],
+            + input[type='email'],
+            + input[type='password'] {
                 width: 138px;
             }
         }

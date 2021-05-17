@@ -24,7 +24,7 @@
         min-width: 260px;
         padding-left: 0;
 
-        input[type="text"] {
+        input[type='text'] {
             width: 300px;
 
             margin-bottom: 0;
@@ -51,7 +51,7 @@
             top: 0;
             width: 28px;
 
-            &:empty:before {
+            &:empty::before {
                 font-size: 22px;
                 height: 22px;
             }
@@ -68,6 +68,7 @@
 }
 
 .search-grid {
+    // stylelint-disable-next-line selector-max-compound-selectors
     .table.grid tbody tr:first-child td {
         border-top: 0 none;
     }

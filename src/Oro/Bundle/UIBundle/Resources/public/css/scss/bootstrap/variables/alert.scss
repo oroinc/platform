@@ -12,7 +12,7 @@ $alert-dismissible-inner-offset-right: 30px !default;
 $alert-message-text-align: left !default;
 
 $alert-icon-inner-offset-left: 30px !default;
-$alert-icon-font-family: 'FontAwesome' !default;
+$alert-icon-font-family: $fa-font-family !default;
 $alert-icon-font-size: $base-font-size + 1 !default;
 $alert-icon-line-height: 1 !default;
 $alert-icon-position: absolute !default;

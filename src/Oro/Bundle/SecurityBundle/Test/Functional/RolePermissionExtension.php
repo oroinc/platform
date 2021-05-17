@@ -22,26 +22,11 @@ trait RolePermissionExtension
 {
     /**
      * @afterInitClient
+     * @beforeResetClient
      */
-    protected function clearAclCache()
+    public static function clearAclCache()
     {
-        $container = self::getContainer();
-        if (null !== $container && !self::isDbIsolationPerTest()) {
-            $container->get('tests.security.acl.cache.doctrine')->clearCache();
-        }
-    }
-
-    /**
-     * @after
-     */
-    protected function afterTest()
-    {
-        $container = self::getContainer();
-        if (null !== $container) {
-            $container->get('tests.security.acl.cache.doctrine')->clearCache();
-        }
-
-        parent::afterTest();
+        self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
     }
 
     /**

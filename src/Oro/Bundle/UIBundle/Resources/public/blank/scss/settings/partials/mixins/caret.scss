@@ -4,7 +4,7 @@
 // @param $size set caret size
 // @param $color set caret color
 @mixin custom-caret($size: 4px, $color: null) {
-    &:after {
+    &::after {
         content: '';
         display: inline-block;
         width: 0;

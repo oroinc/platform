@@ -309,9 +309,6 @@ class DigitalAssetAwareFileStrategyEventListener
     public function preFlush(PreFlushEventArgs $args): void
     {
         $entityManager = $args->getEntityManager();
-        if (!$entityManager->getMetadataFactory()->hasMetadataFor(DigitalAsset::class)) {
-            return;
-        }
 
         foreach ($this->filesWithDigitalAssetsToPersist as $file) {
             if (!$entityManager->contains($file)) {

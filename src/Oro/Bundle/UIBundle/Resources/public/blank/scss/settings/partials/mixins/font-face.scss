@@ -4,9 +4,11 @@
 @mixin font-face($font-family, $file-path, $font-weight, $font-style, $font-formats, $font-display: swap) {
     @font-face {
         font-family: $font-family;
+
         @if ($font-formats) {
             $src: null;
             $url: null;
+
             @each $font-format in $font-formats {
                 $i: index($font-formats, $font-format);
 
@@ -140,6 +142,7 @@
                     @if (map_has_key($font-variants, 'weight')) {
                         $font-weigh: map_get($font-variants, 'weight');
                     }
+
                     @if (map_has_key($font-variants, 'style')) {
                         $font-style: map_get($font-variants, 'style');
                     }
@@ -156,6 +159,7 @@
                         @if (map_has_key($font-variant, 'weight')) {
                             $font-weigh: map_get($font-variant, 'weight');
                         }
+
                         @if (map_has_key($font-variant, 'style')) {
                             $font-style: map_get($font-variant, 'style');
                         }

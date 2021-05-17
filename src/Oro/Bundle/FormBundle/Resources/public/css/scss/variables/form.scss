@@ -20,7 +20,7 @@ $entities-list-group-item-header-inner-offset-end: $content-padding-medium !defa
 
 $entities-list-group-item-title-offset: 0 !default;
 $entities-list-group-item-title-font-size: $base-font-size !default;
-$entities-list-group-item-title-font-weight: bold !default;
+$entities-list-group-item-title-font-weight: font-weight('bold') !default;
 $entities-list-group-item-title-align-self: center !default;
 $entities-list-group-item-title-overflow: hidden !default;
 
@@ -52,13 +52,13 @@ $control-group-collapsible-display: inline-block !default;
 $control-group-collapsible-collapse-action-color: #727272 !default;
 $control-group-collapsible-collapse-action-font-size: 13px !default;
 $control-group-collapsible-collapse-action-font-family: $font-family-sans-serif !default;
-$control-group-collapsible-collapse-action-font-weight: bold !default;
+$control-group-collapsible-collapse-action-font-weight: font-weight('bold') !default;
 
 $control-group-collapsible-collapse-action-icon-content: '−' !default;
 $control-group-collapsible-collapse-action-icon-display: inline-block !default;
 $control-group-collapsible-collapse-action-icon-width: 13px !default;
 $control-group-collapsible-collapse-action-icon-height: 13px !default;
-$control-group-collapsible-collapse-action-icon-font-weight: normal !default;
+$control-group-collapsible-collapse-action-icon-font-weight: font-weight('normal') !default;
 $control-group-collapsible-collapse-action-icon-border: 1px solid #c3c3c3 !default;
 $control-group-collapsible-collapse-action-icon-offset-right: 8px !default;
 $control-group-collapsible-collapse-action-icon-font-size: 12px !default;

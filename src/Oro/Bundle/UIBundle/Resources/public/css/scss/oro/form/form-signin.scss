@@ -1,8 +1,10 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 /* Login + Forgot Password */
 .login-page {
-    background: url('#{$global-url}/oroui/img/background.jpg') no-repeat 50% 50% #fff;
+    background: url('#{$global-url}/oroui/img/background.jpg') no-repeat 50% 50% $primary-inverse;
     background-size: cover;
     height: 100%;
     min-height: 280px;
@@ -22,7 +24,7 @@
     width: 515px;
     max-width: 515px;
     min-height: 100vh;
-    background: rgba(255, 255, 255, .8);
+    background: rgba($primary-inverse, .8);
     padding: 30px 0;
     display: flex;
     flex-direction: column;
@@ -90,7 +92,7 @@
             background: url('#{$global-url}/oroui/img/vertical-divider.png') no-repeat;
             width: 2px;
             height: 28px;
-            margin: 0 10px 0;
+            margin: 0 10px;
         }
 
         .oro-title {
@@ -98,15 +100,15 @@
             font-size: 22px;
             line-height: 28px;
             margin: 0;
-            text-shadow: 1px 1px 1px #000;
+            text-shadow: 1px 1px 1px $primary;
 
             a {
-                color: #fff;
+                color: $primary-inverse;
             }
         }
 
         .title {
-            font: bold 18px/1 $font-family-sans-serif;
+            font: font-weight('bold') 18px/1 $font-family-sans-serif;
             color: $primary-200;
             margin: 0;
         }
@@ -125,7 +127,7 @@
     .oro-hint {
         margin: 0 0 $form-container-control-row-space;
 
-        opacity: 0.9;
+        opacity: .9;
     }
 
     .add-on {
@@ -136,12 +138,13 @@
         border: none;
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
+    input[type='text'],
+    input[type='email'],
+    input[type='password'],
     select {
+        // stylelint-disable-next-line selector-no-vendor-prefix
         &:-ms-input-placeholder {
-            color: #999;
+            color: $primary-600;
         }
     }
 
@@ -155,7 +158,7 @@
 
     .forgot-pass {
         float: left;
-        font-weight: bold;
+        font-weight: font-weight('bold');
         margin: 9px 10px 0 0;
     }
 
@@ -230,6 +233,8 @@
         }
 
         .input-field-group {
+            margin-bottom: 8px;
+
             .input {
                 margin-bottom: 0;
             }
@@ -248,10 +253,6 @@
 
         .extra-submit {
             margin-bottom: 4px;
-        }
-
-        .input-field-group {
-            margin-bottom: 8px;
         }
 
         .field-set,
@@ -279,9 +280,9 @@
         .add-on {
             width: 155px;
 
-            & + input[type="text"],
-            & + input[type="password"],
-            & + select {
+            + input[type='text'],
+            + input[type='password'],
+            + select {
                 width: calc(100% - 178px);
             }
         }
@@ -300,7 +301,7 @@
 
 .login-copyright {
     font-size: 12px;
-    color: #b3b3b3;
+    color: $additional-lighten;
     text-align: center;
     padding: 0 16px;
 }

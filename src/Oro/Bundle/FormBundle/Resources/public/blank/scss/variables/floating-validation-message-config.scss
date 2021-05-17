@@ -5,6 +5,7 @@ $floating-validation-message-bottom: auto !default;
 
 $floating-validation-message-after-top: 100% !default;
 $floating-validation-message-after-left: 10px !default;
+$floating-validation-message-after-left: get-color('ui', 'error') transparent !default;
 
 $floating-validation-message-label-top: -24px !default;
 $floating-validation-message-label-left: 0 !default;

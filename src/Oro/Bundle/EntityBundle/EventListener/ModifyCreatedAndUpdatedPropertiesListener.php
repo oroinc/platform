@@ -9,17 +9,19 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
-use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInterface
+/**
+ * Update createdAt/updatedAt for entities
+ */
+class ModifyCreatedAndUpdatedPropertiesListener
 {
+    use OptionalListenerTrait;
+
     /** @var TokenStorageInterface */
     protected $tokenStorage;
-
-    /** @var bool */
-    protected $enabled = true;
 
     /**
      * @param TokenStorageInterface $tokenStorage
@@ -27,14 +29,6 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

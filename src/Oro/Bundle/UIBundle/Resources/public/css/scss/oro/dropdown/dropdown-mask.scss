@@ -11,10 +11,11 @@
     min-width: 100%;
     height: auto;
     width: auto;
-    opacity: 0;
     z-index: $zindex-dropdown - 101;
-    background-color: #fff;
+    background-color: $primary-inverse;
 
+    opacity: 0;
     // opacity should not be zero for valid scroll work on IOS
+    /* stylelint-disable-nex-line declaration-block-no-duplicate-properties */
     opacity: .001;
 }

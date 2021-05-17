@@ -23,13 +23,13 @@
             text-align: left;
         }
 
-        &-actions {
-            &__menu {
-                &--inline {
-                    display: flex;
-                    font-size: 14px;
-                    line-height: 14px;
-                }
+        &-actions__menu--inline {
+            display: flex;
+            font-size: 14px;
+            line-height: 14px;
+
+            .action {
+                color: $secondary;
             }
         }
 
@@ -48,16 +48,8 @@
             }
         }
 
-        &-actions__menu {
-            &--inline {
-                .action {
-                    color: $secondary;
-                }
-            }
-        }
-
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             display: inline-block;
             text-align: center;
             margin: 0 12px 0 -4px;

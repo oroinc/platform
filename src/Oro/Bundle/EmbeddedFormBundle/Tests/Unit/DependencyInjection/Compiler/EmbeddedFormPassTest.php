@@ -44,7 +44,7 @@ class EmbeddedFormPassTest extends \PHPUnit\Framework\TestCase
             [
                 ['addFormType', ['type', 'label']],
                 ['addFormType', ['type_2', 'type_2']],
-                ['addFormType', ['service_3', 'service_3']]
+                ['addFormType', ['service_3', 'service_3']],
             ],
             $container->getDefinition('oro_embedded_form.manager')->getMethodCalls()
         );

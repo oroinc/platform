@@ -18,9 +18,9 @@ $jstree-default-ocl-background: transparent !default;
 
 $jstree-themeicon-display: none !default;
 
-$jstree-open-font-family: 'FontAwesome' !default;
+$jstree-open-font-family: $fa-font-family !default;
 $jstree-open-font-size: 15px !default;
-$jstree-open-font-weight: normal !default;
+$jstree-open-font-weight: font-weight('normal') !default;
 $jstree-open-font-style: normal !default;
 $jstree-open-color: $primary-550 !default;
 
@@ -51,7 +51,7 @@ $jstree-anchor-active-color: $tree-link-color !default;
 $jstree-wholerow-transition: none !default;
 
 $jstree-search-font-style: normal !default;
-$jstree-search-font-weight: normal !default;
+$jstree-search-font-weight: font-weight('normal') !default;
 
 $jstree-icon-checkbox-display: inline-block !default;
 $jstree-icon-checkbox-height: 16px !default;
@@ -72,11 +72,11 @@ $jstree-icon-checkbox-icon-transform: translate(-50%, -50%) !default;
 $jstree-icon-checkbox-icon-offset-left: -1px !default;
 $jstree-icon-checkbox-icon-font-size: 10px !default;
 $jstree-icon-checkbox-icon-line-height: 1 !default;
-$jstree-icon-checkbox-icon-font-family: FontAwesome !default;
+$jstree-icon-checkbox-icon-font-family: $fa-font-family !default;
 
 $jstree-checked-background: $secondary !default;
 $jstree-checked-border-color: $secondary !default;
-$jstree-checked-content: "\f00c" !default;
+$jstree-checked-content: '\f00c' !default;
 
 $jstree-loading-inner-offset: $content-padding - 4px !default;
 

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageBuilderInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Indicate that cached messages buffer is enabled and get messages from cached buffer
@@ -15,14 +16,10 @@ class MockLifecycleMessageProducer implements MessageProducerInterface
     /** @var MessageProducerInterface */
     private $innerProducer;
 
-    /** @var Cache */
+    /** @var PdoAdapter */
     private $cache;
 
-    /**
-     * @param MessageProducerInterface $producer
-     * @param Cache $cache
-     */
-    public function __construct(MessageProducerInterface $producer, Cache $cache)
+    public function __construct(MessageProducerInterface $producer, PdoAdapter $cache)
     {
         $this->innerProducer = $producer;
         $this->cache = $cache;
@@ -45,36 +42,13 @@ class MockLifecycleMessageProducer implements MessageProducerInterface
         }
 
         $message->setDelay(null);
-        $message->setMessageId(uniqid('oro.', true));
-        $this->saveCache($message->getMessageId());
+        $message->setMessageId(uniqid($topic.'.', true));
+
+        /** @var CacheItemInterface $item */
+        $item = $this->cache->getItem($message->getMessageId());
+        $item->set($message->getMessageId());
+        $this->cache->save($item);
 
         $this->innerProducer->send($topic, $message);
-    }
-
-    /**
-     * @param string $messageId
-     */
-    private function saveCache($messageId)
-    {
-        $messages = $this->getSendMessages();
-        $messages[$messageId] = true;
-        $this->cache->save('send_messages', serialize($messages));
-    }
-
-    /**
-     * @return array
-     */
-    private function getSendMessages()
-    {
-        if (!$this->cache->contains('send_messages')) {
-            return [];
-        }
-
-        $messages = unserialize($this->cache->fetch('send_messages'));
-        if (!is_array($messages)) {
-            return [];
-        }
-
-        return $messages;
     }
 }

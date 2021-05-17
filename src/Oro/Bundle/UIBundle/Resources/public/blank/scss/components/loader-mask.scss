@@ -1,25 +1,5 @@
 /* @theme: blank; */
 
-body.loading {
-    // @TODO: Remove this fix when Apple fix caret placement bug
-    top: 0 !important;
-
-    > .loader-mask {
-        position: fixed;
-        z-index: z('fixed');
-    }
-}
-
-.loading {
-    position: relative;
-
-    > .loader-mask {
-        &.shown {
-            display: block;
-        }
-    }
-}
-
 .view-loading {
     height: $loader-mask-view-loading-height;
 }
@@ -45,8 +25,8 @@ body.loading {
         padding: $loader-mask-frame-offset-inner;
 
         font-size: $base-font-size;
-        font-weight: bold;
-        line-height:  24px;
+        font-weight: font-weight('bold');
+        line-height: 24px;
 
         background: $loader-mask-frame-bg;
         border: $loader-mask-frame-border;
@@ -68,9 +48,30 @@ body.loading {
 
     background: $loader-mask-overlay-bg;
 
-    opacity: 0.2;
+    opacity: .2;
 }
 
 .loader-content {
     text-align: $loader-mask-loader-content-align;
+}
+
+.loading {
+    position: relative;
+
+    > .loader-mask {
+        &.shown {
+            display: block;
+        }
+    }
+}
+
+body.loading {
+    // Remove this fix when Apple fix caret placement bug
+    // stylelint-disable-next-line declaration-no-important
+    top: 0 !important;
+
+    > .loader-mask {
+        position: fixed;
+        z-index: z('fixed');
+    }
 }

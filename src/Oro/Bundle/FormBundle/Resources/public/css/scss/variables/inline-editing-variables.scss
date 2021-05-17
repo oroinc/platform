@@ -4,7 +4,8 @@ $inline-editor-actions-inner-offset: $input-border-width !default;
 
 $inline-editor-action-item-color: $primary-200 !default;
 $inline-editor-action-item-color-hover: $additional-dark !default;
-$inline-editor-action-item-color-disabled: $primary-700 !default; //    closest to #68686a 0.5 opacity
+// closest to #68686a 0.5 opacity
+$inline-editor-action-item-color-disabled: $primary-700 !default;
 
 $inline-editor-action-item-fields-last-offset: 66px !default;
 $inline-editor-inner-offset: -$inline-editor-action-item-fields-last-offset !default;
@@ -43,3 +44,5 @@ $inline-editor-text-editor-bottom: 0 !default;
 $inline-editor-inner-fields-height: 100% !default;
 $inline-editor-inner-outer-offset: 68px !default;
 $inline-editor-inner-textarea-offset: 11px $inline-editor-inner-outer-offset 11px 9px !default;
+
+$inline-editor-checkboxes-shadow: 0 4px 5px rgba(0, 0, 0, .15) !default;

@@ -1,17 +1,18 @@
 /* @theme: blank; */
 
 .select {
-    @include base-ui-element($use-base-style-for-select,
-                             $select-padding,
-                             $select-font-size,
-                             $select-font-family,
-                             $select-line-height,
-                             $select-border,
-                             $select-border-radius,
-                             $select-background-color,
-                             $select-color,
-                             $select-disable-platform-style
-                            );
+    @include base-ui-element(
+        $use-base-style-for-select,
+        $select-padding,
+        $select-font-size,
+        $select-font-family,
+        $select-line-height,
+        $select-border,
+        $select-border-radius,
+        $select-background-color,
+        $select-color,
+        $select-disable-platform-style
+    );
 
     background: $select-bg;
 
@@ -43,9 +44,9 @@
 
 @-moz-document url-prefix() {
     .select {
-    /**
-     * Set fixed height for Firefox
-     */
+        /**
+        *  Set fixed height for Firefox
+        */
         height: $select-firefox-height;
         line-height: $select-firefox-line-height;
         padding-top: $select-firefox-inner-offset-top;

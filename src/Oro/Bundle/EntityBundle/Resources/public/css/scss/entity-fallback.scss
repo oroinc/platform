@@ -10,6 +10,7 @@
 
     &__use {
         min-width: 40%;
+
         @include text-line-truncate($max-width: 40%);
 
         padding-right: $content-padding-small;
@@ -26,7 +27,7 @@
 
         @include selector-width(100%);
 
-        input[type="text"] {
+        input[type='text'] {
             width: 100%;
         }
     }

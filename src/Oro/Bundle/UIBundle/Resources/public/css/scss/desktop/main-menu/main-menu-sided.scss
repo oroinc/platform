@@ -15,6 +15,7 @@
 
         .title {
             @include text-line-truncate();
+
             display: block;
         }
 
@@ -38,7 +39,7 @@
             .accordion-toggle {
                 color: $menu-item-text-color;
 
-                &:before {
+                &::before {
                     content: '';
 
                     display: inline-block;
@@ -46,7 +47,7 @@
                     min-width: 16px;
                     margin-right: 8px;
 
-                    font-weight: normal;
+                    font-weight: font-weight('light');
                     line-height: 1;
                     text-align: center;
 
@@ -57,14 +58,14 @@
             }
 
             .accordion-toggle {
-                font-weight: bold;
+                font-weight: font-weight('bold');
 
                 @include fa-icon($menu-icon, before, true, true) {
                     transform: rotate(90deg);
                 }
 
                 &.collapsed {
-                    font-weight: normal;
+                    font-weight: font-weight('light');
 
                     &::before {
                         transform: rotate(0);
@@ -81,6 +82,7 @@
                 }
 
                 $menu-title-offset: 0;
+
                 @for $i from 1 through 5 {
                     $selector: '&-level-' + $i;
 
@@ -101,7 +103,7 @@
     .accordion-body {
         background-color: $menu-dropdown-background-color;
 
-        & > a {
+        > a {
             display: none;
         }
 
@@ -165,7 +167,6 @@
             width: $menu-side-width-minimized;
 
             .dropdown-menu {
-
                 display: none;
             }
 

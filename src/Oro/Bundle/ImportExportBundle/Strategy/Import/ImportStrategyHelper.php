@@ -269,10 +269,7 @@ class ImportStrategyHelper
      */
     public function importEntity($basicEntity, $importedEntity, array $excludedProperties = [])
     {
-        $basicEntityClass = ClassUtils::getClass($basicEntity);
-        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
-            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
-        }
+        $basicEntityClass = $this->verifyClass($basicEntity, $importedEntity);
 
         $entityProperties = $this->getEntityPropertiesByClassName($basicEntityClass);
         $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
@@ -371,7 +368,7 @@ class ImportStrategyHelper
      *
      * @return array
      */
-    private function getEntityPropertiesByClassName($entityClassName)
+    protected function getEntityPropertiesByClassName($entityClassName)
     {
         /**
          * In case if we work with configured entities then we should use fieldHelper
@@ -417,5 +414,15 @@ class ImportStrategyHelper
         }
 
         return $rowNumber;
+    }
+
+    protected function verifyClass($basicEntity, $importedEntity): string
+    {
+        $basicEntityClass = ClassUtils::getClass($basicEntity);
+        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
+            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
+        }
+
+        return $basicEntityClass;
     }
 }

@@ -36,17 +36,22 @@
         text-overflow: ellipsis;
         overflow: hidden;
 
-        [class^="fa-"] {
+        [class^='fa-'] {
             float: left;
             margin-right: 5px;
             font-size: 13px;
             line-height: inherit;
 
-            &:before {
+            &::before {
                 margin: 0;
                 line-height: inherit;
             }
         }
+    }
+
+    .my-emails,
+    .from-name {
+        float: left;
     }
 
     .items {
@@ -73,15 +78,6 @@
                 top: 16px;
             }
 
-            .info {
-                min-height: 12px;
-
-                .title,
-                .empty-subject {
-                    cursor: pointer;
-                }
-            }
-
             .body {
                 padding-right: 20px;
 
@@ -98,6 +94,16 @@
                 overflow: hidden;
             }
 
+            .info {
+                min-height: 12px;
+
+                // stylelint-disable-next-line selector-max-compound-selectors
+                .title,
+                .empty-subject {
+                    cursor: pointer;
+                }
+            }
+
             .description {
                 color: $primary-550;
                 text-overflow: ellipsis;
@@ -111,6 +117,7 @@
                 margin-top: 12px;
                 line-height: 1.15;
 
+                // stylelint-disable-next-line selector-max-compound-selectors
                 .reply-action,
                 .reply-all-action,
                 .forward-action {
@@ -123,7 +130,7 @@
                 background: $email-highlight-bg;
 
                 .title {
-                    font-weight: bold;
+                    font-weight: font-weight('bold');
                 }
 
                 .description {
@@ -157,11 +164,6 @@
         color: $primary-400;
     }
 
-    .my-emails,
-    .from-name {
-        float: left;
-    }
-
     .mark-as-read,
     .mark-visible-as-read,
     .forward-action-wrapper {
@@ -170,6 +172,7 @@
     }
 }
 
+// stylelint-disable-next-line selector-max-compound-selectors
 .default-reply-action .items li .footer .reply-action,
 .default-reply-all-action .items li .footer .reply-all-action,
 .default-forward-action .items li .footer .forward-action {

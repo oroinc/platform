@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, scss/selector-no-redundant-nesting-selector */
+
 body {
     min-width: $width-body-page-mobile;
 }
@@ -35,7 +37,7 @@ body {
 }
 
 .scrollspy.container-fluid,
-.page-title + [data-bound-component*="datagrid"],
+.page-title + [data-bound-component*='datagrid'],
 .page-title + .product-container {
     .content-with-sidebar--container {
         padding: 0;
@@ -52,9 +54,12 @@ body {
     }
 }
 
-.page-title + [data-bound-component*="datagrid"] {
+.page-title + [data-bound-component*='datagrid'] {
     @include safe-area-property-left(padding-left, $content-padding, false);
     @include safe-area-property-right(padding-right, $content-padding, false);
+
+    padding-left: $content-padding;
+    padding-right: $content-padding;
 }
 
 .layout-content .responsive-section {
@@ -119,7 +124,17 @@ body {
 }
 
 .responsive-cell .box-type1 {
+    margin: 0;
+
+    .container-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
     .filter-box {
+        max-width: 100%;
+        width: 100%;
+
         .btn-group {
             margin-bottom: 0;
         }
@@ -150,20 +165,6 @@ body {
                 padding-left: $content-padding;
                 padding-right: $content-padding;
             }
-        }
-    }
-
-    .box-type1 {
-        margin: 0;
-
-        .filter-box {
-            max-width: 100%;
-            width: 100%;
-        }
-
-        .container-fluid {
-            padding-left: 0;
-            padding-right: 0;
         }
     }
 }
@@ -201,16 +202,12 @@ form > .layout-content {
     }
 }
 
-.page-title + [data-bound-component*="datagrid"] {
-    padding-left: $content-padding;
-    padding-right: $content-padding;
-}
-
 .oro-page {
     &.collapsible-sidebar {
         @media only screen and (min-width: 820px) {
             .oro-page-sidebar {
                 > .dropdown-menu {
+                    // stylelint-disable-next-line declaration-no-important
                     display: block !important;
                     z-index: inherit;
                 }
@@ -226,7 +223,7 @@ form > .layout-content {
                 width: 100%;
 
                 > .dropdown-toggle:focus {
-                    font-weight: normal;
+                    font-weight: font-weight('normal');
                 }
 
                 > .dropdown-toggle {
@@ -242,9 +239,9 @@ form > .layout-content {
                     padding: 5px 0;
                     margin: 2px 0 0;
                     background-color: $primary-inverse;
-                    border: 1px solid rgba(0, 0, 0, .2);
+                    border: $oro-page-sidebar-dropdown-menu-border;
                     border-radius: 6px;
-                    box-shadow: 0 5px 10px rgba(0, 0, 0, .2);
+                    box-shadow: $oro-page-sidebar-dropdown-menu-box-shadow;
 
                     > li {
                         width: auto;

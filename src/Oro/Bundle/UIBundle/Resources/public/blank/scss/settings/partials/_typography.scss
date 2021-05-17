@@ -17,7 +17,7 @@ $theme-fonts: (
     )
 ) !default;
 
-$base-font: Arial, sans-serif !default;
+$base-font: arial, sans-serif !default;
 
 // include in assets
 $icon-font: 'FontAwesome' !default;
@@ -34,15 +34,24 @@ $base-line-height: 1.35 !default;
 
 // Fonts weights
 $font-weights: (
-    'thin': 100, // Thin (Hairline)
-    'extra': 200, // Extra Light (Ultra Light)
-    'light': 300, // Light
-    'normal': 400, // Normal
-    'medium': 500, // Medium
-    'semi-bold': 600, // Semi Bold (Demi Bold)
-    'bold': 700, // Bold
-    'extra-bold': 800, // Extra Bold (Ultra Bold)
-    'black': 900 // Black (Heavy)
+    // Thin (Hairline)
+    'thin': 100,
+    // Extra Light (Ultra Light)
+    'extra': 200,
+    // Light
+    'light': 300,
+    // Normal
+    'normal': 400,
+    // Medium
+    'medium': 500,
+    // Semi Bold (Demi Bold)
+    'semi-bold': 600,
+    // Bold
+    'bold': 700,
+    // Extra Bold (Ultra Bold)
+    'extra-bold': 800,
+    // Black (Heavy)
+    'black': 900
 ) !default;
 
 // Font smoothing

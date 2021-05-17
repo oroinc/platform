@@ -13,6 +13,7 @@ use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -22,6 +23,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class IndexListener implements OptionalListenerInterface
 {
+    use OptionalListenerTrait;
+
     /**
      * @var DoctrineHelper
      */
@@ -48,11 +51,6 @@ class IndexListener implements OptionalListenerInterface
     protected $deletedEntities = [];
 
     /**
-     * @var bool
-     */
-    protected $enabled = true;
-
-    /**
      * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
@@ -73,14 +71,6 @@ class IndexListener implements OptionalListenerInterface
         $this->doctrineHelper   = $doctrineHelper;
         $this->searchIndexer    = $searchIndexer;
         $this->propertyAccessor = $propertyAccessor;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

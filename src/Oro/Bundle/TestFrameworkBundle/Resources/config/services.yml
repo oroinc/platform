@@ -1,3 +1,7 @@
+parameters:
+    optional_search_listeners:
+        - 'oro_search.index_listener'
+
 services:
     _defaults:
         public: true

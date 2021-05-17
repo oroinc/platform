@@ -13,15 +13,17 @@ use Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Client\FileDownloader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailContext extends OroFeatureContext implements KernelAwareContext
+class EmailContext extends OroFeatureContext implements KernelAwareContext, MessageQueueProcessorAwareInterface
 {
-    use AssertTrait, KernelDictionary;
+    use AssertTrait, KernelDictionary, MessageQueueProcessorAwareTrait;
 
     /** @var DirectMailerDecorator */
     private $mailer;
@@ -634,8 +636,10 @@ class EmailContext extends OroFeatureContext implements KernelAwareContext
      */
     private function getSentMessages(DirectMailerDecorator $mailer): array
     {
+        $this->messageQueueProcessor->waitWhileProcessingMessages();
+
         return $this->spin(static function () use ($mailer) {
             return $mailer->getSentMessages() ?: null;
-        }, 30) ?? [];
+        }) ?? [];
     }
 }

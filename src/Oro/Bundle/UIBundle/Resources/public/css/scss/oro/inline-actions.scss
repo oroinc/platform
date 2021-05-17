@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .inline-actions-element {
     display: inline-flex;
     align-items: flex-start;
@@ -33,9 +35,11 @@
 
     &.truncate {
         display: inline-flex;
+
         .inline-actions-element_wrapper {
             padding: 0;
             margin: 0;
+
             @include text-line-truncate(200px, true);
         }
     }
@@ -49,7 +53,7 @@
     line-height: 1.15;
 
     .btn {
-        font: 0/0 a;
+        font: 0/0 a, sans-serif;
         width: 20px;
         height: 20px;
         padding: 0;
@@ -66,15 +70,15 @@
             box-shadow: none;
         }
 
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             width: 14px;
             height: 20px;
             margin: 0 1px;
             line-height: 1;
 
-            &:before {
-                font: $base-font-size/26px 'FontAwesome';
+            &::before {
+                font: $base-font-size/26px $fa-font-family;
                 color: $inline-action-color;
                 font-size: 15px;
                 line-height: 22px;

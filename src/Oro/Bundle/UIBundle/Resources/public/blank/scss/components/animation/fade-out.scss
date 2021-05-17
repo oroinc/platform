@@ -6,17 +6,6 @@
     animation-fill-mode: both;
 }
 
-// Remove -webkit- version after fix scss builder
-@-webkit-keyframes fade-out {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
-}
-
 @keyframes fade-out {
     from {
         opacity: 1;

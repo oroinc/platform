@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .side-menu-overlay {
     $overlay-header-offset-start: 16px !default;
     $overlay-header-offset-end: 32px !default;
@@ -149,7 +151,7 @@
     }
 
     &__fill-blur-inner::after {
-        background-color: rgba($primary-inverse, .5);
+        background-color: $side-menu-overlay-ui-fill-background-color;
     }
 
     .menu {
@@ -160,7 +162,7 @@
 
         max-height: inherit;
         max-width: inherit;
-        min-height: 340px;;
+        min-height: 340px;
         height: inherit;
         margin: 0;
         padding: 0;
@@ -179,7 +181,7 @@
         &:not(.ui-helper) {
             position: relative;
 
-            &:before {
+            &::before {
                 position: absolute;
                 top: 0;
                 right: 0;

@@ -4,7 +4,7 @@
     border-color: $input-disabled-border-color;
     background-color: $input-disabled-background-color;
     color: $input-disabled-color;
-    resize: $input-disabled-resize
+    resize: $input-disabled-resize;
 }
 
 %base-input {
@@ -59,15 +59,15 @@
         display: none;
     }
 
-    .control-group & {
-        margin-bottom: $input-control-group-outer-offset-bottom;
-    }
-
     @include placeholder {
         color: $primary-700;
     }
 
     td & {
         margin-bottom: 0;
+    }
+
+    .control-group & {
+        margin-bottom: $input-control-group-outer-offset-bottom;
     }
 }

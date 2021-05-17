@@ -17,9 +17,9 @@
     .dropdown-menu {
         cursor: default;
         text-align: left;
-        font-weight: normal;
+        font-weight: font-weight('light');
         padding: 22px $content-padding 25px;
-        border-color: #ccc;
+        border-color: $additional-extra-light;
         min-width: 300px;
 
         .close {
@@ -33,11 +33,19 @@
         font-size: $datagrid-settings-title-font-size;
         line-height: $datagrid-settings-title-line-height;
         margin: $datagrid-settings-title-offset;
-        font-weight: 700;
+        font-weight: font-weight('bold');
     }
 
     &__tabs {
         border-bottom: none;
+    }
+
+    &-right-flap {
+        position: absolute;
+        left: 100%;
+        width: 22px;
+        top: 27px;
+        bottom: 0;
     }
 
     &__wrapper {
@@ -57,12 +65,12 @@
                 top: auto;
                 bottom: 0;
 
-                &:before {
+                &::before {
                     top: auto;
                     bottom: 6px;
                 }
 
-                &:after {
+                &::after {
                     top: auto;
                     bottom: 7px;
                 }
@@ -103,7 +111,7 @@
                 .btn.move-down {
                     padding: 0;
 
-                    [class^="fa-"] {
+                    [class^='fa-'] {
                         margin: 0;
                     }
                 }
@@ -188,6 +196,7 @@
                     padding: 0 16px;
                     overflow: hidden;
 
+                    // stylelint-disable-next-line selector-max-compound-selectors
                     span {
                         padding: 0;
                         line-height: 0;
@@ -200,7 +209,7 @@
     &-title {
         font-size: $base-font-size--l;
         line-height: $base-font-size--l;
-        font-weight: bold;
+        font-weight: font-weight('bold');
         margin-bottom: -3px;
     }
 
@@ -214,7 +223,7 @@
             &:not(:last-of-type) {
                 margin-right: 3px;
 
-                &:after {
+                &::after {
                     content: '';
                     width: 1px;
                     height: 12px;
@@ -232,7 +241,7 @@
     }
 
     &-search {
-        margin: 15px 0 12px 0;
+        margin: 15px 0 12px;
         position: relative;
 
         input {
@@ -241,9 +250,9 @@
             padding: 4px 8px;
         }
 
-        &.empty:after {
-            content: "\f002";
-            font-family: FontAwesome;
+        &.empty::after {
+            content: '\f002';
+            font-family: $fa-font-family;
             font-size: $base-font-size * 1.15;
             color: lighten($btn-text-color, 15%);
             position: absolute;
@@ -260,7 +269,7 @@
             margin-top: -10px;
             z-index: 1;
             font-size: $base-font-size * 1.15;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             line-height: 20px;
             color: lighten($btn-text-color, 15%);
 
@@ -291,13 +300,5 @@
 
     .no-data {
         padding-top: $datagrid-settings-table-offset-top;
-    }
-
-    &-right-flap {
-        position: absolute;
-        left: 100%;
-        width: 22px;
-        top: 27px;
-        bottom: 0;
     }
 }

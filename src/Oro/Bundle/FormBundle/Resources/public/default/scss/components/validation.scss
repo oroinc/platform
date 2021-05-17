@@ -3,7 +3,7 @@
 .validation-failed,
 .validation-error,
 .validation-passed,
-.validation-warning{
+.validation-warning {
     @extend .notification;
 
     &--lite {
@@ -52,7 +52,7 @@
 
 .controls {
     &.validation-error {
-        &:before {
+        &::before {
             content: none;
         }
     }
@@ -60,7 +60,7 @@
 
 .input-widget-select {
     &.error {
-        border: 1px solid get-color('ui', 'error-dark');
-        box-shadow: 0 1px 7px 0 rgba(223,96,96,.6);
+        border: $input-widget-select-error-border;
+        box-shadow: $input-widget-select-error-box-shadow;
     }
 }

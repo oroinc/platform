@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .inner-permissions-grid {
     .oro-datagrid {
         margin: 0;
@@ -11,7 +13,8 @@
     }
 
     .grid-header-cell:first-child {
-        width: $role-collapse-action-container-width + $capabilities-offset; // plus grid-header inner offset
+        // plus grid-header inner offset
+        width: $role-collapse-action-container-width + $capabilities-offset;
     }
 
     .collapse-expand-action-container {
@@ -72,6 +75,7 @@
         min-width: $role-collapse-action-container-width;
     }
 }
+
 .field-less .collapse-action {
     display: none;
 }
@@ -90,7 +94,8 @@
 
     + .collapsing,
     + .collapse {
-        padding-top: $entity-permission-collapse-offset; // datagrid row bottom offset
+        // datagrid row bottom offset
+        padding-top: $entity-permission-collapse-offset;
     }
 }
 
@@ -186,7 +191,7 @@
         @include text-line-truncate($action-permissions-toggle-trim-width, true);
 
         &:focus {
-            font-weight: normal;
+            font-weight: font-weight('light');
         }
     }
 }
@@ -195,6 +200,7 @@
     a.role-permissions-action-launcher {
         &:hover,
         &:focus {
+            // stylelint-disable-next-line declaration-no-important
             background: transparent !important;
         }
     }

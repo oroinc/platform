@@ -87,6 +87,7 @@
                 line-height: 1.25;
                 text-align: left;
 
+                // stylelint-disable-next-line selector-max-compound-selectors
                 .desktop-version & {
                     margin-right: $btn-icon-width + 4 - $content-padding;
                 }
@@ -114,6 +115,7 @@
         }
 
         .group-label {
+            // stylelint-disable-next-line declaration-no-important
             width: auto !important;
         }
 

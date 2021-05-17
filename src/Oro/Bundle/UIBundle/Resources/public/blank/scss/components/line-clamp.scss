@@ -5,7 +5,8 @@
 
     display: $line-clamp-display;
     -webkit-line-clamp: $line-clamp-line-clamp;
-    -webkit-box-orient: $line-clamp-box-orient;
+    // stylelint-disable-next-line property-no-unknown
+    box-orient: $line-clamp-box-orient;
 
     &-polyfill {
         position: $line-clamp-polyfill-position;
@@ -14,7 +15,7 @@
 
         overflow: $line-clamp-polyfill-overflow;
 
-        &:after {
+        &::after {
             top: $line-clamp-polyfill-after-top;
             right: $line-clamp-polyfill-after-right;
 

@@ -4,6 +4,8 @@ $email-header-offset: 8px 0 0 0 !default;
 
 $email-dropdown-bg: $primary-inverse !default;
 
+$email-dropdown-box-shadow: 0 4px 30px 0 rgba(0, 0, 0, .5) !default;
+
 $email-default-text-color: $primary-200 !default;
 
 $email-highlight-bg: $extra-300 !default;
@@ -46,6 +48,6 @@ $email-short-color: $primary-550 !default;
 $email-short-sent-date-margin: 8px !default;
 
 $email-short-author-color: $primary-300 !default;
-$email-short-author-font-weight: bold !default;
+$email-short-author-font-weight: font-weight('bold') !default;
 
 $email-short-comment-date-font-size: $base-font-size--s !default;

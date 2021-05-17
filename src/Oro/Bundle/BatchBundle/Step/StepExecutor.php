@@ -259,7 +259,7 @@ class StepExecutor
                 ? $element->getName()
                 : get_class($element);
 
-            $item = null;
+            $item = [];
             $reasonParameters = [];
             if ($e instanceof InvalidItemException) {
                 $item = $e->getItem();

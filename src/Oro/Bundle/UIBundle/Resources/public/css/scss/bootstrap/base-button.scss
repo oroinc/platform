@@ -54,17 +54,17 @@
         }
     }
 
-    [class*="fa-"] {
+    [class*='fa-'] {
         font-size: $btn-fa-icon-font-size;
         line-height: $btn-fa-icon-line-height;
         vertical-align: $btn-fa-icon-vertical-align;
     }
 
-    &:not(.btn-icon) [class*="fa-"] {
+    &:not(.btn-icon) [class*='fa-'] {
         margin: $btn-not-btn-icon-fa-offset;
     }
 
-    &.icon-end:not(.btn-icon) [class^="fa-"] {
+    &.icon-end:not(.btn-icon) [class^='fa-'] {
         margin: $btn-not-btn-icon-end-fa-offset;
     }
 }

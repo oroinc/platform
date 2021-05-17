@@ -1,14 +1,14 @@
 /* @theme: admin.oro; */
 
-@import "app-header";
-@import "dashboard";
-@import "email-notification-menu";
-@import "short-emails-list";
-@import "sidebar-widget";
-@import "email-detailed-info-table";
-@import "email-detail-info";
-@import "icon-email-thread";
-@import "style";
+@import 'app-header';
+@import 'dashboard';
+@import 'email-notification-menu';
+@import 'short-emails-list';
+@import 'sidebar-widget';
+@import 'email-detailed-info-table';
+@import 'email-detail-info';
+@import 'icon-email-thread';
+@import 'style';
 
 // mobile
-@import "mobile/main";
+@import 'mobile/main';

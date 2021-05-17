@@ -5,6 +5,7 @@
 .select2-results .select2-result-label .aware-icon-block {
     height: 16px;
     width: 16px;
+    // stylelint-disable-next-line declaration-no-important
     background-size: contain !important;
     margin-right: 4px;
     vertical-align: middle;
@@ -18,5 +19,6 @@
 .select2-results .select2-result-label .aware-icon-block {
     position: relative;
     top: 3px;
+    // stylelint-disable-next-line declaration-no-important
     background-position: center !important;
 }

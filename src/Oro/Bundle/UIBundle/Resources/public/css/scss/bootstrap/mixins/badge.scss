@@ -4,16 +4,18 @@
     color: $color;
     background-color: $background;
 
-    [class^="fa-"],
-    [class*=" fa-"] {
+    [class^='fa-'],
+    [class*=' fa-'] {
         color: $icon-color;
     }
 
     &[href] {
         @include hover-focus {
+            $background-color: darken($background, 10%);
+
             color: $color;
             text-decoration: none;
-            background-color: darken($background, 10%);
+            background-color: $background-color;
         }
     }
 }

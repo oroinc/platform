@@ -9,7 +9,8 @@ $select-line-height: $base-ui-element-line-height !default;
 
 $select-padding: 8px 24px 8px 9px !default;
 
-$select-firefox-height: ($base-ui-element-border-size  * 2) + ($select-font-size * $select-line-height) + $offset-y !default;
+$select-firefox-height: ($base-ui-element-border-size  * 2) +
+    ($select-font-size * $select-line-height) + $offset-y !default;
 $select-firefox-line-height: #{$select-firefox-height} !important !default;
 $select-firefox-inner-offset-top: 0 !default;
 $select-firefox-inner-offset-bottom: 0 !default;

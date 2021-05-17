@@ -60,7 +60,7 @@
     .accordion-toggle {
         background: transparent;
 
-        &:before {
+        &::before {
             margin: 0;
         }
     }

@@ -1,41 +1,12 @@
 /* @theme: default; */
 
 .custom-checkbox {
-    &__input {
-        &:checked {
-            ~ .custom-checkbox__icon {
-                @include fa-icon($checkbox-icon-checked);
-            }
-        }
-
-        &:indeterminate {
-            ~ .custom-checkbox__icon {
-                @include fa-icon($checkbox-icon-indeterminate);
-            }
-        }
-
-        @include element-state('disabled') {
-            & ~ .custom-checkbox__icon {
-                background: $checkbox-icon-bg-color-disabled-state;
-                color: $checkbox-icon-color-disabled-state;
-                box-shadow: none;
-                border: $checkbox-icon-border-disabled-state;
-
-                @include base-disabled-style(.55);
-            }
-
-            & ~ .custom-checkbox__text {
-                @include base-disabled-style(.35);
-            }
-        }
-    }
-
     &__icon {
         position: relative;
 
-        color: get-color('additional', 'ultra');
+        color: $checkbox-icon-color;
 
-        &:before {
+        &::before {
             position: absolute;
             top: $checkbox-icon-check-top;
             left: $checkbox-icon-check-left;
@@ -55,7 +26,7 @@
             width: $checkbox-icon-font-size--l;
             height: $checkbox-icon-font-size--l;
 
-            &:before {
+            &::before {
                 font-size: $checkbox-icon-check-size--l;
             }
         }
@@ -63,6 +34,35 @@
 
     &__text {
         margin-left: $offset-x-s;
+    }
+
+    &__input {
+        &:checked {
+            ~ .custom-checkbox__icon {
+                @include fa-icon($checkbox-icon-checked);
+            }
+        }
+
+        &:indeterminate {
+            ~ .custom-checkbox__icon {
+                @include fa-icon($checkbox-icon-indeterminate);
+            }
+        }
+
+        @include element-state('disabled') {
+            ~ .custom-checkbox__icon {
+                background: $checkbox-icon-bg-color-disabled-state;
+                color: $checkbox-icon-color-disabled-state;
+                box-shadow: none;
+                border: $checkbox-icon-border-disabled-state;
+
+                @include base-disabled-style(.55);
+            }
+
+            ~ .custom-checkbox__text {
+                @include base-disabled-style(.35);
+            }
+        }
     }
 
     &.absolute {
