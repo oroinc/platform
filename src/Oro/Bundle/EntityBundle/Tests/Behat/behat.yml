@@ -9,7 +9,3 @@ oro_behat_extension:
         - OroUserBundle::FeatureContext
       paths:
         - '@OroEntityBundle/Tests/Behat/Features'
-
-  optional_listeners:
-    required_for_fixtures:
-      - 'oro_entity.event_listener.entity_modify_created_updated_properties_listener'

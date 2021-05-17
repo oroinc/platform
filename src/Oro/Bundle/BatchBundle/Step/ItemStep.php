@@ -21,7 +21,7 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
     {
         $this->initializeStepElements($stepExecution);
 
-        $stepExecutor = new StepExecutor();
+        $stepExecutor = $this->createStepExecutor();
         $stepExecutor
             ->setReader($this->reader)
             ->setProcessor($this->processor)
@@ -34,6 +34,11 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
         $this->flushStepElements();
 
         $this->restoreStepElements();
+    }
+
+    protected function createStepExecutor(): StepExecutor
+    {
+        return new StepExecutor();
     }
 
     /**

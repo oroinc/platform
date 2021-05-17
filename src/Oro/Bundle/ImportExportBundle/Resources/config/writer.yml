@@ -26,6 +26,14 @@ services:
         tags:
             - { name: oro_importexport.writer, alias: entity }
 
+    oro_importexport.writer.cumulative:
+        class: 'Oro\Bundle\ImportExportBundle\Writer\CumulativeWriter'
+        arguments:
+            - '@oro_entity.doctrine_helper'
+        calls:
+            - [setLogger, ['@logger']]
+            - [addIgnoredChange, ['Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue']]
+
     oro_importexport.writer.entity_detach_fixer:
         class: Oro\Bundle\ImportExportBundle\Writer\EntityDetachFixer
         arguments:

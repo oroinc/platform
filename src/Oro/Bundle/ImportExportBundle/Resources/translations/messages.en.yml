@@ -46,7 +46,7 @@ oro:
 
 
         import:
-            error:          "Errors occurred during file import."
+            error:          "Errors occurred during file import: %errors%"
             download_error_log: "Error log"
             errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."

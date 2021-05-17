@@ -64,7 +64,7 @@ class SearchBundleWebTestCase extends WebTestCase
      */
     protected function loadFixture(string $entityClass, string $fixtureClass, int $expectedCount): void
     {
-        $doReindex = static::isDbIsolationPerTest() || !\in_array($fixtureClass, static::$loadedFixtures, false);
+        $doReindex = static::isDbIsolationPerTest() || !$this->isLoadedFixture($fixtureClass);
 
         $this->loadFixtures([$fixtureClass]);
 

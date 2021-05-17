@@ -59,7 +59,7 @@ trait DbIsolationExtension
      */
     protected static function rollbackTransaction()
     {
-        foreach (self::$dbIsolationConnections as $name => $connection) {
+        foreach (array_reverse(self::$dbIsolationConnections) as $connection) {
             $rolledBack = false;
             while ($connection->isConnected() && $connection->isTransactionActive()) {
                 $connection->rollBack();

@@ -299,9 +299,9 @@ services:
             - '@property_accessor'
             - '@oro_entity_config.config_manager'
         tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: prePersist, connection: default }
-            - { name: doctrine.event_listener, event: postPersist, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: postPersist }
 
     oro_attachment.acl.voter.file:
         class: 'Oro\Bundle\AttachmentBundle\Acl\Voter\FileVoter'

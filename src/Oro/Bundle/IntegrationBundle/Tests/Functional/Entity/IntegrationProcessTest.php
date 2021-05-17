@@ -19,10 +19,9 @@ class IntegrationProcessTest extends WebTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
+        $this->getOptionalListenerManager()->enableListener('oro_workflow.listener.event_trigger_collector');
     }
 
     /**

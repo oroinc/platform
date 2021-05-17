@@ -28,16 +28,6 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit\Framework\T
         $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($this->tokenStorage);
     }
 
-    public function testOptionalListenerInterfaceImplementation()
-    {
-        $args = $this->createMock(OnFlushEventArgs::class);
-        $args->expects($this->never())
-            ->method('getEntityManager');
-
-        $this->listener->setEnabled(false);
-        $this->listener->onFlush($args);
-    }
-
     /**
      * @dataProvider userDataProvider
      *

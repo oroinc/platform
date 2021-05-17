@@ -159,7 +159,10 @@ class ImportHandler extends AbstractHandler
 
             $importInfo = $this->getImportInfo($counts, $entityName);
         } else {
-            $message = $this->translator->trans('oro.importexport.import.error');
+            $message = $this->translator->trans(
+                'oro.importexport.import.error',
+                ['%errors%' => json_encode($errors)]
+            );
         }
 
         $context = $jobResult->getContext();

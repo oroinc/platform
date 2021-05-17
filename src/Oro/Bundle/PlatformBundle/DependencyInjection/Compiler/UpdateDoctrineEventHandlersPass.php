@@ -5,6 +5,9 @@ namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * Force Doctrine's listeners and subscribers to the default connection when not configured.
+ */
 class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
 {
     const SESSION_CONNECTION_NAME = 'session';
@@ -20,7 +23,7 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $connections = $this->getConnections($container);
+        $connections = $this->getAllConnections($container);
         if ($connections) {
             $this->processDoctrineEventHandlers(self::DOCTRINE_EVENT_SUBSCRIBER_TAG, $container, $connections);
             $this->processDoctrineEventHandlers(self::DOCTRINE_EVENT_LISTENER_TAG, $container, $connections);
@@ -28,8 +31,6 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
-     *
      * @return string[]
      */
     protected function getConnections(ContainerBuilder $container)
@@ -55,6 +56,15 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
         return array_keys($connections);
     }
 
+    protected function getAllConnections(ContainerBuilder $container): array
+    {
+        if (!$container->hasParameter(self::DOCTRINE_CONNECTIONS_PARAM)) {
+            return [];
+        }
+
+        return array_keys((array)$container->getParameter(self::DOCTRINE_CONNECTIONS_PARAM));
+    }
+
     /**
      * @param string $handlerTag
      * @param ContainerBuilder $container
@@ -67,14 +77,29 @@ class UpdateDoctrineEventHandlersPass implements CompilerPassInterface
             $definition = $container->getDefinition($id);
             $definition->clearTag($handlerTag);
             foreach ($tags as $tag) {
-                if (!isset($tag['connection']) || null === $tag['connection']) {
-                    foreach ($connections as $connection) {
-                        $tag['connection'] = $connection;
-                        $definition->addTag($handlerTag, $tag);
-                    }
-                } else {
-                    $definition->addTag($handlerTag, $tag);
+                if (!empty($tag['connection']) && $tag['connection'] === 'default') {
+                    $customConnections = array_filter(
+                        $connections,
+                        function ($connection) {
+                            return $connection !== 'default';
+                        }
+                    );
+
+                    $definition->setDeprecated(
+                        true,
+                        sprintf(
+                            'Passing "connection: default" to "%%service_id%%" tags is default behaviour now. '.
+                            'Specify one of "%s" or remove default one, please.',
+                            implode(', ', $connections)
+                        )
+                    );
                 }
+
+                if (empty($tag['connection'])) {
+                    $tag['connection'] = 'default';
+                }
+
+                $definition->addTag($handlerTag, $tag);
             }
         }
     }
