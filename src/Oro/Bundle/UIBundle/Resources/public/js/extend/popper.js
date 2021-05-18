@@ -148,6 +148,11 @@ define(function(require) {
             return data;
         }
     };
+    Popper.Defaults.onDestroy = () => {};
+    Popper.prototype.destroy = _.wrap(Popper.prototype.destroy, function(original, ...rest) {
+        this.options.onDestroy(this);
+        return original.apply(this, rest);
+    });
 
     return Popper;
 });
