@@ -57,11 +57,12 @@ class UnixFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
 
     protected function startCopyDumpToTempDir()
     {
-        $this->copyDumpToTempDirProcess = new Process(sprintf(
+        $command = sprintf(
             'exec cp -rp %s %s',
             $this->cacheDumpDir.'/*',
             $this->cacheTempDir.DIRECTORY_SEPARATOR
-        ));
+        );
+        $this->copyDumpToTempDirProcess = Process::fromShellCommandline($command);
 
         $this->copyDumpToTempDirProcess
             ->setTimeout(self::TIMEOUT)

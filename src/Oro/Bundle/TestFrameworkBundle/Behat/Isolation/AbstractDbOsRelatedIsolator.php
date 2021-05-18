@@ -115,7 +115,7 @@ abstract class AbstractDbOsRelatedIsolator extends AbstractOsRelatedIsolator imp
      */
     protected function runProcess($commandline, $timeout = 120)
     {
-        $process = new Process($commandline);
+        $process = Process::fromShellCommandline($commandline);
 
         $process->setTimeout($timeout);
         $process->run();
