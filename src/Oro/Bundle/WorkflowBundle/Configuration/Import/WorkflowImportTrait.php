@@ -5,6 +5,9 @@ namespace Oro\Bundle\WorkflowBundle\Configuration\Import;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Contains common methods for import processors.
+ */
 trait WorkflowImportTrait
 {
     /** @var string */
@@ -92,15 +95,15 @@ trait WorkflowImportTrait
     }
 
     /**
-     * @param array $resourceData
      * @param array $content
+     * @param array $importedContent
      * @return array
      */
-    private function mergeConfigs(array $resourceData, array $content): array
+    private function mergeImports(array $content, array $importedContent): array
     {
         return ArrayUtil::arrayMergeRecursiveDistinct(
-            [WorkflowListConfiguration::NODE_WORKFLOWS => [$this->getTarget() => $resourceData]],
-            $content
+            $content,
+            [WorkflowListConfiguration::NODE_WORKFLOWS => [$this->getTarget() => $importedContent]]
         );
     }
 

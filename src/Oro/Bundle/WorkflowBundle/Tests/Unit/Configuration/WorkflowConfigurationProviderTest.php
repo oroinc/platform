@@ -188,6 +188,25 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $configuration);
     }
 
+    public function testImportConfigWithNumericArrays(): void
+    {
+        $bundles = [
+            new Stub\ImportConfiguration\ImportConfigurationBundle(),
+            new Stub\ImportAppendNumericConfiguration\ImportAppendNumericConfigurationBundle()
+        ];
+
+        $configurationProvider = $this->buildProvider($bundles);
+
+        $configuration = $configurationProvider->getWorkflowDefinitionConfiguration(
+            null,
+            ['workflow_with_numeric_array']
+        );
+
+        $expected = $this->getExpectedWokflowConfiguration('ImportAppendNumericConfiguration');
+
+        $this->assertEquals($expected, $configuration);
+    }
+
     public function testImportSelfContainedConfig()
     {
         $bundles = [new Stub\ImportSelfConfiguration\ImportSelfConfigurationBundle];

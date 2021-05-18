@@ -45,59 +45,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->setReplacements($replacements);
     }
 
-    public function testProcessImportWithinSameContent()
-    {
-        $content = [
-            'workflows' => [
-                'one' => [
-                    'node_to_replace_from_one' => '*',
-                    'steps' => [
-                        'step_a' => null,
-                        'step_b' => [
-                            'is_start' => true
-                        ]
-                    ]
-                ],
-                'two' => [
-                    'steps' => [
-                        'step_c' => [
-                            'is_start' => true
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        $this->configureProcessor('one', 'two', ['node_to_replace_from_one', 'steps.step_b']);
-
-        $resultContent = $this->processor->process($content, new \SplFileInfo(__FILE__));
-
-        $this->assertEquals(
-            [
-                'workflows' => [
-                    'one' => [
-                        'node_to_replace_from_one' => '*',
-                        'steps' => [
-                            'step_a' => null,
-                            'step_b' => [
-                                'is_start' => true
-                            ]
-                        ]
-                    ],
-                    'two' => [
-                        'steps' => [
-                            'step_c' => [
-                                'is_start' => true
-                            ],
-                            'step_a' => null,
-                        ]
-                    ]
-                ]
-            ],
-            $resultContent
-        );
-    }
-
     public function testParentChangesAccepted()
     {
         $content = [
@@ -123,10 +70,13 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $changedByParent = [
             'workflows' => [
                 'one' => [
-                    'steps' => ['step_c' => null, 'step_z' => null]
+                    'steps' => ['step_c' => ['is_start' => true], 'step_z' => null]
                 ],
                 'two' => [
-                    'steps' => ['step_c' => ['is_start' => true], 'step_z' => null]
+                    'steps' => [
+                        'step_c' => null, // this would be replaced by target's one node content
+                        'step_z' => null
+                    ]
                 ]
             ]
         ];
@@ -135,15 +85,13 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
             'workflows' => [
                 'one' => [
                     'steps' => [
-                        'step_c' => null, //this would be replaced by target's one node content
+                        'step_c' => ['is_start' => true],
                         'step_z' => null
                     ]
                 ],
                 'two' => [
                     'steps' => [
-                        'step_c' => [
-                            'is_start' => true
-                        ],
+                        'step_c' => ['is_start' => true],
                         'step_z' => null,
                     ]
                 ]
@@ -158,9 +106,19 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $parent = $this->createMock(ConfigImportProcessorInterface::class);
         $this->processor->setParent($parent);
 
-        $parent->expects($this->once())->method('process')
+        $parent->expects($this->exactly(2))->method('process')
             ->with($content, $file)
             ->willReturn($changedByParent);
+
+        $finderMock = $this->createMock(Finder::class);
+        $this->finderBuilder->expects($this->once())->method('create')
+            ->willReturn($finderMock);
+
+        $finderMock->expects($this->once())->method('getIterator')->willReturn(new ArrayCollection([$file]));
+
+        $this->reader->expects($this->once())->method('read')
+            ->with($file)
+            ->willReturn($content);
 
         $resultContent = $this->processor->process($content, $file);
 
@@ -219,14 +177,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->finderBuilder->expects($this->once())->method('create')
             ->willReturn($finderMock);
-
-        $callbackConstraint = $this->callbackShouldFilterCurrentFile(
-            $filesLookingTo,
-            new ArrayCollection([$currentFile, $file1, $file2])
-        );
-
-        $finderMock->expects($this->once())->method('filter')
-            ->with($callbackConstraint)->willReturn($filesLookingTo);
 
         $finderMock->expects($this->once())->method('getIterator')->willReturn($filesLookingTo);
 
@@ -357,14 +307,6 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $this->finderBuilder->expects($this->once())->method('create')
             ->willReturn($finderMock);
 
-        $callbackConstraint = $this->callbackShouldFilterCurrentFile(
-            $filesLookingTo,
-            new ArrayCollection([$currentFile, $file1, $file2])
-        );
-
-        $finderMock->expects($this->once())->method('filter')
-            ->with($callbackConstraint)->willReturn($filesLookingTo);
-
         $finderMock->expects($this->once())->method('getIterator')->willReturn($filesLookingTo);
 
         $this->reader->expects($this->exactly(2))->method('read')
@@ -397,9 +339,21 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
         $result = [
             'workflows' => [
                 'workflow_to_import' => ['*' => [42]],
-                'one' => ['*' => [42, 'everything']]
+                'one' => ['*' => ['everything', 42]]
             ]
         ];
+
+        $file1 = new \SplFileInfo('file1');
+        $finderMock = $this->createMock(Finder::class);
+        $this->finderBuilder->expects($this->once())->method('create')
+            ->willReturn($finderMock);
+
+        $finderMock->expects($this->once())->method('getIterator')->willReturn(new ArrayCollection([$file1]));
+
+        $this->reader->expects($this->once())->method('read')
+            ->with($file1)
+            ->willReturn($content);
+        
         $this->configureProcessor('workflow_to_import', 'one', ['steps']);
         $processed = $this->processor->process($content, new \SplFileInfo(__FILE__));
         $this->assertEquals($result, $processed);

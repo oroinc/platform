@@ -49,19 +49,21 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
         $contentImported = ['workflows' => [
             'import' => [
                 'distinct' => 'value',
-                'node' => ['to_replace' => 'unneeded data', 'not replaced' => 'yay']
+                'node' => ['to_replace' => 'unneeded data', 'not replaced' => 'yay'],
+                'numeric_array' => ['element2'],
             ]
         ]];
 
         $contentToProcess = ['workflows' => [
-            'target' => ['distinct' => 'merge', 'some' => 'content']
+            'target' => ['distinct' => 'merge', 'some' => 'content', 'numeric_array' => ['element1']]
         ]];
 
         $result = ['workflows' => [
             'target' => [
-                'distinct' => 'merge', //not default recursive merge behavior
+                'distinct' => 'value', // replaced from the imported config
                 'node' => ['not replaced' => 'yay'],
-                'some' => 'content'
+                'some' => 'content',
+                'numeric_array' => ['element1', 'element2'], // New element is appended after existing.
             ]
         ]];
 
@@ -108,7 +110,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = ['workflows' => [
             'target' => [
-                'distinct' => 'merge', //not default recursive merge behavior
+                'distinct' => 'value', // replaced from the imported config
                 'node' => ['not replaced' => 'yay'],
                 'some' => 'content'
             ]
@@ -173,7 +175,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = ['workflows' => [
             'target' => [
-                'distinct' => 'merge',
+                'distinct' => 'value', // replaced from the imported config
                 'node' => ['not replaced' => 'yay', 'added' => 'by parent'],
                 'some' => 'content'
             ]
@@ -235,7 +237,7 @@ class WorkflowFileImportProcessorTest extends \PHPUnit\Framework\TestCase
 
         $result = ['workflows' => [
             'target' => [
-                'distinct' => 'merge',
+                'distinct' => 'value', // replaced from the imported config
                 'node' => ['not replaced' => 'yay', 'added' => 'by parent'],
                 'some' => 'content'
             ]
