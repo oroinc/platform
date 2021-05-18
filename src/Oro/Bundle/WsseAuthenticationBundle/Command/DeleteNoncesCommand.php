@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\WsseAuthenticationBundle\Command;
 
 use Psr\Container\ContainerInterface;
-use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,7 +67,7 @@ HELP
         return 0;
     }
 
-    private function getNonceCache(string $firewallName): CacheInterface
+    private function getNonceCache(string $firewallName): AdapterInterface
     {
         $serviceId = 'oro_wsse_authentication.nonce_cache.' . $firewallName;
         if (!$this->container->has($serviceId)) {

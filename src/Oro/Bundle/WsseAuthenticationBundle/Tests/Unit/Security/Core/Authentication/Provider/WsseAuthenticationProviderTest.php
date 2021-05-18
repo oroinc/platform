@@ -11,9 +11,8 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
 use Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactory;
-use Symfony\Component\Cache\Simple\ArrayCache;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -42,14 +41,11 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var UserCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $userChecker;
 
-    /** @var TokenInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $token;
-
     protected function setUp(): void
     {
         $this->userProvider = $this->createMock(UserProviderInterface::class);
         $this->encoder = new MessageDigestPasswordEncoder('sha1', true, 1);
-        $cache = new ArrayCache();
+        $cache = new ArrayAdapter();
         $this->userChecker = $this->createMock(UserCheckerInterface::class);
 
         $this->provider = new WsseAuthenticationProvider(
@@ -60,8 +56,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             $this->encoder,
             $cache
         );
-
-        $this->token = $this->createMock(TokenInterface::class);
     }
 
     public function testAuthenticateOnCorrectData(): void
@@ -101,15 +95,15 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider wrongUserProvider
      *
-     * @param object $user
+     * @param User $user
      * @param string $secret
      * @param string $exceptionType
      * @param string $exceptionString
-     * @param $isEnabledUser
-     * @param $isLockedUserAuthStatus
+     * @param bool $isEnabledUser
+     * @param bool $isLockedUserAuthStatus
      */
     public function testAuthenticateOnWrongData(
-        $user,
+        User $user,
         string $secret,
         string $exceptionType,
         string $exceptionString,
@@ -288,7 +282,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return Token
      */
-    private function prepareTestInstance($user, $secret): Token
+    private function prepareTestInstance(User $user, string $secret): Token
     {
         $this->userProvider
             ->expects($this->any())

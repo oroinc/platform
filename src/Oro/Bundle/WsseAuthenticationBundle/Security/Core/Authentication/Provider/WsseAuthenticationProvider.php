@@ -8,7 +8,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Security\UserApiKeyInterface;
 use Oro\Bundle\WsseAuthenticationBundle\Exception\NonceExpiredException;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactoryInterface;
-use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -40,7 +40,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
     /** @var PasswordEncoderInterface */
     private $encoder;
 
-    /** @var CacheInterface */
+    /** @var AdapterInterface */
     private $nonceCache;
 
     /** @var int */
@@ -55,7 +55,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
      * @param UserProviderInterface $userProvider An UserProviderInterface instance
      * @param string $providerKey The provider key
      * @param PasswordEncoderInterface $encoder A PasswordEncoderInterface instance
-     * @param CacheInterface $nonceCache The nonce cache
+     * @param AdapterInterface $nonceCache The nonce cache
      * @param int $lifetime The lifetime
      * @param string $dateFormat The date format
      */
@@ -65,7 +65,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         UserProviderInterface $userProvider,
         $providerKey,
         PasswordEncoderInterface $encoder,
-        CacheInterface $nonceCache,
+        AdapterInterface $nonceCache,
         $lifetime = 300,
         $dateFormat = '/^([\+-]?\d{4}(?!\d{2}\b))((-?)((0[1-9]|1[0-2])(\3([12]\d|0[1-9]|3[01]))?|W([0-4]\d|5[0-2])'
         . '(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?0'
@@ -227,11 +227,16 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         $nonceCacheKey = $this->getNonceCacheKey($nonce);
-        if ($this->nonceCache->has($nonceCacheKey)) {
+        $cacheItem = $this->nonceCache->getItem($nonceCacheKey);
+        if ($cacheItem->isHit()) {
             throw new NonceExpiredException('Previously used nonce detected.');
         }
 
-        $this->nonceCache->set($nonceCacheKey, strtotime($this->getCurrentTime()), $this->lifetime);
+        $cacheItem
+            ->set(strtotime($this->getCurrentTime()))
+            ->expiresAfter($this->lifetime);
+
+        $this->nonceCache->save($cacheItem);
 
         $expected = $this->encoder->encodePassword(sprintf('%s%s%s', base64_decode($nonce), $created, $secret), $salt);
 

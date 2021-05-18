@@ -124,13 +124,13 @@ services:
             - [setNamespace, [ 'oro_config' ] ]
 
     oro_embedded_form.csrf_token_cache:
-        class: Symfony\Component\Cache\Simple\ArrayCache
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
         arguments:
             - '%oro_embedded_form.csrf_token_lifetime%'
 
     oro_wsse_authentication.nonce_cache:
         abstract: true
-        class: Symfony\Component\Cache\Simple\ArrayCache
+        class: Symfony\Component\Cache\Adapter\ArrayAdapter
         arguments:
             - '<lifetime>' # set in WsseNonceCachePass
 
