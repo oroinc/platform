@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\ClearableTokenStorageInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
  */
 class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageInterface
 {
-    /** @var CacheInterface */
+    /** @var AdapterInterface */
     protected $tokenCache;
 
     /** @var int */
@@ -22,12 +22,12 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
     protected $sessionIdProvider;
 
     /**
-     * @param CacheInterface $tokenCache
+     * @param AdapterInterface $tokenCache
      * @param int $tokenLifetime
      * @param SessionIdProviderInterface $sessionIdProvider
      */
     public function __construct(
-        CacheInterface $tokenCache,
+        AdapterInterface $tokenCache,
         $tokenLifetime,
         SessionIdProviderInterface $sessionIdProvider
     ) {
@@ -41,7 +41,7 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function hasToken($tokenId)
     {
-        return $this->tokenCache->has($this->getCacheKey($tokenId));
+        return $this->tokenCache->hasItem($this->getCacheKey($tokenId));
     }
 
     /**
@@ -49,7 +49,8 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function getToken($tokenId)
     {
-        $token = $this->tokenCache->get($this->getCacheKey($tokenId));
+        $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
+        $token = $cacheItem->get();
         if (false === $token) {
             $token = null;
         }
@@ -62,7 +63,12 @@ class CsrfTokenStorage implements TokenStorageInterface, ClearableTokenStorageIn
      */
     public function setToken($tokenId, $token)
     {
-        $this->tokenCache->set($this->getCacheKey($tokenId), $token, $this->tokenLifetime);
+        $cacheItem = $this->tokenCache->getItem($this->getCacheKey($tokenId));
+        $cacheItem
+            ->set($token)
+            ->expiresAfter($this->tokenLifetime);
+
+        $this->tokenCache->save($cacheItem);
 
         if ($this->tokenCache instanceof PruneableInterface) {
             $this->tokenCache->prune();

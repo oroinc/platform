@@ -39,7 +39,7 @@ services:
             - 1
 
     oro_wsse_authentication.nonce_cache:
-        class: Symfony\Component\Cache\Simple\PhpFilesCache
+        class: Symfony\Component\Cache\Adapter\PhpFilesAdapter
         abstract: true
         arguments:
             - '<namespace>' # set in WsseNonceCachePass

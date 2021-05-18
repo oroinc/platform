@@ -323,6 +323,15 @@ define(function(require) {
         },
 
         /**
+         * Returns root application element
+         *
+         * @return {HTMLElement}
+         */
+        getRootElement() {
+            return document.getElementById('page');
+        },
+
+        /**
          * Disables ability to scroll of $mainEl's scrollable parents
          *
          * @param $mainEl
