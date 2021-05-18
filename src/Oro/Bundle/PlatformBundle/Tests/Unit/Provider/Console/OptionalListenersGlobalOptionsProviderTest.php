@@ -41,11 +41,11 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
 
         $this->provider->addGlobalOptions($command);
         $this->assertEquals(
-            ['disabled-listeners'],
+            [OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS],
             array_keys($command->getApplication()->getDefinition()->getOptions())
         );
         $this->assertEquals(
-            ['disabled-listeners'],
+            [OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS],
             array_keys($command->getDefinition()->getOptions())
         );
     }
@@ -56,7 +56,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
-            ->with('disabled-listeners')
+            ->with(OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS)
             ->willReturn([]);
 
         $this->listenersManager->expects($this->never())
@@ -72,7 +72,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
-            ->with('disabled-listeners')
+            ->with(OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS)
             ->willReturn(['all']);
 
         $listeners = ['some_listener_service'];
@@ -91,7 +91,7 @@ class OptionalListenersGlobalOptionsProviderTest extends \PHPUnit\Framework\Test
         $input = $this->createMock(InputInterface::class);
         $input->expects($this->once())
             ->method('getOption')
-            ->with('disabled-listeners')
+            ->with(OptionalListenersGlobalOptionsProvider::DISABLE_OPTIONAL_LISTENERS)
             ->willReturn($listeners);
 
         $this->listenersManager->expects($this->never())

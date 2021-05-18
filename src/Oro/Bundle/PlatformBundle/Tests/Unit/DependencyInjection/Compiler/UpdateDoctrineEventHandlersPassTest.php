@@ -19,68 +19,71 @@ class UpdateDoctrineEventHandlersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new UpdateDoctrineEventHandlersPass();
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()->getMock();
+
+        $this->container->expects($this->any())->method('hasParameter')->willReturn(true);
+        $this->container->expects($this->any())->method('getParameter')
+            ->willReturn(['search' => 'doctrine.dbal.search_connection']);
     }
 
-    /**
-     * @param bool $hasConnectionParameter
-     * @param bool $hasExcludedParameter
-     * @param mixed $connectionParameter
-     * @param mixed $excludedParameter
-     * @param array $tags
-     *
-     * @dataProvider dataProvider
-     */
-    public function testProcess(
-        $hasConnectionParameter,
-        $hasExcludedParameter,
-        $connectionParameter,
-        $excludedParameter,
-        array $tags = []
-    ) {
-        $this->container->expects($this->any())->method('hasParameter')
-            ->willReturnOnConsecutiveCalls($hasConnectionParameter, $hasExcludedParameter);
-        $this->container->expects($this->any())->method('getParameter')
-            ->willReturnOnConsecutiveCalls($connectionParameter, $excludedParameter);
-
+    public function testSetDefaultConnectionWhenEmpty()
+    {
         $this->container->expects($this->any())->method('findTaggedServiceIds')
-            ->willReturn(['id' => ['event' => ['tag1' => []]]]);
+            ->willReturn(
+                [
+                    'oro_security.listener.refresh_context_listener' => [
+                        ['event' => 'preClose', 'lazy' => true],
+                        ['event' => 'onClear', 'lazy' => true],
+                    ],
+                ]
+            );
 
         $definition = new Definition();
         $this->container->expects($this->any())->method('getDefinition')->willReturn($definition);
-
         $this->compiler->process($this->container);
 
-        $this->assertEquals($tags, $definition->getTags());
+        $this->assertEquals(
+            [
+                'doctrine.event_subscriber' => [
+                    ['event' => 'preClose', 'lazy' => true, 'connection' => 'default'],
+                    ['event' => 'onClear', 'lazy' => true, 'connection' => 'default'],
+                ],
+                'doctrine.event_listener' => [
+                    ['event' => 'preClose', 'lazy' => true, 'connection' => 'default'],
+                    ['event' => 'onClear', 'lazy' => true, 'connection' => 'default'],
+                ],
+            ],
+            $definition->getTags()
+        );
     }
 
-    /** @return array */
-    public function dataProvider()
+    public function testSetSpecificConnectionWhenNotEmpty()
     {
-        return [
-            'missing connections' => [false, false, [], [], []],
-            'missing excluded connections' => [true, false, [], [], []],
-            'has parameters' => [true, true, [], [], []],
-            'exclude all' => [true, true, ['connection1' => []], ['connection1'], []],
-            'exclude one' => [
-                true,
-                true,
-                ['connection1' => [], 'connection2' => []],
-                ['connection1'],
+        $this->container->expects($this->any())->method('findTaggedServiceIds')
+            ->willReturn(
                 [
-                    'doctrine.event_subscriber' => [['tag1' => [], 'connection' => 'connection2']],
-                    'doctrine.event_listener' => [['tag1' => [], 'connection' => 'connection2']],
+                    'oro_security.listener.refresh_context_listener' => [
+                        ['event' => 'preClose', 'lazy' => true, 'connection' => 'security'],
+                        ['event' => 'onClear', 'lazy' => true, 'connection' => 'security'],
+                    ],
+                ]
+            );
+
+        $definition = new Definition();
+        $this->container->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $this->compiler->process($this->container);
+
+        $this->assertEquals(
+            [
+                'doctrine.event_subscriber' => [
+                    ['event' => 'preClose', 'lazy' => true, 'connection' => 'security'],
+                    ['event' => 'onClear', 'lazy' => true, 'connection' => 'security'],
+                ],
+                'doctrine.event_listener' => [
+                    ['event' => 'preClose', 'lazy' => true, 'connection' => 'security'],
+                    ['event' => 'onClear', 'lazy' => true, 'connection' => 'security'],
                 ],
             ],
-            'exclude session' => [
-                true,
-                true,
-                ['connection1' => [], 'connection2' => [], 'session' => []],
-                ['connection1'],
-                [
-                    'doctrine.event_subscriber' => [['tag1' => [], 'connection' => 'connection2']],
-                    'doctrine.event_listener' => [['tag1' => [], 'connection' => 'connection2']],
-                ],
-            ],
-        ];
+            $definition->getTags()
+        );
     }
 }

@@ -13,8 +13,8 @@ services:
             - '@oro_sync.content.tag_generator'
             - '%installed%'
         tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_sync.content.tag_generator:
         class: Oro\Bundle\SyncBundle\Content\ChainTagGenerator

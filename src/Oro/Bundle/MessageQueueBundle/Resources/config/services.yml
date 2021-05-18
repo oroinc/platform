@@ -193,3 +193,17 @@ services:
             - [] # processors. Will be set in Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass
         tags:
             - { name: container.service_locator }
+
+    oro_message_queue.cache.doctrine_metadata:
+        public: false
+        parent: oro.cache.abstract.without_memory_cache
+        calls:
+            - [ setNamespace, [ 'doctrine_metadata_message_queue' ] ]
+
+    oro_message_queue.platform.optional_listener_extension:
+        class: Oro\Bundle\MessageQueueBundle\Platform\OptionalListenerExtension
+        public: false
+        arguments:
+            - '@oro_platform.optional_listeners.manager'
+        tags:
+            - { name: oro_message_queue.consumption.extension, persistent: true }

@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -15,14 +16,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class DoctrineListener implements OptionalListenerInterface
 {
+    use OptionalListenerTrait;
+
     /** @var EntityPool */
     private $entityPool;
 
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
-
-    /** @var bool */
-    private $enabled = true;
 
     /**
      * @param EntityPool               $entityPool
@@ -32,14 +32,6 @@ class DoctrineListener implements OptionalListenerInterface
     {
         $this->entityPool = $entityPool;
         $this->eventDispatcher = $eventDispatcher;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

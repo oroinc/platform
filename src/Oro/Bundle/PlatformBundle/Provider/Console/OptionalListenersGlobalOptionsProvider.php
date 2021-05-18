@@ -14,6 +14,8 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvider
 {
+    public const DISABLE_OPTIONAL_LISTENERS = 'disabled-listeners';
+
     protected OptionalListenerManager $listenersManager;
 
     public function __construct(OptionalListenerManager $listenerManager)
@@ -25,7 +27,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
     {
         $options = [
             new InputOption(
-                'disabled-listeners',
+                self::DISABLE_OPTIONAL_LISTENERS,
                 null,
                 InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
                 \sprintf(
@@ -50,7 +52,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
     {
         $listeners = [];
 
-        $listenerList = $input->getOption('disabled-listeners');
+        $listenerList = $input->getOption(self::DISABLE_OPTIONAL_LISTENERS);
         if (!empty($listenerList)) {
             if (count($listenerList) === 1 && $listenerList[0] === 'all') {
                 $listeners = $this->listenersManager->getListeners();

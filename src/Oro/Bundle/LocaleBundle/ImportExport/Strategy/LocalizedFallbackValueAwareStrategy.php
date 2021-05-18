@@ -17,11 +17,12 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     /** @var string */
     protected $localizedFallbackValueClass;
 
-    /** @var \ReflectionProperty[] */
+    /**
+     * @var \ReflectionProperty[]
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
+     */
     protected $reflectionProperties = [];
-
-    /** @var array */
-    private $localizedValueRelations = [];
 
     /**
      * @param string $localizedFallbackValueClass
@@ -29,48 +30,6 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     public function setLocalizedFallbackValueClass($localizedFallbackValueClass)
     {
         $this->localizedFallbackValueClass = $localizedFallbackValueClass;
-    }
-
-    /** {@inheritdoc} */
-    protected function beforeProcessEntity($entity)
-    {
-        return parent::beforeProcessEntity($entity);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function afterProcessEntity($entity)
-    {
-        $entityFields = $this->fieldHelper->getRelations($this->entityName);
-        foreach ($entityFields as $field) {
-            if ($this->isLocalizedFallbackValue($field)) {
-                $localizedValueRelations = $this->getLocalizedFallbackValueRelations($field['related_entity_name']);
-                $this->removeNotInitializedEntities($entity, $field, $localizedValueRelations);
-                $this->setLocalizationKeys($entity, $field);
-            }
-        }
-
-        return parent::afterProcessEntity($entity);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return array
-     */
-    private function getLocalizedFallbackValueRelations(string $className): array
-    {
-        if (!array_key_exists($className, $this->localizedValueRelations)) {
-            $metadata = $this->doctrineHelper->getEntityMetadata($className);
-            foreach ($metadata->getAssociationMappings() as $name => $mapping) {
-                if ($metadata->isAssociationInverseSide($name) && $metadata->isCollectionValuedAssociation($name)) {
-                    $this->localizedValueRelations[$className][] = $name;
-                }
-            }
-        }
-
-        return $this->localizedValueRelations[$className] ?? [];
     }
 
     /**
@@ -98,25 +57,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
      */
     private function isLocalizedFallbackValueEntity(object $entity): bool
     {
-        return is_a($this->doctrineHelper->getClass($entity), $this->localizedFallbackValueClass, true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function importExistingEntity($entity, $existingEntity, $itemData = null, array $excludedFields = [])
-    {
-        if ($this->isLocalizedFallbackValueEntity($entity)) {
-            $metadata = $this->doctrineHelper->getEntityMetadata($entity);
-            foreach ($metadata->getAssociationMappings() as $name => $mapping) {
-                if ($metadata->isAssociationInverseSide($name) && $metadata->isCollectionValuedAssociation($name)) {
-                    // exclude all *-to-many relations from import
-                    $excludedFields[] = $name;
-                }
-            }
-        }
-
-        parent::importExistingEntity($entity, $existingEntity, $itemData, $excludedFields);
+        return is_a($entity, $this->localizedFallbackValueClass, true);
     }
 
     /**
@@ -134,7 +75,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
             $sourceCollection = $this->fieldHelper->getObjectValue($existingEntity, $fieldName);
             /** @var LocalizedFallbackValue $sourceValue */
             foreach ($sourceCollection as $sourceValue) {
-                $localizationCode = LocalizationCodeFormatter::formatKey($sourceValue->getLocalization());
+                $localizationCode = LocalizationCodeFormatter::formatName($sourceValue->getLocalization());
                 $searchContext[$localizationCode] = $sourceValue;
             }
 
@@ -150,18 +91,9 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         if ($this->isLocalizedFallbackValueEntity($entity)) {
-            $localizationCode = LocalizationCodeFormatter::formatKey($entity->getLocalization());
-            if (array_key_exists($localizationCode, $searchContext)) {
-                $identifier = $this->databaseHelper->getIdentifier($entity);
-                $existingEntity = $searchContext[$localizationCode];
-                if ($existingEntity && !$identifier) {
-                    $identifier = $this->databaseHelper->getIdentifier($existingEntity);
-                    $identifierName = $this->databaseHelper->getIdentifierFieldName($entity);
-                    $this->fieldHelper->setObjectValue($entity, $identifierName, $identifier);
-                }
+            $localizationCode = LocalizationCodeFormatter::formatName($entity->getLocalization());
 
-                return $existingEntity ? $entity : null;
-            }
+            return $searchContext[$localizationCode] ?? null;
         }
 
         return parent::findExistingEntity($entity, $searchContext);
@@ -173,16 +105,28 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
      */
     protected function isLocalizedFallbackValue($field)
     {
-        return $this->fieldHelper->isRelation($field)
-            && is_a($field['related_entity_name'], $this->localizedFallbackValueClass, true);
+        return is_array($field) &&
+            $this->fieldHelper->isRelation($field) &&
+            is_a($field['related_entity_name'], $this->localizedFallbackValueClass, true);
     }
 
     /**
-     * Clear not initialized entities that might remain in localized entity because of recursive relations
+     * {@inheritdoc}
      *
-     * @param $entity
-     * @param array $field
-     * @param array $relations
+     * No need to search LocalizedFallbackValue by identity fields in new entities storage
+     */
+    protected function combineIdentityValues($entity, $entityClass, array $searchContext)
+    {
+        if (is_a($entityClass, $this->localizedFallbackValueClass, true)) {
+            return null;
+        }
+
+        return parent::combineIdentityValues($entity, $entityClass, $searchContext);
+    }
+
+    /**
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
      */
     protected function removeNotInitializedEntities($entity, array $field, array $relations)
     {
@@ -201,8 +145,8 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     }
 
     /**
-     * @param object $entity
-     * @param Collection $collection
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
      */
     protected function removedDetachedEntities($entity, Collection $collection)
     {
@@ -218,9 +162,8 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     }
 
     /**
-     * @param object $entity
-     * @param array $field
-     * @throws \Exception
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
      */
     protected function setLocalizationKeys($entity, array $field)
     {
@@ -238,8 +181,8 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     }
 
     /**
-     * @param string $fieldName
-     * @return \ReflectionProperty
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
      */
     protected function getReflectionProperty($fieldName)
     {
@@ -254,30 +197,35 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * No need to search LocalizedFallbackValue by identity fields, consider entities without ids as new
+     * @deprecated Error keys logic moved to \Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent
+     * @internal
      */
-    protected function findEntityByIdentityValues($entityName, array $identityValues)
+    protected function mapCollections(Collection $importedCollection, Collection $sourceCollection)
     {
-        if (is_a($entityName, $this->localizedFallbackValueClass, true)) {
-            return null;
+        if ($importedCollection->isEmpty()) {
+            return;
         }
 
-        return parent::findEntityByIdentityValues($entityName, $identityValues);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * No need to search LocalizedFallbackValue by identity fields in new entities storage
-     */
-    protected function combineIdentityValues($entity, $entityClass, array $searchContext)
-    {
-        if (is_a($entityClass, $this->localizedFallbackValueClass, true)) {
-            return null;
+        if ($sourceCollection->isEmpty()) {
+            return;
         }
 
-        return parent::combineIdentityValues($entity, $entityClass, $searchContext);
+        $sourceCollectionArray = $sourceCollection->toArray();
+
+        /** @var LocalizedFallbackValue $sourceValue */
+        foreach ($sourceCollectionArray as $sourceValue) {
+            $key = LocalizationCodeFormatter::formatKey($sourceValue->getLocalization());
+            $sourceCollectionArray[$key] = $sourceValue->getId();
+        }
+
+        $importedCollection
+            ->map(
+                function (LocalizedFallbackValue $importedValue) use ($sourceCollectionArray) {
+                    $key = LocalizationCodeFormatter::formatKey($importedValue->getLocalization());
+                    if (array_key_exists($key, $sourceCollectionArray)) {
+                        $this->fieldHelper->setObjectValue($importedValue, 'id', $sourceCollectionArray[$key]);
+                    }
+                }
+            );
     }
 }

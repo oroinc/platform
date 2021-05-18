@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -26,14 +27,13 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class EntityListener implements OptionalListenerInterface, ServiceSubscriberInterface
 {
+    use OptionalListenerTrait;
+
     /** @var  MessageProducerInterface */
     protected $producer;
 
     /** @var ContainerInterface */
     protected $container;
-
-    /** @var bool */
-    protected $enabled = true;
 
     /** @var Email[] */
     protected $emailsToRemove = [];
@@ -74,14 +74,6 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             'oro_email.model.email_activity_updates' => EmailActivityUpdates::class,
             'oro_email.email.address.manager' => EmailAddressManager::class
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

@@ -10,9 +10,6 @@ use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 class EmailGridTest extends AbstractDatagridTestCase
 {
-    const AUTH_USER = 'simple_user';
-    const AUTH_PW = 'simple_password';
-
     /**
      * @var User
      */
@@ -25,7 +22,7 @@ class EmailGridTest extends AbstractDatagridTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
 
         $this->loadFixtures([
             'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailToOtherFolderData',
@@ -118,20 +115,5 @@ class EmailGridTest extends AbstractDatagridTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function generateBasicAuthHeader(
-        $userName = null,
-        $userPassword = null,
-        $userOrganization = null
-    ) {
-        $userName = $userName ?: static::AUTH_USER;
-        $userPassword = $userPassword ?: static::AUTH_PW;
-        $userOrganization = $userOrganization ?: static::AUTH_ORGANIZATION;
-
-        return parent::generateBasicAuthHeader($userName, $userPassword, $userOrganization);
     }
 }

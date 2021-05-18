@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
+use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
 use Oro\Bundle\NotificationBundle\Async\Topics;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Component\MessageQueue\Transport\Message;
@@ -24,13 +25,12 @@ trait MessageProcessTrait
      */
     protected function processExportMessage(ContainerInterface $container, Client $client): string
     {
-        $sentMessages = $this->getSentMessages();
-        $exportMessageData = reset($sentMessages);
+        $sentMessage = $this->getSentMessage(ImportExportTopics::PRE_EXPORT);
         $this->clearMessageCollector();
 
         $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(json_encode($exportMessageData['message']));
+        $message->setBody(json_encode($sentMessage));
 
         $session = $this->createMock(SessionInterface::class);
 

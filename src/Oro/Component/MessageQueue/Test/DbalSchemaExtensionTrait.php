@@ -4,6 +4,9 @@ namespace Oro\Component\MessageQueue\Test;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSchema;
 
+/**
+ * Message Queue tables helper
+ */
 trait DbalSchemaExtensionTrait
 {
     /**
@@ -40,7 +43,7 @@ trait DbalSchemaExtensionTrait
      */
     public function createConnection($tableName)
     {
-        $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
+        $dbal = $this->getContainer()->get('doctrine.dbal.message_queue_connection');
 
         return new DbalConnection($dbal, $tableName);
     }

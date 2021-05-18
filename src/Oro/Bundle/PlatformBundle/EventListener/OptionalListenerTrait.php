@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\EventListener;
 
+/**
+ * Default implementation of OptionalListenerInterface
+ */
 trait OptionalListenerTrait
 {
     /** @var bool */
@@ -14,6 +17,6 @@ trait OptionalListenerTrait
      */
     public function setEnabled($enabled = true)
     {
-        $this->enabled = $enabled;
+        $this->enabled = (bool)$enabled;
     }
 }
