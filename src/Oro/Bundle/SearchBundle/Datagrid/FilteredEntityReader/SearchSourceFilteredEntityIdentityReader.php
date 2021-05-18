@@ -24,7 +24,10 @@ class SearchSourceFilteredEntityIdentityReader implements FilteredEntityIdentity
 
         $filteredEntitiesIds = [];
 
-        foreach (new SearchIterableResult($query) as $entity) {
+        $iterator = new SearchIterableResult($query);
+        $iterator->setBufferSize(1000);
+
+        foreach ($iterator as $entity) {
             $filteredEntitiesIds[] = $entity->getRecordId();
         }
 
