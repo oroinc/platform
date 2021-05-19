@@ -3,12 +3,15 @@ define(function(require) {
 
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
     const TabsView = require('oroui/js/app/views/tabs-view');
     const DateVariableHelper = require('orofilter/js/date-variable-helper');
     const DateValueHelper = require('orofilter/js/date-value-helper');
     const DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     const moment = require('moment');
     const localeSettings = require('orolocale/js/locale-settings');
+    const layout = require('oroui/js/layout');
+    const Popper = require('popper');
     require('orofilter/js/datevariables-widget');
     require('orofilter/js/itemizedpicker-widget');
 
@@ -167,7 +170,7 @@ define(function(require) {
                 .wrap('<div class="dropdown datefilter">').parent();
             this.$dropdown
                 .append('<div class="dropdown-menu dropdown-menu-calendar"></div>')
-                .on('shown.bs.dropdown', _.bind(this.onOpen, this));
+                .on('shown.bs.dropdown', this.onOpen.bind(this));
             const tabs = new TabsView({
                 el: this.$dropdown.find('.dropdown-menu'),
                 template: options.dropdownTemplate,
@@ -177,8 +180,69 @@ define(function(require) {
                 }
             });
             this.subview('tabs', tabs);
-            this.$frontDateField
-                .attr({'data-toggle': 'dropdown'});
+            this.$frontDateField.attr({
+                'data-toggle': 'dropdown',
+                'data-placement': 'bottom-start',
+                'data-display-arrow': false,
+                'data-flip': false,
+                'data-position-fixed': false
+            }).data({
+                onDestroy(instance) {
+                    if (instance.state.__prevElementsStyle) {
+                        for (const [element, style] of instance.state.__prevElementsStyle) {
+                            const entries = Object.entries(style)[0];
+
+                            element.style[entries[0]] = entries[1];
+                        }
+                        delete instance.state.__prevElementsStyle;
+                        mediator.trigger('layout:reposition');
+                    }
+                },
+                modifiers: {
+                    hide: {
+                        enabled: false
+                    },
+                    offset: {
+                        enabled: true,
+                        fn(data, options) {
+                            const scrollElement = data.instance.state.scrollElement;
+                            const popperReact = data.instance.popper.getBoundingClientRect();
+                            const bottom = Math.round(popperReact.bottom);
+                            const rootEl = layout.getRootElement();
+                            let scrollRootElement = scrollElement;
+
+                            if (
+                                document.body.isSameNode(scrollElement) &&
+                                bottom > document.body.clientHeight
+                            ) {
+                                if (!data.instance.state.__prevElementsStyle) {
+                                    data.instance.state.__prevElementsStyle = [
+                                        [document.body, {
+                                            overflowY: document.body.style.overflowY
+                                        }],
+                                        [rootEl, {
+                                            minHeight: rootEl.style.minHeight
+                                        }]
+                                    ];
+                                }
+
+                                document.body.style.overflowY = 'scroll';
+                                rootEl.style.minHeight = `${bottom}px`;
+                                scrollRootElement = rootEl;
+                                mediator.trigger('layout:reposition');
+                            }
+
+                            const shift = scrollRootElement.scrollWidth - scrollRootElement.clientWidth;
+
+                            if (popperReact.right > scrollRootElement.clientWidth && shift > 0) {
+                                options.offset = _.isRTL() ? `${shift}, 0` : `${-shift}, 0`;
+                            }
+
+                            Popper.Defaults.modifiers.offset.fn(data, options);
+                            return data;
+                        }
+                    }
+                }});
         },
 
         /**

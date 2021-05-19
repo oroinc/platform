@@ -1,0 +1,12 @@
+# @see \Oro\Component\Testing\Doctrine\PersistentConnection::getConnectionId
+doctrine:
+  dbal:
+    connections:
+      default:
+        options: { ConnectionId: default }
+      config:
+        options: { ConnectionId: config }
+      message_queue:
+        options: { ConnectionId: message_queue }
+      search:
+        options: { ConnectionId: search }

@@ -117,6 +117,8 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function IOpenImportTab($tabLabel)
     {
+        $this->closeFlashMessages();
+
         $this->openImportModalAndReturnImportSubmitButton();
 
         if (false === $this->isMultiImportModal()) {
@@ -242,6 +244,8 @@ class ImportExportContext extends OroFeatureContext implements
      */
     public function iRunExport()
     {
+        $this->closeFlashMessages();
+
         $exportButton = $this->createElement('MainExportFileButton');
         $exportButton->click();
     }
@@ -874,6 +878,8 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected function openImportModalAndReturnImportSubmitButton()
     {
+        $this->closeFlashMessages();
+
         $importSubmitButton = $this->createElement('ImportModalImportFileButton');
 
         if (false === $importSubmitButton->isIsset()) {
@@ -891,6 +897,8 @@ class ImportExportContext extends OroFeatureContext implements
      */
     protected function openImportModalAndReturnValidateButton()
     {
+        $this->closeFlashMessages();
+
         $validateFileButton = $this->createElement('Validate File Button');
 
         if (false === $validateFileButton->isIsset()) {
@@ -1001,5 +1009,17 @@ class ImportExportContext extends OroFeatureContext implements
         }
 
         return tempnam($path, $prefix) . '.csv';
+    }
+
+    private function closeFlashMessages()
+    {
+        $flashMessages = $this->findAllElements('Flash Message');
+        foreach ($flashMessages as $flashMessage) {
+            if ($flashMessage->isValid() && $flashMessage->isVisible()) {
+                /** @var NodeElement $closeButton */
+                $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+                $closeButton->press();
+            }
+        }
     }
 }

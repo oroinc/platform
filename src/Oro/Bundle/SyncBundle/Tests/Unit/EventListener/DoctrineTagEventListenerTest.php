@@ -68,15 +68,11 @@ class DoctrineTagEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->uow->expects(self::never())->method('getScheduledCollectionDeletions');
         $this->uow->expects(self::never())->method('getScheduledCollectionUpdates');
 
+        $this->dataUpdateTopicSender->expects(static::never())->method('send');
         $this->tagGenerator->expects(self::never())->method('generate');
 
         $this->eventListener->setEnabled(false);
         $this->eventListener->onFlush(new OnFlushEventArgs($this->em));
-
-        $this->dataUpdateTopicSender->expects(static::once())
-            ->method('send')
-            ->with([]);
-
         $this->eventListener->postFlush(new PostFlushEventArgs($this->em));
     }
 

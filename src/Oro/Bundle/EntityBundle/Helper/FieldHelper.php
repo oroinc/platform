@@ -255,28 +255,38 @@ class FieldHelper
         return !empty($field['type']) && in_array($field['type'], ['datetime', 'date', 'time']);
     }
 
-    /**
-     * @param object $object
-     * @param string $fieldName
-     * @return mixed
-     * @throws \Exception
-     */
     public function getObjectValue($object, $fieldName)
     {
         try {
             return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
-            $class = ClassUtils::getClass($object);
-            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
-            }
+            return $this->getObjectValueWithReflection($object, $fieldName, $e);
+        }
+    }
 
-            if ($class) {
-                $reflection = new \ReflectionProperty($class, $fieldName);
-                $reflection->setAccessible(true);
-                return $reflection->getValue($object);
-            } else {
-                throw $e;
-            }
+    public function getObjectValueWithReflection($object, string $fieldName, \Throwable $exception = null)
+    {
+        $class = ClassUtils::getClass($object);
+        while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        }
+
+        if ($exception === null) {
+            $exception = new NoSuchPropertyException(
+                sprintf(
+                    'Property "%s" does not exist in class "%s"',
+                    $fieldName,
+                    $class
+                )
+            );
+        }
+
+        if ($class) {
+            $reflection = new \ReflectionProperty($class, $fieldName);
+            $reflection->setAccessible(true);
+
+            return $reflection->getValue($object);
+        } else {
+            throw $exception;
         }
     }
 

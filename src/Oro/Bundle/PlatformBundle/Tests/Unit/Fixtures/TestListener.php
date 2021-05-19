@@ -3,13 +3,19 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Fixtures;
 
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 
 class TestListener implements OptionalListenerInterface
 {
-    public $enabled;
+    use OptionalListenerTrait;
 
-    public function setEnabled($enabled = true)
+    public function getEnabled(): bool
     {
-        $this->enabled = $enabled;
+        return $this->enabled;
+    }
+
+    public function resetEnabled(): void
+    {
+        $this->enabled = false;
     }
 }

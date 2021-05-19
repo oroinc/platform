@@ -145,7 +145,7 @@ services:
         class: Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
         public: true
         arguments:
-            - '@doctrine.dbal.default_connection'
+            - '@doctrine.dbal.search_connection'
             - '%oro_search.drivers%'
             - 'oro_search_index_text'
 
@@ -153,7 +153,7 @@ services:
         class: Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
         arguments:
             - 'oro_search_index_text'
-            - '@doctrine.dbal.default_connection'
+            - '@doctrine.dbal.search_connection'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 

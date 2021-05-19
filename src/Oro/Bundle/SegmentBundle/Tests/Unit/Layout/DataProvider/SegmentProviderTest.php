@@ -7,9 +7,8 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Layout\DataProvider\SegmentProvider;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class SegmentProviderTest extends WebTestCase
+class SegmentProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SegmentProvider */
     private $provider;

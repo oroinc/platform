@@ -67,7 +67,7 @@ services:
     oro_cron.listener.schema_column_definition:
         class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
         tags:
-            - {name: doctrine.event_listener, event: onSchemaColumnDefinition, method: onSchemaColumnDefinition}
+            - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
 
     oro_cron.repository.schedule:
         class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository

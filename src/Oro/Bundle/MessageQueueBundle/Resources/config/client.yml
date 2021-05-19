@@ -19,6 +19,15 @@ services:
             - '@security.token_storage'
             - '@oro_security.token_serializer'
 
+    oro_message_queue.platform.optional_listener_driver_factory:
+        class: Oro\Bundle\MessageQueueBundle\Platform\OptionalListenerDriverFactory
+        public: false
+        decorates: oro_message_queue.client.driver_factory
+        decoration_priority: -255
+        arguments:
+            - '@oro_message_queue.platform.optional_listener_driver_factory.inner'
+            - '@oro_platform.optional_listeners.manager'
+
     oro_message_queue.client.driver:
         class: 'Oro\Component\MessageQueue\Client\DriverInterface'
         public: true
@@ -121,6 +130,7 @@ services:
         arguments:
             - '@oro_message_queue.client.buffered_message_producer'
             - '@doctrine'
+            - 'default'
 
     oro_message_queue.client.message_filter:
         class: Oro\Bundle\MessageQueueBundle\Client\ChainMessageFilter

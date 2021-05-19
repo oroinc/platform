@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Processor;
 
-use Doctrine\Common\Cache\Cache;
+use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
@@ -83,7 +83,7 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
         );
         $message .= sprintf(
             ' The following messages have not been yet consumed: %s',
-            implode(', ', array_keys($this->getMessages('send_messages')))
+            implode(', ', $this->getMessages())
         );
 
         throw new \RuntimeException($message);
@@ -102,11 +102,13 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
      */
     public function cleanUp()
     {
+        $this->baseMessageQueueProcessor->cleanUp();
+
         $container = $this->kernel->getContainer();
 
         /** @var ManagerRegistry $doctrine */
         $doctrine = $container->get('doctrine');
-        $connection = $doctrine->getConnection();
+        $connection = $doctrine->getConnection('message_queue');
 
         // clear queue
         $this->getChannel()->exchange_delete(self::DEFAULT_EXCHANGE);
@@ -118,21 +120,13 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
 
         $this->closeConnections();
 
-        if ($container->has('oro_message_queue.mock_lifecycle_message.cache')) {
-            $cache = $container->get('oro_message_queue.mock_lifecycle_message.cache');
-            $cache->delete('send_messages');
-            $cache->delete('consume_messages');
-        }
+        $cache = $container->get('oro_message_queue.mock_lifecycle_message.cache');
+        $cache->clear();
     }
 
-    /**
-     * @return bool
-     */
-    private function isQueueEmpty()
+    private function isQueueEmpty(): bool
     {
-        $messages = array_diff_key($this->getMessages('send_messages'), $this->getMessages('consume_messages'));
-
-        return count($messages) < 1;
+        return empty($this->getMessages());
     }
 
     /**
@@ -166,27 +160,22 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
         }
     }
 
-    /**
-     * @param string $key
-     *
-     * @return array
-     */
-    private function getMessages($key)
+    private function getMessages(): array
     {
         $container = $this->kernel->getContainer();
-        if (!$container->has('oro_message_queue.mock_lifecycle_message.cache')) {
-            return [];
-        }
 
-        /** @var Cache $cache */
+        /** @var Connection $connection */
+        $connection = $container->get('doctrine')->getConnection('message_queue');
+
+        // guard
         $cache = $container->get('oro_message_queue.mock_lifecycle_message.cache');
-        if (!$cache->contains($key)) {
-            return [];
-        }
+        $cache->getItem('oro_behat_message_queue');
 
-        $messages = unserialize($cache->fetch($key));
-        if (!is_array($messages)) {
-            return [];
+        $messageIds = array_column($connection->fetchAll('SELECT item_id FROM oro_behat_message_queue'), 'item_id');
+
+        $messages = [];
+        foreach ($messageIds as $messageId) {
+            $messages[] = $cache->getItem($messageId)->get();
         }
 
         return $messages;

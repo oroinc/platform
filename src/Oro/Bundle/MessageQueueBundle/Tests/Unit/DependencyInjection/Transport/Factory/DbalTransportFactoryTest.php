@@ -28,7 +28,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
         $config = [
-            'connection' => 'default',
+            'connection' => 'message_queue',
             'table' => 'oro_message_queue',
             'pid_file_dir' => '/tmp/oro-message-queue',
             'consumer_process_pattern' => ':consume',
@@ -109,7 +109,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
                 ->info('DBAL transport configuration.')
                 ->children()
                     ->scalarNode('connection')
-                        ->defaultValue('default')
+                        ->defaultValue('message_queue')
                         ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('table')

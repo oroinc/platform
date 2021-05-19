@@ -29,7 +29,7 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
      */
     private function getDbalConnection()
     {
-        return $this->container->get('doctrine.dbal.default_connection');
+        return $this->container->get('doctrine')->getConnection('message_queue');
     }
 
     /**

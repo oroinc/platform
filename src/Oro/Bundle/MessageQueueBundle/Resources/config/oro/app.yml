@@ -1,12 +1,27 @@
 doctrine:
+    dbal:
+        connections:
+            message_queue:
+                driver:   '%database_driver%'
+                host:     '%database_host%'
+                port:     '%database_port%'
+                dbname:   '%database_name%'
+                user:     '%database_user%'
+                password: '%database_password%'
+                options:  '%database_driver_options%'
+                charset:  '%database_charset%'
+                server_version: '%database_server_version%'
     orm:
         entity_managers:
             message_queue:
-                connection: default
+                connection: message_queue
                 mappings:
                     OroMessageQueueBundle:
                         mapping: true
                         is_bundle: true
+                metadata_cache_driver:
+                    type: service
+                    id:   oro_message_queue.cache.doctrine_metadata
 
 oro_message_queue:
     persistent_services:
@@ -19,6 +34,7 @@ oro_message_queue:
         - 'oro_message_queue.log.consumer_state'
         - 'oro_message_queue.log.message_to_array_converter'
         - 'oro_message_queue.log.message_processor_class_provider'
+        - 'oro_platform.optional_listeners.manager'
     persistent_processors:
         - 'oro_message_queue.client.route_message_processor'
         - 'oro_message_queue.job.calculate_root_job_status_processor'
