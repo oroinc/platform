@@ -44,7 +44,7 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
         $this->assertTrue($form->has('localization'));
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes(): void
     {
         $this->assertEquals([ScopeType::class], LocalizationScopeExtension::getExtendedTypes());
     }
