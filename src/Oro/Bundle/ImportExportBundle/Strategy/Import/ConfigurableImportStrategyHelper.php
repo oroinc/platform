@@ -158,7 +158,7 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
         $violations = $this->validator->validate($entity, $constraints, $groups);
 
         $event = new StrategyValidationEvent($violations);
-        $this->eventDispatcher->dispatch(StrategyValidationEvent::BUILD_ERRORS, $event);
+        $this->eventDispatcher->dispatch($event, StrategyValidationEvent::BUILD_ERRORS);
 
         return $event->getErrors() ?: null;
     }

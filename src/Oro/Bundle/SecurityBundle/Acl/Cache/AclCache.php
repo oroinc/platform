@@ -11,6 +11,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
+use Oro\Bundle\SecurityBundle\Acl\Event\CacheClearEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\Entry;
@@ -26,8 +27,6 @@ use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
  */
 class AclCache implements AclCacheInterface
 {
-    private const CACHE_CLEAR_EVENT = 'oro_security.acl_cache.clear';
-
     /** @var Cache */
     private $cache;
 
@@ -137,7 +136,7 @@ class AclCache implements AclCacheInterface
 
         // we should clear underlying cache to avoid generation of wrong ACLs
         $this->underlyingCache->clearCache();
-        $this->eventDispatcher->dispatch(self::CACHE_CLEAR_EVENT);
+        $this->eventDispatcher->dispatch(new CacheClearEvent(), CacheClearEvent::CACHE_CLEAR_EVENT);
     }
 
     /**

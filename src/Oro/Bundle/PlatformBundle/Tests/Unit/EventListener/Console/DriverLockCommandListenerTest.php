@@ -3,7 +3,7 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\EventListener\Console;
 
 use Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener;
-use Oro\Bundle\PlatformBundle\Maintenance\Events;
+use Oro\Bundle\PlatformBundle\Maintenance\MaintenanceEvent;
 
 class DriverLockCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -48,7 +48,9 @@ class DriverLockCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->will($this->returnValue(DriverLockCommandListener::LEXIK_MAINTENANCE_LOCK));
 
-        $this->dispatcherInterface->expects($this->once())->method('dispatch')->with(Events::MAINTENANCE_ON);
+        $this->dispatcherInterface->expects($this->once())
+            ->method('dispatch')
+            ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
 
         $this->event->expects($this->once())->method('getCommand')->will($this->returnValue($this->command));
 
@@ -61,7 +63,9 @@ class DriverLockCommandListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->will($this->returnValue(DriverLockCommandListener::LEXIK_MAINTENANCE_UNLOCK));
 
-        $this->dispatcherInterface->expects($this->once())->method('dispatch')->with(Events::MAINTENANCE_OFF);
+        $this->dispatcherInterface->expects($this->once())
+            ->method('dispatch')
+            ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
 
         $this->event->expects($this->once())->method('getCommand')->will($this->returnValue($this->command));
 
