@@ -5,10 +5,30 @@
 
     display: flex;
 
+    &__link {
+        color: $primary-menu-link-color;
+
+        @include element-state('hover') {
+            color: $primary-menu-link-color-hover;
+        }
+
+        &--current {
+            color: $primary-menu-link-color-current;
+
+            @include element-state('hover') {
+                color: $primary-menu-link-color-current;
+            }
+        }
+    }
+
     &__item {
         flex: 0 1 auto;
 
         padding: $primary-menu-item-inner-offset;
+
+        .primary-menu {
+            display: none;
+        }
 
         &--current,
         &.active {
@@ -24,26 +44,6 @@
         &--offset-m {
             &:not(:first-child) {
                 margin-left: $offset-x-m;
-            }
-        }
-
-        .primary-menu {
-            display: none;
-        }
-    }
-
-    &__link {
-        color: $primary-menu-link-color;
-
-        @include element-state('hover') {
-            color: $primary-menu-link-color-hover;
-        }
-
-        &--current {
-            color: $primary-menu-link-color-current;
-
-            @include element-state('hover') {
-                color: $primary-menu-link-color-current;
             }
         }
     }

@@ -6,6 +6,22 @@
     display: inline-block;
     vertical-align: middle;
 
+    &__icon {
+        display: inline-block;
+
+        height: $checkbox-icon-size;
+        width: $checkbox-icon-size;
+
+        border: $checkbox-icon-border;
+        background-color: $checkbox-icon-bg-color;
+
+        border-radius: $checkbox-icon-border-radius;
+
+        cursor: $base-ui-element-cursor;
+
+        vertical-align: middle;
+    }
+
     &__input {
         position: absolute;
         top: $checkbox-icon-size / 2;
@@ -45,22 +61,6 @@
                 background-color: $checkbox-icon-bg-color-focus-state;
             }
         }
-    }
-
-    &__icon {
-        display: inline-block;
-
-        height: $checkbox-icon-size;
-        width: $checkbox-icon-size;
-
-        border: $checkbox-icon-border;
-        background-color: $checkbox-icon-bg-color;
-
-        border-radius: $checkbox-icon-border-radius;
-
-        cursor: $base-ui-element-cursor;
-
-        vertical-align: middle;
     }
 
     &__text {

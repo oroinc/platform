@@ -1,7 +1,9 @@
 /* @theme: admin.oro; */
 
 .hide {
-    display: none !important; // override inline styles
+    // override inline styles
+    // stylelint-disable-next-line declaration-no-important
+    display: none !important;
 }
 
 .nowrap {
@@ -9,7 +11,7 @@
 }
 
 .direction-ltr {
-    /*rtl:ignore*/
+    /* rtl:ignore */
     direction: ltr;
     unicode-bidi: bidi-override;
 }

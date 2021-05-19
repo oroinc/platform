@@ -18,7 +18,8 @@
     padding: $inline-editor-actions-inner-offset;
 
     &--over-multiselect {
-        z-index: 10004; // to show over .ui-multiselect-menu
+        // to show over .ui-multiselect-menu
+        z-index: 10004;
     }
 
     .btn {
@@ -35,14 +36,14 @@
             color: $inline-editor-action-item-color-disabled;
         }
 
-        [class^="fa-"] {
+        [class^='fa-'] {
             margin: 0;
         }
     }
 }
 
 .inline-editor__fields {
-    input[type="text"] {
+    input[type='text'] {
         width: 100%;
         margin: 0;
 
@@ -76,8 +77,17 @@
         }
     }
 
+    .hasDatepicker,
+    .timepicker-input {
+        &:focus {
+            position: relative;
+            z-index: 1;
+        }
+    }
+
     &.datetime-editor {
         min-width: $inline-editor-datetime-editor-width;
+        // stylelint-disable-next-line declaration-no-important
         width: auto !important;
 
         .hasDatepicker {
@@ -95,20 +105,12 @@
         }
     }
 
-    .hasDatepicker,
-    .timepicker-input {
-        &:focus {
-            position: relative;
-            z-index: 1;
-        }
-    }
-
     &.select-editor {
         min-width: $inline-editor-select-editor-width;
     }
 
     .select2-choice {
-        &:after {
+        &::after {
             position: absolute;
             right: 0;
             top: 50%;
@@ -129,11 +131,15 @@
 
     &.multi-select-editor,
     &.multi-relation-editor {
-        width: auto !important; // ignore cell width
-        min-width: 0; // ignore min-width
+        // ignore cell width
+        // stylelint-disable-next-line declaration-no-important
+        width: auto !important;
+        // ignore min-width
+        min-width: 0;
 
         .select2-container {
             height: auto;
+            // stylelint-disable-next-line declaration-no-important
             width: auto !important;
         }
 

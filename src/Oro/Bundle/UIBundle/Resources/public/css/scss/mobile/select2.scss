@@ -67,7 +67,7 @@
         .select2-choices {
             padding: $mobile-select2-search-multi-choices-inner-offset;
 
-            &:before {
+            &::before {
                 height: $mobile-select2-search-multi-placeholder-height;
             }
 
@@ -95,7 +95,7 @@
                     border: none;
                     justify-content: center;
 
-                    &:before {
+                    &::before {
                         font-size: 16px;
                         height: auto;
                         display: block;

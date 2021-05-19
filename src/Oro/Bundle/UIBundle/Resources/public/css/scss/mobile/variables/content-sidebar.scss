@@ -12,4 +12,5 @@ $content-sidebar-mobile-margin: 0 0 0 (-$content-padding) !default;
 $content-sidebar-items-mobile-offset-inner: 0 $content-padding !default;
 
 $content-sidebar-jstree-wrapper-mobile-inner-offset: 0 $content-padding !default;
-$content-sidebar-jstree-wrapper-jstree-mobile-inner-offset: 0 -#{$content-padding} 0 -#{$content-padding + $content-padding-medium} !default;
+$content-sidebar-jstree-wrapper-jstree-mobile-inner-offset: 0
+    (-$content-padding) 0 -($content-padding + $content-padding-medium) !default;

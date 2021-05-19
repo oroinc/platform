@@ -26,9 +26,10 @@
 
     &__entity-title {
         min-height: 15px;
+        // stylelint-disable-next-line declaration-no-important
         float: none !important;
         font-size: $base-font-size--xl;
-        font-weight: normal;
+        font-weight: font-weight('light');
         margin-right: 2px;
         line-height: $content-title-line-height;
     }
@@ -118,9 +119,9 @@
 .customer-info-actions {
     position: relative;
     z-index: 2;
-    
+
     margin-top: $content-padding-small;
-    
+
     background-color: $primary-860;
     border-bottom: 1px solid $additional-ultra-light;
 

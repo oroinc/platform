@@ -83,7 +83,7 @@
     &__link,
     &__close {
         @include hover() {
-            background-color: $demo-popup-color-gray-300
+            background-color: $demo-popup-color-gray-300;
         }
 
         @include hover-focus-active() {

@@ -11,6 +11,7 @@
     }
 }
 
+// stylelint-disable-next-line scss/selector-no-redundant-nesting-selector
 & {
     min-width: inherit;
     font-size: $base-font-size;
@@ -31,6 +32,7 @@
 .dot-menu,
 #bookmark-buttons,
 #breadcrumb {
+    // stylelint-disable-next-line declaration-no-important
     display: none !important;
 }
 

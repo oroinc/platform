@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, max-nesting-depth */
+
 /* Header */
 .app-header {
     margin-bottom: 0;
@@ -30,7 +32,7 @@
             }
         }
 
-        &:before {
+        &::before {
             border: 0 none;
 
             content: '';
@@ -41,11 +43,11 @@
             top: -5px;
             left: 9px;
             transform: rotate(53deg) skewX(15deg);
-            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
+            box-shadow: $header-dropdown-menu-box-shadow;
             z-index: -1;
         }
 
-        &:after {
+        &::after {
             border: 0 none;
             background: inherit;
             content: '';
@@ -70,7 +72,8 @@
         }
     }
 
-    &__search-and-shortcuts { // Includes Shortcuts and Search
+    // Includes Shortcuts and Search
+    &__search-and-shortcuts {
         .dropdown {
             float: left;
 
@@ -102,7 +105,6 @@
                         display: flex;
                         flex-wrap: nowrap;
                         align-items: stretch;
-
 
                         .search-field-container {
                             position: relative;
@@ -143,7 +145,10 @@
                             box-shadow: $header-search-suggestion-list-shadow;
 
                             li {
-                                border-top: $header-search-suggestion-list-separator-width solid $header-search-suggestion-list-separator-color;
+                                border-top:
+                                    $header-search-suggestion-list-separator-width
+                                    solid
+                                    $header-search-suggestion-list-separator-color;
                                 padding: $header-search-suggestion-item-v-margin 0;
                                 margin: 0 $header-search-suggestion-item-h-margin;
                             }
@@ -180,7 +185,8 @@
                                 padding-right: $header-search-suggestion-item-h-margin / 2;
                                 background-color: $header-search-selected-suggestion-item-bg;
 
-                                .description, .entity-label {
+                                .description,
+                                .entity-label {
                                     color: $header-search-selected-suggestion-item-color;
                                 }
                             }
@@ -219,6 +225,7 @@
                         }
 
                         input.search:not(:focus) + .search-suggestion-list + .no-data {
+                            // stylelint-disable-next-line declaration-no-important
                             display: none !important;
                         }
 
@@ -226,14 +233,14 @@
                             float: right;
                         }
 
-                        &:after {
-                            content: "";
+                        &::after {
+                            content: '';
                             display: block;
                             clear: both;
                         }
-                    } // Ends .header-search
-                } // Ends .search-form
-            } // Ends &:.header-dropdown-search
+                    } /* Ends .header-search */
+                } /* Ends .search-form */
+            } /* Ends &:.header-dropdown-search */
 
             &.header-dropdown-shortcut {
                 .header-dropdown-shortcut__search {
@@ -241,6 +248,7 @@
 
                     margin-bottom: $header-shortcut-dropdown-search-margin-bottom;
                 }
+
                 .dropdown-menu {
                     width: $header-shortcut-dropdown-width;
 
@@ -250,8 +258,8 @@
                         border-top-left-radius: 0;
                         border-top-right-radius: 0;
 
-                        &:before,
-                        &:after {
+                        &::before,
+                        &::after {
                             display: none;
                         }
                     }
@@ -267,11 +275,10 @@
                     }
                 }
             }
-        } // Ends .dropdown
+        } /* Ends .dropdown */
 
         .select2-container {
             box-sizing: border-box;
         }
-
-    } // Ends .top-search
+    } /* Ends .top-search */
 }

@@ -115,8 +115,8 @@ final class DataType
     }
 
     /**
-     * Checks whether the given data-type represents an extended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
+     * Checks whether the given data-type represents a multi-target association.
+     * @link https://doc.oroinc.com/backend/entities/extend-entities/multi-target-associations
      *
      * @param string|null $dataType
      *
@@ -128,8 +128,8 @@ final class DataType
     }
 
     /**
-     * Extracts the type and the kind of an extended association.
-     * See EntityExtendBundle/Resources/doc/associations.md for details about extended associations.
+     * Extracts the type and the kind of a multi-target association.
+     * @link https://doc.oroinc.com/backend/entities/extend-entities/multi-target-associations
      *
      * @param string $dataType
      *

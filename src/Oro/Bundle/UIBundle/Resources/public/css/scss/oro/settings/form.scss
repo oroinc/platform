@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "form-selectors";
+@import 'form-selectors';
 
 $field-size: 32px !default;
 $field-width: 294px !default;
@@ -107,7 +107,7 @@ $selector-uniform-width: 100% !default;
 
 $selector-uniform-arrow-outer-offset: 2px 0 0 0 !default;
 $selector-uniform-arrow-display: inline-block !default;
-$selector-uniform-arrow-font-family: FontAwesome !default;
+$selector-uniform-arrow-font-family: $fa-font-family !default;
 $selector-uniform-arrow-position: absolute !default;
 $selector-uniform-arrow-right: $select-caret-offset-end !default;
 

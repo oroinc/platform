@@ -14,7 +14,7 @@
     animation: $loading-bar-animation;
     overflow: $loading-bar-overflow;
 
-    &:before {
+    &::before {
         content: '';
         background: $loading-bar-point-background;
         width: $loading-bar-point-width;

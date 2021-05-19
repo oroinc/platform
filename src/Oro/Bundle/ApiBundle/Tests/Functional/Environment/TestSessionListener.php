@@ -35,8 +35,9 @@ class TestSessionListener implements EventSubscriberInterface
             return;
         }
 
-        $session = $event->getRequest()->getSession();
-        if (null === $session) {
+        $request = $event->getRequest();
+        $session = $request->hasSession() ? $request->getSession() : null;
+        if (!$session) {
             throw new \LogicException(sprintf(
                 'The Session is not initialized. Check the priority of %s::onKernelRequest().',
                 __CLASS__
@@ -58,8 +59,8 @@ class TestSessionListener implements EventSubscriberInterface
             return;
         }
 
-        $session = $event->getRequest()->getSession();
-        $this->isSessionStarted = $session && $session->isStarted();
+        $request = $event->getRequest();
+        $this->isSessionStarted = $request->hasSession() && $request->getSession()->isStarted();
     }
 
     /**

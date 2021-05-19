@@ -5,6 +5,9 @@ namespace Oro\Bundle\PlatformBundle\Maintenance;
 use Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Class represents Maintenance Mode
+ */
 class Mode
 {
     /**
@@ -36,7 +39,7 @@ class Mode
         $result = $this->factory->getDriver()->lock();
 
         if ($result) {
-            $this->dispatcher->dispatch(Events::MAINTENANCE_ON);
+            $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
         }
 
         return $result;
@@ -51,7 +54,7 @@ class Mode
         $result = $this->factory->getDriver()->unlock();
 
         if ($result) {
-            $this->dispatcher->dispatch(Events::MAINTENANCE_OFF);
+            $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
         }
 
         return $result;

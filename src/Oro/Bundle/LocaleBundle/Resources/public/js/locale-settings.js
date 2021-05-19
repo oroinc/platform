@@ -71,7 +71,7 @@ define(function(require, exports, module) {
                     decimal: {
                         grouping_size: 3,
                         grouping_used: 1,
-                        max_fraction_digits: 3,
+                        max_fraction_digits: 14,
                         min_fraction_digits: 0,
                         negative_prefix: '-',
                         negative_suffix: '',
@@ -89,7 +89,7 @@ define(function(require, exports, module) {
                     percent: {
                         grouping_size: 3,
                         grouping_used: 1,
-                        max_fraction_digits: 3,
+                        max_fraction_digits: 14,
                         min_fraction_digits: 0,
                         negative_prefix: '-',
                         negative_suffix: '%',

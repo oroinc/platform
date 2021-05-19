@@ -46,6 +46,7 @@
         border-width: 1px 0 0;
 
         .title {
+            // stylelint-disable-next-line declaration-no-important
             display: none !important;
         }
     }

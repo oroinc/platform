@@ -12,25 +12,25 @@
 
     cursor: pointer;
 
-    &:before,
-    &:after {
+    &::before,
+    &::after {
         position: absolute;
         left: 0;
         right: 0;
 
         height: $load-more-decor-size;
 
-        border-top:  $load-more-decor-border;
+        border-top: $load-more-decor-border;
         border-bottom: $load-more-decor-border;
 
         content: '';
     }
 
-    &:before {
+    &::before {
         top: 0;
     }
 
-    &:after {
+    &::after {
         bottom: 0;
     }
 
@@ -51,7 +51,7 @@
         .load-more__label {
             font-size: 0;
 
-            &:before {
+            &::before {
                 display: inline-block;
 
                 content: '';
@@ -72,13 +72,13 @@
 
         background-color: $load-more-in-thread-background-color;
 
-        &:before {
+        &::before {
             top: -$load-more-border-width;
 
             border-top-color: $load-more-in-thread-border-color;
         }
 
-        &:after {
+        &::after {
             bottom: -$load-more-border-width;
 
             border-bottom-color: $load-more-in-thread-border-color;

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .filter-container {
     position: $filter-container-position;
 }
@@ -23,6 +25,7 @@
 
         &.criteria-hidden {
             // Break inline styles
+            // stylelint-disable-next-line declaration-no-important
             margin-inline-start: -9999px !important;
             visibility: hidden;
         }
@@ -44,7 +47,7 @@
                 margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
             }
 
-            [class^="fa-"] {
+            [class^='fa-'] {
                 padding-top: $filter-box-criteria-btn-group-icon-inner-offset-top;
                 vertical-align: $filter-box-criteria-btn-group-icon-vertical-align;
             }
@@ -55,7 +58,7 @@
                 width: 100%;
                 font-size: $selector-uniform-font-size;
 
-                &:after {
+                &::after {
                     position: $selector-uniform-arrow-position;
                     right: $number-range-filter-field-caret-end;
                     top: $number-range-filter-field-caret-top;
@@ -144,7 +147,7 @@
         }
 
         .btn-group {
-            & + .btn-group {
+            + .btn-group {
                 margin-left: $filter-box-criteria-btn-group-offset-left;
             }
         }
@@ -204,13 +207,13 @@
             display: $filter-box-reset-display;
             width: $filter-box-reset-width;
 
-            [class^="fa-"],
-            [class*=" fa-"] {
+            [class^='fa-'],
+            [class*=' fa-'] {
                 vertical-align: $filter-box-reset-icon-vertical-align;
             }
 
             &:hover {
-                [class^="fa-"]:before {
+                [class^='fa-']::before {
                     color: $filter-box-reset-icon-hover-color;
                 }
             }
@@ -286,6 +289,7 @@
                     label {
                         padding-left: $choice-tree-filter-list-label-inner-offset-left;
 
+                        // stylelint-disable-next-line max-nesting-depth
                         &.search-result {
                             color: $choice-tree-filter-list-search-color;
                             font-weight: $choice-tree-filter-list-search-font-weight;
@@ -294,7 +298,7 @@
                 }
             }
 
-            input[name="value"] {
+            input[name='value'] {
                 display: $choice-tree-filter-value-field-display;
             }
         }
@@ -307,7 +311,7 @@
         .filter-criteria-selector {
             padding-right: 30px;
 
-            &:after {
+            &::after {
                 position: absolute;
                 right: 14px;
                 top: 50%;
@@ -316,7 +320,7 @@
         }
 
         &.open-filter {
-            &:before {
+            &::before {
                 content: $open-filter-before-content;
                 background: $open-filter-before-background;
                 width: $open-filter-before-width;
@@ -328,7 +332,7 @@
                 box-shadow: $open-filter-before-box-shadow;
             }
 
-            &:after {
+            &::after {
                 border-bottom: $open-filter-after-border-bottom;
                 border-left: $open-filter-after-border-left;
                 border-right: $open-filter-after-border-right;
@@ -361,7 +365,7 @@
             position: $filter-item-dropdown-toggle-position;
         }
 
-        & > .btn {
+        > .btn {
             height: $filter-item-btn-height;
             font-size: $filter-item-btn-font-size;
             line-height: $filter-item-btn-line-height;
@@ -382,7 +386,7 @@
         position: $filter-item-filter-list-position;
     }
 
-    .fa-close:before {
+    .fa-close::before {
         color: $filter-item-fa-close-color;
         font-size: $filter-item-fa-close-font-size;
     }
@@ -435,7 +439,7 @@
     cursor: $filters-state-cursor;
 
     // Added to avoid showing Safari's hint for elements with ellipsis
-    &:before {
+    &::before {
         content: '';
         display: block;
     }
@@ -443,7 +447,7 @@
     .fa-filter {
         margin-right: $filters-state-icon-offset-right;
 
-        &:before {
+        &::before {
             color: $filters-state-icon-color;
             font-size: $filters-state-icon-font-size;
         }
@@ -466,7 +470,7 @@
 
 .filters-state-view-container {
     position: absolute;
-    width: 100%
+    width: 100%;
 }
 
 .filters-state-popover {
@@ -508,7 +512,7 @@
                     padding-bottom: $select-filter-widget-checkboxes-list-offset-vertical;
                 }
 
-                &:after {
+                &::after {
                     content: $select-filter-widget-li-after-content;
                     display: $select-filter-widget-li-after-display;
                     clear: $select-filter-widget-li-after-clear;
@@ -519,7 +523,7 @@
                 }
             }
 
-            input[type="checkbox"] {
+            input[type='checkbox'] {
                 margin: $select-filter-widget-checkboxes-offset;
             }
 
@@ -540,7 +544,7 @@
             }
         }
 
-        input[type="search"] {
+        input[type='search'] {
             margin: $select-filter-widget-search-offset;
             width: $select-filter-widget-search-width;
         }
@@ -551,7 +555,7 @@
             margin: $select-filter-widget-header-offset;
             position: relative;
 
-            & > div {
+            > div {
                 padding: $select-filter-widget-header-child-inner-offset;
             }
 
@@ -589,7 +593,7 @@
 }
 
 .filter-items {
-    & > :empty {
+    > :empty {
         display: $filter-items-empty-display;
     }
 
@@ -619,8 +623,9 @@
         }
     }
 
-    &.select-filter-widget {
+    .select-filter-widget {
         // Rewrite inline styles for filter manager
+        // stylelint-disable-next-line declaration-no-important
         width: $select-filter-widget-width !important;
     }
 }
@@ -643,7 +648,7 @@
 .active-filter {
     .dropdown,
     .dropup {
-        &:after {
+        &::after {
             display: $active-filter-display;
         }
     }

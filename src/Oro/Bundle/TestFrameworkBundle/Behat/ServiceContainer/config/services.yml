@@ -162,7 +162,7 @@ services:
         tags:
             - { name: 'context.class_resolver' }
 
-    oro_test.processor.message_queue:
+    oro_test.processor.message_queue.base:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessor
         arguments:
             - '@symfony2_extension.kernel'
@@ -171,10 +171,24 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\DbalMessageQueueProcessor
         arguments:
             - '@symfony2_extension.kernel'
-            - '@oro_test.processor.message_queue'
+            - '@oro_test.processor.message_queue.base'
 
     oro_test.processor.message_queue.amqp:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\AmqpMessageQueueProcessor
         arguments:
             - '@symfony2_extension.kernel'
-            - '@oro_test.processor.message_queue'
+            - '@oro_test.processor.message_queue.base'
+
+    oro_test.processor.message_queue:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorFacade
+        arguments:
+            - '@symfony2_extension.kernel'
+            - '@oro_test.processor.message_queue.dbal'
+            - '@oro_test.processor.message_queue.amqp'
+
+    oro_test.processor.message_queue_initializer:
+        class: 'Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInitializer'
+        calls:
+            - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
+        tags:
+            - { name: 'context.initializer' }

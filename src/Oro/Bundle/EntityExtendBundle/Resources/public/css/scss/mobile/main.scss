@@ -1,7 +1,6 @@
 /* @theme: admin.oro; */
 
 .mobile-version {
-    @import "variables";
-
-    @import "enum-value-collection";
+    @import 'variables';
+    @import 'enum-value-collection';
 }

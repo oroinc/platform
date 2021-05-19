@@ -1,12 +1,7 @@
 /* @theme: admin.oro; */
 
-@-webkit-keyframes fade-in {
-    to {
-        height: 0;
-        margin: 0;
-        opacity: 0;
-    }
-}
+/* stylelint-disable no-descending-specificity */
+
 @keyframes fade-in {
     to {
         height: 0;
@@ -15,23 +10,12 @@
     }
 }
 
-@-webkit-keyframes fade-out {
-    from {
-        height: 0;
-        margin: 0;
-        opacity: 0;
-    }
-    to {
-        height: auto;
-        margin: auto;
-        opacity: 1;
-    }
-}
 @keyframes fade-out {
     from {
         opacity: 0;
         transform: translate3d(0, -100%, 0);
     }
+
     to {
         opacity: 1;
         transform: none;
@@ -43,11 +27,6 @@
 .workflow-step,
 .workflow-transition-overlay,
 .workflow-flowchart {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -68,6 +47,7 @@
                 animation: fade-in .5s both;
             }
         }
+
         &.fixed {
             .workflow-flowchart-wrapper {
                 animation: fade-out .5s both;
@@ -126,7 +106,7 @@
         .step-label {
             text-align: center;
             font-size: $flowchart-step-font-size;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             width: 100%;
             cursor: default;
 
@@ -168,9 +148,14 @@
         &.dropdown .dropdown-toggle {
             padding-right: $flowchart-step-h-padding;
 
-            &:before {
+            &::before {
                 right: $flowchart-step-h-padding;
-                background-image: linear-gradient(to left, $flowchart-step-bg-color, rgba($flowchart-step-bg-color, 0.2));
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-step-bg-color,
+                        rgba($flowchart-step-bg-color, .2)
+                    );
             }
         }
 
@@ -190,8 +175,13 @@
 
             background-color: $flowchart-step-hover-bg-color;
 
-            .dropdown-toggle:before {
-                background-image: linear-gradient(to left, $flowchart-step-hover-bg-color, rgba($flowchart-step-hover-bg-color, 0.2));
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-step-hover-bg-color,
+                        rgba($flowchart-step-hover-bg-color, .2)
+                    );
             }
         }
 
@@ -244,8 +234,13 @@
         &.final-step {
             background-color: $flowchart-final-step-bg-color;
 
-            .dropdown-toggle:before {
-                background-image: linear-gradient(to left, $flowchart-final-step-bg-color, rgba($flowchart-final-step-bg-color, 0.2));
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-final-step-bg-color,
+                        rgba($flowchart-final-step-bg-color, .2)
+                    );
             }
 
             &._jsPlumb_hover,
@@ -255,8 +250,13 @@
             &:hover {
                 background-color: $flowchart-final-step-hover-bg-color;
 
-                .dropdown-toggle:before {
-                    background-image: linear-gradient(to left, $flowchart-final-step-hover-bg-color, rgba($flowchart-final-step-hover-bg-color, 0.2));
+                .dropdown-toggle::before {
+                    background-image:
+                        linear-gradient(
+                            to left,
+                            $flowchart-final-step-hover-bg-color,
+                            rgba($flowchart-final-step-hover-bg-color, .2)
+                        );
                 }
             }
         }
@@ -295,9 +295,14 @@
         &.dropdown .dropdown-toggle {
             padding-right: $flowchart-transition-h-padding;
 
-            &:before {
+            &::before {
                 right: $flowchart-transition-h-padding;
-                background-image: linear-gradient(to left, $flowchart-transition-bg-color, rgba($flowchart-transition-bg-color, 0.3));
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-transition-bg-color,
+                        rgba($flowchart-transition-bg-color, .3)
+                    );
             }
         }
 
@@ -309,11 +314,17 @@
             background-color: $flowchart-transition-hover-bg-color;
             color: $flowchart-transition-hover-color;
             opacity: 1;
+            // stylelint-disable-next-line declaration-no-important
             display: block !important;
             z-index: $flowchart-transition-hover-z-index;
 
-            .dropdown-toggle:before {
-                background-image: linear-gradient(to left, $flowchart-transition-hover-bg-color, rgba($flowchart-transition-hover-bg-color, 0.3));
+            .dropdown-toggle::before {
+                background-image:
+                    linear-gradient(
+                        to left,
+                        $flowchart-transition-hover-bg-color,
+                        rgba($flowchart-transition-hover-bg-color, .3)
+                    );
             }
         }
     }
@@ -343,7 +354,7 @@
                 cursor: pointer;
                 right: 0;
 
-                &:before {
+                &::before {
                     content: '';
                     display: block;
                     position: absolute;
@@ -351,7 +362,7 @@
                     height: 100%;
                 }
 
-                &:after {
+                &::after {
                     position: relative;
                 }
             }

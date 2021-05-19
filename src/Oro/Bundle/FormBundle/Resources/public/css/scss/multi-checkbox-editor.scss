@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 .inline-editor-wrapper.multi-checkbox-editor {
+    // stylelint-disable-next-line declaration-no-important
     z-index: auto !important;
     min-width: 190px;
 
@@ -10,6 +11,7 @@
     }
 
     button.ui-multiselect {
+        // stylelint-disable-next-line declaration-no-important
         width: 100% !important;
         height: 0;
         border: 0 none;
@@ -44,10 +46,10 @@
             height: 30px;
             font-size: 14px;
             border-radius: 0;
-            border: 1px solid #ccc;
+            border: 1px solid $additional-extra-light;
 
             &:focus {
-                border-color: rgba(82, 168, 236, .8);
+                border-color: $input-focus-border-color;
                 outline: none;
                 box-shadow: none;
             }
@@ -55,16 +57,16 @@
     }
 
     .ui-multiselect-checkboxes {
-        border: 1px solid #ccc;
+        border: 1px solid $additional-extra-light;
         border-top: 0 none;
-        background: #fff;
+        background: $primary-inverse;
         padding: 0 3px;
         max-height: 300px;
         border-radius: 0;
-        box-shadow: 0 4px 5px rgba(0, 0, 0, .15);
+        box-shadow: $inline-editor-checkboxes-shadow;
 
-        input[type="radio"],
-        input[type="checkbox"] {
+        input[type='radio'],
+        input[type='checkbox'] {
             margin-top: -4px;
         }
 

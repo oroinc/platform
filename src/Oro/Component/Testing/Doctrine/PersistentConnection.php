@@ -177,6 +177,9 @@ class PersistentConnection extends Connection
      */
     protected function getConnectionId()
     {
-        return md5(serialize($this->getParams()));
+        $params = $this->getParams();
+        unset($params['wrapperClass']);
+
+        return $params['driverOptions']['ConnectionId'] ?? md5(serialize($params));
     }
 }

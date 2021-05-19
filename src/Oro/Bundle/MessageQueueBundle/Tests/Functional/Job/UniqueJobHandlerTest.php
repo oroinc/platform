@@ -29,7 +29,7 @@ class UniqueJobHandlerTest extends WebTestCase
      */
     private function getConnection(): ?Connection
     {
-        return $this->getContainer()->get('doctrine')->getManager()->getConnection();
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class)->getConnection();
     }
 
     public function testShouldThrowIfDuplicateJobOwnerIdAndName(): void

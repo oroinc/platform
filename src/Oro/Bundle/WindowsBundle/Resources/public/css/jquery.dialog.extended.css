@@ -1,3 +1,5 @@
+/* stylelint-disable */
+
 .ui-dialog-titlebar-buttonpane {
     position: absolute;
     top: 50%;
@@ -84,7 +86,7 @@
 }
 
 .ui-dialog-minimized {
-    margin: 4px 2px 0 2px !important;
+    margin: 4px 2px 0 !important;
 }
 
 .loading .ui-widget-overlay,

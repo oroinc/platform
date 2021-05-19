@@ -65,7 +65,7 @@
 
         @include border($nav-tabs-border-width, $nav-tabs-border-style, $nav-tabs-border-color);
 
-        &:after {
+        &::after {
             // Disable bootstrap clearfix
             content: none;
         }
@@ -98,7 +98,11 @@
             background: $nav-tabs-link-hover-background;
             color: $nav-tabs-link-hover-color;
 
-            @include border($nav-tabs-link-hover-border-width, $nav-tabs-link-hover-border-style, $nav-tabs-link-hover-border-color);
+            @include border(
+                $nav-tabs-link-hover-border-width,
+                $nav-tabs-link-hover-border-style,
+                $nav-tabs-link-hover-border-color
+            );
         }
 
         @if $nav-tabs-link-active-color-focus-visible {
@@ -107,13 +111,17 @@
             }
         }
 
-       &#{$nav-tabs-item-active} {
+        &#{$nav-tabs-item-active} {
             padding: $nav-tabs-link-active-inner-offset;
 
             background: $nav-tabs-link-active-background;
             color: $nav-tabs-link-active-color;
 
-            @include border($nav-tabs-link-active-border-width, $nav-tabs-link-active-border-style, $nav-tabs-link-active-border-color);
+            @include border(
+                $nav-tabs-link-active-border-width,
+                $nav-tabs-link-active-border-style,
+                $nav-tabs-link-active-border-color
+            );
         }
     }
 

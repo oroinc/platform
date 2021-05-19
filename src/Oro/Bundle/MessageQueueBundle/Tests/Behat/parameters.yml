@@ -1,10 +1,12 @@
 services:
     oro_message_queue.mock_lifecycle_message.cache:
-      # This service marked as public (origin private) for compatibility with Symfony 4. All dependencies must be refactored after BAP-17037
         public: true
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_behat_mesage_queue_mock_lifecycle_message' ] ]
+        class: 'Symfony\Component\Cache\Adapter\PdoAdapter'
+        arguments:
+            - '@doctrine.dbal.message_queue_connection'
+            - ''
+            - 0
+            - { db_table: oro_behat_message_queue }
 
     oro_message_queue.client.mock_lifecycle_message_producer:
         class: Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\MockLifecycleMessageProducer

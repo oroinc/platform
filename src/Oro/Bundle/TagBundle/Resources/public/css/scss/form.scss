@@ -1,7 +1,8 @@
 /* @theme: admin.oro; */
 
 .tags-select-editor {
-    min-width: $tag-selector-item-min-width; // ignore min-width
+    // ignore min-width
+    min-width: $tag-selector-item-min-width;
 
     .select2-container {
         border-radius: 0;
@@ -19,7 +20,7 @@
         background: $primary-inverse;
         width: $tag-selector-items-width;
 
-        &:before {
+        &::before {
             content: ' ';
             float: right;
             width: $tag-selector-actions-width;
@@ -60,13 +61,14 @@
                 align-items: center;
                 justify-content: center;
 
-                &:before {
+                &::before {
                     color: $tag-selector-item-color;
                     line-height: 1;
                 }
             }
 
             &.select2-locked {
+                /* stylelint-disable-next-line declaration-no-important */
                 padding: $tag-selector-item-padding-vertical $tag-selector-item-padding-horizontal !important;
             }
         }

@@ -1,5 +1,7 @@
 /* @theme: view-switcher; */
 
+/* stylelint-disable no-descending-specificity, no-duplicate-selectors */
+
 .help-carousel {
     &:not(.shown) {
         display: none;
@@ -14,7 +16,7 @@
         margin: 100px 0 0 (-$help-carousel-popup-width / 2);
 
         color: $primary-200;
-        background-color:  $primary-inverse;
+        background-color: $primary-inverse;
 
         border-radius: 4px;
 
@@ -57,7 +59,7 @@
         position: absolute;
         top: $content-padding-small;
         right: $content-padding-small;
-        width:  16px;
+        width: 16px;
         height: 16px;
 
         color: $primary-750;
@@ -79,13 +81,12 @@
         bottom: -100vh;
         left: 0;
         right: 0;
-
-        background-color: rgba($primary, 0.4);
+        background-color: rgba($primary, .4);
     }
 }
 
 @media only screen and (max-height: 750px) {
-    .help-carousel{
+    .help-carousel {
         &__popup {
             margin-top: 26px;
         }
@@ -125,7 +126,7 @@
 
     &__subtitle {
         font-size: 16px;
-        font-weight: bold;
+        font-weight: font-weight('bold');
         margin: 8px 0;
     }
 
@@ -147,16 +148,16 @@
         padding: 14px 12px;
 
         font-size: 15px;
-        color: #fff;
-        background-color: #cc5c28;
+        color: $primary-inverse;
+        background-color: $tab-switcher-button-color;
         text-decoration: none;
         outline: none;
 
         border-radius: 5px;
-        transition: color .1s,background .1s,box-shadow .1s;
+        transition: color .1s, background .1s, box-shadow .1s;
 
         @include hover-focus-active() {
-            background: #d86936;
+            background: $tab-switcher-button-color-hover;
         }
     }
 }
@@ -200,6 +201,7 @@
     .slick-disabled {
         cursor: default;
         color: $primary-700;
+
         @include hover-focus-active() {
             color: $primary-700;
         }
@@ -233,6 +235,7 @@
             background: transparent;
             border: 1px solid $extra;
             border-radius: 50%;
+
             @include hover() {
                 border-color: $extra-100;
                 background: $extra-100;
@@ -242,6 +245,7 @@
         .slick-active {
             button {
                 background: $extra;
+
                 @include hover() {
                     background: $extra;
                     cursor: default;

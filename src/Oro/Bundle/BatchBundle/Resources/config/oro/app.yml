@@ -1,20 +1,8 @@
 doctrine:
-    dbal:
-        connections:
-            batch:
-                driver:   '%database_driver%'
-                host:     '%database_host%'
-                port:     '%database_port%'
-                dbname:   '%database_name%'
-                user:     '%database_user%'
-                password: '%database_password%'
-                options:  '%database_driver_options%'
-                charset:  '%database_charset%'
-                server_version: '%database_server_version%'
     orm:
         entity_managers:
             batch:
-                connection: batch
+                connection: message_queue
                 mappings:
                     AkeneoBatchBundle:
                         mapping: true

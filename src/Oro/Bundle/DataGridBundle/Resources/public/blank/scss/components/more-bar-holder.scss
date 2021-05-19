@@ -19,8 +19,10 @@
         color: inherit;
 
         // Hide bootstrap arrow
-        &:before {
-            content: none !important; // Override bootstrap styles
+        &::before {
+            // Override bootstrap styles
+            // stylelint-disable-next-line declaration-no-important
+            content: none !important;
         }
 
         .action-cell & {

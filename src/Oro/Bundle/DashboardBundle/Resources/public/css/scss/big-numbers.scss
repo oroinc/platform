@@ -24,7 +24,7 @@
         display: block;
         vertical-align: middle;
 
-        &:after {
+        &::after {
             position: absolute;
             right: 15px;
             bottom: -15px;
@@ -41,15 +41,15 @@
             border: 0;
         }
 
-        &:nth-child(3n):after {
+        &:nth-child(3n)::after {
             content: '';
         }
 
-        &:last-child:after {
+        &:last-child::after {
             content: normal;
         }
 
-        & > .title {
+        > .title {
             max-width: 100%;
             padding: 0;
 
@@ -57,7 +57,7 @@
                 padding: 0;
             }
 
-            font-weight: normal;
+            font-weight: font-weight('light');
             font-size: $base-font-size;
             text-align: left;
             color: $primary-400;
@@ -66,20 +66,20 @@
             margin-bottom: 10px;
         }
 
-        & > .value {
+        > .value {
             margin-bottom: 15px;
 
             text-align: left;
-            font-weight: normal;
+            font-weight: font-weight('light');
             color: $primary-100;
         }
 
-        & > div.deviation {
+        > div.deviation {
             font-size: 11px;
             line-height: 1.7;
             overflow: hidden;
 
-            & > .deviation {
+            > .deviation {
                 float: left;
 
                 &.positive {
@@ -91,7 +91,7 @@
                 }
             }
 
-            & > .date-range {
+            > .date-range {
                 max-width: calc(100% - 70px);
 
                 text-overflow: ellipsis;
@@ -115,14 +115,14 @@
             width: 50%;
         }
 
-        li:nth-child(even):after {
+        li:nth-child(even)::after {
             width: calc(200% - 30px);
 
             content: '';
         }
 
-        li:nth-child(3n):after,
-        li:last-child:after {
+        li:nth-child(3n)::after,
+        li:last-child::after {
             content: normal;
         }
     }

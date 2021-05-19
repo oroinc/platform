@@ -1,11 +1,5 @@
 /* @theme: admin.oro; */
 
-@-webkit-keyframes spin-loading {
-    100% {
-        -webkit-transform: rotate(360deg);
-    }
-}
-
 @keyframes spin-loading {
     100% {
         transform: rotate(360deg);

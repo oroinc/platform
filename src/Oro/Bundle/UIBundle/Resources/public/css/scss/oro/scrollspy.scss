@@ -16,7 +16,7 @@
 
         @include clearfix();
 
-        &:after {
+        &::after {
             content: '';
             position: absolute;
             pointer-events: none;

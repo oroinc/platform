@@ -18,10 +18,10 @@
 // Use: color: get-color('primary', 'base') => color: #000;
 
 @function get-color($palette: 'primary', $key: 'main') {
-    $colorKey: get-nested-map-value($color-palette, $palette, $key);
+    $color-key: get-nested-map-value($color-palette, $palette, $key);
 
-    @if ($colorKey) {
-        @return $colorKey;
+    @if ($color-key) {
+        @return $color-key;
     } @else {
         @warn 'Color not found:' $palette $key;
     }
@@ -44,10 +44,10 @@
 // Use: font-weight: font-weight('bold') => font-weight: 700;
 
 @function font-weight($key) {
-    $fontWeightKey: map-get($font-weights, $key);
+    $font-weight-key: map-get($font-weights, $key);
 
-    @if ($fontWeightKey) {
-        @return $fontWeightKey
+    @if ($font-weight-key) {
+        @return $font-weight-key;
     } @else {
         @warn 'Font weight value not found:' $key;
     }

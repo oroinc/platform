@@ -7,6 +7,8 @@ $dialog-z-index: $zindex-fixed !default;
 $dialog-outline: none !default;
 $dialog-border: none !default;
 $dialog-position: absolute !default;
+$dialog-display: flex !default;
+$dialog-flex-direction: column !default;
 
 $dialog-resizable-width: auto !important !default;
 
@@ -47,7 +49,7 @@ $dialog-minimized-box-shadow: none !default;
 $dialog-minimized-titlebar-inner-offset: 3px 11px 3px 12px !default;
 $dialog-minimized-titlebar-outer-bottom-offset: 0 !default;
 
-$dialog-title-font-weight: bold !default;
+$dialog-title-font-weight: font-weight('bold') !default;
 $dialog-title-display: block !default;
 $dialog-title-white-space: nowrap !default;
 $dialog-title-overflow: hidden !default;

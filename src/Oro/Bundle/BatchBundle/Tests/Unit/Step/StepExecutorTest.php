@@ -7,9 +7,8 @@ use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Processor;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Reader;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\WarningHandler;
 use Oro\Bundle\BatchBundle\Tests\Unit\Step\Stub\Writer;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class StepExecutorTest extends WebTestCase
+class StepExecutorTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @throws \Exception
@@ -57,21 +56,21 @@ class StepExecutorTest extends WebTestCase
                 Reader::class,
                 Reader::LOGIC_EXCEPTION_MESSAGE,
                 [],
-                null
+                []
             ],
             [
                 $stepExecutor->getProcessor(),
                 Processor::class,
                 Processor::LOGIC_EXCEPTION_MESSAGE,
                 [],
-                null
+                []
             ],
             [
                 $stepExecutor->getWriter(),
                 Writer::class,
                 Writer::LOGIC_EXCEPTION_MESSAGE,
                 [],
-                null
+                []
             ]
         ];
 

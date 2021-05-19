@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .app-logo {
     display: inline-block;
     text-indent: -9999px;
@@ -61,17 +63,19 @@
         margin-left: 0;
         margin-right: $app-header-logo-wrapper-margin-end;
         flex-wrap: nowrap;
-        position: static;   //  necessary for showing menu outside of overflow hidden block
+        // necessary for showing menu outside of overflow hidden block
+        position: static;
         height: 100%;
     }
 
     .logo {
         color: $app-header-logo-text-color;
-        font-weight: bold;
+        font-weight: font-weight('bold');
         font-size: $app-header-logo-font-size;
         line-height: inherit;
         margin: 0;
         display: inline-block;
+
         @include text-line-truncate($app-header-max-width, true);
 
         a {
@@ -80,7 +84,7 @@
             display: inline-block;
             max-width: $app-header-max-width;
 
-            [class^="fa-"] {
+            [class^='fa-'] {
                 font-size: $app-header-logo-link-font-size;
             }
         }
@@ -112,7 +116,7 @@
                 color: $app-header-text-hover-color;
             }
 
-            > [class^="fa-"] {
+            > [class^='fa-'] {
                 margin: 0;
                 width: $app-header-icon-font-width;
                 font-size: $app-header-icon-font-size;
@@ -123,7 +127,7 @@
             padding: $desktop-app-header-dropdown-menu-padding;
             left: $app-header-search-and-shortcuts-dropdown-start;
 
-            &:before {
+            &::before {
                 left: $app-header-search-and-shortcuts-arrow-start;
             }
         }
@@ -145,7 +149,8 @@
         }
 
         .select2-container-active {
-            z-index: 1; // to show active border over near input
+            // to show active border over near input
+            z-index: 1;
         }
 
         .search-field-container {
@@ -203,8 +208,9 @@
                 font-size: $app-header-font-size;
                 white-space: normal;
 
-                [class^="fa-"],
-                [class*=" fa-"] {
+                // stylelint-disable-next-line selector-max-compound-selectors
+                [class^='fa-'],
+                [class*=' fa-'] {
                     font-size: $app-header-icon-font-size;
                     width: $app-header-icon-font-size;
                     text-align: center;
@@ -222,7 +228,7 @@
                 left: auto;
                 z-index: $zindex-dropdown;
 
-                &:before {
+                &::before {
                     right: -$desktop-app-header-user-menu-offset;
                     left: auto;
                     margin-right: 2px;
@@ -232,7 +238,7 @@
     }
 
     .dropdown.user-menu-dropdown {
-        &:before {
+        &::before {
             content: '';
             display: inline-block;
             border-left: $app-header-divider-width solid $app-header-divider-color;
@@ -250,7 +256,7 @@
                 margin: $desktop-app-header-user-menu-divider-margin;
             }
 
-            &:before {
+            &::before {
                 margin-right: -1px;
             }
         }

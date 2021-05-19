@@ -1,9 +1,11 @@
 /* @theme: admin.oro; */
 
-@import "base-input";
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
+@import 'base-input';
 
 .input {
-   @extend %base-input;
+    @extend %base-input;
 }
 
 /**
@@ -149,12 +151,12 @@ select[multiple] {
         }
     }
 
-    .control-group & {
-        margin-bottom: $input-control-group-outer-offset-bottom;
-    }
-
     td & {
         margin-bottom: 0;
+    }
+
+    .control-group & {
+        margin-bottom: $input-control-group-outer-offset-bottom;
     }
 }
 
@@ -183,9 +185,6 @@ select[multiple] {
         width: $selector-select-width;
         box-sizing: $selector-select-box-sizing;
         color: $selector-select-color;
-
-        -webkit-appearance: none;
-        -moz-appearance: none;
         appearance: none;
     }
 
@@ -201,8 +200,8 @@ select[multiple] {
         position: $selector-uniform-position;
         width: $selector-uniform-width;
 
-        &:after {
-            content: "\f0dd";
+        &::after {
+            content: '\f0dd';
             margin: $selector-uniform-arrow-outer-offset;
             display: $selector-uniform-arrow-display;
             font-size: $base-font-size--m;
@@ -228,7 +227,7 @@ select[multiple] {
             background-color: $input-disabled-background-color;
             color: $input-disabled-color;
 
-            &:after {
+            &::after {
                 color: $input-disabled-border-color;
             }
         }
@@ -357,8 +356,8 @@ select[multiple] {
 .entity-select-btn,
 .entity-create-btn {
     &.btn {
-        [class^="fa-"],
-        [class*=" fa-"] {
+        [class^='fa-'],
+        [class*=' fa-'] {
             margin: $entity-create-btn-icon-offset;
             vertical-align: $entity-create-btn-icon-vertical-align;
         }
@@ -422,7 +421,7 @@ select[multiple] {
         }
     }
 
-    div[data-name="field__default-product-options"] {
+    div[data-name='field__default-product-options'] {
         margin: 0 0 $form-container-control-row-space;
     }
 
@@ -436,13 +435,13 @@ select[multiple] {
 // ie, chrome, safari
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 // firefox
 input[type='number'] {
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .alert .message ul:last-child {
@@ -452,7 +451,7 @@ input[type='number'] {
 .loading > .input-append {
     position: relative;
 
-    & .btn:focus {
+    .btn:focus {
         outline: 0 none;
     }
 
@@ -461,7 +460,7 @@ input[type='number'] {
         box-shadow: none;
     }
 
-    &:after {
+    &::after {
         content: '';
         display: block;
         position: absolute;
@@ -474,12 +473,11 @@ input[type='number'] {
     }
 }
 
-.timepicker-dialog-is-below.timepicker-error + span.validation-failed:after {
+.timepicker-dialog-is-below.timepicker-error + span.validation-failed::after {
     left: 128px;
 }
 
 .clearable-input {
-
     &__container {
         position: relative;
     }
@@ -498,7 +496,7 @@ input[type='number'] {
     }
 
     &__clear {
-        [class^="fa-"] {
+        [class^='fa-'] {
             @include fa-icon($fa-var-close);
         }
 

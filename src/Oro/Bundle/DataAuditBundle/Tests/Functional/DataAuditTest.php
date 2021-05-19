@@ -44,6 +44,10 @@ class DataAuditTest extends WebTestCase
             $this->findAdmin()->getRoles()
         );
         $this->getContainer()->get('security.token_storage')->setToken($token);
+
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
+        );
     }
 
     protected function tearDown(): void

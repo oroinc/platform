@@ -12,7 +12,7 @@ $oro-tabs-content-flex-grow: 1 !default;
 $oro-tabs-content-border-left: 2px solid $primary-750 !default;
 
 $oro-tabs-subtitle-inner-offset: 8px 12px !default;
-$oro-tabs-subtitle-font-weight: bold !default;
+$oro-tabs-subtitle-font-weight: font-weight('bold') !default;
 
 $oro-tabs-fill-tab-border: none !default;
 $oro-tabs-fill-tab-box-shadow: none !default;

@@ -62,6 +62,7 @@
             }
         }
 
+        // stylelint-disable-next-line selector-max-compound-selectors
         .short-emails-list .items li .footer .reply-all-action,
         .short-emails-list .items li .footer .reply-action,
         .short-emails-list .items li .footer .forward-action {

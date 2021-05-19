@@ -1,14 +1,12 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .filter-box {
     background-color: $mobile-filter-box-background-color;
     border-bottom-width: $mobile-filter-box-border-bottom-width;
 
-    &.ui-dialog {
-        padding: $mobile-filter-box-ui-dialog-inner-offset;
-    }
-
-    & > .dropdown {
+    > .dropdown {
         margin-left: $mobile-filter-box-dropdown-offset-left;
         margin-right: $mobile-filter-box-dropdown-offset-right;
 
@@ -16,7 +14,7 @@
     }
 
     .dropdown {
-        & > .dropdown-toggle {
+        > .dropdown-toggle {
             text-align: $mobile-filter-box-dropdown-toggle-text-align;
             width: $mobile-filter-box-dropdown-toggle-width;
             background-color: $mobile-filter-box-dropdown-toggle-background-color;
@@ -52,13 +50,13 @@
             }
         }
 
-        & > .dropdown-menu {
+        > .dropdown-menu {
             padding: $mobile-filter-box-dropdown-menu-inner-offset;
             margin: $mobile-filter-box-dropdown-menu-offset;
             max-width: $mobile-filter-box-dropdown-menu-max-width;
             width: $mobile-filter-box-dropdown-menu-width;
 
-            &:before {
+            &::before {
                 border-bottom: $mobile-filter-box-dropdown-menu-before-border-bottom;
                 border-left: $mobile-filter-box-dropdown-menu-before-border-left;
                 border-right: $mobile-filter-box-dropdown-menu-before-border-right;
@@ -70,7 +68,7 @@
                 top: $mobile-filter-box-dropdown-menu-before-top;
             }
 
-            &:after {
+            &::after {
                 border-bottom: $mobile-filter-box-dropdown-menu-after-border-bottom;
                 border-left: $mobile-filter-box-dropdown-menu-after-border-left;
                 border-right: $mobile-filter-box-dropdown-menu-after-border-right;
@@ -125,7 +123,8 @@
                 font-size: $mobile-filter-box-font-size;
                 text-transform: $mobile-filter-box-text-transform;
             }
-            & + .value-field-frame {
+
+            + .value-field-frame {
                 margin-left: 0;
             }
         }
@@ -151,6 +150,7 @@
             }
 
             .select2-container {
+                // stylelint-disable-next-line declaration-no-important
                 width: 100% !important;
                 margin-left: -2px;
 
@@ -174,10 +174,6 @@
                 .filter-end {
                     margin-top: $mobile-filter-offset-y;
                     margin-bottom: 0;
-                }
-
-                .filter-start,
-                .filter-end {
                     display: block;
                     width: 100%;
 
@@ -187,6 +183,7 @@
                 }
 
                 .btn-group.btn-block {
+                    // stylelint-disable-next-line declaration-no-important
                     float: none !important;
                 }
 
@@ -214,17 +211,20 @@
                     .product-price-unit-filter-separator {
                         margin-left: $content-padding-medium;
                     }
+
                     .filter-separator,
                     .product-price-unit-filter-separator {
                         height: 40px;
                         line-height: 40px;
                         align-self: center;
                     }
+
                     .filter-value {
                         flex-direction: row;
                         margin-top: $mobile-filter-offset-y;
                         padding-bottom: $mobile-choice-filter-inner-offset-bottom;
                     }
+
                     .filter-start,
                     .filter-end {
                         margin-top: 0;
@@ -251,6 +251,7 @@
     }
 
     .filter-item {
+        // stylelint-disable-next-line declaration-no-important
         display: $mobile-filter-item-display !important;
         margin: $mobile-filter-item-offset;
 
@@ -261,8 +262,8 @@
         }
 
         &.open-filter {
-            &:before,
-            &:after {
+            &::before,
+            &::after {
                 left: 0;
                 right: 0;
                 width: 0;
@@ -302,6 +303,8 @@
     }
 
     &.ui-dialog {
+        padding: $mobile-filter-box-ui-dialog-inner-offset;
+
         .ui-dialog-content {
             padding: $mobile-filter-box-ui-dialog-content-inner-offset;
             height: $mobile-filter-box-ui-dialog-content-height;
@@ -341,6 +344,7 @@
 
 .ui-multiselect-menu {
     &.select-filter-widget {
+        // stylelint-disable-next-line declaration-no-important
         min-width: 100% !important;
         max-width: 100%;
 
@@ -361,7 +365,7 @@
     .filter-box {
         .filter-criteria {
             .btn-group {
-                & + .value-field-frame {
+                + .value-field-frame {
                     margin-top: $mobile-filter-offset-y;
                 }
             }

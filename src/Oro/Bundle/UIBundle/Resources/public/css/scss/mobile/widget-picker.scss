@@ -30,7 +30,7 @@
             overflow: auto;
         }
 
-        &__filter.empty:after,
+        &__filter.empty::after,
         &__filter-clear {
             margin: 4px;
         }
@@ -39,7 +39,7 @@
             flex-wrap: wrap;
         }
 
-        &__item.loading .widget-picker__actions-column:after {
+        &__item.loading .widget-picker__actions-column::after {
             margin-right: $content-padding;
         }
 

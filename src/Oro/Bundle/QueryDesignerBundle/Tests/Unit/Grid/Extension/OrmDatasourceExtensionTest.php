@@ -24,6 +24,8 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Utils\DateFilterModifier;
+use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
+use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\QueryDesignerBundle\Grid\Extension\OrmDatasourceExtension;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
@@ -50,19 +52,27 @@ class OrmDatasourceExtensionTest extends OrmTestCase
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
         $this->localeSettings = $this->createMock(LocaleSettings::class);
-        $this->localeSettings->expects($this->any())
+        $this->localeSettings->expects(self::any())
             ->method('getTimeZone')
             ->willReturn('America/Los_Angeles');
-        $this->localeSettings->expects($this->any())
+        $this->localeSettings->expects(self::any())
             ->method('getTimeZone')
             ->willReturn('UTC');
+        $this->localeSettings->expects(self::any())
+            ->method('getLocale')
+            ->willReturn('en');
 
         $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
+
+        $numberFormatter = new NumberFormatter(
+            $this->localeSettings,
+            new IntlNumberFormatterFactory($this->localeSettings)
+        );
 
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions([
@@ -71,7 +81,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                         'oro_type_text_filter'           => new TextFilterType($translator),
                         'oro_type_number_filter'         => new NumberFilterType(
                             $translator,
-                            $this->localeSettings
+                            $numberFormatter
                         ),
                         'oro_type_datetime_range_filter' => new DateTimeRangeFilterType(
                             $translator,
@@ -108,14 +118,14 @@ class OrmDatasourceExtensionTest extends OrmTestCase
             ->join('user.shippingAddresses', 'shippingAddresses');
 
         $manager = $this->createMock(Manager::class);
-        $manager->expects($this->any())
+        $manager->expects(self::any())
             ->method('createFilter')
             ->willReturnCallback(function ($name, $params) {
                 return $this->createFilter($name, $params);
             });
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('get')
             ->with('oro_query_designer.conditions_group_merge_same_entity_conditions')
             ->willReturn($enableGrouping);
@@ -127,7 +137,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
         );
 
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->once())
+        $datasource->expects(self::once())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
@@ -147,9 +157,9 @@ class OrmDatasourceExtensionTest extends OrmTestCase
 
         $expected = str_replace([PHP_EOL, '( ', ' )'], [' ', '(', ')'], preg_replace('/\s+/', ' ', $expected));
         // Check that generated DQL is valid and may be converted to SQL
-        $this->assertNotEmpty($qb->getQuery()->getSQL());
+        self::assertNotEmpty($qb->getQuery()->getSQL());
         // Check that generated DQL is expected
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function visitDatasourceProvider(): array

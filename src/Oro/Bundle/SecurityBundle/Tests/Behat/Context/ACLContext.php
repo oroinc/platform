@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Behat\Context;
 
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
+use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ExpectationException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
@@ -23,6 +24,7 @@ use Oro\Bundle\UserBundle\Tests\Behat\Element\UserRoleViewForm;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ACLContext extends OroFeatureContext implements
     OroPageObjectAware,
@@ -370,25 +372,64 @@ class ACLContext extends OroFeatureContext implements
         }
     }
 
-
+    //@codingStandardsIgnoreStart
     /**
-     * @When /^(?:|I )click Perform Transition permissions for "(?P<transition>(?:[^"]|\\")*)" transition$/
+     * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for field "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
+     * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for transition "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
      *
-     * @param string $transition
+     * @param string $fieldName
+     * @param string $permission
+     * @param string $accessLevel
      */
-    public function iClickPerformTransitionPermissions($transition)
+    //@codingStandardsIgnoreEnd
+    public function permissionIsSetTo(string $fieldName, string $permission, string $accessLevel): void
     {
-        $page = $this->getSession()->getPage();
-        $element = $page->find(
-            'xpath',
-            "//*[contains(@class,'field-name')][contains(text(),'$transition')]/" .
-            "..//*[contains(@class,'action-permissions__item')]/" .
-            "*[contains(@class,'action-permissions__dropdown-toggle')]"
+        $element = $this->getPermissionDropdownForField($fieldName, $permission);
+        self::assertNotNull(
+            $element,
+            sprintf('Failed to find "%s" permission dropdown for field "%s"', $permission, $fieldName)
         );
+        $actualAccessLevel = trim($element->getText());
+        self::assertEquals(
+            $accessLevel,
+            $actualAccessLevel,
+            sprintf(
+                'Expected "%s", got "%s" access level for "%s" permission of "%s" field',
+                $accessLevel,
+                $actualAccessLevel,
+                $permission,
+                $fieldName
+            )
+        );
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" transition$/
+     * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" field$/
+     *
+     * @param string $permission
+     * @param string $fieldName
+     */
+    //@codingStandardsIgnoreEnd
+    public function iOpenPermissionDropdown(string $permission, string $fieldName): void
+    {
+        $element = $this->getPermissionDropdownForField($fieldName, $permission);
         if ($element) {
             $element->focus();
             $element->click();
         }
+    }
+
+    private function getPermissionDropdownForField(string $fieldName, string $permission): ?NodeElement
+    {
+        return $this->getSession()->getPage()->find(
+            'xpath',
+            "//*[contains(@class,'field-name')][contains(text(),'$fieldName')]/" .
+            "..//*[contains(@class,'action-permissions__item')]/" .
+            "*[contains(@class,'action-permissions__label')][text()='$permission']" .
+            "/following-sibling::*[contains(@class,'action-permissions__dropdown-toggle')]"
+        );
     }
 
     /**
@@ -400,10 +441,11 @@ class ACLContext extends OroFeatureContext implements
     {
         $itemElements = $this->findAllElements('Permissions Dropdown Items');
         $actualItems = [];
-        if (count($itemElements)) {
-            foreach ($itemElements as $itemElement) {
-                $actualItems[] = $itemElement->getText();
+        foreach ($itemElements as $itemElement) {
+            if (!$itemElement->isVisible()) {
+                continue;
             }
+            $actualItems[] = $itemElement->getText();
         }
 
         $expectedItems = [];
@@ -419,11 +461,20 @@ class ACLContext extends OroFeatureContext implements
      *
      * @param string $option
      */
-    public function iSelectOptionInPermissionsDropdown($option)
+    public function iSelectOptionInPermissionsDropdown(string $option): void
     {
-        $itemElement = $this->findElementContains('Permissions Dropdown Items', $option);
+        $itemElements = $this->findAllElements('Permissions Dropdown Items');
+        $itemElement = null;
+        foreach ($itemElements as $itemElement) {
+            if (!$itemElement->isVisible()) {
+                continue;
+            }
+            if (stripos($itemElement->getText(), $option) !== false) {
+                break;
+            }
+        }
 
-        self::assertNotNull($itemElement, "Selected Option is not found in permissions dropdown");
+        self::assertNotNull($itemElement, 'Selected Option is not found in permissions dropdown');
 
         $itemElement->focus();
         $itemElement->click();

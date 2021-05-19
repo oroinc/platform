@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-@import "~bootstrap/scss/reboot";
+@import '~bootstrap/scss/reboot';
 
 body {
     text-align: left;
@@ -17,16 +17,13 @@ input {
         display: none;
     }
 
-    &[type="date"] {
+    &[type='date'] {
         min-height: 32px;
 
         &::-webkit-inner-spin-button {
             display: none;
         }
-    }
 
-    &[type="date"],
-    &[type="time"] {
         // Fix height Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
@@ -34,7 +31,15 @@ input {
         }
     }
 
-    &[type="number"] {
+    &[type='time'] {
+        // Fix height Shadow DOM elements
+        &::-webkit-date-and-time-value,
+        &::-webkit-datetime-edit {
+            line-height: 1;
+        }
+    }
+
+    &[type='number'] {
         // fix FireFox platform styles
         box-shadow: none;
     }
@@ -49,7 +54,7 @@ select {
     }
 }
 
-[type="search"] {
-    -webkit-appearance: textfield;
+[type='search'] {
+    appearance: textfield;
     outline-offset: -2px;
 }

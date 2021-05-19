@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const TextEditorView = require('./text-editor-view');
-    const _ = require('underscore');
     const NumberFormatter = require('orofilter/js/formatter/number-formatter');
 
     /**
@@ -75,14 +74,23 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.formatter = new NumberFormatter(options);
+            const formatOptions = {};
+            if (options.metadata) {
+                const cellMetadata = options.metadata;
+                if (cellMetadata.style) {
+                    formatOptions.style = cellMetadata.style;
+                }
+            }
+
+            this.formatter = new NumberFormatter(formatOptions);
             NumberEditorView.__super__.initialize.call(this, options);
         },
 
         getValue: function() {
             const userInput = this.$('input[name=value]').val();
             const parsed = this.formatter.toRaw(userInput);
-            return _.isNumber(parsed) ? parsed : (!parsed ? void 0 : NaN);
+
+            return parsed ? parsed : void 0;
         },
 
         getValidationRules: function() {
@@ -92,15 +100,10 @@ define(function(require) {
         },
 
         formatRawValue: function(value) {
-            value = this.parseRawValue(value);
             if (isNaN(value)) {
                 return '';
             }
             return this.formatter.fromRaw(value);
-        },
-
-        parseRawValue: function(value) {
-            return parseFloat(value);
         },
 
         isChanged: function() {

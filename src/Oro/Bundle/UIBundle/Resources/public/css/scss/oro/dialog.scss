@@ -9,15 +9,8 @@
     border: $dialog-border;
     position: $dialog-position;
     border-radius: $dialog-border-radius;
-    display: flex;
-    flex-flow: row;
-
-    .ui-dialog-inner-wrapper {
-        // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
+    display: $dialog-display;
+    flex-direction: $dialog-flex-direction;
 
     &-titlebar {
         background: $primary-200;
@@ -33,8 +26,8 @@
 
         cursor: $dialog-titlebar-cursor;
 
-        &:before,
-        &:after {
+        &::before,
+        &::after {
             content: none;
         }
 
@@ -67,7 +60,7 @@
             text-transform: capitalize;
         }
 
-        &:after {
+        &::after {
             display: inline-block;
             content: '';
         }
@@ -91,7 +84,8 @@
         min-width: $dialog-content-min-width;
         width: $dialog-content-width;
         max-width: 100%;
-        min-height: $dialog-content-min-height; // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
+        // since minHeight of dialog is 199px (clientHeight 197px - header 30px - ActionPanel 49px)
+        min-height: $dialog-content-min-height;
         overflow: $dialog-content-overflow;
         flex-shrink: $dialog-content-flex-shrink;
         flex-grow: $dialog-content-flex-grow;
@@ -129,6 +123,13 @@
         cursor: $dialog-titlebar-min-cursor;
     }
 
+    // Reset offset for layout content into dialog
+    .ui-dialog-content {
+        form > .layout-content {
+            padding: 0;
+        }
+    }
+
     &.ui-resizable {
         width: $dialog-resizable-width;
 
@@ -164,10 +165,13 @@
         right: $dialog-titlebar-buttonpane-end;
 
         /* iOS 11.2+ */
-        /*rtl:ignore*/
+
+        /* rtl:ignore */
         right: calc(env(safe-area-inset-right) + 16px);
-        /*rtl:ignore*/
-        /*rtl:raw:
+
+        /* rtl:ignore */
+
+        /* rtl:raw:
         left: calc(env(safe-area-inset-left) + 16px);
         */
         top: $dialog-titlebar-buttonpane-top;
@@ -190,11 +194,11 @@
                 display: none;
             }
 
-            &:before {
+            &::before {
                 display: inline-block;
                 color: $primary-inverse;
                 font-size: $base-font-size--l;
-                font-family: FontAwesome;
+                font-family: $fa-font-family;
                 text-align: center;
                 line-height: 1;
 
@@ -208,19 +212,19 @@
             margin-right: 0;
         }
 
-        .ui-dialog-titlebar-close:before {
+        .ui-dialog-titlebar-close::before {
             content: $dialog-titlebar-close-icon;
         }
 
-        .ui-dialog-titlebar-maximize:before {
+        .ui-dialog-titlebar-maximize::before {
             content: $dialog-titlebar-maximize-icon;
         }
 
-        .ui-dialog-titlebar-minimize:before {
+        .ui-dialog-titlebar-minimize::before {
             content: $dialog-titlebar-minimize-icon;
         }
 
-        .ui-dialog-titlebar-restore:before {
+        .ui-dialog-titlebar-restore::before {
             content: $dialog-titlebar-restore-icon;
         }
 
@@ -254,15 +258,15 @@
                 [class*='ui-dialog-titlebar-'] {
                     margin-right: $dialog-titlebar-min-button-outer-offset;
 
-                    &:before {
+                    &::before {
                         border-right: none;
                         color: $primary-700;
                         font-size: $base-font-size;
                     }
 
-                    &:hover:before,
-                    &:active:before,
-                    &:focus:before {
+                    &:hover::before,
+                    &:active::before,
+                    &:focus::before {
                         color: $primary-200;
                     }
                 }
@@ -289,13 +293,6 @@
             margin-left: $dialog-buttonpane-action-wrapper-offset-left;
         }
     }
-
-    // Reset offset for layout content into dialog
-    .ui-dialog-content {
-        form > .layout-content {
-            padding: 0;
-        }
-    }
 }
 
 .ui-dialog .ui-resizable-se {
@@ -307,9 +304,9 @@
     right: $dialog-resizable-se-end;
     cursor: $dialog-resizable-se-cursor;
 
-    &:before,
-    &:after {
-        content: "";
+    &::before,
+    &::after {
+        content: '';
         border-top: $dialog-resizable-se-presudo-border-top;
         display: $dialog-resizable-se-presudo-display;
         position: $dialog-resizable-se-presudo-position;
@@ -322,7 +319,7 @@
         transform: $dialog-resizable-se-presudo-transform;
     }
 
-    &:after {
+    &::after {
         top: $dialog-resizable-se-presudo-db-top;
     }
 }

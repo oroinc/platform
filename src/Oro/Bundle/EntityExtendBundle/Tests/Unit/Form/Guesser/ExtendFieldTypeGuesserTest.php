@@ -10,10 +10,8 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser;
-use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Validator\Constraints\Length;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -309,9 +307,6 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
                     'label' => self::SOME_LABEL,
                     'required' => false,
                     'block' => 'general',
-                    'constraints' => [
-                        new Length(['max' => 17])
-                    ]
                 ]
             ],
             'decimal' => [
@@ -325,9 +320,6 @@ class ExtendFieldTypeGuesserTest extends \PHPUnit\Framework\TestCase
                     'label' => self::SOME_LABEL,
                     'required' => false,
                     'block' => 'general',
-                    'constraints' => [
-                        new Decimal(['precision' => 8, 'scale' => 2])
-                    ],
                     'grouping' => true
                 ]
             ],

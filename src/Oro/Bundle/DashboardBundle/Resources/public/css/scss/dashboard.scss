@@ -1,6 +1,9 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, no-descending-specificity */
+
 .dashboard-selector-container {
+    // stylelint-disable-next-line declaration-no-important
     text-align: left !important;
 
     label {
@@ -111,10 +114,6 @@
             }
         }
 
-        .default-actions-container {
-            display: none;
-        }
-
         .widget-actions-container,
         .default-actions-container {
             line-height: 1;
@@ -122,8 +121,14 @@
         }
 
         .default-actions-container {
+            display: none;
+
             .action-wrapper {
                 padding: 0 6px;
+
+                &:last-child {
+                    border-right: none;
+                }
 
                 > a {
                     padding: 10px 8px;
@@ -142,12 +147,6 @@
             cursor: move;
         }
 
-        .default-actions-container {
-            .action-wrapper:last-child {
-                border-right: none;
-            }
-        }
-
         .widget-title {
             padding: 0;
 
@@ -162,7 +161,7 @@
 
             align-self: center;
 
-            &:before {
+            &::before {
                 min-height: 40px;
 
                 content: '';
@@ -197,11 +196,13 @@
     }
 
     .hidden-empty-text {
+        /* stylelint-disable declaration-no-important */
         height: 0 !important;
         padding: 0 !important;
         margin: 0 !important;
 
         overflow: hidden !important;
+        /* stylelint-enable declaration-no-important */
         visibility: hidden;
     }
 
@@ -230,7 +231,7 @@
 }
 
 .dashboard-link {
-    font-weight: normal;
+    font-weight: font-weight('normal');
 }
 
 .chart-container {
@@ -244,14 +245,16 @@
         margin: 0 auto;
     }
 
-    & > .clearfix {
+    > .clearfix {
         margin: 0 auto;
 
         .chart-legend {
             position: relative;
 
+            // stylelint-disable-next-line declaration-no-important
             height: auto !important;
-            min-width: 250px; // to wrap legend event if it's empty yet
+            // to wrap legend event if it's empty yet
+            min-width: 250px;
             padding-bottom: 20px;
 
             table {
@@ -291,12 +294,15 @@
 }
 
 .chart-legend table {
+    // stylelint-disable-next-line declaration-no-important
     font-size: 13px !important;
 
     .flotr-legend-color-box > div {
+        // stylelint-disable-next-line declaration-no-important
         border: 0 !important;
 
-        & > div {
+        > div {
+            // stylelint-disable-next-line declaration-no-important
             border: 0 !important;
         }
     }
@@ -317,7 +323,7 @@
         margin-bottom: 5px;
         margin-left: 25px;
 
-        &:first-letter {
+        &::first-letter {
             text-transform: uppercase;
         }
     }
@@ -365,7 +371,7 @@
     }
 
     .date-range-filter {
-        & > div > .control-group {
+        > div > .control-group {
             margin-bottom: 0;
         }
 
@@ -427,7 +433,7 @@
     }
 
     .widget-date-input-widget {
-        input[type="text"] {
+        input[type='text'] {
             max-width: 110px;
         }
     }
@@ -444,15 +450,16 @@
             display: none;
         }
 
-        .collapse, .collapsing {
+        .collapse,
+        .collapsing {
             margin-top: $dashboard-widget-configuration-collapsed-margin-top;
         }
     }
 }
 
 .widget-content.widget-configuration {
-    .table input[type="checkbox"] {
-        margin: 0 0 1px 0;
+    .table input[type='checkbox'] {
+        margin: 0 0 1px;
     }
 }
 
@@ -465,13 +472,13 @@
         .items-selector-widget {
             margin-bottom: $dashboard-configuration-items-table-margin-y / 2;
         }
+
         .actions-wrap {
             float: left;
             margin-bottom: $dashboard-configuration-items-table-margin-y;
 
             @include clearfix();
         }
-
     }
 
     .btn-group + .btn-group {

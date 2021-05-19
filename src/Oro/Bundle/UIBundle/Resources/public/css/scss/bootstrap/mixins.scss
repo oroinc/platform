@@ -1,8 +1,7 @@
 /* @theme: admin.oro; */
 
-@import "~bootstrap/scss/mixins";
-
-@import "mixins/buttons";
-@import "mixins/badge";
-@import "mixins/reset-caret";
-@import "mixins/border-radius";
+@import '~bootstrap/scss/mixins';
+@import 'mixins/buttons';
+@import 'mixins/badge';
+@import 'mixins/reset-caret';
+@import 'mixins/border-radius';

@@ -1,12 +1,12 @@
 /* @theme: blank; */
 
 .section-title {
-  margin: $section-title-offset;
+    margin: $section-title-offset;
 
-  font-size: $section-title-font-size;
-  font-family: $section-title-font-family;
+    font-size: $section-title-font-size;
+    font-family: $section-title-font-family;
 
-  &--size-m {
-    font-size: $section-title-font-size-m;
-  }
+    &--size-m {
+        font-size: $section-title-font-size-m;
+    }
 }

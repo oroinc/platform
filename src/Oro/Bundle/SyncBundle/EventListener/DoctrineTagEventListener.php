@@ -5,18 +5,17 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
 use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 
 /**
  * Collects changes in entities and sends tags to websocket server using DataUpdateTopicSender.
  */
-class DoctrineTagEventListener
+class DoctrineTagEventListener implements OptionalListenerInterface
 {
-    /**
-     * @var bool
-     */
-    private $enabled = true;
+    use OptionalListenerTrait;
 
     /**
      * @var bool
@@ -64,16 +63,6 @@ class DoctrineTagEventListener
     }
 
     /**
-     * Enables or disables the listener.
-     *
-     * @param bool $enabled
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
-    }
-
-    /**
      * Collect changes that were done
      * Generates tags and store in protected variable
      *
@@ -111,6 +100,10 @@ class DoctrineTagEventListener
      */
     public function postFlush(PostFlushEventArgs $event)
     {
+        if (!$this->enabled || !$this->isApplicationInstalled) {
+            return;
+        }
+
         $this->dataUpdateTopicSender->send(array_unique($this->collectedTags));
         $this->collectedTags = [];
         $this->processedEntities = [];

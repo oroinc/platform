@@ -3,6 +3,9 @@ namespace Oro\Component\MessageQueue\Consumption\Dbal;
 
 use Symfony\Component\Process\Process;
 
+/**
+ * Allows to get list of processes PIDs
+ */
 class DbalCliProcessManager
 {
     /**
@@ -21,7 +24,7 @@ class DbalCliProcessManager
         }
         $cmd = sprintf($cmd, escapeshellarg($searchTerm));
 
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline($cmd);
         $process->run();
         $output = $process->getOutput();
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 
 /**
@@ -12,13 +13,12 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
  */
 class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterface
 {
+    use OptionalListenerTrait;
+
     public const FIELD_ALIAS = 'workflow:currentStep';
 
     /** @var AdditionalEntityChangesToAuditStorage */
     private $storage;
-
-    /** @var bool */
-    private $enabled = true;
 
     /**
      * @param AdditionalEntityChangesToAuditStorage $storage
@@ -26,14 +26,6 @@ class SendWorkflowStepChangesToAuditListener implements OptionalListenerInterfac
     public function __construct(AdditionalEntityChangesToAuditStorage $storage)
     {
         $this->storage = $storage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

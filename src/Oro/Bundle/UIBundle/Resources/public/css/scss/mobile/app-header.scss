@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, no-duplicate-selectors */
+
 %header-button {
     text-align: center;
     border: 0 none;
@@ -29,7 +31,7 @@
         .app-header.sticky-out-of-viewport {
             ~ * .sticky-pinned,
             ~ * .floatThead.floatThead-fixed .grid-header:first-child,
-            &.sticky-pinned  {
+            &.sticky-pinned {
                 margin-top: -$app-header-height;
             }
         }
@@ -96,7 +98,7 @@
                     outline: none;
                 }
 
-                &:before {
+                &::before {
                     font-size: $app-header-dropdown-close-icon-font-size;
                 }
             }
@@ -132,7 +134,7 @@
         .logo {
             font-size: $mobile-app-header-organization-logo-font-size;
             color: $app-header-logo-text-color;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             margin: 0;
             float: left;
             line-height: $app-header-height;
@@ -145,6 +147,7 @@
                 text-transform: uppercase;
                 display: inline-block;
                 max-width: $app-header-max-width;
+
                 @include text-line-truncate($app-header-max-width, true);
             }
 
@@ -152,7 +155,7 @@
                 padding-right: 32px;
                 position: relative;
 
-                &:after {
+                &::after {
                     position: absolute;
                     right: 10px;
                     top: ($app-header-height - 5)/ 2;
@@ -201,7 +204,7 @@
                 left: auto;
                 right: 0;
 
-                &:before {
+                &::before {
                     left: auto;
                     right: $tablet-app-header-shortcuts-arrow-end;
                 }
@@ -213,6 +216,7 @@
 
             .dropdown-item {
                 padding: $mobile-app-header-dropdown-item-padding;
+
                 > a {
                     font-size: $mobile-app-header-dropdown-link-font-size;
                 }
@@ -237,7 +241,7 @@
                     overflow-x: visible;
                 }
 
-                &:before {
+                &::before {
                     left: auto;
                     right: $tablet-app-header-search-arrow-end;
                 }
@@ -283,6 +287,7 @@
         .dropdown {
             > .dropdown-toggle {
                 @extend %header-button;
+
                 padding-right: $mobile-app-header-user-menu-toggler-padding-end;
             }
 
@@ -302,20 +307,20 @@
 
                 li:not(.nav-header):not(.divider) {
                     padding: $mobile-app-header-dropdown-item-padding;
+
                     > a {
                         font-size: $mobile-app-header-dropdown-link-font-size;
                         padding: 0;
                     }
                 }
 
-                &:before {
+                &::before {
                     left: auto;
                     right: $tablet-app-header-user-menu-arrow-end;
                 }
             }
         }
     }
-
 
     @media only screen and (max-width: $small-devices-media-breakpoint) {
         &__search-and-shortcuts,
@@ -333,28 +338,28 @@
                 min-width: 0;
                 width: auto;
 
-                &:after {
+                &::after {
                     position: fixed;
                     top: $app-header-height;
                 }
             }
         }
 
-        .organization-logo-wrapper .dropdown .dropdown-menu:before {
+        .organization-logo-wrapper .dropdown .dropdown-menu::before {
             left: $mobile-app-header-organization-logo-wrapper-margin-start;
         }
 
-        .user-menu .dropdown .dropdown-menu:before {
+        .user-menu .dropdown .dropdown-menu::before {
             right: $phone-app-header-user-menu-arrow-end;
         }
 
         &__search-and-shortcuts {
-            .header-dropdown-search .dropdown-menu:before {
+            .header-dropdown-search .dropdown-menu::before {
                 right: $phone-app-header-search-arrow-end;
             }
 
             .header-dropdown-shortcut .dropdown-menu {
-                &:before {
+                &::before {
                     right: $phone-app-header-shortcuts-arrow-end;
                 }
 

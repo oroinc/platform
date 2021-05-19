@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
-@import "role/permissions-grid";
-@import "role/capabilities";
+@import 'role/permissions-grid';
+@import 'role/capabilities';
 
 .api-block .btn {
     vertical-align: baseline;
@@ -32,7 +32,7 @@ form.change-password-form {
 .mobile-version {
     form.change-password-form {
         .controls {
-            [class^="fa-"] {
+            [class^='fa-'] {
                 top: 10px;
             }
         }
@@ -66,5 +66,5 @@ form.change-password-form {
 h1 .popover .oro-popover-content {
     font-size: 13px;
     line-height: 20px;
-    font-weight: normal;
+    font-weight: font-weight('light');
 }

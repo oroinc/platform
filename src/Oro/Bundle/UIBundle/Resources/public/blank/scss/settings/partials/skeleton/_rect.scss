@@ -2,7 +2,6 @@
 
 // @private: background-image generator
 // Take a particle map and generate background-image value
-//
 // @param: Map $particle
 // @return: List of background-image value
 @function skeleton-image-rect($particle) {
@@ -32,7 +31,6 @@
 
 // @private: background-size generator
 // Take a particle map and generate background-size value
-//
 // @param: Map $particle
 // @return: List of background-size value
 @function skeleton-size-rect($particle) {
@@ -61,7 +59,6 @@
 
 // @private: background-position generator
 // Take a particle map and generate background-position value
-//
 // @param: Map $particle
 // @return: List of background-position value
 @function skeleton-position-rect($particle) {
@@ -91,14 +88,12 @@
 }
 
 // @public: function for get $particle object for draw rect
-//
 // @param: $color
 // @param: $width
 // @param: $height
 // @param: $x: 0
 // @param: $y: 0
 // @param: $radius: null
-// 
 // @return: Formated map of parameters
 @function skeleton-rect(
     $color,

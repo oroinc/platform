@@ -1,6 +1,7 @@
 /* @theme: admin.oro; */
 
 .app-header .nav.pull-right {
+    // stylelint-disable-next-line selector-max-compound-selectors
     .email-notification-menu.dropdown .dropdown-menu li a {
         padding: 0;
     }

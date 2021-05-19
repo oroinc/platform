@@ -5,7 +5,7 @@ $navbar-li-a-text-shadow: none !default;
 $navbar-li-a-hover-color: $primary-200 !default;
 
 $navbar-active-a-color: $primary-200 !default;
-$navbar-active-a-font-weight: bold !default;
+$navbar-active-a-font-weight: font-weight('bold') !default;
 $navbar-active-a-hover-color: $primary-200 !default;
 
 $nav-tabs-border-width: 2px !default;
@@ -27,7 +27,7 @@ $nav-item-float: none !default;
 $nav-item-offset-bottom: -$nav-tabs-border-width !default;
 
 $nav-link-background: $primary-900 !default;
-$nav-link-font-weight: bold !default;
+$nav-link-font-weight: font-weight('bold') !default;
 $nav-link-color: $primary-200 !default;
 $nav-link-border: $nav-tabs-border-width solid $nav-tabs-border-color !default;
 $nav-link-border-radius: 0 !default;

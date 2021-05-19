@@ -35,7 +35,7 @@
 
     .menu-item {
         &:not(.ui-helper) {
-            &:after {
+            &::after {
                 background-color: $menu-item-divider-color;
             }
         }

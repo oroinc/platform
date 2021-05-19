@@ -657,12 +657,12 @@
 
             {% if isButtonsEnabled %}
                 <button class="add-on btn btn-icon btn-square-default entity-select-btn" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
-                    <span class="fa-bars"></span>
+                    <span class="fa-bars fa-offset-none" aria-hidden="true"></span>
                 </button>
 
                 {% if form.vars.create_enabled %}
                     <button class="btn btn-icon btn-square-default entity-create-btn">
-                        <span class="fa-plus"></span>
+                        <span class="fa-plus fa-offset-none" aria-hidden="true"></span>
                     </button>
                 {% endif %}
             {% endif %}

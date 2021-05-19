@@ -44,14 +44,14 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
     public function testDisableListener()
     {
         $testListener = new TestListener();
-        $testListener->enabled = false;
+        $testListener->resetEnabled();
         $listenerId = 'test.listener2';
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
             ->will($this->returnValue($testListener));
         $this->manager->disableListener($listenerId);
-        $this->assertFalse($testListener->enabled);
+        $this->assertFalse($testListener->getEnabled());
     }
 
     public function testDisableNonExistsListener()
@@ -65,13 +65,13 @@ class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
     public function testDisableOneListener()
     {
         $testListener = new TestListener();
-        $testListener->enabled = false;
+        $testListener->resetEnabled();
         $listenerId = 'test.listener3';
         $this->container->expects($this->once())
             ->method('get')
             ->with($listenerId)
             ->will($this->returnValue($testListener));
         $this->manager->disableListeners([$listenerId]);
-        $this->assertFalse($testListener->enabled);
+        $this->assertFalse($testListener->getEnabled());
     }
 }

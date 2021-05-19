@@ -72,8 +72,6 @@ define(function (require) {
 
             this._initBottomLine();
 
-            // inner-wrapper fixes max-height for flex container in IE11 https://jsfiddle.net/d158647x/
-            this.uiDialog.wrapInner('<div class="ui-dialog-inner-wrapper"></div>');
             this.uiDialog.attr('data-skip-focus-decoration', '');
 
             this._onBackspacePress = this._onBackspacePress.bind(this);
@@ -166,7 +164,7 @@ define(function (require) {
         showActionsContainer: function() {
             if (!this.uiDialogButtonPane.parent().length) {
                 this.uiDialog.addClass('ui-dialog-buttons');
-                this.uiDialogButtonPane.appendTo(this.uiDialog.find('.ui-dialog-inner-wrapper'));
+                this.uiDialogButtonPane.appendTo(this.uiDialog);
             }
         },
 

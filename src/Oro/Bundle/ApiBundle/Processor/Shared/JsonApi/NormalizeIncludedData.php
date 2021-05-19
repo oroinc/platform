@@ -255,7 +255,7 @@ class NormalizeIncludedData implements ProcessorInterface
             return $entityClass;
         }
 
-        $this->addValidationError(Constraint::ENTITY_TYPE, $pointer);
+        $this->addValidationError(Constraint::ENTITY_TYPE, $pointer, sprintf('Unknown entity type: %s.', $entityType));
 
         return null;
     }

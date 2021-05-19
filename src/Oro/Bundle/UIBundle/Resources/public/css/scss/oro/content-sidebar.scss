@@ -11,7 +11,6 @@
         flex-shrink: $content-sidebar-sidebar-flex-shrink;
         width: $content-sidebar-sidebar-width;
 
-
         &:not(.ui-resizable-resizing) {
             transition: $content-sidebar-sidebar-not-ui-resizable-resizing-transition;
         }

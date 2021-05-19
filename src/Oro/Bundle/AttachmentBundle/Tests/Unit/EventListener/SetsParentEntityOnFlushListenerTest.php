@@ -55,10 +55,6 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $classMetadata = $this->createMock(ClassMetadata::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(true);
-        $metadataFactory->expects($this->once())
             ->method('getMetadataFor')
             ->with(File::class)
             ->willReturn($classMetadata);
@@ -106,10 +102,6 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$entityToUpdate, $entityWithoutFileToUpdate, $entityWithoutFileField]);
         $classMetadata = $this->createMock(ClassMetadata::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(true);
         $metadataFactory->expects($this->once())
             ->method('getMetadataFor')
             ->with(File::class)
@@ -195,10 +187,6 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
         $classMetadata = $this->createMock(ClassMetadata::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
         $metadataFactory->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(true);
-        $metadataFactory->expects($this->once())
             ->method('getMetadataFor')
             ->with(File::class)
             ->willReturn($classMetadata);
@@ -236,10 +224,6 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
 
         $classMetadata = $this->createMock(ClassMetadata::class);
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(true);
         $metadataFactory->expects($this->once())
             ->method('getMetadataFor')
             ->with(File::class)

@@ -34,7 +34,7 @@ services:
             - '@annotation_reader'
             - '@oro_entity_config.provider.extend'
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
             - { name: doctrine.event_listener, event: onFlush }
 
     oro_entity_extend.manager.multi_enum_entity:

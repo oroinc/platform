@@ -82,7 +82,7 @@ class WorkflowFileImportProcessor implements ConfigImportProcessorInterface
             $resourceData = $this->getResourceData($importContent);
 
             $resourceData = $this->applyReplacements($resourceData);
-            $content = $this->mergeConfigs($resourceData, $content);
+            $content = $this->mergeImports($content, $resourceData);
         }
 
         return $content;

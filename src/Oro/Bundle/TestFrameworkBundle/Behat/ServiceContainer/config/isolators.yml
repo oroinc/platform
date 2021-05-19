@@ -10,8 +10,8 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\MessageQueueIsolationSubscriber'
     arguments:
       - '@symfony2_extension.kernel'
-      - '@oro_test.processor.message_queue.dbal'
-      - '@oro_test.processor.message_queue.amqp'
+    calls:
+      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 150 }
 
@@ -103,8 +103,8 @@ services:
     class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\InitalMessageQueueIsolator'
     arguments:
       - '@symfony2_extension.kernel'
-      - '@oro_test.processor.message_queue.dbal'
-      - '@oro_test.processor.message_queue.amqp'
+    calls:
+      - ['setMessageQueueProcessor', ['@oro_test.processor.message_queue']]
     tags:
       - { name: 'oro_behat.isolator', priority: 50 }
 

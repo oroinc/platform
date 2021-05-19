@@ -9,6 +9,16 @@
         display: flex;
         flex-wrap: wrap;
 
+        /* stylelint-disable selector-max-compound-selectors */
+        .select2-container,
+        input.label-text,
+        .function-selector .controls select,
+        .function-selector .controls .selector {
+            width: 100%;
+            max-width: 100%;
+        }
+        /* stylelint-enable selector-max-compound-selectors */
+
         .control-group {
             float: left;
             flex-direction: column;
@@ -28,6 +38,7 @@
                 margin-left: 0;
                 min-width: 0;
 
+                // stylelint-disable-next-line selector-max-compound-selectors
                 .select2-container {
                     order: -1;
                 }
@@ -51,14 +62,7 @@
             }
         }
 
-        .select2-container,
-        input.label-text,
-        .function-selector .controls select,
-        .function-selector .controls .selector {
-            width: 100%;
-            max-width: 100%;
-        }
-
+        // stylelint-disable-next-line selector-max-compound-selectors
         .sorting-selector .controls select {
             width: $query-designer-sorting-selector-width;
         }
@@ -71,7 +75,7 @@
 
             @include clearfix();
 
-            &:before {
+            &::before {
                 display: block;
                 height: $form-horizontal-control-label-line-height + $form-horizontal-control-label-offset;
 
@@ -98,6 +102,7 @@
             .filter-item {
                 padding: 0;
 
+                /* stylelint-disable selector-max-compound-selectors */
                 > .btn {
                     border-top-right-radius: $query-designer-filter-item-border-radius;
                     border-bottom-right-radius: $query-designer-filter-item-border-radius;
@@ -105,8 +110,9 @@
 
                 .filter-select .select-filter-widget,
                 .filter-criteria-hint {
-                    font-weight: normal;
+                    font-weight: font-weight('light');
                 }
+                /* stylelint-enable selector-max-compound-selectors */
             }
         }
     }

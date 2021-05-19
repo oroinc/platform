@@ -3,8 +3,8 @@
 .filter-box {
     margin-bottom: $filter-box-offset-buttom;
 
-    & > .filter-container {
-        & > .select-filter-widget {
+    > .filter-container {
+        > .select-filter-widget {
             margin: $filter-box-filter-container-select-filter-widget-offset;
             position: $filter-box-filter-container-select-filter-widget-position;
         }

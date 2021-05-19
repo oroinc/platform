@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\WsseAuthenticationBundle\Command\DeleteNoncesCommand;
 use Oro\Bundle\WsseAuthenticationBundle\Command\GenerateWsseHeaderCommand;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Response;
@@ -134,7 +135,7 @@ class CommandsTest extends WebTestCase
     {
         $nonceCache = $this->getNonceCache(self::FIREWALL_NAME);
 
-        $this->assertTrue($nonceCache->has($this->getNonceCacheKey($this->getNonce($header[4][1]))));
+        $this->assertTrue($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
 
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
@@ -154,7 +155,7 @@ class CommandsTest extends WebTestCase
             '--firewall' => self::FIREWALL_NAME,
         ]);
 
-        $this->assertFalse($nonceCache->has($this->getNonceCacheKey($this->getNonce($header[4][1]))));
+        $this->assertFalse($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
         static::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
 
         return $header;
@@ -163,14 +164,13 @@ class CommandsTest extends WebTestCase
     /**
      * @param string $firewallName
      *
-     * @return mixed
+     * @return AdapterInterface
      */
-    private function getNonceCache(string $firewallName)
+    private function getNonceCache(string $firewallName): AdapterInterface
     {
         $nonceCacheServiceLocator = $this->getContainer()->get('oro_wsse_authentication.service_locator.nonce_cache');
-        $nonceCache = $nonceCacheServiceLocator->get('oro_wsse_authentication.nonce_cache.' . $firewallName);
 
-        return $nonceCache;
+        return $nonceCacheServiceLocator->get('oro_wsse_authentication.nonce_cache.' . $firewallName);
     }
 
     /**prepare

@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .select2 {
     &-container {
         margin: $select2-container-offset;
@@ -39,6 +41,7 @@
             .select2-search-choice-close {
                 display: $select2-search-choice-close-allow-display;
             }
+
             .select2-chosen {
                 padding-right: $select2-chosen-end-offset + $select2-search-choice-close-right;
             }
@@ -50,7 +53,7 @@
         }
 
         @at-root #{map_get($oro-form-selectors, 'select2-append'),
-                   map_get($oro-form-selectors, 'select2-prepend')} {
+        map_get($oro-form-selectors, 'select2-prepend')} {
             width: $select2-container-input-append-width;
             max-width: $select2-container-input-append-max-width;
         }
@@ -119,7 +122,7 @@
         padding: $select2-chosen-inner-offset;
         height: $select2-chosen-height;
 
-        & > i[class^="fa-"] {
+        > i[class^='fa-'] {
             height: $select2-chosen-icon-height;
             margin-top: $select2-chosen-icon-offset-left;
             margin-right: $select2-result-label-icon-offset;
@@ -173,7 +176,7 @@
         text-decoration: $select2-search-choice-arrow-text-decoration;
         -webkit-font-smoothing: $select2-search-choice-arrow-font-smoothing;
 
-        &:before {
+        &::before {
             content: $select2-search-choice-arrow-icon;
             text-decoration: $select2-search-choice-arrow-text-decoration;
             display: $select2-search-choice-arrow-display;
@@ -212,9 +215,7 @@
 
                 > div {
                     @include text-line-truncate(auto, 100%);
-                }
 
-                > div {
                     background: $select2-search-choice-background;
                     padding:
                         $select2-search-choice-inner-offset-vertical
@@ -285,7 +286,7 @@
                 color: inherit;
             }
 
-            &:before {
+            &::before {
                 font-size: $select2-search-multi-choice-close-icon-font-size;
                 height: $select2-search-multi-choice-close-icon-height;
             }
@@ -317,7 +318,7 @@
 
         color: $select2-drop-color;
 
-        &:before {
+        &::before {
             position: absolute;
             content: ' ';
 
@@ -354,7 +355,7 @@
             width: $select2-drop-auto-width;
         }
 
-        &.select2-drop-above:before {
+        &.select2-drop-above::before {
             border-radius: $select2-drop-above-border-radius;
             box-shadow: $select2-drop-above-box-shadow;
         }
@@ -431,9 +432,6 @@
             line-height: $select2-result-label-line-height;
 
             -webkit-touch-callout: $select2-result-label-user-select;
-            -webkit-user-select: $select2-result-label-user-select;
-            -moz-user-select: $select2-result-label-user-select;
-            -ms-user-select: $select2-result-label-user-select;
             user-select: $select2-result-label-user-select;
 
             color: $select2-result-label-color;
@@ -454,7 +452,7 @@
 
                 text-align: center;
 
-                &:before {
+                &::before {
                     vertical-align: text-bottom;
                 }
             }
@@ -477,6 +475,7 @@
             background: $select2-results-disabled-background;
             display: $select2-results-disabled-display;
             cursor: $select2-results-disabled-cursor;
+
             .select2-highlighted {
                 color: $select2-results-disabled-color;
                 background: $select2-results-disabled-background;
@@ -527,7 +526,7 @@
                 color: $link-color-hover;
             }
 
-            &:after {
+            &::after {
                 display: inline;
                 padding: 0 2px;
                 color: $body-color;
@@ -538,7 +537,8 @@
             &:last-child {
                 color: $select2-breadcrumbs-item-color;
                 cursor: $select2-breadcrumbs-item-cursor;
-                &:after {
+
+                &::after {
                     display: $select2-breadcrumbs-item-last-display;
                 }
             }
@@ -584,6 +584,7 @@
 
 .select2-offscreen,
 .select2-offscreen:focus {
+    /* stylelint-disable declaration-no-important */
     clip: $select2-offscreen-clip;
     border: $select2-offscreen-border !important;
     width: $select2-offscreen-width !important;
@@ -594,7 +595,9 @@
     position: $select2-offscreen-position !important;
     outline: $select2-offscreen-outline;
     left: $select2-offscreen-left;
+    /* stylelint-enable declaration-no-important */
 }
+
 .select2-offscreen[multiple] {
     height: auto;
 }

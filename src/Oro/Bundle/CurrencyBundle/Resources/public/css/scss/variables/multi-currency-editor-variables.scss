@@ -4,10 +4,8 @@ $multi-currency-editor-single-width: 168px !default;
 $multi-currency-editor-single-offset: 10px !default;
 $multi-currency-editor-single-border-width: $input-border-width;
 $multi-currency-editor-single-border-color: $input-border-color;
-$multi-currency-editor-single-border:
-    $multi-currency-editor-single-border-width
-    solid
-    $multi-currency-editor-single-border-color !default;
+$multi-currency-editor-single-border: $multi-currency-editor-single-border-width
+    solid $multi-currency-editor-single-border-color !default;
 $multi-currency-editor-single-color: $primary-830 !default;
 $multi-currency-editor-single-add-on-inner-offset:
     ($oro-datagrid-body-cell-inner-top - $multi-currency-editor-single-border-width)

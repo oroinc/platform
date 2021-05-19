@@ -417,6 +417,7 @@ services:
         arguments:
             - "@oro_entity_config.provider.extend"
             - "@oro_entity_config.provider.form"
+            - "@oro_entity_config.validator.field_config_constraints_factory"
         calls:
             -
                 - addConstraints
@@ -702,3 +703,8 @@ services:
             - '@oro_entity_config.config_manager'
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+
+    oro_entity_extend.validator.constraints.provider.decimal:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\Provider\DecimalFieldConfigConstraintsProvider
+        tags:
+            - { name: oro_entity_config.field_config_constraints_provider, type: decimal }

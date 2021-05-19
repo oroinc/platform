@@ -7,7 +7,7 @@
             color: inherit;
             background-color: $highlight-text-color;
             font-family: inherit;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             font-size: inherit;
             line-height: inherit;
 
@@ -17,24 +17,21 @@
     }
 
     &-element {
-        &:first-letter {
+        &::first-letter {
             text-transform: none;
         }
 
         @at-root label#{&} {
             mark {
-                font-weight: normal;
+                font-weight: font-weight('light');
             }
         }
     }
 
-    &-element[class^="fa-"],
-    &-element[class*=" fa-"] {
+    &-element[class^='fa-'],
+    &-element[class*=' fa-'] {
         background-color: $highlight-text-color;
-        box-shadow: 2px -1px 0 0 $highlight-text-color,
-                    2px 1px 0 0 $highlight-text-color,
-                    -2px 1px 0 0 $highlight-text-color,
-                    -2px -1px 0 0 $highlight-text-color;
+        box-shadow: $highlight-box-shadow;
 
         &.tooltip-icon {
             color: $primary-550;

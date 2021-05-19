@@ -4,6 +4,6 @@
     margin: $offset-x 0;
 
     sup {
-        color: get-color('ui', 'error-dark');
+        color: $label-required-color;
     }
 }

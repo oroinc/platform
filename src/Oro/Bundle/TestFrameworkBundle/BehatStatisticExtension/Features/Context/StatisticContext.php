@@ -77,17 +77,15 @@ class StatisticContext implements Context
     {
         $argumentsString = strtr($argumentsString, ['\'' => '"']);
 
-        $this->process = new Process(
-            sprintf(
-                '%s %s %s %s -c %s',
-                $this->phpBin,
-                escapeshellarg(BEHAT_BIN_PATH),
-                $argumentsString,
-                strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
-                $this->testAppPath.'/behat.yml'
-            ),
-            $this->testAppPath
+        $command = sprintf(
+            '%s %s %s %s -c %s',
+            $this->phpBin,
+            escapeshellarg(BEHAT_BIN_PATH),
+            $argumentsString,
+            strtr('--format-settings=\'{"timer": false}\'', ['\'' => '"', '"' => '\"']),
+            $this->testAppPath.'/behat.yml'
         );
+        $this->process = Process::fromShellCommandline($command, $this->testAppPath);
         $this->process->start();
         $this->process->wait();
     }

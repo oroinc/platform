@@ -6,6 +6,8 @@ namespace Oro\Component\MessageQueue\Consumption;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumerMemoryExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,9 +26,11 @@ trait LimitsExtensionsCommandTrait
             ->addOption('message-limit', null, InputOption::VALUE_REQUIRED, 'Consume n messages and exit')
             ->addOption('time-limit', null, InputOption::VALUE_REQUIRED, 'Exit after this time')
             ->addOption('memory-limit', null, InputOption::VALUE_REQUIRED, 'Exit if this memory limit (MB) is reached')
+            ->addOption('object-limit', null, InputOption::VALUE_REQUIRED, 'Exit when objects amount reached')
+            ->addOption('gc-limit', null, InputOption::VALUE_REQUIRED, 'Exit when GC calls amount reached')
             ->setHelp(
-                // @codingStandardsIgnoreStart
-            $this->getHelp() . <<<'HELP'
+            // @codingStandardsIgnoreStart
+                $this->getHelp().<<<'HELP'
 
 The <info>--message-limit</info> option can be used to limit the maximum number of messages
 to consume before exiting:
@@ -42,13 +46,21 @@ The <info>--memory-limit</info> option defines the maximum used memory threshold
 
   <info>php %command.full_name% --memory-limit=<number></info></info> <fg=green;options=underscore>other options and arguments</>
 
+The <info>--object-limit</info> option defines the maximum amount of objects in runtime:
+
+  <info>php %command.full_name% --object-limit=<number></info></info> <fg=green;options=underscore>other options and arguments</>
+
+The <info>--gc-limit</info> option defines the maximum amount GC calls:
+
+  <info>php %command.full_name% --gc-limit=<number></info></info> <fg=green;options=underscore>other options and arguments</>
 HELP
-                // @codingStandardsIgnoreEnd
+            // @codingStandardsIgnoreEnd
             )
             ->addUsage('--message-limit=<number> [other options and arguments]')
             ->addUsage('--time-limit=<date-time-string> [other options and arguments]')
             ->addUsage('--memory-limit=<number-of-megabytes> [other options and arguments]')
-        ;
+            ->addUsage('--object-limit=<number> [other options and arguments]')
+            ->addUsage('--gc-limit=<number> [other options and arguments]');
     }
 
     /**
@@ -60,7 +72,7 @@ HELP
     {
         $extensions = [];
 
-        $messageLimit = (int) $input->getOption('message-limit');
+        $messageLimit = (int)$input->getOption('message-limit');
         if ($messageLimit) {
             $extensions[] = new LimitConsumedMessagesExtension($messageLimit);
         }
@@ -78,9 +90,19 @@ HELP
             $extensions[] = new LimitConsumptionTimeExtension($timeLimit);
         }
 
-        $memoryLimit = (int) $input->getOption('memory-limit');
+        $memoryLimit = (int)$input->getOption('memory-limit');
         if ($memoryLimit) {
             $extensions[] = new LimitConsumerMemoryExtension($memoryLimit);
+        }
+
+        $objectsLimit = (int)$input->getOption('object-limit');
+        if ($objectsLimit) {
+            $extensions[] = new LimitObjectExtension($objectsLimit);
+        }
+
+        $garbageCollectionLimit = (int)$input->getOption('gc-limit');
+        if ($garbageCollectionLimit) {
+            $extensions[] = new LimitGarbageCollectionExtension($garbageCollectionLimit);
         }
 
         return $extensions;

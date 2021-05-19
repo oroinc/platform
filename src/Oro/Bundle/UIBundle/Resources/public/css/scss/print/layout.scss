@@ -4,13 +4,16 @@ html,
 body,
 .app-page,
 .app-page__central-panel {
+    // stylelint-disable-next-line declaration-no-important
     height: auto !important;
 }
 
 .app-page {
     display: block;
+
     &__main {
         display: block;
+        // stylelint-disable-next-line declaration-no-important
         width: 100% !important;
     }
 

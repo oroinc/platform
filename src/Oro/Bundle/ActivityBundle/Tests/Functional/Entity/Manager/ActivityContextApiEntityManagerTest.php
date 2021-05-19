@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Functional\Entity\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\ReflectionUtil;
@@ -19,13 +19,6 @@ class ActivityContextApiEntityManagerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-
-        $entityAliasResolver = $this->createMock(EntityAliasResolver::class);
-        $entityAliasResolver->expects($this->any())
-            ->method('getPluralAlias')
-            ->willReturn('sample-alias-plural');
-
-        $this->getContainer()->set('oro_entity.entity_alias_resolver', $entityAliasResolver);
 
         $this->loadFixtures([
             LoadActivityData::class,
@@ -48,12 +41,12 @@ class ActivityContextApiEntityManagerTest extends WebTestCase
             ->willReturn(true);
 
         $manager = self::getContainer()->get('oro_activity.manager.activity_context.api');
-        $result = $manager->getActivityContext(\get_class($activity), $activity->getId());
+        $result = $manager->getActivityContext(ClassUtils::getClass($activity), $activity->getId());
 
         $target = $this->getReference('test_activity_target_1');
         $expectedItem = [
             'title' => $target->getId(),
-            'activityClassAlias' => 'sample-alias-plural',
+            'activityClassAlias' => 'testactivities',
             'entityId' => $activity->getId(),
             'targetId' => $target->getId(),
             'targetClassName' => 'Oro_Bundle_TestFrameworkBundle_Entity_TestActivityTarget',

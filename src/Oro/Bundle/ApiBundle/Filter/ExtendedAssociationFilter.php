@@ -10,7 +10,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
- * A filter that can be used to filter data by an extended association.
+ * A filter that can be used to filter data by a multi-target association.
  */
 class ExtendedAssociationFilter extends AssociationFilter
 {

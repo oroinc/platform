@@ -13,7 +13,23 @@
 
     .collapse-text {
         display: inline;
-        font-weight: bold;
+        font-weight: font-weight('bold');
+    }
+
+    .sql-query-box {
+        padding: 0 $content-padding-medium $content-padding-small;
+    }
+
+    .sql-query-code {
+        display: block;
+        padding: 2px 4px;
+        margin: 10px 0;
+
+        background-color: $primary-900;
+        color: $danger;
+        border: 1px solid $primary-830;
+
+        word-break: normal;
     }
 
     .show-sql-query {
@@ -32,7 +48,7 @@
 
             .expand-text {
                 display: inline;
-                font-weight: bold;
+                font-weight: font-weight('bold');
             }
 
             .collapse-text,
@@ -40,21 +56,5 @@
                 display: none;
             }
         }
-    }
-
-    .sql-query-box {
-        padding: 0 $content-padding-medium $content-padding-small;
-    }
-
-    .sql-query-code {
-        display: block;
-        padding: 2px 4px;
-        margin: 10px 0;
-
-        background-color: $primary-900;
-        color: $danger;
-        border: 1px solid $primary-830;
-
-        word-break: normal;
     }
 }

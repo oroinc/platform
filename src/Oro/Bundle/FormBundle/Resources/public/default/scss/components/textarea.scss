@@ -2,7 +2,7 @@
 
 .textarea {
     @include placeholder {
-        color: get-color('additional', 'middle');
+        color: $textarea-placeholder-color;
     }
 
     &--size-m {

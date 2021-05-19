@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .activity-list-widget {
     position: relative;
 
@@ -198,7 +200,7 @@
 
         .activity-item-email-content,
         .activity-item-content {
-             margin-bottom: 0;
+            margin-bottom: 0;
         }
     }
 }
@@ -207,7 +209,7 @@
     .btn.filter-select {
         border: none;
         background: none transparent;
-        font-weight: normal;
+        font-weight: font-weight('normal');
         padding-left: 0;
         padding-right: 0;
         color: $activity-filter-select-color;
@@ -222,7 +224,7 @@
         }
     }
 
-    .dropdown-toggle:after {
+    .dropdown-toggle::after {
         display: none;
     }
 }
