@@ -69,7 +69,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo(Events::MAINTENANCE_ON));
+            ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
 
         $this->assertTrue($this->mode->on());
     }
@@ -79,7 +79,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher
             ->expects($this->once())
             ->method('dispatch')
-            ->with($this->equalTo(Events::MAINTENANCE_OFF));
+            ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
 
         $this->assertTrue($this->mode->off());
     }
