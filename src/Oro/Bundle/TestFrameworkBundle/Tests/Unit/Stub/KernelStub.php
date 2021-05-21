@@ -115,7 +115,7 @@ class KernelStub extends OroKernel
     /**
      * {@inheritdoc}
      */
-    public function locateResource($name, $dir = null, $first = true)
+    public function locateResource($name)
     {
     }
 
