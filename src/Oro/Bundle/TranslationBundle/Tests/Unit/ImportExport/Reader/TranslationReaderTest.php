@@ -12,33 +12,25 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 class TranslationReaderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $contextRegistry;
+    private $contextRegistry;
 
     /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageRepository;
+    private $languageRepository;
 
     /** @var StepExecution|\PHPUnit\Framework\MockObject\MockObject */
-    protected $stepExecution;
+    private $stepExecution;
 
     /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
+    private $context;
 
     /** @var TranslationReader */
-    protected $reader;
+    private $reader;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->languageRepository = $this->createMock(LanguageRepository::class);
-        $this->stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->stepExecution = $this->createMock(StepExecution::class);
         $this->context = $this->createMock(ContextInterface::class);
 
         $this->contextRegistry->expects($this->any())
@@ -51,34 +43,29 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $offset
-     * @param string $locale
-     * @param array|null $expectedData
-     *
      * @dataProvider readProvider
      */
-    public function testRead($offset, $locale, array $expectedData = null)
+    public function testRead(int $offset, string $locale, array $expectedData = null)
     {
-        $this->languageRepository->expects($this->at(0))
+        $this->languageRepository->expects($this->exactly(2))
             ->method('getTranslationsForExport')
-            ->with(Translator::DEFAULT_LOCALE)
-            ->willReturn($this->getCatalogueEnMap());
+            ->willReturnMap([
+                [Translator::DEFAULT_LOCALE, $this->getCatalogueEnMap()],
+                [$locale, $this->getCatalogueMap()]
+            ]);
 
-        $this->languageRepository->expects($this->at(1))
-            ->method('getTranslationsForExport')
-            ->with($locale)
-            ->willReturn($this->getCatalogueMap());
-
-        $this->stepExecution->expects($this->once())->method('getReadCount')->willReturn($offset);
-        $this->context->expects($this->once())->method('getOption')->with('language_code')->willReturn('locale1');
+        $this->stepExecution->expects($this->once())
+            ->method('getReadCount')
+            ->willReturn($offset);
+        $this->context->expects($this->once())
+            ->method('getOption')
+            ->with('language_code')
+            ->willReturn('locale1');
 
         $this->assertEquals($expectedData, $this->reader->read());
     }
 
-    /**
-     * @return array
-     */
-    public function readProvider()
+    public function readProvider(): array
     {
         return [
             'offset0' => [
@@ -122,10 +109,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    protected function getCatalogueMap()
+    private function getCatalogueMap(): array
     {
         return [
             0 => [
@@ -149,10 +133,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     *
-     */
-    private function getCatalogueEnMap()
+    private function getCatalogueEnMap(): array
     {
         return [
             0 => [
