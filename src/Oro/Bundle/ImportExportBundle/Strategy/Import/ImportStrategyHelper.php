@@ -13,6 +13,7 @@ use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -29,6 +30,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImportStrategyHelper
 {
+    use AuthorizationCheckerTrait;
+
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -217,9 +220,13 @@ class ImportStrategyHelper
         }
 
         try {
-            $this->isGrantedCache[$cacheKey] = $this->authorizationChecker->isGranted($attributes, $obj);
+            $this->isGrantedCache[$cacheKey] = $this->isAttributesGranted(
+                $this->authorizationChecker,
+                $attributes,
+                $obj
+            );
         } catch (InvalidDomainObjectException $exception) {
-            // if object do not have identity we skipp check
+            // if object do not have identity we skip check
             $this->isGrantedCache[$cacheKey] = true;
         }
 

@@ -7,7 +7,7 @@ use Doctrine\DBAL\Event\ConnectionEventArgs;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\Testing\Doctrine\Events;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * Provides functions to operate DB transactions.
@@ -24,10 +24,10 @@ trait DbIsolationExtension
      *
      * @internal
      */
-    protected function startTransaction($nestTransactionsWithSavepoints = false)
+    protected function startTransaction(bool $nestTransactionsWithSavepoints = false)
     {
-        if (false == $this->getClientInstance() instanceof Client) {
-            throw new \LogicException('The client must be instance of Client');
+        if (false == $this->getClientInstance() instanceof KernelBrowser) {
+            throw new \LogicException('The client must be instance of KernelBrowser');
         }
         if (false == $this->getClientInstance()->getContainer()) {
             throw new \LogicException('The client missing a container. Make sure the kernel was booted');
@@ -35,7 +35,7 @@ trait DbIsolationExtension
 
         /** @var ManagerRegistry $registry */
         $registry = $this->getClientInstance()->getContainer()->get('doctrine');
-        foreach ($registry->getManagers() as $name => $em) {
+        foreach ($registry->getManagers() as $em) {
             if ($em instanceof EntityManagerInterface) {
                 $objectId = spl_object_id($em->getConnection());
                 if (array_key_exists($objectId, self::$dbIsolationConnections)) {
@@ -75,7 +75,7 @@ trait DbIsolationExtension
     }
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Client
+     * @return \Symfony\Bundle\FrameworkBundle\KernelBrowser
      */
     abstract protected static function getClientInstance();
 }

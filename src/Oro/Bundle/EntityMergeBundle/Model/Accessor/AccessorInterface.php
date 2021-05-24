@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
+/**
+ * Provides an interface for services to access entity data.
+ */
 interface AccessorInterface
 {
     /**
@@ -27,7 +30,7 @@ interface AccessorInterface
     /**
      * Checks if this class supports accessing entity
      *
-     * @param string        $entity
+     * @param object        $entity
      * @param FieldMetadata $metadata
      * @return bool
      */

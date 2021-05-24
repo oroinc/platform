@@ -26,9 +26,6 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
     /** @var BufferedMessageProducer */
     private $producer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->inner = $this->createMock(MessageProducerInterface::class);
@@ -165,15 +162,8 @@ class BufferedMessageProducerTest extends \PHPUnit\Framework\TestCase
 
         // do the test
         $this->inner->expects(self::exactly(2))
-            ->method('send');
-        [$topic, $message] = $messages[0];
-        $this->inner->expects(self::at(0))
             ->method('send')
-            ->with($topic, $message);
-        [$topic, $message] = $messages[1];
-        $this->inner->expects(self::at(1))
-            ->method('send')
-            ->with($topic, $message);
+            ->withConsecutive($messages[0], $messages[1]);
 
         $this->producer->flushBuffer();
         // test that the buffer is cleared up

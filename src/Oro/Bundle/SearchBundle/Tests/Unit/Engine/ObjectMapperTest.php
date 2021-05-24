@@ -7,6 +7,7 @@ use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
@@ -14,6 +15,7 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Category;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -43,7 +45,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     protected $dispatcher;
 
     /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mapperProvider;
+    protected $mappingProvider;
 
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $htmlTagHelper;
@@ -202,35 +204,36 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $cache->expects($this->any())
             ->method('fetch')
             ->willReturn(false);
-        $this->mapperProvider = new SearchMappingProvider($this->dispatcher, $configProvider, $cache, 'test', 'test');
+        $this->mappingProvider = new SearchMappingProvider(
+            $this->dispatcher,
+            $configProvider,
+            $cache,
+            'test',
+            'test'
+        );
 
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->htmlTagHelper->expects($this->any())
             ->method('stripTags')
-            ->willReturnCallback(
-                function ($value) {
-                    return trim(strip_tags($value));
-                }
-            );
+            ->willReturnCallback(function ($value) {
+                return trim(strip_tags($value));
+            });
         $this->htmlTagHelper->expects($this->any())
             ->method('stripLongWords')
-            ->willReturnCallback(
-                function ($value) {
-                    $words = preg_split('/\s+/', $value);
+            ->willReturnCallback(function ($value) {
+                $words = preg_split('/\s+/', $value);
+                $words = array_filter(
+                    $words,
+                    function ($item) {
+                        return \strlen($item) <= HtmlTagHelper::MAX_STRING_LENGTH;
+                    }
+                );
 
-                    $words = array_filter(
-                        $words,
-                        function ($item) {
-                            return \strlen($item) <= HtmlTagHelper::MAX_STRING_LENGTH;
-                        }
-                    );
-
-                    return implode(' ', $words);
-                }
-            );
+                return implode(' ', $words);
+            });
 
         $this->mapper = new ObjectMapper(
-            $this->mapperProvider,
+            $this->mappingProvider,
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->dispatcher,
@@ -466,22 +469,21 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $product->setName('test product');
         $product->setDescription('short description');
 
-        $this->dispatcher->expects($this->at(1))->method('dispatch')
-            ->with(
-                $this->callback(
-                    function ($event) {
-                        /** @var PrepareEntityMapEvent $event */
-                        $this->assertInstanceOf(PrepareEntityMapEvent::class, $event);
-
-                        $data = $event->getData();
-                        $data[Query::TYPE_TEXT]['name'] = 'test product with changed title';
-                        $data[Query::TYPE_TEXT]['all_text'] = 'custom text';
-                        $event->setData($data);
-
-                        return true;
-                    }
-                ),
-                PrepareEntityMapEvent::EVENT_NAME
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$this->isInstanceOf(SearchMappingCollectEvent::class)],
+                [$this->isInstanceOf(PrepareEntityMapEvent::class), PrepareEntityMapEvent::EVENT_NAME]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () {
+                }),
+                new ReturnCallback(function (PrepareEntityMapEvent $event) {
+                    $data = $event->getData();
+                    $data[Query::TYPE_TEXT]['name'] = 'test product with changed title';
+                    $data[Query::TYPE_TEXT]['all_text'] = 'custom text';
+                    $event->setData($data);
+                })
             );
 
         $mapping = $this->mapper->mapObject($product);
@@ -530,10 +532,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
     public function testSelectedData()
     {
-        $query = $this->getMockBuilder(Query::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('getSelectDataFields')
             ->willReturn([
@@ -580,12 +579,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('first second third', $allData);
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return array
-     */
-    protected function clearTextData(array $fields)
+    protected function clearTextData(array $fields): array
     {
         foreach ($fields as $name => &$value) {
             if ($name !== Indexer::TEXT_ALL_DATA_FIELD) {

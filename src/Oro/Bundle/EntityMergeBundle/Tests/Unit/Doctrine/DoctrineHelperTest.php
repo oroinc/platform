@@ -2,6 +2,15 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Doctrine;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
@@ -10,9 +19,6 @@ use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
  */
 class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
@@ -34,35 +40,25 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $expression;
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
     protected function setUp(): void
     {
-        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->metadataFactory = $this->createMock(ClassMetadataFactory::class);
+        $this->metadata = $this->createMock(ClassMetadata::class);
+        $this->repository = $this->createMock(EntityRepository::class);
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->query = $this->createMock(AbstractQuery::class);
+        $this->expression = $this->createMock(Expr::class);
 
-        $this->metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()->getMock();
+        $additionalMetadataProvider = $this->createMock(AdditionalMetadataProvider::class);
 
-        $this->metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()
-            ->getMock();
-
-        $this->query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()->setMethods(array('execute'))
-            ->getMockForAbstractClass();
-
-        $this->expression = $this->createMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
-
-        $additionalMetadataProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = new DoctrineHelper($this->entityManager, $additionalMetadataProvider);
+        $this->doctrineHelper = new DoctrineHelper(
+            $this->entityManager,
+            $additionalMetadataProvider
+        );
     }
 
     public function testGetEntityRepository()
@@ -72,15 +68,15 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->with($entityName)
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
 
         $this->assertEquals($this->repository, $this->doctrineHelper->getEntityRepository($entityName));
     }
 
     public function testGetEntitiesByIds()
     {
-        $entityIds = array(1, 2, 3);
-        $entities = array(new \stdClass());
+        $entityIds = [1, 2, 3];
+        $entities = [new EntityStub()];
         $identifier = 'id';
 
         $className = 'TestEntity';
@@ -88,34 +84,32 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('getRepository')
             ->with($className)
-            ->will($this->returnValue($this->repository));
+            ->willReturn($this->repository);
 
         $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with($className)
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
         $this->metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue($identifier));
+            ->willReturn($identifier);
 
         $this->repository->expects($this->once())
             ->method('createQueryBuilder')
             ->with('entity')
-            ->will($this->returnValue($this->queryBuilder));
+            ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($this->expression));
+            ->willReturn($this->expression);
 
-        $inExpression = $this->getMockBuilder('Doctrine\ORM\Query\Expr\Func')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $inExpression = $this->createMock(Func::class);
 
         $this->expression->expects($this->once())
             ->method('in')
             ->with('entity.' . $identifier, ':entityIds')
-            ->will($this->returnValue($inExpression));
+            ->willReturn($inExpression);
 
         $this->queryBuilder->expects($this->once())
             ->method('setParameter')
@@ -127,11 +121,11 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
-            ->will($this->returnValue($this->query));
+            ->willReturn($this->query);
 
         $this->query->expects($this->once())
             ->method('execute')
-            ->will($this->returnValue($entities));
+            ->willReturn($entities);
 
         $this->assertEquals($entities, $this->doctrineHelper->getEntitiesByIds($className, $entityIds));
     }
@@ -139,7 +133,7 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetEntitiesByIdsForEmptyArray()
     {
         $className = 'TestEntity';
-        $this->assertEquals(array(), $this->doctrineHelper->getEntitiesByIds($className, array()));
+        $this->assertEquals([], $this->doctrineHelper->getEntitiesByIds($className, []));
     }
 
     public function testGetSingleIdentifierFieldName()
@@ -150,36 +144,34 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects($this->once())
             ->method('getClassMetadata')
             ->with($entityClass)
-            ->will($this->returnValue($this->metadata));
+            ->willReturn($this->metadata);
 
         $this->metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue($identifier));
+            ->willReturn($identifier);
 
         $this->assertEquals($identifier, $this->doctrineHelper->getSingleIdentifierFieldName($entityClass));
     }
 
     public function testGetEntityIdentifierValue()
     {
-        $entityClass = 'stdClass';
-        $entity = new \stdClass();
-        $identifiers = array('id' => 1);
+        $entity = new EntityStub(1);
 
         $this->entityManager->expects($this->once())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataFor')
-            ->with($entityClass)
-            ->will($this->returnValue($this->metadata));
+            ->with(EntityStub::class)
+            ->willReturn($this->metadata);
 
         $this->metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue($identifiers));
+            ->willReturn(['id' => $entity->getId()]);
 
-        $this->assertEquals($identifiers['id'], $this->doctrineHelper->getEntityIdentifierValue($entity));
+        $this->assertSame($entity->getId(), $this->doctrineHelper->getEntityIdentifierValue($entity));
     }
 
     public function testGetEntityIdentifierValueFails()
@@ -187,57 +179,49 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Multiple id is not supported.');
 
-        $entityClass = 'stdClass';
-        $entity = new \stdClass();
-        $identifiers = array('id1' => 1, 'id2' => 2);
+        $entity = new EntityStub();
 
         $this->entityManager->expects($this->once())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
         $this->metadataFactory->expects($this->once())
             ->method('getMetadataFor')
-            ->with($entityClass)
-            ->will($this->returnValue($this->metadata));
+            ->with(EntityStub::class)
+            ->willReturn($this->metadata);
 
         $this->metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue($identifiers));
+            ->willReturn(['id1' => 1, 'id2' => 2]);
 
         $this->doctrineHelper->getEntityIdentifierValue($entity);
     }
 
     public function testGetEntityIds()
     {
-        $entityClass = 'stdClass';
-        $fooEntity = new \stdClass();
-        $fooEntity->id = 1;
-        $barEntity = new \stdClass();
-        $barEntity->id = 2;
-        $entities = array($fooEntity, $barEntity);
-        $expectedIdentifiers = array($fooEntity->id, $barEntity->id);
+        $fooEntity = new EntityStub(1);
+        $barEntity = new EntityStub(2);
 
         $this->entityManager->expects($this->exactly(2))
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
         $this->metadataFactory->expects($this->exactly(2))
             ->method('getMetadataFor')
-            ->with($entityClass)
-            ->will($this->returnValue($this->metadata));
+            ->with(EntityStub::class)
+            ->willReturn($this->metadata);
 
-        $this->metadata->expects($this->at(0))
+        $this->metadata->expects($this->exactly(2))
             ->method('getIdentifierValues')
-            ->with($fooEntity)
-            ->will($this->returnValue(array('id' => $fooEntity->id)));
+            ->willReturnCallback(function (EntityStub $entity) {
+                return ['id' => $entity->getId()];
+            });
 
-        $this->metadata->expects($this->at(1))
-            ->method('getIdentifierValues')
-            ->with($barEntity)
-            ->will($this->returnValue(array('id' => $barEntity->id)));
-
-        $this->assertEquals($expectedIdentifiers, $this->doctrineHelper->getEntityIds($entities));
+        $this->assertEquals(
+            [$fooEntity->getId(), $barEntity->getId()],
+            $this->doctrineHelper->getEntityIds([$fooEntity, $barEntity])
+        );
     }
 
     /**
@@ -247,49 +231,47 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityManager->expects($this->exactly(2))
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
-        $this->metadataFactory->expects($this->at(0))
+        $this->metadataFactory->expects($this->exactly(2))
             ->method('getMetadataFor')
-            ->with(get_class($firstObject))
-            ->will($this->returnValue($this->metadata));
+            ->willReturnMap([
+                [get_class($firstObject), $this->metadata],
+                [get_class($secondObject), $this->metadata]
+            ]);
 
-        $this->metadata->expects($this->at(0))
+        $this->metadata->expects($this->exactly(2))
             ->method('getIdentifierValues')
-            ->with($firstObject)
-            ->will($this->returnValue(array('id' => $firstId)));
-
-        $this->metadataFactory->expects($this->at(1))
-            ->method('getMetadataFor')
-            ->with(get_class($secondObject))
-            ->will($this->returnValue($this->metadata));
-
-        $this->metadata->expects($this->at(1))
-            ->method('getIdentifierValues')
-            ->with($secondObject)
-            ->will($this->returnValue(array('id' => $secondId)));
+            ->withConsecutive(
+                [$this->identicalTo($firstObject)],
+                [$this->identicalTo($secondObject)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                ['id' => $firstId],
+                ['id' => $secondId]
+            );
 
         $this->assertEquals($expected, $this->doctrineHelper->isEntityEqual($firstObject, $secondObject));
     }
 
-    public function isEntityEqualDataProvider()
+    public function isEntityEqualDataProvider(): array
     {
-        return array(
-            'equal_class_equal_id' => array(
+        return [
+            'equal_class_equal_id' => [
                 'firstObject' => new EntityStub(1),
                 'firstId' => 1,
                 'secondObject' => new EntityStub(2),
                 'secondId' => 1,
                 'expected' => true
-            ),
-            'equal_class_not_equal_id' => array(
+            ],
+            'equal_class_not_equal_id' => [
                 'firstObject' => new EntityStub(1),
                 'firstId' => 1,
                 'secondObject' => new EntityStub(2),
                 'secondId' => 2,
                 'expected' => false
-            ),
-        );
+            ],
+        ];
     }
 
     public function testIsEntityEqualForNotSameClass()
@@ -315,17 +297,16 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllMetadata()
     {
-        $className = 'TestEntity';
-        $expectedResult = array($this->metadata);
+        $expectedResult = [$this->metadata];
 
         $this->entityManager->expects($this->once())
             ->method('getMetadataFactory')
-            ->will($this->returnValue($this->metadataFactory));
+            ->willReturn($this->metadataFactory);
 
         $this->metadataFactory->expects($this->once())
             ->method('getAllMetadata')
-            ->will($this->returnValue($expectedResult));
+            ->willReturn($expectedResult);
 
-        $this->assertEquals($expectedResult, $this->doctrineHelper->getAllMetadata($className));
+        $this->assertEquals($expectedResult, $this->doctrineHelper->getAllMetadata());
     }
 }

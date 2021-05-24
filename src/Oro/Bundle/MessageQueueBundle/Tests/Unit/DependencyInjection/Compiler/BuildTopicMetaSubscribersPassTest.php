@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaSubscribersPass;
@@ -6,275 +7,239 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\I
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\OnlyTopicNameTopicSubscriber;
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class BuildTopicMetaSubscribersPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArguments()
+    private BuildTopicMetaSubscribersPass $compiler;
+
+    protected function setUp(): void
     {
-        new BuildTopicMetaSubscribersPass();
+        $this->compiler = new BuildTopicMetaSubscribersPass();
     }
 
     public function testShouldBuildTopicMetaSubscribersForOneTagAndEmptyRegistry()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-            'processorName' => 'processor-name',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic', 'processorName' => 'processor-name']
+            );
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'topic' => ['subscribers' => ['processor-name']],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+        $this->assertEquals(
+            [
+                'topic' => ['subscribers' => ['processor-name']]
+            ],
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildTopicMetaSubscribersForOneTagAndSameMetaInRegistry()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument(['topic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']]]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-            'processorName' => 'barProcessorName',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic', 'processorName' => 'barProcessorName']
+            );
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[
-            'topic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']],
-        ]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'topic' => [
-                'description' => 'aDescription',
-                'subscribers' => ['fooProcessorName', 'barProcessorName',]
+        $this->assertEquals(
+            [
+                'topic' => [
+                    'description' => 'aDescription',
+                    'subscribers' => ['fooProcessorName', 'barProcessorName']
+                ]
             ],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildTopicMetaSubscribersForOneTagAndSameMetaInPlusAnotherRegistry()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument(
+                [
+                    'fooTopic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']],
+                    'barTopic' => ['description' => 'aBarDescription']
+                ]
+            );
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'fooTopic',
-            'processorName' => 'barProcessorName',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'fooTopic', 'processorName' => 'barProcessorName']
+            );
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[
-            'fooTopic' => ['description' => 'aDescription', 'subscribers' => ['fooProcessorName']],
-            'barTopic' => ['description' => 'aBarDescription'],
-        ]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'fooTopic' => [
-                'description' => 'aDescription',
-                'subscribers' => ['fooProcessorName', 'barProcessorName',]
+        $this->assertEquals(
+            [
+                'fooTopic' => [
+                    'description' => 'aDescription',
+                    'subscribers' => ['fooProcessorName', 'barProcessorName']
+                ],
+                'barTopic' => ['description' => 'aBarDescription']
             ],
-            'barTopic' => ['description' => 'aBarDescription'],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildTopicMetaSubscribersForTwoTagAndEmptyRegistry()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'fooTopic',
-            'processorName' => 'fooProcessorName',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'fooTopic', 'processorName' => 'fooProcessorName']
+            );
+        $container->register('another_processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'fooTopic', 'processorName' => 'barProcessorName']
+            );
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'fooTopic',
-            'processorName' => 'barProcessorName',
-        ]);
-        $container->setDefinition('another-processor-id', $processor);
+        $this->compiler->process($container);
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
-
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'fooTopic' => [
-                'subscribers' => ['fooProcessorName', 'barProcessorName',]
+        $this->assertEquals(
+            [
+                'fooTopic' => [
+                    'subscribers' => ['fooProcessorName', 'barProcessorName']
+                ]
             ],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildTopicMetaSubscribersForTwoTagSameMetaRegistry()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument(['fooTopic' => ['description' => 'aDescription', 'subscribers' => ['bazProcessorName']]]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'fooTopic',
-            'processorName' => 'fooProcessorName',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'fooTopic', 'processorName' => 'fooProcessorName']
+            );
+        $container->register('another_processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'fooTopic', 'processorName' => 'barProcessorName']
+            );
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'fooTopic',
-            'processorName' => 'barProcessorName',
-        ]);
-        $container->setDefinition('another-processor-id', $processor);
+        $this->compiler->process($container);
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[
-            'fooTopic' => ['description' => 'aDescription', 'subscribers' => ['bazProcessorName']],
-        ]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
-
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'fooTopic' => [
-                'description' => 'aDescription',
-                'subscribers' => ['bazProcessorName', 'fooProcessorName', 'barProcessorName',]
+        $this->assertEquals(
+            [
+                'fooTopic' => [
+                    'description' => 'aDescription',
+                    'subscribers' => ['bazProcessorName', 'fooProcessorName', 'barProcessorName']
+                ]
             ],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldSkipServiceWithEmptyTopicNameAttribute()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor', $processor);
+        $container->register('processor_id')
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
+        $this->assertEquals([], $registryDef->getArgument(0));
     }
 
     public function testShouldSetServiceIdAdProcessorIdIfIsNotSetInTag()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-        ]);
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id')
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'topic']);
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'topic' => ['subscribers' => ['processor-id']],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+        $this->assertEquals(
+            [
+                'topic' => ['subscribers' => ['processor_id']]
+            ],
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildMetaFromSubscriberIfOnlyTopicNameSpecified()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id', OnlyTopicNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'topic-subscriber-name' => ['subscribers' => ['processor-id']],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+        $this->assertEquals(
+            [
+                'topic-subscriber-name' => ['subscribers' => ['processor_id']]
+            ],
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldBuildMetaFromSubscriberIfProcessorNameSpecified()
     {
         $container = new ContainerBuilder();
+        $registryDef = $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition(ProcessorNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id', ProcessorNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
+        $this->compiler->process($container);
 
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
-
-        $expectedValue = [
-            'topic-subscriber-name' => ['subscribers' => ['subscriber-processor-name']],
-        ];
-
-        $this->assertEquals($expectedValue, $topicMetaRegistry->getArgument(0));
+        $this->assertEquals(
+            [
+                'topic-subscriber-name' => ['subscribers' => ['subscriber-processor-name']]
+            ],
+            $registryDef->getArgument(0)
+        );
     }
 
     public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Topic subscriber configuration is invalid. "[12345]"');
+
         $container = new ContainerBuilder();
+        $container->register('oro_message_queue.client.meta.topic_meta_registry')
+            ->addArgument([]);
 
-        $processor = new Definition(InvalidTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-id', $processor);
+        $container->register('processor_id', InvalidTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $topicMetaRegistry = new Definition();
-        $topicMetaRegistry->setArguments([[]]);
-        $container->setDefinition('oro_message_queue.client.meta.topic_meta_registry', $topicMetaRegistry);
-
-        $pass = new BuildTopicMetaSubscribersPass();
-        $pass->process($container);
+        $this->compiler->process($container);
     }
 }

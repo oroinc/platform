@@ -23,10 +23,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new LayoutHelper($this->requestStack);
     }
 
-    /**
-     * @return array
-     */
-    public function layoutHelperDataProvider()
+    public function layoutHelperDataProvider(): array
     {
         return [
             [
@@ -95,7 +92,7 @@ class LayoutHelperTest extends \PHPUnit\Framework\TestCase
         /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject $attributes */
         $attributes = $this->createMock(ParameterBag::class);
         $request->attributes = $attributes;
-        $attributes->expects($this->at(0))
+        $attributes->expects($this->once())
             ->method('get')
             ->with('_layout')
             ->willReturn($annotation);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
@@ -24,23 +25,17 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
     protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock(ManagerRegistry::class);
 
         parent::setUp();
     }
 
-    /**
-     * @return array
-     */
     protected function getExtensions()
     {
         $localizationCollection = new LocalizationCollectionType($this->registry);
         $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
         $translator = $this->createMock(Translator::class);
 
         return [
@@ -83,10 +78,7 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'text with null data' => [
@@ -144,20 +136,21 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())->method('setDefaults')->with(
-            $this->callback(
-                function (array $options) {
+        $resolver->expects($this->once())
+            ->method('setDefaults')
+            ->with(
+                $this->callback(function (array $options) {
                     self::assertEquals([], $options['entry_options']);
                     self::assertFalse($options['exclude_parent_localization']);
 
                     return true;
-                }
-            )
-        );
+                })
+            );
 
-        $resolver->expects($this->once())->method('setRequired')->with(['entry_type']);
+        $resolver->expects($this->once())
+            ->method('setRequired')
+            ->with(['entry_type']);
         $formType = new LocalizedPropertyType();
         $formType->configureOptions($resolver);
     }
@@ -167,30 +160,30 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         $type = 'form_text';
         $options = ['key' => 'value'];
 
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->at(0))
+        $builder->expects($this->exactly(2))
             ->method('add')
-            ->with(
-                LocalizedPropertyType::FIELD_DEFAULT,
-                $type,
+            ->withConsecutive(
                 [
-                    'key' => 'value',
-                    'label' => 'oro.locale.fallback.value.default'
-                ]
-            )->willReturnSelf();
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                LocalizedPropertyType::FIELD_LOCALIZATIONS,
-                LocalizationCollectionType::class,
+                    LocalizedPropertyType::FIELD_DEFAULT,
+                    $type,
+                    [
+                        'key' => 'value',
+                        'label' => 'oro.locale.fallback.value.default'
+                    ]
+                ],
                 [
-                    'entry_type' => $type,
-                    'entry_options' => $options,
-                    'exclude_parent_localization' => false,
-                    'use_tabs' => true,
+                    LocalizedPropertyType::FIELD_LOCALIZATIONS,
+                    LocalizationCollectionType::class,
+                    [
+                        'entry_type' => $type,
+                        'entry_options' => $options,
+                        'exclude_parent_localization' => false,
+                        'use_tabs' => true,
+                    ]
                 ]
-            )->willReturnSelf();
+            )
+            ->willReturnSelf();
         $builder->expects($this->once())
             ->method('addViewTransformer')
             ->with(
@@ -215,14 +208,15 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
 
     public function testFinishView(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
-        $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
-
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['form', '_custom_block_prefix'];
 
         $formType = new LocalizedPropertyType();
-        $formType->finishView($formView, $formMock, ['use_tabs' => true]);
+        $formType->finishView(
+            $formView,
+            $this->createMock(FormInterface::class),
+            ['use_tabs' => true]
+        );
 
         $this->assertEquals(
             ['form', 'oro_locale_localized_property_tabs', '_custom_block_prefix'],

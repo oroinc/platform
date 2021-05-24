@@ -11,24 +11,23 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackVal
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry
-     */
-    protected $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    /**
-     * @var LocalizedFallbackValueCollectionType
-     */
-    protected $type;
+    /** @var LocalizedFallbackValueCollectionType */
+    private $type;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
+        $this->registry = $this->createMock(ManagerRegistry::class);
+
         $this->type = new LocalizedFallbackValueCollectionType($this->registry);
     }
 
@@ -43,7 +42,7 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
             'use_tabs' => false
         ];
 
-        $resolver = $this->createMock('Symfony\Component\OptionsResolver\OptionsResolver');
+        $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($expectedOptions);
@@ -58,26 +57,27 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
         $field = 'text';
         $valueClass = CustomLocalizedFallbackValueStub::class;
 
-        $builder = $this->createMock('Symfony\Component\Form\FormBuilderInterface');
-        $builder->expects($this->at(0))
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects($this->exactly(2))
             ->method('add')
-            ->with(
-                LocalizedFallbackValueCollectionType::FIELD_VALUES,
-                LocalizedPropertyType::class,
+            ->withConsecutive(
                 [
-                    'entry_type' => $type,
-                    'entry_options' => $options,
-                    'exclude_parent_localization' => false,
-                    'use_tabs' => true
+                    LocalizedFallbackValueCollectionType::FIELD_VALUES,
+                    LocalizedPropertyType::class,
+                    [
+                        'entry_type' => $type,
+                        'entry_options' => $options,
+                        'exclude_parent_localization' => false,
+                        'use_tabs' => true
+                    ]
+                ],
+                [
+                    LocalizedFallbackValueCollectionType::FIELD_IDS,
+                    CollectionType::class,
+                    ['entry_type' => HiddenType::class]
                 ]
-            )->willReturnSelf();
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                LocalizedFallbackValueCollectionType::FIELD_IDS,
-                CollectionType::class,
-                ['entry_type' => HiddenType::class]
-            )->willReturnSelf();
+            )
+            ->willReturnSelf();
         $builder->expects($this->once())
             ->method('addViewTransformer')
             ->with(new LocalizedFallbackValueCollectionTransformer($this->registry, $field, $valueClass))
@@ -98,13 +98,14 @@ class LocalizedFallbackValueCollectionTypeTest extends \PHPUnit\Framework\TestCa
 
     public function testFinishView(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
-        $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
-
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['form', '_custom_block_prefix'];
 
-        $this->type->finishView($formView, $formMock, ['use_tabs' => true]);
+        $this->type->finishView(
+            $formView,
+            $this->createMock(FormInterface::class),
+            ['use_tabs' => true]
+        );
 
         $this->assertEquals(
             ['form', 'oro_locale_localized_fallback_value_collection_tabs', '_custom_block_prefix'],

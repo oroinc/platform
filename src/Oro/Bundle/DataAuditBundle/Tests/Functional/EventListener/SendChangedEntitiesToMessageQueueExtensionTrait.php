@@ -8,7 +8,8 @@ use Oro\Bundle\DataAuditBundle\Async\Topics;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Oro\Component\MessageQueue\Client\Message;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait SendChangedEntitiesToMessageQueueExtensionTrait
 {
@@ -16,9 +17,9 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
     /**
      * @param int $expected
-     * @param array $message
+     * @param Message $message
      */
-    public function assertEntitiesInsertedInMessageCount($expected, $message)
+    public function assertEntitiesInsertedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_inserted']));
         $this->assertCount($expected, $message->getBody()['entities_inserted']);
@@ -26,9 +27,9 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
     /**
      * @param int $expected
-     * @param array $message
+     * @param Message $message
      */
-    public function assertEntitiesUpdatedInMessageCount($expected, $message)
+    public function assertEntitiesUpdatedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_updated']));
         $this->assertCount($expected, $message->getBody()['entities_updated']);
@@ -36,9 +37,9 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
     /**
      * @param int $expected
-     * @param array $message
+     * @param Message $message
      */
-    public function assertEntitiesDeletedInMessageCount($expected, $message)
+    public function assertEntitiesDeletedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_deleted']));
         $this->assertCount($expected, $message->getBody()['entities_deleted']);
@@ -46,9 +47,9 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
     /**
      * @param int $expected
-     * @param array $message
+     * @param Message $message
      */
-    public function assertCollectionsUpdatedInMessageCount($expected, $message)
+    public function assertCollectionsUpdatedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['collections_updated']));
         $this->assertCount($expected, $message->getBody()['collections_updated']);
@@ -57,7 +58,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
     /**
      * @return TestAuditDataOwner
      */
-    protected function createOwner()
+    protected function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
 
@@ -89,7 +90,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
     /**
      * @return TestAuditDataChild
      */
-    protected function createChild()
+    protected function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
 
@@ -102,9 +103,9 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
     }
 
     /**
-     * @return array
+     * @return Message
      */
-    protected function getFirstEntitiesChangedMessage()
+    protected function getFirstEntitiesChangedMessage(): Message
     {
         $messages = self::getSentMessages();
 
@@ -124,7 +125,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
     }
 
     /**
-     * @return Client
+     * @return KernelBrowser
      */
     abstract protected static function getClientInstance();
 }
