@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Layout\DataProvider;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -12,6 +13,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AclProvider
 {
+    use AuthorizationCheckerTrait;
+
     /** @var AuthorizationCheckerInterface */
     protected $authorizationChecker;
 
@@ -48,6 +51,10 @@ class AclProvider
             }
         }
 
-        return $this->authorizationChecker->isGranted($attributes, $object);
+        return $this->isAttributesGranted(
+            $this->authorizationChecker,
+            $attributes,
+            $object
+        );
     }
 }

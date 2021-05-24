@@ -16,6 +16,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
+    use AuthorizationCheckerTrait;
+
     /** @var ServiceLink */
     private $authorizationCheckerLink;
 
@@ -109,7 +111,11 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
         /** @var AuthorizationCheckerInterface $authorizationChecker */
         $authorizationChecker = $this->authorizationCheckerLink->getService();
 
-        return $authorizationChecker->isGranted($attributes, $object);
+        return $this->isAttributesGranted(
+            $authorizationChecker,
+            $attributes,
+            $object
+        );
     }
 
     /**
