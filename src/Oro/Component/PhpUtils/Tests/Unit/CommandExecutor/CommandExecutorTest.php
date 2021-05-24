@@ -2,8 +2,8 @@
 
 namespace Oro\Component\PhpUtils\Tests\Unit\CommandExecutor;
 
-use Monolog\Logger;
 use Oro\Component\PhpUtils\Tools\CommandExecutor\CommandExecutor;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 class CommandExecutorTest extends \PHPUnit\Framework\TestCase
@@ -40,16 +40,29 @@ class CommandExecutorTest extends \PHPUnit\Framework\TestCase
 
     public function testRunCommand(): void
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Logger $logger */
-        $logger = self::createMock(Logger::class);
-        $logger->expects(self::once())->method('warning');
-        $logger->expects(self::once())->method('error');
-        $logger->expects(self::once())->method('info');
+        $logger = new TestLogger();
+        self::assertEquals(0, $this->commandExecutor->runCommand('echo "acme";', [], $logger));
+        $this->assertTrue($logger->hasInfo('acme'));
+    }
 
-        self::assertEquals(0, $this->commandExecutor->runCommand('echo "acme";', []));
-        $this->commandExecutor->runCommand('error command', ['--ignore-errors' => true], $logger);
+    public function testErrorCommand(): void
+    {
+        $logger = new TestLogger();
+        self::assertGreaterThanOrEqual(
+            254,
+            $this->commandExecutor->runCommand('error command', ['--ignore-errors' => true], $logger)
+        );
+    }
 
+    public function testTimedOutCommand(): void
+    {
+        $logger = new TestLogger();
         self::expectException(ProcessTimedOutException::class);
-        $this->commandExecutor->runCommand('sleep(2);', ['--process-timeout' => 1]);
+        self::assertEquals(
+            254,
+            $this->commandExecutor->runCommand('echo "acme";sleep(2);', ['--process-timeout' => 1], $logger)
+        );
+        $this->assertFalse($logger->hasInfoRecords());
+        $this->assertFalse($logger->hasWarningRecords());
     }
 }

@@ -2,6 +2,82 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.2.4
+
+### Added
+* Added support for Right To Left UI design see more [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html). 
+
+#### BatchBundle
+* Added \Oro\Bundle\BatchBundle\Step\CumulativeStepExecutor and \Oro\Bundle\BatchBundle\Step\CumulativeItemStep with writer call for empty items.
+
+#### EntityBundle
+* Added `\Oro\Bundle\EntityBundle\ORM\DoctrineHelper::getManager` to get manager by name.
+
+#### ImportExportBundle
+* Added `oro_importexport.strategy.configurable_import_strategy_helper` with performance improvements to replace `oro_importexport.strategy.import.helper` in strategries.
+* Added `\Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent` to handle validation errors formatting cases.
+* Added `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper` to improve import performance.
+* Added `\Oro\Bundle\ImportExportBundle\Writer\CumulativeWriter` to improve import performance.
+* Added `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy::isEntityFieldFallbackValue` to support `\Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue` import.
+* Added `\Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper::getEntityPropertiesByClassName` to support `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper` import.
+* Added `\Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper::verifyClass` to support `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper` import.
+
+#### LocaleBundle
+* Added `\Oro\Bundle\LocaleBundle\EventListener\StrategyValidationEventListener` to format `LocalizedFallbackValue` error keys.
+
+#### MessageQueueBundle
+* Added `message_queue` connection.
+* Added metadata cache for `message_queue` entity manager.
+* Added `\Oro\Bundle\MessageQueueBundle\Platform\{OptionalListenerDriver,OptionalListenerDriverFactory,OptionalListenerExtension}` to bypass optional listeners from CLI to MQ.
+
+#### MessageQueue component
+* Added `\Oro\Component\MessageQueue\Consumption\Extension\LimitGarbageCollectionExtension` to limit consumer by GC runs.
+* Added `\Oro\Component\MessageQueue\Consumption\Extension\LimitObjectExtension` to limit consumer by objects in runtime.
+
+#### PlatformBundle
+* Added \Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\DoctrineTagMethodPass to handle unsupported method definitions for Doctrine events.
+
+#### TestFrameworkBundle
+* Optional listeners (except search listeners) disabled in functional tests by default. Use `$this->getOptionalListenerManager()->enableListener('oro_workflow.listener.event_trigger_collector');` to enable listeners in tests.
+* Added additional hook for client cleanup - `@beforeResetClient`, use it instead of `@after` for full tests isolation.
+
+### Changed
+
+#### ApiBundle
+* Changed connection from `batch` to `message_queue`
+
+#### ImportExportBundle
+* Changed step class and writer service for `entity_import_from_csv` to improve import performance.
+* Changed `oro_importexport.strategy.add` and all strategies `oro_importexport.strategy.import.helper` implementation to `oro_importexport.strategy.configurable_import_strategy_helper`
+* Changed `\Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer` to handle advanced boolean fields cases - yes/no, true/false, 1/0.
+* Changed `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy::process` to process validation errors gracefully.
+* Changed `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy::updateRelations` to avoid massive collection changes.
+* Changed `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy::processValidationErrors` to improve validation errors processing.
+* Changed `\Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableAddOrReplaceStrategy::getObjectValue` to support edge cases, like User#roles.
+
+#### LocaleBundle
+* Changed `\Oro\Bundle\LocaleBundle\ImportExport\Strategy\LocalizedFallbackValueAwareStrategy` for performance reasons, error keys logic moved to `\Oro\Bundle\LocaleBundle\EventListener\StrategyValidationEventListener`.
+
+#### MessageQueueBundle
+* Changed connection from `batch` to `message_queue`
+
+#### SearchBundle
+* `oro_search.fulltext_index_manager` to use `doctrine.dbal.search_connection`
+* `oro_search.event_listener.orm.fulltext_index_listener` to use `doctrine.dbal.search_connection`
+
+#### TestFrameworkBundle
+* Public methods `newBrowserTabIsOpened` and `newBrowserTabIsOpenedAndISwitchToIt` are moved from `Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext` to dedicated context `Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\BrowserTabContext`.
+
+#### PlatformBundle
+* Changed \Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass to apply default connection (instead of all) for Doctrine events when it's empty in a tag.
+
+### Removed
+#### BatchBundle
+* Removed `batch` connection, use `message_queue` connection instead.
+
+#### PlatformBundle
+* `doctrine.exclude_listener_connections` parameter is no longer in use.
+
 ## 4.2.2
 
 ### Added

@@ -106,10 +106,13 @@ class JobManagerTest extends WebTestCase
 
         $anotherJob = $this->getReference(LoadJobData::JOB_1);
 
-        $this->jobManager->saveJobWithLock($job, static function (Job $job) use ($anotherJob) {
-            $job->setStatus(Job::STATUS_CANCELLED);
-            $anotherJob->setStatus(Job::STATUS_SUCCESS);
-        });
+        $this->jobManager->saveJobWithLock(
+            $job,
+            static function (Job $job) use ($anotherJob) {
+                $job->setStatus(Job::STATUS_CANCELLED);
+                $anotherJob->setStatus(Job::STATUS_SUCCESS);
+            }
+        );
 
         $updatedJob = $this->getJobRepository()->findJobById($job->getId());
         $anotherJobAfterFlush = $this->getJobRepository()->findJobById($anotherJob->getId());
@@ -173,9 +176,12 @@ class JobManagerTest extends WebTestCase
     {
         $job = $this->getReference(LoadJobData::JOB_3);
 
-        $this->jobManager->saveJobWithLock($job, static function (Job $job) {
-            $job->setStatus(Job::STATUS_CANCELLED);
-        });
+        $this->jobManager->saveJobWithLock(
+            $job,
+            static function (Job $job) {
+                $job->setStatus(Job::STATUS_CANCELLED);
+            }
+        );
 
         $updatedJob = $this->getJobRepository()->findJobById($job->getId());
 
@@ -209,10 +215,13 @@ class JobManagerTest extends WebTestCase
 
         $rootJob->addChildJob($childJob);
 
-        $this->jobManager->saveJobWithLock($childJob, static function (Job $job) {
-            $job->setStatus(Job::STATUS_CANCELLED);
-            $job->getRootJob()->setStatus(Job::STATUS_CANCELLED);
-        });
+        $this->jobManager->saveJobWithLock(
+            $childJob,
+            static function (Job $job) {
+                $job->setStatus(Job::STATUS_CANCELLED);
+                $job->getRootJob()->setStatus(Job::STATUS_CANCELLED);
+            }
+        );
 
         $updatedRootJob = $this->getJobRepository()->findJobById($rootJob->getId());
         $updatedChildJob = $this->getJobRepository()->findJobById($childJob->getId());
@@ -243,9 +252,12 @@ class JobManagerTest extends WebTestCase
         $this->assertEquals($job->getId(), $createdJob->getId());
 
         // stop and delete the created job manually because it was created outside of the transaction
-        $this->jobManager->saveJobWithLock($createdJob, static function (Job $job) {
-            $job->setStoppedAt(new \DateTime());
-        });
+        $this->jobManager->saveJobWithLock(
+            $createdJob,
+            static function (Job $job) {
+                $job->setStoppedAt(new \DateTime());
+            }
+        );
         $this->getJobEntityManager()->remove($createdJob);
         $this->getJobEntityManager()->flush($createdJob);
     }

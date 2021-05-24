@@ -676,8 +676,8 @@ services:
         class: Oro\Bundle\EntityBundle\EventListener\DoctrineFlushProgressListener
         public: false
         tags:
-            - { name: doctrine.event_listener, event: preFlush, method: preFlush }
-            - { name: doctrine.event_listener, event: postFlush, method: postFlush }
+            - { name: doctrine.event_listener, event: preFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_entity.manager.preloading_manager:
         class: Oro\Bundle\EntityBundle\Manager\PreloadingManager

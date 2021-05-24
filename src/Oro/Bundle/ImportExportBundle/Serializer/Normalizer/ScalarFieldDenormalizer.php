@@ -25,10 +25,14 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
     /** @var string */
     public const SCALAR_TYPE_FLOAT = 'float';
 
+    /** @var string */
+    public const SCALAR_TYPE_BOOLEAN = 'boolean';
+
     /** @var array */
     protected $supportedScalarTypes = [
         self::SCALAR_TYPE_INTEGER,
-        self::SCALAR_TYPE_FLOAT
+        self::SCALAR_TYPE_FLOAT,
+        self::SCALAR_TYPE_BOOLEAN,
     ];
 
     /**
@@ -46,7 +50,8 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
         Types::FLOAT => self::SCALAR_TYPE_FLOAT,
         Types::DECIMAL => self::SCALAR_TYPE_FLOAT,
         MoneyType::TYPE => self::SCALAR_TYPE_FLOAT,
-        PercentType::TYPE => self::SCALAR_TYPE_FLOAT
+        PercentType::TYPE => self::SCALAR_TYPE_FLOAT,
+        Types::BOOLEAN => self::SCALAR_TYPE_BOOLEAN,
     ];
 
     /**
@@ -130,6 +135,8 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
                 return $this->denormalizeInteger($data, $skipInvalidValue);
             case self::SCALAR_TYPE_FLOAT:
                 return $this->denormalizeFloat($data, $skipInvalidValue);
+            case self::SCALAR_TYPE_BOOLEAN:
+                return $this->denormalizeBoolean($data, $skipInvalidValue);
         }
 
         return $data;
@@ -146,14 +153,9 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
             return (int) $data;
         }
 
-        if (!is_numeric($data)) {
-            return $data;
-        }
-
-        $originalValueAsInt = (int)$data;
-        /** Check that variable is not float and not overflow */
-        if ($originalValueAsInt == $data) {
-            return $originalValueAsInt;
+        $filtered = filter_var($data, FILTER_VALIDATE_INT);
+        if (is_int($filtered)) {
+            return $filtered;
         }
 
         return $data;
@@ -168,17 +170,41 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
     protected function denormalizeFloat($data, bool $skipInvalidValue)
     {
         if (!$skipInvalidValue) {
-            return (float) $data;
+            return (float)$data;
         }
 
-        if (!is_numeric($data)) {
+        $filtered = filter_var($data, FILTER_VALIDATE_FLOAT);
+        if (is_float($filtered)) {
+            return $filtered;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param mixed $data
+     * @param bool $skipInvalidValue
+     *
+     * @return mixed
+     */
+    protected function denormalizeBoolean($data, bool $skipInvalidValue)
+    {
+        if (!$skipInvalidValue) {
+            return (bool)$data;
+        }
+
+        if (is_bool($data)) {
             return $data;
         }
 
-        $originalValueAsFloat = (float)$data;
-        /** Check that variable is not float and not overflow */
-        if (is_finite($originalValueAsFloat) && $originalValueAsFloat == $data) {
-            return $originalValueAsFloat;
+        $filtered = filter_var($data, FILTER_VALIDATE_INT);
+        if (is_int($filtered)) {
+            return (bool)$filtered;
+        }
+
+        $filtered = filter_var($data, FILTER_VALIDATE_BOOLEAN);
+        if (is_bool($filtered)) {
+            return $filtered;
         }
 
         return $data;

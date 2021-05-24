@@ -5,7 +5,7 @@ services:
         arguments:
             - '%database_driver%'
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
 
     oro_draft.duplicator.extension_provider:
         class: Oro\Bundle\DraftBundle\Duplicator\ExtensionProvider

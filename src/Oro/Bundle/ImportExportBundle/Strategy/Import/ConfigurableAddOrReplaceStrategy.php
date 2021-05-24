@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\ORMInvalidArgumentException;
+use Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
@@ -15,6 +16,7 @@ use Oro\Bundle\ImportExportBundle\Field\RelatedEntityStateHelper;
 use Oro\Bundle\ImportExportBundle\Validator\TypeValidationLoader;
 use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -48,6 +50,9 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 
     /** @var object */
     protected $processingEntity;
+
+    /** @var array */
+    protected $isEntityFieldFallbackValue = [];
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -98,19 +103,31 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->processingEntity = null;
         $this->relatedEntityStateHelper->clear();
 
+        $source = $entity;
         if (!$entity = $this->validateBeforeProcess($entity)) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
+        $source = $entity;
         if (!$entity = $this->beforeProcessEntity($entity)) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
+        $source = $entity;
         if (!$entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'))) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
+        $source = $entity;
         if (!$entity = $this->afterProcessEntity($entity)) {
+            $this->invalidateEntity($source);
+
             return null;
         }
 
@@ -317,15 +334,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $ownerEntity ?: $relationEntity);
                 } elseif ($this->fieldHelper->isMultipleRelation($field)) {
                     // multiple relation
-                    $relationCollection = $this->getObjectValue($entity, $fieldName);
-                    if ($relationCollection instanceof Collection) {
+                    $importedCollection = $this->getObjectValue($entity, $fieldName);
+                    if ($importedCollection instanceof Collection) {
                         $collectionItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
-                        $collectionEntities = new ArrayCollection();
-
-                        foreach ($relationCollection as $collectionEntity) {
+                        foreach ($importedCollection as $importedEntity) {
                             $entityItemData = $this->fieldHelper->getItemData(array_shift($collectionItemData));
-                            $collectionEntity = $this->processEntity(
-                                $collectionEntity,
+                            $databaseEntity = $this->processEntity(
+                                $importedEntity,
                                 $isFullRelation,
                                 $isPersistRelation,
                                 $entityItemData,
@@ -333,14 +348,13 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                                 true
                             );
 
-                            if ($collectionEntity) {
-                                $collectionEntities->add($collectionEntity);
-                                $this->cacheInverseFieldRelation($entityName, $fieldName, $collectionEntity);
+                            $key = $importedCollection->indexOf($importedEntity);
+                            $importedCollection->removeElement($importedEntity);
+                            if ($databaseEntity) {
+                                $importedCollection->set($key, $databaseEntity);
+                                $this->cacheInverseFieldRelation($entityName, $fieldName, $databaseEntity);
                             }
                         }
-
-                        $relationCollection->clear();
-                        $this->fieldHelper->setObjectValue($entity, $fieldName, $collectionEntities);
                     }
                 }
             }
@@ -416,13 +430,26 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->context->incrementErrorEntriesCount();
         $this->strategyHelper->addValidationErrors($validationErrors, $this->context);
 
+        $this->invalidateEntity($entity);
+    }
+
+    protected function invalidateEntity($entity)
+    {
         $this->relatedEntityStateHelper->revertRelations();
 
-        $em = $this->doctrineHelper->getEntityManager($entity);
-        if ($this->doctrineHelper->isNewEntity($entity)) {
-            $em->detach($entity);
-        } else {
+        if (!$entity) {
+            return;
+        }
+
+        $em = $this->doctrineHelper->getEntityManager($entity, false);
+        if (!$em) {
+            return;
+        }
+
+        try {
             $em->refresh($entity);
+        } catch (ORMInvalidArgumentException $e) {
+            $em->detach($entity);
         }
     }
 
@@ -561,7 +588,44 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      */
     protected function getObjectValue($entity, $fieldName)
     {
-        return $this->fieldHelper->getObjectValue($entity, $fieldName);
+        $methodName = 'getObjectValue';
+
+        if (is_a($entity, UserInterface::class, true)) {
+            $methodName = 'getObjectValueWithReflection';
+        }
+
+        if ($this->isEntityFieldFallbackValue(ClassUtils::getClass($entity), $fieldName)) {
+            return $this->fieldHelper->$methodName($this->processingEntity, $fieldName) ?:
+                $this->fieldHelper->$methodName($entity, $fieldName);
+        }
+
+        return $this->fieldHelper->$methodName($entity, $fieldName);
+    }
+
+    /**
+     * EntityFieldFallbackValue generated automaticaly when column is empty in imported files.
+     * Allow initial generation only and get data from existing entity in other cases.
+     * There is no way to use identity fields for EntityFieldFallbackValue.
+     */
+    protected function isEntityFieldFallbackValue(string $className, string $fieldName): bool
+    {
+        $key = $className.'::'.$fieldName;
+        if (array_key_exists($key, $this->isEntityFieldFallbackValue)) {
+            return (bool)$this->isEntityFieldFallbackValue[$key];
+        }
+
+        $fields = array_filter(
+            $this->fieldHelper->getFields($className, true),
+            function (array $field) use ($fieldName) {
+                return $field['name'] === $fieldName &&
+                    $this->fieldHelper->isRelation($field) &&
+                    is_a($field['related_entity_name'], EntityFieldFallbackValue::class, true);
+            }
+        );
+
+        $this->isEntityFieldFallbackValue[$key] = !empty($fields);
+
+        return $this->isEntityFieldFallbackValue[$key];
     }
 
     /**

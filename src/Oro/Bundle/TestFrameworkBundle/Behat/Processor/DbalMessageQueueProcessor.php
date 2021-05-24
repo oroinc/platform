@@ -85,9 +85,11 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
      */
     public function cleanUp()
     {
+        $this->baseMessageQueueProcessor->cleanUp();
+
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
-        $connection = $doctrine->getConnection();
+        $connection = $doctrine->getConnection('message_queue');
 
         /** @var Filesystem $filesystem */
         $filesystem = $this->kernel->getContainer()->get('filesystem');
@@ -108,7 +110,7 @@ class DbalMessageQueueProcessor implements MessageQueueProcessorInterface
         /** @var ManagerRegistry $doctrine */
         $doctrine = $this->kernel->getContainer()->get('doctrine');
         /** @var Connection $connection */
-        $connection = $doctrine->getConnection();
+        $connection = $doctrine->getConnection('message_queue');
 
         return
             !$this->hasRows($connection, 'SELECT * FROM oro_message_queue')

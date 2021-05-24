@@ -30,6 +30,12 @@ class WorkflowStepAuditTest extends WebTestCase
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowSteps::class]);
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
+        );
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_workflow.event_listener.send_workflow_step_changes_to_audit'
+        );
     }
 
     /**

@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Batch\FileLockManager;
 
 class FileLockManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const CONNECTION_NAME = 'batch';
+    private const CONNECTION_NAME = 'message_queue';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
     private $doctrine;

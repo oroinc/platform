@@ -20,7 +20,7 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
     }
 
     /**
-     * @afterClass
+     * @beforeResetClient
      */
     public static function buildOriginCache()
     {

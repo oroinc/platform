@@ -6,13 +6,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * @method ContainerInterface getContainer()
+ */
 trait AdminUserTrait
 {
-    /**
-     * @return ContainerInterface
-     */
-    abstract public static function getContainer();
-
     /**
      * @return User
      */

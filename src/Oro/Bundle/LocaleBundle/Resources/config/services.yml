@@ -430,6 +430,13 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_enabled_localization, acl_resource: oro_locale_localization_view }
 
+    oro_locale.event_listener.strategy_validation_event_listener:
+        class: Oro\Bundle\LocaleBundle\EventListener\StrategyValidationEventListener
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.build_errors, priority: -255, method: buildErrors }
+
     Oro\Bundle\LocaleBundle\Action\CheckIfDefaultLanguageAction:
         arguments:
             - '@oro_action.expression.context_accessor'

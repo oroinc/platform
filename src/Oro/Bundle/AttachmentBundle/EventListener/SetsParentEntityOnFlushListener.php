@@ -51,9 +51,6 @@ class SetsParentEntityOnFlushListener
     {
         $entityManager = $event->getEntityManager();
         $metadataFactory = $entityManager->getMetadataFactory();
-        if (!$metadataFactory->hasMetadataFor(File::class)) {
-            return;
-        }
 
         $unitOfWork = $entityManager->getUnitOfWork();
         $entities = $unitOfWork->getScheduledEntityUpdates();

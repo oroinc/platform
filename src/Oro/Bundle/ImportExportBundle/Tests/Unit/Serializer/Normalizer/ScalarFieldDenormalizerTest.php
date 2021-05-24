@@ -132,6 +132,15 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                     'className' => '\StdClass',
                 ],
             ],
+            'String to boolean is supported' => [
+                'isSupported' => true,
+                'data' => '1',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                ],
+            ],
         ];
     }
 
@@ -326,6 +335,116 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
                 'expectedValue' => 'test',
                 'data' => 'test',
                 'type' => 'decimal',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value 1 to boolean' => [
+                'expectedValue' => true,
+                'data' => '1',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value true to boolean' => [
+                'expectedValue' => true,
+                'data' => 'true',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value on to boolean' => [
+                'expectedValue' => true,
+                'data' => 'on',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value yes to boolean' => [
+                'expectedValue' => true,
+                'data' => 'yes',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'Int value as string to boolean for BC' => [
+                'expectedValue' => true,
+                'data' => '2',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value 0 to boolean' => [
+                'expectedValue' => false,
+                'data' => '0',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value false to boolean' => [
+                'expectedValue' => false,
+                'data' => 'false',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value off to boolean' => [
+                'expectedValue' => false,
+                'data' => 'off',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value no to boolean' => [
+                'expectedValue' => false,
+                'data' => 'no',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value empty to boolean' => [
+                'expectedValue' => false,
+                'data' => '',
+                'type' => 'boolean',
+                'context' => [
+                    'fieldName' => 'test',
+                    'className' => '\StdClass',
+                    'skip_invalid_value' => true,
+                ],
+            ],
+            'String value null to boolean' => [
+                'expectedValue' => false,
+                'data' => null,
+                'type' => 'boolean',
                 'context' => [
                     'fieldName' => 'test',
                     'className' => '\StdClass',

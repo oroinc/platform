@@ -1006,7 +1006,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\FileLockManager
         arguments:
             - '@doctrine'
-            - 'batch'
+            - 'message_queue'
 
     oro_api.batch.include_map_manager:
         class: Oro\Bundle\ApiBundle\Batch\IncludeMapManager

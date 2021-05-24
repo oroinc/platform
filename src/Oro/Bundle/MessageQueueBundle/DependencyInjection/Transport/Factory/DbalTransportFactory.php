@@ -92,7 +92,7 @@ class DbalTransportFactory implements TransportFactoryInterface
                     ->info('DBAL transport configuration.')
                     ->children()
                         ->scalarNode('connection')
-                            ->defaultValue('default')
+                            ->defaultValue('message_queue')
                             ->cannotBeEmpty()
                         ->end()
                         ->scalarNode('table')

@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessageProducer;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
@@ -77,19 +78,21 @@ abstract class WebTestCase extends BaseWebTestCase
     private static $clientInstance;
 
     /** @var array */
-    protected static $loadedFixtures = [];
+    private static $loadedFixtures = [];
 
     /** @var Client */
     protected $client;
-
-    /** @var callable */
-    private static $resetCallback;
 
     /** @var ReferenceRepository */
     private static $referenceRepository;
 
     /** @var array */
     private static $afterInitClientMethods = [];
+
+    /**
+     * @var array
+     */
+    private static $beforeResetClientMethods = [];
 
     /** @var bool */
     private static $initClientAllowed = false;
@@ -107,65 +110,32 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * @before
-     * @internal
-     */
-    protected function beforeTest()
-    {
-        if (!self::$resetCallback) {
-            $self = $this;
-            self::$resetCallback = function () use ($self) {
-                $self->client = null;
-            };
-        }
-    }
-
-    /**
      * @after
      * @internal
      */
     protected function afterTest()
     {
+        $this->client = null;
+
         if (self::isDbIsolationPerTest()) {
-            $this->rollbackTransaction();
             self::$loadedFixtures = [];
             self::$referenceRepository = null;
 
+            self::rollbackTransaction();
             self::resetClient();
         }
     }
 
     /**
-     * @beforeClass
      * @internal
-     */
-    public static function beforeClass()
-    {
-        /**
-         * In case we have isolated test we should have clean env before run it,
-         * so we will not have next problem:
-         * - Data provider in phpunit called before tests (even before this method) and can start a client
-         *   for not isolated tests (ex. GetRestJsonApiTest),
-         *   so we will have client without transaction started in our test
-         */
-        self::resetClient();
-    }
-
-    /**
      * @afterClass
-     * @internal
      */
     public static function afterClass()
     {
-        self::rollbackTransaction();
         self::$loadedFixtures = [];
         self::$referenceRepository = null;
 
-        if (self::$resetCallback) {
-            call_user_func(self::$resetCallback);
-            self::$resetCallback = null;
-        }
-
+        self::rollbackTransaction();
         self::resetClient();
     }
 
@@ -187,6 +157,8 @@ abstract class WebTestCase extends BaseWebTestCase
      * @param bool $force If this option - true, will reset client on each initClient call
      *
      * @return Client A Client instance
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function initClient(array $options = [], array $server = [], $force = false)
     {
@@ -225,7 +197,17 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
-            self::$clientInstance = static::createClient($options, $server);
+            if (self::$kernel) {
+                throw new \RuntimeException(
+                    sprintf(
+                        '%s::initClient not allowed with booted kernel, call %s::resetClient first',
+                        get_called_class(),
+                        get_called_class()
+                    )
+                );
+            }
+
+            self::$clientInstance = self::createClient($options, $server);
 
             if (self::isClassHasAnnotation(get_called_class(), 'dbReindex')) {
                 throw new \RuntimeException(
@@ -259,7 +241,7 @@ abstract class WebTestCase extends BaseWebTestCase
                 $class = new \ReflectionClass($className);
 
                 foreach ($class->getMethods() as $method) {
-                    if (\preg_match('/@afterInitClient\b/', $method->getDocComment()) > 0) {
+                    if (self::isClassHasAnnotation($className, 'afterInitClient', $method->getName())) {
                         \array_unshift(
                             self::$afterInitClientMethods[$className],
                             $method->getName()
@@ -297,6 +279,61 @@ abstract class WebTestCase extends BaseWebTestCase
         return parent::createKernel($options);
     }
 
+    private static function getBeforeResetClientMethods($className)
+    {
+        if (!isset(self::$beforeResetClientMethods[$className])) {
+            self::$beforeResetClientMethods[$className] = [];
+
+            try {
+                $class = new \ReflectionClass($className);
+
+                /** @var \ReflectionMethod $method */
+                foreach ($class->getMethods() as $method) {
+                    if (self::isClassHasAnnotation($className, 'beforeResetClient', $method->getName())) {
+                        if (!$method->isStatic()) {
+                            throw new \RuntimeException(
+                                sprintf('%s::%s should be static', $className, $method->getName())
+                            );
+                        }
+
+                        \array_unshift(
+                            self::$beforeResetClientMethods[$className],
+                            $method->getName()
+                        );
+                    }
+                }
+            } catch (\ReflectionException $e) {
+            }
+        }
+
+        return self::$beforeResetClientMethods[$className];
+    }
+
+    /**
+     * @afterInitClient
+     */
+    protected function enableSearchListeners()
+    {
+        if ($this->getContainer()->hasParameter('optional_search_listeners')) {
+            $optionalSearchListeners = $this->getContainer()->getParameter('optional_search_listeners');
+            $this->getOptionalListenerManager()->enableListeners($optionalSearchListeners);
+        }
+    }
+
+    /**
+     * @afterInitClient
+     */
+    protected function disableOptionalListeners(): void
+    {
+        $manager = $this->getOptionalListenerManager();
+        $manager->disableListeners($manager->getListeners());
+    }
+
+    protected function getOptionalListenerManager(): OptionalListenerManager
+    {
+        return self::getContainer()->get('oro_platform.optional_listeners.manager');
+    }
+
     /**
      * @param string $tokenId
      * @return CsrfToken
@@ -312,7 +349,7 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function loginUser($login)
     {
         if ('' !== $login) {
-            self::$clientInstance->setServerParameters(static::generateBasicAuthHeader($login, $login));
+            self::$clientInstance->setServerParameters(self::generateBasicAuthHeader($login, $login));
         } else {
             self::$clientInstance->setServerParameters([]);
             self::$clientInstance->getCookieJar()->clear();
@@ -340,15 +377,21 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Reset client and rollback transaction
+     * Reset client
      */
     protected static function resetClient()
     {
         if (self::$clientInstance) {
-            self::$clientInstance = null;
+            $hookMethods = self::getBeforeResetClientMethods(static::class);
+            foreach ($hookMethods as $method) {
+                static::$method();
+            }
         }
 
-        static::ensureKernelShutdown();
+        self::$clientInstance = null;
+
+        self::ensureKernelShutdown();
+        self::$kernel = null;
     }
 
     /**
@@ -424,16 +467,18 @@ abstract class WebTestCase extends BaseWebTestCase
         return self::$nestTransactionsWithSavepoints[$calledClass];
     }
 
-    /**
-     * @param string $className
-     * @param string $annotationName
-     *
-     * @return bool
-     */
-    private static function isClassHasAnnotation($className, $annotationName)
-    {
-        $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className);
-        return isset($annotations['class'][$annotationName]);
+    private static function isClassHasAnnotation(
+        string $className,
+        string $annotationName,
+        ?string $methodName = null
+    ): bool {
+        $annotations = \PHPUnit\Util\Test::parseTestMethodAnnotations($className, $methodName);
+
+        if ($methodName) {
+            return !empty($annotations['method'][$annotationName]);
+        }
+
+        return !empty($annotations['class'][$annotationName]);
     }
 
     /**
@@ -448,7 +493,7 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = [], $cleanUp = true, $exceptionOnError = false)
     {
-        $application = new Application(static::$kernel ?? static::bootKernel());
+        $application = new Application(self::$kernel ?? self::bootKernel());
         $application->setAutoExit(false);
 
         putenv('COLUMNS=120');
@@ -540,14 +585,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $eventDispatcher = self::getContainer()->get('event_dispatcher');
         $eventDispatcher->dispatch($event, DisableListenersForDataFixturesEvent::NAME);
 
-        return array_merge(
-            [
-                'oro_dataaudit.listener.send_changed_entities_to_message_queue',
-                'oro_sync.event_listener.doctrine_tag',
-                'oro_search.index_listener'
-            ],
-            $event->getListeners()
-        );
+        return $event->getListeners();
     }
 
     /**
@@ -625,6 +663,11 @@ abstract class WebTestCase extends BaseWebTestCase
         self::$loadedFixtures = array_merge(self::$loadedFixtures, array_keys($filteredFixtures));
 
         return $filteredFixtures;
+    }
+
+    protected function isLoadedFixture(string $fixtureClass): bool
+    {
+        return in_array($fixtureClass, self::$loadedFixtures, true);
     }
 
     /**

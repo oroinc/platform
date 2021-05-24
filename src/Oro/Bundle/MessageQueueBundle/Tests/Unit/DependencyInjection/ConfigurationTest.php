@@ -40,7 +40,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             ],
             'transport' => [
                 'dbal' => [
-                    'connection' => 'default',
+                    'connection' => 'message_queue',
                     'table' => 'oro_message_queue',
                     'pid_file_dir' => '/tmp/oro-message-queue',
                     'consumer_process_pattern' => ':consume',

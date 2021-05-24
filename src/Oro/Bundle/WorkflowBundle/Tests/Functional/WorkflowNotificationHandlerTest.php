@@ -20,6 +20,19 @@ class WorkflowNotificationHandlerTest extends WebTestCase
         $this->initClient();
 
         $this->notificationManager = $this->getContainer()->get('oro_notification.manager');
+
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
+        );
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_workflow.event_listener.send_workflow_step_changes_to_audit'
+        );
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_workflow.listener.event_trigger_collector'
+        );
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_workflow.listener.workflow_transition_record'
+        );
     }
 
     public function testEmailNotificationHandlerIsNotCalled(): void

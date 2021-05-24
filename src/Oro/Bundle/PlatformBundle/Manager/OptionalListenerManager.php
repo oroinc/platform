@@ -2,14 +2,23 @@
 
 namespace Oro\Bundle\PlatformBundle\Manager;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Manager to control OptionalListenerInterface execution
+ */
 class OptionalListenerManager
 {
     /**
-     * @var array
+     * @var OptionalListenerInterface[]
      */
     protected $optionalListeners = [];
+
+    /**
+     * @var OptionalListenerInterface[]
+     */
+    protected $disabledListeners = [];
 
     /**
      * @var ContainerInterface
@@ -45,6 +54,8 @@ class OptionalListenerManager
     {
         if (in_array($listenerId, $this->optionalListeners)) {
             $this->container->get($listenerId)->setEnabled(false);
+
+            $this->disabledListeners[$listenerId] = $listenerId;
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Listener "%s" does not exist or not optional', $listenerId)
@@ -75,6 +86,8 @@ class OptionalListenerManager
     {
         if (in_array($listenerId, $this->optionalListeners)) {
             $this->container->get($listenerId)->setEnabled(true);
+
+            unset($this->disabledListeners[$listenerId]);
         } else {
             throw new \InvalidArgumentException(
                 sprintf('Listener "%s" does not exist or not optional', $listenerId)
@@ -92,5 +105,10 @@ class OptionalListenerManager
         foreach ($listeners as $listener) {
             $this->enableListener($listener);
         }
+    }
+
+    public function getDisabledListeners(): array
+    {
+        return array_values($this->disabledListeners);
     }
 }

@@ -7,37 +7,24 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
-use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Process all messages in queue before make db dump
  */
-class InitalMessageQueueIsolator
+class InitalMessageQueueIsolator implements MessageQueueProcessorAwareInterface
 {
+    use MessageQueueProcessorAwareTrait;
+
     /** @var KernelInterface */
     private $kernel;
 
-    /** @var MessageQueueProcessorInterface */
-    private $dbalMessageQueueProcessor;
-
-    /** @var MessageQueueProcessorInterface */
-    private $amqpMessageQueueProcessor;
-
-    /**
-     * @param KernelInterface $kernel
-     * @param MessageQueueProcessorInterface $dbalMessageQueueProcessor
-     * @param MessageQueueProcessorInterface $amqpMessageQueueProcessor
-     */
-    public function __construct(
-        KernelInterface $kernel,
-        MessageQueueProcessorInterface $dbalMessageQueueProcessor,
-        MessageQueueProcessorInterface $amqpMessageQueueProcessor
-    ) {
+    public function __construct(KernelInterface $kernel)
+    {
         $this->kernel = $kernel;
-        $this->dbalMessageQueueProcessor = $dbalMessageQueueProcessor;
-        $this->amqpMessageQueueProcessor = $amqpMessageQueueProcessor;
     }
 
     /** {@inheritdoc} */
@@ -46,9 +33,15 @@ class InitalMessageQueueIsolator
         $event->writeln('<info>Process messages before make db dump</info>');
 
         $this->kernel->boot();
-        $this->getMessageQueueProcessor()->startMessageQueue();
-        $this->getMessageQueueProcessor()->waitWhileProcessingMessages();
-        $this->getMessageQueueProcessor()->stopMessageQueue();
+
+        if ($this->kernel->getContainer()->has('oro_message_queue.mock_lifecycle_message.cache')) {
+            $cache = $this->kernel->getContainer()->get('oro_message_queue.mock_lifecycle_message.cache');
+            $cache->clear();
+        }
+
+        $this->messageQueueProcessor->startMessageQueue();
+        $this->messageQueueProcessor->waitWhileProcessingMessages();
+        $this->messageQueueProcessor->stopMessageQueue();
         $this->kernel->shutdown();
     }
 
@@ -96,18 +89,5 @@ class InitalMessageQueueIsolator
     public function getTag()
     {
         return 'inital_message_queue';
-    }
-
-    /**
-     * @return MessageQueueProcessorInterface
-     */
-    private function getMessageQueueProcessor()
-    {
-        $container = $this->kernel->getContainer();
-        if ($container->getParameter('message_queue_transport') === 'amqp') {
-            return $this->amqpMessageQueueProcessor;
-        }
-
-        return $this->dbalMessageQueueProcessor;
     }
 }

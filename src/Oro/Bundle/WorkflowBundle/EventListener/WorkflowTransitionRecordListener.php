@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
@@ -17,14 +18,13 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class WorkflowTransitionRecordListener implements OptionalListenerInterface
 {
+    use OptionalListenerTrait;
+
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /** @var TokenStorageInterface */
     protected $tokenStorage;
-
-    /** @var bool */
-    protected $enabled = true;
 
     /**
      * @param EventDispatcherInterface $eventDispatcher
@@ -34,14 +34,6 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenStorage = $tokenStorage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = (bool)$enabled;
     }
 
     /**

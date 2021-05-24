@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Behat\Mock\Client\ConsumptionExtension;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
+use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Remove message from cached buffer when it processed
@@ -15,14 +15,10 @@ class MockLifecycleMessageExtension extends AbstractExtension
     /** @var Config */
     private $config;
 
-    /** @var Cache */
+    /** @var PdoAdapter */
     private $cache;
 
-    /**
-     * @param Config $config
-     * @param Cache $cache
-     */
-    public function __construct(Config $config, Cache $cache)
+    public function __construct(Config $config, PdoAdapter $cache)
     {
         $this->config = $config;
         $this->cache = $cache;
@@ -39,33 +35,6 @@ class MockLifecycleMessageExtension extends AbstractExtension
             return;
         }
 
-        $this->saveCache($message->getMessageId());
-    }
-
-    /**
-     * @param string $messageId
-     */
-    private function saveCache($messageId)
-    {
-        $messages = $this->getConsumeMessages();
-        $messages[$messageId] = true;
-        $this->cache->save('consume_messages', serialize($messages));
-    }
-
-    /**
-     * @return array
-     */
-    private function getConsumeMessages()
-    {
-        if (!$this->cache->contains('consume_messages')) {
-            return [];
-        }
-
-        $messages = unserialize($this->cache->fetch('consume_messages'));
-        if (!is_array($messages)) {
-            return [];
-        }
-
-        return $messages;
+        $this->cache->delete($message->getMessageId());
     }
 }

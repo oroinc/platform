@@ -112,7 +112,7 @@ class DbalStateDriver implements StateDriverInterface
      */
     private function getConnection()
     {
-        return $this->doctrine->getConnection();
+        return $this->doctrine->getConnection('message_queue');
     }
 
     /**
