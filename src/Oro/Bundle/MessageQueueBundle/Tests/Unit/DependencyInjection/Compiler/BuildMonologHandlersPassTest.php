@@ -4,146 +4,75 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildMonologHandlersPass;
-use Symfony\Bundle\MonologBundle\DependencyInjection\Configuration;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bundle\MonologBundle\DependencyInjection\MonologExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var BuildMonologHandlersPass */
-    private $buildMonologHandlersPass;
+    private BuildMonologHandlersPass $compiler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->buildMonologHandlersPass = new BuildMonologHandlersPass();
+        $this->compiler = new BuildMonologHandlersPass();
     }
 
     /**
      * @dataProvider processVerbosityFilterProvider
-     *
-     * @param array $handler
-     * @param array $verbosityLevels
      */
     public function testProcessVerbosityFilter(array $handler, array $verbosityLevels)
     {
-        $configuration = new Configuration();
-        $monologExtension = $this->createMock(MonologExtension::class);
-        $monologExtension->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
+        $container = new ExtendedContainerBuilder();
+        $container->registerExtension(new MonologExtension());
+        $container->setExtensionConfig('monolog', [['handlers' => [$handler]]]);
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('monolog')
-            ->willReturn($monologExtension);
-        $container->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('monolog')
-            ->willReturn([
-                ['handlers' => [$handler]]
-            ]);
+        $filterHandlerDef = $container->register($handler['id']);
 
+        $this->compiler->process($container);
 
-        $filterHandlerDefinition = $this->createMock(Definition::class);
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with($handler['id'])
-            ->willReturn($filterHandlerDefinition);
-
-        $filterHandlerDefinition->expects($this->exactly(2))
-            ->method('setArgument')
-            ->withConsecutive(
-                [1, new Reference('monolog.handler.' . $handler['handler'])],
-                [2, $verbosityLevels]
-            );
-
-        $this->buildMonologHandlersPass->process($container);
+        $this->assertEquals(
+            new Reference('monolog.handler.' . $handler['handler']),
+            $filterHandlerDef->getArgument(1)
+        );
+        $this->assertEquals(
+            $verbosityLevels,
+            $filterHandlerDef->getArgument(2)
+        );
     }
 
     public function testProcessWithEmptyConfigs()
     {
-        $configuration = new Configuration();
-        $monologExtension = $this->createMock(MonologExtension::class);
-        $monologExtension->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
+        $container = new ContainerBuilder();
+        $container->registerExtension(new MonologExtension());
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('monolog')
-            ->willReturn($monologExtension);
-        $container->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('monolog')
-            ->willReturn([]);
-
-        $container->expects($this->never())
-            ->method('getDefinition');
-
-        $this->buildMonologHandlersPass->process($container);
+        $this->compiler->process($container);
     }
 
     public function testProcessWithoutHandlers()
     {
-        $configuration = new Configuration();
-        $monologExtension = $this->createMock(MonologExtension::class);
-        $monologExtension->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
+        $container = new ExtendedContainerBuilder();
+        $container->registerExtension(new MonologExtension());
+        $container->setExtensionConfig('monolog', [['handlers' => []]]);
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('monolog')
-            ->willReturn($monologExtension);
-        $container->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('monolog')
-            ->willReturn([
-                ['handlers' => []]
-            ]);
-
-        $container->expects($this->never())
-            ->method('getDefinition');
-
-        $this->buildMonologHandlersPass->process($container);
+        $this->compiler->process($container);
     }
 
     public function testProcessWithInvalidHandler()
     {
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container */
-        $container = $this->createMock(ContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtension')
-            ->with('monolog')
-            ->willReturn([
-                ['handlers' => [
-                    ['type' => 'buffer'],
-                    ['type' => 'service', 'id' => 'other.handler']
-                ]]
-            ]);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The attribute "name" must be set for path "monolog.handlers".');
 
-        $container->expects($this->never())
-            ->method('getDefinition');
+        $container = new ExtendedContainerBuilder();
+        $container->registerExtension(new MonologExtension());
+        $container->setExtensionConfig('monolog', [['handlers' => [['type' => 'buffer']]]]);
 
-        $this->buildMonologHandlersPass->process($container);
+        $this->compiler->process($container);
     }
 
-    /**
-     * @return array
-     */
-    public function processVerbosityFilterProvider()
+    public function processVerbosityFilterProvider(): array
     {
         return [
             'simple verbosity filter handler' => [

@@ -32,9 +32,9 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldFlushBufferAndThenDisableBufferingWhenTransactionCommitted()
     {
-        $this->bufferedProducer->expects(self::at(0))
+        $this->bufferedProducer->expects(self::once())
             ->method('flushBuffer');
-        $this->bufferedProducer->expects(self::at(1))
+        $this->bufferedProducer->expects(self::once())
             ->method('disableBuffering');
 
         $this->transactionWatcher->onTransactionCommitted();
@@ -44,10 +44,10 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
     {
         $exception = new \Exception('some error');
 
-        $this->bufferedProducer->expects(self::at(0))
+        $this->bufferedProducer->expects(self::once())
             ->method('flushBuffer')
             ->willThrowException($exception);
-        $this->bufferedProducer->expects(self::at(1))
+        $this->bufferedProducer->expects(self::once())
             ->method('disableBuffering');
 
         try {
@@ -62,9 +62,9 @@ class DbalTransactionWatcherTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldClearBufferAndThenDisableBufferingWhenTransactionRolledback()
     {
-        $this->bufferedProducer->expects(self::at(0))
+        $this->bufferedProducer->expects(self::once())
             ->method('clearBuffer');
-        $this->bufferedProducer->expects(self::at(1))
+        $this->bufferedProducer->expects(self::once())
             ->method('disableBuffering');
 
         $this->transactionWatcher->onTransactionRolledback();

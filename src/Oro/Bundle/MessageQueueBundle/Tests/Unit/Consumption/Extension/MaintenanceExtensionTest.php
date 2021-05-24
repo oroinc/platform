@@ -42,7 +42,7 @@ class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
         $context = $this->createMock(Context::class);
         $logger = $this->createMock(LoggerInterface::class);
 
-        $context->expects($this->any())
+        $context->expects($this->atLeastOnce())
             ->method('getLogger')
             ->willReturn($logger);
 
@@ -53,12 +53,9 @@ class MaintenanceExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('info')
             ->with('Waiting for the maintenance mode deactivation.');
 
-        $this->maintenance->expects($this->at(0))
+        $this->maintenance->expects($this->exactly(2))
             ->method('isOn')
-            ->willReturn(true);
-        $this->maintenance->expects($this->at(1))
-            ->method('isOn')
-            ->willReturn(false);
+            ->willReturnOnConsecutiveCalls(true, false);
         $context->expects($this->once())
             ->method('setExecutionInterrupted')
             ->with(true);

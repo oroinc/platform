@@ -6,25 +6,23 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all image filter providers.
+ */
 class CustomImageFilterProvidersCompilerPass implements CompilerPassInterface
 {
-    const IMAGE_LOADER_PROVIDER_SERVICE_ID = 'oro_layout.loader.image_filter';
-    const TAG_NAME = 'layout.image_filter.provider';
+    private const IMAGE_LOADER_PROVIDER_SERVICE_ID = 'oro_layout.loader.image_filter';
+    private const TAG_NAME = 'layout.image_filter.provider';
 
     /**
-     * @param ContainerBuilder $container
+     * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(self::IMAGE_LOADER_PROVIDER_SERVICE_ID)) {
-            return;
-        }
-
-        $definition = $container->findDefinition(self::IMAGE_LOADER_PROVIDER_SERVICE_ID);
-        $taggedServices = $container->findTaggedServiceIds(self::TAG_NAME);
-
-        foreach ($taggedServices as $id => $tags) {
-            $definition->addMethodCall('addCustomImageFilterProvider', [new Reference($id)]);
+        $imageFilterDef = $container->findDefinition(self::IMAGE_LOADER_PROVIDER_SERVICE_ID);
+        $taggedServiceIds = $container->findTaggedServiceIds(self::TAG_NAME);
+        foreach ($taggedServiceIds as $id => $attributes) {
+            $imageFilterDef->addMethodCall('addCustomImageFilterProvider', [new Reference($id)]);
         }
     }
 }
