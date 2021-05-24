@@ -5,7 +5,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-use Symfony\Bundle\FrameworkBundle\Client as BaseClient;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser as BaseKernelBrowser;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\BrowserKit\Request as InternalRequest;
 use Symfony\Component\BrowserKit\Response as InternalResponse;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Simulates a browser and makes requests to a Kernel object.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class Client extends BaseClient
+class Client extends BaseKernelBrowser
 {
     const LOCAL_URL = 'http://localhost';
 
