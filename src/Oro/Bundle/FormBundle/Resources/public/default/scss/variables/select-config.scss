@@ -3,6 +3,8 @@
 $select-font-family: $base-font;
 $select-color: get-color('additional', 'dark');
 
+$select-placeholder-color: get-color('additional', 'middle');
+
 $select-firefox-height: null;
 $select-firefox-line-height: null;
 $select-firefox-inner-offset-top: null;
@@ -21,3 +23,7 @@ $select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additi
 // Error
 $select-border-color-error-state: get-color('ui', 'error-dark');
 $select-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
+
+// Disabled
+
+$select-disabled-background-color: get-color('additional', 'base');

@@ -1,20 +1,20 @@
 /* @theme: admin.oro; */
 
-@import "~bootstrap/scss/breadcrumb";
+@import '~bootstrap/scss/breadcrumb';
 
 .breadcrumb {
     font-size: $breadcrumb-font-size;
     color: $breadcrumb-color;
 
     + .breadcrumb-item {
-    /*rtl:raw:
+        /* rtl:raw:
         padding-left: 0;
     */
 
         padding-left: $breadcrumb-item-padding;
 
         &::before {
-        /*rtl:raw:
+            /* rtl:raw:
             padding-right: 0;
         */
 

@@ -2,13 +2,14 @@
 
 $global-url: '~bundles' !default;
 
-@import "colors";
-@import "global-variables";
-@import "mixins/main";
-@import "../font-awesome/config";
-@import "../bootstrap/functions";
-@import "../bootstrap/variables";
-@import "../bootstrap/mixins";
+@import 'functions';
+@import 'colors';
+@import 'global-variables';
+@import 'mixins/main';
+@import '../font-awesome/config';
+@import '../bootstrap/functions';
+@import '../bootstrap/variables';
+@import '../bootstrap/mixins';
 
 // Oro variables
-@import "../oro/settings/main";
+@import '../oro/settings/main';

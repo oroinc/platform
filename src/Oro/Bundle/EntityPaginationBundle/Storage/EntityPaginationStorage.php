@@ -7,6 +7,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Stores pagination data.
+ */
 class EntityPaginationStorage
 {
     const STORAGE_NAME = 'entity_pagination_storage';
@@ -155,7 +158,7 @@ class EntityPaginationStorage
     protected function getStorage()
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->getSession()) {
+        if ($request && $request->hasSession()) {
             return $request->getSession()->get(self::STORAGE_NAME, []);
         } else {
             return null;
@@ -168,7 +171,7 @@ class EntityPaginationStorage
     protected function setStorage(array $storage)
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request && $request->getSession()) {
+        if ($request && $request->hasSession()) {
             $request->getSession()->set(self::STORAGE_NAME, $storage);
         }
     }

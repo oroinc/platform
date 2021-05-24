@@ -3,7 +3,7 @@
 label.required em {
     margin-left: 2px;
 
-    color: get-color('ui', 'error-dark');
+    color: $label-required-color;
 }
 
 .form__col {

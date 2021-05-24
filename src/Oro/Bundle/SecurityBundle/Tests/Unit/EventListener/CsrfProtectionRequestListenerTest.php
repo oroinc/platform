@@ -225,7 +225,7 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testOnKernelResponseRefreshCookie()
     {
-        $cookie = new Cookie('test');
+        $cookie = Cookie::create('test');
 
         $request = Request::create('/');
         $request->attributes->set(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE, $cookie);

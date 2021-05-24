@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors */
+
 .notes {
     position: relative;
 
@@ -7,8 +9,10 @@
         margin-top: $note-item-margin-top;
 
         .list-item {
+            display: block;
+            border-top: 1px solid $primary-830;
+            border-bottom: 0;
             padding: $note-message-list-item-offset;
-            display: inline-block;
 
             .visual {
                 margin-left: $note-message-padding - ($note-avatar-size + $note-avatar-margin-horizontal);
@@ -72,7 +76,7 @@
                 .message {
                     color: $primary-550;
 
-                    &:before {
+                    &::before {
                         content: '- ';
                     }
                 }
@@ -92,12 +96,6 @@
             }
         }
 
-        .list-item {
-            display: block;
-            border-top: 1px solid $primary-830;
-            border-bottom: 0;
-        }
-
         .list-item:last-child {
             border-bottom: 0;
         }
@@ -114,7 +112,7 @@
                 display: table;
                 border-collapse: separate;
 
-                & > div {
+                > div {
                     display: table-cell;
 
                     &:not(:first-child) {
@@ -148,10 +146,6 @@
                 }
             }
 
-            .accordion-heading.in .message {
-                display: none;
-            }
-
             .accordion-body.collapse {
                 height: auto;
             }
@@ -166,6 +160,10 @@
                 .details {
                     padding-top: $content-padding-small;
                 }
+            }
+
+            .accordion-heading.in .message {
+                display: none;
             }
 
             .accordion-body.in .message {

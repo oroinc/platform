@@ -3,7 +3,8 @@
 .page-main {
     flex-grow: 1;
 
-    min-height: 1px; // decrease white space above page footer in E11
+    // decrease white space above page footer in E11
+    min-height: 1px;
 
     &__content {
         display: flex;

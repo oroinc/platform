@@ -2,32 +2,32 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
-use Oro\Bundle\TestFrameworkBundle\Behat\Context\SpinTrait;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Psr\Cache\CacheItemInterface;
+use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Mailer for behat tests
  */
 class DirectMailerDecorator extends DirectMailer
 {
-    use SpinTrait;
-
     /** @var DirectMailer */
     private $directMailer;
 
-    /** @var CacheProvider */
+    /** @var PdoAdapter */
     private $cache;
 
-    /**
-     * @param DirectMailer $directMailer
-     * @param CacheProvider $cache
-     */
-    public function __construct(DirectMailer $directMailer, CacheProvider $cache)
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
+    public function __construct(DirectMailer $directMailer, PdoAdapter $cache, DoctrineHelper $doctrineHelper)
     {
         $this->directMailer = $directMailer;
         $this->cache = $cache;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -75,31 +75,34 @@ class DirectMailerDecorator extends DirectMailer
      */
     public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
-        $messages = $this->getSentMessages();
-        array_unshift($messages, $message);
-
-        $this->cache->save('messages', serialize($messages));
+        /** @var CacheItemInterface $item */
+        $item = $this->cache->getItem(uniqid('', true));
+        $item->set(serialize($message));
+        $this->cache->save($item);
 
         return $this->directMailer->send($message, $failedRecipients);
     }
 
     public function clear()
     {
-        $this->cache->save('messages', serialize([]));
+        $this->cache->clear();
     }
 
-    /**
-     * @return array
-     */
     public function getSentMessages(): array
     {
-        return (array) $this->spin(
-            function () {
-                $messages = $this->cache->fetch('messages');
+        /** @var Connection $connection */
+        $connection = $this->doctrineHelper->getManager()->getConnection('message_queue');
 
-                return is_string($messages) ? unserialize($messages) : [];
-            },
-            3
-        );
+        // guard
+        $this->cache->getItem('oro_behat_email');
+
+        $messageIds = array_column($connection->fetchAll('SELECT item_id FROM oro_behat_email'), 'item_id');
+
+        $messages = [];
+        foreach ($messageIds as $messageId) {
+            $messages[] = unserialize($this->cache->getItem($messageId)->get());
+        }
+
+        return $messages;
     }
 }

@@ -16,7 +16,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
         parent::setUp();
 
         $this->mapper = new TextFilteredObjectMapper(
-            $this->mapperProvider,
+            $this->mappingProvider,
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->dispatcher,
@@ -72,9 +72,9 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
     /**
      * {@inheritdoc}
      */
-    protected function clearTextData(array $fields)
+    protected function clearTextData(array $fields): array
     {
-        foreach ($fields as $name => &$value) {
+        foreach ($fields as &$value) {
             $value = str_replace(['<p>', '</p>'], ['', ''], $value);
         }
 

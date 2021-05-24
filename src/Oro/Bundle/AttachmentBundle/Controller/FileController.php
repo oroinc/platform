@@ -9,8 +9,8 @@ use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -23,16 +23,17 @@ class FileController extends AbstractController
      *   name="oro_attachment_get_file",
      *   requirements={"id"="\d+", "action"="(get|download)"}
      * )
-     * @param int    $id
+     * @param int $id
      * @param string $filename
      * @param string $action
+     * @param Request $request
      *
      * @return Response
      */
-    public function getFileAction(int $id, string $filename, string $action): Response
+    public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->unlockSession();
+        $this->unlockSession($request);
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -60,17 +61,23 @@ class FileController extends AbstractController
      *   name="oro_resize_attachment",
      *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
      * )
-     * @param int    $id
-     * @param int    $width
-     * @param int    $height
+     * @param int $id
+     * @param int $width
+     * @param int $height
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
-    public function getResizedAttachmentImageAction(int $id, int $width, int $height, string $filename): Response
-    {
+    public function getResizedAttachmentImageAction(
+        int $id,
+        int $width,
+        int $height,
+        string $filename,
+        Request $request
+    ): Response {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->unlockSession();
+        $this->unlockSession($request);
 
         $binary = $this->getImageResizeManager()->resize($file, $width, $height);
         if (!$binary) {
@@ -85,16 +92,17 @@ class FileController extends AbstractController
      *   name="oro_filtered_attachment",
      *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
      * )
-     * @param int    $id
+     * @param int $id
      * @param string $filter
      * @param string $filename
+     * @param Request $request
      *
      * @return Response
      */
-    public function getFilteredImageAction(int $id, string $filter, string $filename): Response
+    public function getFilteredImageAction(int $id, string $filter, string $filename, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
-        $this->unlockSession();
+        $this->unlockSession($request);
 
         $binary = $this->getImageResizeManager()->applyFilter($file, $filter);
         if (!$binary) {
@@ -130,10 +138,10 @@ class FileController extends AbstractController
         return $file;
     }
 
-    private function unlockSession(): void
+    private function unlockSession(Request $request): void
     {
-        $session = $this->getSession();
-        if (null !== $session && $session->isStarted()) {
+        $session = $request->hasSession() ? $request->getSession() : null;
+        if ($session && $session->isStarted()) {
             $session->save();
         }
     }
@@ -151,14 +159,6 @@ class FileController extends AbstractController
     private function getFileNameProvider(): FileNameProviderInterface
     {
         return $this->get('oro_attachment.provider.file_name');
-    }
-
-    /**
-     * @return SessionInterface|null
-     */
-    private function getSession(): ?SessionInterface
-    {
-        return $this->get('session');
     }
 
     /**

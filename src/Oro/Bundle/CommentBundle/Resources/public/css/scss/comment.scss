@@ -1,17 +1,17 @@
 /* @theme: admin.oro; */
 
+.comments-view-header {
+    padding: $comment-view-header-offset;
+
+    @include clearfix();
+}
+
 .comment-list {
     padding: $comment-view-list-offset;
 
     .comments-view-header {
         padding-top: 0;
     }
-}
-
-.comments-view-header {
-    padding: $comment-view-header-offset;
-
-    @include clearfix();
 }
 
 .comments-header-view-title {
@@ -57,26 +57,6 @@
 
     color: $comments-block-color;
 
-    .comment-item {
-        display: flex;
-        align-items: flex-start;
-    }
-
-    .comment-item:last-child {
-        .comment-content {
-            padding-bottom: 0;
-        }
-    }
-
-    .comment-title {
-        width: $comments-block-title-size;
-        position: relative;
-    }
-
-    .comment-author-info {
-        margin-bottom: $comments-block-author-info-offset;
-    }
-
     .comment-content {
         flex-grow: 1;
         padding: $comments-block-content-offset;
@@ -90,7 +70,25 @@
         }
     }
 
+    .comment-item {
+        display: flex;
+        align-items: flex-start;
+    }
+
+    .comment-item:last-child {
+        .comment-content {
+            padding-bottom: 0;
+        }
+    }
+
+    .comment-author-info {
+        margin-bottom: $comments-block-author-info-offset;
+    }
+
     .comment-title {
+        width: $comments-block-title-size;
+        position: relative;
+
         .comment-title-avatar {
             width: $comments-block-title-size;
             height: $comments-block-title-size;
@@ -138,10 +136,8 @@
                 display: inline-block;
             }
 
-            .dropdown-menu {
-                .view-image {
-                    display: none;
-                }
+            .view-image {
+                display: none;
             }
 
             .fa {
@@ -162,8 +158,8 @@
 
 .ui-dialog {
     .comment-form {
-        .comment-message-label{
-            width: 100%
+        .comment-message-label {
+            width: 100%;
         }
     }
 }

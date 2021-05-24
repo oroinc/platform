@@ -82,7 +82,7 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
      */
     private function createConnection()
     {
-        $dbal = $this->getContainer()->get('doctrine.dbal.default_connection');
+        $dbal = $this->getContainer()->get('doctrine.dbal.message_queue_connection');
 
         return new DbalConnection($dbal, 'message_queue');
     }

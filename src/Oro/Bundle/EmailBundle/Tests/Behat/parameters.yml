@@ -8,9 +8,12 @@ services:
 
     oro_email.direct_mailer.cache:
         public: true
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_behat_email_messages' ] ]
+        class: 'Symfony\Component\Cache\Adapter\PdoAdapter'
+        arguments:
+            - '@doctrine.dbal.message_queue_connection'
+            - ''
+            - 0
+            - { db_table: oro_behat_email }
 
     oro_email.direct_mailer.decorator:
         class: Oro\Bundle\EmailBundle\Tests\Behat\Mock\Mailer\DirectMailerDecorator
@@ -19,3 +22,4 @@ services:
         arguments:
             - '@oro_email.direct_mailer.decorator.inner'
             - '@oro_email.direct_mailer.cache'
+            - '@oro_entity.doctrine_helper'

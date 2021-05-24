@@ -3,7 +3,7 @@
 .main-menu-top {
     background: rgba($primary-inverse, .5);
 
-    &:after {
+    &::after {
         background-color: rgba($menu-background-color, .15);
         color: $menu-full-screen-button-color;
     }
@@ -26,6 +26,7 @@
                     color: $menu-accordion-icon-color;
                 }
             }
+
             .title {
                 &:hover {
                     background-color: $menu-background-color-active;

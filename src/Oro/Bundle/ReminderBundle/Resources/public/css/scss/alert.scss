@@ -9,7 +9,7 @@
         color: $alert-info-close-color;
     }
 
-    &.alert-icon:before {
+    &.alert-icon::before {
         content: $fa-var-bell-o;
     }
 }

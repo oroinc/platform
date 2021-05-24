@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth, no-descending-specificity */
+
 .auto-response-rules {
     .select-all-header-cell__dropdown-menu .all-visible {
         display: none;
@@ -29,7 +31,7 @@
         .controls {
             width: 100%;
 
-            > input[type="text"] {
+            > input[type='text'] {
                 width: 100%;
             }
 
@@ -52,6 +54,7 @@
 
     .emailtemplate-translatation {
         width: 360px;
+
         .oro-tabs__content {
             margin-left: -154px;
 
@@ -106,7 +109,7 @@
     margin-right: 10px;
     width: auto;
 
-    input[type="radio"] {
+    input[type='radio'] {
         margin: -2px 6px 0 0;
     }
 }
@@ -121,8 +124,8 @@
         padding-left: 15px;
         padding-bottom: 10px;
 
-        & > li,
-        & > li.active {
+        > li,
+        > li.active {
             text-transform: none;
             font-size: 13px;
         }
@@ -134,7 +137,7 @@
         }
 
         .group-label {
-            font-weight: bold;
+            font-weight: font-weight('bold');
         }
 
         .nav {
@@ -142,7 +145,7 @@
             padding-left: $content-padding-medium;
             padding-right: $content-padding-medium;
 
-            & > li > a {
+            > li > a {
                 display: inline-block;
                 padding: 3px 0;
             }
@@ -156,7 +159,7 @@
         padding: 0;
         margin: 0;
 
-        & > li {
+        > li {
             display: inline-block;
         }
     }
@@ -216,7 +219,7 @@
                     .divider {
                         display: inline-block;
 
-                        &:before {
+                        &::before {
                             content: '';
                             display: inline-block;
                             vertical-align: middle;
@@ -281,11 +284,11 @@ span.icon.grid .fa-paperclip {
 
 .email-thread-action-panel {
     .email-view-toggle-all {
-        color: #888;
+        color: $primary-550;
         text-decoration: underline;
 
         &:hover {
-            color: #777;
+            color: $primary-500;
         }
     }
 }
@@ -325,7 +328,7 @@ span.icon.grid .fa-paperclip {
     .email-has-attachment {
         margin-right: $email-attachmen-offset;
 
-        @include fa-icon($email-attachment-icon)
+        @include fa-icon($email-attachment-icon);
     }
 
     .email-content {
@@ -339,7 +342,6 @@ span.icon.grid .fa-paperclip {
 
     .email-recipients {
         color: $email-recipients-color;
-
     }
 
     .email-short {
@@ -368,7 +370,7 @@ span.icon.grid .fa-paperclip {
         }
 
         .email-body {
-            @include text-line-truncate()
+            @include text-line-truncate();
         }
     }
 
@@ -378,11 +380,11 @@ span.icon.grid .fa-paperclip {
         @include clearfix();
 
         .email-author {
-            font-weight: bold;
+            font-weight: font-weight('bold');
         }
 
         .email-body {
-            & > iframe {
+            > iframe {
                 border: 0;
                 width: 100%;
                 height: 0;
@@ -418,7 +420,6 @@ span.icon.grid .fa-paperclip {
         }
 
         &:not(:only-child):not(:last-child) {
-
             border-bottom: 1px solid $email-info-in-border-color;
         }
 
@@ -465,7 +466,8 @@ span.icon.grid .fa-paperclip {
                     margin-right: 10px;
 
                     .email-attachments-file {
-                        display: none; // hide thumbnails on mobile
+                        // hide thumbnails on mobile
+                        display: none;
                     }
                 }
 
@@ -474,14 +476,14 @@ span.icon.grid .fa-paperclip {
                     height: 80px;
                     padding: 0;
                     text-align: center;
-                    background: #eee;
+                    background: $primary-830;
                     border-radius: 6px;
                     border: none;
                     display: block;
 
                     .fa {
                         padding-top: 20px;
-                        color: #fff;
+                        color: $primary-inverse;
                     }
                 }
 
@@ -498,7 +500,7 @@ span.icon.grid .fa-paperclip {
                         }
 
                         &:focus {
-                            font-weight: normal;
+                            font-weight: font-weight('light');
                         }
                     }
 
@@ -511,12 +513,12 @@ span.icon.grid .fa-paperclip {
 
                             span {
                                 margin-left: 7px;
-                                color: #777;
+                                color: $primary-500;
                             }
 
                             &:hover {
                                 span {
-                                    color: #777;
+                                    color: $primary-500;
                                 }
                             }
                         }
@@ -533,7 +535,7 @@ span.icon.grid .fa-paperclip {
                     }
 
                     .fa {
-                        color: #444;
+                        color: $additional-lighten;
                         font-size: 15px;
                         margin-right: 1px;
                         margin-left: 0;
@@ -566,18 +568,18 @@ span.icon.grid .fa-paperclip {
     .email-prev-body {
         margin-left: 10px;
         padding-left: 10px;
-        border-left: 1px solid #000;
+        border-left: 1px solid $primary;
     }
 }
 
 .forged-required label em {
-    color: #c30b25;
+    color: $danger-darken;
     font-size: 15px;
     line-height: 1px;
 }
 
 a.attachment .icon .fa-link {
-    color: #999;
+    color: $primary-600;
 }
 
 .control-group .email-body-action {
@@ -594,13 +596,13 @@ a.attachment .icon .fa-link {
 }
 
 .email-body-actions .attach-file {
-    &:after {
+    &::after {
         display: none;
     }
 }
 
 .attachment-list-popup .attachment-list-content {
-    padding: 10px 10px 0 10px;
+    padding: 10px 10px 0;
 }
 
 .attachment-list-popup .attachment-actions {
@@ -608,8 +610,8 @@ a.attachment .icon .fa-link {
     margin-top: 6px;
     margin-bottom: -5px;
     padding: 10px;
-    background-color: rgb(250, 250, 250);
-    border-top: 1px solid rgb(229, 229, 229);
+    background-color: $primary-inverse;
+    border-top: 1px solid $primary-800;
 }
 
 .attachment-list-popup .attachment-actions .pull-left {
@@ -643,7 +645,7 @@ a.attachment .icon .fa-link {
 .attachment-list-popup .attachment-list-row input.checkbox {
     display: inline-block;
     width: 14px;
-    margin: -1px 0 0 0;
+    margin: -1px 0 0;
 }
 
 .attachment-list-popup .attachment-list-row span {
@@ -651,13 +653,13 @@ a.attachment .icon .fa-link {
 }
 
 .email-row-is-read {
-    background-color: #f5f5f5;
+    background-color: $primary-860;
 }
 
 .email-mail-count-circle {
     display: inline;
-    background-color: #f80;
-    color: #fff;
+    background-color: $danger-light;
+    color: $primary-inverse;
     border-radius: 6px;
     padding: 1px 4px;
     vertical-align: top;
@@ -666,11 +668,11 @@ a.attachment .icon .fa-link {
 
 .oro-email-user-emails .email-count {
     margin-left: 4px;
-    color: #f80;
+    color: $danger-light;
 }
 
 .has-new-emails .fa-user-circle {
-    color: #f80;
+    color: $danger-light;
 }
 
 a.sync-btn span.dots {
@@ -687,7 +689,7 @@ a.sync-btn span.dots {
             padding-left: 5px;
 
             a {
-                color: rgb(68, 68, 68);
+                color: $additional-lighten;
                 font-size: 13px;
             }
         }
@@ -695,10 +697,6 @@ a.sync-btn span.dots {
 }
 
 .folder-tree {
-    .folder-tree-widget {
-        margin-top: 5px;
-    }
-
     .folder-label {
         margin-left: 5px;
     }
@@ -708,11 +706,13 @@ a.sync-btn span.dots {
     }
 
     .folder-tree-widget {
+        margin-top: 5px;
+
         .folder-list {
             margin-left: 20px;
         }
 
-        input[type="checkbox"] {
+        input[type='checkbox'] {
             margin: 0;
         }
     }
@@ -737,7 +737,7 @@ a.sync-btn span.dots {
     .email-body {
         display: inline;
 
-        &:before {
+        &::before {
             content: '-';
             display: inline;
             margin-right: 4px;

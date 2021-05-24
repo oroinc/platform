@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .workflow-definition-buttons {
     @include clearfix();
 
@@ -72,7 +74,7 @@ table.grid {
     .workflow-label {
         padding: 0 6px;
         flex-grow: 0;
-        line-height: $workflow-widget-row-height
+        line-height: $workflow-widget-row-height;
     }
 
     &.only-workflow .workflow-label {
@@ -88,11 +90,11 @@ table.grid {
     .transitions-btn-group {
         display: inline-flex;
         vertical-align: middle;
+
         > .btn {
             margin-left: 8px;
         }
     }
-
 }
 
 .workflow-label-text {
@@ -146,7 +148,7 @@ table.grid {
         background: $workflow-step-background-color;
     }
 
-    &:before {
+    &::before {
         position: absolute;
         left: 0;
         z-index: 1;
@@ -160,7 +162,7 @@ table.grid {
         line-height: 0;
     }
 
-    &:after {
+    &::after {
         position: absolute;
         top: 0;
         right: 0;
@@ -184,12 +186,12 @@ table.grid {
                 background: $workflow-final-step-background-color;
             }
 
-            &:before {
+            &::before {
                 border-top-color: $workflow-final-step-background-color;
                 border-bottom-color: $workflow-final-step-background-color;
             }
 
-            &:after {
+            &::after {
                 border-left-color: $workflow-final-step-background-color;
             }
 
@@ -199,12 +201,12 @@ table.grid {
                     background: $workflow-final-step-background-color;
                 }
 
-                &:before {
+                &::before {
                     border-top-color: $workflow-final-step-background-color;
                     border-bottom-color: $workflow-final-step-background-color;
                 }
 
-                &:after {
+                &::after {
                     border-left-color: $workflow-final-step-background-color;
                 }
             }
@@ -216,12 +218,12 @@ table.grid {
                 background: $workflow-step-background-color;
             }
 
-            &:before {
+            &::before {
                 border-top-color: $workflow-step-background-color;
                 border-bottom-color: $workflow-step-background-color;
             }
 
-            &:after {
+            &::after {
                 border-left-color: $workflow-step-background-color;
             }
         }
@@ -231,12 +233,12 @@ table.grid {
             background: $workflow-ordered-step-background-color;
         }
 
-        &:before {
+        &::before {
             border-top-color: $workflow-ordered-step-background-color;
             border-bottom-color: $workflow-ordered-step-background-color;
         }
 
-        &:after {
+        &::after {
             border-left-color: $workflow-ordered-step-background-color;
         }
 
@@ -248,12 +250,12 @@ table.grid {
                 background: $primary-860;
             }
 
-            &:before {
+            &::before {
                 border-top-color: $primary-860;
                 border-bottom-color: $primary-860;
             }
 
-            &:after {
+            &::after {
                 border-left-color: $primary-860;
             }
 
@@ -269,12 +271,12 @@ table.grid {
             background: $workflow-not-started-steps-background-color;
         }
 
-        &:before {
+        &::before {
             border-top-color: $workflow-not-started-steps-background-color;
             border-bottom-color: $workflow-not-started-steps-background-color;
         }
 
-        &:after {
+        &::after {
             border-left-color: $workflow-not-started-steps-background-color;
         }
     }
@@ -312,6 +314,7 @@ table.grid {
     width: 2%;
     padding: 0 0 0 10px;
     text-align: right;
+
     .workflow-transition-buttons {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -365,7 +368,9 @@ table.grid {
 .transitions-list-short li {
     list-style: none;
 
-    a, i, span {
+    a,
+    i,
+    span {
         &:not(:first-child) {
             margin-left: 8px;
         }

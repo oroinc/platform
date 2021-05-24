@@ -5,11 +5,11 @@
     height: auto;
     text-align: center;
 
-   .modal-dialog {
-       display: inline-block;
-       text-align: left;
-       margin-top: $sidebar-widget-setup-modal-margin-top;
-   }
+    .modal-dialog {
+        display: inline-block;
+        text-align: left;
+        margin-top: $sidebar-widget-setup-modal-margin-top;
+    }
 }
 
 .sidebar-widget-setup .control-group:last-child,

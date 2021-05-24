@@ -368,6 +368,16 @@ class DoctrineHelper implements ResetInterface
     }
 
     /**
+     * Gets the EntityManager by name.
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getManager(?string $name = null): ?ObjectManager
+    {
+        return $this->registry->getManager($name);
+    }
+
+    /**
      * Gets the EntityManager associated with the given class.
      *
      * @param string $entityClass    The real class name of an entity

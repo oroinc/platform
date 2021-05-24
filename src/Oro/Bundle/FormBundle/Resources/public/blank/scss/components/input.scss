@@ -1,16 +1,17 @@
 /* @theme: blank; */
 
 .input {
-    @include base-ui-element($use-base-style-for-input,
-                             $input-padding,
-                             $input-font-size,
-                             $input-font-family,
-                             $input-line-height,
-                             $input-border,
-                             $input-border-radius,
-                             $input-background-color,
-                             $input-color
-                            );
+    @include base-ui-element(
+        $use-base-style-for-input,
+        $input-padding,
+        $input-font-size,
+        $input-font-family,
+        $input-line-height,
+        $input-border,
+        $input-border-radius,
+        $input-background-color,
+        $input-color
+    );
 
     margin: 0;
 
@@ -36,16 +37,16 @@
     }
 
     @include element-state('disabled') {
-        background: get-color('additional', 'base');
+        background: $input-border-color-disabled-background;
 
         @include base-disabled-style();
 
         @include element-state('hover') {
-            border-color: get-color('additional', 'light');
+            border-color: $input-border-color-disabled-hover-border-color;
         }
     }
 
-    &[type="date"] {
+    &[type='date'] {
         min-height: $input-date-height;
 
         &::-webkit-inner-spin-button {
@@ -55,10 +56,7 @@
         &::-webkit-calendar-picker-indicator {
             display: none;
         }
-    }
 
-    &[type="date"],
-    &[type="time"] {
         // Fix height Shadow DOM elements
         &::-webkit-date-and-time-value,
         &::-webkit-datetime-edit {
@@ -66,7 +64,15 @@
         }
     }
 
-    &[type="search"] {
+    &[type='time'] {
+        // Fix height Shadow DOM elements
+        &::-webkit-date-and-time-value,
+        &::-webkit-datetime-edit {
+            line-height: 1;
+        }
+    }
+
+    &[type='search'] {
         &::-webkit-search-decoration,
         &::-webkit-search-cancel-button,
         &::-webkit-search-results-button,
@@ -76,16 +82,16 @@
     }
 
     &--empty {
-        &[type="date"],
-        &[type="time"] {
+        &[type='date'],
+        &[type='time'] {
             &::-webkit-date-and-time-value,
             &::-webkit-datetime-edit {
                 display: none;
             }
 
-            &:before {
+            &::before {
                 content: attr(placeholder);
-                color: get-color('additional', 'middle');
+                color: $input-time-placeholder-color;
                 flex: 1 1 0%;
             }
         }

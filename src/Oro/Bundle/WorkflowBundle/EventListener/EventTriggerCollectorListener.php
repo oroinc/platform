@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\EventTriggerExtensionInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -16,8 +17,7 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class EventTriggerCollectorListener implements OptionalListenerInterface, ResetInterface
 {
-    /** @var bool */
-    private $enabled = true;
+    use OptionalListenerTrait;
 
     /** @var bool */
     private $forceQueued = false;
@@ -34,14 +34,6 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
     public function __construct(iterable $extensions)
     {
         $this->extensions = $extensions;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = (bool)$enabled;
     }
 
     /**

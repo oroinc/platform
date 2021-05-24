@@ -34,10 +34,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->scopeCache = $this->createMock(CacheProvider::class);
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory->expects($this->any())
-            ->method('hasMetadataFor')
-            ->with(Scope::class)
-            ->willReturn(true);
+
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->em->expects($this->any())
             ->method('getMetadataFactory')

@@ -97,13 +97,15 @@
             .select2-search-choice-close {
                 top: 6px;
 
-                &:before {
+                &::before {
                     color: $tag-item-color;
                 }
             }
 
             &.select2-locked {
+                /* stylelint-disable declaration-no-important */
                 padding: 4px 5px 3px 6px !important;
+                /* stylelint-enable declaration-no-important */
             }
         }
     }

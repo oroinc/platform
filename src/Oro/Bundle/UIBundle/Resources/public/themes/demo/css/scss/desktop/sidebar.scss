@@ -1,6 +1,6 @@
 /* @theme: admin.demo; */
 
-@import "orosidebar/css/scss/variables";
+@import 'orosidebar/css/scss/variables';
 
 // sidebar
 .sidebar {
@@ -16,24 +16,13 @@
 
 // sidebar-widget
 .sidebar-widget {
-    .sidebar.minimized &.poppedup &__popup {
-        &:before {
-            border-color: $sidebar-widget-header-active-bg-color;
-            border-bottom-color: transparent;
-            border-right-color: transparent;
-        }
-    }
-
     &__icon,
     &__header {
         background-color: $sidebar-widget-header-bg-color;
+
         &:hover {
             background-color: $sidebar-widget-header-active-bg-color;
         }
-    }
-    &.poppedup &__icon,
-    &.expanded &__header {
-        background-color: $sidebar-widget-header-active-bg-color;
     }
 
     &__header-title {
@@ -46,5 +35,18 @@
 
     &__popup {
         background-color: $sidebar-widget-content-bg-color;
+    }
+
+    .sidebar.minimized &.poppedup &__popup {
+        &::before {
+            border-color: $sidebar-widget-header-active-bg-color;
+            border-bottom-color: transparent;
+            border-right-color: transparent;
+        }
+    }
+
+    &.poppedup &__icon,
+    &.expanded &__header {
+        background-color: $sidebar-widget-header-active-bg-color;
     }
 }

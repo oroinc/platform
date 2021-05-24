@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors, max-nesting-depth */
+
 .main-menu-top {
     background-color: $menu-background-color;
 
@@ -21,14 +23,14 @@
 
         background-color: $menu-dropdown-background-color;
         border: 0;
-        border-radius: 0 2px 2px 2px;
+        border-radius: 0 2px 2px;
         box-shadow: $menu-dropdown-box-shadow;
     }
 
     .dropdown-menu,
     .dropdown-toggle {
-        &:before,
-        &:after {
+        &::before,
+        &::after {
             content: none;
         }
     }
@@ -44,7 +46,7 @@
         &-level-1 {
             padding: 15px 16px;
 
-            font-weight: bold;
+            font-weight: font-weight('bold');
 
             color: $menu-item-first-level-text-color;
 
@@ -122,7 +124,6 @@
 
                 .dropdown-menu-wrapper {
                     z-index: $zindex-dropdown + 1;
-
 
                     &__placeholder {
                         height: auto;

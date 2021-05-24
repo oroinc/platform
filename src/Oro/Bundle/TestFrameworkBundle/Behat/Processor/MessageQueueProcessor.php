@@ -18,7 +18,7 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
     /**
      * Maximum number of retries to start consuming after a failure.
      */
-    private const MAX_RETRIES = 10;
+    private const MAX_RETRIES = 20;
 
     /** @var KernelInterface */
     private $kernel;
@@ -38,7 +38,6 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->lastCacheStateChangeDate = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**
@@ -65,13 +64,14 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
             for ($i = 1; $i <= self::CONSUMERS_AMOUNT; $i++) {
                 $process = new Process($command);
 
-                $process->setTimeout(null);
+                $process->setTimeout(self::TIMEOUT);
+                $process->setIdleTimeout(self::TIMEOUT);
                 $process->start(function ($type, $buffer) use ($filesystem) {
                     if (Process::ERR === $type) {
                         $this->getLogger()->error($buffer);
-                    } else {
-                        $filesystem->appendToFile(sprintf('%s/mq.log', realpath($this->kernel->getLogDir())), $buffer);
                     }
+
+                    $filesystem->appendToFile(sprintf('%s/mq.log', realpath($this->kernel->getLogDir())), $buffer);
                 });
 
                 $this->processes[] = $process;
@@ -85,7 +85,7 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
     public function stopMessageQueue()
     {
         foreach ($this->processes as $process) {
-            $process->stop(1);
+            $process->stop();
         }
 
         $this->processes = [];
@@ -102,7 +102,7 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
         $isRunning = $this->isRunning();
         if (!$isRunning) {
             $cacheChangeDate = $cacheState->getChangeDate();
-            if (null === $cacheChangeDate || $cacheChangeDate > $this->lastCacheStateChangeDate) {
+            if ($cacheChangeDate > $this->lastCacheStateChangeDate) {
                 $this->lastCacheStateChangeDate = $cacheChangeDate;
             } else {
                 ++$this->retries;
@@ -122,6 +122,11 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
      */
     public function cleanUp()
     {
+        $this->stopMessageQueue();
+
+        $this->retries = 0;
+        $this->lastCacheStateChangeDate = null;
+        $this->processes = [];
     }
 
     /**

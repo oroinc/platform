@@ -2,7 +2,6 @@
 
 @media only screen and (max-width: $medium-devices-media-breakpoint) {
     .launchpad-container {
-
         .launchpad-first-column,
         .launchpad-second-column {
             width: auto;
@@ -37,7 +36,7 @@
             vertical-align: middle;
 
             &:not(:first-child) {
-                margin: 16px 0 0 0;
+                margin: 16px 0 0;
             }
         }
 
@@ -67,7 +66,7 @@
             padding: 0;
 
             color: $dashboard-launchpad-bold-label-color;
-            font-weight: bold;
+            font-weight: font-weight('bold');
             text-align: center;
             text-transform: uppercase;
 
@@ -78,7 +77,6 @@
     }
 
     .launchpad-container {
-
         .launchpad-first-column,
         .launchpad-second-column {
             width: auto;

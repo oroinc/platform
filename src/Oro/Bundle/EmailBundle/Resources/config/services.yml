@@ -82,7 +82,7 @@ services:
         arguments:
             - '@oro_email.email.address.manager'
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata }
 
     oro_email.email.model.builder.helper:
         class: Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
@@ -152,9 +152,9 @@ services:
             - '@oro_message_queue.client.message_producer'
             - '@Psr\Container\ContainerInterface'
         tags:
-            - { name: doctrine.event_listener, event: onFlush, connection: default }
-            - { name: doctrine.event_listener, event: postFlush, connection: default }
-            - { name: doctrine.event_listener, event: postRemove, connection: default }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: postRemove }
             - { name: container.service_subscriber, id: oro_email.email.owner.manager }
             - { name: container.service_subscriber, id: oro_email.email.thread.manager }
             - { name: container.service_subscriber, id: oro_email.email.activity.manager }

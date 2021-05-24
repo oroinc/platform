@@ -19,6 +19,9 @@ use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
+/**
+ * Abstract test case for CLI imports using MQ
+ */
 abstract class AbstractImportExportTestCase extends WebTestCase
 {
     use MessageQueueExtension;
@@ -42,7 +45,8 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl('oro_importexport_export_template', [
-                'processorAlias' => $configuration->getExportProcessorAlias(),
+                'processorAlias' => $configuration->getExportTemplateProcessorAlias() ?:
+                    $configuration->getExportProcessorAlias(),
                 'exportTemplateJob' => $configuration->getExportTemplateJobName(),
             ])
         );
@@ -186,12 +190,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $jobId = $importValidateMessageData['jobId'];
         $this->clearMessageCollector();
 
-        static::getContainer()
-            ->get('oro_importexport.async.import')
-            ->process(
-                $this->createTransportMessage($importValidateMessageData),
-                $this->createSessionInterfaceMock()
-            );
+        $this->assertMessageProcessorExecuted('oro_importexport.async.import', $importValidateMessageData);
 
         $job = $this->findJob($jobId);
         $jobData = $job->getData();
@@ -387,6 +386,8 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             );
 
         static::assertEquals(MessageProcessorInterface::ACK, $processorResult);
+
+        self::flushMessagesBuffer();
     }
 
     /**

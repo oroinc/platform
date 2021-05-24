@@ -38,10 +38,12 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
     {
         $options = $this->command->getDefinition()->getOptions();
 
-        $this->assertCount(3, $options);
+        $this->assertCount(5, $options);
         $this->assertArrayHasKey('memory-limit', $options);
         $this->assertArrayHasKey('message-limit', $options);
         $this->assertArrayHasKey('time-limit', $options);
+        $this->assertArrayHasKey('object-limit', $options);
+        $this->assertArrayHasKey('gc-limit', $options);
     }
 
     public function testShouldHaveExpectedAttributes()

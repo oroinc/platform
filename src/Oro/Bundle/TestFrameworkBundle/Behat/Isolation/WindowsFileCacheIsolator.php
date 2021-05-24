@@ -72,7 +72,8 @@ class WindowsFileCacheIsolator extends AbstractFileCacheOsRelatedIsolator
             );
         }
 
-        $this->copyDumpToTempDirProcess = new Process(implode(' & ', $commands));
+        $command = implode(' & ', $commands);
+        $this->copyDumpToTempDirProcess = Process::fromShellCommandline($command);
 
         $this->copyDumpToTempDirProcess
             ->setTimeout(self::TIMEOUT)

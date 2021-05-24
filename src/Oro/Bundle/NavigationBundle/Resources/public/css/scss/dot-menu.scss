@@ -1,7 +1,10 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable selector-max-compound-selectors, max-nesting-depth, no-descending-specificity */
+
 .dot-menu {
     .dropdown-toggle {
+        // stylelint-disable-next-line declaration-no-important
         background-color: transparent !important;
 
         .fa-bars {
@@ -132,7 +135,7 @@
 
                 @include fa-icon($fa-var-times);
 
-                &:before {
+                &::before {
                     font-size: 15px;
                 }
             }

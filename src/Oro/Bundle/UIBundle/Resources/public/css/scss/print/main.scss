@@ -1,8 +1,8 @@
 /* @theme: admin.oro; */
 
 @media print {
-    @import "layout";
-    @import "app-header";
-    @import "page-header";
-    @import "page";
+    @import 'layout';
+    @import 'app-header';
+    @import 'page-header';
+    @import 'page';
 }

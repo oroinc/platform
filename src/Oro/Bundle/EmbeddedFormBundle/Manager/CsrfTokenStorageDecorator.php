@@ -102,10 +102,8 @@ class CsrfTokenStorageDecorator implements TokenStorageInterface, ClearableToken
             return false;
         }
 
-        $session = $request->getSession();
+        $session = $request->hasSession() ? $request->getSession() : null;
 
-        return
-            null !== $session
-            && !$request->cookies->has($session->getName());
+        return $session && !$request->cookies->has($session->getName());
     }
 }

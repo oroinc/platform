@@ -5,6 +5,7 @@
         display: none;
     }
 }
+
 .dashboard-container-wrapper {
     min-height: calc(100vh - #{$app-header-height} - 1px);
 
@@ -35,7 +36,7 @@
 }
 
 .chart-container {
-    & > .clearfix {
+    > .clearfix {
         max-width: 100%;
 
         .chart-legend {
@@ -94,7 +95,7 @@
             width: $dashboard-mobile-items-btn-size;
             height: $dashboard-mobile-items-btn-size;
 
-            & + .btn-icon {
+            + .btn-icon {
                 margin-left: $dashboard-mobile-items-btn-space;
             }
         }

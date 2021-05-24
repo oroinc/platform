@@ -8,24 +8,24 @@
     height: 158px;
     overflow-y: auto;
 
-    border: 1px solid get-color('additional', 'middle');
-    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    border: $ui-timepicker-list-border;
+    box-shadow: $ui-timepicker-list-box-shadow;
     border-radius: 4px;
 
-    background: get-color('additional', 'ultra');
+    background: $ui-timepicker-list-background;
 
     li {
         padding: 4px 9px;
 
-        color: get-color('additional', 'darker');
+        color: $ui-timepicker-list-item-color;
 
         white-space: nowrap;
 
         cursor: pointer;
 
         &:hover {
-            background: get-color('ui', 'focus');;
-            color: get-color('additional', 'ultra');
+            background: $ui-timepicker-list-item-hover-background;
+            color: $ui-timepicker-list-item-hover-color;
         }
     }
 }

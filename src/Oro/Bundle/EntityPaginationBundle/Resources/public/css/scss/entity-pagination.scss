@@ -9,10 +9,10 @@
         padding: $entity-pagination-page-link-padding;
         line-height: 1;
 
-        [class*="fa-"]{
+        [class*='fa-'] {
             padding: $entity-pagination-arrow-icon-padding;
 
-            &:before {
+            &::before {
                 font-size: $entity-pagination-arrow-icon-font-size;
             }
         }

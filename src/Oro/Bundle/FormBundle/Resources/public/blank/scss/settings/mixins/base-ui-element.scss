@@ -11,7 +11,7 @@
     $background-color: $base-ui-element-bg-color,
     $color:            $base-ui-element-color,
     $appearance:       true
-    ) {
+) {
     @if ($use-base-style) {
         display: inline-block;
         padding: $padding;

@@ -8,7 +8,7 @@ div.disabled-choice {
         span {
             color: inherit;
 
-            &:after {
+            &::after {
                 content: '';
             }
         }

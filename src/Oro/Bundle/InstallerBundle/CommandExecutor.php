@@ -233,7 +233,7 @@ class CommandExecutor extends AbstractCommandExecutor
             $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $command);
         }
 
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline($cmd);
         $process->run();
         $results = $process->getOutput();
 

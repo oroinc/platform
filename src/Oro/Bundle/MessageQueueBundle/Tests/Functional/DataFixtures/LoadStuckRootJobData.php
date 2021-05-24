@@ -105,7 +105,7 @@ class LoadStuckRootJobData extends AbstractFixture implements ContainerAwareInte
      */
     private function createConnection()
     {
-        $dbal = $this->container->get('doctrine.dbal.default_connection');
+        $dbal = $this->container->get('doctrine.dbal.message_queue_connection');
 
         return new DbalConnection($dbal, 'oro_message_queue');
     }

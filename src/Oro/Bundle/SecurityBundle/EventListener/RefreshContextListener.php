@@ -81,10 +81,12 @@ class RefreshContextListener
         if ($event->getEntityClass() && $event->getEntityClass() !== $userClass) {
             return;
         }
-        $em = $event->getEntityManager();
-        if ($em !== $this->doctrine->getManagerForClass($userClass)) {
+
+        $em = $this->doctrine->getManagerForClass($userClass);
+        if (!$em) {
             return;
         }
+
         $user = $this->refreshEntity($user, $userClass, $em);
         if ($user) {
             $token->setUser($user);
@@ -107,10 +109,12 @@ class RefreshContextListener
         if ($event->getEntityClass() && $event->getEntityClass() !== $organizationClass) {
             return;
         }
-        $em = $event->getEntityManager();
-        if ($em !== $this->doctrine->getManagerForClass($organizationClass)) {
+
+        $em = $this->doctrine->getManagerForClass($organizationClass);
+        if (!$em) {
             return;
         }
+
         $organization = $this->refreshEntity($organization, $organizationClass, $em);
         if (!$organization) {
             return;

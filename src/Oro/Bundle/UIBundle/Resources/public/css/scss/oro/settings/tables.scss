@@ -2,12 +2,13 @@
 
 $table-offset-bottom: 0 !default;
 $table-unit-table-min-width: 300px !default;
-$table-unit-table-td-first-child-font-weight: bold !default;
+$table-unit-table-td-first-child-font-weight: font-weight('bold') !default;
 
 $table-td-first-child-inner-offset: $content-padding-medium !default;
 $table-td-first-child-text-align: left !default;
 $table-td-expander-font-size: 30px !default;
-
+$table-td-expander-content: '- - - - - - - - - - - - - - - - - - - - - - -' +
+    '- - - - - - - - - - - - - - - - - - - - - - - - - - - - - ' !default;
 $table-td-last-child-inner-offset: $content-padding-medium !default;
 
 $table-td-ul-only-child-offset-bottom: 0 !default;
@@ -103,7 +104,7 @@ $table-account-info-dd-clear: right !default;
 $table-account-info-dd-inner-offset: 0 0 10px 120px !default;
 
 $table-user-name-font-size: 20px !default;
-$table-user-name-font-weight: bold !default;
+$table-user-name-font-weight: font-weight('bold') !default;
 
 $table-user-state-font-size: 14px !default;
 $table-user-state-inner-offset: 0 15px !default;

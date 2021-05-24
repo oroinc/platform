@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Button;
 use Oro\Bundle\ActionBundle\Exception\ButtonCollectionMapException;
 use Oro\Bundle\ActionBundle\Extension\ButtonProviderExtensionInterface;
 
+/**
+ * The list of ordered actions buttons
+ */
 class ButtonsCollection implements \IteratorAggregate, \Countable
 {
     /** @var \SplObjectStorage (ButtonInterface -> ButtonProviderExtensionInterface) */
@@ -117,6 +120,11 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         $this->buttonsList = $this->toArray();
 
         usort($this->buttonsList, function (ButtonInterface $b1, ButtonInterface $b2) {
+            if ($b1->getOrder() === $b2->getOrder()) {
+                # For PHP 7 we returned 0, but for PHP 8, to preserve the order after sort, we should return -1.
+                # This is just a workaround that should be replaced with the explicit order for actions.
+                return -1;
+            }
             return $b1->getOrder() - $b2->getOrder();
         });
 

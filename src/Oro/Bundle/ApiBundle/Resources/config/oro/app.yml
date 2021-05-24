@@ -50,7 +50,7 @@ knp_gaufrette:
     adapters:
         api:
             doctrine_dbal:
-                connection_name: batch
+                connection_name: message_queue
                 table: oro_api_async_data
                 columns:
                     key: name

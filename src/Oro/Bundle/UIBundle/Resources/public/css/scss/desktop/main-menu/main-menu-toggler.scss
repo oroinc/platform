@@ -12,10 +12,11 @@
     background-color: transparent;
 
     @extend %main-menu-trigger;
+
     @include fa-icon($menu-icon-toggler, before, true, true) {
         display: inline-block;
         transform: rotate($menu-icon-toggler-transform);
-    };
+    }
 
     &:hover,
     &:focus {

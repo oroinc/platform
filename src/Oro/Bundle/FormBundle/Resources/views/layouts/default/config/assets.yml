@@ -11,6 +11,7 @@ styles:
         - 'bundles/oroform/default/scss/variables/textarea-config.scss'
         - 'bundles/oroform/default/scss/variables/label-config.scss'
         - 'bundles/oroform/default/scss/variables/select2-container-config.scss'
+        - 'bundles/oroform/default/scss/variables/validation-config.scss'
 
         - 'bundles/oroform/default/scss/components/datepicker.scss'
         - 'bundles/oroform/default/scss/components/oro-toolbar.scss'

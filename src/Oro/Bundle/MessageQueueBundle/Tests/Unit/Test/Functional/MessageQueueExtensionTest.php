@@ -45,6 +45,11 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public static function tearDownAfterClass(): void
     {
+        if (self::$container) {
+            /** @beforeResetClient */
+            self::tearDownMessageCollector();
+        }
+
         self::$container = null;
         self::$messageCollector = null;
         self::$messageFilter = null;
@@ -64,6 +69,9 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::$bufferedProducer = $this->createMock(BufferedMessageProducer::class);
             self::$container->set('oro_message_queue.client.buffered_message_producer', self::$bufferedProducer);
         }
+
+        /** @afterInitClient */
+        $this->setUpMessageCollector();
     }
 
     /**

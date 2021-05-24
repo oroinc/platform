@@ -12,7 +12,7 @@
         width: $mobile-attachment-item-icon-size;
         height: $mobile-attachment-item-icon-size;
 
-        [class^="fa-"]:before {
+        [class^='fa-']::before {
             font-size: inherit;
         }
     }

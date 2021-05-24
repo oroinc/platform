@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\PlatformBundle\EventListener\Console;
 
-use Oro\Bundle\PlatformBundle\Maintenance\Events;
+use Oro\Bundle\PlatformBundle\Maintenance\MaintenanceEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Dispatch MaintenanceEvent after executing lexik:maintenance:lock/unlock commands
+ */
 class DriverLockCommandListener
 {
     const LEXIK_MAINTENANCE_LOCK = 'lexik:maintenance:lock';
@@ -31,10 +34,10 @@ class DriverLockCommandListener
     {
         switch ($event->getCommand()->getName()) {
             case DriverLockCommandListener::LEXIK_MAINTENANCE_LOCK:
-                $this->dispatcher->dispatch(Events::MAINTENANCE_ON);
+                $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
                 break;
             case DriverLockCommandListener::LEXIK_MAINTENANCE_UNLOCK:
-                $this->dispatcher->dispatch(Events::MAINTENANCE_OFF);
+                $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
                 break;
         }
     }

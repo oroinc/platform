@@ -35,9 +35,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
+        $this->getOptionalListenerManager()->enableListener(
+            'oro_dataaudit.listener.send_changed_entities_to_message_queue'
+        );
     }
 
     /**

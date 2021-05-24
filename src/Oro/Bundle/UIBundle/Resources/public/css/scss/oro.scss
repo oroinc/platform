@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 .widget-content > .label-info:first-child {
     margin-bottom: 10px;
 }
@@ -31,6 +33,7 @@ footer {
 }
 
 .small-text.checkbox {
+    // stylelint-disable-next-line declaration-no-important
     margin-top: 0 !important;
 }
 
@@ -79,6 +82,7 @@ footer {
 .oro_translations {
     .nav-tabs {
         > li {
+            // stylelint-disable-next-line declaration-no-important
             height: 29px !important;
 
             > a {
@@ -138,7 +142,7 @@ footer {
     overflow: auto;
 }
 
-.icons-holder .icons-holder-text [class^="fa-"] {
+.icons-holder .icons-holder-text [class^='fa-'] {
     margin-right: 5px;
 }
 
@@ -149,6 +153,7 @@ footer {
         padding: 0 12px;
         background-color: $primary-inverse;
         float: right;
+
         > * {
             margin-top: 3px;
             margin-bottom: 3px;
@@ -163,10 +168,10 @@ footer {
 .user-profile-cols .label {
     display: block;
     background: none;
-    padding: 0 0 7px 0;
+    padding: 0 0 7px;
     text-shadow: none;
     color: $body-color;
-    font-weight: normal;
+    font-weight: font-weight('light');
     font-size: $base-font-size;
     line-height: 1.2em;
 }
@@ -177,7 +182,7 @@ footer {
     border-bottom: 1px solid $primary-860;
     white-space: nowrap;
 
-    &:after {
+    &::after {
         content: '';
         display: block;
         clear: both;
@@ -254,7 +259,7 @@ footer {
     span.label {
         background: $primary-830;
         font-size: 12px;
-        font-weight: normal;
+        font-weight: font-weight('light');
         text-shadow: none;
         padding: 4px 6px;
         border: none;
@@ -288,7 +293,7 @@ textarea {
     vertical-align: top;
 }
 
-.oro-clearfix:after {
+.oro-clearfix::after {
     content: '';
     display: block;
     clear: both;
@@ -360,7 +365,8 @@ textarea {
 }
 
 .ui-slider-horizontal .ui-slider-range {
-    top: 0; height: 100%;
+    top: 0;
+    height: 100%;
 }
 
 .ui-slider-horizontal .ui-slider-range-min {
@@ -449,16 +455,16 @@ textarea {
 }
 
 .oro-multiselect-holder .selector {
-        display: inline-block;
-        width: 122px;
-        overflow: hidden;
-        vertical-align: middle;
+    display: inline-block;
+    width: 122px;
+    overflow: hidden;
+    vertical-align: middle;
 }
 
 .oro-collection-item {
     .removeRow,
     .addAfterRow {
-        &:before {
+        &::before {
             margin: $btn-icon-fa-offset;
             text-indent: $btn-icon-fa-text-indent;
             line-height: $btn-icon-fa-line-height;
@@ -482,14 +488,14 @@ textarea {
     font-size: 0;
     text-indent: -9999em;
 
-    &:before {
+    &::before {
         display: inline-block;
         margin-left: 8px;
-        font: normal 18px/1em FontAwesome;
+        font: font-weight('light') 18px/1em $fa-font-family;
         font-style: normal;
         text-decoration: inherit;
         -webkit-font-smoothing: antialiased;
-        content: "\f06a";
+        content: '\f06a';
         color: $danger;
         text-indent: 0;
         speak: none;
@@ -506,7 +512,7 @@ textarea {
     min-width: 230px;
 }
 
-.validate-group:after {
+.validate-group::after {
     content: '';
     clear: both;
     display: block;
@@ -521,12 +527,13 @@ label.radio.error {
     .oro-subtitle {
         line-height: 1.2;
         font-size: $base-font-size--xl;
-        font-weight: normal;
+        font-weight: font-weight('light');
         padding: 0;
         margin: 0;
     }
 
     &.disable-scroll {
+        // stylelint-disable-next-line declaration-no-important
         overflow: hidden !important;
     }
 }
@@ -537,7 +544,7 @@ label.radio.error {
 }
 
 .grid {
-    & + .add-list-item {
+    + .add-list-item {
         margin-top: $content-padding-medium;
     }
 }
@@ -549,7 +556,7 @@ label.radio.error {
 }
 
 .oro-item-collection {
-    & > div {
+    > div {
         position: relative;
         padding: 0;
         margin: 0;
@@ -577,12 +584,11 @@ label.radio.error {
                 display: flex;
             }
 
-            input:not([type="checkbox"]):not([type="radio"]) {
+            input:not([type='checkbox']):not([type='radio']) {
                 margin-top: 0;
             }
         }
     }
-
 
     &.grid-container,
     &.collection-fields-list {
@@ -591,7 +597,7 @@ label.radio.error {
 }
 
 .collection-fields-list-bg.oro-item-collection {
-    & > div {
+    > div {
         position: relative;
         padding: $content-padding-medium 0;
         margin: 0 0 $content-padding-medium;
@@ -611,7 +617,7 @@ label.radio.error {
         right: 6px;
         text-decoration: none;
 
-        &:after {
+        &::after {
             color: $primary-700;
         }
     }
@@ -651,10 +657,13 @@ label.radio.error {
     .removeRow {
         margin: 0;
     }
+
+    label.add-on {
+        margin-bottom: 0;
+    }
 }
 
 pre {
-    color: color('pink');
     white-space: pre-wrap;
 
     .email-body {
@@ -668,15 +677,15 @@ iframe.email-body {
     width: 100%;
     min-height: 5em;
     font-family: $font-family-monospace;
-    color: color('gray-dark');
+    color: $primary;
     padding: ($line-height-base - 1) / 2;
     margin: 0 0 $line-height-base / 2;
     display: block;
-    font-size: $base-font-size - 1; // 14px to 13px
+    // 14px to 13px
+    font-size: $base-font-size - 1;
     line-height: $line-height-base;
     background-color: $primary-900;
-    border: 1px solid #ccc; // fallback for IE7-8
-    border: 1px solid rgba(0, 0, 0, .15);
+    border: 1px solid $primary-750;
     border-radius: $border-radius;
 }
 
@@ -685,12 +694,12 @@ iframe.email-body {
     width: 30%;
     margin-bottom: 25px;
 
-    & > div {
+    > div {
         display: inline-block;
         margin-right: 20px;
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
         margin: 0;
     }
 }
@@ -718,7 +727,7 @@ span.validation-failed {
 }
 
 .create-select-entity-container {
-    padding: 5px 30px 30px 30px;
+    padding: 5px 30px 30px;
     border: 1px solid $primary-860;
     border-radius: 3px;
 
@@ -732,6 +741,7 @@ span.validation-failed {
     }
 
     .control-label {
+        // stylelint-disable-next-line declaration-no-important
         width: 160px !important;
     }
 
@@ -743,10 +753,11 @@ span.validation-failed {
 
 /** Gray line after title centered vertically */
 
-
 .nav-tabs > li > a.widget-component-processing {
+    /* stylelint-disable declaration-no-important */
     background: rgba($primary-inverse, .5) !important;
     border-bottom: 1px solid transparent !important;
+    /* stylelint-enable declaration-no-important */
     position: relative;
     z-index: 1;
 }
@@ -819,7 +830,7 @@ label .popover-body {
     @include clearfix();
 
     // once accordion is opened and animation is finished
-    &[style="height: auto;"] {
+    &[style='height: auto;'] {
         overflow: visible;
     }
 
@@ -851,19 +862,13 @@ label .popover-body {
 }
 
 .chart-hint {
-    color: #666;
+    color: $primary-400;
     text-align: center;
 }
 
 .stackedbar-chart {
     .flotr-overlay {
         cursor: all-scroll;
-    }
-}
-
-.float-holder {
-    label.add-on {
-        margin-bottom: 0;
     }
 }
 
@@ -876,7 +881,7 @@ label .popover-body {
         overflow: hidden;
     }
 
-    &.overflows [data-collapse-container]:after {
+    &.overflows [data-collapse-container]::after {
         position: absolute;
         bottom: 0;
 
@@ -884,7 +889,7 @@ label .popover-body {
         height: round($font-size-base * $line-height-base);
         width: 100%;
 
-        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, 0.1));
+        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));
 
         content: '';
         pointer-events: none;
@@ -910,6 +915,7 @@ label .popover-body {
 }
 
 .url-actions a.btn {
+    // stylelint-disable-next-line declaration-no-important
     text-transform: none !important;
 }
 

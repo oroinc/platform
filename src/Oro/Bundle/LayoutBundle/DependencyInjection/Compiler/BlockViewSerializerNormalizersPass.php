@@ -6,27 +6,26 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Registers all block view normalizers.
+ */
 class BlockViewSerializerNormalizersPass implements CompilerPassInterface
 {
-    const BLOCK_VIEW_SERIALIZER_SERVICE_ID = 'oro_layout.block_view_serializer';
-    const BLOCK_VIEW_SERIALIZER_NORMALIZER_TAG = 'layout.block_view_serializer.normalizer';
+    private const BLOCK_VIEW_SERIALIZER_SERVICE_ID = 'oro_layout.block_view_serializer';
+    private const TAG_NAME = 'layout.block_view_serializer.normalizer';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has(self::BLOCK_VIEW_SERIALIZER_SERVICE_ID)) {
-            return;
-        }
-
         $normalizers = [];
-        $taggedServices = $container->findTaggedServiceIds(self::BLOCK_VIEW_SERIALIZER_NORMALIZER_TAG);
-        foreach ($taggedServices as $id => $tags) {
+        $taggedServiceIds = $container->findTaggedServiceIds(self::TAG_NAME);
+        foreach ($taggedServiceIds as $id => $attributes) {
             $normalizers[] = new Reference($id);
         }
 
-        $serializer = $container->findDefinition(self::BLOCK_VIEW_SERIALIZER_SERVICE_ID);
-        $serializer->replaceArgument(0, $normalizers);
+        $container->findDefinition(self::BLOCK_VIEW_SERIALIZER_SERVICE_ID)
+            ->replaceArgument(0, $normalizers);
     }
 }

@@ -14,6 +14,7 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityToEntityChangeArrayConverter;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -34,6 +35,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInterface
 {
+    use OptionalListenerTrait;
+
     private const BATCH_SIZE = 100;
 
     /** @var MessageProducerInterface */
@@ -50,9 +53,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
     /** @var LoggerInterface */
     private $logger;
-
-    /** @var bool */
-    private $enabled = true;
 
     /** @var \SplObjectStorage */
     private $allInsertions;
@@ -112,14 +112,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->allDeletions = new \SplObjectStorage;
         $this->allCollectionUpdates = new \SplObjectStorage;
         $this->allTokens = new \SplObjectStorage;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setEnabled($enabled = true)
-    {
-        $this->enabled = $enabled;
     }
 
     /**

@@ -13,6 +13,23 @@ services:
         calls:
             - [setConfigProvider, ['@oro_entity_config.provider.extend']]
 
+    oro_importexport.strategy.configurable_import_strategy_helper:
+        class: 'Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper'
+        parent: oro_importexport.strategy.import.helper
+        calls:
+            - [setEventDispatcher, ['@event_dispatcher']]
+            - [setLogger, ['@logger']]
+
+    oro_importexport.data_converter.configurable_helper:
+        parent: oro_importexport.data_converter.configurable
+
+    oro_importexport.event_listener.strategy_validation_event_listener:
+        class: Oro\Bundle\ImportExportBundle\EventListener\StrategyValidationEventListener
+        arguments:
+            - '@oro_importexport.data_converter.configurable_helper'
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.build_errors, method: buildErrors }
+
     oro_importexport.strategy.add:
         abstract: true
         arguments:
@@ -35,7 +52,7 @@ services:
         abstract: true
         arguments:
             - '@event_dispatcher'
-            - '@oro_importexport.strategy.import.helper'
+            - '@oro_importexport.strategy.configurable_import_strategy_helper'
             - '@oro_entity.helper.field_helper'
             - '@oro_importexport.field.database_helper'
             - '@oro_entity.entity_class_name_provider'

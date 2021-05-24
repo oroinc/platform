@@ -20,72 +20,15 @@
         @include fa-icon($fa-var-trash-o);
 
         &:hover {
-            &:after {
+            &::after {
                 color: $primary-550;
             }
         }
     }
 
-    [class^="fa-"],
-    [class*="fa-"] {
+    [class^='fa-'],
+    [class*='fa-'] {
         margin-right: $attachment-offset-global;
-    }
-}
-
-.attachment-file {
-    max-width: 100%;
-
-    .uploader {
-        display: flex;
-        height: auto;
-        max-width: $attachment-file-uploader-width;
-
-        align-items: center;
-        border: none;
-
-        input {
-            cursor: pointer;
-
-            &:hover ~ .action {
-                color: $link-color-hover;
-            }
-        }
-
-        .action {
-            width: auto;
-            border: none;
-            background: none;
-            color: $link-color;
-            cursor: pointer;
-            text-overflow: clip;
-            overflow: visible;
-        }
-
-        .active .action {
-            background: none;
-        }
-
-        .filename {
-            padding: 0;
-            flex-shrink: 1;
-            flex-grow: 0;
-
-            @include text-line-truncate(auto);
-        }
-
-        .focus {
-            border: none;
-            box-shadow: none;
-        }
-
-        &.focus {
-            border: none;
-            box-shadow: none;
-
-            .action {
-                color: $link-color;
-            }
-        }
     }
 }
 
@@ -144,8 +87,10 @@
         left: 0;
         right: 0;
         bottom: 0;
+        /* stylelint-disable declaration-no-important */
         width: 0 !important;
         height: 0 !important;
+        /* stylelint-enable declaration-no-important */
         border: none;
         z-index: -1;
     }
@@ -153,6 +98,7 @@
     &__errors {
         li {
             list-style: none;
+
             span {
                 @include validation-failed($danger-dark);
             }
@@ -176,13 +122,16 @@
     th.sort-order {
         width: $attachment-fileitems-sort-order-width;
     }
+
     th.remove {
         width: $attachment-fileitems-remove-width;
     }
+
     td.sort-order input {
         width: $attachment-fileitems-sort-order-input-width;
     }
+
     td.file .control-group .controls {
-        margin-left: 0px;
+        margin-left: 0;
     }
 }

@@ -1,9 +1,9 @@
 /* @theme: admin.oro; */
 
-@import "~bootstrap/scss/dropdown";
+@import '~bootstrap/scss/dropdown';
 
 .dropdown-menu {
-    box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+    box-shadow: $dropdown-menu-box-shadow;
 
     &[x-adjusted-height] {
         overflow-y: auto;
@@ -17,7 +17,7 @@
         $arrow-offset: -4px;
         $placeholder: 6px;
 
-        &:before {
+        &::before {
             position: absolute;
 
             height: $placeholder;
@@ -26,7 +26,7 @@
             content: '';
         }
 
-        &:after {
+        &::after {
             position: absolute;
             top: 0;
             right: 0;
@@ -50,15 +50,15 @@
 
             border: 0 none;
             background: inherit;
-            box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05);
+            box-shadow: $dropdown-menu-arrow-box-shadow;
 
             transform: rotate(53deg) skewX(15deg);
         }
 
-        &[x-placement^="top"] {
+        &[x-placement^='top'] {
             margin-bottom: $placeholder;
 
-            &:before {
+            &::before {
                 top: 100%;
             }
 
@@ -67,10 +67,10 @@
             }
         }
 
-        &[x-placement^="right"] {
+        &[x-placement^='right'] {
             margin-left: $placeholder;
 
-            &:before {
+            &::before {
                 top: 0;
                 right: 100%;
 
@@ -85,10 +85,10 @@
             }
         }
 
-        &[x-placement^="bottom"] {
+        &[x-placement^='bottom'] {
             margin-top: $placeholder;
 
-            &:before {
+            &::before {
                 bottom: 100%;
             }
 
@@ -97,10 +97,10 @@
             }
         }
 
-        &[x-placement^="left"] {
+        &[x-placement^='left'] {
             margin-right: $placeholder;
 
-            &:before {
+            &::before {
                 top: 0;
                 left: 100%;
 
@@ -117,9 +117,10 @@
     }
 
     &[x-placement] {
-        /*rtl:ignore*/
+        /* rtl:ignore */
         right: auto;
-        /*rtl:ignore*/
+
+        /* rtl:ignore */
     }
 
     // Support of old markup
@@ -137,7 +138,7 @@
 }
 
 .dropdown-toggle {
-    &:after {
+    &::after {
         vertical-align: $caret-width / 2;
 
         margin-left: $content-padding-small;
@@ -148,14 +149,16 @@
     }
 
     &--no-caret {
-        &:after {
+        &::after {
+            // stylelint-disable-next-line declaration-no-important
             content: none !important;
         }
     }
 }
 
 .dropleft > .dropdown-toggle--no-caret {
-    &:before {
+    &::before {
+        // stylelint-disable-next-line declaration-no-important
         content: none !important;
     }
 }
@@ -163,8 +166,8 @@
 .dropdown-item {
     line-height: $dropdown-item-line-height;
 
-    [class^="fa-"],
-    [class*=" fa-"] {
+    [class^='fa-'],
+    [class*=' fa-'] {
         position: relative;
 
         min-width: $dropdown-item-icon-fa-size;
@@ -174,7 +177,7 @@
         text-align: center;
         line-height: 1;
 
-        &:before {
+        &::before {
             font-size: $dropdown-item-icon-fa-font-size;
         }
     }

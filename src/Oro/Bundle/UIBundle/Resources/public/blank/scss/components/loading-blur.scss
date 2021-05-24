@@ -2,7 +2,8 @@
 
 @mixin loading-blur {
     filter: blur(2px);
-    transform: translate3d(0, 0, 0); // Fix issue with blur artefacts on safari
+    // Fix issue with blur artefacts on safari
+    transform: translate3d(0, 0, 0);
 }
 
 @mixin loading-blur-overlay {
@@ -13,7 +14,7 @@
 
     @include loading-blur();
 
-    &:before {
+    &::before {
         position: absolute;
         top: 0;
         right: 0;

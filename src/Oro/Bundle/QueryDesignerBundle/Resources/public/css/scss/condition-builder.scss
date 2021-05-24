@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .drag-n-drop-hint {
     display: none;
 
@@ -32,6 +34,7 @@
         display: none;
     }
 }
+
 .condition-container {
     border: $condition-builder-condition-container-border;
 
@@ -53,9 +56,9 @@
     list-style: none;
     margin: 0;
 
-    &:before,
-    &:after {
-        content: "";
+    &::before,
+    &::after {
+        content: '';
         display: block;
         height: $condition-builder-condition-container-space;
     }
@@ -92,7 +95,7 @@
             margin-left: 0;
 
             &.loading {
-                &:after {
+                &::after {
                     content: '';
                     display: block;
                     position: absolute;
@@ -100,12 +103,15 @@
                     left: 50%;
                     margin: -$condition-builder-condition-item-loader-size / 2;
 
-                    @include loader($condition-builder-condition-item-loader-size, $condition-builder-condition-item-loader-width);
+                    @include loader(
+                        $condition-builder-condition-item-loader-size,
+                        $condition-builder-condition-item-loader-width
+                    );
                 }
 
                 .condition-item > * {
                     visibility: hidden;
-                    point-events: none;
+                    pointer-events: none;
                 }
             }
         }
@@ -116,7 +122,7 @@
             padding-left: $condition-builder-conditions-group-start-padding;
         }
 
-        & > .btn-close {
+        > .btn-close {
             position: relative;
             float: right;
             margin: $condition-builder-close-item-margin;
@@ -124,7 +130,7 @@
             z-index: 1;
             padding: 0;
 
-            &:before {
+            &::before {
                 font-size: $condition-builder-close-item-size;
             }
 
@@ -134,7 +140,7 @@
         }
 
         &[data-criteria^='conditions-group'] {
-            & > .btn-close {
+            > .btn-close {
                 opacity: 1;
                 float: none;
                 position: absolute;
@@ -147,7 +153,7 @@
                 background-color: $condition-builder-condition-container-background-color;
                 z-index: 1;
 
-                &:before {
+                &::before {
                     line-height: $condition-builder-close-item-size - 1;
                 }
             }
@@ -264,7 +270,7 @@
                 white-space: normal;
             }
 
-            .entity-field-path > span:after {
+            .entity-field-path > span::after {
                 content: ' ';
                 font-size: 0;
             }
@@ -298,14 +304,14 @@
     .active-filter {
         display: inline;
 
-        & > div,
+        > div,
         .dropdown,
         .dropup,
         .filter-select {
             display: inline;
         }
 
-        .dropdown-toggle:after,
+        .dropdown-toggle::after,
         .filter-update {
             display: none;
         }
@@ -321,7 +327,7 @@
                     border-color: transparent;
                     cursor: pointer;
                     border-radius: 0;
-                    font-weight: normal;
+                    font-weight: font-weight('light');
                     outline: none;
                     color: $link-color;
                     padding-left: 0;
@@ -340,8 +346,10 @@
 
             .value-field-frame {
                 display: inline;
+                /* stylelint-disable declaration-no-important */
                 margin-left: 0 !important;
                 padding-left: 0 !important;
+                /* stylelint-enable declaration-no-important */
             }
 
             .filter-value {
@@ -356,15 +364,18 @@
 }
 
 .condition-builder {
-    min-width: $condition-builder-min-width;/* $TODO temporary solution, will be fixed in CRM-2025 */
+    min-width: $condition-builder-min-width;/* temporary solution, will be fixed in CRM-2025 */
 
     > div {
         display: flex;
     }
 
     .criteria-list-container {
-        padding: $condition-builder-filter-criteria-padding;
-        padding-bottom: $condition-builder-filter-criteria-padding - $condition-builder-filter-criteria-option-margin-bottom;
+        padding:
+            $condition-builder-filter-criteria-padding
+            $condition-builder-filter-criteria-padding
+            ($condition-builder-filter-criteria-padding - $condition-builder-filter-criteria-option-margin-bottom)
+            $condition-builder-filter-criteria-padding;
         width: $condition-builder-filter-criteria-width;
 
         background-color: $condition-builder-filter-criteria-background-color;

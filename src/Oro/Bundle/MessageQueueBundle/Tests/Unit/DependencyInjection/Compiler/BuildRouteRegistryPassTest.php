@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass;
@@ -8,205 +9,178 @@ use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\O
 use Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection\Compiler\Mock\ProcessorNameTopicSubscriber;
 use Oro\Component\MessageQueue\Client\Config;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class BuildRouteRegistryPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithoutAnyArguments()
+    private BuildRouteRegistryPass $compiler;
+
+    protected function setUp(): void
     {
-        new BuildRouteRegistryPass();
+        $this->compiler = new BuildRouteRegistryPass();
     }
 
     public function testShouldBuildRouteRegistry()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-            'processorName' => 'processor',
-            'destinationName' => 'destination',
-        ]);
-        $container->setDefinition('processor', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic', 'processorName' => 'processor-name', 'destinationName' => 'destination']
+            );
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic' =>  [
-                ['processor', 'destination']
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic' =>  [
+                    ['processor-name', 'destination']
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldThrowExceptionIfTopicNameIsNotSet()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
-            'Topic name is not set but it is required. service: "processor", '.
+            'Topic name is not set but it is required. service: "processor_id", '.
             'tag: "oro_message_queue.client.message'
         );
 
         $container = new ContainerBuilder();
+        $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor', $processor);
+        $container->register('processor_id')
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
-
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
+        $this->compiler->process($container);
     }
 
     public function testShouldSetServiceIdAdProcessorIdIfIsNotSetInTag()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-            'destinationName' => 'destination',
-        ]);
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id')
+            ->addTag(
+                'oro_message_queue.client.message_processor',
+                ['topicName' => 'topic', 'destinationName' => 'destination']
+            );
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic' =>  [
-                ['processor-service-id', 'destination']
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic' =>  [
+                    ['processor_id', 'destination']
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldSetDefaultDestinationIfNotSetInTag()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition();
-        $processor->addTag('oro_message_queue.client.message_processor', [
-            'topicName' => 'topic',
-        ]);
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id')
+            ->addTag('oro_message_queue.client.message_processor', ['topicName' => 'topic']);
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic' =>  [
-                ['processor-service-id', Config::DEFAULT_QUEUE_NAME]
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic' =>  [
+                    ['processor_id', Config::DEFAULT_QUEUE_NAME]
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldBuildRouteFromSubscriberIfOnlyTopicNameSpecified()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition(OnlyTopicNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id', OnlyTopicNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic-subscriber-name' =>  [
-                ['processor-service-id', Config::DEFAULT_QUEUE_NAME]
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic-subscriber-name' =>  [
+                    ['processor_id', Config::DEFAULT_QUEUE_NAME]
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldBuildRouteFromSubscriberIfProcessorNameSpecified()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition(ProcessorNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id', ProcessorNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic-subscriber-name' =>  [
-                ['subscriber-processor-name', Config::DEFAULT_QUEUE_NAME]
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic-subscriber-name' =>  [
+                    ['subscriber-processor-name', Config::DEFAULT_QUEUE_NAME]
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldBuildRouteFromSubscriberIfDestinationNameSpecified()
     {
         $container = new ContainerBuilder();
+        $routerDef = $container->register('oro_message_queue.client.router')
+            ->setArguments([null, null, null]);
 
-        $processor = new Definition(DestinationNameTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id', DestinationNameTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $router = new Definition();
-        $router->setArguments([null, null, null]);
-        $container->setDefinition('oro_message_queue.client.router', $router);
+        $this->compiler->process($container);
 
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
-
-        $expectedRoutes = [
-            'topic-subscriber-name' =>  [
-                ['processor-service-id', 'subscriber-destination-name']
-            ]
-        ];
-
-        $this->assertEquals($expectedRoutes, $router->getArgument(2));
+        $this->assertEquals(
+            [
+                'topic-subscriber-name' =>  [
+                    ['processor_id', 'subscriber-destination-name']
+                ]
+            ],
+            $routerDef->getArgument(2)
+        );
     }
 
     public function testShouldThrowExceptionWhenTopicSubscriberConfigurationIsInvalid()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Topic subscriber configuration is invalid. "[12345]"');
+
         $container = new ContainerBuilder();
+        $container->register('oro_message_queue.client.router')
+            ->setArguments(['', '']);
 
-        $processor = new Definition(InvalidTopicSubscriber::class);
-        $processor->addTag('oro_message_queue.client.message_processor');
-        $container->setDefinition('processor-service-id', $processor);
+        $container->register('processor_id', InvalidTopicSubscriber::class)
+            ->addTag('oro_message_queue.client.message_processor');
 
-        $router = new Definition();
-        $router->setArguments(['', '']);
-        $container->setDefinition('oro_message_queue.client.router', $router);
-
-        $pass = new BuildRouteRegistryPass();
-        $pass->process($container);
+        $this->compiler->process($container);
     }
 }

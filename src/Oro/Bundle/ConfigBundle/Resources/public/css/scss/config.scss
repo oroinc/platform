@@ -1,24 +1,24 @@
 /* @theme: admin.oro; */
 
 .left-panel-container {
-    background-color: #fff;
+    background-color: $primary-inverse;
 
-    & > .placeholder {
+    > .placeholder {
         margin-left: 334px;
-        background-color: #f1f1f1;
-        border-left: 1px solid #e2e2e2;
+        background-color: $primary-900;
+        border-left: 1px solid $primary-800;
 
-        & > * {
+        > * {
             margin-left: -335px;
 
-            & > .left-panel {
+            > .left-panel {
                 float: left;
                 width: 334px;
-                border-top: 1px solid #f2f2f2;
+                border-top: 1px solid $primary-860;
                 margin: 0;
             }
 
-            & > .content {
+            > .content {
                 margin-left: 335px;
                 padding: $content-padding-medium $content-padding-medium 0;
                 box-sizing: border-box;
@@ -33,14 +33,6 @@
     flex-shrink: 1;
     flex-basis: 0;
     overflow: hidden;
-
-    .control-group {
-        .controls, &.controls {
-            .control-subgroup {
-                margin-right: $content-padding-medium;;
-            }
-        }
-    }
 
     .controls {
         &.control-subgroup {
@@ -71,7 +63,8 @@
         margin-top: ($content-padding-small / 2);
         margin-right: $content-padding-small;
 
-        label, .checkbox-view__text {
+        label,
+        .checkbox-view__text {
             margin: 0 $content-padding-small 0 0;
             line-height: 1.75;
             white-space: nowrap;
@@ -84,8 +77,17 @@
         }
     }
 
-    .container-fluid:after {
+    .container-fluid::after {
         clear: none;
+    }
+
+    .control-group {
+        .controls,
+        &.controls {
+            .control-subgroup {
+                margin-right: $content-padding-medium;
+            }
+        }
     }
 
     .ping-holder {
@@ -110,6 +112,10 @@
 }
 
 .system-configuration-content-inner {
+    padding: $content-padding $content-padding $content-padding-medium;
+    width: 100%;
+    overflow-y: auto;
+
     .form-horizontal {
         margin-bottom: 26px;
     }
@@ -136,12 +142,6 @@
         margin-bottom: 15px;
     }
 
-    &-inner {
-        padding: $content-padding $content-padding $content-padding-medium;
-        width: 100%;
-        overflow-y: auto;
-    }
-
     &-header {
         display: flex;
         justify-content: space-between;
@@ -152,6 +152,6 @@
 
     &-title {
         font-size: 14px;
-        font-weight: bold;
+        font-weight: font-weight('bold');
     }
 }

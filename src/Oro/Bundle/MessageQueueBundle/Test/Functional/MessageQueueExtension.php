@@ -19,22 +19,20 @@ trait MessageQueueExtension
      */
     public function setUpMessageCollector()
     {
-        if (null !== self::getContainer()) {
-            self::getMessageCollector()->clear();
-        }
+        self::clearMessageCollector();
     }
 
     /**
      * Removes all sent messages.
      *
      * After triggered after client removed
+     *
+     * @beforeResetClient
      */
-    protected function tearDown(): void
+    protected static function tearDownMessageCollector(): void
     {
-        if (null !== self::getContainer()) {
-            self::getMessageCollector()->clear();
-            self::disableMessageBuffering();
-        }
+        self::clearMessageCollector();
+        self::disableMessageBuffering();
     }
 
     /**

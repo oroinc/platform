@@ -14,8 +14,6 @@ fieldset .span6 {
     margin-right: 10px;
 }
 
-
-
 .responsive-form-inner {
     .input-append {
         display: flex;
@@ -27,9 +25,9 @@ fieldset .span6 {
         margin-right: $content-padding-small;
     }
 
-    input[type="text"]:not(.precision, .conversionRate),
-    input[type="email"],
-    input[type="password"] {
+    input[type='text']:not(.precision, .conversionRate),
+    input[type='email'],
+    input[type='password'] {
         width: 100%;
     }
 
@@ -46,10 +44,13 @@ fieldset .span6 {
 
     .control-label.wrap {
         + .controls {
+            /* stylelint-disable selector-max-compound-selectors, declaration-no-important */
             > .input-widget-select,
             > .input-widget-select span {
-                width: 100% !important //Override js width setting
+                // Override js width setting
+                width: 100% !important;
             }
+            /* stylelint-enable selector-max-compound-selectors, declaration-no-important */
         }
     }
 }

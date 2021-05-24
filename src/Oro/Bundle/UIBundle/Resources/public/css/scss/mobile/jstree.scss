@@ -18,8 +18,8 @@
         background: $tree-link-bg-color;
     }
 
-    .jstree-open > .jstree-ocl:before,
-    .jstree-closed > .jstree-ocl:before {
+    .jstree-open > .jstree-ocl::before,
+    .jstree-closed > .jstree-ocl::before {
         font-size: $base-font-size--l;
     }
 
@@ -30,7 +30,7 @@
         height: $jstree-mobile-wholerow-height;
 
         &.jstree-clicked {
-            font-weight: 700;
+            font-weight: font-weight('bold');
         }
     }
 

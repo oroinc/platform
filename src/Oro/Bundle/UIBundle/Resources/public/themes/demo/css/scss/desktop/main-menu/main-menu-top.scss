@@ -35,6 +35,8 @@
                     &-level-1 {
                         background-color: $menu-dropdown-background-color;
                         color: $menu-item-text-color;
+
+                        /* stylelint-disable max-nesting-depth */
                         &::after {
                             background: $menu-dropdown-background-color;
                         }
@@ -42,6 +44,7 @@
                         &:hover {
                             background-color: $menu-dropdown-background-color;
                         }
+                        /* stylelint-enable max-nesting-depth */
                     }
                 }
             }

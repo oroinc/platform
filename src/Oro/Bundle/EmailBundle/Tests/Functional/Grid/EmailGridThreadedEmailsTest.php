@@ -7,15 +7,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
 {
-    const AUTH_USER = 'simple_user';
-    const AUTH_PW   = 'simple_password';
-
     /** @var User */
     protected $user;
 
     protected function setUp(): void
     {
-        parent::setUp();
+        $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
 
         $this->loadFixtures([
             'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailThreadedData',
@@ -92,20 +89,5 @@ class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
                 ],
             ],
         ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function generateBasicAuthHeader(
-        $userName = null,
-        $userPassword = null,
-        $userOrganization = null
-    ) {
-        $userName = $userName ?: static::AUTH_USER;
-        $userPassword = $userPassword ?: static::AUTH_PW;
-        $userOrganization = $userOrganization ?: static::AUTH_ORGANIZATION;
-
-        return parent::generateBasicAuthHeader($userName, $userPassword, $userOrganization);
     }
 }

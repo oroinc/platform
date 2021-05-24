@@ -6,12 +6,12 @@
 @import 'font-awesome/scss/animated';
 @import 'animated-rtl';
 
-[class^="fa-"],
-[class*=" fa-"] {
+[class^='fa-'],
+[class*=' fa-'] {
     display: inline-block;
-    font-family: 'FontAwesome';
+    font-family: $fa-font-family;
     font-size: inherit;
-    font-weight: 400;
+    font-weight: font-weight('normal');
     font-style: normal;
     line-height: 1;
     text-rendering: auto;
@@ -23,13 +23,13 @@
 
         color: inherit;
 
-        &:after,
-        &:before {
+        &::after,
+        &::before {
             padding: 0;
             text-indent: 0;
             font-size: $icon-font-size;
             line-height: 1;
-            font-family: 'FontAwesome';
+            font-family: $fa-font-family;
         }
     }
 }
@@ -39,10 +39,11 @@
     padding: 0 3px;
 }
 
-.icon-empty:before {
+.icon-empty::before {
     content: ' ';
 }
 
 .fa-offset-none {
+    // stylelint-disable-next-line declaration-no-important
     margin: 0 !important;
 }

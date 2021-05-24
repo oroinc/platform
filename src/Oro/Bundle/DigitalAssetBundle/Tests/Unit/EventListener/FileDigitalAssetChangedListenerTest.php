@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
@@ -167,32 +166,6 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->preUpdate($this->file, $this->eventArgs);
     }
 
-    public function testFlushWhenNoMetadata(): void
-    {
-        $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
-        $onFlushEventArgs
-            ->expects($this->once())
-            ->method('getEntityManager')
-            ->willReturn($entityManager = $this->createMock(EntityManager::class));
-
-        $entityManager
-            ->expects($this->once())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory = $this->createMock(ClassMetadataFactory::class));
-
-        $metadataFactory
-            ->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(false);
-
-        $this->fileReflector
-            ->expects($this->never())
-            ->method('reflectFromDigitalAsset');
-
-        $this->listener->onFlush($onFlushEventArgs);
-    }
-
     public function testFlush(): void
     {
         $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
@@ -200,17 +173,6 @@ class FileDigitalAssetChangedListenerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('getEntityManager')
             ->willReturn($entityManager = $this->createMock(EntityManager::class));
-
-        $entityManager
-            ->expects($this->once())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory = $this->createMock(ClassMetadataFactory::class));
-
-        $metadataFactory
-            ->expects($this->once())
-            ->method('hasMetadataFor')
-            ->with(File::class)
-            ->willReturn(true);
 
         $entityManager
             ->expects($this->once())

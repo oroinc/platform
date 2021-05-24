@@ -29,7 +29,7 @@ class CollectionCalculatorTest extends WebTestCase
     public function testCalculateRootJobProgressForAsyncChild(): void
     {
         /** @var Job $job */
-        $job = $this->getReference(LoadJobData::JOB_5);
+        $job = $this->getJobReference(LoadJobData::JOB_5);
         $this->assertInstanceOf(PersistentCollection::class, $job->getChildJobs());
         $this->assertFalse($job->getChildJobs()->isInitialized());
 
@@ -55,7 +55,7 @@ class CollectionCalculatorTest extends WebTestCase
     public function testCalculateRootJobStatusForAsyncChild(): void
     {
         /** @var Job $job */
-        $job = $this->getReference(LoadJobData::JOB_5);
+        $job = $this->getJobReference(LoadJobData::JOB_5);
         $this->assertInstanceOf(PersistentCollection::class, $job->getChildJobs());
         $this->assertFalse($job->getChildJobs()->isInitialized());
 
@@ -108,5 +108,13 @@ class CollectionCalculatorTest extends WebTestCase
         $child->setRootJob($job);
         $child->setCreatedAt(new \DateTime());
         $jobManager->saveJob($child);
+    }
+
+    protected function getJobReference(string $name): ?Job
+    {
+        return $this->getContainer()
+            ->get('oro_entity.doctrine_helper')
+            ->getEntityRepository(Job::class)
+            ->findOneBy(['name' => $name]);
     }
 }

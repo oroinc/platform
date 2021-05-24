@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Import;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisor;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Reader\ConfigFileReaderInterface;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigFinderBuilder;
+use Symfony\Component\Finder\Finder;
 
 class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowConfigFinderBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $finderBuilder;
+    private WorkflowConfigFinderBuilder $finderBuilder;
 
     /** @var ConfigFileReaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $reader;
+    private ConfigFileReaderInterface $reader;
 
-    /** @var WorkflowImportProcessorSupervisorFactory */
-    private $factory;
+    private WorkflowImportProcessorSupervisorFactory $factory;
 
     protected function setUp(): void
     {
@@ -28,18 +29,16 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
 
     /**
      * @dataProvider applicabilityCases
-     * @param mixed $import
+     *
+     * @param array $import
      * @param bool $expected
      */
-    public function testIsApplicable($import, bool $expected)
+    public function testIsApplicable(array $import, bool $expected): void
     {
-        $this->assertEquals($expected, $this->factory->isApplicable($import));
+        self::assertEquals($expected, $this->factory->isApplicable($import));
     }
 
-    /**
-     * @return \Generator
-     */
-    public function applicabilityCases()
+    public function applicabilityCases(): \Generator
     {
         yield 'ok full' => [
             'import' => [
@@ -78,26 +77,42 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
         ];
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
+        $file1 = new \SplFileInfo(__FILE__);
+        $file1Content = [
+            'workflows' => [
+                'from' => ['a' => 1, 'node1' => 'replaced in to'],
+                'to' => ['b' => 2]
+            ]
+        ];
         $processor = $this->factory->create(['workflow' => 'from', 'as' => 'to', 'replace' => ['node1']]);
 
-        $this->assertInstanceOf(WorkflowImportProcessorSupervisor::class, $processor);
+        self::assertInstanceOf(WorkflowImportProcessorSupervisor::class, $processor);
+
+        $finderMock = $this->createMock(Finder::class);
+        $this->finderBuilder
+            ->expects(self::once())
+            ->method('create')
+            ->willReturn($finderMock);
+
+        $finderMock
+            ->expects(self::once())
+            ->method('getIterator')
+            ->willReturn(new ArrayCollection([$file1]));
+
+        $this->reader
+            ->expects(self::once())
+            ->method('read')
+            ->with($file1)
+            ->willReturnOnConsecutiveCalls($file1Content);
 
         //as view is hidden and factory uses `new` - testing by indirect indications
         //e.g inner processor merges data correctly `from` to `to`, also replaces nodes unnecessary in `to`
         //so that factory configures objects properly
-        $result = $processor->process(
-            [
-                'workflows' => [
-                    'from' => ['a' => 1, 'node1' => 'replaced in to'],
-                    'to' => ['b' => 2]
-                ]
-            ],
-            new \SplFileInfo(__FILE__)
-        );
+        $result = $processor->process($file1Content, $file1);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'workflows' => [
                     'from' => ['a' => 1, 'node1' => 'replaced in to'],
@@ -108,7 +123,7 @@ class WorkflowImportProcessorSupervisorFactoryTest extends \PHPUnit\Framework\Te
         );
     }
 
-    public function testCreateException()
+    public function testCreateException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Can not create import processor. Import format is not supported.');

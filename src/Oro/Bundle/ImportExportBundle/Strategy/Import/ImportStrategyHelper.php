@@ -13,6 +13,7 @@ use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
@@ -29,6 +30,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ImportStrategyHelper
 {
+    use AuthorizationCheckerTrait;
+
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
@@ -217,9 +220,13 @@ class ImportStrategyHelper
         }
 
         try {
-            $this->isGrantedCache[$cacheKey] = $this->authorizationChecker->isGranted($attributes, $obj);
+            $this->isGrantedCache[$cacheKey] = $this->isAttributesGranted(
+                $this->authorizationChecker,
+                $attributes,
+                $obj
+            );
         } catch (InvalidDomainObjectException $exception) {
-            // if object do not have identity we skipp check
+            // if object do not have identity we skip check
             $this->isGrantedCache[$cacheKey] = true;
         }
 
@@ -269,10 +276,7 @@ class ImportStrategyHelper
      */
     public function importEntity($basicEntity, $importedEntity, array $excludedProperties = [])
     {
-        $basicEntityClass = ClassUtils::getClass($basicEntity);
-        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
-            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
-        }
+        $basicEntityClass = $this->verifyClass($basicEntity, $importedEntity);
 
         $entityProperties = $this->getEntityPropertiesByClassName($basicEntityClass);
         $importedEntityProperties = array_diff($entityProperties, $excludedProperties);
@@ -371,7 +375,7 @@ class ImportStrategyHelper
      *
      * @return array
      */
-    private function getEntityPropertiesByClassName($entityClassName)
+    protected function getEntityPropertiesByClassName($entityClassName)
     {
         /**
          * In case if we work with configured entities then we should use fieldHelper
@@ -417,5 +421,15 @@ class ImportStrategyHelper
         }
 
         return $rowNumber;
+    }
+
+    protected function verifyClass($basicEntity, $importedEntity): string
+    {
+        $basicEntityClass = ClassUtils::getClass($basicEntity);
+        if ($basicEntityClass != ClassUtils::getClass($importedEntity)) {
+            throw new InvalidArgumentException('Basic and imported entities must be instances of the same class');
+        }
+
+        return $basicEntityClass;
     }
 }

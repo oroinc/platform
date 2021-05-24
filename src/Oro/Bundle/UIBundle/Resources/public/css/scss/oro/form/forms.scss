@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity, selector-max-compound-selectors */
+
 .form-horizontal .control-label {
     &.header-tooltips {
         display: inline;
@@ -22,7 +24,7 @@
 
         > .control-label {
             width: $form-horizontal-control-label-width;
-            font-weight: normal;
+            font-weight: font-weight('light');
             text-align: right;
             flex-shrink: 0;
 
@@ -56,7 +58,7 @@
             flex-grow: 1;
             min-width: $field-width;
 
-            & .controls {
+            .controls {
                 min-width: 0;
             }
 
@@ -118,7 +120,7 @@
         }
 
         &.control-group-datetime {
-            input[type="text"] {
+            input[type='text'] {
                 &.datepicker-input {
                     width: 189px;
                 }
@@ -128,6 +130,7 @@
                 }
             }
         }
+
         &.control-group-checkbox {
             .controls {
                 padding-top: 5px;
@@ -165,6 +168,7 @@
     .control-group-oro_pricing_price_lists_settings,
     .control-group-oro_file {
         .controls:first-child {
+            // stylelint-disable-next-line declaration-no-important
             margin-left: 0 !important;
         }
     }
@@ -214,7 +218,7 @@
     margin-bottom: 22px;
 
     span {
-        background-color: #fff;
+        background-color: $primary-inverse;
         padding: 0 20px 0 0;
         display: inline-block;
     }

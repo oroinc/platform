@@ -23,8 +23,8 @@
 
 .fallback-container {
     input {
-        &[type="radio"],
-        &[type="checkbox"] {
+        &[type='radio'],
+        &[type='checkbox'] {
             margin-top: $fallback-container-input-offset-top;
         }
     }
@@ -107,6 +107,7 @@
 
 .fallback-item-use-fallback {
     min-width: $fallback-item-use-fallback-width;
+
     @include text-line-truncate($max-width: $fallback-item-use-fallback-max-width);
 
     padding-right: $content-padding-small;

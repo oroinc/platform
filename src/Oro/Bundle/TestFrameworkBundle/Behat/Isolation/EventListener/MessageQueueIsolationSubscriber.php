@@ -6,7 +6,8 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeStepTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\SkipIsolatorsTrait;
-use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Processor\MessageQueueProcessorAwareTrait;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,35 +16,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Subscriber that processed message queue during test execution
  */
-class MessageQueueIsolationSubscriber implements EventSubscriberInterface
+class MessageQueueIsolationSubscriber implements EventSubscriberInterface, MessageQueueProcessorAwareInterface
 {
-    use SkipIsolatorsTrait;
+    use SkipIsolatorsTrait, MessageQueueProcessorAwareTrait;
 
     /** @var KernelInterface */
     private $kernel;
 
-    /** @var MessageQueueProcessorInterface */
-    private $dbalMessageQueueProcessor;
-
-    /** @var MessageQueueProcessorInterface */
-    private $amqpMessageQueueProcessor;
-
     /** @var OutputInterface */
     private $output;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param MessageQueueProcessorInterface $dbalMessageQueueProcessor
-     * @param MessageQueueProcessorInterface $amqpMessageQueueProcessor
-     */
-    public function __construct(
-        KernelInterface $kernel,
-        MessageQueueProcessorInterface $dbalMessageQueueProcessor,
-        MessageQueueProcessorInterface $amqpMessageQueueProcessor
-    ) {
+    public function __construct(KernelInterface $kernel)
+    {
         $this->kernel = $kernel;
-        $this->dbalMessageQueueProcessor = $dbalMessageQueueProcessor;
-        $this->amqpMessageQueueProcessor = $amqpMessageQueueProcessor;
     }
 
     /**
@@ -72,7 +57,7 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->getMessageQueueProcessor()->waitWhileProcessingMessages();
+        $this->messageQueueProcessor->waitWhileProcessingMessages();
     }
 
     public function beforeFeature()
@@ -82,7 +67,7 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface
         }
 
         $this->output->writeln('<info>Start message queue</info>');
-        $this->getMessageQueueProcessor()->startMessageQueue();
+        $this->messageQueueProcessor->startMessageQueue();
     }
 
     public function afterFeature()
@@ -92,10 +77,10 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface
         }
 
         $this->output->writeln('<info>Stop message queue</info>');
-        $this->getMessageQueueProcessor()->stopMessageQueue();
+        $this->messageQueueProcessor->stopMessageQueue();
 
         $this->output->writeln('<info>Cleanup message queue</info>');
-        $this->getMessageQueueProcessor()->cleanUp();
+        $this->messageQueueProcessor->cleanUp();
     }
 
     /**
@@ -104,18 +89,5 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;
-    }
-
-    /**
-     * @return MessageQueueProcessorInterface
-     */
-    private function getMessageQueueProcessor()
-    {
-        $container = $this->kernel->getContainer();
-        if ($container->getParameter('message_queue_transport') === 'amqp') {
-            return $this->amqpMessageQueueProcessor;
-        }
-
-        return $this->dbalMessageQueueProcessor;
     }
 }

@@ -41,7 +41,7 @@
 
         .email-body {
             white-space: normal;
-            color: #777;
+            color: $primary-500;
         }
     }
 }
@@ -60,9 +60,11 @@
     .email-form {
         .form-horizontal {
             width: 100%;
+
             .control-group {
                 max-width: 100%;
 
+                /* stylelint-disable selector-max-compound-selectors */
                 .controls {
                     &:first-child {
                         margin-left: 0;
@@ -78,6 +80,7 @@
                     margin-right: 0;
                     margin-bottom: 6px;
                 }
+                /* stylelint-enable selector-max-compound-selectors */
             }
         }
     }

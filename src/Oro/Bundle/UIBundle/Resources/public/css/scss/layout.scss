@@ -1,5 +1,7 @@
 /* @theme: admin.oro; */
 
+/* stylelint-disable no-descending-specificity */
+
 @mixin responsive-inline-position() {
     float: left;
     width: 50%;
@@ -81,9 +83,7 @@
             background: none;
         }
     }
-}
 
-.responsive-section {
     figure {
         display: table;
         margin: 5px auto 1rem;
@@ -137,7 +137,7 @@
         &.responsive-big,
         &.responsive-medium,
         &:not(.responsive-small) {
-            form[name="oro_product"] & {
+            form[name='oro_product'] & {
                 .responsive-cell {
                     padding-bottom: $content-padding-medium;
                 }
@@ -174,18 +174,19 @@
 body.backdrop {
     .select2-drop,
     #ui-datepicker-div {
+        // stylelint-disable-next-line declaration-no-important
         z-index: 10001 !important;
     }
 
-    &:before {
+    &::before {
         position: absolute;
-        content: "";
+        content: '';
         display: block;
         width: 100%;
         height: 100%;
         top: 0;
         left: 0;
-        background: rgba(0, 0, 0, .1);
+        background: $backdrop-shadow;
         z-index: 9999;
     }
 }
@@ -215,7 +216,7 @@ body.backdrop {
             padding-bottom: 4px;
         }
 
-        [class^="fa-"] {
+        [class^='fa-'] {
             color: $primary-100;
             height: $dropdown-item-icon-fa-font-size;
         }
@@ -235,7 +236,7 @@ body.backdrop {
 
             a {
                 padding-right: 24px;
-                font-weight: bold;
+                font-weight: font-weight('bold');
                 background-color: $primary-800;
                 color: $primary-100;
             }
@@ -252,7 +253,7 @@ body.backdrop {
 }
 
 .oro-page {
-    border-top: 1px solid $page-border-color;
+    border: 1px solid $page-border-color;
     background: $page-sidebar-background-color;
     border-bottom: 1px solid $page-border-color;
 
@@ -270,13 +271,12 @@ body.backdrop {
         width: calc(100% - 235px);
         border-left: 1px solid $page-border-color;
         padding: 10px;
-        background-color: #fff;
+        background-color: $primary-inverse;
         overflow: hidden;
     }
 
     &.collapsible-sidebar {
         .oro-page-sidebar {
-
             > .dropdown-toggle {
                 display: none;
             }

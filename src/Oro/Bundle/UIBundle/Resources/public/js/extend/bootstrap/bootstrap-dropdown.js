@@ -258,7 +258,8 @@ define(function(require, exports, module) {
             }
 
             // https://popper.js.org/popper-documentation.html#Popper.Defaults
-            _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled'));
+            _.extend(config, _.pick(this._config, 'placement', 'positionFixed', 'eventsEnabled',
+                'onCreate', 'onUpdate', 'onDestroy'));
             _.extend(config.modifiers, _.pick(this._config.modifiers, 'shift', 'offset', 'preventOverflow',
                 'keepTogether', 'arrow', 'flip', 'inner', 'hide', 'computeStyle', 'applyStyle'));
 

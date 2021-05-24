@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 
 /**
  * @group search
+ * @dbIsolationPerTest
  */
 class RestSearchApiTest extends SearchBundleWebTestCase
 {

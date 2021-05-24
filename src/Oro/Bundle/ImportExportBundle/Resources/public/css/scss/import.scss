@@ -2,7 +2,7 @@
 
 .import-file {
     span.validation-failed {
-        &:before {
+        &::before {
             margin-left: 0;
         }
     }
@@ -11,14 +11,16 @@
 .ui-dialog {
     .alert {
         &.alert-info.import-notice {
-            background-color: #d9edf7;
+            background-color: $info-lighten;
             background-image: none;
-            border-color: #bce8f1;
+            border-color: $secondary-300;
             padding: 8px 20px 8px 14px;
         }
+
         &.alert-warning {
-            &.import-warning, &.export-warning {
-                border-color: #fdebb8;
+            &.import-warning,
+            &.export-warning {
+                border-color: $warning;
                 padding: 8px 20px 8px 14px;
             }
         }
@@ -43,7 +45,9 @@
 
         > li {
             > a:hover {
+                // stylelint-disable-next-line selector-max-compound-selectors
                 > .icon-download-alt {
+                    // stylelint-disable-next-line declaration-no-important
                     background-image: url('#{$global-url}/oroimportexport/img/glyphicons-halflings.png') !important;
                 }
             }

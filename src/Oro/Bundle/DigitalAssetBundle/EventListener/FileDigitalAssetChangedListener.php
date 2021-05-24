@@ -49,9 +49,6 @@ class FileDigitalAssetChangedListener
     public function onFlush(OnFlushEventArgs $args): void
     {
         $entityManager = $args->getEntityManager();
-        if (!$entityManager->getMetadataFactory()->hasMetadataFor(File::class)) {
-            return;
-        }
 
         $fileClassMetadata = $entityManager->getClassMetadata(File::class);
         $unitOfWork = $entityManager->getUnitOfWork();

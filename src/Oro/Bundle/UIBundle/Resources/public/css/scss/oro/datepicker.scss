@@ -15,7 +15,7 @@
         background: none;
         border: 0 none;
         border-radius: 0;
-        font-weight: normal;
+        font-weight: font-weight('light');
 
         .ui-state-hover,
         .ui-state-focus {
@@ -50,7 +50,7 @@
             font-size: 0;
             text-align: center;
 
-            &:before {
+            &::before {
                 font-size: $datepicker-header-nav-buttons-size;
                 line-height: $datepicker-header-nav-buttons-size;
             }
@@ -74,7 +74,6 @@
             text-align: left;
             margin: $datepicker-input-widget-select-margin;
         }
-
     }
 
     .ui-datepicker-title {
@@ -91,15 +90,19 @@
 
         .ui-state-hover {
             color: $datepicker-color;
+            // stylelint-disable-next-line declaration-no-important
             background-color: $datepicker-calendar-hover-background-color !important;
         }
 
         .ui-state-active {
+            // stylelint-disable-next-line declaration-no-important
             background-color: $datepicker-calendar-active-background-color !important;
+            // stylelint-disable-next-line declaration-no-important
             color: $datepicker-calendar-active-color;
             font-weight: $datepicker-calendar-active-font-weight;
 
             &:hover {
+                // stylelint-disable-next-line declaration-no-important
                 background-color: $datepicker-calendar-active-hover-background-color !important;
             }
         }
@@ -108,7 +111,7 @@
             font-weight: $datepicker-calendar-active-font-weight;
             position: relative;
 
-            &:after {
+            &::after {
                 content: '';
                 display: block;
                 position: absolute;
@@ -130,6 +133,7 @@
 
         td {
             padding: $datepicker-calendar-cell-padding;
+
             a {
                 padding: $datepicker-calendar-cell-link-padding;
                 margin-bottom: $datepicker-calendar-cell-link-margin-bottom;
@@ -225,12 +229,6 @@
 }
 
 .fields-row {
-    input.error + .datepicker-input,
-    input.error + .datepicker-input + .timepicker-input {
-        border-color: $input-error-border-color;
-        box-shadow: $input-error-box-shadow;
-    }
-
     .datepicker-input {
         margin-right: $fields-row-datepicker-input-margin-end;
     }
@@ -238,12 +236,17 @@
     .timepicker-input {
         min-width: $fields-row-timepicker-input-min-width;
     }
+
+    input.error + .datepicker-input,
+    input.error + .datepicker-input + .timepicker-input {
+        border-color: $input-error-border-color;
+        box-shadow: $input-error-box-shadow;
+    }
 }
 
 .ui-timepicker-input:first-child {
     margin-left: 0;
 }
-
 
 .hasDatepicker.tab-pane {
     overflow: hidden;
