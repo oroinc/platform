@@ -60,11 +60,16 @@ services:
             - ~ # url prefix. It is injected by Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory
             - ~ # cache prefix. It is injected by Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory
 
+    oro_attachment.liip_imagine.binary.mime_type_guesser:
+        class: Liip\ImagineBundle\Binary\SimpleMimeTypeGuesser
+        arguments:
+            - '@mime_types'
+
     oro_attachment.liip_imagine.binary.factory.guess_mime_type:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContentFactory'
         arguments:
-          - '@liip_imagine.binary.mime_type_guesser'
-          - '@liip_imagine.extension_guesser'
+          - '@oro_attachment.liip_imagine.binary.mime_type_guesser'
+          - '@mime_types'
 
     oro_attachment.liip_imagine.binary.filter:
         class: 'Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\Basic\BasicImagineBinaryFilter'

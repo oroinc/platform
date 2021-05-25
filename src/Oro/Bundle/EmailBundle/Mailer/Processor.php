@@ -23,7 +23,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * This class process emails
@@ -60,15 +60,19 @@ class Processor
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
+    /** @var MimeTypesInterface */
+    protected $mimeTypes;
+
     /**
-     * @param DoctrineHelper           $doctrineHelper
-     * @param DirectMailer             $mailer
-     * @param EmailAddressHelper       $emailAddressHelper
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param EmailActivityManager     $emailActivityManager
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param DoctrineHelper            $doctrineHelper
+     * @param DirectMailer              $mailer
+     * @param EmailAddressHelper        $emailAddressHelper
+     * @param EmailEntityBuilder        $emailEntityBuilder
+     * @param EmailActivityManager      $emailActivityManager
+     * @param EventDispatcherInterface  $eventDispatcher
      * @param SymmetricCrypterInterface $encryptor
-     * @param EmailOriginHelper        $emailOriginHelper
+     * @param EmailOriginHelper         $emailOriginHelper
+     * @param MimeTypesInterface        $mimeTypes
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -78,7 +82,8 @@ class Processor
         EmailActivityManager $emailActivityManager,
         EventDispatcherInterface $eventDispatcher,
         SymmetricCrypterInterface $encryptor,
-        EmailOriginHelper $emailOriginHelper
+        EmailOriginHelper $emailOriginHelper,
+        MimeTypesInterface $mimeTypes
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
@@ -88,6 +93,7 @@ class Processor
         $this->eventDispatcher      = $eventDispatcher;
         $this->encryptor            = $encryptor;
         $this->emailOriginHelper    = $emailOriginHelper;
+        $this->mimeTypes            = $mimeTypes;
     }
 
     /**
@@ -229,10 +235,9 @@ class Processor
             return;
         }
 
-        $guesser = ExtensionGuesser::getInstance();
         $body = preg_replace_callback(
             '/<img(.*)src(\s*)=(\s*)["\'](.*)["\']/U',
-            function ($matches) use ($message, $guesser, $model) {
+            function ($matches) use ($message, $model) {
                 if (count($matches) === 5) {
                     // 1st match contains any data between '<img' and 'src' parts (e.g. 'width=100')
                     $imgConfig = $matches[1];
@@ -244,14 +249,14 @@ class Processor
                         list($mime, $content) = explode(';', $srcData);
                         list($encoding, $file) = explode(',', $content);
                         $mime            = str_replace('data:', '', $mime);
-                        $fileName        = sprintf('%s.%s', uniqid(), $guesser->guess($mime));
+                        $extensions      = $this->mimeTypes->getExtensions($mime);
+                        $fileName        = sprintf('%s.%s', uniqid(), \array_shift($extensions));
                         $swiftAttachment = new \Swift_Image(
                             ContentDecoder::decode($file, $encoding),
                             $fileName,
                             $mime
                         );
 
-                        /** @var $message \Swift_Message */
                         $id = $message->embed($swiftAttachment);
 
                         if ($model) {
@@ -319,14 +324,12 @@ class Processor
                 continue;
             }
 
-            if (!$attachment->getId()) {
-                $this->getEntityManager()->persist($attachment);
-            } else {
+            if ($attachment->getId()) {
                 $attachmentContent = clone $attachment->getContent();
                 $attachment        = clone $attachment;
                 $attachment->setContent($attachmentContent);
-                $this->getEntityManager()->persist($attachment);
             }
+            $this->getEntityManager()->persist($attachment);
 
             $email->getEmailBody()->addAttachment($attachment);
             $attachment->setEmailBody($email->getEmailBody());

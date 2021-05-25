@@ -61,6 +61,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     'cache_key'            => '_test:block--1_block_ad7b81dea42cf2ef7525c274471e3ce6',
                     'translation_domain'   => 'messages',
                     'visible'              => true,
+                    '_blockThemes'         => [],
+                    '_formThemes'          => [],
                 ]
             ],
             $view,
@@ -103,7 +105,9 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     'attr'                 => ['test_attr' => 'test_attr_val'],
                     'label'                => 'Test Label',
                     'label_attr'           => ['test_label_attr' => 'test_label_attr_val'],
-                    'test_var'             => 'test_var_val'
+                    'test_var'             => 'test_var_val',
+                    '_blockThemes'         => [],
+                    '_formThemes'          => [],
                 ]
             ],
             $view,

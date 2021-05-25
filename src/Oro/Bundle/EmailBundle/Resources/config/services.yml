@@ -535,6 +535,7 @@ services:
             - '@event_dispatcher'
             - '@oro_security.encoder.default'
             - '@oro_email.tools.email_origin_helper'
+            - '@mime_types'
 
     oro_email.workflow.action.send_email:
         class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail

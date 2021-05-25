@@ -12,11 +12,15 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+/**
+ * Processes layout expressions in the array of values
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExpressionProcessor
 {
-    const STRING_IS_REGULAR = 0;
-    const STRING_IS_EXPRESSION = 1;
-    const STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
+    private const STRING_IS_REGULAR = 0;
+    private const STRING_IS_EXPRESSION = 1;
+    private const STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
 
     /** @var ExpressionLanguage */
     protected $expressionLanguage;
@@ -36,10 +40,6 @@ class ExpressionProcessor
     /** @var boolean */
     protected $visible = true;
 
-    /**
-     * @param ExpressionLanguage        $expressionLanguage
-     * @param ExpressionEncoderRegistry $encoderRegistry
-     */
     public function __construct(
         ExpressionLanguage $expressionLanguage,
         ExpressionEncoderRegistry $encoderRegistry
@@ -48,19 +48,12 @@ class ExpressionProcessor
         $this->encoderRegistry = $encoderRegistry;
     }
 
-    /**
-     * @param array                 $values
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
-     */
     public function processExpressions(
         array &$values,
         ContextInterface $context,
         DataAccessorInterface $data = null,
-        $evaluate = true,
-        $encoding = null
+        bool $evaluate = true,
+        string $encoding = null
     ) {
         if (!$evaluate && $encoding === null) {
             return;
@@ -78,30 +71,22 @@ class ExpressionProcessor
         }
 
         foreach ($values as $key => $value) {
-            if (!array_key_exists($key, $this->processedValues)) {
-                $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
-            } else {
+            if (array_key_exists($key, $this->processedValues)) {
                 $value = $this->processedValues[$key];
+            } else {
+                $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
             }
             $values[$key] = $value;
         }
     }
 
-    /**
-     * @param string                $key
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
-     */
     protected function processRootValue(
         $key,
         &$value,
         ContextInterface $context,
         DataAccessorInterface $data = null,
-        $evaluate = true,
-        $encoding = null
+        bool $evaluate = true,
+        string $encoding = null
     ) {
         $this->processingValues[$key] = $key;
         $this->processValue($value, $context, $data, $evaluate, $encoding);
@@ -109,19 +94,12 @@ class ExpressionProcessor
         unset($this->processingValues[$key]);
     }
 
-    /**
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
-     */
     protected function processValue(
         &$value,
         ContextInterface $context,
         DataAccessorInterface $data = null,
-        $evaluate = true,
-        $encoding = null
+        bool $evaluate = true,
+        string $encoding = null
     ) {
         if (is_string($value) && !empty($value)) {
             $this->processStringValue($value, $context, $data, $evaluate, $encoding);
@@ -132,35 +110,22 @@ class ExpressionProcessor
             }
             unset($item);
         } elseif ($value instanceof OptionValueBag) {
-            foreach ($value->all() as $action) {
-                $args = $action->getArguments();
-                foreach ($args as $index => $arg) {
-                    $this->processValue($arg, $context, $data, $evaluate, $encoding);
-                    $action->setArgument($index, $arg);
-                }
-            }
+            $this->processOptionValueBag($value, $context, $data, $evaluate, $encoding);
         } elseif ($value instanceof ParsedExpression) {
             $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+        } elseif ($value instanceof \Closure) {
+            $value = $this->processClosure($value, $context, $data);
         }
     }
 
-    /**
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param null                  $encoding
-     */
     protected function processStringValue(
         &$value,
         ContextInterface $context,
         DataAccessorInterface $data = null,
-        $evaluate = true,
-        $encoding = null
+        bool $evaluate = true,
+        string $encoding = null
     ) {
         switch ($this->checkStringValue($value)) {
-            case self::STRING_IS_REGULAR:
-                break;
             case self::STRING_IS_EXPRESSION:
                 $expr = $this->parseExpression($value);
                 $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
@@ -173,11 +138,11 @@ class ExpressionProcessor
     }
 
     /**
-     * @param ParsedExpression      $expr
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string                $encoding
+     * @param ParsedExpression           $expr
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param null                       $encoding
      * @return mixed|string|ParsedExpression
      * @throws CircularReferenceException
      */
@@ -195,7 +160,7 @@ class ExpressionProcessor
         $node = $expr->getNodes();
         $deps = $this->getNotProcessedDependencies($node);
 
-        if ($data === null && $this->nodeWorkWithData($node)) {
+        if ($data === null && $this->worksWithDataVariable($node)) {
             return $expr;
         }
 
@@ -224,7 +189,7 @@ class ExpressionProcessor
      *             -1 - the value is string that starts with "\="
      *                  which should be replaces with "="
      */
-    protected function checkStringValue($value)
+    protected function checkStringValue(string $value): int
     {
         if (is_string($value)) {
             $pos = strpos($value, '=');
@@ -241,11 +206,7 @@ class ExpressionProcessor
         return self::STRING_IS_REGULAR;
     }
 
-    /**
-     * @param Node $node
-     * @return array
-     */
-    protected function getNotProcessedDependencies(Node $node)
+    protected function getNotProcessedDependencies(Node $node): array
     {
         $deps = [];
         if ($node instanceof NameNode) {
@@ -263,33 +224,52 @@ class ExpressionProcessor
         return $deps;
     }
 
-    /**
-     * @param $value
-     * @return ParsedExpression
-     */
-    protected function parseExpression($value)
+    protected function parseExpression($value): ParsedExpression
     {
         $names = array_merge(['context', 'data'], array_keys($this->values));
 
         return $this->expressionLanguage->parse(substr($value, 1), $names);
     }
 
-    /**
-     * @param Node $node
-     * @return boolean
-     */
-    protected function nodeWorkWithData(Node $node)
+    protected function worksWithDataVariable(Node $node): bool
     {
-        $hasData = false;
-        if ($node instanceof NameNode) {
-            if ($node->attributes['name'] === 'data') {
+        if ($node instanceof NameNode && $node->attributes['name'] === 'data') {
+            return true;
+        }
+        foreach ($node->nodes as $childNode) {
+            if ($this->worksWithDataVariable($childNode)) {
                 return true;
             }
         }
-        foreach ($node->nodes as $childNode) {
-            $hasData = $this->nodeWorkWithData($childNode) || $hasData;
-        }
 
-        return $hasData;
+        return false;
+    }
+
+    protected function processClosure(\Closure $value, ContextInterface $context, ?DataAccessorInterface $data)
+    {
+        return $this->visible ? $value($context, $data) : null;
+    }
+
+    /**
+     * @param OptionValueBag             $value
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
+     */
+    protected function processOptionValueBag(
+        OptionValueBag $value,
+        ContextInterface $context,
+        ?DataAccessorInterface $data,
+        bool $evaluate,
+        ?string $encoding
+    ) {
+        foreach ($value->all() as $action) {
+            $args = $action->getArguments();
+            foreach ($args as $index => $arg) {
+                $this->processValue($arg, $context, $data, $evaluate, $encoding);
+                $action->setArgument($index, $arg);
+            }
+        }
     }
 }

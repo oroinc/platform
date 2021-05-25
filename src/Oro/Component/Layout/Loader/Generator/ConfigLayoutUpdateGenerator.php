@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Component\Layout\Loader\Generator;
 
 use Oro\Component\Layout\Exception\SyntaxException;
+use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
@@ -19,15 +20,20 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     public const PATH_ATTR = '__path';
 
     /** @var ConfigLayoutUpdateGeneratorExtensionInterface[] */
-    protected $extensions = [];
+    protected array $extensions = [];
 
     protected ?ReflectionClassHelper $helper = null;
 
     private ExpressionValidator $expressionValidator;
 
-    public function __construct(ExpressionValidator $expressionValidator)
-    {
+    private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
+
+    public function __construct(
+        ExpressionValidator $expressionValidator,
+        ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer
+    ) {
         $this->expressionValidator = $expressionValidator;
+        $this->expressionLanguageCacheWarmer = $expressionLanguageCacheWarmer;
     }
 
     public function addExtension(ConfigLayoutUpdateGeneratorExtensionInterface $extension)
@@ -121,7 +127,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             }
         }
 
-        $this->validateExpressionsRecursive($source);
+        $this->processExpressionsRecursive($source);
     }
 
     protected function prepare(GeneratorData $data, VisitorCollection $visitorCollection): void
@@ -150,7 +156,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $actionName = \substr($actionName, 1);
     }
 
-    private function validateExpressionsRecursive(array $source, ?string $path = null): void
+    private function processExpressionsRecursive(array $source, ?string $path = null): void
     {
         if ($path) {
             $path .= '.';
@@ -162,13 +168,15 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             }
 
             if (\is_array($value)) {
-                $this->validateExpressionsRecursive($value, $path . $key);
+                $this->processExpressionsRecursive($value, $path . $key);
                 continue;
             }
 
             if (\is_string($value) && '=' === $value[0]) {
+                $expression = \substr($value, 1);
                 try {
-                    $this->expressionValidator->validate(\substr($value, 1));
+                    $this->expressionValidator->validate($expression);
+                    $this->expressionLanguageCacheWarmer->collect($expression);
                 } catch (\Throwable $e) {
                     throw new SyntaxException($e->getMessage(), $source, $path . $key, $e);
                 }

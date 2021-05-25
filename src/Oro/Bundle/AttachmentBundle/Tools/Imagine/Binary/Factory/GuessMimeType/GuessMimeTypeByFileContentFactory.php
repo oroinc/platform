@@ -6,7 +6,7 @@ use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+use Symfony\Component\Mime\MimeTypesInterface;
 
 /**
  * Creates Liip Imagine Binary from raw file content, guesses extension and mime type.
@@ -19,20 +19,20 @@ class GuessMimeTypeByFileContentFactory implements ImagineBinaryByFileContentFac
     private $mimeTypeGuesser;
 
     /**
-     * @var ExtensionGuesserInterface
+     * @var MimeTypesInterface
      */
-    private $extensionGuesser;
+    private $mimeTypes;
 
     /**
-     * @param MimeTypeGuesserInterface  $mimeTypeGuesser
-     * @param ExtensionGuesserInterface $extensionGuesser
+     * @param MimeTypeGuesserInterface $mimeTypeGuesser
+     * @param MimeTypesInterface       $mimeTypes
      */
     public function __construct(
         MimeTypeGuesserInterface $mimeTypeGuesser,
-        ExtensionGuesserInterface $extensionGuesser
+        MimeTypesInterface $mimeTypes
     ) {
         $this->mimeTypeGuesser = $mimeTypeGuesser;
-        $this->extensionGuesser = $extensionGuesser;
+        $this->mimeTypes = $mimeTypes;
     }
 
     /**
@@ -41,8 +41,8 @@ class GuessMimeTypeByFileContentFactory implements ImagineBinaryByFileContentFac
     public function createImagineBinary(string $content): BinaryInterface
     {
         $mimeType = $this->mimeTypeGuesser->guess($content);
-        $format = $this->extensionGuesser->guess($mimeType);
+        $extensions = $this->mimeTypes->getExtensions($mimeType);
 
-        return new Binary($content, $mimeType, $format);
+        return new Binary($content, $mimeType, \array_shift($extensions));
     }
 }
