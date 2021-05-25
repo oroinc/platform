@@ -12,6 +12,9 @@ use Oro\Component\Layout\ExpressionLanguage\ExpressionProcessor;
  */
 class LayoutBuilder implements LayoutBuilderInterface
 {
+    private const BLOCK_THEMES = '_blockThemes';
+    private const FORM_THEMES = '_formThemes';
+
     /** @var LayoutRegistryInterface */
     protected $registry;
 
@@ -219,20 +222,20 @@ class LayoutBuilder implements LayoutBuilderInterface
             $context->resolve();
         }
 
-        $this->layoutManipulator->applyChanges($context);
-        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-
         if ($this->blockViewCache) {
             $rootView = $this->blockViewCache->fetch($context);
             if ($rootView === null) {
-                $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+                $rootView = $this->buildLayout($context);
 
                 $this->blockViewCache->save($context, $rootView);
             }
         } else {
-            $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+            $rootView = $this->buildLayout($context);
         }
 
+        $rootBlockId = $rootView->getId();
+        $blockThemes = $rootView->vars[self::BLOCK_THEMES];
+        $formThemes = $rootView->vars[self::FORM_THEMES];
         $rootView = $this->getRootView($rootView, $rootId);
 
         if ($context->getOr('expressions_evaluate')) {
@@ -249,17 +252,29 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         $layout = $this->createLayout($rootView);
-        $rootBlockId = $rawLayout->getRootId();
-        $blockThemes = $rawLayout->getBlockThemes();
 
         foreach ($blockThemes as $blockId => $themes) {
             $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
 
-        $formThemes = $rawLayout->getFormThemes();
         $layout->setFormTheme($formThemes);
 
         return $layout;
+    }
+
+    /**
+     * @param ContextInterface $context
+     * @return BlockView
+     */
+    protected function buildLayout(ContextInterface $context): BlockView
+    {
+        $this->layoutManipulator->applyChanges($context);
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+        $rootView = $this->blockFactory->createBlockView($rawLayout, $context);
+        $rootView->vars[self::BLOCK_THEMES] = $rawLayout->getBlockThemes();
+        $rootView->vars[self::FORM_THEMES] = $rawLayout->getFormThemes();
+
+        return $rootView;
     }
 
     /**

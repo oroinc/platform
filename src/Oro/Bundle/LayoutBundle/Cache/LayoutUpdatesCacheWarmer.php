@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Cache;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\Loader\LayoutUpdateLoader;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
@@ -12,24 +13,23 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
 {
-    /**
-     * @var LayoutUpdateLoader
-     */
-    private $layoutUpdateLoader;
+    private LayoutUpdateLoader $layoutUpdateLoader;
 
-    /**
-     * @var KernelInterface
-     */
-    private $kernel;
+    private KernelInterface $kernel;
 
-    /**
-     * @param LayoutUpdateLoader $layoutUpdateLoader
-     * @param KernelInterface    $kernel
-     */
-    public function __construct(LayoutUpdateLoader $layoutUpdateLoader, KernelInterface $kernel)
-    {
+    private ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer;
+
+    public function __construct(
+        LayoutUpdateLoader $layoutUpdateLoader,
+        KernelInterface $kernel
+    ) {
         $this->layoutUpdateLoader = $layoutUpdateLoader;
         $this->kernel = $kernel;
+    }
+
+    public function setCacheWarmer(ExpressionLanguageCacheWarmer $expressionLanguageCacheWarmer)
+    {
+        $this->expressionLanguageCacheWarmer = $expressionLanguageCacheWarmer;
     }
 
     /**
@@ -64,5 +64,6 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
                 $this->layoutUpdateLoader->load($layoutUpdatePath);
             }
         }
+        $this->expressionLanguageCacheWarmer->write();
     }
 }
