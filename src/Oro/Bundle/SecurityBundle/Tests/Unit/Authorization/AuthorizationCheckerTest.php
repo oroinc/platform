@@ -141,24 +141,7 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($result);
     }
 
-    public function testIsGrantedWithRoleNames(): void
-    {
-        $this->annotationProvider->expects(self::never())
-            ->method('findAnnotationById');
-        $this->innerAuthorizationChecker->expects(self::exactly(2))
-            ->method('isGranted')
-            ->willReturnMap(
-                [
-                    ['TestRole1', null, true],
-                    ['TestRole2', null, true],
-                ]
-            );
-
-        $result = $this->authorizationChecker->isGranted(['TestRole1', 'TestRole2']);
-        self::assertTrue($result);
-    }
-
-    public function testIsGrantedWithString()
+    public function testIsGrantedWithString(): void
     {
         $oid = new ObjectIdentity('1', 'TestType');
         $obj = 'Entity:SomeClass';
