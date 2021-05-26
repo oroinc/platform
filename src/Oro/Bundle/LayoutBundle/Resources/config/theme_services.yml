@@ -2,6 +2,7 @@ parameters:
     oro_layout.default_active_theme: ~
     oro_layout.debug: ~
     oro_layout.cache_dir: '%kernel.cache_dir%/layouts'
+    oro_layout.expression_language_cache_file: '%kernel.cache_dir%/oro/layout_expressions.php'
 
 services:
     oro_layout.dependency_initializer:
@@ -142,11 +143,19 @@ services:
         tags:
             - { name: layout.data_provider, alias: theme }
 
+    oro_layout.expression_language.compiled_cache_warmer:
+        class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer
+        arguments:
+            - '@oro_layout.expression_language'
+            - '@filesystem'
+            - '%oro_layout.expression_language_cache_file%'
+
     oro_layout.layout_update_generator.config:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         arguments:
             - '@oro_layout.expression_language.expression_validator'
         calls:
+            - [setCacheWarmer, ['@oro_layout.expression_language.compiled_cache_warmer']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.theme_relative_path']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.add_tree']]
             - [addExtension, ['@oro_layout.layout_update_generator.extension.config_imports']]

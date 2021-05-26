@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Component\Layout\Tests\Unit\Loader\Generator;
 
+use Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer;
 use Oro\Component\Layout\ExpressionLanguage\ExpressionValidator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGeneratorExtensionInterface;
@@ -12,12 +13,18 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    protected ConfigLayoutUpdateGenerator $generator;
+    /** @var ConfigLayoutUpdateGenerator */
+    protected $generator;
+
+    /** @var ExpressionLanguageCacheWarmer|MockObject */
+    protected $cacheWarmer;
 
     protected function setUp(): void
     {
         $expressionValidator = $this->createMock(ExpressionValidator::class);
+        $this->cacheWarmer = $this->createMock(ExpressionLanguageCacheWarmer::class);
         $this->generator = new ConfigLayoutUpdateGenerator($expressionValidator);
+        $this->generator->setCacheWarmer($this->cacheWarmer);
     }
 
     protected function tearDown(): void
@@ -100,6 +107,49 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit\Framework\TestCase
                 '$exception' => '"add" method requires at least 3 argument(s) to be passed, 1 given at "actions.0"'
             ],
         ];
+    }
+
+    public function testShouldCollectExpressions()
+    {
+        $data = [
+            'actions' => [
+                [
+                    '@setOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=context["foo"].bar()',
+                    ],
+                    '@add' => [
+                        'id' => 'foo',
+                        'options' => [
+                            'a' => '=bar',
+                            'b' => 'regularText',
+                            'c' => '=qux["a"].b(c)["d"]',
+                            'd' => [
+                                'nested' => [
+                                    'option' => '=context["a"].call(data["b"])',
+                                ],
+                            ],
+                        ],
+                    ],
+                    '@appendOption' => [
+                        'id' => 'foo',
+                        'optionName' => 'bar',
+                        'optionValue' => '=context["baz"].qux()',
+                    ],
+                ],
+            ],
+        ];
+        $this->cacheWarmer->expects($this->exactly(5))
+            ->method('collect')
+            ->withConsecutive(
+                ['context["foo"].bar()'],
+                ['bar'],
+                ['qux["a"].b(c)["d"]'],
+                ['context["a"].call(data["b"])'],
+                ['context["baz"].qux()'],
+            );
+        $this->generator->generate('testClassName', new GeneratorData($data));
     }
 
     // @codingStandardsIgnoreStart

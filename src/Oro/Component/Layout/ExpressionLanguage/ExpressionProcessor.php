@@ -12,11 +12,15 @@ use Symfony\Component\ExpressionLanguage\Node\NameNode;
 use Symfony\Component\ExpressionLanguage\Node\Node;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
+/**
+ * Processes layout expressions in the array of values
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ExpressionProcessor
 {
-    const STRING_IS_REGULAR = 0;
-    const STRING_IS_EXPRESSION = 1;
-    const STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
+    private const STRING_IS_REGULAR = 0;
+    private const STRING_IS_EXPRESSION = 1;
+    private const STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH = -1;
 
     /** @var ExpressionLanguage */
     protected $expressionLanguage;
@@ -33,13 +37,9 @@ class ExpressionProcessor
     /** @var  array */
     protected $processedValues = [];
 
-    /** @var boolean */
+    /** @var boolean|mixed */
     protected $visible = true;
 
-    /**
-     * @param ExpressionLanguage        $expressionLanguage
-     * @param ExpressionEncoderRegistry $encoderRegistry
-     */
     public function __construct(
         ExpressionLanguage $expressionLanguage,
         ExpressionEncoderRegistry $encoderRegistry
@@ -49,11 +49,11 @@ class ExpressionProcessor
     }
 
     /**
-     * @param array                 $values
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
+     * @param array                      $values
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
      */
     public function processExpressions(
         array &$values,
@@ -78,22 +78,22 @@ class ExpressionProcessor
         }
 
         foreach ($values as $key => $value) {
-            if (!array_key_exists($key, $this->processedValues)) {
-                $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
-            } else {
+            if (array_key_exists($key, $this->processedValues)) {
                 $value = $this->processedValues[$key];
+            } else {
+                $this->processRootValue($key, $value, $context, $data, $evaluate, $encoding);
             }
             $values[$key] = $value;
         }
     }
 
     /**
-     * @param string                $key
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
+     * @param                            $key
+     * @param                            $value
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
      */
     protected function processRootValue(
         $key,
@@ -110,11 +110,12 @@ class ExpressionProcessor
     }
 
     /**
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string|null           $encoding
+     * @param                            $value
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
+     * @throws CircularReferenceException
      */
     protected function processValue(
         &$value,
@@ -132,24 +133,21 @@ class ExpressionProcessor
             }
             unset($item);
         } elseif ($value instanceof OptionValueBag) {
-            foreach ($value->all() as $action) {
-                $args = $action->getArguments();
-                foreach ($args as $index => $arg) {
-                    $this->processValue($arg, $context, $data, $evaluate, $encoding);
-                    $action->setArgument($index, $arg);
-                }
-            }
+            $this->processOptionValueBag($value, $context, $data, $evaluate, $encoding);
         } elseif ($value instanceof ParsedExpression) {
             $value = $this->processExpression($value, $context, $data, $evaluate, $encoding);
+        } elseif ($value instanceof \Closure) {
+            $value = $this->processClosure($value, $context, $data);
         }
     }
 
     /**
-     * @param mixed                 $value
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param null                  $encoding
+     * @param                            $value
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
+     * @throws CircularReferenceException
      */
     protected function processStringValue(
         &$value,
@@ -159,8 +157,6 @@ class ExpressionProcessor
         $encoding = null
     ) {
         switch ($this->checkStringValue($value)) {
-            case self::STRING_IS_REGULAR:
-                break;
             case self::STRING_IS_EXPRESSION:
                 $expr = $this->parseExpression($value);
                 $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
@@ -173,11 +169,11 @@ class ExpressionProcessor
     }
 
     /**
-     * @param ParsedExpression      $expr
-     * @param ContextInterface      $context
-     * @param DataAccessorInterface $data
-     * @param bool                  $evaluate
-     * @param string                $encoding
+     * @param ParsedExpression           $expr
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param null                       $encoding
      * @return mixed|string|ParsedExpression
      * @throws CircularReferenceException
      */
@@ -241,11 +237,7 @@ class ExpressionProcessor
         return self::STRING_IS_REGULAR;
     }
 
-    /**
-     * @param Node $node
-     * @return array
-     */
-    protected function getNotProcessedDependencies(Node $node)
+    protected function getNotProcessedDependencies(Node $node): array
     {
         $deps = [];
         if ($node instanceof NameNode) {
@@ -263,11 +255,7 @@ class ExpressionProcessor
         return $deps;
     }
 
-    /**
-     * @param $value
-     * @return ParsedExpression
-     */
-    protected function parseExpression($value)
+    protected function parseExpression($value): ParsedExpression
     {
         $names = array_merge(['context', 'data'], array_keys($this->values));
 
@@ -276,20 +264,47 @@ class ExpressionProcessor
 
     /**
      * @param Node $node
-     * @return boolean
+     * @return bool
      */
     protected function nodeWorkWithData(Node $node)
     {
-        $hasData = false;
-        if ($node instanceof NameNode) {
-            if ($node->attributes['name'] === 'data') {
+        if ($node instanceof NameNode && $node->attributes['name'] === 'data') {
+            return true;
+        }
+        foreach ($node->nodes as $childNode) {
+            if ($this->nodeWorkWithData($childNode)) {
                 return true;
             }
         }
-        foreach ($node->nodes as $childNode) {
-            $hasData = $this->nodeWorkWithData($childNode) || $hasData;
-        }
 
-        return $hasData;
+        return false;
+    }
+
+    protected function processClosure(\Closure $value, ContextInterface $context, ?DataAccessorInterface $data)
+    {
+        return $this->visible ? $value($context, $data) : null;
+    }
+
+    /**
+     * @param OptionValueBag             $value
+     * @param ContextInterface           $context
+     * @param DataAccessorInterface|null $data
+     * @param bool                       $evaluate
+     * @param string|null                $encoding
+     */
+    protected function processOptionValueBag(
+        OptionValueBag $value,
+        ContextInterface $context,
+        ?DataAccessorInterface $data,
+        bool $evaluate,
+        ?string $encoding
+    ) {
+        foreach ($value->all() as $action) {
+            $args = $action->getArguments();
+            foreach ($args as $index => $arg) {
+                $this->processValue($arg, $context, $data, $evaluate, $encoding);
+                $action->setArgument($index, $arg);
+            }
+        }
     }
 }

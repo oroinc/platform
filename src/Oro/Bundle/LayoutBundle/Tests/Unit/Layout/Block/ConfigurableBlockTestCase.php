@@ -55,6 +55,8 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
                     'option_default_false' => false,
                     'option_default_null' => null,
                     'option_required' => true,
+                    '_blockThemes' => [],
+                    '_formThemes' => [],
                 ]
             ],
             $view,
@@ -110,6 +112,8 @@ class ConfigurableBlockTestCase extends BaseBlockTypeTestCase
             'attr' => ['test_attr' => 'test_attr_val'],
             'label' => 'Test Label',
             'label_attr' => ['test_label_attr' => 'test_label_attr_val'],
+            '_blockThemes' => [],
+            '_formThemes' => [],
         ];
         return [
             [
