@@ -29,7 +29,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new AclProtectedTypeExtension($fieldAclHelper);
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedTypes(): void
     {
         self::assertEquals([EntityType::class], AclProtectedTypeExtension::getExtendedTypes());
     }

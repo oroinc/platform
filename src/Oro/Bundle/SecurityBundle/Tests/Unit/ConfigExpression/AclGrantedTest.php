@@ -43,69 +43,105 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->condition->setContextAccessor(new ContextAccessor());
     }
 
-    public function testEvaluateByAclAnnotationId()
+    public function testEvaluateByAclAnnotationId(): void
     {
         $options = ['acme_product_view'];
         $context = [];
         $expectedResult = true;
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options[0], null)
             ->willReturn($expectedResult);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateByObjectIdentityDescriptor()
-    {
-        $options = ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity'];
+    /**
+     * @dataProvider getEvaluateByObjectIdentityDescriptorDataProvider
+     *
+     * @param array $options
+     * @param array $isGrantedCalls
+     * @param bool $expectedResult
+     */
+    public function testEvaluateByObjectIdentityDescriptor(
+        array $options,
+        array $isGrantedCalls,
+        bool $expectedResult
+    ): void {
         $context = [];
-        $expectedResult = true;
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::exactly(count($isGrantedCalls)))
             ->method('isGranted')
-            ->with($options[0], $options[1])
-            ->willReturn($expectedResult);
+            ->willReturnMap($isGrantedCalls);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateForNotEntityObject()
+    public function getEvaluateByObjectIdentityDescriptorDataProvider(): array
+    {
+        return [
+            [
+                'options' => ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity'],
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                ],
+                'expectedResult' => true,
+            ],
+            [
+                'options' => [['VIEW', 'EDIT'], 'entity:Acme/DemoBundle/Entity/AcmeEntity'],
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                    ['EDIT', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true]
+                ],
+                'expectedResult' => true,
+            ],
+            [
+                'options' => [['VIEW', 'EDIT'], 'entity:Acme/DemoBundle/Entity/AcmeEntity'],
+                'isGrantedCalls' => [
+                    ['VIEW', 'entity:Acme/DemoBundle/Entity/AcmeEntity', true],
+                    ['EDIT', 'entity:Acme/DemoBundle/Entity/AcmeEntity', false]
+                ],
+                'expectedResult' => false,
+            ],
+        ];
+    }
+
+    public function testEvaluateForNotEntityObject(): void
     {
         $options = ['VIEW', new \stdClass()];
         $context = [];
         $expectedResult = true;
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->willReturn(null);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options[0], $this->identicalTo($options[1]))
             ->willReturn($expectedResult);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateForExistingEntity()
+    public function testEvaluateForExistingEntity(): void
     {
         $options = ['VIEW', new \stdClass()];
         $context = [];
@@ -113,37 +149,37 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManager::class);
         $uow = $this->createMock(UnitOfWork::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($options[1])
             ->willReturn(false);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('isInIdentityMap')
             ->with($options[1])
             ->willReturn(true);
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options[0], $this->identicalTo($options[1]))
             ->willReturn($expectedResult);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateForNewEntity()
+    public function testEvaluateForNewEntity(): void
     {
         $options = ['VIEW', new \stdClass()];
         $context = [];
@@ -151,35 +187,35 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManager::class);
         $uow = $this->createMock(UnitOfWork::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($options[1])
             ->willReturn(true);
-        $uow->expects($this->never())
+        $uow->expects(self::never())
             ->method('isInIdentityMap');
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
             ->willReturn($expectedResult);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateForEntityWhichIsNotInUowYet()
+    public function testEvaluateForEntityWhichIsNotInUowYet(): void
     {
         $options = ['VIEW', new \stdClass()];
         $context = [];
@@ -187,53 +223,53 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
 
         $em = $this->createMock(EntityManager::class);
         $uow = $this->createMock(UnitOfWork::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('isScheduledForInsert')
             ->with($options[1])
             ->willReturn(false);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('isInIdentityMap')
             ->with($options[1])
             ->willReturn(false);
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(ClassUtils::getRealClass($options[1]))
             ->willReturn($em);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(new \stdClass());
 
-        $this->authorizationChecker->expects($this->once())
+        $this->authorizationChecker->expects(self::once())
             ->method('isGranted')
             ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
             ->willReturn($expectedResult);
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertEquals($expectedResult, $this->condition->evaluate($context));
     }
 
-    public function testEvaluateHasNoUser()
+    public function testEvaluateHasNoUser(): void
     {
         $options = ['acme_product_view'];
         $context = [];
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
 
-        $this->authorizationChecker->expects($this->never())
+        $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
-        $this->assertSame($this->condition, $this->condition->initialize($options));
-        $this->assertFalse($this->condition->evaluate($context));
+        self::assertSame($this->condition, $this->condition->initialize($options));
+        self::assertFalse($this->condition->evaluate($context));
     }
 
-    public function testInitializeFailsWhenEmptyOptions()
+    public function testInitializeFailsWhenEmptyOptions(): void
     {
         $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Options must have 1 or 2 elements, but 0 given.');
@@ -241,7 +277,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize([]);
     }
 
-    public function testInitializeFailsWhenEmptyAttributes()
+    public function testInitializeFailsWhenEmptyAttributes(): void
     {
         $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('ACL attributes must not be empty.');
@@ -249,7 +285,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $this->condition->initialize(['']);
     }
 
-    public function testInitializeFailsWhenEmptyObject()
+    public function testInitializeFailsWhenEmptyObject(): void
     {
         $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('ACL object must not be empty.');
@@ -260,17 +296,17 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toArrayDataProvider
      */
-    public function testToArray($options, $message, $expected)
+    public function testToArray($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
             $this->condition->setMessage($message);
         }
         $actual = $this->condition->toArray();
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
-    public function toArrayDataProvider()
+    public function toArrayDataProvider(): array
     {
         return [
             [
@@ -303,17 +339,17 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider compileDataProvider
      */
-    public function testCompile($options, $message, $expected)
+    public function testCompile($options, $message, $expected): void
     {
         $this->condition->initialize($options);
         if ($message !== null) {
             $this->condition->setMessage($message);
         }
         $actual = $this->condition->compile('$factory');
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
     }
 
-    public function compileDataProvider()
+    public function compileDataProvider(): array
     {
         return [
             [

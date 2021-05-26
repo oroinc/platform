@@ -24,20 +24,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 {
     use SearchMappingTypeCastingHandlersTestTrait;
 
-    /** @var Indexer */
-    protected $indexService;
-
-    /** @var ObjectMapper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $mapper;
-
     /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $engine;
-
-    /** @var SecurityProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $securityProvider;
+    private $engine;
 
     /** @var array */
-    protected $config;
+    private $config;
+
+    /** @var Indexer */
+    private $indexService;
 
     protected function setUp(): void
     {
@@ -52,35 +46,26 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $cache->expects($this->any())
             ->method('fetch')
             ->willReturn(false);
-        /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher */
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()->getMock();
-        $mapperProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache, 'test', 'test');
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
+        $mappingProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache, 'test', 'test');
 
-        $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
-            ->disableOriginalConstructor()->getMock();
-        $this->securityProvider->expects($this->any())
+        $securityProvider = $this->createMock(SecurityProvider::class);
+        $securityProvider->expects($this->any())
             ->method('isGranted')
-            ->will($this->returnValue(true));
-        $this->securityProvider->expects($this->any())
+            ->willReturn(true);
+        $securityProvider->expects($this->any())
             ->method('isProtectedEntity')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject $searchAclHelper */
-        $searchAclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Search\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $searchAclHelper = $this->createMock(AclHelper::class);
         $searchAclHelper->expects($this->any())
             ->method('apply')
-            ->willReturnCallback(
-                function ($query) {
-                    return $query;
-                }
-            );
+            ->willReturnCallback(function ($query) {
+                return $query;
+            });
 
-        $this->mapper = new ObjectMapper(
-            $mapperProvider,
+        $mapper = new ObjectMapper(
+            $mappingProvider,
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->createMock(EventDispatcherInterface::class),
@@ -89,8 +74,8 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->indexService = new Indexer(
             $this->engine,
-            $this->mapper,
-            $this->securityProvider,
+            $mapper,
+            $securityProvider,
             $searchAclHelper
         );
     }
@@ -111,23 +96,16 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->engine->expects($this->once())
             ->method('search')
-            ->will(
-                $this->returnCallback(
-                    function (Query $query) use ($searchResults) {
-                        return new Result($query, $searchResults, count($searchResults));
-                    }
-                )
-            );
+            ->willReturnCallback(function (Query $query) use ($searchResults) {
+                return new Result($query, $searchResults, count($searchResults));
+            });
 
         $result = $this->indexService->query($select);
         $this->assertEquals($searchResults, $result->getElements());
         $this->assertEquals(count($searchResults), $result->getRecordsCount());
     }
 
-    /**
-     * @return array
-     */
-    public function simpleSearchDataProvider()
+    public function simpleSearchDataProvider(): array
     {
         return [
             'no extra parameters' => [
@@ -192,27 +170,23 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expectedQuery
-     * @param string $string
-     * @param int $offset
-     * @param int $maxResults
-     * @param null $from
-     * @param int $page
      * @dataProvider simpleSearchDataProvider
      */
-    public function testSimpleSearch($expectedQuery, $string, $offset = 0, $maxResults = 0, $from = null, $page = 0)
-    {
+    public function testSimpleSearch(
+        string $expectedQuery,
+        string $string,
+        ?int $offset = 0,
+        ?int $maxResults = 0,
+        string $from = null,
+        int $page = 0
+    ) {
         $searchResults = ['one', 'two', 'three'];
 
         $this->engine->expects($this->any())
             ->method('search')
-            ->will(
-                $this->returnCallback(
-                    function (Query $query) use ($searchResults) {
-                        return new Result($query, $searchResults, count($searchResults));
-                    }
-                )
-            );
+            ->willReturnCallback(function (Query $query) use ($searchResults) {
+                return new Result($query, $searchResults, count($searchResults));
+            });
 
         $result = $this->indexService->simpleSearch($string, $offset, $maxResults, $from, $page);
         $actualQuery = $result->getQuery()->getStringQuery();
@@ -234,13 +208,9 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->engine->expects($this->any())
             ->method('search')
-            ->will(
-                $this->returnCallback(
-                    function (Query $query) use ($searchResults) {
-                        return new Result($query, $searchResults, count($searchResults));
-                    }
-                )
-            );
+            ->willReturnCallback(function (Query $query) use ($searchResults) {
+                return new Result($query, $searchResults, count($searchResults));
+            });
 
         $sourceQuery = 'from test_product' .
             ' where (name ~ "test string" and integer count > 10 and (decimal price = 10 or integer qty in (2, 5)))' .

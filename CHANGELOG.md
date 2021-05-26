@@ -2,6 +2,15 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 5.0.0
+
+### Removed
+
+#### EntityMergeBundle
+* The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.
+* The service `oro_entity_merge.strategy.delegate` was removed. Use `oro_entity_merge.strategy` instead.
+
+
 ## 5.0.0-alpha.2
 
 ### Changed

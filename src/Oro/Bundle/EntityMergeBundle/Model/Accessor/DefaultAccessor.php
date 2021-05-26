@@ -6,15 +6,15 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * The default implementation of a service to access entity data.
+ */
 class DefaultAccessor implements AccessorInterface
 {
-    /**
-     * @var PropertyAccessor
-     */
-    protected $propertyAccessor;
+    private ?PropertyAccessor $propertyAccessor = null;
 
     /**
-     * @return PropertyAccessor
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -22,11 +22,7 @@ class DefaultAccessor implements AccessorInterface
     }
 
     /**
-     * Checks if this class supports accessing entity
-     *
-     * @param string        $entity
-     * @param FieldMetadata $metadata
-     * @return string
+     * {@inheritdoc}
      */
     public function supports($entity, FieldMetadata $metadata)
     {
@@ -40,11 +36,11 @@ class DefaultAccessor implements AccessorInterface
     {
         if ($metadata->has('getter')) {
             $getter = $metadata->get('getter');
+
             return $entity->$getter();
         }
 
-        return $this
-            ->getPropertyAccessor()
+        return $this->getPropertyAccessor()
             ->getValue($entity, $this->getPropertyPath($metadata));
     }
 
@@ -60,33 +56,23 @@ class DefaultAccessor implements AccessorInterface
             return;
         }
 
-        $this
-            ->getPropertyAccessor()
-            ->setValue(
-                $entity,
-                $this->getPropertyPath($metadata),
-                $value
-            );
+        $this->getPropertyAccessor()
+            ->setValue($entity, $this->getPropertyPath($metadata), $value);
     }
 
-    /**
-     * @param FieldMetadata $metadata
-     * @return string
-     */
-    protected function getPropertyPath(FieldMetadata $metadata)
+    protected function getPropertyPath(FieldMetadata $metadata): string
     {
-        return $metadata->has('property_path') ?
-            $metadata->get('property_path') : $metadata->getFieldName();
+        return $metadata->has('property_path')
+            ? $metadata->get('property_path')
+            : $metadata->getFieldName();
     }
 
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
+    protected function getPropertyAccessor(): PropertyAccessor
     {
         if (!$this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
+
         return $this->propertyAccessor;
     }
 }

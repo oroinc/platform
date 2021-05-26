@@ -2,15 +2,29 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface;
+use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Mime\MimeTypesInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -52,75 +66,57 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $emailOriginHelper;
 
+    /** @var MimeTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $mimeTypes;
+
     protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\DirectMailer')
-             ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailerTransport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->mailer->expects($this->any())
+        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->mailer = $this->createMock(DirectMailer::class);
+        $this->mailerTransport = $this->createMock(\Swift_Transport_EsmtpTransport::class);
+        $this->mailer->expects(self::any())
             ->method('getTransport')
-            ->will($this->returnValue($this->mailerTransport));
-        $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailActivityManager =
-            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager')
-                ->disableOriginalConstructor()
-                ->getMock();
+            ->willReturn($this->mailerTransport);
+        $this->emailEntityBuilder = $this->createMock(EmailEntityBuilder::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->emailActivityManager = $this->createMock(EmailActivityManager::class);
 
-        $this->emailOriginHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper')
-            ->setMethods(['setEmailModel', 'findEmailOrigin'])
+        $this->emailOriginHelper = $this->getMockBuilder(EmailOriginHelper::class)
+            ->onlyMethods(['setEmailModel', 'findEmailOrigin'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->userEmailOrigin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
-                ->disableOriginalConstructor()
-                ->getMock();
-
-        $this->userEmailOrigin->expects($this->any())
+        $this->userEmailOrigin = $this->createMock(UserEmailOrigin::class);
+        $this->userEmailOrigin->expects(self::any())
             ->method('getSmtpHost')
-            ->will($this->returnValue('abc'));
-
-        $this->userEmailOrigin->expects($this->any())
+            ->willReturn('abc');
+        $this->userEmailOrigin->expects(self::any())
             ->method('getSmtpPort')
-            ->will($this->returnValue(25));
+            ->willReturn(25);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManager')
             ->with('OroEmailBundle:Email')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
-        $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->userEmailOrigin->expects($this->any())
+        $folder = $this->createMock(EmailFolder::class);
+        $this->userEmailOrigin->expects(self::any())
             ->method('getFolder')
             ->with(FolderType::SENT)
-            ->will($this->returnValue($folder));
+            ->willReturn($folder);
 
-        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailOriginRepo->expects($this->any())
+        $emailOriginRepo = $this->createMock(EntityRepository::class);
+        $emailOriginRepo->expects(self::any())
             ->method('findOneBy')
             ->with(['internalName' => InternalEmailOrigin::BAP])
-            ->will($this->returnValue($this->userEmailOrigin));
-        $this->em->expects($this->any())
+            ->willReturn($this->userEmailOrigin);
+        $this->em->expects(self::any())
             ->method('getRepository')
             ->with('OroEmailBundle:InternalEmailOrigin')
-            ->will($this->returnValue($emailOriginRepo));
+            ->willReturn($emailOriginRepo);
+
+        $this->mimeTypes = $this->createMock(MimeTypesInterface::class);
 
         $this->emailProcessor = new Processor(
             $this->doctrineHelper,
@@ -130,18 +126,19 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
             $this->emailActivityManager,
             $this->dispatcher,
             new DefaultCrypter(),
-            $this->emailOriginHelper
+            $this->emailOriginHelper,
+            $this->mimeTypes
         );
     }
 
-    public function testProcessEmptyFromException()
+    public function testProcessEmptyFromException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Sender can not be empty');
 
-        $this->mailer->expects($this->never())
+        $this->mailer->expects(self::never())
             ->method('createMessage');
-        $this->mailer->expects($this->never())
+        $this->mailer->expects(self::never())
             ->method('send');
 
         $this->emailProcessor->process($this->createEmailModel([]));
@@ -150,11 +147,11 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidModelDataProvider
      */
-    public function testProcessEmptyToException($data, $exception, $exceptionMessage)
+    public function testProcessEmptyToException($data, $exception, $exceptionMessage): void
     {
-        $this->mailer->expects($this->never())
+        $this->mailer->expects(self::never())
             ->method('createMessage');
-        $this->mailer->expects($this->never())
+        $this->mailer->expects(self::never())
             ->method('send');
 
         $this->expectException($exception);
@@ -162,7 +159,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         $this->emailProcessor->process($this->createEmailModel($data));
     }
 
-    public function invalidModelDataProvider()
+    public function invalidModelDataProvider(): array
     {
         return [
             [[], '\InvalidArgumentException', 'Sender can not be empty'],
@@ -170,35 +167,35 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessSend()
+    public function testProcessSend(): void
     {
         $message = new \Swift_Message();
-        $this->mailer->expects($this->once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($message)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $emailOrigin = $this->userEmailOrigin;
 
         $oldMessageId = $message->getId();
         $this->emailProcessor->processSend($message, $emailOrigin);
         $messageId = $message->getId();
 
-        $this->assertEquals($oldMessageId, $messageId);
+        self::assertEquals($oldMessageId, $messageId);
     }
 
-    public function testProcessSendFailException()
+    public function testProcessSendFailException(): void
     {
         $this->expectException(\Swift_SwiftException::class);
         $this->expectExceptionMessage('The email was not delivered.');
 
         $message = $this->getMockForAbstractClass('\Swift_Message');
-        $this->mailer->expects($this->once())
+        $this->mailer->expects(self::once())
             ->method('createMessage')
-            ->will($this->returnValue($message));
-        $this->mailer->expects($this->once())
+            ->willReturn($message);
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($message)
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $model = $this->createEmailModel(
             [
@@ -211,7 +208,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         $this->emailProcessor->process($model);
     }
 
-    public function testProcessAddressException()
+    public function testProcessAddressException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -219,10 +216,10 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = $this->getMockForAbstractClass('\Swift_Message');
-        $this->mailer->expects($this->once())
+        $this->mailer->expects(self::once())
             ->method('createMessage')
-            ->will($this->returnValue($message));
-        $this->mailer->expects($this->never())
+            ->willReturn($message);
+        $this->mailer->expects(self::never())
             ->method('send');
 
         $model = $this->createEmailModel(
@@ -242,29 +239,27 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcess($data, $expectedMessageData, $needConverting = false)
+    public function testProcess(array $data, array $expectedMessageData, bool $needConverting = false): void
     {
         $message = new \Swift_Message();
-        $this->mailer->expects($this->once())
+        $this->mailer->expects(self::once())
             ->method('createMessage')
-            ->will($this->returnValue($message));
-        $this->mailer->expects($this->once())
+            ->willReturn($message);
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($message)
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $oldMessageId = $message->getId();
 
-        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['addFolder', 'getEmail'])
+        $emailUser = $this->getMockBuilder(EmailUser::class)
+            ->onlyMethods(['addFolder', 'getEmail'])
             ->getMock();
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailUser->expects($this->any())
+        $email = $this->createMock(Email::class);
+        $emailUser->expects(self::any())
             ->method('getEmail')
             ->willReturn($email);
-        $this->emailEntityBuilder->expects($this->once())
+        $this->emailEntityBuilder->expects(self::once())
             ->method('emailUser')
             ->with(
                 $data['subject'],
@@ -273,65 +268,70 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
                 $this->isInstanceOf('DateTime'),
                 $this->isInstanceOf('DateTime'),
                 $this->isInstanceOf('DateTime'),
-                \Oro\Bundle\EmailBundle\Entity\Email::NORMAL_IMPORTANCE,
+                Email::NORMAL_IMPORTANCE,
                 $data['cc'],
                 $data['bcc']
             )
             ->willReturn($emailUser);
 
-        $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailEntityBuilder->expects($this->once())
+        $body = $this->createMock(EmailBody::class);
+        $this->emailEntityBuilder->expects(self::once())
             ->method('body')
-            ->will($this->returnValue($body));
+            ->willReturn($body);
 
-        $batch = $this->createMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
-        $this->emailEntityBuilder->expects($this->once())
+        $batch = $this->createMock(EmailEntityBatchInterface::class);
+        $this->emailEntityBuilder->expects(self::once())
             ->method('getBatch')
-            ->will($this->returnValue($batch));
-        $batch->expects($this->once())
+            ->willReturn($batch);
+        $batch->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($this->em));
-        $this->em->expects($this->once())->method('flush');
+        $this->em->expects(self::once())->method('flush');
 
-        $email->expects($this->any())
+        $email->expects(self::any())
             ->method('getEmailBody')
             ->willReturn($body);
 
-        if (!empty($data['entityClass']) && !empty($data['entityClass'])) {
+        if (!empty($data['entityClass'])) {
             $targetEntity = new TestUser();
-            $this->doctrineHelper->expects($this->exactly(0))
+            $this->doctrineHelper->expects(self::exactly(0))
                 ->method('getEntity')
                 ->with($data['entityClass'], $data['entityId'])
-                ->will($this->returnValue($targetEntity));
-            $this->emailActivityManager->expects($this->exactly(0))
+                ->willReturn($targetEntity);
+            $this->emailActivityManager->expects(self::exactly(0))
                 ->method('addAssociation')
                 ->with($this->identicalTo($email), $this->identicalTo($targetEntity));
         }
 
         $model = $this->createEmailModel($data);
 
-        $this->assertSame($emailUser, $this->emailProcessor->process($model));
-        $this->assertEquals($expectedMessageData['from'], [$model->getFrom()]);
-        $this->assertEquals($data['cc'], $model->getCc());
-        $this->assertEquals($data['bcc'], $model->getBcc());
-        $this->assertEquals($expectedMessageData['subject'], $model->getSubject());
-        $this->assertEquals($oldMessageId, $message->getId());
+        if ($needConverting) {
+            $this->mimeTypes->expects(self::once())
+                ->method('getExtensions')
+                ->with('image/png')
+                ->willReturn(['png']);
+        }
+
+        self::assertSame($emailUser, $this->emailProcessor->process($model));
+        self::assertEquals($expectedMessageData['from'], [$model->getFrom()]);
+        self::assertEquals($data['cc'], $model->getCc());
+        self::assertEquals($data['bcc'], $model->getBcc());
+        self::assertEquals($expectedMessageData['subject'], $model->getSubject());
+        self::assertEquals($oldMessageId, $message->getId());
 
         if ($needConverting) {
             $id = $model->getAttachments()->first()->getEmailAttachment()->getEmbeddedContentId();
-            $this->assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
+            self::assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
         } else {
-            $this->assertEquals($expectedMessageData['body'], $model->getBody());
-            $this->assertEquals($expectedMessageData['body'], $message->getBody());
-        };
+            self::assertEquals($expectedMessageData['body'], $model->getBody());
+            self::assertEquals($expectedMessageData['body'], $message->getBody());
+        }
     }
 
     /**
     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
     */
-    public function messageDataProvider()
+    public function messageDataProvider(): array
     {
         return [
             [
@@ -439,7 +439,7 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getTestUser()
+    protected function getTestUser(): User
     {
         $user = new User();
         $user->setId(1);
@@ -449,9 +449,9 @@ class ProcessorTest extends \PHPUnit\Framework\TestCase
         return $user;
     }
 
-    protected function createEmailModel($data)
+    protected function createEmailModel($data): EmailModel
     {
-        $email = new Email();
+        $email = new EmailModel();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($data as $key => $value) {
             $propertyAccessor->setValue($email, $key, $value);

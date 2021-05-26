@@ -9,14 +9,14 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Message;
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuditChangedEntitiesExtensionTrait
 {
     /**
      * @return TestAuditDataOwner
      */
-    protected function createOwner()
+    protected function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
 
@@ -29,7 +29,7 @@ trait AuditChangedEntitiesExtensionTrait
     /**
      * @return TestAuditDataChild
      */
-    protected function createChild()
+    protected function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
 
@@ -39,15 +39,15 @@ trait AuditChangedEntitiesExtensionTrait
         return $child;
     }
     
-    private function assertStoredAuditCount($expected)
+    private function assertStoredAuditCount($expected): void
     {
-        $this->assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
+        self::assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
     }
 
     /**
      * @return Audit
      */
-    private function findLastStoredAudit()
+    private function findLastStoredAudit(): Audit
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('log')
@@ -77,7 +77,7 @@ trait AuditChangedEntitiesExtensionTrait
      * @param array $body
      * @return Message
      */
-    private function createDummyMessage(array $body)
+    private function createDummyMessage(array $body): Message
     {
         $body = array_replace([
             'timestamp' => time(),
@@ -123,7 +123,7 @@ trait AuditChangedEntitiesExtensionTrait
     }
 
     /**
-     * @return Client
+     * @return KernelBrowser
      */
     abstract protected static function getClientInstance();
 }

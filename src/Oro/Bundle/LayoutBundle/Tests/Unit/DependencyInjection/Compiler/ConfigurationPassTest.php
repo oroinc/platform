@@ -9,18 +9,14 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationPass */
-    private $compiler;
+    private ConfigurationPass $compiler;
 
     protected function setUp(): void
     {
         $this->compiler = new ConfigurationPass();
     }
 
-    /**
-     * @return ContainerBuilder
-     */
-    private function getContainer()
+    private function getContainer(): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->register('oro_layout.theme_extension.configuration');

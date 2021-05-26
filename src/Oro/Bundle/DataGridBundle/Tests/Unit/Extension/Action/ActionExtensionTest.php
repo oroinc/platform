@@ -622,9 +622,7 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
                 ['acl_resource1'],
                 ['acl_resource3']
             )
-            ->willReturnCallback(function ($resource, DomainObjectReference $object = null) {
-                return false;
-            });
+            ->willReturn(false);
 
         $this->setOwnershipFields(
             ['t' => ['Test\Entity', 'id', 't_organization_id', 't_owner_id']]

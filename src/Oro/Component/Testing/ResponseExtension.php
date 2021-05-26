@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Testing;
 
-use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,15 +15,15 @@ trait ResponseExtension
      * @param Response $response
      * @param int $expectedStatus
      */
-    public function assertResponseStatus($response, $expectedStatus)
+    public function assertResponseStatus(Response $response, int $expectedStatus): void
     {
         $this->assertInstanceOfResponse($response);
-        $this->assertEquals($expectedStatus, $response->getStatusCode(), $this->getAssertMessage($response));
+        self::assertEquals($expectedStatus, $response->getStatusCode(), $this->getAssertMessage($response));
     }
     /**
      * @param int $expectedStatus
      */
-    public function assertLastResponseStatus($expectedStatus)
+    public function assertLastResponseStatus(int $expectedStatus): void
     {
         $this->assertResponseStatus($this->getClientInstance()->getResponse(), $expectedStatus);
     }
@@ -31,11 +31,11 @@ trait ResponseExtension
     /**
      * @param Response $response
      */
-    public function assertResponseContentTypeHtml($response)
+    public function assertResponseContentTypeHtml(Response $response): void
     {
         $this->assertInstanceOfResponse($response);
 
-        $this->assertTrue($response->headers->has('Content-Type'));
+        self::assertTrue($response->headers->has('Content-Type'));
         static::assertStringContainsString(
             'text/html',
             $response->headers->get('Content-Type'),
@@ -43,7 +43,7 @@ trait ResponseExtension
         );
     }
 
-    public function assertLastResponseContentTypeHtml()
+    public function assertLastResponseContentTypeHtml(): void
     {
         $this->assertResponseContentTypeHtml($this->getClientInstance()->getResponse());
     }
@@ -51,32 +51,32 @@ trait ResponseExtension
     /**
      * @param Response $response
      */
-    public function assertResponseContentTypeJson($response)
+    public function assertResponseContentTypeJson(Response $response): void
     {
         $this->assertInstanceOfResponse($response);
 
-        $this->assertTrue($response->headers->has('Content-Type'));
-        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+        self::assertTrue($response->headers->has('Content-Type'));
+        self::assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
-    public function assertLastResponseContentTypeJson()
+    public function assertLastResponseContentTypeJson(): void
     {
         $this->assertResponseContentTypeJson($this->getClientInstance()->getResponse());
     }
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param Response $response
      *
      * @return array
      */
-    public function getResponseJsonContent($response)
+    public function getResponseJsonContent(Response $response)
     {
         $this->assertInstanceOfResponse($response);
 
-        $content = json_decode($response->getContent(), $assoc = true);
+        $content = json_decode($response->getContent(), true);
 
         //guard
-        $this->assertNotNull(
+        self::assertNotNull(
             $content,
             sprintf("The response content is not valid json.\n\n%s", $response->getContent())
         );
@@ -94,9 +94,9 @@ trait ResponseExtension
     /**
      * @param mixed $actual
      */
-    public function assertInstanceOfResponse($actual)
+    public function assertInstanceOfResponse($actual): void
     {
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $actual);
+        self::assertInstanceOf(Response::class, $actual);
     }
 
     /**
@@ -104,9 +104,10 @@ trait ResponseExtension
      *
      * @return string
      */
-    private function getAssertMessage(Response $response)
+    private function getAssertMessage(Response $response): string
     {
-        if (500 >= $response->getStatusCode() && $response->getStatusCode() < 600) {
+        $responseStatusCode = $response->getStatusCode();
+        if (500 >= $responseStatusCode && $responseStatusCode < 600) {
             $crawler = new Crawler();
             $crawler->addHtmlContent($response->getContent());
             if ($crawler->filter('.text-exception h1')->count() > 0) {
@@ -115,14 +116,14 @@ trait ResponseExtension
                 if ($crawler->filter('#traces-0 li')->count() > 0) {
                     list($trace) = explode("\n", trim($crawler->filter('#traces-0 li')->text()));
                 }
-                return $message = 'Internal Server Error: '.$exceptionMessage.' '.$trace;
+                return 'Internal Server Error: '.$exceptionMessage.' '.$trace;
             }
         }
         return $response->getContent();
     }
 
     /**
-     * @return Client
+     * @return KernelBrowser
      */
     abstract protected static function getClientInstance();
 }

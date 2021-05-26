@@ -11,21 +11,21 @@ class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenNoProviders()
     {
         $container = new ContainerBuilder();
-        $container->register('oro_email.email.owner.provider.storage');
+        $storageDef = $container->register('oro_email.email.owner.provider.storage');
 
         $compiler = new EmailOwnerConfigurationPass();
         $compiler->process($container);
 
         self::assertSame(
             [],
-            $container->getDefinition('oro_email.email.owner.provider.storage')->getMethodCalls()
+            $storageDef->getMethodCalls()
         );
     }
 
     public function testProcess()
     {
         $container = new ContainerBuilder();
-        $container->register('oro_email.email.owner.provider.storage');
+        $storageDef = $container->register('oro_email.email.owner.provider.storage');
 
         $container->register('provider1')->addTag('oro_email.owner.provider', ['order' => 3]);
         $container->register('provider2')->addTag('oro_email.owner.provider', ['order' => 1]);
@@ -44,7 +44,7 @@ class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
                 ['addProvider', [new Reference('provider5')]],
                 ['addProvider', [new Reference('provider3')]]
             ],
-            $container->getDefinition('oro_email.email.owner.provider.storage')->getMethodCalls()
+            $storageDef->getMethodCalls()
         );
     }
 }

@@ -9,96 +9,93 @@ use Symfony\Bundle\FrameworkBundle\CacheWarmer\TranslationsCacheWarmer as InnerC
 
 class TranslationCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var InnerCacheWarmer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $innerWarmer;
+    /** @var InnerCacheWarmer|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerWarmer;
 
-    /**
-     * @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $strategyProvider;
+    /** @var TranslationStrategyProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $strategyProvider;
 
-    /**
-     * @var TranslationCacheWarmer
-     */
-    protected $warmer;
+    /** @var TranslationCacheWarmer */
+    private $warmer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->innerWarmer = $this->getMockBuilder(InnerCacheWarmer::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->strategyProvider = $this->getMockBuilder(TranslationStrategyProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->innerWarmer = $this->createMock(InnerCacheWarmer::class);
+        $this->strategyProvider = $this->createMock(TranslationStrategyProvider::class);
 
         $this->warmer = new TranslationCacheWarmer($this->innerWarmer, $this->strategyProvider);
     }
 
     public function testWarmUp()
     {
-        $directory = '/cache_dir';
-        $defaultStrategyName = 'default';
-        $mixingStrategyName = 'mix';
+        $cacheDir = '/cache_dir';
 
-        $defaultStrategy = $this->getStrategy($defaultStrategyName);
-        $mixingStrategy = $this->getStrategy($mixingStrategyName);
+        $defaultStrategy = $this->createMock(TranslationStrategyInterface::class);
+        $mixingStrategy = $this->createMock(TranslationStrategyInterface::class);
 
-        $this->strategyProvider->expects($this->at(0))->method('getStrategy')
+        $calls = [];
+
+        $this->strategyProvider->expects(self::once())
+            ->method('getStrategy')
             ->willReturn($defaultStrategy);
-
-        $this->strategyProvider->expects($this->at(1))->method('getStrategies')
+        $this->strategyProvider->expects(self::once())
+            ->method('getStrategies')
             ->willReturn(['default' => $defaultStrategy, 'mix' => $mixingStrategy]);
+        $this->strategyProvider->expects(self::exactly(3))
+            ->method('setStrategy')
+            ->withConsecutive(
+                [self::identicalTo($defaultStrategy)],
+                [self::identicalTo($mixingStrategy)],
+                [self::identicalTo($defaultStrategy)]
+            )
+            ->willReturnCallback(function ($strategy) use (&$calls, $defaultStrategy, $mixingStrategy) {
+                $strategyType = 'UNKNOWN';
+                if ($strategy === $defaultStrategy) {
+                    $strategyType = 'default';
+                } elseif ($strategy === $mixingStrategy) {
+                    $strategyType = 'mixing';
+                }
+                $calls[] = 'setStrategy - ' . $strategyType;
+            });
 
-        $this->strategyProvider->expects($this->at(2))->method('setStrategy')->with($defaultStrategy);
-        $this->strategyProvider->expects($this->at(3))->method('setStrategy')->with($mixingStrategy);
+        $this->innerWarmer->expects(self::exactly(2))
+            ->method('warmUp')
+            ->with($cacheDir)
+            ->willReturnCallback(function () use (&$calls) {
+                $calls[] = 'warmUp';
+            });
 
-        $this->innerWarmer->expects($this->exactly(2))->method('warmUp')->with($directory);
+        $this->warmer->warmUp($cacheDir);
 
-        $this->strategyProvider->expects($this->at(4))->method('setStrategy')->with($defaultStrategy);
-
-        $this->warmer->warmUp($directory);
+        self::assertEquals(
+            [
+                'setStrategy - default',
+                'warmUp',
+                'setStrategy - mixing',
+                'warmUp',
+                'setStrategy - default'
+            ],
+            $calls
+        );
     }
 
     /**
-     * @param bool $isOptional
      * @dataProvider optionalDataProvider
      */
-    public function testIsOptional($isOptional)
+    public function testIsOptional(bool $isOptional)
     {
-        $this->innerWarmer->expects($this->once())
+        $this->innerWarmer->expects(self::once())
             ->method('isOptional')
             ->willReturn($isOptional);
 
-        $this->assertEquals($isOptional, $this->warmer->isOptional());
+        self::assertSame($isOptional, $this->warmer->isOptional());
     }
 
-    /**
-     * @return array
-     */
-    public function optionalDataProvider()
+    public function optionalDataProvider(): array
     {
         return [
             'optional' => [true],
             'not optional' => [false],
         ];
-    }
-
-    /**
-     * @param string $name
-     * @return TranslationStrategyInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getStrategy($name)
-    {
-        $strategy = $this->createMock(TranslationStrategyInterface::class);
-        $strategy->expects($this->any())->method('isApplicable')->willReturn(true);
-        $strategy->expects($this->any())->method('getName')->willReturn($name);
-
-        return $strategy;
     }
 }

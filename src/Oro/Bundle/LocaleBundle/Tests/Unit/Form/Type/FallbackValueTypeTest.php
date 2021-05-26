@@ -27,15 +27,9 @@ use Symfony\Component\Validator\Validation;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @return array
-     */
     protected function getExtensions()
     {
-        /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider */
         $configProvider = $this->createMock(ConfigProvider::class);
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
         $translator = $this->createMock(Translator::class);
 
         return [
@@ -92,10 +86,7 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'percent with value' => [
@@ -165,33 +156,31 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $options = ['key' => 'value'];
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->at(0))
+        $builder->expects($this->exactly(3))
             ->method('add')
-            ->with('value', $type, array_merge($options, ['required' => false]))
-            ->willReturnSelf();
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'use_fallback',
-                CheckboxType::class,
-                ['label' => 'oro.locale.fallback.use_fallback.label']
-            )->willReturnSelf();
-        $builder->expects($this->at(2))
-            ->method('add')
-            ->with(
-                'fallback',
-                $fallbackType,
+            ->withConsecutive(
+                ['value', $type, array_merge($options, ['required' => false])],
                 [
-                    'enabled_fallbacks' => [],
-                    'localization' => $fallbackTypeLocalization,
-                    'parent_localization' => $fallbackTypeParentLocalization,
-                    'required' => false,
-                    'label' => 'oro.locale.fallback.form.label',
-                    'tooltip' => 'oro.locale.fallback.form.tooltip',
-                    'use_tabs' => true,
+                    'use_fallback',
+                    CheckboxType::class,
+                    ['label' => 'oro.locale.fallback.use_fallback.label']
+                ],
+                [
+                    'fallback',
+                    $fallbackType,
+                    [
+                        'enabled_fallbacks' => [],
+                        'localization' => $fallbackTypeLocalization,
+                        'parent_localization' => $fallbackTypeParentLocalization,
+                        'required' => false,
+                        'label' => 'oro.locale.fallback.form.label',
+                        'tooltip' => 'oro.locale.fallback.form.tooltip',
+                        'use_tabs' => true
+                    ]
                 ]
-            )->willReturnSelf();
-        $builder->expects($this->at(3))
+            )
+            ->willReturnSelf();
+        $builder->expects($this->once())
             ->method('addViewTransformer')
             ->with(new FallbackValueTransformer())
             ->willReturnSelf();
@@ -217,16 +206,13 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
         $groupFallbackFields = 'test value';
         $excludeParentLocalization = true;
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
-        $formMock = $this->createMock('Symfony\Component\Form\FormInterface');
-
         $formView = new FormView();
         $formView->vars['block_prefixes'] = ['form', '_custom_block_prefix'];
 
         $formType = new FallbackValueType();
         $formType->finishView(
             $formView,
-            $formMock,
+            $this->createMock(FormInterface::class),
             [
                 'group_fallback_fields' => $groupFallbackFields,
                 'exclude_parent_localization' => $excludeParentLocalization,

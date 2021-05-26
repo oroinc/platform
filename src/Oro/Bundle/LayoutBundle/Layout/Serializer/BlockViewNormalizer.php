@@ -10,6 +10,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * Normalizer for layout block view
+ */
 class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     /**
@@ -37,7 +40,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof BlockView;
     }
@@ -54,8 +57,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         if (!empty($view->vars)) {
             $data['vars'] = $view->vars;
-
-            unset($data['vars']['block'], $data['vars']['blocks']);
+            $this->unsetDefaults($data);
 
             array_walk_recursive(
                 $data['vars'],
@@ -77,7 +79,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
 
         foreach ($view->children as $childId => $childView) {
-            $data['children'][$childId] = $this->normalize($childView, $format, $context);
+            $data['children'][] = $this->normalize($childView, $format, $context);
         }
 
         return $data;
@@ -86,7 +88,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null): bool
     {
         return $type === BlockView::class;
     }
@@ -111,13 +113,15 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
             $view->vars = $data['vars'];
             $this->denormalizeVarRecursive($view->vars, $format, $context);
         }
+        $this->populateDefaults($view);
 
         if (array_key_exists('children', $data)) {
-            foreach ($data['children'] as $childId => $childData) {
+            foreach ($data['children'] as $childData) {
                 $childView = $this->denormalize($childData, $class, $format, $context);
+                $childId = $childView->getId();
                 $childView->parent = $view;
 
-                $this->currentDenormalizedViews[$childView->getId()] = $childView;
+                $this->currentDenormalizedViews[$childId] = $childView;
 
                 $view->children[$childId] = $childView;
             }
@@ -130,11 +134,41 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $view;
     }
 
-    /**
-     * @param BlockView $view
-     * @param BlockViewCollection $blocks
-     */
-    private function setBlocksRecursive($view, BlockViewCollection $blocks)
+    protected function unsetDefaults(array &$data): void
+    {
+        unset($data['vars']['block'], $data['vars']['blocks']);
+        if (array_key_exists('visible', $data['vars']) && $data['vars']['visible'] === true) {
+            unset($data['vars']['visible']);
+        }
+        if (array_key_exists('hidden', $data['vars']) && $data['vars']['hidden'] === false) {
+            unset($data['vars']['hidden']);
+        }
+        if (array_key_exists('attr', $data['vars']) && empty($data['vars']['attr'])) {
+            unset($data['vars']['attr']);
+        }
+        if (array_key_exists('translation_domain', $data['vars']) &&
+            $data['vars']['translation_domain'] === 'messages') {
+            unset($data['vars']['translation_domain']);
+        }
+    }
+
+    protected function populateDefaults(BlockView $view): void
+    {
+        if (!array_key_exists('visible', $view->vars)) {
+            $view->vars['visible'] = true;
+        }
+        if (!array_key_exists('hidden', $view->vars)) {
+            $view->vars['hidden'] = false;
+        }
+        if (!array_key_exists('attr', $view->vars)) {
+            $view->vars['attr'] = [];
+        }
+        if (!array_key_exists('translation_domain', $view->vars)) {
+            $view->vars['translation_domain'] = 'messages';
+        }
+    }
+
+    protected function setBlocksRecursive(BlockView $view, BlockViewCollection $blocks)
     {
         $view->blocks = $blocks;
         $view->vars['block'] = $view;
@@ -145,12 +179,7 @@ class BlockViewNormalizer implements NormalizerInterface, DenormalizerInterface,
         }
     }
 
-    /**
-     * @param array $var
-     * @param string $format
-     * @param array $context
-     */
-    protected function denormalizeVarRecursive(array &$var, $format, array $context)
+    protected function denormalizeVarRecursive(array &$var, ?string $format, array $context)
     {
         foreach ($var as $key => &$value) {
             if (is_array($value)) {

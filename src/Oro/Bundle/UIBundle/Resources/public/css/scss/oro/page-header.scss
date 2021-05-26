@@ -12,8 +12,9 @@
     .sub-title,
     .separator,
     &__entity-title {
-        display: inline;
-        vertical-align: middle;
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
     }
 
     .sub-title {
@@ -31,7 +32,12 @@
         font-size: $base-font-size--xl;
         font-weight: font-weight('light');
         margin-right: 2px;
+        margin-bottom: 0;
         line-height: $content-title-line-height;
+
+        .tooltip-icon {
+            margin-left: $content-padding-small;
+        }
     }
 
     &__entity-title-wrapper,

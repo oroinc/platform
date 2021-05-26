@@ -4,9 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 
 use Oro\Bundle\ApiBundle\Form\FormExtension;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\StubFormTypeExtensionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
@@ -28,7 +28,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
      *
      * @return FormExtension
      */
-    private function getExtension(array $types, array $typeExtensions, array $guessers)
+    private function getExtension(array $types, array $typeExtensions, array $guessers): FormExtension
     {
         return new FormExtension($this->container, $types, $typeExtensions, $guessers);
     }
@@ -36,19 +36,19 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @param string $extendedType
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject|FormTypeExtensionInterface
+     * @return \PHPUnit\Framework\MockObject\MockObject|StubFormTypeExtensionInterface
      */
-    private function getFormTypeExtension($extendedType)
+    private function getFormTypeExtension(string $extendedType)
     {
-        $extension = $this->createMock(FormTypeExtensionInterface::class);
+        $extension = $this->createMock(StubFormTypeExtensionInterface::class);
         $extension->expects(self::any())
-            ->method('getExtendedType')
-            ->willReturn($extendedType);
+            ->method('getExtendedTypes')
+            ->willReturn([$extendedType]);
 
         return $extension;
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $extension = $this->getExtension(
             ['test' => 'test_type_service', BooleanType::class => null],
@@ -79,7 +79,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(BooleanType::class, $extension->getType(BooleanType::class));
     }
 
-    public function testGetTypeShouldThrowExceptionForUnknownType()
+    public function testGetTypeShouldThrowExceptionForUnknownType(): void
     {
         $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not registered.');
@@ -89,7 +89,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getType(BooleanType::class);
     }
 
-    public function testGetTypeShouldThrowExceptionForUnknownTypeClass()
+    public function testGetTypeShouldThrowExceptionForUnknownTypeClass(): void
     {
         $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not load form type "Test\UnknownClass": class does not exist.');
@@ -99,7 +99,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getType('Test\UnknownClass');
     }
 
-    public function testGetTypeShouldThrowExceptionForInvalidTypeClass()
+    public function testGetTypeShouldThrowExceptionForInvalidTypeClass(): void
     {
         $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -111,7 +111,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->getType(\stdClass::class);
     }
 
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $extension = $this->getExtension(
             [],
@@ -144,7 +144,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$typeExtension1, $typeExtension2], $extension->getTypeExtensions('test'));
     }
 
-    public function testGetTypeExtensionsShouldThrowExceptionForInvalidExtendedType()
+    public function testGetTypeExtensionsShouldThrowExceptionForInvalidExtendedType(): void
     {
         $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -166,7 +166,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($formTypeExtension, $extensions[0]);
     }
 
-    public function testGetTypeGuesser()
+    public function testGetTypeGuesser(): void
     {
         $extension = $this->getExtension([], [], ['foo']);
 
@@ -178,7 +178,7 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }
 
-    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
+    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured(): void
     {
         $extension = $this->getExtension([], [], []);
 
