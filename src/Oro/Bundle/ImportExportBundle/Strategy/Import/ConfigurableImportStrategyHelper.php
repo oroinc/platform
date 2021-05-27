@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\PersistentCollection;
+use Oro\Bundle\EntityBundle\EntityProperty\DenormalizedPropertyAwareInterface;
 use Oro\Bundle\ImportExportBundle\Event\StrategyValidationEvent;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -137,6 +138,10 @@ class ConfigurableImportStrategyHelper extends ImportStrategyHelper
                     ]
                 );
             }
+        }
+
+        if ($databaseEntity instanceof DenormalizedPropertyAwareInterface) {
+            $databaseEntity->updateDenormalizedProperties();
         }
     }
 
