@@ -73,10 +73,9 @@ class CumulativeWriter implements ItemWriterInterface, ClosableInterface
         );
         if ($changes) {
             $this->logger->debug('Writing batch of changes to the database', $changes);
-
-            $entityManager->flush();
         }
 
+        $entityManager->flush();
         $entityManager->clear();
     }
 
