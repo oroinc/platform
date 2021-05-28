@@ -6,30 +6,21 @@ use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
  * Disable Draftable Filter for Draft actions based on kernel event
  */
 class DraftableFilterListener
 {
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     */
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();
         $entityId = $request->get('entityId');
@@ -48,11 +39,7 @@ class DraftableFilterListener
         $this->allowDraftAction($id, $className);
     }
 
-    /**
-     * @param FilterControllerEvent $event
-     * @return string|null
-     */
-    private function getClassName(FilterControllerEvent $event): ?string
+    private function getClassName(ControllerEvent $event): ?string
     {
         $r = $this->getReflectionFunctionByController($event->getController());
         $parameters = $r->getParameters();
@@ -69,10 +56,6 @@ class DraftableFilterListener
         return null;
     }
 
-    /**
-     * @param callable $controller
-     * @return \ReflectionFunctionAbstract
-     */
     private function getReflectionFunctionByController(callable $controller): \ReflectionFunctionAbstract
     {
         if (\is_array($controller)) {
@@ -86,10 +69,6 @@ class DraftableFilterListener
         return $r;
     }
 
-    /**
-     * @param string|null $id
-     * @param string|null $className
-     */
     private function allowDraftAction($id = null, string $className = null): void
     {
         if (!$id || !$className || !is_subclass_of($className, DraftableInterface::class)) {

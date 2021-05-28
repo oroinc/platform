@@ -3,118 +3,72 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
+use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_URL = 'http://test_url/';
-    const TEMPLATE = 'OroNavigationBundle:HashNav:redirect.html.twig';
+    private const TEST_URL = 'http://test_url/';
+    private const TEMPLATE = 'OroNavigationBundle:HashNav:redirect.html.twig';
 
-    /**
-     * @var \Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
-     */
-    protected $listener;
+    private ResponseHashnavListener $listener;
 
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
+    private Request $request;
 
-    /**
-     * @var \Symfony\Component\HttpFoundation\Response
-     */
-    protected $response;
+    private Response $response;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $templating;
+    private EngineInterface|\PHPUnit\Framework\MockObject\MockObject $templating;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    private ResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $tokenStorage;
+    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
     protected function setUp(): void
     {
         $this->response = new Response();
         $this->request  = Request::create(self::TEST_URL);
         $this->request->headers->add(array(ResponseHashnavListener::HASH_NAVIGATION_HEADER => true));
-        $this->event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\FilterResponseEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(ResponseEvent::class);
 
-        $this->event->expects($this->any())
+        $this->event->expects(self::any())
             ->method('getRequest')
-            ->will($this->returnValue($this->request));
+            ->willReturn($this->request);
 
-        $this->event->expects($this->any())
+        $this->event->expects(self::any())
             ->method('getResponse')
-            ->will($this->returnValue($this->response));
+            ->willReturn($this->response);
 
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->templating = $this->createMock('Symfony\Bundle\FrameworkBundle\Templating\EngineInterface');
-        $this->kernel = $this->createMock('Symfony\Component\HttpKernel\KernelInterface');
+        $this->templating = $this->createMock(EngineInterface::class);
         $this->listener = $this->getListener(false);
     }
 
-    public function testPlainRequest()
+    public function testPlainRequest(): void
     {
         $testBody = 'test';
         $this->response->setContent($testBody);
 
         $this->listener->onResponse($this->event);
 
-        $this->assertEquals($testBody, $this->response->getContent());
+        self::assertEquals($testBody, $this->response->getContent());
     }
 
-    public function testHashRequestWOUser()
+    public function testHashRequestWOUser(): void
     {
         $this->response->setStatusCode(302);
         $this->response->headers->add(array('location' => self::TEST_URL));
 
-        $this->tokenStorage->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->event->expects($this->once())
+        $this->event->expects(self::once())
             ->method('setResponse');
 
-        $this->templating->expects($this->once())
-            ->method('renderResponse')
-            ->with(
-                self::TEMPLATE,
-                array(
-                    'full_redirect' => true,
-                    'location'      => self::TEST_URL
-                )
-            )
-            ->will($this->returnValue(new Response()));
-
-        $this->listener->onResponse($this->event);
-    }
-
-    public function testHashRequestWithFullRedirectAttribute()
-    {
-        $this->response->setStatusCode(302);
-        $this->response->headers->add(['location' => self::TEST_URL]);
-
-        $this->request->attributes->set('_fullRedirect', true);
-
-        $this->tokenStorage->expects($this->never())
-            ->method('getToken');
-
-        $this->event->expects($this->once())
-            ->method('setResponse');
-
-        $this->templating->expects($this->once())
+        $this->templating->expects(self::once())
             ->method('renderResponse')
             ->with(
                 self::TEMPLATE,
@@ -123,68 +77,91 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
                     'location'      => self::TEST_URL
                 ]
             )
-            ->will($this->returnValue(new Response()));
+            ->willReturn(new Response());
 
         $this->listener->onResponse($this->event);
     }
 
-    public function testHashRequestNotFound()
+    public function testHashRequestWithFullRedirectAttribute(): void
+    {
+        $this->response->setStatusCode(302);
+        $this->response->headers->add(['location' => self::TEST_URL]);
+
+        $this->request->attributes->set('_fullRedirect', true);
+
+        $this->tokenStorage->expects(self::never())
+            ->method('getToken');
+
+        $this->event->expects(self::once())
+            ->method('setResponse');
+
+        $this->templating->expects(self::once())
+            ->method('renderResponse')
+            ->with(
+                self::TEMPLATE,
+                [
+                    'full_redirect' => true,
+                    'location'      => self::TEST_URL
+                ]
+            )
+            ->willReturn(new Response());
+
+        $this->listener->onResponse($this->event);
+    }
+
+    public function testHashRequestNotFound(): void
     {
         $this->response->setStatusCode(404);
         $this->serverErrorHandle();
     }
 
-    public function testFullRedirectProducedInProdEnv()
+    public function testFullRedirectProducedInProdEnv(): void
     {
         $expected = array('full_redirect' => 1, 'location' => self::TEST_URL);
         $this->response->headers->add(array('location' => self::TEST_URL));
         $response = new Response();
         $this->response->setStatusCode(503);
         $this->templating
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('renderResponse')
             ->with('OroNavigationBundle:HashNav:redirect.html.twig', $expected)
-            ->will($this->returnValue($response));
+            ->willReturn($response);
 
-        $this->event->expects($this->once())->method('setResponse')->with($response);
+        $this->event->expects(self::once())->method('setResponse')->with($response);
         $this->listener->onResponse($this->event);
     }
 
-    public function testFullRedirectNotProducedInDevEnv()
+    public function testFullRedirectNotProducedInDevEnv(): void
     {
         $listener = $this->getListener(true);
         $this->response->headers->add(array('location' => self::TEST_URL));
         $this->response->setStatusCode(503);
-        $this->templating->expects($this->never())->method('renderResponse');
+        $this->templating->expects(self::never())->method('renderResponse');
 
-        $this->event->expects($this->once())->method('setResponse');
+        $this->event->expects(self::once())->method('setResponse');
         $listener->onResponse($this->event);
     }
 
-    /**
-     * @param bool $isDebug
-     * @return ResponseHashnavListener
-     */
-    protected function getListener($isDebug)
+    private function getListener($isDebug): ResponseHashnavListener
     {
         return new ResponseHashnavListener($this->tokenStorage, $this->templating, $isDebug);
     }
 
-    private function serverErrorHandle()
+    private function serverErrorHandle(): void
     {
-        $this->event->expects($this->once())
+        $this->event->expects(self::once())
             ->method('setResponse');
 
-        $this->templating->expects($this->once())
+        $this->templating->expects(self::once())
             ->method('renderResponse')
             ->with(
                 self::TEMPLATE,
-                array(
+                [
                     'full_redirect' => true,
                     'location'      => self::TEST_URL
-                )
+                ]
             )
-            ->will($this->returnValue(new Response()));
+            ->willReturn(new Response());
 
         $this->listener->onResponse($this->event);
     }

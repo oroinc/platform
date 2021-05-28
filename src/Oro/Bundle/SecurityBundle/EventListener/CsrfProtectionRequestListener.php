@@ -5,8 +5,8 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -16,12 +16,8 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
  */
 class CsrfProtectionRequestListener
 {
-    /** @var CsrfRequestManager */
-    private $csrfRequestManager;
+    private CsrfRequestManager $csrfRequestManager;
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
     public function __construct(CsrfRequestManager $csrfRequestManager)
     {
         $this->csrfRequestManager = $csrfRequestManager;
@@ -30,11 +26,11 @@ class CsrfProtectionRequestListener
     /**
      * Implements double submit cookie CSRF check.
      *
-     * @param FilterControllerEvent $event
+     * @param ControllerEvent $event
      *
      * @throws AccessDeniedHttpException when route is protected against CSRF attacks and security check failed
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -74,9 +70,9 @@ class CsrfProtectionRequestListener
     /**
      * Regenerates CSRF cookie on each response.
      *
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

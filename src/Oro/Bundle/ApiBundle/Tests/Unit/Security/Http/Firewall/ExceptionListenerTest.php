@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -25,7 +25,7 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider getExceptionProvider
      */
-    public function testSetTargetPathShouldCallParentWithCookie(\Exception $exception)
+    public function testSetTargetPathShouldCallParentWithCookie(\Exception $exception): void
     {
         $event = $this->createEvent($exception);
         $event->getRequest()->cookies->add([self::SESSION_NAME => 'o595fqdg5214u4e4nfcs3uc923']);
@@ -48,7 +48,7 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider getExceptionProvider
      */
-    public function testSetTargetPathShouldNotCallParentWithoutCookie(\Exception $exception)
+    public function testSetTargetPathShouldNotCallParentWithoutCookie(\Exception $exception): void
     {
         $event = $this->createEvent($exception);
 
@@ -63,7 +63,7 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onKernelException($event);
     }
 
-    public function getExceptionProvider()
+    public function getExceptionProvider(): array
     {
         return [
             [new AccessDeniedException()],
@@ -72,12 +72,7 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param bool $fullSetup
-     *
-     * @return ExceptionListener
-     */
-    protected function createExceptionListener($fullSetup = false)
+    protected function createExceptionListener($fullSetup = false): ExceptionListener
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);
@@ -107,14 +102,9 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param \Exception $exception
-     *
-     * @return GetResponseForExceptionEvent
-     */
-    private function createEvent(\Exception $exception)
+    private function createEvent(\Exception $exception): ExceptionEvent
     {
-        return new GetResponseForExceptionEvent(
+        return new ExceptionEvent(
             $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MASTER_REQUEST,

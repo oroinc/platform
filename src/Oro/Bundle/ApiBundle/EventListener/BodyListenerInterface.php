@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\EventListener;
 
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Represents the listener that handles the request body decoding.
@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 interface BodyListenerInterface
 {
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event): void;
+    public function onKernelRequest(RequestEvent $event): void;
 }

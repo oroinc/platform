@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Changes Content-Type header to "application/x-www-form-urlencoded" in case of "update_list" REST API request
@@ -30,9 +30,9 @@ class UpdateListBodyListenerDecorator implements BodyListenerInterface
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if ($this->isUpdateListAction($request)) {

@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -24,8 +24,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class LayoutListener implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * @param ContainerInterface $container
@@ -36,9 +35,9 @@ class LayoutListener implements ServiceSubscriberInterface
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             LayoutManager::class,
@@ -47,11 +46,11 @@ class LayoutListener implements ServiceSubscriberInterface
     }
 
     /**
-     * @param GetResponseForControllerResultEvent $event
+     * @param ViewEvent $event
      *
      * @throws LogicException if @Layout annotation is used in incorrect way
      */
-    public function onKernelView(GetResponseForControllerResultEvent $event)
+    public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -160,7 +159,7 @@ class LayoutListener implements ServiceSubscriberInterface
      * @param string $blockId
      * @param BlockViewNotFoundException $e
      */
-    private function logNotFoundViewException($blockId, BlockViewNotFoundException $e)
+    private function logNotFoundViewException($blockId, BlockViewNotFoundException $e): void
     {
         /** @var LoggerInterface $logger */
         $logger = $this->container->get(LoggerInterface::class);

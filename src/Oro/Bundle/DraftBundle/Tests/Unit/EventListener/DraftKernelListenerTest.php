@@ -13,7 +13,7 @@ use Oro\Bundle\DraftBundle\Manager\Publisher;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
@@ -21,21 +21,17 @@ class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
     public function testOnKernelControllerArguments(): void
     {
         $source = new DraftableEntityStub();
-        /** @var HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject $httpKernel */
         $httpKernel = $this->createMock(HttpKernelInterface::class);
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
-        $controller = function () {
-        };
+        $controller = static fn () => null;
         $draftManger = $this->getDraftManager();
-        /** @var DraftHelper|\PHPUnit\Framework\MockObject\MockObject $draftHelper */
         $draftHelper = $this->createMock(DraftHelper::class);
         $draftHelper
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('isSaveAsDraftAction')
             ->willReturn(true);
 
-        $event = new FilterControllerArgumentsEvent(
+        $event = new ControllerArgumentsEvent(
             $httpKernel,
             $controller,
             [$source, 'any argument'],
@@ -47,22 +43,18 @@ class DraftKernelListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onKernelControllerArguments($event);
 
         $actualArguments = $event->getArguments();
-        $this->assertNotSame([$source, 'any argument'], $actualArguments);
+        self::assertNotSame([$source, 'any argument'], $actualArguments);
 
         /** @var DraftableInterface $draftableArgument */
         $draftableArgument = reset($actualArguments);
-        $this->assertSame($source, $draftableArgument->getDraftSource());
+        self::assertSame($source, $draftableArgument->getDraftSource());
     }
 
-    /**
-     * @return DraftManager
-     */
     private function getDraftManager(): DraftManager
     {
         $extension = new DraftSourceExtension();
 
         $contextAccessor = new ContextAccessor();
-        /** @var Publisher|\PHPUnit\Framework\MockObject\MockObject $publisher */
         $publisher = $this->createMock(Publisher::class);
         $extensionProvider = new ExtensionProvider(new ArrayCollection([$extension]));
 

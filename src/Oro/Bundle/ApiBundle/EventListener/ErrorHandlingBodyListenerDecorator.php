@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 use JsonStreamingParser\Exception\ParsingException;
 use JsonStreamingParser\Listener\InMemoryListener;
 use JsonStreamingParser\Parser;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -14,12 +14,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
 {
-    /** @var BodyListenerInterface */
-    private $listener;
+    private BodyListenerInterface $listener;
 
-    /**
-     * @param BodyListenerInterface $listener
-     */
     public function __construct(BodyListenerInterface $listener)
     {
         $this->listener = $listener;
@@ -28,7 +24,7 @@ class ErrorHandlingBodyListenerDecorator implements BodyListenerInterface
     /**
      * {@inheritDoc}
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         try {
             $this->listener->onKernelRequest($event);

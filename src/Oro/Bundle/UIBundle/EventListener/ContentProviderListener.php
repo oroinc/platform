@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\EventListener;
 
 use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -12,21 +12,14 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class ContentProviderListener implements ServiceSubscriberInterface
 {
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -61,7 +54,7 @@ class ContentProviderListener implements ServiceSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             'oro_ui.content_provider.manager' => ContentProviderManager::class

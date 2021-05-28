@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\EventListener;
 use Nelmio\ApiDocBundle\Controller\ApiDocController;
 use Oro\Bundle\ApiBundle\Controller\RestApiDocController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -38,9 +38,9 @@ class ValidateApiDocViewListener
     }
 
     /**
-     * @param FilterControllerEvent $event
+     * @param ControllerEvent $event
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
         if (\is_array($controller) && $this->isApiDocController($controller)) {

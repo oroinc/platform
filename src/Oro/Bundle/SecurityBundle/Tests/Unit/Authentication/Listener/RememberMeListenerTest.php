@@ -15,7 +15,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID   = 'o595fqdg5214u4e4nfcs3uc923';
 
-    public function testShouldCallInnerAuthentificateForAnyRequestWithAjaxCsrfModeOff()
+    public function testShouldCallInnerAuthenticateForAnyRequestWithAjaxCsrfModeOff(): void
     {
         $event = $this->createMasterRequestEvent();
 
@@ -25,7 +25,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::once())
             ->method('authenticate')
             ->with($event);
-        $csrfRequestManager->expects($this->never())
+        $csrfRequestManager->expects(self::never())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false);
 
@@ -35,7 +35,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $listener($event);
     }
 
-    public function testShouldCallInnerAuthentificateForGetCsrfProtectedRequest()
+    public function testShouldCallInnerAuthenticateForGetCsrfProtectedRequest(): void
     {
         $event = $this->createMasterRequestEvent();
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
@@ -48,7 +48,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::once())
             ->method('authenticate')
             ->with($event);
-        $csrfRequestManager->expects($this->never())
+        $csrfRequestManager->expects(self::never())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false);
 
@@ -59,7 +59,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $listener($event);
     }
 
-    public function testShouldCallInnerAuthentificateForPostCsrfProtectedRequest()
+    public function testShouldCallInnerAuthenticateForPostCsrfProtectedRequest(): void
     {
         $event = $this->createMasterRequestEvent();
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
@@ -72,7 +72,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::once())
             ->method('authenticate')
             ->with($event);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(true);
@@ -84,7 +84,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $listener($event);
     }
 
-    public function testShouldNotCallInnerAuthentificateForGetNoneCsrfProtectedRequest()
+    public function testShouldNotCallInnerAuthenticateForGetNoneCsrfProtectedRequest(): void
     {
         $event = $this->createMasterRequestEvent();
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
@@ -96,7 +96,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('authenticate')
             ->with($event);
-        $csrfRequestManager->expects($this->never())
+        $csrfRequestManager->expects(self::never())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false);
 
@@ -107,7 +107,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $listener($event);
     }
 
-    public function testShouldNotCallInnerAuthentificateForPostNoneCsrfProtectedRequest()
+    public function testShouldNotCallInnerAuthenticateForPostNoneCsrfProtectedRequest(): void
     {
         $event = $this->createMasterRequestEvent();
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
@@ -119,7 +119,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $innerListener->expects(self::never())
             ->method('authenticate')
             ->with($event);
-        $csrfRequestManager->expects($this->once())
+        $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($event->getRequest(), false)
             ->willReturn(false);
@@ -135,10 +135,10 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
      * @param OrigRememberMeListener $innerListener
      * @return RememberMeListener
      */
-    private function getListener(OrigRememberMeListener $innerListener)
+    private function getListener(OrigRememberMeListener $innerListener): RememberMeListener
     {
         $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->any())
+        $sessionMock->expects(self::any())
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
@@ -150,7 +150,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @return RequestEvent
      */
-    private function createMasterRequestEvent($isXmlHttpRequest = false)
+    private function createMasterRequestEvent($isXmlHttpRequest = false): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);
