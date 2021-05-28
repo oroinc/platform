@@ -9,6 +9,11 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for date, extends Symfony DateType:
+ * - adds ability to set min and max date
+ * - fixes buggy 'placeholder' normalizer
+ */
 class OroDateType extends AbstractType
 {
     const NAME = 'oro_date';
@@ -40,7 +45,7 @@ class OroDateType extends AbstractType
             [
                 'model_timezone' => 'UTC',
                 'view_timezone'  => 'UTC',
-                'format'         => 'yyyy-MM-dd', // ISO format
+                'format'         => DateType::HTML5_FORMAT,
                 'widget'         => 'single_text',
                 'placeholder'    => 'oro.form.click_here_to_select',
                 'years'          => [],
