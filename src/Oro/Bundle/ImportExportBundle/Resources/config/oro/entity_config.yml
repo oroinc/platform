@@ -26,7 +26,6 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             label:          oro.importexport.entity_config.order.label
-                            scale:          0
                             empty_data:     ''
                             required:       false
                             block:          import_export
