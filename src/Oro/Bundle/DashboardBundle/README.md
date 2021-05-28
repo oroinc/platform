@@ -100,7 +100,7 @@ Make the following changes in `config/routing.yml`:
 oro_default:
     pattern:  /
     defaults:
-        _controller: OroDashboardBundle:Dashboard:view
+        _controller: Oro\Bundle\DashboardBundle\Controller\DashboardController::viewAction
 ```
  
 ## How to add new widget

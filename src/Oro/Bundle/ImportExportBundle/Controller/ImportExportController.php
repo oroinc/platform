@@ -55,7 +55,7 @@ class ImportExportController extends AbstractController
      *
      * @param Request $request
      *
-     * @return array
+     * @return array|Response
      */
     public function importFormAction(Request $request)
     {
@@ -76,7 +76,7 @@ class ImportExportController extends AbstractController
             $fileName = $this->getFileManager()->saveImportingFile($file);
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:importProcess',
+                __CLASS__ . '::importProcessAction',
                 [
                     'processorAlias' => $processorAlias,
                     'fileName' => $fileName,
@@ -143,8 +143,8 @@ class ImportExportController extends AbstractController
                 }
                 $fileName = $this->getFileManager()->saveImportingFile($file);
 
-                $importForward = 'OroImportExportBundle:ImportExport:importProcess';
-                $validateForward = 'OroImportExportBundle:ImportExport:importValidate';
+                $importForward = ImportExportController::class . '::importProcessAction';
+                $validateForward = ImportExportController::class . '::importValidateAction';
 
                 $forward = $isValidate ? $validateForward : $importForward;
 
@@ -214,7 +214,7 @@ class ImportExportController extends AbstractController
             $fileName = $this->getFileManager()->saveImportingFile($file);
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:importValidate',
+                ImportExportController::class . '::importValidateAction',
                 [
                     'processorAlias' => $processorAlias,
                     'fileName' => $fileName,
@@ -371,7 +371,7 @@ class ImportExportController extends AbstractController
             $data = $exportForm->getData();
 
             return $this->forward(
-                'OroImportExportBundle:ImportExport:instantExport',
+                ImportExportController::class . '::instantExportAction',
                 [
                     'processorAlias' => $data->getProcessorAlias(),
                     'request' => $request
@@ -405,7 +405,7 @@ class ImportExportController extends AbstractController
             $data = $exportForm->getData();
 
             $exportTemplateResponse = $this->forward(
-                'OroImportExportBundle:ImportExport:templateExport',
+                ImportExportController::class . '::templateExport',
                 ['processorAlias' => $data->getProcessorAlias()]
             );
 

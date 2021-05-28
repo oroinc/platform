@@ -3,6 +3,8 @@
 namespace Oro\Component\Config\Tests\Unit\Resolver;
 
 use Oro\Component\Config\Resolver\SystemAwareResolver;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\InvokableController;
+use Oro\Component\Config\Tests\Unit\Fixtures\Bundle\TestBundle1\Controller\TestController;
 use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 use Oro\Component\Routing\Tests\Unit\Resolver\TestResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -263,7 +265,15 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 ['root' => ['node' => 'func2 + const1']],
-            ]
+            ],
+            'controller action' => [
+                ['root' => ['node' => TestController::class . '::test1Action']],
+                ['root' => ['node' => TestController::class . '::test1Action']],
+            ],
+            'invokable controller' => [
+                ['root' => ['node' => InvokableController::class]],
+                ['root' => ['node' => InvokableController::class]],
+            ],
         ];
     }
 }

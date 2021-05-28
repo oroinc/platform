@@ -41,7 +41,7 @@ class SearchController extends AbstractController
                     $request->get('query')
                 )->toSearchResultData()
             )
-            : $this->forward('OroSearchBundle:Search:searchResults');
+            : $this->forward(__CLASS__ . '::searchResults');
     }
 
     /**

@@ -6,7 +6,7 @@ oro_api_autocomplete_search:
     path:            /api/rest/{version}/autocomplete/search.{_format}
     methods:         [GET]
     defaults:
-        _controller: OroFormBundle:Api\Rest\Autocomplete:search
+        _controller: Oro\Bundle\FormBundle\Controller\Api\Rest\AutocompleteController::searchAction
         _format:     json
         version:     latest
     requirements:
