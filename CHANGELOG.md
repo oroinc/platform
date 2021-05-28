@@ -2,7 +2,8 @@ Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## 5.0.0-alpha.2
+## 5.0.0-alpha.2 (2021-05-28)
+[Show detailed list of changes](incompatibilities-5-0-alpha-2.md)
 
 ### Changed
 
