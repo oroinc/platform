@@ -141,6 +141,8 @@ services:
         arguments:
             - '@oro_layout.loader'
             - '@kernel'
+        calls:
+            - [ setCacheWarmer, [ '@oro_layout.expression_language.compiled_cache_warmer' ] ]
         tags:
             - { name: 'kernel.cache_warmer' }
 
@@ -188,9 +190,15 @@ services:
         tags:
             - { name: layout.block_view_serializer.normalizer }
 
+    oro_layout.expression_language.compiled_cache:
+        class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCache
+        arguments:
+            - '%oro_layout.expression_language_cache_file%'
+
     oro_layout.block_view_serializer.expression_normalizer:
         class: Oro\Bundle\LayoutBundle\Layout\Serializer\ExpressionNormalizer
-        arguments: [{}, {}]
+        arguments:
+            - '@oro_layout.expression_language.compiled_cache'
         tags:
             - { name: layout.block_view_serializer.normalizer }
 
