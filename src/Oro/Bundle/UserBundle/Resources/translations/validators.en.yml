@@ -49,3 +49,7 @@ oro:
                     duplicated_emails:
                         message: 'Cannot enable "Case-Insensitive Email Addresses" - there are existing users who have identical lowercase emails. Please resolve these conflicts and try again. %click_here% to see some of the conflicting users.'
                         click_here: 'Click here'
+        user:
+            birthday:
+                type:
+                    message: 'This value is not a valid date.'
