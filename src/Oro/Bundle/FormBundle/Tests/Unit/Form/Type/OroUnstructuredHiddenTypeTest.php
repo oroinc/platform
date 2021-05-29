@@ -10,13 +10,13 @@ class OroUnstructuredHiddenTypeTest extends FormIntegrationTestCase
 {
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->at(1))
+        $resolver->expects($this->exactly(2))
             ->method('setDefaults')
-            ->with([
-                'multiple' => true
-            ]);
+            ->withConsecutive(
+                [$this->isType('array')],
+                [['multiple' => true]]
+            );
 
         $formType = new OroUnstructuredHiddenType();
         $formType->configureOptions($resolver);
@@ -26,9 +26,7 @@ class OroUnstructuredHiddenTypeTest extends FormIntegrationTestCase
     {
         $formData = [
             'type' => 1,
-            [
-                'value' => ['val0', 'val1']
-            ]
+            ['value' => ['val0', 'val1']]
         ];
         $form = $this->factory->create(OroUnstructuredHiddenType::class);
         $form->submit($formData);
