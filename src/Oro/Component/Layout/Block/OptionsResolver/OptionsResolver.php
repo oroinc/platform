@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionsResolver;
 /**
  * Decorator class of `Symfony\Component\OptionsResolver\OptionsResolver` with removed methods, that not allowed for
  * using with expressions, like `setAllowedTypes` etc.
- * @see Symfony\Component\OptionsResolver\OptionsResolver
+ * @see \Symfony\Component\OptionsResolver\OptionsResolver
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OptionsResolver implements Options

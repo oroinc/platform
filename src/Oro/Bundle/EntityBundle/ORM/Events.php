@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 /**
- * Container for ORM events in addition to ORM events declared in {@see Doctrine\ORM\Events}.
+ * Container for ORM events in addition to ORM events declared in {@see \Doctrine\ORM\Events}.
  */
 final class Events
 {
