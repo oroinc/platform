@@ -10,8 +10,8 @@ The current file describes significant changes in the code that may affect the u
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.
 * The service `oro_entity_merge.strategy.delegate` was removed. Use `oro_entity_merge.strategy` instead.
 
-
-## 5.0.0-alpha.2
+## 5.0.0-alpha.2 (2021-05-28)
+[Show detailed list of changes](incompatibilities-5-0-alpha-2.md)
 
 ### Changed
 

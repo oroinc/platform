@@ -10,7 +10,7 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 /**
  * This class responsible for loading a different kind of data fixtures.
  *
- * This class is based on {@see Doctrine\Common\DataFixtures\Loader}
+ * This class is based on {@see \Doctrine\Common\DataFixtures\Loader}
  * created by Jonathan H. Wage <jonwage@gmail.com>.
  */
 class Loader

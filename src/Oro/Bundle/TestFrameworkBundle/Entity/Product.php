@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityBundle\EntityProperty\DenormalizedPropertyAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -12,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @Config()
  */
-class Product implements TestFrameworkEntityInterface
+class Product implements TestFrameworkEntityInterface, DenormalizedPropertyAwareInterface
 {
     /**
      * @var int
@@ -29,6 +30,32 @@ class Product implements TestFrameworkEntityInterface
      * @ORM\Column(name="name", type="string", nullable=true)
      */
     protected $name;
+
+    protected $denormalizedName;
+
+    protected $nameLowercase;
+
+    public function updateDenormalizedProperties(): void
+    {
+        $this->denormalizedName = mb_strtoupper($this->name);
+        $this->nameLowercase = mb_strtolower($this->name);
+    }
+
+    /**
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->updateDenormalizedProperties();
+    }
+
+    /**
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updateDenormalizedProperties();
+    }
 
     /**
      * @return int
@@ -52,5 +79,15 @@ class Product implements TestFrameworkEntityInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    public function getDenormalizedName()
+    {
+        return $this->denormalizedName;
+    }
+
+    public function getNameLowercase()
+    {
+        return $this->nameLowercase;
     }
 }

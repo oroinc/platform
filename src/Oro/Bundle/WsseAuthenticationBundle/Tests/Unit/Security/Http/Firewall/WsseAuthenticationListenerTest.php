@@ -7,7 +7,7 @@ use Oro\Bundle\WsseAuthenticationBundle\Security\WsseToken;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -23,33 +23,26 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     private const NONCE = 'somenonce';
     private const PROVIDER_KEY = 'someproviderkey';
 
-    /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $responseEvent;
+    private RequestEvent|\PHPUnit\Framework\MockObject\MockObject $responseEvent;
 
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private Request $request;
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
+    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
-    /** @var AuthenticationManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authenticationManager;
+    private AuthenticationManagerInterface|\PHPUnit\Framework\MockObject\MockObject $authenticationManager;
 
-    /** @var WsseTokenFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $wsseTokenFactory;
+    private WsseTokenFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $wsseTokenFactory;
 
-    /** @var AuthenticationEntryPointInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authenticationEntryPoint;
+    private AuthenticationEntryPointInterface|\PHPUnit\Framework\MockObject\MockObject $authenticationEntryPoint;
 
-    /** @var WsseAuthenticationListener */
-    private $listener;
+    private WsseAuthenticationListener $listener;
 
     protected function setUp(): void
     {
-        $this->responseEvent = $this->createMock(GetResponseEvent::class);
-        $this->request = $this->getMockForAbstractClass(Request::class);
+        $this->responseEvent = $this->createMock(RequestEvent::class);
+        $this->request = Request::create('/sample/uri');
         $this->responseEvent
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -75,17 +68,14 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     public function testHandleWhenNoHeader(array $header): void
     {
         $this->tokenStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('setToken');
 
         $this->request->headers->add($header);
 
-        $this->listener->handle($this->responseEvent);
+        ($this->listener)($this->responseEvent);
     }
 
-    /**
-     * @return array
-     */
     public function handleWhenNoHeaderDataProvider(): array
     {
         return [
@@ -99,19 +89,19 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         $token = $this->mockWsseTokenFactory();
 
         $this->authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willReturn($tokenMock2 = $this->createMock(WsseToken::class));
 
         $this->tokenStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setToken')
             ->with($tokenMock2);
 
         $this->request->headers->add(['X-WSSE' => self::WSSE]);
 
-        $this->listener->handle($this->responseEvent);
+        ($this->listener)($this->responseEvent);
     }
 
     /**
@@ -124,7 +114,7 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         $token->setAttribute('created', self::CREATED);
 
         $this->wsseTokenFactory
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('create')
             ->with(self::USERNAME, self::PASSWORD, self::PROVIDER_KEY)
             ->willReturn($token);
@@ -137,19 +127,19 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         $token = $this->mockWsseTokenFactory();
 
         $this->authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willReturn($response = new Response());
 
         $this->responseEvent
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setResponse')
             ->with($response);
 
         $this->request->headers->add(['X-WSSE' => self::WSSE]);
 
-        $this->listener->handle($this->responseEvent);
+        ($this->listener)($this->responseEvent);
     }
 
     public function testHandleWhenException(): void
@@ -157,24 +147,24 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         $token = $this->mockWsseTokenFactory();
 
         $this->authenticationManager
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willThrowException($exception = new AuthenticationException($msg = 'sample exception'));
 
         $this->authenticationEntryPoint
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('start')
             ->with($this->request, $exception)
             ->willReturn($response = new Response($msg));
 
         $this->responseEvent
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('setResponse')
             ->with($response);
 
         $this->request->headers->add(['X-WSSE' => self::WSSE]);
 
-        $this->listener->handle($this->responseEvent);
+        ($this->listener)($this->responseEvent);
     }
 }

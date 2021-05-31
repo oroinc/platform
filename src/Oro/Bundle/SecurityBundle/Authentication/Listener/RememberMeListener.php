@@ -7,44 +7,27 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Http\Firewall\AbstractListener;
-use Symfony\Component\Security\Http\Firewall\LegacyListenerTrait;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
-use Symfony\Component\Security\Http\Firewall\RememberMeListener as OrigRememberMeListener;
+use Symfony\Component\Security\Http\Firewall\RememberMeListener as SymfonyRememberMeListener;
 
 /**
  * 'Remember Me' security listener override to have ability to process CSRF protected AJAX requests only
  */
-class RememberMeListener extends AbstractListener implements ListenerInterface
+class RememberMeListener extends AbstractListener
 {
-    use LegacyListenerTrait;
+    private SymfonyRememberMeListener $innerListener;
 
-    /** @var OrigRememberMeListener */
-    private $innerListener;
+    private bool $ajaxCsrfOnlyFlag = false;
 
-    /** @var bool */
-    private $ajaxCsrfOnlyFlag = false;
+    private CsrfRequestManager $csrfRequestManager;
 
-    /** @var CsrfRequestManager */
-    private $csrfRequestManager;
+    private ?SessionInterface $session;
 
-    /** @var SessionInterface|null */
-    private $session;
-
-    /**
-     * @param OrigRememberMeListener $innerListener
-     * @param SessionInterface|null  $session
-     */
-    public function __construct(
-        OrigRememberMeListener $innerListener,
-        SessionInterface $session = null
-    ) {
+    public function __construct(SymfonyRememberMeListener $innerListener, SessionInterface $session = null)
+    {
         $this->innerListener = $innerListener;
         $this->session = $session;
     }
 
-    /**
-     * {@inheritdsoc}
-     */
     public function supports(Request $request): ?bool
     {
         return $this->ajaxCsrfOnlyFlag
@@ -65,9 +48,6 @@ class RememberMeListener extends AbstractListener implements ListenerInterface
         $this->ajaxCsrfOnlyFlag = true;
     }
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
     public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager): void
     {
         $this->csrfRequestManager = $csrfRequestManager;

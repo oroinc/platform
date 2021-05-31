@@ -5,7 +5,7 @@ namespace Oro\Bundle\SoapBundle\EventListener;
 use Gedmo\Translatable\TranslatableListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -15,8 +15,7 @@ class LocaleListener implements EventSubscriberInterface
 {
     const API_PREFIX = '/api/rest/';
 
-    /** @var TranslatableListener */
-    private $translatableListener;
+    private TranslatableListener $translatableListener;
 
     /**
      * @param TranslatableListener $translatableListener
@@ -27,9 +26,9 @@ class LocaleListener implements EventSubscriberInterface
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
 
@@ -45,7 +44,7 @@ class LocaleListener implements EventSubscriberInterface
      *
      * @return bool
      */
-    protected function isApiRequest(Request $request)
+    protected function isApiRequest(Request $request): bool
     {
         return strpos($request->getPathInfo(), self::API_PREFIX) === 0;
     }
@@ -53,7 +52,7 @@ class LocaleListener implements EventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // must be registered after Symfony's original LocaleListener

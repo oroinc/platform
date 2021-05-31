@@ -6,7 +6,7 @@ use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -23,6 +23,8 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getExceptionProvider
+     *
+     * @param \Exception $exception
      */
     public function testSetTarget(\Exception $exception): void
     {
@@ -95,9 +97,6 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onKernelException($event);
     }
 
-    /**
-     * @return array[]
-     */
     public function shouldSetTargetPathForNonExcludedRoutesProvider(): array
     {
         return [
@@ -128,8 +127,8 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
     public function shouldNotSetTargetPathForExcludedRoutesProvider(): array
     {
         return [
-            'exluded route 1' => [self::EXCLUDED_ROUTE_1, true],
-            'exluded route 2' => [self::EXCLUDED_ROUTE_2, true],
+            'excluded route 1' => [self::EXCLUDED_ROUTE_1, true],
+            'excluded route 2' => [self::EXCLUDED_ROUTE_2, true],
         ];
     }
 
@@ -176,9 +175,9 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         return $listener;
     }
 
-    private function createEvent(\Exception $exception): GetResponseForExceptionEvent
+    private function createEvent(\Exception $exception): ExceptionEvent
     {
-        return new GetResponseForExceptionEvent(
+        return new ExceptionEvent(
             $this->createMock(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MASTER_REQUEST,

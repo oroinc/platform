@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\SecurityBundle\Exception\OrganizationAccessDeniedException;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
@@ -17,20 +17,12 @@ use Symfony\Component\Security\Core\Security;
  */
 class ContextListener
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param ManagerRegistry       $doctrine
-     * @param LoggerInterface       $logger
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         ManagerRegistry $doctrine,
@@ -44,9 +36,9 @@ class ContextListener
     /**
      * Refresh organization context in token
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $token = $this->tokenStorage->getToken();
         if (!$token instanceof OrganizationAwareTokenInterface) {
@@ -74,11 +66,6 @@ class ContextListener
         }
     }
 
-    /**
-     * @param Organization $organization
-     *
-     * @return Organization|null
-     */
     private function refreshOrganization(Organization $organization): ?Organization
     {
         $organizationId = $organization->getId();
@@ -94,11 +81,11 @@ class ContextListener
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      *
      * @throws OrganizationAccessDeniedException
      */
-    private function denyAccess(GetResponseEvent $event): void
+    private function denyAccess(RequestEvent $event): void
     {
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();

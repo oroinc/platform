@@ -2,7 +2,7 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
@@ -45,10 +45,10 @@ class ResponseHashnavListener
     /**
      * Checking request and response and decide whether we need a redirect
      *
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function onResponse(FilterResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         $request  = $event->getRequest();
         $response = $event->getResponse();

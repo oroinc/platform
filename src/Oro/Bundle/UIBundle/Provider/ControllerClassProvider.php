@@ -6,7 +6,6 @@ use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\ResourcesContainerInterface;
 use ProxyManager\Proxy\VirtualProxyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -20,9 +19,6 @@ class ControllerClassProvider extends PhpArrayConfigProvider
     /** @var RouterInterface */
     private $router;
 
-    /** @var ControllerNameParser */
-    private $controllerNameParser;
-
     /** @var ContainerInterface */
     private $container;
 
@@ -30,24 +26,21 @@ class ControllerClassProvider extends PhpArrayConfigProvider
     private $logger;
 
     /**
-     * @param string               $cacheFile
-     * @param bool                 $debug
-     * @param RouterInterface      $router
-     * @param ControllerNameParser $controllerNameParser
-     * @param ContainerInterface   $container
-     * @param LoggerInterface      $logger
+     * @param string             $cacheFile
+     * @param bool               $debug
+     * @param RouterInterface    $router
+     * @param ContainerInterface $container
+     * @param LoggerInterface    $logger
      */
     public function __construct(
         string $cacheFile,
         bool $debug,
         RouterInterface $router,
-        ControllerNameParser $controllerNameParser,
         ContainerInterface $container,
         LoggerInterface $logger
     ) {
         parent::__construct($cacheFile, $debug);
         $this->router = $router;
-        $this->controllerNameParser = $controllerNameParser;
         $this->container = $container;
         $this->logger = $logger;
     }
@@ -158,11 +151,7 @@ class ControllerClassProvider extends PhpArrayConfigProvider
             return \explode('::', $controller);
         }
 
-        // check for "bundle:controller:action"
         $separatorCount = \substr_count($controller, ':');
-        if (2 === $separatorCount) {
-            return \explode('::', $this->controllerNameParser->parse($controller));
-        }
 
         // check for "service:method" or "service"
         $className = null;

@@ -5,10 +5,9 @@ namespace Oro\Bundle\ApiBundle\Security\Http\Firewall;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 /**
  * Gives an additional chance to authorise user from the session context if
@@ -17,27 +16,18 @@ use Symfony\Component\Security\Http\Firewall\ListenerInterface;
  * It is required because API can work in two modes, stateless and statefull.
  * The statefull mode is used when API is called internally from web pages as AJAX request.
  */
-class ContextListener implements ListenerInterface
+class ContextListener
 {
-    /** @var ListenerInterface */
-    private $innerListener;
+    private object $innerListener;
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
-    /** @var SessionInterface|null */
-    private $session;
+    private ?SessionInterface $session;
 
-    /** @var CsrfRequestManager */
-    private $csrfRequestManager;
+    private CsrfRequestManager $csrfRequestManager;
 
-    /**
-     * @param ListenerInterface     $innerListener
-     * @param TokenStorageInterface $tokenStorage
-     * @param SessionInterface|null $session
-     */
     public function __construct(
-        ListenerInterface $innerListener,
+        object $innerListener,
         TokenStorageInterface $tokenStorage,
         SessionInterface $session = null
     ) {
@@ -46,18 +36,12 @@ class ContextListener implements ListenerInterface
         $this->session = $session;
     }
 
-    /**
-     * @param CsrfRequestManager $csrfRequestManager
-     */
-    public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager)
+    public function setCsrfRequestManager(CsrfRequestManager $csrfRequestManager): void
     {
         $this->csrfRequestManager = $csrfRequestManager;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(GetResponseEvent $event): void
+    
+    public function __invoke(RequestEvent $event): void
     {
         $token = $this->tokenStorage->getToken();
         if (null === $token) {
@@ -82,7 +66,7 @@ class ContextListener implements ListenerInterface
      *
      * @return bool
      */
-    private function isAjaxRequest(Request $request)
+    private function isAjaxRequest(Request $request): bool
     {
         $isGetRequest = $request->isMethod('GET');
 
@@ -95,12 +79,9 @@ class ContextListener implements ListenerInterface
             );
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    protected function processEvent(GetResponseEvent $event): void
+    protected function processEvent(RequestEvent $event): void
     {
-        $this->innerListener->handle($event);
+        ($this->innerListener)($event);
         $this->csrfRequestManager->refreshRequestToken();
     }
 }

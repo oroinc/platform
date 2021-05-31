@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Tests\Unit\Stub;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension\Stub;
 
-use Closure;
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use ProxyManager\Proxy\LazyLoadingInterface;
+use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * This class is needed to avoid exceptions with default Logger interface.
  */
-class LoggerStub extends ArrayLogger implements LazyLoadingInterface
+class LoggerProxyStub extends BufferingLogger implements LazyLoadingInterface
 {
     /**
      * {@inheritdoc}
@@ -21,7 +20,7 @@ class LoggerStub extends ArrayLogger implements LazyLoadingInterface
     /**
      * {@inheritdoc}
      */
-    public function getProxyInitializer() : ?Closure
+    public function getProxyInitializer(): ?\Closure
     {
     }
 

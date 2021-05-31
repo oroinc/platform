@@ -3,28 +3,24 @@
 namespace Oro\Bundle\ApiBundle\EventListener;
 
 use FOS\RestBundle\EventListener\BodyListener;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Adapts {@see \FOS\RestBundle\EventListener\BodyListener} to BodyListenerInterface.
  */
 class FosRestBodyListenerAdapter implements BodyListenerInterface
 {
-    /** @var BodyListener */
-    private $listener;
+    private BodyListener $listener;
 
-    /**
-     * @param BodyListener $listener
-     */
     public function __construct(BodyListener $listener)
     {
         $this->listener = $listener;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         $this->listener->onKernelRequest($event);
     }

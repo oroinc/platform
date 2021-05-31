@@ -18,4 +18,4 @@ placeholders:
             applicable: "@oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\\Bundle\\ActivityBundle\\EntityConfig\\ActivityScope::UPDATE_PAGE)"
             template: OroActivityListBundle:ActivityList:activities.html.twig
         activity_condition:
-            action: OroActivityListBundle:Segment:activityCondition
+            action: Oro\Bundle\ActivityListBundle\Controller\SegmentController::activityConditionAction

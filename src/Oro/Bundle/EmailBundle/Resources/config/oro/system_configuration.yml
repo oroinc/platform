@@ -69,7 +69,6 @@ system_configuration:
             search_type: text
             options:
                 label: oro.email.system_configuration.email_autocomplete_configuration.minimum_input_length.label
-                scale: 0
                 required: true
                 constraints:
                     - NotBlank: ~

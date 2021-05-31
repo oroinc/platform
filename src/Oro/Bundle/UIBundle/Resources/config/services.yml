@@ -292,7 +292,6 @@ services:
             - '%kernel.cache_dir%/oro/controllers.php'
             - '%kernel.debug%'
             - '@router'
-            - '@controller_name_converter'
             - '@service_container'
             - '@logger'
 

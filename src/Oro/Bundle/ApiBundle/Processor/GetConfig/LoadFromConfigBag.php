@@ -105,8 +105,6 @@ class LoadFromConfigBag implements ProcessorInterface
     private function processConfig(ConfigContext $context)
     {
         $this->entityClass = $context->getClassName();
-        $config = null;
-        $parentResourceClass = null;
         try {
             $config = $this->buildConfig($this->entityClass, $context->getVersion(), $context->getRequestType());
             $parentResourceClass = $this->parentResourceClass;

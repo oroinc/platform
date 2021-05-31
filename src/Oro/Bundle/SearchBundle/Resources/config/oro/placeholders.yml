@@ -7,5 +7,5 @@ placeholders:
 
     items:
        search:
-            action: OroSearchBundle:Search:searchBar
+            action: Oro\Bundle\SearchBundle\Controller\SearchController::searchBarAction
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"

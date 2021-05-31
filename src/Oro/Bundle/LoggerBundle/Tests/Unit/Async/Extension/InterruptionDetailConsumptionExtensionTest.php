@@ -1,29 +1,28 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Bundle\Tests\Unit\Async\Extension;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension;
 
 use Oro\Bundle\LoggerBundle\Async\Extension\InterruptionDetailConsumptionExtension;
-use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\ConfigManagerStub;
-use Oro\Bundle\LoggerBundle\Tests\Unit\Stub\LoggerStub;
+use Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension\Stub\ConfigManagerProxyStub;
+use Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension\Stub\LoggerProxyStub;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|ContainerInterface */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /** @var MockObject|MessageProcessorClassProvider */
-    protected $messageProcessorClassProvider;
+    /** @var MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $messageProcessorClassProvider;
 
     /** @var InterruptionDetailConsumptionExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -40,13 +39,13 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
     {
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $message = $this->createMock(MessageInterface::class);
-        $messageProcessorClass = \get_class($messageProcessor);
+        $messageProcessorClass = get_class($messageProcessor);
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
         $context->setMessage($message);
 
-        $logger = $this->createMock(LoggerStub::class);
+        $logger = $this->createMock(LoggerProxyStub::class);
         $context->setLogger($logger);
 
         $this->messageProcessorClassProvider->expects(self::once())
@@ -56,21 +55,22 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
 
         $this->extension->onPostReceived($context);
 
-        $this->container->expects(static::exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
-                    ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
-                    [
-                        'oro_config.user',
-                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                        $this->createMock(ConfigManagerStub::class)
-                    ],
-                ]);
-        $logger->expects(static::once())
+                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
+                [
+                    'oro_config.user',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ConfigManagerProxyStub::class)
+                ],
+            ]);
+        $logger->expects(self::once())
             ->method('info')
             ->with(
-                \sprintf('The last processor executed before interrupt of consuming was "%s"', $messageProcessorClass)
+                sprintf('The last processor executed before interrupt of consuming was "%s"', $messageProcessorClass)
             );
+
         $this->extension->onInterrupted($context);
     }
 
@@ -95,7 +95,9 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
         $this->extension->onPostReceived($context);
         $this->extension->onIdle($context);
 
-        $logger->expects(static::never())->method('info');
+        $logger->expects(self::never())
+            ->method('info');
+
         $this->extension->onInterrupted($context);
     }
 
@@ -117,7 +119,7 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
         $messageProcessor = $this->createMock(MessageProcessorInterface::class);
         $message = $this->createMock(MessageInterface::class);
         $messageProcessorClass = get_class($messageProcessor);
-        $logger = new LoggerStub();
+        $logger = new LoggerProxyStub();
 
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setMessageProcessor($messageProcessor);
@@ -129,25 +131,32 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
             ->with(self::identicalTo($messageProcessor), self::identicalTo($message))
             ->willReturn($messageProcessorClass);
 
-        $this->container->expects(static::exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->willReturnMap([
-                    ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
-                    [
-                        'oro_config.user',
-                        ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
-                        $this->createMock(ConfigManagerStub::class)
-                    ],
-                ]);
+                ['oro_logger.cache', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $logger],
+                [
+                    'oro_config.user',
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->createMock(ConfigManagerProxyStub::class)
+                ],
+            ]);
 
         $this->extension->onPostReceived($context);
         $this->extension->onInterrupted($context);
 
-        static::assertEquals(
+        self::assertEquals(
             [
-                \sprintf('The last processor executed before interrupt of consuming was "%s"', $messageProcessorClass)
+                [
+                    'info',
+                    sprintf(
+                        'The last processor executed before interrupt of consuming was "%s"',
+                        $messageProcessorClass
+                    ),
+                    []
+                ]
             ],
-            $logger->getMessages()
+            $logger->cleanLogs()
         );
 
         // verify that the last processor was cleared
@@ -155,7 +164,9 @@ class InterruptionDetailConsumptionExtensionTest extends \PHPUnit\Framework\Test
         $logger = $this->createMock(LoggerInterface::class);
         $context = new Context($this->createMock(SessionInterface::class));
         $context->setLogger($logger);
-        $logger->expects(static::never())->method('info');
+        $logger->expects(self::never())
+            ->method('info');
+
         $this->extension->onInterrupted($context);
     }
 }

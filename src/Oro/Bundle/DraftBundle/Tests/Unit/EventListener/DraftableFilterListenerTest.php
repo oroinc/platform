@@ -12,15 +12,13 @@ use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\StubController;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
 
-    /** @var DraftableFilterListener */
-    private $listener;
+    private DraftableFilterListener $listener;
 
     protected function setUp(): void
     {
@@ -33,13 +31,12 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
     {
         $request = Request::create('/entity/draftable/index', 'GET', []);
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->any())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
 
         $this->listener->onKernelController($event);
@@ -54,9 +51,8 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
             ['entityId' => ['id' => $entityId ], 'entityClass' => DraftableEntityStub::class]
         );
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->any())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 
@@ -75,18 +71,17 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
             ['entityId' => ['id' => $entityId ], 'entityClass' => DraftableEntityStub::class]
         );
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->any())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('isEnabled')
             ->with(DraftableFilter::FILTER_ID)
             ->willReturn(true);
-        $filters->expects($this->never())
+        $filters->expects(self::never())
             ->method('enable');
         $this->mockEntityManager($entityId, $filters);
 
@@ -98,12 +93,11 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $request = Request::create('/entity/draftable/view/' . $entityId, 'GET', ['id' => $entityId]);
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->any())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getController')
             ->willReturn([new StubController(), 'viewAction']);
 
@@ -118,38 +112,34 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $request = Request::create('/entity/draftable/view/' . $entityId, 'GET', ['id' => $entityId]);
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->any())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getController')
             ->willReturn([new StubController(), 'viewAction']);
 
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('isEnabled')
             ->with(DraftableFilter::FILTER_ID)
             ->willReturn(true);
-        $filters->expects($this->never())
+        $filters->expects(self::never())
             ->method('enable');
         $this->mockEntityManager($entityId, $filters);
 
         $this->listener->onKernelController($event);
     }
 
-    /**
-     * @return FilterCollection|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getFilters(): FilterCollection
+    private function getFilters(): FilterCollection|\PHPUnit\Framework\MockObject\MockObject
     {
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('isEnabled')
             ->with(DraftableFilter::FILTER_ID)
             ->willReturn(true);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('enable')
             ->with(DraftableFilter::FILTER_ID);
 
@@ -167,20 +157,20 @@ class DraftableFilterListenerTest extends \PHPUnit\Framework\TestCase
         DraftableInterface $expectedEntity = null
     ): void {
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($id)
             ->willReturn($expectedEntity);
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getFilters')
             ->willReturn($filters);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->willReturn($repository);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManagerForClass')
             ->with(DraftableEntityStub::class)
             ->willReturn($em);

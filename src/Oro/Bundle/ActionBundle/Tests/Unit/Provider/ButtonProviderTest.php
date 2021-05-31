@@ -26,9 +26,6 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ButtonSearchContext|\PHPUnit\Framework\MockObject\MockObject */
     private $searchContext;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -38,14 +35,18 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testMatch()
     {
-        $button1 = $this->getButton();
-        $button2 = $this->getButton();
-        $button3 = $this->getButton();
+        $button1 = $this->getButton(1);
+        $button2 = $this->getButton(1);
+        $button3 = $this->getButton(1);
 
         $extension1 = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension1->expects($this->once())->method('find')->willReturn([$button1]);
+        $extension1->expects($this->once())
+            ->method('find')
+            ->willReturn([$button1]);
         $extension2 = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension2->expects($this->once())->method('find')->willReturn([$button2, $button3]);
+        $extension2->expects($this->once())
+            ->method('find')
+            ->willReturn([$button2, $button3]);
 
         $buttonProvider = $this->getButtonProvider([$extension1, $extension2]);
         $collection = $buttonProvider->match($this->searchContext);
@@ -53,26 +54,18 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
 
         //checking correct mapping button => extension at collection
         $callable = $this->createMock(CallableStub::class);
-        $callable->expects($this->at(0))
+        $callable->expects($this->exactly(3))
             ->method('__invoke')
-            ->with(
-                $this->identicalTo($button1),
-                $this->identicalTo($extension1)
-            )->willReturn($button1);
-
-        $callable->expects($this->at(1))
-            ->method('__invoke')
-            ->with(
-                $this->identicalTo($button2),
-                $this->identicalTo($extension2)
-            )->willReturn($button2);
-
-        $callable->expects($this->at(2))
-            ->method('__invoke')
-            ->with(
-                $this->identicalTo($button3),
-                $this->identicalTo($extension2)
-            )->willReturn($button3);
+            ->withConsecutive(
+                [$this->identicalTo($button1), $this->identicalTo($extension1)],
+                [$this->identicalTo($button2), $this->identicalTo($extension2)],
+                [$this->identicalTo($button3), $this->identicalTo($extension2)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $button1,
+                $button2,
+                $button3
+            );
 
         $collection->map($callable);
     }
@@ -80,9 +73,13 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     public function testMatchEvent()
     {
         $extension1 = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension1->expects($this->once())->method('find')->willReturn([]);
+        $extension1->expects($this->once())
+            ->method('find')
+            ->willReturn([]);
         $extension2 = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension2->expects($this->once())->method('find')->willReturn([]);
+        $extension2->expects($this->once())
+            ->method('find')
+            ->willReturn([]);
 
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
@@ -95,16 +92,18 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     public function testFindAvailableWithErrors()
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension->expects($this->once())->method('find')->willReturn([$this->getButton()]);
+        $extension->expects($this->once())
+            ->method('find')
+            ->willReturn([$this->getButton(1)]);
         $extension->expects($this->once())
             ->method('isAvailable')
-            ->willReturnCallback(
-                function ($button, $searchContext, ArrayCollection $errors) {
-                    $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
-                }
-            );
+            ->willReturnCallback(function ($button, $searchContext, ArrayCollection $errors) {
+                $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
+            });
 
-        $this->logger->expects($this->once())->method('error')->with('error message', ['param1']);
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('error message', ['param1']);
 
         $buttonProvider = $this->getButtonProvider([$extension]);
         $buttonProvider->findAvailable($this->searchContext);
@@ -128,10 +127,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($output, $buttonProvider->findAll($this->searchContext));
     }
 
-    /**
-     * @return array
-     */
-    public function findAllDataProvider()
+    public function findAllDataProvider(): array
     {
         $button1 = $this->getButton(1);
         $button2 = $this->getButton(2);
@@ -160,16 +156,18 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
     public function testFindAllWithErrors()
     {
         $extension = $this->createMock(ButtonProviderExtensionInterface::class);
-        $extension->expects($this->once())->method('find')->willReturn([$this->getButton()]);
+        $extension->expects($this->once())
+            ->method('find')
+            ->willReturn([$this->getButton(1)]);
         $extension->expects($this->once())
             ->method('isAvailable')
-            ->willReturnCallback(
-                function ($button, $searchContext, ArrayCollection $errors) {
-                    $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
-                }
-            );
+            ->willReturnCallback(function ($button, $searchContext, ArrayCollection $errors) {
+                $errors->add(['message' => 'error message', 'parameters' => ['param1']]);
+            });
 
-        $this->logger->expects($this->once())->method('error')->with('error message', ['param1']);
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with('error message', ['param1']);
 
         $buttonProvider = $this->getButtonProvider([$extension]);
         $buttonProvider->findAll($this->searchContext);
@@ -181,7 +179,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         $extension->expects($this->once())
             ->method('find')
             ->with($this->searchContext)
-            ->willReturn([$this->getButton()]);
+            ->willReturn([$this->getButton(1)]);
 
         $buttonProvider = $this->getButtonProvider([$extension]);
         $this->assertTrue($buttonProvider->hasButtons($this->searchContext));
@@ -204,7 +202,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
      *
      * @return ButtonProvider
      */
-    private function getButtonProvider(array $extensions)
+    private function getButtonProvider(array $extensions): ButtonProvider
     {
         return new ButtonProvider(
             $extensions,
@@ -213,11 +211,7 @@ class ButtonProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param int $order
-     * @return ButtonInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getButton($order = 1)
+    private function getButton(int $order): ButtonInterface
     {
         return new StubButton(
             [

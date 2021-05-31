@@ -18,69 +18,68 @@ use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderBagMock;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_CLASS = DemoEntity::class;
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $testConfigProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigModelManager|\PHPUnit\Framework\MockObject\MockObject */
     private $modelManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var AuditManager|\PHPUnit\Framework\MockObject\MockObject */
     private $auditManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigCache|\PHPUnit\Framework\MockObject\MockObject */
     private $configCache;
+
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigProvider;
+
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $testConfigProvider;
+
+    /** @var ConfigManager */
+    private $configManager;
 
     protected function setUp(): void
     {
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->entityConfigProvider->expects($this->atLeast(1))
-            ->method('getScope')
-            ->willReturn('entity');
-
         $this->testConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->testConfigProvider->expects($this->atLeast(1))
-            ->method('getScope')
-            ->willReturn('test');
 
-        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
-        $this->metadataFactory = $this->createMock(MetadataFactory::class);
+        $configProviderBag = $this->createMock(ConfigProviderBag::class);
+        $configProviderBag->expects($this->any())
+            ->method('getProvider')
+            ->willReturnCallback(function ($scope) {
+                switch ($scope) {
+                    case 'entity':
+                        return $this->entityConfigProvider;
+                    case 'test':
+                        return $this->testConfigProvider;
+                    default:
+                        return null;
+                }
+            });
+
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->modelManager = $this->createMock(ConfigModelManager::class);
         $this->auditManager = $this->createMock(AuditManager::class);
         $this->configCache = $this->createMock(ConfigCache::class);
 
         $this->configManager = new ConfigManager(
             $this->eventDispatcher,
-            $this->metadataFactory,
+            $this->createMock(MetadataFactory::class),
             $this->modelManager,
             $this->auditManager,
             $this->configCache
         );
-
-        $configProviderBag = new ConfigProviderBagMock();
-        $configProviderBag->addProvider($this->entityConfigProvider);
-        $configProviderBag->addProvider($this->testConfigProvider);
         $this->configManager->setProviderBag($configProviderBag);
     }
 
@@ -326,7 +325,7 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
      * @param \PHPUnit\Framework\MockObject\MockObject $em
      * @param ConfigModel[]                            $models
      */
-    private function setFlushExpectations($em, $models)
+    private function setFlushExpectations($em, array $models): void
     {
         $this->configCache->expects($this->once())
             ->method('deleteAllConfigurable');
@@ -337,19 +336,17 @@ class FlushConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $em->expects($this->exactly(count($models)))
             ->method('persist')
-            ->willReturnCallback(function ($obj) use (&$models) {
+            ->willReturnCallback(function ($obj) use ($models) {
                 foreach ($models as $model) {
-                    if ($model == $obj) {
+                    if ($model === $obj) {
                         return;
                     }
                 }
-                $this->fail(
-                    sprintf(
-                        'Expected that $em->persist(%s[%s]) is called.',
-                        get_class($obj),
-                        $obj instanceof FieldConfigModel ? $obj->getFieldName() : $obj->getClassName()
-                    )
-                );
+                $this->fail(sprintf(
+                    'Expected that $em->persist(%s[%s]) is called.',
+                    get_class($obj),
+                    $obj instanceof FieldConfigModel ? $obj->getFieldName() : $obj->getClassName()
+                ));
             });
         $em->expects($this->once())
             ->method('flush');

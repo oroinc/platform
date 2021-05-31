@@ -19,7 +19,6 @@ services:
             - '@oro_help.configuration.provider'
             - '@request_stack'
             - '@oro_ui.controller_class_provider'
-            - '@controller_name_converter'
             - '@oro_platform.composer.version_helper'
             - '@oro_help.help_link.cache'
 

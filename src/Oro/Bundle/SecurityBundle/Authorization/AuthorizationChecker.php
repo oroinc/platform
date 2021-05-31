@@ -16,8 +16,6 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class AuthorizationChecker implements AuthorizationCheckerInterface
 {
-    use AuthorizationCheckerTrait;
-
     /** @var ServiceLink */
     private $authorizationCheckerLink;
 
@@ -51,18 +49,18 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     /**
      * Checks if an access to a resource is granted for the current authentication token.
      *
-     * @param string|string[] $attributes Can be a role name(s), permission name(s), an ACL annotation id,
-     *                                    string in format "permission;descriptor"
-     *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
-     *                                    or something else, it depends on registered security voters
-     * @param  mixed          $object     A domain object, object identity or object identity descriptor (id:type)
-     *                                    (entity:Acme/DemoBundle/Entity/AcmeEntity,  action:some_action)
+     * @param mixed $attribute  Can be a role name, permission name, an ACL annotation id,
+     *                          string in format "permission;descriptor"
+     *                          (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
+     *                          or something else, it depends on registered security voters
+     * @param mixed $object     A domain object, object identity or object identity descriptor (id:type)
+     *                          (entity:Acme/DemoBundle/Entity/AcmeEntity, action:some_action)
      *
      * @return bool
      */
-    public function isGranted($attributes, $object = null)
+    public function isGranted($attribute, $object = null)
     {
-        if (\is_string($attributes) && !empty($attributes) && $annotation = $this->getAnnotation($attributes)) {
+        if (\is_string($attribute) && !empty($attribute) && $annotation = $this->getAnnotation($attribute)) {
             if (null === $object) {
                 $this->logger->debug(
                     \sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
@@ -82,40 +80,36 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
             }
         } elseif (\is_string($object)) {
             $isGranted = $this->isAccessGranted(
-                $attributes,
+                $attribute,
                 $this->tryGetObjectIdentity($object) ?? $object
             );
         } else {
-            if (null === $object && \is_string($attributes)) {
-                $delimiter = \strpos($attributes, ';');
+            if (null === $object && \is_string($attribute)) {
+                $delimiter = \strpos($attribute, ';');
                 if ($delimiter) {
-                    $object = \substr($attributes, $delimiter + 1);
-                    $attributes = \substr($attributes, 0, $delimiter);
+                    $object = \substr($attribute, $delimiter + 1);
+                    $attribute = \substr($attribute, 0, $delimiter);
                 }
             }
 
-            $isGranted = $this->isAccessGranted($attributes, $object);
+            $isGranted = $this->isAccessGranted($attribute, $object);
         }
 
         return $isGranted;
     }
 
     /**
-     * @param mixed $attributes
+     * @param mixed $attribute
      * @param mixed $object
      *
      * @return bool
      */
-    private function isAccessGranted($attributes, $object = null)
+    private function isAccessGranted($attribute, $object = null): bool
     {
         /** @var AuthorizationCheckerInterface $authorizationChecker */
         $authorizationChecker = $this->authorizationCheckerLink->getService();
 
-        return $this->isAttributesGranted(
-            $authorizationChecker,
-            $attributes,
-            $object
-        );
+        return $authorizationChecker->isGranted($attribute, $object);
     }
 
     /**
@@ -123,7 +117,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @return AclAnnotation|null
      */
-    private function getAnnotation($annotationId)
+    private function getAnnotation(string $annotationId): ?AclAnnotation
     {
         /** @var AclAnnotationProvider $annotationProvider */
         $annotationProvider = $this->annotationProviderLink->getService();
@@ -136,7 +130,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @return ObjectIdentity
      */
-    private function getObjectIdentity($val)
+    private function getObjectIdentity($val): ObjectIdentity
     {
         /** @var ObjectIdentityFactory $objectIdentityFactory */
         $objectIdentityFactory = $this->objectIdentityFactoryLink->getService();
