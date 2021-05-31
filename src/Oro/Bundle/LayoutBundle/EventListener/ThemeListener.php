@@ -3,10 +3,13 @@
 namespace Oro\Bundle\LayoutBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
+/**
+ * Sets master request theme to the non-master requests.
+ */
 class ThemeListener implements EventSubscriberInterface
 {
     /** @var string */
@@ -30,9 +33,9 @@ class ThemeListener implements EventSubscriberInterface
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if ($event->getRequestType() === HttpKernelInterface::MASTER_REQUEST) {
@@ -62,7 +65,7 @@ class ThemeListener implements EventSubscriberInterface
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // must be registered with high priority because _master_request_route attribute
@@ -74,7 +77,7 @@ class ThemeListener implements EventSubscriberInterface
     /**
      * @param bool $debug
      */
-    public function setDebug($debug)
+    public function setDebug($debug): void
     {
         $this->debug = $debug;
     }

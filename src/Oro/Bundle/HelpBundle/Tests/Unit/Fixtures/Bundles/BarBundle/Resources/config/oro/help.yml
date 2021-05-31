@@ -4,13 +4,10 @@ help:
             alias: BarAlias
 
     resources:
-        BarBundle:
-            alias: Bar
+        Bar\Bundle\BarBundle\Controller\BarController:
+            alias: Bar\Bundle\BarBundle\Controller\BarOverrideController
 
-        BarBundle:Bar:
-            alias: BarBundleBar
-
-        BarBundle:Bar:foo:
+        Bar\Bundle\BarBundle\Controller\BarController::fooAction:
             prefix: baz/prefix
             uri: bar/uri
             alias: bar/alias

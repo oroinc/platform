@@ -9,56 +9,47 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Twig\Loader\FilesystemLoader;
 
 class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Request */
-    private $request;
+    private Request $request;
 
-    /** @var GetResponseForControllerResultEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
+    private ViewEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
-    /** @var DelegatingEngine|\PHPUnit\Framework\MockObject\MockObject */
-    private $templating;
+    private DelegatingEngine|\PHPUnit\Framework\MockObject\MockObject $templating;
 
-    /** @var TemplateNameParserInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $templateNameParser;
+    private TemplateNameParserInterface|\PHPUnit\Framework\MockObject\MockObject $templateNameParser;
 
-    /** @var FilesystemLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $loader;
-
-    /** @var TemplateListener */
-    private $listener;
+    private TemplateListener $listener;
 
     protected function setUp(): void
     {
         $this->request = Request::create('/test/url');
 
-        $this->event = $this->createMock(GetResponseForControllerResultEvent::class);
-        $this->event->expects($this->any())
+        $this->event = $this->createMock(ViewEvent::class);
+        $this->event->expects(self::any())
             ->method('getRequest')
             ->willReturn($this->request);
 
         $this->templating = $this->createMock(DelegatingEngine::class);
         $this->templateNameParser = $this->createMock(TemplateNameParserInterface::class);
 
-        $this->loader = $this->createMock(FilesystemLoader::class);
-        $this->loader->expects($this->any())
+        $loader = $this->createMock(FilesystemLoader::class);
+        $loader->expects(self::any())
             ->method('getPaths')
             ->with('TestBundle')
             ->willReturn([realpath(__DIR__  . '/fixtures')]);
 
-        /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('get')
             ->willReturnMap([
                 ['templating', $this->templating],
                 ['templating.name_parser', $this->templateNameParser],
-                ['twig.loader.native_filesystem', $this->loader]
+                ['twig.loader.native_filesystem', $loader]
             ]);
 
         $this->listener = new TemplateListener($container, (new InflectorFactory())->build());
@@ -71,23 +62,20 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
      * @param TemplateReference|string $expectedTemplate
      * @param TemplateReference|null $parsedTemplate
      */
-    public function testOnKernelControllerPath($inputTemplate, $expectedTemplate, $parsedTemplate = null)
+    public function testOnKernelControllerPath($inputTemplate, $expectedTemplate, $parsedTemplate = null): void
     {
         $this->request->attributes->set('_template', $inputTemplate);
 
-        $this->templateNameParser->expects($parsedTemplate ? $this->once() : $this->never())
+        $this->templateNameParser->expects($parsedTemplate ? self::once() : self::never())
             ->method('parse')
             ->with($inputTemplate)
             ->willReturn($parsedTemplate);
 
         $this->listener->onKernelView($this->event);
-        $this->assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
+        self::assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
     }
 
-    /**
-     * @return array
-     */
-    public function controllerDataProvider()
+    public function controllerDataProvider(): array
     {
         return [
             'exist legacy controller' => [
@@ -164,11 +152,11 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         $inputTemplate,
         $expectedTemplate,
         string $requestAttribute
-    ) {
+    ): void {
         $this->request->$requestAttribute->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);
 
-        $this->templating->expects($this->atLeastOnce())
+        $this->templating->expects(self::atLeastOnce())
             ->method('exists')
             ->willReturnMap([
                 [(string)$this->templateWithContainer('container'), $containerExists],
@@ -177,13 +165,13 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
                 ['@TestBundle/Default/widget/test.html.twig', $widgetExists],
             ]);
 
-        $this->templateNameParser->expects($this->any())
+        $this->templateNameParser->expects(self::any())
             ->method('parse')
             ->with('TestBundle:Default:test.html.twig')
             ->willReturn($this->templateWithContainer());
 
         $this->listener->onKernelView($this->event);
-        $this->assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
+        self::assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
     }
 
     /**
@@ -191,7 +179,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function templateDataProvider()
+    public function templateDataProvider(): array
     {
         return [
             'container yes, widget yes' => [

@@ -4,41 +4,31 @@ namespace Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall;
 
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 
 /**
  * Firewall listener for WSSE authentication.
  */
-class WsseAuthenticationListener implements ListenerInterface
+class WsseAuthenticationListener
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
-    /** @var AuthenticationManagerInterface */
-    private $authenticationManager;
+    private AuthenticationManagerInterface $authenticationManager;
 
-    /** @var WsseTokenFactoryInterface */
-    private $wsseTokenFactory;
+    private WsseTokenFactoryInterface $wsseTokenFactory;
 
-    /** @var AuthenticationEntryPointInterface */
-    private $authenticationEntryPoint;
-
-    /** @var string */
-    private $providerKey;
+    private AuthenticationEntryPointInterface $authenticationEntryPoint;
 
     /**
-     * @param TokenStorageInterface $tokenStorage
-     * @param AuthenticationManagerInterface $authenticationManager
-     * @param WsseTokenFactoryInterface $wsseTokenFactory
-     * @param AuthenticationEntryPointInterface $authenticationEntryPoint
-     * @param string $providerKey The unique id of the firewall
+     * @var string The unique id of the firewall
      */
+    private string $providerKey;
+
     public function __construct(
         TokenStorageInterface $tokenStorage,
         AuthenticationManagerInterface $authenticationManager,
@@ -53,17 +43,14 @@ class WsseAuthenticationListener implements ListenerInterface
         $this->authenticationEntryPoint = $authenticationEntryPoint;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function handle(GetResponseEvent $event): void
+    public function __invoke(RequestEvent $event): void
     {
         $request = $event->getRequest();
         if (!$request->headers->has('X-WSSE')) {
             return;
         }
 
-        $wsseHeaderData = $this->getHeaderData((string) $request->headers->get('X-WSSE'));
+        $wsseHeaderData = $this->getHeaderData((string)$request->headers->get('X-WSSE'));
         if ($wsseHeaderData) {
             $token = $this->wsseTokenFactory->create(
                 $wsseHeaderData['Username'],
@@ -92,12 +79,6 @@ class WsseAuthenticationListener implements ListenerInterface
         }
     }
 
-    /**
-     * @param string $wsseHeader
-     * @param string $key
-     *
-     * @return string
-     */
     private function parseValue(string $wsseHeader, string $key): ?string
     {
         preg_match('/' . $key . '="([^"]+)"/', $wsseHeader, $matches);

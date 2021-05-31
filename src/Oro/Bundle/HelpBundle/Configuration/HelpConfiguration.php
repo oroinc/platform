@@ -138,7 +138,7 @@ class HelpConfiguration implements ConfigurationInterface
     private function assertKeysAreValidResourceNames(array $resources)
     {
         foreach (array_keys($resources) as $resourceName) {
-            if (!preg_match('/^[a-z_][a-z0-9_]*(:[a-z_][a-z0-9_]*){0,2}$/i', $resourceName)) {
+            if (!preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)(::(.+)Action)?$#', $resourceName)) {
                 throw new InvalidConfigurationException(
                     sprintf('Node "resources" contains invalid resource name "%s".', $resourceName)
                 );

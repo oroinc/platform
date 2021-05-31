@@ -50,16 +50,10 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'resources' => [
-                    'FooBundle'         => [
-                        'alias' => 'Foo'
+                    'Bar\Bundle\BarBundle\Controller\BarController'     => [
+                        'alias' => 'Foo\Bundle\FooBundle\Controller\FooController'
                     ],
-                    'BarBundle'         => [
-                        'alias' => 'BarOverride'
-                    ],
-                    'BarBundle:Bar'     => [
-                        'alias' => 'BarBundleBar'
-                    ],
-                    'BarBundle:Bar:foo' => [
+                    'Bar\Bundle\BarBundle\Controller\BarController::fooAction' => [
                         'server' => 'http://server.com/',
                         'prefix' => 'baz/prefix',
                         'alias'  => 'bar/alias',

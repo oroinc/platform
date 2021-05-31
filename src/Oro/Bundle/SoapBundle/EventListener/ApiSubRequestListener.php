@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SoapBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\RequestMatcherInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * Reverts https://github.com/symfony/symfony/pull/28565 for REST API sub-requests to avoid BC break.
@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class ApiSubRequestListener
 {
     /** @var array [[request matcher, options], ...] */
-    private $rules;
+    private array $rules;
 
     /**
      * @param RequestMatcherInterface $requestMatcher
@@ -22,10 +22,7 @@ class ApiSubRequestListener
         $this->rules[] = [$requestMatcher, $options];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMasterRequest()) {
             return;

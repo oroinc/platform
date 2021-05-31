@@ -17,7 +17,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * Writes and reads values to/from an object/array graph.
  *
- * This class is mostly a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor} v2.7.3
+ * This class is mostly a copy of {@see \Symfony\Component\PropertyAccess\PropertyAccessor} v2.7.3
  * but it has the following advantages:
  * * allows to use the same syntax of the property path for objects and arrays
  * * a bit faster getValue method

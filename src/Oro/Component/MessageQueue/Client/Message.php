@@ -2,6 +2,9 @@
 
 namespace Oro\Component\MessageQueue\Client;
 
+/**
+ * Represents a message that are sent by a producer to a message queue.
+ */
 class Message
 {
     /** @var mixed */
@@ -33,7 +36,7 @@ class Message
 
     /**
      * @param mixed       $body     Can be null, scalar or array
-     * @param string|null $priority Can be any value from {@see Oro\Component\MessageQueue\Client\MessagePriority)
+     * @param string|null $priority Can be any value from {@see \Oro\Component\MessageQueue\Client\MessagePriority}
      */
     public function __construct($body = null, $priority = null)
     {
@@ -122,7 +125,7 @@ class Message
     }
 
     /**
-     * @see Oro\Component\MessageQueue\Client\MessagePriority
+     * @see \Oro\Component\MessageQueue\Client\MessagePriority
      *
      * @return string
      */
@@ -132,7 +135,7 @@ class Message
     }
 
     /**
-     * @param string $priority Can be any value from {@see Oro\Component\MessageQueue\Client\MessagePriority)
+     * @param string $priority Can be any value from {@see \Oro\Component\MessageQueue\Client\MessagePriority}
      *
      * @return self
      */

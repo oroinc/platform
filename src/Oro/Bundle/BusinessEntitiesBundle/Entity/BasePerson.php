@@ -269,11 +269,11 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     }
 
     /**
-     * @param \DateTime $birthday
+     * @param \DateTime|null $birthday
      *
      * @return $this
      */
-    public function setBirthday($birthday)
+    public function setBirthday(\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
 
@@ -281,9 +281,9 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getBirthday()
+    public function getBirthday(): ?\DateTime
     {
         return $this->birthday;
     }

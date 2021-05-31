@@ -5,7 +5,7 @@ namespace Oro\Bundle\DraftBundle\EventListener;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\DraftBundle\Manager\DraftManager;
-use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 
 /**
  * This class is part of the basic logic of the draft(Save as draft from update page).
@@ -16,30 +16,17 @@ use Symfony\Component\HttpKernel\Event\FilterControllerArgumentsEvent;
  */
 class DraftKernelListener
 {
-    /**
-     * @var DraftManager
-     */
-    private $draftManager;
+    private DraftManager $draftManager;
 
-    /**
-     * @var DraftHelper
-     */
-    private $draftHelper;
+    private DraftHelper $draftHelper;
 
-    /**
-     * @param DraftManager $draftManager
-     * @param DraftHelper $draftHelper
-     */
     public function __construct(DraftManager $draftManager, DraftHelper $draftHelper)
     {
         $this->draftManager = $draftManager;
         $this->draftHelper = $draftHelper;
     }
 
-    /**
-     * @param FilterControllerArgumentsEvent $event
-     */
-    public function onKernelControllerArguments(FilterControllerArgumentsEvent $event): void
+    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
     {
         if ($event->isMasterRequest() && $this->draftHelper->isSaveAsDraftAction()) {
             $arguments = $this->updateArguments($event->getArguments());
@@ -47,11 +34,6 @@ class DraftKernelListener
         }
     }
 
-    /**
-     * @param array $arguments
-     *
-     * @return array
-     */
     private function updateArguments(array $arguments = []): array
     {
         return array_map(function ($argument) {

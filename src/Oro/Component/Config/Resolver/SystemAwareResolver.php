@@ -86,6 +86,10 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
             return $val;
         }
 
+        if (preg_match('#^(.*?\\\\Controller\\\\(.+)Controller)(::(.+)Action)?$#', $val)) {
+            return $val;
+        }
+
         if (strpos($val, '%') !== false) {
             $val = $this->resolveParameter($val);
         }

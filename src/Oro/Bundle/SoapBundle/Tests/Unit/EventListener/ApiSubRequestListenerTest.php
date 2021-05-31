@@ -5,13 +5,12 @@ namespace Oro\Bundle\SoapBundle\Tests\Unit\EventListener;
 use Oro\Bundle\SoapBundle\EventListener\ApiSubRequestListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ApiSubRequestListener */
-    private $listener;
+    private ApiSubRequestListener $listener;
 
     protected function setUp(): void
     {
@@ -21,58 +20,52 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->addRule(new RequestMatcher('^/'), ['stop' => true]);
     }
 
-    public function testOnKernelRequestForMasterRequest()
+    public function testOnKernelRequestForMasterRequest(): void
     {
         $request = $this->createRequest();
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request, HttpKernelInterface::MASTER_REQUEST));
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
     }
 
-    public function testOnKernelRequestForSubRequest()
+    public function testOnKernelRequestForSubRequest(): void
     {
         $request = $this->createRequest();
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertNull($request->getRequestFormat(null));
+        self::assertNull($request->getRequestFormat(null));
     }
 
-    public function testOnKernelRequestForSubRequestWithoutFormat()
+    public function testOnKernelRequestForSubRequestWithoutFormat(): void
     {
         $request = $this->createRequest(null);
-        $this->assertNull($request->getRequestFormat(null));
+        self::assertNull($request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertNull($request->getRequestFormat(null));
+        self::assertNull($request->getRequestFormat(null));
     }
 
-    public function testOnKernelRequestForNonRestApiSubRequest()
+    public function testOnKernelRequestForNonRestApiSubRequest(): void
     {
         $request = $this->createRequest('xml', '/api/doc');
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
     }
 
-    public function testOnKernelRequestForExceptionHandlingSubRequest()
+    public function testOnKernelRequestForExceptionHandlingSubRequest(): void
     {
         $request = $this->createRequest();
         $request->attributes->set('exception', new \Exception());
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
 
         $this->listener->onKernelRequest($this->createEvent($request));
-        $this->assertEquals('xml', $request->getRequestFormat(null));
+        self::assertEquals('xml', $request->getRequestFormat(null));
     }
 
-    /**
-     * @param string|null $format
-     * @param string      $uri
-     *
-     * @return Request
-     */
     private function createRequest(?string $format = 'xml', string $uri = '/api/rest/query'): Request
     {
         $request = Request::create($uri);
@@ -83,17 +76,11 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         return $request;
     }
 
-    /**
-     * @param Request $request
-     * @param int     $type
-     *
-     * @return GetResponseEvent
-     */
-    private function createEvent(Request $request, int $type = HttpKernelInterface::SUB_REQUEST): GetResponseEvent
+    private function createEvent(Request $request, int $type = HttpKernelInterface::SUB_REQUEST): RequestEvent
     {
         /** @var HttpKernelInterface $httpKernel */
         $httpKernel = $this->createMock(HttpKernelInterface::class);
 
-        return new GetResponseEvent($httpKernel, $request, $type);
+        return new RequestEvent($httpKernel, $request, $type);
     }
 }

@@ -11,10 +11,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class ApiResolvedFormTypeFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ResolvedFormTypeFactoryInterface|\Oro\Bundle\FormBundle\Tests\Unit\MockHelper */
+    /** @var ResolvedFormTypeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultFactory;
 
-    /** @var FormExtensionCheckerInterface|\Oro\Bundle\FormBundle\Tests\Unit\MockHelper */
+    /** @var FormExtensionCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formExtensionChecker;
 
     /** @var ApiResolvedFormTypeFactory */

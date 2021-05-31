@@ -8,7 +8,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -64,9 +64,9 @@ class ResponseHistoryListener implements ServiceSubscriberInterface
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onResponse(FilterResponseEvent $event)
+    public function onResponse(ResponseEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

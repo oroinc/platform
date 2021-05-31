@@ -59,22 +59,22 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'template' => 'TestBundle::test.html.twig',
             ],
             'item2'                      => [
-                'action' => 'TestBundle:Test:test2',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test2Action',
             ],
             'item3'                      => [
-                'action' => 'TestBundle:Test:test3',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test3Action',
             ],
             'item4'                      => [
-                'action' => 'TestBundle:Test:test4',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test4Action',
             ],
             'item5'                      => [
-                'action' => 'TestBundle:Test:test5',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test5Action',
             ],
             'item6'                      => [
-                'action' => 'TestBundle:Test:test6',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test6Action',
             ],
             'item7'                      => [
-                'action' => 'TestBundle:Test:test7',
+                'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test7Action',
             ],
             'new_item'                   => [
                 'template' => 'test_template',

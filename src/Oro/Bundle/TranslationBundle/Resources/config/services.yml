@@ -82,11 +82,11 @@ services:
     oro_translation.empty_array.loader:
         class: Oro\Bundle\TranslationBundle\Translation\EmptyArrayLoader
 
-    oro_translation.selector:
-        class: Oro\Bundle\TranslationBundle\Translation\MessageSelector
-        decorates: translator.selector
-        arguments:
-            - '@logger'
+    oro_translation.identity_translator:
+        class: Oro\Bundle\TranslationBundle\Translation\IdentityTranslator
+        decorates: identity_translator
+        calls:
+            - [setLogger, ['@logger']]
 
     oro_translation.cache:
         parent: oro.cache.abstract

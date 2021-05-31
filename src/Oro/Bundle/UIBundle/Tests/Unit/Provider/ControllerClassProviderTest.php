@@ -10,12 +10,9 @@ use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Testing\TempDirExtension;
 use ProxyManager\Proxy\VirtualProxyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
@@ -29,9 +26,6 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
     /** @var RouteCollection */
     private $routeCollection;
-
-    /** @var KernelInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
 
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
@@ -53,7 +47,6 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
         $this->cacheFile = $this->getTempFile('ControllerClassProvider');
 
         $this->routeCollection = new RouteCollection();
-        $this->kernel = $this->createMock(KernelInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -66,27 +59,9 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
             $this->cacheFile,
             true,
             $router,
-            new ControllerNameParser($this->kernel),
             $this->container,
             $this->logger
         );
-    }
-
-    /**
-     * @return BundleInterface
-     */
-    private function getBundle(): BundleInterface
-    {
-        /** @var BundleInterface|\PHPUnit\Framework\MockObject\MockObject $bundle */
-        $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects(self::any())
-            ->method('getNamespace')
-            ->willReturn('Oro\Bundle\UIBundle\Tests\Unit\Fixture');
-        $bundle->expects(self::any())
-            ->method('getName')
-            ->willReturn('Acme');
-
-        return $bundle;
     }
 
     public function testGetControllers()
@@ -196,60 +171,6 @@ class ControllerClassProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             ['test_route' => [TestController::class, 'someAction']],
-            $this->controllerClassProvider->getControllers()
-        );
-    }
-
-    /**
-     * test for controller defined as "bundle:controller:action"
-     */
-    public function testLoadBundleControllerAction()
-    {
-        $this->routeCollection->add(
-            'test_route',
-            new Route('test', ['_controller' => 'Acme:Test:some'])
-        );
-
-        $this->kernel->expects(self::once())
-            ->method('getBundle')
-            ->with('Acme')
-            ->willReturn($this->getBundle());
-        $this->container->expects(self::never())
-            ->method('has');
-        $this->logger->expects(self::never())
-            ->method('error');
-
-        self::assertSame(
-            ['test_route' => [TestController::class, 'someAction']],
-            $this->controllerClassProvider->getControllers()
-        );
-    }
-
-    /**
-     * test for controller defined as "bundle:controller:action", but that cannot be parsed
-     */
-    public function testLoadBundleControllerActionWithError()
-    {
-        $this->routeCollection->add(
-            'test_route',
-            new Route('test', ['_controller' => 'Acme:Undefined:some'])
-        );
-
-        $this->kernel->expects(self::once())
-            ->method('getBundle')
-            ->with('Acme')
-            ->willReturn($this->getBundle());
-        $this->container->expects(self::never())
-            ->method('has');
-        $this->logger->expects(self::once())
-            ->method('error')
-            ->willReturnCallback(function ($message, $context) {
-                self::assertEquals('Cannot extract controller for "test_route" route.', $message);
-                self::assertInstanceOf(\InvalidArgumentException::class, $context['exception']);
-            });
-
-        self::assertSame(
-            [],
             $this->controllerClassProvider->getControllers()
         );
     }

@@ -9,17 +9,15 @@ use Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $csrfRequestManager;
+    private CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject $csrfRequestManager;
 
-    /** @var CsrfProtectionRequestListener */
-    private $listener;
+    private CsrfProtectionRequestListener $listener;
 
     protected function setUp(): void
     {
@@ -28,65 +26,62 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new CsrfProtectionRequestListener($this->csrfRequestManager);
     }
 
-    public function testOnKernelControllerNotMasterRequest()
+    public function testOnKernelControllerNotMasterRequest(): void
     {
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(false);
 
-        $event->expects($this->never())
+        $event->expects(self::never())
             ->method('getRequest');
 
-        $this->csrfRequestManager->expects($this->never())
-            ->method($this->anything());
+        $this->csrfRequestManager->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerCsrfTokenRefreshWhenCookieNotPresent()
+    public function testOnKernelControllerCsrfTokenRefreshWhenCookieNotPresent(): void
     {
         $request = Request::create('/');
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->csrfRequestManager->expects($this->once())
+        $this->csrfRequestManager->expects(self::once())
             ->method('refreshRequestToken');
 
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerNoCsrfProtection()
+    public function testOnKernelControllerNoCsrfProtection(): void
     {
         $request = Request::create('/');
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->csrfRequestManager->expects($this->never())
-            ->method($this->anything());
+        $this->csrfRequestManager->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerDisabledCheck()
+    public function testOnKernelControllerDisabledCheck(): void
     {
         $csrfProtection = new CsrfProtection(['enabled' => false]);
 
@@ -94,18 +89,17 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
         $request->cookies->set(CsrfRequestManager::CSRF_TOKEN_ID, 'test');
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->csrfRequestManager->expects($this->never())
-            ->method($this->anything());
+        $this->csrfRequestManager->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->onKernelController($event);
     }
@@ -114,28 +108,27 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider useRequestDataProvider
      * @param bool $useRequest
      */
-    public function testOnKernelControllerCsrfPassed($useRequest)
+    public function testOnKernelControllerCsrfPassed(bool $useRequest): void
     {
         $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
 
         $request = Request::create('/');
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->csrfRequestManager->expects($this->once())
+        $this->csrfRequestManager->expects(self::once())
             ->method('refreshRequestToken')
             ->with();
 
-        $this->csrfRequestManager->expects($this->once())
+        $this->csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($request, $useRequest)
             ->willReturn(true);
@@ -147,29 +140,28 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider useRequestDataProvider
      * @param bool $useRequest
      */
-    public function testOnKernelControllerCsrfFail($useRequest)
+    public function testOnKernelControllerCsrfFail(bool $useRequest): void
     {
         $csrfProtection = new CsrfProtection(['enabled' => true, 'useRequest' => $useRequest]);
 
         $request = Request::create('/');
         $request->attributes->set('_' . CsrfProtection::ALIAS_NAME, $csrfProtection);
 
-        /** @var FilterControllerEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterControllerEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ControllerEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->csrfRequestManager->expects($this->once())
+        $this->csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
             ->with($request, $useRequest)
             ->willReturn(false);
 
-        $this->csrfRequestManager->expects($this->never())
+        $this->csrfRequestManager->expects(self::never())
             ->method('refreshRequestToken');
 
         $this->expectException(AccessDeniedHttpException::class);
@@ -188,42 +180,40 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testOnKernelResponseNotMasterRequest()
+    public function testOnKernelResponseNotMasterRequest(): void
     {
-        /** @var FilterResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterResponseEvent::class);
+        $event = $this->createMock(ResponseEvent::class);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(false);
 
-        $event->expects($this->never())
+        $event->expects(self::never())
             ->method('getResponse');
 
         $this->listener->onKernelResponse($event);
     }
 
-    public function testOnKernelResponseNoCsrfProtection()
+    public function testOnKernelResponseNoCsrfProtection(): void
     {
         $request = Request::create('/');
 
-        /** @var FilterResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterResponseEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ResponseEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $event->expects($this->never())
+        $event->expects(self::never())
             ->method('getResponse');
 
         $this->listener->onKernelResponse($event);
     }
 
-    public function testOnKernelResponseRefreshCookie()
+    public function testOnKernelResponseRefreshCookie(): void
     {
         $cookie = Cookie::create('test');
 
@@ -231,22 +221,21 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $request->attributes->set(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE, $cookie);
         $response = new Response();
 
-        /** @var FilterResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(FilterResponseEvent::class);
-        $event->expects($this->once())
+        $event = $this->createMock(ResponseEvent::class);
+        $event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getResponse')
             ->willReturn($response);
 
         $this->listener->onKernelResponse($event);
 
-        $this->assertEquals([$cookie], $response->headers->getCookies());
+        self::assertEquals([$cookie], $response->headers->getCookies());
     }
 }

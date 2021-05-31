@@ -13,7 +13,7 @@ use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Security;
@@ -22,14 +22,11 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private TokenStorageInterface $tokenStorage;
+    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private ManagerRegistry $doctrine;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private LoggerInterface $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
     private ContextListener $listener;
 
@@ -49,15 +46,14 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsupportedTokenDataProvider
      *
-     * @param mixed $token
+     * @param TokenInterface $token
      */
-    public function testOnKernelRequestUnsupportedTokenInstance($token): void
+    public function testOnKernelRequestUnsupportedTokenInstance(TokenInterface $token): void
     {
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::never())
             ->method(self::anything());
         $this->doctrine->expects(self::never())
@@ -90,8 +86,8 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage->expects(self::atLeastOnce())
             ->method('getToken')
             ->willReturn($token);
-        /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
+
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::never())
             ->method(self::anything());
 
@@ -117,7 +113,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::any())
             ->method('getSession')
             ->willReturn($session);
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
@@ -149,8 +145,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::never())
             ->method(self::anything());
 
@@ -192,8 +187,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::never())
             ->method(self::anything());
 
@@ -260,8 +254,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $request->expects(self::any())
             ->method('getSession')
             ->willReturn($session);
-        /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(GetResponseEvent::class);
+        $event = $this->createMock(RequestEvent::class);
         $event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);

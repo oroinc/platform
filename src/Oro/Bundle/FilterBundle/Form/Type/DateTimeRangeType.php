@@ -46,8 +46,9 @@ class DateTimeRangeType extends AbstractType
         $resolver->setDefaults([
             'field_type'    => DateTimeType::class,
             'field_options' => [
-                'format' => DateTimeRangeFilter::DATE_FORMAT
-            ]
+                'format' => DateTimeRangeFilter::DATE_FORMAT,
+                'html5'  => false,
+            ],
         ]);
     }
 }

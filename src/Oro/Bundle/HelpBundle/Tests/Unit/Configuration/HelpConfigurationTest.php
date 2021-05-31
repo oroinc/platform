@@ -39,21 +39,14 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
                         ]
                     ],
                     'resources' => [
-                        'AcmeFooBundle'         => [
-                            'server' => 'http://server.com',
-                            'prefix' => 'prefix',
-                            'alias'  => 'alias',
-                            'uri'    => 'uri',
-                            'link'   => 'http://server.com/link'
-                        ],
-                        'AcmeFooBundle:Foo'     => [
+                        'Acme\Bundle\FooBundle\Controller\FooController'     => [
                             'server' => 'https://server.com',
                             'prefix' => 'prefix',
                             'alias'  => 'alias',
                             'uri'    => 'uri',
                             'link'   => 'http://server.com/link'
                         ],
-                        'AcmeFooBundle:Foo:bar' => [
+                        'Acme\Bundle\FooBundle\Controller\FooController::barAction' => [
                             'server' => 'http://server.com',
                             'prefix' => 'prefix',
                             'alias'  => 'alias',
@@ -76,21 +69,14 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
                         ]
                     ],
                     'resources' => [
-                        'AcmeFooBundle'         => [
-                            'server' => 'http://server.com',
-                            'prefix' => 'prefix',
-                            'alias'  => 'alias',
-                            'uri'    => 'uri',
-                            'link'   => 'http://server.com/link'
-                        ],
-                        'AcmeFooBundle:Foo'     => [
+                        'Acme\Bundle\FooBundle\Controller\FooController'     => [
                             'server' => 'https://server.com',
                             'prefix' => 'prefix',
                             'alias'  => 'alias',
                             'uri'    => 'uri',
                             'link'   => 'http://server.com/link'
                         ],
-                        'AcmeFooBundle:Foo:bar' => [
+                        'Acme\Bundle\FooBundle\Controller\FooController::barAction' => [
                             'server' => 'http://server.com',
                             'prefix' => 'prefix',
                             'alias'  => 'alias',
@@ -139,25 +125,26 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
             'invalid_server'                   => [
                 [
                     'resources' => [
-                        'AcmeFooBundle:Foo:bar' => [
+                        'Acme\Bundle\FooBundle\Controller\FooController::barAction' => [
                             'server' => 'server'
                         ]
                     ]
                 ],
                 InvalidConfigurationException::class,
-                'Invalid configuration for path "help.resources.AcmeFooBundle:Foo:bar.server": '
-                . 'Invalid URL "server".'
+                'Invalid configuration for path "help.resources.Acme\Bundle\FooBundle\Controller\FooController'
+                . '::barAction.server": Invalid URL "server".'
             ],
             'invalid_link'                     => [
                 [
                     'resources' => [
-                        'AcmeFooBundle:Foo:bar' => [
+                        'Acme\Bundle\FooBundle\Controller\FooController::barAction' => [
                             'link' => 'link'
                         ]
                     ]
                 ],
                 InvalidConfigurationException::class,
-                'Invalid configuration for path "help.resources.AcmeFooBundle:Foo:bar.link": Invalid URL "link".'
+                'Invalid configuration for path "help.resources.Acme\Bundle\FooBundle\Controller\FooController'
+                . '::barAction.link": Invalid URL "link".'
             ],
             'invalid_vendor_name'              => [
                 [
@@ -168,15 +155,6 @@ class HelpConfigurationTest extends \PHPUnit\Framework\TestCase
                 InvalidConfigurationException::class,
                 'Node "vendors" contains invalid vendor name "123".'
             ],
-            'invalid_vendor_too_many_sections' => [
-                [
-                    'resources' => [
-                        'AcmeFooBundle:Foo:bar:baz' => []
-                    ]
-                ],
-                InvalidConfigurationException::class,
-                'Node "resources" contains invalid resource name "AcmeFooBundle:Foo:bar:baz".'
-            ]
         ];
     }
 }

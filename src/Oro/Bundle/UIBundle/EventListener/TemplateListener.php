@@ -7,7 +7,7 @@ use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateNameParserInterface;
 use Symfony\Component\Templating\TemplateReferenceInterface;
@@ -21,11 +21,10 @@ class TemplateListener implements ServiceSubscriberInterface
 {
     private const DEFAULT_CONTAINER = 'widget';
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerInterface $container;
 
-    /** @var EngineInterface */
-    private $templating;
+    private ?EngineInterface $templating = null;
+
     private Inflector $inflector;
 
     public function __construct(ContainerInterface $container, Inflector $inflector)
@@ -34,10 +33,7 @@ class TemplateListener implements ServiceSubscriberInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function onKernelView(GetResponseForControllerResultEvent $event): void
+    public function onKernelView(ViewEvent $event): void
     {
         $request = $event->getRequest();
         $templateReference = $this->getTemplateReference($request);

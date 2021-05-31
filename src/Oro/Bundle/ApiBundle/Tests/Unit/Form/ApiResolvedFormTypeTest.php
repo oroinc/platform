@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ApiResolvedFormTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ResolvedFormTypeInterface|\Oro\Bundle\FormBundle\Tests\Unit\MockHelper */
+    /** @var ResolvedFormTypeInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerType;
 
     /** @var ApiResolvedFormTypeFactory */

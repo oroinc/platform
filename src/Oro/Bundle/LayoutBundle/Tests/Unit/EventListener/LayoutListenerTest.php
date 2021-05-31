@@ -16,7 +16,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -25,20 +25,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LayoutManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $layoutManager;
+    private LayoutManager|\PHPUnit\Framework\MockObject\MockObject $layoutManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var LayoutListener
-     */
-    private $listener;
+    private LayoutListener $listener;
 
     protected function setUp(): void
     {
@@ -53,30 +44,29 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new LayoutListener($container);
     }
 
-    public function testShouldNotModifyResponseWithoutLayoutAnnotation()
+    public function testShouldNotModifyResponseWithoutLayoutAnnotation(): void
     {
-        $this->layoutManager->expects($this->never())
-            ->method('getLayoutBuilder');
+        $this->layoutManager->expects(self::never())->method('getLayoutBuilder');
         $responseEvent = $this->createResponseForControllerResultEvent([], []);
         $this->listener->onKernelView($responseEvent);
-        $this->assertFalse($responseEvent->hasResponse());
+        self::assertFalse($responseEvent->hasResponse());
     }
 
-    public function testShouldAddOptionsFromLayoutAnnotationToContext()
+    public function testShouldAddOptionsFromLayoutAnnotationToContext(): void
     {
         $builder = $this->createMock(LayoutBuilderInterface::class);
 
-        $builder->expects($this->once())
+        $builder->expects(self::once())
             ->method('setBlockTheme')
             ->with(['blockTheme1.html.twig', 'blockTheme2.html.twig']);
 
         $this->setupLayoutExpectations(
             $builder,
             function (ContextInterface $context) {
-                $this->assertEquals('action', $context->get('action'));
-                $this->assertEquals('theme', $context->get('theme'));
-                $this->assertEquals('value1', $context->get('var1'));
-                $this->assertEquals('value2', $context->get('var2'));
+                self::assertEquals('action', $context->get('action'));
+                self::assertEquals('theme', $context->get('theme'));
+                self::assertEquals('value1', $context->get('var1'));
+                self::assertEquals('value2', $context->get('var2'));
             }
         );
 
@@ -96,14 +86,14 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldAddBlockThemeFromLayoutAnnotation()
+    public function testShouldAddBlockThemeFromLayoutAnnotation(): void
     {
         $builder = $this->createMock(LayoutBuilderInterface::class);
 
-        $builder->expects($this->once())
+        $builder->expects(self::once())
             ->method('setBlockTheme')
             ->with('blockTheme.html.twig');
 
@@ -119,14 +109,14 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             []
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldAddOneBlockThemeFromLayoutAnnotationBlockThemesAttr()
+    public function testShouldAddOneBlockThemeFromLayoutAnnotationBlockThemesAttr(): void
     {
         $builder = $this->createMock(LayoutBuilderInterface::class);
 
-        $builder->expects($this->once())
+        $builder->expects(self::once())
             ->method('setBlockTheme')
             ->with('blockTheme.html.twig');
 
@@ -142,10 +132,10 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             []
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldReturnBlocksContent()
+    public function testShouldReturnBlocksContent(): void
     {
         $blocks = [
             'block1' => 'Test block 1',
@@ -165,25 +155,25 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             []
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals(json_encode($blocks), $responseEvent->getResponse()->getContent());
+        self::assertEquals(json_encode($blocks), $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldReturnAvailableBlocksContentWhenUnknownBlocksRequested()
+    public function testShouldReturnAvailableBlocksContentWhenUnknownBlocksRequested(): void
     {
         $builder = $this->createMock(LayoutBuilderInterface::class);
-        $this->layoutManager->expects($this->any())
+        $this->layoutManager->expects(self::any())
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
         $layout = $this->createMock(Layout::class);
-        $layout->expects($this->once())
+        $layout->expects(self::once())
             ->method('render')
             ->willReturn('Test block 1');
 
         $exception = new BlockViewNotFoundException();
-        $this->layoutManager->expects($this->exactly(2))
+        $this->layoutManager->expects(self::exactly(2))
             ->method('getLayout')
-            ->willReturnCallback(function ($context, $blockId) use ($layout, $exception) {
+            ->willReturnCallback(static function ($context, $blockId) use ($layout, $exception) {
                 if ($blockId === 'block1') {
                     return $layout;
                 }
@@ -191,7 +181,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                 throw $exception;
             });
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('warning')
             ->with(
                 'Unknown block "block2" was requested via layout_block_ids',
@@ -208,10 +198,10 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             []
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals(json_encode(['block1' => 'Test block 1']), $responseEvent->getResponse()->getContent());
+        self::assertEquals(json_encode(['block1' => 'Test block 1']), $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldThrowExceptionIfBothLayoutAndTemplateAreUsed()
+    public function testShouldThrowExceptionIfBothLayoutAndTemplateAreUsed(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -225,7 +215,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    public function testShouldThrowExceptionForMissingVarsInAnnotation()
+    public function testShouldThrowExceptionForMissingVarsInAnnotation(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -241,7 +231,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned()
+    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenArrayReturned(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -250,13 +240,13 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->setupLayoutExpectations();
 
-        $attributes    = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
-        $result        = ['required1' => 'value1'];
+        $attributes = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
+        $result = ['required1' => 'value1'];
         $responseEvent = $this->createResponseForControllerResultEvent($attributes, $result);
         $this->listener->onKernelView($responseEvent);
     }
 
-    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned()
+    public function testShouldThrowExceptionForNotHavingRequiredVarsWhenContextReturned(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
@@ -266,25 +256,28 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->setupLayoutExpectations();
 
         $attributes = ['_layout' => new LayoutAnnotation(['vars' => ['required1', 'required2']])];
-        $context    = new LayoutContext();
+        $context = new LayoutContext();
         $context->getResolver()->setRequired(['required2']);
         $context['required2'] = 'value1';
-        $responseEvent        = $this->createResponseForControllerResultEvent($attributes, $context);
+        $responseEvent = $this->createResponseForControllerResultEvent($attributes, $context);
         $this->listener->onKernelView($responseEvent);
     }
 
     /**
-     * @dataProvider             getNotEmptyAnnotationDataProvider
+     * @dataProvider getNotEmptyAnnotationDataProvider
      *
      * @param array $options
      */
-    public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty(array $options)
-    {
+    public function testShouldThrowExceptionWhenAlreadyBuiltLayoutReturnedAndLayoutAnnotationIsNotEmpty(
+        array $options
+    ): void {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage(\sprintf(
-            'The empty @Layout() annotation must be used when the controller returns an instance of "%s".',
-            \Oro\Component\Layout\Layout::class
-        ));
+        $this->expectExceptionMessage(
+            \sprintf(
+                'The empty @Layout() annotation must be used when the controller returns an instance of "%s".',
+                Layout::class
+            )
+        );
 
         $attributes = ['_layout' => new LayoutAnnotation($options)];
         $layout = $this->createMock(Layout::class);
@@ -292,26 +285,23 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelView($responseEvent);
     }
 
-    /**
-     * @return array
-     */
-    public function getNotEmptyAnnotationDataProvider()
+    public function getNotEmptyAnnotationDataProvider(): array
     {
         return [
             [['action' => 'action']],
             [['theme' => 'theme']],
             [['blockThemes' => ['blockTheme.html.twig']]],
             [['blockTheme' => 'blockTheme.html.twig']],
-            [['vars' => ['var1']]]
+            [['vars' => ['var1']]],
         ];
     }
 
-    public function testShouldNotOverrideActionFromLayoutAnnotation()
+    public function testShouldNotOverrideActionFromLayoutAnnotation(): void
     {
         $this->setupLayoutExpectations(
             null,
             function (ContextInterface $context) {
-                $this->assertEquals('updated_action', $context->get('action'));
+                self::assertEquals('updated_action', $context->get('action'));
             }
         );
 
@@ -327,15 +317,15 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    public function testShouldNotOverrideThemeFromLayoutAnnotation()
+    public function testShouldNotOverrideThemeFromLayoutAnnotation(): void
     {
         $this->setupLayoutExpectations(
             null,
             function (ContextInterface $context) {
-                $this->assertEquals('updated_theme', $context->get('theme'));
+                self::assertEquals('updated_theme', $context->get('theme'));
             }
         );
 
@@ -351,28 +341,23 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $this->listener->onKernelView($responseEvent);
-        $this->assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
+        self::assertEquals('Test Layout', $responseEvent->getResponse()->getContent());
     }
 
-    /**
-     * @param LayoutBuilderInterface|null $builder
-     * @param \Closure|null $assertContextCallback
-     * @param array $renderBlocks
-     */
     private function setupLayoutExpectations(
-        $builder = null,
+        ?LayoutBuilderInterface $builder = null,
         \Closure $assertContextCallback = null,
         array $renderBlocks = []
-    ) {
+    ): void {
         if (null === $builder) {
             $builder = $this->createMock(LayoutBuilderInterface::class);
         }
         $callCount = $renderBlocks ? count($renderBlocks) : 1;
-        $this->layoutManager->expects($this->any())
+        $this->layoutManager->expects(self::any())
             ->method('getLayoutBuilder')
             ->willReturn($builder);
 
-        $this->layoutManager->expects($this->exactly($callCount))
+        $this->layoutManager->expects(self::exactly($callCount))
             ->method('getLayout')
             ->willReturnCallback(
                 function (ContextInterface $context, $blockId) use ($assertContextCallback, $renderBlocks) {
@@ -384,7 +369,7 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
                     }
 
                     if (null !== $assertContextCallback) {
-                        call_user_func($assertContextCallback, $context);
+                        $assertContextCallback($context);
                     }
 
                     return $this->getLayoutMock($renderBlocks, $blockId);
@@ -392,37 +377,28 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
             );
     }
 
-    /**
-     * @param array $renderBlocks
-     * @param string $blockId
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getLayoutMock($renderBlocks, $blockId)
-    {
+    private function getLayoutMock(
+        array $renderBlocks,
+        ?string $blockId
+    ): \PHPUnit\Framework\MockObject\MockObject|Layout {
         $renderContent = 'Test Layout';
         if ($blockId) {
             $renderContent = $renderBlocks[$blockId] ?? '';
         }
         $layout = $this->createMock(Layout::class);
-        $layout->expects($this->once())
+        $layout->expects(self::once())
             ->method('render')
             ->willReturn($renderContent);
-        $layout->expects($this->any())
+        $layout->expects(self::any())
             ->method('getView')
-            ->will($this->returnValue($this->createMock(BlockView::class)));
+            ->willReturn($this->createMock(BlockView::class));
 
         return $layout;
     }
 
-    /**
-     * @param array $attributes
-     * @param mixed $controllerResult
-     *
-     * @return GetResponseForControllerResultEvent
-     */
-    private function createResponseForControllerResultEvent(array $attributes, $controllerResult)
+    private function createResponseForControllerResultEvent(array $attributes, $controllerResult): ViewEvent
     {
-        return new GetResponseForControllerResultEvent(
+        return new ViewEvent(
             $this->createMock(HttpKernelInterface::class),
             new Request([], [], $attributes),
             HttpKernelInterface::MASTER_REQUEST,

@@ -39,7 +39,9 @@ Oro\Bundle\UserBundle\Entity\User:
             - Length:
                 max:        100
         birthday:
-            - Date:         ~
+            - Type:
+                type: \DateTimeInterface
+                message: oro.user.user.birthday.type.message
             - LessThanOrEqual:
                 value: now UTC
                 message: The birth date cannot be in the future.

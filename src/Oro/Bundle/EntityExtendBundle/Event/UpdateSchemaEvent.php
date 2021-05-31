@@ -33,12 +33,12 @@ class UpdateSchemaEvent extends Event
 
     /**
      * Launches a command as a separate process.
-     * @see Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor::runCommand
+     * @see \Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor::runCommand
      *
      * @param string $command
      * @param array  $options
      *
-     * @return integer The exit status code
+     * @return int The exit status code
      */
     protected function executeCommand($command, array $options)
     {

@@ -7,13 +7,10 @@ use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
 use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\Controller\TestController;
-use Oro\Bundle\HelpBundle\Tests\Unit\Fixtures\Bundles\TestBundle\OroTestBundle as TestBundle;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -56,28 +53,17 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($config);
 
-        $bundle = new TestBundle();
-        $kernel = $this->createMock(KernelInterface::class);
-        $kernel->expects($this->any())
-            ->method('getBundle')
-            ->with($bundle->getName(), $this->isFalse())
-            ->willReturn($bundle);
-        $kernel->expects($this->any())
-            ->method('getBundles')
-            ->willReturn([$bundle->getName() => $bundle]);
-
         return new HelpLinkProvider(
             $defaultConfig,
             $configProvider,
             $this->requestStack,
             $this->controllerClassProvider,
-            new ControllerNameParser($kernel),
             $this->helper,
             $this->cache
         );
     }
 
-    public function testGetHelpLinkCached()
+    public function testGetHelpLinkCached(): void
     {
         $expectedLink = self::TEST . '/help/test?v=1.1';
         $routeName = 'test_route';
@@ -99,7 +85,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
-    public function testGetHelpLinkWithoutRouteAndWithoutCache()
+    public function testGetHelpLinkWithoutRouteAndWithoutCache(): void
     {
         $expectedLink = 'http://example.com/';
 
@@ -114,7 +100,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedLink, $helpLinkProvider->getHelpLinkUrl());
     }
 
-    public function testGetHelpLinkWithoutRouteAndWithCache()
+    public function testGetHelpLinkWithoutRouteAndWithCache(): void
     {
         $expectedLink = 'http://example.com/';
 
@@ -137,7 +123,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         array $controllers,
         array $requestAttributes,
         string $expectedLink
-    ) {
+    ): void {
         $this->helper
             ->expects($this->any())
             ->method('getVersion')
@@ -175,8 +161,15 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
+        $myTestController = 'Oro\Bundle\HelpBundle\Controller\MyTestController';
+        $myTestControllerRunAction = str_replace('\\', '/', $myTestController) . '_runAction?v=' . self::VERSION;
+
+        $testControllerName = str_replace('\\', '/', TestController::class);
+        $testControllerRunAction = $testControllerName . '_runAction?v=' . self::VERSION;
+        $testControllerExecuteAction = $testControllerName . '_executeAction?v=' . self::VERSION;
+
         return [
             'simple default no cache'                   => [
                 'configuration'     => [
@@ -190,7 +183,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::TEST_WIKI . '/Oro/' . $testControllerRunAction
             ],
             'simple default with cache'                 => [
                 'configuration'     => [
@@ -204,7 +197,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::TEST_WIKI . '/Oro/' . $testControllerRunAction
             ],
             'default with prefix'                       => [
                 'configuration'     => [
@@ -219,7 +212,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/' . $testControllerRunAction
             ],
             'default with link'                         => [
                 'configuration'     => [
@@ -277,7 +270,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::WIKI . '/Prefix/CustomVendor/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::WIKI . '/Prefix/CustomVendor/' . $testControllerRunAction
             ],
             'vendor uri'                                => [
                 'configuration'     => [
@@ -299,68 +292,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
             ],
-            'bundle config'                             => [
-                'configuration'     => [
-                    'defaults'  => [
-                        'server' => self::TEST_WIKI . '/',
-                        'prefix' => 'Third_Party'
-                    ],
-                    'resources' => [
-                        'OroTestBundle' => [
-                            'alias'  => 'CustomBundle',
-                            'prefix' => 'Prefix',
-                            'server' => self::WIKI . '/'
-                        ]
-                    ]
-                ],
-                'controllers'       => [
-                    'test_route' => [TestController::class, 'runAction']
-                ],
-                'requestAttributes' => [
-                    '_route' => 'test_route'
-                ],
-                'expectedLink'      => self::WIKI . '/Prefix/Oro/CustomBundle/Test_run?v=' . self::VERSION
-            ],
-            'bundle link'                               => [
-                'configuration'     => [
-                    'defaults'  => [
-                        'server' => self::TEST_WIKI . '/',
-                        'prefix' => 'Third_Party'
-                    ],
-                    'resources' => [
-                        'OroTestBundle' => [
-                            'link' => self::WIKI . '/'
-                        ]
-                    ]
-                ],
-                'controllers'       => [
-                    'test_route' => [TestController::class, 'runAction']
-                ],
-                'requestAttributes' => [
-                    '_route' => 'test_route'
-                ],
-                'expectedLink'      => self::WIKI . '/'
-            ],
-            'bundle uri'                                => [
-                'configuration'     => [
-                    'defaults'  => [
-                        'server' => self::TEST_WIKI . '/',
-                        'prefix' => 'Third_Party'
-                    ],
-                    'resources' => [
-                        'OroTestBundle' => [
-                            'uri' => 'test'
-                        ]
-                    ]
-                ],
-                'controllers'       => [
-                    'test_route' => [TestController::class, 'runAction']
-                ],
-                'requestAttributes' => [
-                    '_route' => 'test_route'
-                ],
-                'expectedLink'      => self::TEST_WIKI . '/test?v=' . self::VERSION
-            ],
             'controller config'                         => [
                 'configuration'     => [
                     'defaults'  => [
@@ -368,8 +299,8 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test' => [
-                            'alias'  => 'MyTest',
+                        TestController::class => [
+                            'alias'  => $myTestController,
                             'prefix' => 'Prefix',
                             'server' => self::WIKI . '/'
                         ]
@@ -381,7 +312,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::WIKI . '/Prefix/Oro/OroTestBundle/MyTest_run?v=' . self::VERSION
+                'expectedLink'      => self::WIKI . '/Prefix/Oro/' . $myTestControllerRunAction
             ],
             'controller link'                           => [
                 'configuration'     => [
@@ -390,7 +321,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test' => [
+                        TestController::class => [
                             'link' => self::WIKI . '/'
                         ]
                     ]
@@ -410,7 +341,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test' => [
+                        TestController::class => [
                             'uri' => 'test'
                         ]
                     ]
@@ -430,8 +361,8 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test:run' => [
-                            'alias'  => 'execute',
+                        TestController::class . '::runAction' => [
+                            'alias'  => 'executeAction',
                             'prefix' => 'Prefix',
                             'server' => self::WIKI . '/'
                         ]
@@ -443,7 +374,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::WIKI . '/Prefix/Oro/OroTestBundle/Test_execute?v=' . self::VERSION
+                'expectedLink'      => self::WIKI . '/Prefix/Oro/' . $testControllerExecuteAction
             ],
             'action link'                               => [
                 'configuration'     => [
@@ -452,7 +383,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test:run' => [
+                        TestController::class . '::runAction' => [
                             'link' => self::WIKI . '/'
                         ]
                     ]
@@ -472,7 +403,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test:run' => [
+                        TestController::class . '::runAction' => [
                             'uri' => 'test'
                         ]
                     ]
@@ -531,14 +462,13 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         [
                             'actionAlias'     => 'execute',
                             'controllerAlias' => 'Executor',
-                            'bundleAlias'     => 'Bundle',
                             'vendorAlias'     => 'Vendor',
                             'prefix'          => 'Prefix',
                             'server'          => self::WIKI . '/'
                         ]
                     )
                 ],
-                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Bundle/Executor_execute?v=' . self::VERSION
+                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Executor_execute?v=' . self::VERSION
             ],
             'annotation configuration override'         => [
                 'configuration'     => [
@@ -567,7 +497,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                             [
                                 'actionAlias'     => 'executeBar',
                                 'controllerAlias' => 'ExecutorBar',
-                                'bundleAlias'     => 'BundleBar',
                                 'vendorAlias'     => 'VendorBar',
                                 'prefix'          => 'PrefixBar',
                                 'server'          => self::WIKI . '/bar'
@@ -575,7 +504,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         )
                     ]
                 ],
-                'expectedLink'      => self::WIKI . '/bar/PrefixBar/VendorBar/BundleBar/ExecutorBar_executeBar?v='
+                'expectedLink'      => self::WIKI . '/bar/PrefixBar/VendorBar/ExecutorBar_executeBar?v='
                     . self::VERSION
             ],
             'annotation uri'                            => [
@@ -606,7 +535,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'prefix' => 'Third_Party'
                     ],
                     'resources' => [
-                        'OroTestBundle:Test:run' => [
+                        TestController::class . '::runAction' => [
                             'uri' => null
                         ]
                     ]
@@ -622,7 +551,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         ]
                     )
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::TEST_WIKI . '/Third_Party/Oro/' . $testControllerRunAction
             ],
             'route config'                              => [
                 'configuration'     => [
@@ -633,7 +562,6 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         'test_route' => [
                             'action'     => 'execute',
                             'controller' => 'Executor',
-                            'bundle'     => 'Bundle',
                             'vendor'     => 'Vendor',
                             'prefix'     => 'Prefix',
                             'server'     => self::WIKI . '/'
@@ -646,7 +574,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Bundle/Executor_execute?v=' . self::VERSION
+                'expectedLink'      => self::WIKI . '/Prefix/Vendor/Executor_execute?v=' . self::VERSION
             ],
             'route uri'                                 => [
                 'configuration'     => [
@@ -697,7 +625,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                         ]
                     ],
                     'resources' => [
-                        'OroTestBundle:Test:run' => [
+                        TestController::class . '::runAction' => [
                             'link' => null
                         ]
                     ]
@@ -708,7 +636,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route' => 'test_route'
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run?v=' . self::VERSION
+                'expectedLink'      => self::TEST_WIKI . '/Oro/' . $testControllerRunAction
             ],
             'with parameters'                           => [
                 'configuration'     => [
@@ -722,13 +650,13 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        ['actionAlias' => 'run/{optionOne}/{option_two}/{option_3}']
+                        ['actionAlias' => 'runAction/{optionOne}/{option_two}/{option_3}']
                     ),
                     'optionOne'       => 'test1',
                     'option_two'      => 'test2',
                     'option_3'        => 'test3'
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run/test1/test2/test3?v='
+                'expectedLink' => self::TEST_WIKI . '/Oro/' . $testControllerName . '_runAction/test1/test2/test3?v='
                     . self::VERSION
             ],
             'with parameters without parameter value'   => [
@@ -743,10 +671,10 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
                 'requestAttributes' => [
                     '_route'          => 'test_route',
                     '_' . Help::ALIAS => new Help(
-                        ['actionAlias' => 'run/{option}']
+                        ['actionAlias' => 'runAction/{option}']
                     )
                 ],
-                'expectedLink'      => self::TEST_WIKI . '/Oro/OroTestBundle/Test_run/?v=' . self::VERSION
+                'expectedLink' => self::TEST_WIKI . '/Oro/' . $testControllerName . '_runAction/?v=' . self::VERSION
             ]
         ];
     }

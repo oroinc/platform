@@ -71,7 +71,7 @@ class AssociationManager
      *                                             $ownerClass and $targetClass is allowed.
      * @param string        $associationType       The type of the association.
      *                                             For example manyToOne or manyToMany
-     *                                             {@see Oro\Bundle\EntityExtendBundle\Extend\RelationType}
+     *                                             {@see \Oro\Bundle\EntityExtendBundle\Extend\RelationType}
      * @param string        $associationKind       The kind of the association.
      *                                             For example 'activity', 'sponsorship' etc
      *                                             Can be NULL for unclassified (default) association

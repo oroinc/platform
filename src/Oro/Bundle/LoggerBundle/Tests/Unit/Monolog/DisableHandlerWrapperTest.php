@@ -8,21 +8,15 @@ use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Handler\SwiftMailerHandler;
-use Symfony\Component\HttpKernel\Event\PostResponseEvent;
+use Symfony\Component\HttpKernel\Event\TerminateEvent;
 
 class DisableHandlerWrapperTest extends TestCase
 {
     use MonologTestCaseTrait;
 
-    /**
-     * @var LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $config;
+    private LogLevelConfig|\PHPUnit\Framework\MockObject\MockObject $config;
 
-    /**
-     * @var HandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $inner;
+    private HandlerInterface|\PHPUnit\Framework\MockObject\MockObject $inner;
 
     private DisableHandlerWrapper $wrapper;
 
@@ -35,16 +29,19 @@ class DisableHandlerWrapperTest extends TestCase
 
     /**
      * @dataProvider isHandlingProvider
+     *
+     * @param bool $expected
+     * @param bool $isActive
      */
-    public function testIsHandling(bool $expected, bool $isActive)
+    public function testIsHandling(bool $expected, bool $isActive): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
             ->willReturn($isActive);
-        $this->assertEquals($expected, $this->wrapper->isHandling($this->getLogRecord()));
+        self::assertEquals($expected, $this->wrapper->isHandling($this->getLogRecord()));
     }
 
-    public function isHandlingProvider()
+    public function isHandlingProvider(): array
     {
         return [
             'enabled' => [true, false],
@@ -52,7 +49,7 @@ class DisableHandlerWrapperTest extends TestCase
         ];
     }
 
-    public function testHandleBatch()
+    public function testHandleBatch(): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
@@ -64,7 +61,7 @@ class DisableHandlerWrapperTest extends TestCase
         $this->wrapper->handleBatch($records);
     }
 
-    public function testHandleBatchDisabled()
+    public function testHandleBatchDisabled(): void
     {
         $this->config->expects(self::once())
             ->method('isActive')
@@ -74,9 +71,9 @@ class DisableHandlerWrapperTest extends TestCase
         $this->wrapper->handleBatch($this->getMultipleLogRecords());
     }
 
-    public function testMagicCall()
+    public function testMagicCall(): void
     {
-        $event = $this->createMock(PostResponseEvent::class);
+        $event = $this->createMock(TerminateEvent::class);
         $mailerHandler = $this->createMock(SwiftMailerHandler::class);
         $mailerHandler->expects(self::once())
             ->method('onKernelTerminate')

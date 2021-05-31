@@ -3,7 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
  * The request listener that handles HTTP requests in case the application is not installed yet.
@@ -12,20 +12,20 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class RequestListener
 {
     /** @var bool */
-    private $debug;
+    private bool $debug;
 
     /**
      * @param bool $debug
      */
     public function __construct($debug = false)
     {
-        $this->debug = $debug;
+        $this->debug = (bool) $debug;
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onRequest(GetResponseEvent $event)
+    public function onRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

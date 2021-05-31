@@ -93,7 +93,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
      * @acl: ['contact_view']
      * @acl: ['EDIT', 'Acme\DemoBundle\Entity\Contact']
      *
-     * {@see Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
+     * {@see \Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
      */
     public function initialize(array $options)
     {

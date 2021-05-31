@@ -5,15 +5,11 @@ namespace Oro\Bundle\SoapBundle\Tests\EventListener;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\SoapBundle\EventListener\LocaleListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LocaleListener */
-    protected $listener;
-
-    /** @var string */
-    protected $defaultLocale;
+    private string $defaultLocale;
 
     protected function setUp(): void
     {
@@ -25,7 +21,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $customLocale = 'fr';
 
@@ -35,28 +31,20 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
         $translationListener = new TranslatableListener();
 
-        $this->listener = new LocaleListener($translationListener);
-        $this->listener->onKernelRequest($this->createGetResponseEvent($request));
+        $listener = new LocaleListener($translationListener);
+        $listener->onKernelRequest($this->createRequestEvent($request));
 
-        $this->assertEquals($customLocale, $request->getLocale());
-        $this->assertEquals($customLocale, $translationListener->getListenerLocale());
+        self::assertEquals($customLocale, $request->getLocale());
+        self::assertEquals($customLocale, $translationListener->getListenerLocale());
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return GetResponseEvent
-     */
-    protected function createGetResponseEvent(Request $request)
+    private function createRequestEvent(Request $request): RequestEvent
     {
-        $event = $this->getMockBuilder('Symfony\Component\HttpKernel\Event\GetResponseEvent')
-            ->disableOriginalConstructor()
-            ->setMethods(['getRequest'])
-            ->getMock();
+        $event = $this->createMock(RequestEvent::class);
 
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRequest')
-            ->will($this->returnValue($request));
+            ->willReturn($request);
 
         return $event;
     }

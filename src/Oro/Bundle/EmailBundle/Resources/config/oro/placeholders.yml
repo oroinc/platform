@@ -25,7 +25,7 @@ placeholders:
             template: OroEmailBundle:Email:activityLink.html.twig
             acl: oro_email_email_create
         dots_menu_email:
-            action: OroEmailBundle:Email:placeholderLast
+            action: Oro\Bundle\EmailBundle\Controller\EmailController::placeholderLastAction
             applicable: "@oro_user.placeholder.filter->isUserApplicable()"
         email_filter_templates:
             template: OroEmailBundle:Js:default_templates.js.twig
