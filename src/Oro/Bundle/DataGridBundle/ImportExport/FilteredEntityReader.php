@@ -24,7 +24,8 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
 {
     use LoggerAwareTrait;
 
-    const FILTERED_RESULTS_GRID = 'filteredResultsGrid';
+    public const FILTERED_RESULTS_GRID = 'filteredResultsGrid';
+    public const FILTERED_RESULTS_GRID_PARAMS = 'filteredResultsGridParams';
 
     /** @var Manager */
     private $datagridManager;
@@ -89,12 +90,12 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
      */
     public function getIds($entityName, array $options = [])
     {
-        if (!isset($options['filteredResultsGrid'])) {
+        if (!isset($options[self::FILTERED_RESULTS_GRID])) {
             return $this->entityReader->getIds($entityName, $options);
         }
 
-        $gridName = $options['filteredResultsGrid'];
-        $queryString = $options['filteredResultsGridParams'] ?? '';
+        $gridName = $options[self::FILTERED_RESULTS_GRID];
+        $queryString = $options[self::FILTERED_RESULTS_GRID_PARAMS] ?? '';
 
         if (!is_string($queryString)) {
             throw new LogicException(sprintf(
