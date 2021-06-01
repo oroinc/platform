@@ -67,6 +67,10 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction(
                 'oro_currency_symbol_prepend',
                 [$this, 'isCurrencySymbolPrepend']
+            ),
+            new TwigFunction(
+                'oro_locale_allow_to_round_displayed_prices_and_amounts',
+                [$this, 'isAllowedToRoundPricesAndAmounts']
             )
         ];
     }
@@ -420,6 +424,14 @@ class NumberExtension extends AbstractExtension implements ServiceSubscriberInte
     public function isCurrencySymbolPrepend($currency = null, $locale = null)
     {
         return $this->getNumberFormatter()->isCurrencySymbolPrepend($currency, $locale);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToRoundPricesAndAmounts(): bool
+    {
+        return $this->getNumberFormatter()->isAllowedToRoundPricesAndAmounts();
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
@@ -25,6 +26,9 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     private $localeSettings;
 
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
+
     /** @var IntlNumberFormatterFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $intlNumberFormatterFactory;
 
@@ -34,9 +38,11 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->intlNumberFormatterFactory = $this->createMock(IntlNumberFormatterFactory::class);
 
         $this->formatter = new NumberFormatter($this->localeSettings, $this->intlNumberFormatterFactory);
+        $this->formatter->setConfigManager($this->configManager);
     }
 
     public function testFormat(): void
@@ -380,6 +386,12 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         array $attributes,
         int $minFractionDigits = 0
     ): void {
+        $this->configManager
+            ->expects($this->any())
+            ->method('get')
+            ->with('oro_locale.allow_to_round_displayed_prices_and_amounts', true)
+            ->willReturn(false);
+
         $this->localeSettings
             ->expects($this->any())
             ->method('getCurrencySymbolByCurrency')
@@ -446,6 +458,47 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testFormatCurrencyWithAllowToRoundPricesAndAmounts(): void
+    {
+        $locale = 'en_US';
+        $currencyCode = 'USD';
+        $value = 99.9999;
+        $formattedValue = '$99.99';
+
+        $this->configManager
+            ->expects($this->any())
+            ->method('get')
+            ->with('oro_locale.allow_to_round_displayed_prices_and_amounts', true)
+            ->willReturn(true);
+
+        $this->localeSettings
+            ->expects($this->any())
+            ->method('getCurrencySymbolByCurrency')
+            ->with($currencyCode, $locale)
+            ->willReturn('');
+
+        $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
+        $intlNumberFormatter
+            ->expects($this->once())
+            ->method('formatCurrency')
+            ->with($value, $currencyCode)
+            ->willReturn($formattedValue);
+        $intlNumberFormatter
+            ->expects($this->never())
+            ->method('getAttribute');
+        $intlNumberFormatter
+            ->expects($this->never())
+            ->method('setAttribute');
+
+        $this->intlNumberFormatterFactory
+            ->expects($this->once())
+            ->method('create')
+            ->with($locale. '@currency=' . $currencyCode, IntlNumberFormatter::CURRENCY, [], [], [])
+            ->willReturn($intlNumberFormatter);
+
+        $currency = $this->formatter->formatCurrency($value, $currencyCode, [], [], [], $locale);
+        $this->assertEquals($formattedValue, $currency);
+    }
 
     public function testFormatDecimal(): void
     {

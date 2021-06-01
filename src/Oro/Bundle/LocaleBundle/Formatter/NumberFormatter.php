@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Brick\Math\BigDecimal;
 use NumberFormatter as IntlNumberFormatter;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Tools\NumberFormatterHelper;
@@ -40,6 +41,11 @@ class NumberFormatter
     protected $currencySymbols = [];
 
     /**
+     * @var ConfigManager
+     */
+    private $configManager;
+
+    /**
      * @param LocaleSettings $localeSettings
      * @param IntlNumberFormatterFactory $intlNumberFormatterFactory
      */
@@ -47,6 +53,26 @@ class NumberFormatter
     {
         $this->localeSettings = $localeSettings;
         $this->numberFormatterFactory = $intlNumberFormatterFactory;
+    }
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function setConfigManager(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
+    /**
+     * @return ConfigManager
+     */
+    public function getConfigManager(): ConfigManager
+    {
+        if (!$this->configManager) {
+            throw new \LogicException('ConfigManager should not be null.');
+        }
+
+        return $this->configManager;
     }
 
     /**
@@ -163,7 +189,7 @@ class NumberFormatter
         string $currencyCode,
         bool $fixedFraction = false
     ): string {
-        if (!$value || ((int)$value == $value) || $fixedFraction) {
+        if (!$value || ((int)$value == $value) || $fixedFraction || $this->isAllowedToRoundPricesAndAmounts()) {
             return $currencyFormatter->formatCurrency($value, $currencyCode);
         }
         $decimalObject = BigDecimal::of($value);
@@ -592,5 +618,13 @@ class NumberFormatter
         }
 
         return $this->currencySymbolPrepend[$key];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowedToRoundPricesAndAmounts(): bool
+    {
+        return $this->getConfigManager()->get('oro_locale.allow_to_round_displayed_prices_and_amounts', true);
     }
 }
