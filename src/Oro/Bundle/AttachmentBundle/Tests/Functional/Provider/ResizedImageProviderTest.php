@@ -5,7 +5,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Provider;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Configurator\AttachmentSettingsTrait;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -22,14 +21,6 @@ class ResizedImageProviderTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    private function getConfigManager(): ConfigManager
-    {
-        return self::getContainer()->get('oro_config.global');
     }
 
     /**
@@ -89,7 +80,7 @@ class ResizedImageProviderTest extends WebTestCase
     public function testGetPNG(string $fileName, int $quality): void
     {
         $this->changeProcessorsParameters(85, $quality);
-        $this->getConfigManager()->flush();
+        self::getConfigManager('global')->flush();
         $this->assertImageSizeShrink($fileName);
     }
 
