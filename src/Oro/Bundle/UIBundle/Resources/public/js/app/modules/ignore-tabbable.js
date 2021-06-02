@@ -4,28 +4,39 @@ import manageFocus from 'oroui/js/tools/manage-focus';
 /**
  * Perverts focus from getting into container with `[data-ignore-tabbable]` attribute
  */
-$(document).on('keydown', function(event) {
-    const TAB_KEY_CODE = 9;
-    if (event.keyCode !== TAB_KEY_CODE || event.isDefaultPrevented()) {
+const onFocusin = event => {
+    const $receivingFocus = $(event.target);
+    if (!$receivingFocus.is('[data-ignore-tabbable] *')) {
+        // nothing to do
         return;
     }
 
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
     const allTabbable = $('body').find(':tabbable');
     const index = allTabbable.toArray().indexOf(event.target);
-    const reverse = event.shiftKey || event.altKey;
-    let nextTabbable;
+    const reverse = Boolean(event.relatedTarget) &&
+        index < allTabbable.toArray().indexOf(event.relatedTarget);
     if (index !== -1) {
-        nextTabbable = reverse ? allTabbable.slice(0, index) : allTabbable.slice(index + 1);
-        nextTabbable = nextTabbable.not('[data-ignore-tabbable] *').toArray();
-        if (reverse) {
-            nextTabbable = manageFocus.getLastTabbable(nextTabbable);
-        } else {
-            nextTabbable = manageFocus.getFirstTabbable(nextTabbable);
+        const tabbables = (reverse ? allTabbable.slice(0, index) : allTabbable.slice(index + 1))
+            .not('[data-ignore-tabbable] *').toArray();
+        const nextTabbable = reverse
+            ? manageFocus.getLastTabbable(tabbables)
+            : manageFocus.getFirstTabbable(tabbables);
+
+        if (nextTabbable) {
+            $(nextTabbable).focus();
+            if (nextTabbable.nodeName.toLowerCase() === 'input' && typeof nextTabbable.select !== 'undefined') {
+                nextTabbable.select();
+            }
+
+            // natural blur action for current receivingFocus element
+            return;
         }
     }
 
-    if (nextTabbable) {
-        $(nextTabbable).focus();
-        event.preventDefault();
-    }
-});
+    $receivingFocus.blur();
+};
+
+document.addEventListener('focusin', onFocusin, true);
