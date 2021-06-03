@@ -78,6 +78,7 @@ main {
     &__logo {
         display: $head-panel-logo-display;
         width: $head-panel-logo-width;
+        height: $head-panel-logo-height;
         background-image: url($head-panel-logo-background-image);
         background-repeat: $head-panel-logo-background-repeat;
         background-size: 134px 26px;
@@ -86,6 +87,7 @@ main {
         &.logo-hidden {
             // stylelint-disable-next-line declaration-no-important
             background-image: none !important;
+            height: initial;
         }
 
         &:not(.logo-hidden) {

@@ -14,10 +14,10 @@ use Symfony\Component\Form\FormView;
 class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 {
     /** @var EmailNotificationTypeListener|\PHPUnit\Framework\MockObject\MockObject */
-    protected $listener;
+    private $listener;
 
     /** @var EmailNotificationTypeExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -35,14 +35,13 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
 
     public function testBuildForm()
     {
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->at(0))
+        $builder->expects($this->exactly(2))
             ->method('addEventListener')
-            ->with(FormEvents::POST_SET_DATA, [$this->listener, 'onPostSetData']);
-        $builder->expects($this->at(1))
-            ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, [$this->listener, 'onPreSubmit']);
+            ->withConsecutive(
+                [FormEvents::POST_SET_DATA, [$this->listener, 'onPostSetData']],
+                [FormEvents::PRE_SUBMIT, [$this->listener, 'onPreSubmit']]
+            );
 
         $this->extension->buildForm($builder, []);
     }
@@ -61,7 +60,6 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
             $childView3->vars['name'] => $childView3
         ];
 
-        /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
 
         $this->extension->finishView($formView, $form, []);
@@ -73,11 +71,7 @@ class EmailNotificationTypeExtensionTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @return FormView
-     */
-    protected function getFormView($name)
+    private function getFormView(string $name): FormView
     {
         $view = new FormView();
         $view->vars['id'] = $name . '_id';

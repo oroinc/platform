@@ -25,32 +25,35 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     use EntityTrait;
 
     /** @var VariableGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    protected $variableGuesser;
+    private $variableGuesser;
 
     /** @var WorkflowVariablesType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
-        $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);
+        $classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
+        $entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
         $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())->method('getManagerForClass')->willReturn($entityManager);
+        $managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
 
         $this->variableGuesser = $this->createMock(VariableGuesser::class);
 
         $this->type = new WorkflowVariablesType($this->variableGuesser, $managerRegistry);
+
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
         return [
@@ -66,14 +69,23 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     public function testBuildForm()
     {
         $variable = $this->createMock(Variable::class);
-        $variable->expects($this->once())->method('getName')->willReturn('variableName');
-        $variable->expects($this->once())->method('getType')->willReturn('entity');
+        $variable->expects($this->once())
+            ->method('getName')
+            ->willReturn('variableName');
+        $variable->expects($this->once())
+            ->method('getType')
+            ->willReturn('entity');
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())->method('getVariables')->with(true)->willReturn([$variable]);
+        $workflow->expects($this->once())
+            ->method('getVariables')
+            ->with(true)
+            ->willReturn([$variable]);
 
         $typeGuess = $this->createMock(TypeGuess::class);
-        $typeGuess->expects($this->once())->method('getOptions')->willReturn(['label' => 'testLabel']);
+        $typeGuess->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(['label' => 'testLabel']);
 
         $this->variableGuesser->expects($this->once())
             ->method('guessVariableForm')
@@ -91,7 +103,9 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->method('create')
             ->with('variableName', EntityType::class, ['label' => 'testLabel'])
             ->willReturn($field);
-        $builder->expects($this->once())->method('add')->with($field);
+        $builder->expects($this->once())
+            ->method('add')
+            ->with($field);
 
         $this->type->buildForm($builder, ['workflow' => $workflow]);
     }
@@ -112,11 +126,17 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         array $childrenOptions,
         array $guessedData = []
     ) {
-        foreach ($guessedData as $number => $guess) {
-            $typeGuess = new TypeGuess($guess['form_type'], $guess['form_options'], TypeGuess::VERY_HIGH_CONFIDENCE);
-
-            $this->variableGuesser->expects($this->at($number))->method('guessVariableForm')->willReturn($typeGuess);
+        $guessVariableFormExpectationResults = [];
+        foreach ($guessedData as $guess) {
+            $guessVariableFormExpectationResults[] = new TypeGuess(
+                $guess['form_type'],
+                $guess['form_options'],
+                TypeGuess::VERY_HIGH_CONFIDENCE
+            );
         }
+        $this->variableGuesser->expects($this->exactly(count($guessVariableFormExpectationResults)))
+            ->method('guessVariableForm')
+            ->willReturnOnConsecutiveCalls(...$guessVariableFormExpectationResults);
 
         $form = $this->factory->create(WorkflowVariablesType::class, null, $formOptions);
 
@@ -144,10 +164,8 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'empty_variables' => [
@@ -276,15 +294,11 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         ];
     }
 
-    /**
-     * @param array $variables
-     * @return Workflow
-     */
-    protected function createWorkflowWithVariables(array $variables = [])
+    private function createWorkflowWithVariables(array $variables = []): Workflow
     {
         $variableCollection = new ArrayCollection();
 
-        foreach ($variables as $key => $varOptions) {
+        foreach ($variables as $varOptions) {
             $variableCollection->add(
                 $this->getEntity(
                     Variable::class,
@@ -299,9 +313,10 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             );
         }
 
-        /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject $workflow */
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())->method('getVariables')->willReturn($variableCollection);
+        $workflow->expects($this->any())
+            ->method('getVariables')
+            ->willReturn($variableCollection);
 
         return $workflow;
     }
