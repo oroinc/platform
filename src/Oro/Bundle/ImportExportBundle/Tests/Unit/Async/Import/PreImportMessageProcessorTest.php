@@ -30,6 +30,7 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -440,21 +441,26 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 return $callback($jobRunner, $childJob);
             });
 
-        $jobRunner
-            ->expects($this->at(0))
+        $jobRunner->expects($this->exactly(2))
             ->method('createDelayed')
-            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
-                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*:chunk.1/', $jobId);
-                return $callback($jobRunner, $childJob1);
-            });
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob1) {
+                    self::assertMatchesRegularExpression(
+                        '/^oro:import:processor_test:test_import:1:\d*:chunk.1/',
+                        $jobId
+                    );
 
-        $jobRunner
-            ->expects($this->at(1))
-            ->method('createDelayed')
-            ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
-                self::assertMatchesRegularExpression('/^oro:import:processor_test:test_import:1:\d*:chunk.2/', $jobId);
-                return $callback($jobRunner, $childJob2);
-            });
+                    return $callback($jobRunner, $childJob1);
+                }),
+                new ReturnCallback(function ($jobId, $callback) use ($jobRunner, $childJob2) {
+                    self::assertMatchesRegularExpression(
+                        '/^oro:import:processor_test:test_import:1:\d*:chunk.2/',
+                        $jobId
+                    );
+
+                    return $callback($jobRunner, $childJob2);
+                })
+            );
 
         $messageData1 = $messageData;
         $messageData1['fileName'] = 'chunk_1_12345.csv';
