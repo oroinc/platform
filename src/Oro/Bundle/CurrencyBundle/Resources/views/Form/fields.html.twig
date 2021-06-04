@@ -16,7 +16,7 @@
             {{ form_label(form) }}
         </div>
         <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
             <div class="currency-select-enabled" {{ UI.renderPageComponentAttributes({
                 module: 'oroui/js/app/components/view-component',
                 options: {

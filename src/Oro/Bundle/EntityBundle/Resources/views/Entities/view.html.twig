@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {
     "%entityName%": entity_config.get('label')|default('N/A')|trans,
@@ -7,7 +7,7 @@
 }) %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('EDIT', entity) %}
         {{ UI.editButton({
@@ -46,7 +46,7 @@
 {% endblock stats%}
 
 {% block content_data %}
-    {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+    {% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 
     {% set data = { 'dataBlocks': [{
         'title': 'General'|trans,

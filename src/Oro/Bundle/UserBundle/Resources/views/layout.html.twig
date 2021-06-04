@@ -13,7 +13,7 @@
     {% endblock %}
 </head>
 <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">
-    {% include 'OroUIBundle:Default:noscript.html.twig' %}
+    {% include '@OroUI/Default/noscript.html.twig' %}
     <div id="page" class="app-page">
         <div id="central-panel" class="app-page__central-panel">
             {% set messagesContent %}

@@ -1,8 +1,8 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroUserBundle:Form:fields.html.twig',
-    'OroEmailBundle:Form:fields.html.twig'
+    '@OroForm/Form/fields.html.twig',
+    '@OroUser/Form/fields.html.twig',
+    '@OroEmail/Form/fields.html.twig'
 ]%}
 {% if form.vars.value.id %}
     {% oro_title_set({params : {"%id%": form.vars.value.id} }) %}
@@ -14,7 +14,7 @@
 %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if form.vars.value.id and is_granted('DELETE', form.vars.value) %}
         {{ UI.deleteButton({
@@ -57,12 +57,12 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.notification.emailnotification.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set id = 'emailnotificaton-edit' %}
 

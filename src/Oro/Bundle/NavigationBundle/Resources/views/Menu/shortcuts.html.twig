@@ -1,7 +1,7 @@
-{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+{% extends '@OroNavigation/Menu/menu.html.twig' %}
 
 {% block list %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
             {% set togglerId = 'dropdown-'|uniqid %}
             <div class="dropdown header-dropdown-shortcut" data-layout="separate"

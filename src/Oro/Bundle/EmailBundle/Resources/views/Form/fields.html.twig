@@ -53,7 +53,7 @@
 {% endblock %}
 
 {% block _oro_email_autoresponserule_template_new_entity_translations_widget %}
-    {% import 'OroEmailBundle::macros.html.twig' as email %}
+    {% import '@OroEmail/macros.html.twig' as email %}
     {% set entityNameForm = form.parent.entityName %}
 
     {{ form_widget(form) }}
@@ -69,7 +69,7 @@
 
     {{ form_row(form) }}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set options = {
         targetSelector: '#' ~ id,
@@ -89,7 +89,7 @@
 {% endblock %}
 
 {% block oro_email_link_to_scope_row %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set options = {
         enableAttachmentSelector: '[data-ftid=oro_entity_config_type_attachment_enabled]',
@@ -149,7 +149,7 @@
 {% block oro_email_emailtemplate_localizations_widget %}
     {% import _self as emailFormFealds %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div class="emailtemplate-translatation oro-tabs tabbable" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-translation-view'
     }) }}>
@@ -216,7 +216,7 @@
 {% endblock %}
 
 {% block oro_email_mailbox_grid_label %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set redirectData = {
         'route': app.request.attributes.get('_route'),
         'parameters': app.request.attributes.get('_route_params'),
@@ -234,7 +234,7 @@
 {% endblock %}
 
 {% block oro_email_mailbox_grid_widget %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
     {% set redirectData = {
         'route': app.request.attributes.get('_route'),
         'parameters': app.request.attributes.get('_route_params')
@@ -375,7 +375,7 @@
         uniqid - is unique identifier
 #}
 {% macro renderTab(form, isActive = false, uniqid = null) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="emailtemplate-translatation-fields-{{ form.vars.name }} tab-pane{% if isActive %} active{% endif %}"
          role="tabpanel"

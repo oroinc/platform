@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
 <div class="widget-content activity-list {{ containerExtraClass }}">
     {% set pager = {
@@ -86,8 +86,8 @@
             <div class="container-fluid accordion"
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
-            {% include 'OroActivityListBundle:ActivityList:js/list.html.twig' with {'id': 'template-activity-list'} %}
-            {% include 'OroActivityListBundle:ActivityList:js/view.html.twig' with {'id': 'template-activity-item'} %}
+            {% include '@OroActivityList/ActivityList/js/list.html.twig' with {'id': 'template-activity-list'} %}
+            {% include '@OroActivityList/ActivityList/js/view.html.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}

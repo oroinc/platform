@@ -1,4 +1,4 @@
-{% extends 'OroUIBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/Form/fields.html.twig' %}
 
 {% block oro_select2_widget %}
     {% if configs.grid is defined and configs.grid.name is defined %}
@@ -66,7 +66,7 @@
 
 {% block form_row_collection %}
     {% spaceless %}
-        {% from 'OroUIBundle::macros.html.twig' import collection_prototype  %}
+        {% from '@OroUI/macros.html.twig' import collection_prototype  %}
         <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}{% if group_attr.class is defined %} {{ group_attr.class }}{% endif %}"{% if group_attr is defined %}{{ block('group_attributes') }}{% endif %}>
             {% if hint|default() and hint_position|default() == 'above' %}
                 <div{{ block('hint_attributes') }}>{{ hint|raw }}</div>
@@ -213,7 +213,7 @@
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {%- if tooltip is defined and tooltip -%}
-                {% import 'OroUIBundle::macros.html.twig' as ui %}
+                {% import '@OroUI/macros.html.twig' as ui %}
                 {{ ui.tooltip(
                     tooltip,
                     tooltip_parameters|default({}),
@@ -436,7 +436,7 @@
 {% endblock %}
 
 {% macro oro_collection_validate_primary_js(context) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
         options: {
@@ -447,7 +447,7 @@
 {% endmacro %}
 
 {% block oro_form_js_validation %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',
         options: {
@@ -637,7 +637,7 @@
                         }
                     }) %}
                 {% endif %}
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                {% import '@OroUI/macros.html.twig' as UI %}
                 {{ UI.renderPageComponentAttributes({
                     module: 'oroform/js/app/components/select-create-inline-type-' ~ asyncNameSegment|default('') ~ 'component',
                     options: {
@@ -767,7 +767,7 @@
 {% endblock %}
 
 {% block oro_entity_tree_select_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {{ UI.renderJsTree(
         {
             'treeOptions': form.vars.treeOptions,

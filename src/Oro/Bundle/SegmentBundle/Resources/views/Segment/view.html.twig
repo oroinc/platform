@@ -1,12 +1,12 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+{% import '@OroSegment/macros.html.twig' as segmentQD %}
 {% oro_title_set({params : {"%segment.name%": entity.name, "%segment.group%": segmentGroup|trans} }) %}
 {% set pageTitle = entity.name %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ segmentQD.runButton(entity, true) }}
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}

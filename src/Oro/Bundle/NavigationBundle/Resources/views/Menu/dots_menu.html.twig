@@ -1,4 +1,4 @@
-{% extends 'OroNavigationBundle:Menu:dots_tabs.html.twig' %}
+{% extends '@OroNavigation/Menu/dots_tabs.html.twig' %}
 
 {% block root %}
     {% if isDesktopVersion() and item.hasChildren and options.depth is not same as(0) and item.displayChildren %}

@@ -1,7 +1,7 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
-{% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
-{% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig'] %}
+{% import '@OroQueryDesigner/macros.html.twig' as QD %}
+{% import '@OroSegment/macros.html.twig' as segmentQD %}
 
 {% oro_title_set({params : {"%segment.name%": entity.name} }) %}
 {% set formAction = form.vars.value.id ? path('oro_segment_update', { 'id': form.vars.value.id }) : path('oro_segment_create')  %}
@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if form.vars.value.id and is_granted('CREATE', form.vars.value) %}
         {{ UI.button({
@@ -74,12 +74,12 @@
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.segment.entity_label'|trans}) %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: title } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set id = 'segment-profile' %}
     {% set ownerDataBlock = {

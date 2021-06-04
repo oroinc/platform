@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
 
@@ -63,8 +63,8 @@
                 data-page-component-module="oronote/js/app/components/notes-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
-            {% include 'OroNoteBundle:Note:js/list.html.twig' with {'id': 'template-note-list'} %}
-            {% include 'OroNoteBundle:Note:js/view.html.twig' with {'id': 'template-note-item'} %}
+            {% include '@OroNote/Note/js/list.html.twig' with {'id': 'template-note-list'} %}
+            {% include '@OroNote/Note/js/view.html.twig' with {'id': 'template-note-item'} %}
         {% endblock %}
     {% endblock %}
 </div>

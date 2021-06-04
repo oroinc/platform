@@ -1,7 +1,7 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 {% form_theme form with [
-    'OroFormBundle:Form:fields.html.twig',
-    'OroEntityBundle:Form:fields.html.twig'
+    '@OroForm/Form/fields.html.twig',
+    '@OroEntity/Form/fields.html.twig'
 ] %}
 
 {% oro_title_set({params : {
@@ -16,7 +16,7 @@
 {% set audit_show_change_history = true %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('oro_entityconfig_manage') %}
         {{ UI.cancelButton(path('oro_entityconfig_view', {id: field.entity.id})) }}

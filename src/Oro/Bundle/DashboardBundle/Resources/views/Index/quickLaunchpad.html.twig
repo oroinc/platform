@@ -17,10 +17,10 @@
                             {% placeholder dashboard_navButtons_before %}
 
                             {% block navButtons %}
-                                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                                {% import '@OroUI/macros.html.twig' as UI %}
 
                                 {% if dashboards|length > 1 %}
-                                    {% import 'OroUIBundle::macros.html.twig' as UI %}
+                                    {% import '@OroUI/macros.html.twig' as UI %}
 
                                     <div class="dashboard-selector-container pull-left">
                                         <label for="dashboard_selector">{{ 'oro.dashboard.entity_plural_label'|trans }}:</label>

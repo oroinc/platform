@@ -1,4 +1,4 @@
-{% extends 'OroNavigationBundle:Menu:menu_base.html.twig' %}
+{% extends '@OroNavigation/Menu/menu_base.html.twig' %}
 {% block compressed_root %}
     {% spaceless %}
         {{ block('root') }}
@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block navbar_tabs %}
-    {% set options = options|merge({'template': 'OroNavigationBundle:Menu:_htabs.html.twig', 'depth': 1}) %}
+    {% set options = options|merge({'template': '@OroNavigation/Menu/_htabs.html.twig', 'depth': 1}) %}
     {{ knp_menu_render(item, options) }}
 {% endblock %}
 

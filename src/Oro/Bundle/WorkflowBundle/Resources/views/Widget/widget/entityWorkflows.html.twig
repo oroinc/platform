@@ -1,4 +1,4 @@
-{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+{% import '@OroWorkflow/macros.html.twig' as workflowMacros %}
 {% if workflows|length > 0 %}
     {% set collapseContainerId = 'entityWorkflow' ~ entityId %}
 <div class="widget-content workflow-widget-content">

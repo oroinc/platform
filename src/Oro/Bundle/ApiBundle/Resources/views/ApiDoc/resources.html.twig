@@ -1,4 +1,4 @@
-{% extends "OroApiBundle:ApiDoc:layout.html.twig" %}
+{% extends "@OroApi/ApiDoc/layout.html.twig" %}
 
 {% block content %}
     {% for section, sections in resources  %}
@@ -26,7 +26,7 @@
                     <li class="endpoint">
                         <ul class="operations">
                             {% for data in methods %}
-                                {% include 'OroApiBundle:ApiDoc:collapsed_method.html.twig' %}
+                                {% include '@OroApi/ApiDoc/collapsed_method.html.twig' %}
                             {% endfor %}
                         </ul>
                     </li>

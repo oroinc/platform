@@ -1,5 +1,5 @@
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% block content %}
     {{ dataGrid.renderGrid(gridName, params, {

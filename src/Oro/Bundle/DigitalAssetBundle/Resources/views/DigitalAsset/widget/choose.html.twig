@@ -26,7 +26,7 @@
     } -%}
     {{ widgetResponse|json_encode|raw }}
 {%- else -%}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
     {% set grid_render_params = {
         enableViews: true,

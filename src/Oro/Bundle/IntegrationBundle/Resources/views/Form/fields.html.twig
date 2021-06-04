@@ -39,6 +39,6 @@
 
     {{ form_rest(form) }}
 
-    {% import 'OroIntegrationBundle:Form:javascript.html.twig' as jsRenderer %}
+    {% import '@OroIntegration/Form/javascript.html.twig' as jsRenderer %}
     {{ jsRenderer.renderIntegrationFormJS(form) }}
 {% endblock %}

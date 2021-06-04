@@ -1,4 +1,4 @@
-{% extends bap.layout is defined ? bap.layout : 'OroUserBundle::layout.html.twig' %}
+{% extends bap.layout is defined ? bap.layout : '@OroUser/layout.html.twig' %}
 
 {% block content %}
     <form action="{{ path('oro_user_status_create') }}" method="POST" class="form-status">

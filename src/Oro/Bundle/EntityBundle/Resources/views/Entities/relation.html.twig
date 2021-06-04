@@ -1,4 +1,4 @@
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 <div class="widget-content">
     {% set gridName = oro_datagrid_build_fullname('entity-relation-grid', entity_name ~ '-' ~  field_name) %}
 
@@ -18,7 +18,7 @@
         <input type="hidden" name="removeRelation" id="removeRelation" value="{{ app.request.get('removed') }}" />
     {% endblock %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set extraData = [] %}
     {% for fieldName in relation.get('target_grid') %}

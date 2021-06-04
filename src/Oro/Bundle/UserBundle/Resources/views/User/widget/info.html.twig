@@ -1,10 +1,10 @@
-{% import 'OroUIBundle::macros.html.twig' as ui %}
-{% import 'OroTagBundle::macros.html.twig' as tag %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% import '@OroUI/macros.html.twig' as ui %}
+{% import '@OroTag/macros.html.twig' as tag %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 {% import _self as userInfo %}
 
 {% macro renderEmail(emailAddress, isPrimary, entity) %}
-    {% import 'OroEmailBundle::macros.html.twig' as email %}
+    {% import '@OroEmail/macros.html.twig' as email %}
     {% if isPrimary %}<strong>{% endif %}
         {{ email.renderEmailWithActions(emailAddress, entity) }}
     {% if isPrimary %}</strong>{% endif %}

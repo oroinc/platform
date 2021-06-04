@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroWorkflow/macros.html.twig' as workflowMacros %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 
@@ -28,7 +28,7 @@
 %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ parent() }}
 
@@ -120,7 +120,7 @@
 {% endblock pageHeader %}
 
 {% block breadcrumbs %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ parent() }}
 
@@ -140,7 +140,7 @@
 {% endblock breadcrumbs %}
 
 {% macro view_step_row(stepData, entity, translateLinks) %}
-    {% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+    {% import '@OroWorkflow/macros.html.twig' as workflowMacros %}
     <tr>
         <td class="step-name workflow-translatable-label">
             {{ stepData.label }}
@@ -199,7 +199,7 @@
 {% endmacro %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% import _self as workflowDefinitionView %}
 
     {% set workflowDefinitionInfo %}

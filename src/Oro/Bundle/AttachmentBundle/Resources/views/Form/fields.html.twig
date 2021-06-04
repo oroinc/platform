@@ -16,7 +16,7 @@
                 {% set inputId = form.emptyFile.vars.id %}
                 {% set divId = inputId ~ 'div' %}
 
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                {% import '@OroUI/macros.html.twig' as UI %}
 
                 <div id="{{ divId }}" class="well well-small oro_attachment_file" {{ UI.renderPageComponentAttributes({
                     view: 'oroattachment/js/app/views/attachment-view',
@@ -74,7 +74,7 @@
                     {% set inputId = form.emptyFile.vars.id %}
                     {% set divId = inputId ~ 'div' %}
 
-                    {% import 'OroUIBundle::macros.html.twig' as UI %}
+                    {% import '@OroUI/macros.html.twig' as UI %}
                     <div class="control-group">
                         <div class="controls">
                             <div id="{{ divId }}" class="attachment-item" {{ UI.renderPageComponentAttributes({
@@ -144,7 +144,7 @@
 {% endmacro %}
 
 {% block oro_attachment_multi_file_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% import _self as fields %}
     {% spaceless %}
         {% if prototype is defined %}
