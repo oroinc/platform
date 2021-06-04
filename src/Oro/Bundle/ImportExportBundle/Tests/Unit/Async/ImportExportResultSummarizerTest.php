@@ -6,6 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
@@ -166,21 +167,16 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $job->addChildJob($childJob2);
 
         $fileManager = $this->createFileManagerMock();
-        $fileManager
-            ->expects($this->at(0))
+        $fileManager->expects($this->exactly(2))
             ->method('isFileExist')
-            ->with('test.json')
-            ->willReturn(true);
-        $fileManager
-            ->expects($this->at(1))
+            ->willReturnMap([
+                ['test.json', true],
+                ['test2.json', false]
+            ]);
+        $fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.json')
             ->willReturn(json_encode(['Tests error in import.']));
-        $fileManager
-            ->expects($this->at(2))
-            ->method('isFileExist')
-            ->with('test2.json')
-            ->willReturn(false);
 
         $consolidateService = new ImportExportResultSummarizer(
             $this->createRouterMock(),
@@ -296,20 +292,20 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
     private function createConsolidatedService($jobId = 1)
     {
         $routerMock = $this->createRouterMock();
-        $routerMock
-            ->expects($this->at(0))
+        $routerMock->expects($this->exactly(2))
             ->method('generate')
-            ->with('oro_importexport_export_download', ['jobId' => $jobId])
-            ->willReturnCallback(function ($route, $args) {
-                return sprintf('/%s', $args['jobId']);
-            });
-        $routerMock
-            ->expects($this->at(1))
-            ->method('generate')
-            ->with('oro_importexport_job_error_log', ['jobId' => $jobId])
-            ->willReturnCallback(function ($route, $args) {
-                return sprintf('/%s.log', $args['jobId']);
-            });
+            ->withConsecutive(
+                ['oro_importexport_export_download', ['jobId' => $jobId]],
+                ['oro_importexport_job_error_log', ['jobId' => $jobId]]
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function ($route, $args) {
+                    return sprintf('/%s', $args['jobId']);
+                }),
+                new ReturnCallback(function ($route, $args) {
+                    return sprintf('/%s.log', $args['jobId']);
+                })
+            );
 
         $configManagerMock = $this->createConfigManagerMock();
         $configManagerMock
