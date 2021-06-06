@@ -4,57 +4,52 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection\Compiler
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureToggleVotersPass
-     */
-    protected $featureToggleVotersPass;
+    /** @var FeatureToggleVotersPass */
+    private $compiler;
 
     protected function setUp(): void
     {
-        $this->featureToggleVotersPass = new FeatureToggleVotersPass();
+        $this->compiler = new FeatureToggleVotersPass();
     }
 
     public function testProcess()
     {
-        $voters = [
-            'first_voter' => [['priority' => 20]],
-            'second_voter' => [['priority' => 10]],
-        ];
+        $container = new ContainerBuilder();
+        $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
 
-        $expected = [
-            new Reference('second_voter'),
-            new Reference('first_voter')
-        ];
+        $container->register('voter_1')
+            ->addTag('oro_featuretogle.voter', ['priority' => 100]);
+        $container->register('voter_2')
+            ->addTag('oro_featuretogle.voter');
+        $container->register('voter_3')
+            ->addTag('oro_featuretogle.voter', ['priority' => -100]);
 
-        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $featureChecker */
-        $featureCheckerDefinition = $this->getMockBuilder(Definition::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->compiler->process($container);
 
-        $featureCheckerDefinition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('setVoters', [$expected]);
+        self::assertEquals(
+            [
+                ['setVoters', [[new Reference('voter_3'), new Reference('voter_2'), new Reference('voter_1')]]]
+            ],
+            $featureCheckerDef->getMethodCalls()
+        );
+    }
 
-        /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject $container **/
-        $container = $this->getMockBuilder(ContainerBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    public function testProcessWhenNoVoters()
+    {
+        $container = new ContainerBuilder();
+        $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
 
-        $container->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_featuretoggle.checker.feature_checker')
-            ->willReturn($featureCheckerDefinition);
+        $this->compiler->process($container);
 
-        $container->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('oro_featuretogle.voter')
-            ->willReturn($voters);
-
-        $this->featureToggleVotersPass->process($container);
+        self::assertEquals(
+            [
+                ['setVoters', [[]]]
+            ],
+            $featureCheckerDef->getMethodCalls()
+        );
     }
 }

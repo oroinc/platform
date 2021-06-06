@@ -4,120 +4,92 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler\AddNormalizerCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Definition|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializerDefinition;
-
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $containerBuilder;
+    /** @var AddNormalizerCompilerPass */
+    private $compiler;
 
     protected function setUp(): void
     {
-        $this->serializerDefinition = $this->createMock(Definition::class);
-        $this->containerBuilder = $this->createMock(ContainerBuilder::class);
+        $this->compiler = new AddNormalizerCompilerPass();
     }
 
-    /**
-     * @dataProvider processDataProvider
-     *
-     * @param array $normalizers
-     * @param array $encoders
-     * @param array $expectedNormalizers
-     * @param array $expectedEncoders
-     */
-    public function testProcess(
-        array $normalizers,
-        array $encoders,
-        array $expectedNormalizers,
-        array $expectedEncoders
-    ) {
-        $this->containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_importexport.serializer')
-            ->willReturn($this->serializerDefinition);
-
-        $this->containerBuilder->expects($this->exactly(2))
-            ->method('findTaggedServiceIds')
-            ->willReturnMap(
-                [
-                    ['oro_importexport.normalizer', false, $normalizers],
-                    ['serializer.encoder', false, $encoders],
-                ]
-            );
-
-        $this->serializerDefinition->expects($this->once())
-            ->method('getArgument')
-            ->with(1)
-            ->willReturn([new Reference('bazz')]);
-
-        $this->serializerDefinition->expects($this->exactly(2))
-            ->method('replaceArgument')
-            ->withConsecutive(
-                [0, $expectedNormalizers],
-                [1, $expectedEncoders]
-            );
-
-        $pass = new AddNormalizerCompilerPass();
-        $pass->process($this->containerBuilder);
-    }
-
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function testProcess()
     {
-        return [
-            'sort_by_priority' => [
-                'normalizers' => [
-                    'foo_1' => [['priority' => 1]],
-                    'bar_0' => [[]],
-                    'baz_2' => [['priority' => 2]],
-                ],
-                'encoders' => [
-                    'foo' => [[]],
-                    'bar' => [[]],
-                ],
-                'expectedNormalizers' => [
-                    new Reference('baz_2'),
-                    new Reference('foo_1'),
-                    new Reference('bar_0'),
-                ],
-                'expectedEncoders' => [
-                    new Reference('bazz'),
-                    new Reference('foo'),
-                    new Reference('bar'),
-                ]
+        $container = new ContainerBuilder();
+        $serializerDef = $container->register('oro_importexport.serializer')
+            ->setArguments([[], []]);
+
+        $container->register('normalizer_1')
+            ->addTag('oro_importexport.normalizer', ['priority' => -100]);
+        $container->register('normalizer_2')
+            ->addTag('oro_importexport.normalizer');
+        $container->register('normalizer_3')
+            ->addTag('oro_importexport.normalizer', ['priority' => 100]);
+
+        $container->register('encoder_1')
+            ->addTag('serializer.encoder', ['priority' => -100]);
+        $container->register('encoder_2')
+            ->addTag('serializer.encoder');
+        $container->register('encoder_3')
+            ->addTag('serializer.encoder', ['priority' => 100]);
+
+        $this->compiler->process($container);
+
+        self::assertEquals(
+            [
+                new Reference('normalizer_3'),
+                new Reference('normalizer_2'),
+                new Reference('normalizer_1')
             ],
-            'default_order' => [
-                'normalizers' => [
-                    'foo' => [[]],
-                    'bar' => [[]],
-                    'baz' => [[]],
-                ],
-                'encoders' => [
-                    'foo' => [[]],
-                    'bar' => [[]],
-                ],
-                'expectedNormalizers' => [
-                    new Reference('foo'),
-                    new Reference('bar'),
-                    new Reference('baz'),
-                ],
-                'expectedEncoders' => [
-                    new Reference('bazz'),
-                    new Reference('foo'),
-                    new Reference('bar'),
-                ]
+            $serializerDef->getArgument(0)
+        );
+        self::assertEquals(
+            [
+                new Reference('encoder_3'),
+                new Reference('encoder_2'),
+                new Reference('encoder_1')
             ],
-        ];
+            $serializerDef->getArgument(1)
+        );
     }
 
-    //@codingStandardsIgnoreStart
-    // @codingStandardIgnoreEnd
+    public function testProcessWhenEncodersInjectedInConstructor()
+    {
+        $container = new ContainerBuilder();
+        $serializerDef = $container->register('oro_importexport.serializer')
+            ->setArguments([
+                [],
+                [new Reference('existing_encoder_1'), new Reference('existing_encoder_2')]
+            ]);
+
+        $container->register('normalizer_1')
+            ->addTag('oro_importexport.normalizer');
+
+        $container->register('encoder_1')
+            ->addTag('serializer.encoder', ['priority' => -100]);
+        $container->register('encoder_2')
+            ->addTag('serializer.encoder');
+        $container->register('encoder_3')
+            ->addTag('serializer.encoder', ['priority' => 100]);
+
+        $this->compiler->process($container);
+
+        self::assertEquals([new Reference('normalizer_1')], $serializerDef->getArgument(0));
+        self::assertEquals(
+            [
+                new Reference('existing_encoder_1'),
+                new Reference('existing_encoder_2'),
+                new Reference('encoder_3'),
+                new Reference('encoder_2'),
+                new Reference('encoder_1')
+            ],
+            $serializerDef->getArgument(1)
+        );
+    }
+
     public function testProcessFailsWhenNoNormalizers()
     {
         $this->expectException(\RuntimeException::class);
@@ -126,22 +98,16 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
             . ' to use the import export Serializer service'
         );
 
-        $this->containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_importexport.serializer')
-            ->willReturn($this->serializerDefinition);
+        $container = new ContainerBuilder();
+        $container->register('oro_importexport.serializer')
+            ->setArguments([[], []]);
 
-        $this->containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with('oro_importexport.normalizer')
-            ->willReturn([]);
+        $container->register('encoder_1')
+            ->addTag('serializer.encoder');
 
-        $pass = new AddNormalizerCompilerPass();
-        $pass->process($this->containerBuilder);
+        $this->compiler->process($container);
     }
 
-    //@codingStandardsIgnoreStart
-    // @codingStandardIgnoreEnd
     public function testProcessFailsWhenNoEncoders()
     {
         $this->expectException(\RuntimeException::class);
@@ -149,21 +115,13 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
             'You must tag at least one service as "serializer.encoder" to use the import export Serializer service'
         );
 
-        $this->containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with('oro_importexport.serializer')
-            ->willReturn($this->serializerDefinition);
+        $container = new ContainerBuilder();
+        $container->register('oro_importexport.serializer')
+            ->setArguments([[], []]);
 
-        $this->containerBuilder->expects($this->exactly(2))
-            ->method('findTaggedServiceIds')
-            ->willReturnMap(
-                [
-                    ['oro_importexport.normalizer', false, [new Reference('foo')]],
-                    ['serializer.encoder', false, []],
-                ]
-            );
+        $container->register('normalizer_1')
+            ->addTag('oro_importexport.normalizer');
 
-        $pass = new AddNormalizerCompilerPass();
-        $pass->process($this->containerBuilder);
+        $this->compiler->process($container);
     }
 }

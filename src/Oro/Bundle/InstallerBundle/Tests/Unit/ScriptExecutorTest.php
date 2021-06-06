@@ -5,7 +5,7 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,11 +20,11 @@ class ScriptExecutorTest extends \PHPUnit\Framework\TestCase
                 [$this->stringContains(sprintf('Launching "Test Package Installer" (%s) script', $testScriptFile))],
                 ['Test Package Installer data']
             );
-        $container = $this->createMock(ContainerBuilder::class);
 
+        $container = $this->createMock(ContainerInterface::class);
         $commandExecutor = $this->createMock(CommandExecutor::class);
-        $scriptExecutor = new ScriptExecutor($output, $container, $commandExecutor);
 
+        $scriptExecutor = new ScriptExecutor($output, $container, $commandExecutor);
         $scriptExecutor->runScript($testScriptFile);
     }
 }
