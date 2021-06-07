@@ -9,7 +9,7 @@
     {{ parent() }}
 
     <span class="page-title__status">
-        {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
+        {% include '@OroMessageQueue/Job/Datagrid/status.html.twig' with {'record': {'rootEntity': entity}} %}
 
         {% if entity.unique %}
             {{ UI.badge('oro.message_queue_job.header.unique'|trans, 'info') }}

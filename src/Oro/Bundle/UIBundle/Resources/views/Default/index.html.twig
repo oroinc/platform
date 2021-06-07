@@ -63,7 +63,7 @@
     <div id="page" style="display:none;" class="app-page">
         {% block content_side %}
             <div class="app-page__content-side">
-                {% include 'OroUIBundle:Default/navbar:sided.html.twig' %}
+                {% include '@OroUI/Default/navbar/sided.html.twig' %}
             </div>
         {% endblock content_side %}
         <div class="app-page__content">
@@ -93,7 +93,7 @@
                             {% placeholder pin_tabs_list %}
                         </div>
                     </div>
-                    {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
+                    {% include '@OroUI/Default/navbar/top.html.twig' %}
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
@@ -187,7 +187,7 @@
     {# Title should be generated as least once in order to pass data to title service #}
     {% set title = oro_title_render() %}
     {# Template for hash tag navigation#}
-    {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
+    {% use '@OroUI/Default/navbar/blocks.html.twig' %}
     {% include '@OroNavigation/HashNav/hashNavAjax.html.twig'
         with {
             'data': {

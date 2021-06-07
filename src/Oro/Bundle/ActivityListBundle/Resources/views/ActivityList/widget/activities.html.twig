@@ -91,7 +91,7 @@
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}
-            {% include 'OroCommentBundle:Comment/js:list.html.twig' with {'id': 'template-activity-item-comment'} %}
+            {% include '@OroComment/Comment/js/list.html.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
 
         {% placeholder oro_activity_list_after with {entityClass: oro_class_name(entity, true), entityId: entity.id} %}
