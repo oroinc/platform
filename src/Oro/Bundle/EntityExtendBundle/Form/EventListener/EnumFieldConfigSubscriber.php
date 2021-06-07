@@ -211,16 +211,7 @@ class EnumFieldConfigSubscriber implements EventSubscriberInterface, LoggerAware
      */
     protected function sortOptions(array &$options)
     {
-        usort(
-            $options,
-            function ($a, $b) {
-                if ($a['priority'] == $b['priority']) {
-                    return 0;
-                }
-
-                return $a['priority'] < $b['priority'] ? -1 : 1;
-            }
-        );
+        usort($options, static fn ($a, $b) => $a['priority'] <=> $b['priority']);
         $index = 0;
         foreach ($options as &$option) {
             $option['priority'] = ++$index;

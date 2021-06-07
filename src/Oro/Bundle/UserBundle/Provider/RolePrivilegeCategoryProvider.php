@@ -52,7 +52,7 @@ class RolePrivilegeCategoryProvider
             }
             if ($categories) {
                 ksort($categories);
-                $categories = array_merge(...$categories);
+                $categories = array_merge(...array_values($categories));
             }
             $this->categories = $categories;
         }

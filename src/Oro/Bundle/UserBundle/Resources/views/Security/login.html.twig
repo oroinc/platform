@@ -24,7 +24,7 @@
         <div class="form-wrapper__inner">
             {% set usernameLabel = 'Username'|trans %}
             {% set passwordLabel = 'Password'|trans %}
-            {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|trans <= 9) %}
+            {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|length <= 9) %}
             {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
             <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
                 <div class="form-description">
