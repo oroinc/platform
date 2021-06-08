@@ -4,6 +4,8 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const mask = require('oroui/js/dropdown-mask');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
+    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes');
     require('jquery-ui/widget');
     require('jquery.multiselect');
 
@@ -13,12 +15,21 @@ define(function(require) {
             refreshNotOpened: true
         }),
 
-        _create: function(...args) {
+        _create(...args) {
+            this._uniqueName = _.uniqueId(this.widgetName);
             this.outerTrigger = this.options.outerTrigger;
-            this._superApply(args);
+            this.initialValue = this.element.val();
+            const superResult = this._superApply(args);
+            this.button.attr({
+                'id': this._uniqueName,
+                'aria-haspopup': true,
+                'aria-expanded': false
+            });
+            this.menu.attr('aria-labelledby', this._uniqueName);
+            return superResult;
         },
 
-        _bindEvents: function() {
+        _bindEvents() {
             const self = this;
 
             this._bindButtonEvents();
@@ -41,13 +52,60 @@ define(function(require) {
             });
         },
 
+        _bindMenuEvents() {
+            const superResult = this._super();
+
+            // Remove original an event handler and attach new one based on original
+            this.menu.undelegate('label', 'keydown.multiselect');
+            this.menu.on(`keydown${this._namespaceID}`, 'label', e => {
+                switch (e.which) {
+                    case KEY_CODES.TAB:
+                        this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
+                        break;
+                    case KEY_CODES.ARROW_UP:
+                    case KEY_CODES.ARROW_DOWN:
+                    case KEY_CODES.ARROW_LEFT:
+                    case KEY_CODES.ARROW_RIGHT:
+                        e.preventDefault();
+                        this._traverse(e.which, this);
+                        break;
+                    case KEY_CODES.ENTER:
+                    case KEY_CODES.SPACE:
+                        e.preventDefault();
+                        $(e.currentTarget).find('input').click();
+                        break;
+                    case KEY_CODES.A:
+                        if (e.altKey) {
+                            this.checkAll();
+                        }
+                        break;
+                    case KEY_CODES.U:
+                        if (e.altKey) {
+                            this.uncheckAll();
+                        }
+                        break;
+                }
+            });
+            this.menu.on(`keydown${this._namespaceID}`, e => {
+                manageFocus.preventTabOutOfContainer(e, this.menu);
+
+                if (e.which === KEY_CODES.ESCAPE) {
+                    this.close();
+                }
+            });
+
+            return superResult;
+        },
+
         /**
          * Bind update position method after menu is opened
          * @override
          */
-        open: function(...args) {
+        open(...args) {
             if (!this.hasBeenOpened) {
                 this.hasBeenOpened = true;
+                // Actualize initial value when dropdown will be opened first time because
+                this.initialValue = this.element.val();
                 this.refresh();
             }
             this._superApply(args);
@@ -63,21 +121,23 @@ define(function(require) {
                 mask.show(zIndex + 1)
                     .onhide(this.close.bind(this));
             }
+            this.button.attr('aria-expanded', true);
         },
 
         /**
          * Remove all handlers before closing menu
          * @override
          */
-        close: function(...args) {
+        close(...args) {
             mask.hide();
-            this._superApply(args);
+            this.button.attr('aria-expanded', false);
+            return this._superApply(args);
         },
 
         /**
          * Process position update for menu element
          */
-        updatePos: function(position) {
+        updatePos(position) {
             const menu = this.widget();
             const isShown = menu.is(':visible');
 
@@ -87,23 +147,25 @@ define(function(require) {
             }
         },
 
-        refresh: function(init) {
+        refresh(init) {
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
                 const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
                 this._super(init);
                 this.menu.find('.ui-multiselect-checkboxes').scrollTop(scrollTop);
             }
+            this.headerLinkContainer.attr('role', 'presentation');
+            this.menu.find('.ui-multiselect-checkboxes').attr('role', 'presentation');
         },
 
-        getChecked: function() {
+        getChecked() {
             return this.menu.find('input').not('[type=search]').filter(':checked');
         },
 
-        getUnchecked: function() {
+        getUnchecked() {
             return this.menu.find('input').not('[type=search]').not(':checked');
         },
 
-        _getMinWidth: function() {
+        _getMinWidth() {
             const width = this.options.minWidth;
 
             if (['auto', 'none'].includes(width)) {
@@ -113,7 +175,7 @@ define(function(require) {
             return this._super();
         },
 
-        _setButtonWidth: function() {
+        _setButtonWidth() {
             const width = this._getMinWidth();
 
             if (width === 'auto') {
@@ -123,13 +185,13 @@ define(function(require) {
             }
         },
 
-        _setMenuHeight: function() {
+        _setMenuHeight() {
             this.menu.find('.ui-multiselect-checkboxes li:hidden, .ui-multiselect-checkboxes a:hidden')
                 .addClass('hidden-item');
             this.menu.find('.hidden-item').removeClass('hidden-item');
         },
 
-        _isExcluded: function(target) {
+        _isExcluded(target) {
             const $target = $(target);
             const isMenu = !!$target.closest(this.menu).length;
             const isButton = !!$target.closest(this.button).length;
@@ -142,6 +204,13 @@ define(function(require) {
             return !isMenu &&
                    !isButton &&
                    !isOuterTrigger;
+        },
+
+        _destroy() {
+            this.menu.off(`keydown${this._namespaceID}`, 'label');
+            this.menu.off(`keydown${this._namespaceID}`);
+            delete this.initialValue;
+            return this._super();
         }
     });
 

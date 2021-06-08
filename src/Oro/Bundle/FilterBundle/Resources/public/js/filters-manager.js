@@ -290,9 +290,9 @@ define(function(require, exports, module) {
                 const option = filterSelector.find(`option[value="${filter.name}"]`);
 
                 if (filter.visible && option.hasClass('hidden')) {
-                    option.removeClass('hidden');
+                    option.removeClass('hidden').removeAttr('disabled');
                 } else if (!filter.visible && !option.hasClass('hidden')) {
-                    option.addClass('hidden');
+                    option.addClass('hidden').attr('disabled', true);
                 }
             });
 
