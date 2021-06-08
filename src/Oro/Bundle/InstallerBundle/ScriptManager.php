@@ -185,7 +185,7 @@ class ScriptManager
             return 1;
         }
 
-        return $a['index'] < $b['index'] ? -1 : 1;
+        return $a['index'] <=> $b['index'];
     }
 
     /**

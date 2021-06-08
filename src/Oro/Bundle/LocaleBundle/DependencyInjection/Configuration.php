@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
     public const LANGUAGE              = 'language';
     public const ENABLED_LOCALIZATIONS = 'enabled_localizations';
     public const DEFAULT_LOCALIZATION  = 'default_localization';
+    public const ALLOW_TO_ROUND_DISPLAYED_PRICES_AND_AMOUNT = 'allow_to_round_displayed_prices_and_amounts';
 
     /**
      * {@inheritdoc}
@@ -46,6 +47,7 @@ class Configuration implements ConfigurationInterface
             [
                 'country' => ['value' => null],
                 'currency' => ['value' => null],
+                self::ALLOW_TO_ROUND_DISPLAYED_PRICES_AND_AMOUNT => ['value' => true],
                 'timezone' => ['value' => date_default_timezone_get()],
                 'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],
                 'qwerty' => ['value' => [], 'type' => 'array'],

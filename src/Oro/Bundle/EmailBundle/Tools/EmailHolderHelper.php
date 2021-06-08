@@ -162,7 +162,7 @@ class EmailHolderHelper implements ResetInterface
         if (null === $this->sortedTargetEntities) {
             ksort($this->targetEntities);
             $this->sortedTargetEntities = $this->targetEntities
-                ? array_merge(...$this->targetEntities)
+                ? array_merge(...array_values($this->targetEntities))
                 : [];
         }
 

@@ -1276,11 +1276,9 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: When I filter Date Range as between "2015-12-24" and "2015-12-26"
      * Example: But when I filter Created At as not between "25 Jun 2015" and "30 Jun 2015"
      *
-     * @When /^(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|equals|not equals)) "(?P<start>.+)" as single value$/
-     * @When /^(?:|I )filter "(?P<filterName>[\w\s]+)" as (?P<type>(?:|equals|not equals)) "(?P<start>.+)" as single value$/
-     * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
-     * @When /^(?:|when )(?:|I )filter "(?P<filterName>[\w\s\/]+)" as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)"$/
-     * @When /^(?:|when )(?:|I )filter (?P<filterName>[\w\s]+) as (?P<type>(?:|between|not between)) "(?P<start>.+)" and "(?P<end>.+)" in "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|equals|not equals)) "(?P<start>[^"]+)" as single value$/
+     * @When /^(?:|when )(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|between|not between)) "(?P<start>[^"]+)" and "(?P<end>[^"]+)"$/
+     * @When /^(?:|when )(?:|I )filter "?(?P<filterName>[^"]+)"? as (?P<type>(?:|between|not between)) "(?P<start>[^"]+)" and "(?P<end>[^"]+)" in "(?P<filterGridName>[^"]+)"$/
      *
      * @param string $filterName
      * @param string $type

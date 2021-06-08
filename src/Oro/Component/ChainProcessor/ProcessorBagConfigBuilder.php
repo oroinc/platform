@@ -281,7 +281,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     {
         if (!empty($items)) {
             krsort($items);
-            $items = array_merge(...$items);
+            $items = array_merge(...array_values($items));
         }
 
         return $items;

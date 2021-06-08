@@ -821,7 +821,7 @@ class ImportExportContext extends OroFeatureContext implements
 
         // sort by modification date
         usort($exportFiles, function (File $a, File $b) {
-            return $b->getMtime() > $a->getMtime();
+            return $b->getMtime() <=> $a->getMtime();
         });
 
         /** @var File $exportFile */

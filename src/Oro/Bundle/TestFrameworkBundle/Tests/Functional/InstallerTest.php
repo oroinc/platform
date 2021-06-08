@@ -51,6 +51,10 @@ class InstallerTest extends WebTestCase
                 continue;
             }
 
+            if (strpos(get_class($migrationState->getMigration()), 'ACME\\Bundle\\') === 0) {
+                continue;
+            }
+
             if (!is_a($migrationState->getMigration(), Installation::class)) {
                 $notCoveredMigrations[] = get_class($migrationState->getMigration());
             }

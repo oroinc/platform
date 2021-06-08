@@ -185,7 +185,7 @@ define(function(require) {
      */
     function toAssignAriaAttributesForSelect($realSelect, $select2Element) {
         $realSelect.on('validate-element', event => {
-            if (event.errorClass === void 0 || event.isValid === void 0) {
+            if (event.errorClass === void 0 || event.invalid === void 0) {
                 return;
             }
 
@@ -197,10 +197,10 @@ define(function(require) {
 
             $select2Element
                 .attr({
-                    'aria-invalid': event.isValid,
+                    'aria-invalid': event.invalid,
                     'aria-describedby': $(event.target).attr('aria-describedby')
                 })
-                .toggleClass(event.errorClass, event.isValid);
+                .toggleClass(event.errorClass, event.invalid);
         });
 
         if ($realSelect.is('[required], [data-rule-required], .required')) {

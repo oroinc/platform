@@ -5,6 +5,9 @@ namespace Oro\Component\Layout\Extension\Theme\PathProvider;
 use Oro\Component\Layout\ContextAwareInterface;
 use Oro\Component\Layout\ContextInterface;
 
+/**
+ * Provides sorted list of paths where applicable resources are located
+ */
 class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
 {
     /** @var array */
@@ -60,7 +63,7 @@ class ChainPathProvider implements ContextAwareInterface, PathProviderInterface
         if (!$this->sorted) {
             krsort($this->providers);
             $this->sorted = !empty($this->providers)
-                ? call_user_func_array('array_merge', $this->providers)
+                ? array_merge(...array_values($this->providers))
                 : [];
         }
 

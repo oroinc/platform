@@ -110,7 +110,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
     public function testSafeDeleteChunkFiles()
     {
         $operationId = 123;
-        $chunkFileNameTemplate = 'api_chunk_test_%';
+        $chunkFileNameTemplate = 'api_chunk_test_%s';
         $chunkFileName = 'api_chunk_test_1';
 
         $this->fileManager->expects(self::once())
@@ -129,7 +129,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
     public function testSafeDeleteChunkFilesWhenExceptionOccurredInFindFiles()
     {
         $operationId = 123;
-        $chunkFileNameTemplate = 'api_chunk_test_%';
+        $chunkFileNameTemplate = 'api_chunk_test_%s';
         $exception = new \Exception('some error');
 
         $this->fileManager->expects(self::once())
@@ -151,7 +151,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
     public function testSafeDeleteChunkFilesWhenExceptionOccurredInDeleteFile()
     {
         $operationId = 123;
-        $chunkFileNameTemplate = 'api_chunk_test_%';
+        $chunkFileNameTemplate = 'api_chunk_test_%s';
         $chunk1FileName = 'api_chunk_test_1';
         $chunk2FileName = 'api_chunk_test_2';
         $exception = new \Exception('some error');

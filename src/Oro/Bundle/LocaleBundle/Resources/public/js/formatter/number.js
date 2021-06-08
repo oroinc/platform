@@ -230,8 +230,10 @@ define(function(require) {
                     currency = localeSettings.getCurrency();
                 }
                 const options = _.extend({}, currencyOptions, customOptions);
-                options.min_fraction_digits = currencyFractionDigits(value);
-                options.max_fraction_digits = options.min_fraction_digits;
+                if (!options.allow_to_round_displayed_prices_and_amounts) {
+                    options.min_fraction_digits = currencyFractionDigits(value);
+                    options.max_fraction_digits = options.min_fraction_digits;
+                }
                 options.style = 'currency';
                 options.currency_code = currency;
                 const formattersChain = [
