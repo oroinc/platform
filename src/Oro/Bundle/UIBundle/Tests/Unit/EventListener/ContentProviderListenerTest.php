@@ -6,23 +6,20 @@ use Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager;
 use Oro\Bundle\UIBundle\EventListener\ContentProviderListener;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject */
-    private $event;
+    private RequestEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
-    /** @var ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $contentProviderManager;
+    private ContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
 
-    /** @var ContentProviderListener */
-    private $listener;
+    private ContentProviderListener $listener;
 
     protected function setUp(): void
     {
-        $this->event = $this->createMock(GetResponseEvent::class);
-        $this->event->expects($this->any())
+        $this->event = $this->createMock(RequestEvent::class);
+        $this->event->expects(self::any())
             ->method('isMasterRequest')
             ->willReturn(true);
 
@@ -35,56 +32,56 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ContentProviderListener($container);
     }
 
-    public function testOnKernelViewNoData()
+    public function testOnKernelViewNoData(): void
     {
         $request = Request::create('/test/url');
-        $this->event->expects($this->any())
+        $this->event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
-        $this->contentProviderManager->expects($this->never())
-            ->method($this->anything());
+        $this->contentProviderManager->expects(self::never())
+            ->method(self::anything());
         $this->listener->onKernelRequest($this->event);
     }
 
-    public function testOnKernelViewToEnable()
+    public function testOnKernelViewToEnable(): void
     {
-        $this->contentProviderManager->expects($this->exactly(2))
+        $this->contentProviderManager->expects(self::exactly(2))
             ->method('enableContentProvider');
-        $this->contentProviderManager->expects($this->exactly(2))
+        $this->contentProviderManager->expects(self::exactly(2))
             ->method('enableContentProvider')
             ->withConsecutive(['test1'], ['test2']);
 
         $request = $this->createMock(Request::class);
 
-        $request->expects($this->any())
+        $request->expects(self::any())
             ->method('get')
             ->willReturnMap([
                 ['_enableContentProviders', null, 'test1,test2']
             ]);
-        $this->event->expects($this->any())
+        $this->event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 
         $this->listener->onKernelRequest($this->event);
     }
 
-    public function testOnKernelViewToDisplay()
+    public function testOnKernelViewToDisplay(): void
     {
-        $this->contentProviderManager->expects($this->once())
+        $this->contentProviderManager->expects(self::once())
             ->method('disableContentProvider')
             ->with('test1');
 
-        $this->contentProviderManager->expects($this->once())
+        $this->contentProviderManager->expects(self::once())
             ->method('getContentProviderNames')
             ->willReturn(['test1', 'test2']);
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->any())
+        $request->expects(self::any())
             ->method('get')
             ->willReturnMap([
                 ['_displayContentProviders', null, 'test2']
             ]);
-        $this->event->expects($this->any())
+        $this->event->expects(self::any())
             ->method('getRequest')
             ->willReturn($request);
 

@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Twig;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -24,9 +24,9 @@ class HashNavExtension extends AbstractExtension
      * The request can not be injected directly into a Twig extension,
      * this causes a ScopeWideningInjectionException
      *
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->getRequestType() === HttpKernel::MASTER_REQUEST) {
             $this->request = $event->getRequest();
@@ -36,7 +36,7 @@ class HashNavExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction(
@@ -55,7 +55,7 @@ class HashNavExtension extends AbstractExtension
      *
      * @return bool
      */
-    public function checkIsHashNavigation()
+    public function checkIsHashNavigation(): bool
     {
         return
             is_object($this->request)
@@ -70,7 +70,7 @@ class HashNavExtension extends AbstractExtension
      *
      * @return string
      */
-    public function getHashNavigationHeaderConst()
+    public function getHashNavigationHeaderConst(): string
     {
         return ResponseHashnavListener::HASH_NAVIGATION_HEADER;
     }
@@ -80,7 +80,7 @@ class HashNavExtension extends AbstractExtension
      *
      * @return string The extension name
      */
-    public function getName()
+    public function getName(): string
     {
         return 'oro_hash_nav';
     }

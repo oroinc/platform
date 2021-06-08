@@ -6,11 +6,8 @@ help:
             alias: FooAlias
 
     resources:
-        BarBundle:
-          alias: BarOverride
-        FooBundle:
-          alias: Foo
-
+        Bar\Bundle\BarBundle\Controller\BarController:
+          alias: Foo\Bundle\FooBundle\Controller\FooController
 
     routes:
         bar_route:

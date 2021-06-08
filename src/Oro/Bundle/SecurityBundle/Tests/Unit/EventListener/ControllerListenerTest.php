@@ -7,25 +7,21 @@ use Oro\Bundle\SecurityBundle\EventListener\ControllerListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ControllerListenerTest extends \PHPUnit\Framework\TestCase
 {
-    protected $className = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject';
-    protected $methodName = 'getId';
+    private string $className = 'Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\TestDomainObject';
+    private string $methodName = 'getId';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $classAuthorizationChecker;
+    private ClassAuthorizationChecker|\PHPUnit\Framework\MockObject\MockObject $classAuthorizationChecker;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var Request */
-    protected $request;
+    private Request $request;
 
-    /** @var ControllerListener */
-    protected $listener;
+    private ControllerListener $listener;
 
     protected function setUp(): void
     {
@@ -41,9 +37,9 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAccessGranted()
+    public function testAccessGranted(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
             [new TestDomainObject(), $this->methodName],
             $this->request,
@@ -62,10 +58,10 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testAccessDenied()
+    public function testAccessDenied(): void
     {
         $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
             [new TestDomainObject(), $this->methodName],
             $this->request,
@@ -84,9 +80,9 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testAccessDeniedForSubRequest()
+    public function testAccessDeniedForSubRequest(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
             [new TestDomainObject(), $this->methodName],
             $this->request,
@@ -105,13 +101,11 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testUnsupportedControllerType()
+    public function testUnsupportedControllerType(): void
     {
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
-            function () {
-                // some controller
-            },
+            static fn () => null,
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
         );
@@ -125,10 +119,10 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testAccessAlreadyChecked()
+    public function testAccessAlreadyChecked(): void
     {
         $this->request->attributes->set('_oro_access_checked', true);
-        $event = new FilterControllerEvent(
+        $event = new ControllerEvent(
             $this->createMock(HttpKernelInterface::class),
             [new TestDomainObject(), $this->methodName],
             $this->request,

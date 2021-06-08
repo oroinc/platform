@@ -4,28 +4,23 @@ namespace Oro\Bundle\DistributionBundle\Security;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
 
+/**
+ * Redirects user to login page if AccessDeniedHttpException is thrown.
+ */
 class AccessDeniedListener
 {
-    /** @var Session */
-    protected $session;
+    protected Session $session;
 
-    /** @var Router */
-    protected $router;
+    protected Router $router;
 
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
 
-    /**
-     * @param Session               $session
-     * @param Router                $router
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(Session $session, Router $router, TokenStorageInterface $tokenStorage)
     {
         $this->session = $session;
@@ -33,10 +28,7 @@ class AccessDeniedListener
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @param GetResponseForExceptionEvent $event
-     */
-    public function onAccessDeniedException(GetResponseForExceptionEvent $event)
+    public function onAccessDeniedException(ExceptionEvent $event): void
     {
         if ($event->getThrowable() instanceof AccessDeniedHttpException) {
             $this->session->invalidate();

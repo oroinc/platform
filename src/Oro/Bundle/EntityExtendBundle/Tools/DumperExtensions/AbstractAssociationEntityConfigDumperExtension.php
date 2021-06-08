@@ -8,6 +8,9 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
+/**
+ * The base class for association related extensions for the extended entity config dumper.
+ */
 abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
 {
     /** @var ConfigManager */
@@ -43,7 +46,7 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
 
     /**
      * Gets the type of the association. For example manyToOne or manyToMany
-     * {@see Oro\Bundle\EntityExtendBundle\Extend\RelationType}
+     * @see \Oro\Bundle\EntityExtendBundle\Extend\RelationType
      *
      * @return string
      */

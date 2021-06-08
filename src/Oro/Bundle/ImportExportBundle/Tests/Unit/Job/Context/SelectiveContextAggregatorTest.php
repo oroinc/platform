@@ -78,14 +78,16 @@ class SelectiveContextAggregatorTest extends \PHPUnit\Framework\TestCase
             ->method('getStepExecutions')
             ->willReturn($stepExecutions);
 
-        $this->contextRegistry->expects(self::at(0))
+        $this->contextRegistry->expects(self::exactly(2))
             ->method('getByStepExecution')
-            ->with(self::identicalTo($stepExecution2))
-            ->willReturn($stepExecution2Context);
-        $this->contextRegistry->expects(self::at(1))
-            ->method('getByStepExecution')
-            ->with(self::identicalTo($stepExecution4))
-            ->willReturn($stepExecution4Context);
+            ->withConsecutive(
+                [self::identicalTo($stepExecution2)],
+                [self::identicalTo($stepExecution4)]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $stepExecution2Context,
+                $stepExecution4Context
+            );
 
         $result = $this->aggregator->getAggregatedContext($jobExecution);
         self::assertInstanceOf(ContextInterface::class, $result);

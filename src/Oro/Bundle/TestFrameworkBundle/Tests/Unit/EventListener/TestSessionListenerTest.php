@@ -7,88 +7,75 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class TestSessionListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var GetResponseEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    private RequestEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    private ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container;
 
-    /**
-     * @var TestSessionListener|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $testSessionListener;
+    private TestSessionListener $testSessionListener;
 
     protected function setUp(): void
     {
-        $this->event = $this->getMockBuilder(GetResponseEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->container = $this->getMockBuilder(ContainerInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->event = $this->createMock(RequestEvent::class);
+        $this->container = $this->createMock(ContainerInterface::class);
         $this->testSessionListener = new TestSessionListener($this->container);
     }
 
-    public function testListenerNoSession()
+    public function testListenerNoSession(): void
     {
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('has')
             ->with('session')
             ->willReturn(false);
-        $this->container->expects($this->never())
+        $this->container->expects(self::never())
             ->method('get');
         $this->testSessionListener->onKernelRequest($this->event);
     }
 
-    public function testListenerSameSessionId()
+    public function testListenerSameSessionId(): void
     {
         $sessionId = 'sessionId';
         $sessionName = 'sessionName';
         $session = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('getId')
             ->willReturn($sessionId);
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('getName')
             ->willReturn($sessionName);
 
         $request = $this->createMock(Request::class);
         $request->cookies = $this->createMock(ParameterBag::class);
-        $request->cookies->expects($this->once())
+        $request->cookies->expects(self::once())
             ->method('get')
             ->with($sessionName)
             ->willReturn($sessionId);
 
-        $this->event->expects($this->once())
+        $this->event->expects(self::once())
             ->method('getRequest')
             ->willReturn($request);
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('has')
             ->with('session')
             ->willReturn(true);
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('session')
             ->willReturn($session);
 
-        $this->event->expects($this->never())
+        $this->event->expects(self::never())
             ->method('isMasterRequest');
 
         $this->testSessionListener->onKernelRequest($this->event);
     }
 
-    public function testSetSession()
+    public function testSetSession(): void
     {
         $sessionId = 'sessionId';
         $sessionName = 'sessionName';
@@ -96,39 +83,39 @@ class TestSessionListenerTest extends \PHPUnit\Framework\TestCase
         $session = $this->getMockBuilder(Session::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('getId')
             ->willReturn($sessionId);
-        $session->expects($this->exactly(3))
+        $session->expects(self::exactly(3))
             ->method('getName')
             ->willReturn($sessionName);
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('setId')
             ->with($newSessionId);
 
         $request = $this->createMock(Request::class);
         $request->cookies = $this->createMock(ParameterBag::class);
-        $request->cookies->expects($this->exactly(2))
+        $request->cookies->expects(self::exactly(2))
             ->method('get')
             ->with($sessionName)
             ->willReturn($newSessionId);
-        $request->cookies->expects($this->once())
+        $request->cookies->expects(self::once())
             ->method('has')
             ->with($sessionName)
             ->willReturn(true);
 
-        $this->event->expects($this->exactly(2))
+        $this->event->expects(self::exactly(2))
             ->method('getRequest')
             ->willReturn($request);
-        $this->event->expects($this->once())
+        $this->event->expects(self::once())
             ->method('isMasterRequest')
             ->willReturn(true);
 
-        $this->container->expects($this->exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('has')
             ->with('session')
             ->willReturn(true);
-        $this->container->expects($this->exactly(2))
+        $this->container->expects(self::exactly(2))
             ->method('get')
             ->with('session')
             ->willReturn($session);

@@ -11,7 +11,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -19,14 +19,11 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
+    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
 
-    /** @var NavigationHistoryLogger|\PHPUnit\Framework\MockObject\MockObject */
-    private $navigationHistoryLogger;
+    private NavigationHistoryLogger|\PHPUnit\Framework\MockObject\MockObject $navigationHistoryLogger;
 
-    /** @var ResponseHistoryListener */
-    private $listener;
+    private ResponseHistoryListener $listener;
 
     protected function setUp(): void
     {
@@ -48,7 +45,7 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return Request
      */
-    private function getRequest(string $route = 'test_route', string $format = 'html', string $method = 'GET')
+    private function getRequest(string $route = 'test_route', string $format = 'html', string $method = 'GET'): Request
     {
         $request = new Request(['id' => 1], [], ['_route' => $route, '_route_params' => []]);
         $request->setRequestFormat($format);
@@ -60,7 +57,7 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @return Response
      */
-    private function getResponse(int $statusCode = 200)
+    private function getResponse(int $statusCode = 200): Response
     {
         return new Response('message', $statusCode);
     }
@@ -70,11 +67,11 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
      * @param Response $response
      * @param bool     $isMasterRequest
      *
-     * @return FilterResponseEvent
+     * @return ResponseEvent
      */
-    private function getEvent(Request $request, Response $response, bool $isMasterRequest = true)
+    private function getEvent(Request $request, Response $response, bool $isMasterRequest = true): ResponseEvent
     {
-        return new FilterResponseEvent(
+        return new ResponseEvent(
             $this->createMock(HttpKernelInterface::class),
             $request,
             $isMasterRequest ? HttpKernelInterface::MASTER_REQUEST : HttpKernelInterface::SUB_REQUEST,
@@ -82,11 +79,11 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForSubRequest()
+    public function testForSubRequest(): void
     {
-        $this->tokenAccessor->expects($this->never())
+        $this->tokenAccessor->expects(self::never())
             ->method('getUser');
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -94,12 +91,12 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForUnsupportedUser()
+    public function testForUnsupportedUser(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(AbstractUser::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -107,28 +104,28 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForSupportedUser()
+    public function testForSupportedUser(): void
     {
         $request = $this->getRequest();
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->once())
+        $this->navigationHistoryLogger->expects(self::once())
             ->method('logRequest')
-            ->with($this->identicalTo($request));
+            ->with(self::identicalTo($request));
 
         $this->listener->onResponse(
             $this->getEvent($request, $this->getResponse())
         );
     }
 
-    public function testForUnsupportedStatusCode()
+    public function testForUnsupportedStatusCode(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -136,12 +133,12 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForExcludedRoute()
+    public function testForExcludedRoute(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -152,12 +149,12 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForUnsupportedRequestFormat()
+    public function testForUnsupportedRequestFormat(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -168,12 +165,12 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForUnsupportedHttpMethod()
+    public function testForUnsupportedHttpMethod(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -184,15 +181,15 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForXmlHttpRequest()
+    public function testForXmlHttpRequest(): void
     {
         $request = $this->getRequest();
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -200,51 +197,51 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForXmlHttpRequestAndHashNavigation()
+    public function testForXmlHttpRequestAndHashNavigation(): void
     {
         $request = $this->getRequest();
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
         $request->headers->set(ResponseHashnavListener::HASH_NAVIGATION_HEADER, '1');
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->once())
+        $this->navigationHistoryLogger->expects(self::once())
             ->method('logRequest')
-            ->with($this->identicalTo($request));
+            ->with(self::identicalTo($request));
 
         $this->listener->onResponse(
             $this->getEvent($request, $this->getResponse())
         );
     }
 
-    public function testForUnknownContentDisposition()
+    public function testForUnknownContentDisposition(): void
     {
         $request = $this->getRequest();
         $response = $this->getResponse();
         $response->headers->set('Content-Disposition', 'another');
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->once())
+        $this->navigationHistoryLogger->expects(self::once())
             ->method('logRequest')
-            ->with($this->identicalTo($request));
+            ->with(self::identicalTo($request));
 
         $this->listener->onResponse(
             $this->getEvent($request, $response)
         );
     }
 
-    public function testForInlineContentDisposition()
+    public function testForInlineContentDisposition(): void
     {
         $response = $this->getResponse();
         $response->headers->set('Content-Disposition', 'inline');
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(
@@ -252,15 +249,15 @@ class ResponseHistoryListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForAttachmentContentDisposition()
+    public function testForAttachmentContentDisposition(): void
     {
         $response = $this->getResponse();
         $response->headers->set('Content-Disposition', 'attachment; filename=file.html');
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
-        $this->navigationHistoryLogger->expects($this->never())
+        $this->navigationHistoryLogger->expects(self::never())
             ->method('logRequest');
 
         $this->listener->onResponse(

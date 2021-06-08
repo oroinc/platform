@@ -6,31 +6,27 @@ use Oro\Bundle\ApiBundle\EventListener\BodyListenerInterface;
 use Oro\Bundle\ApiBundle\EventListener\UpdateListBodyListenerDecorator;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     private const LIST_ROUTE_NAME = 'list_route';
 
-    /** @var Request */
-    private $request;
+    private Request $request;
 
-    /** @var GetResponseEvent */
-    private $event;
+    private RequestEvent $event;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BodyListenerInterface */
-    private $bodyListener;
+    private BodyListenerInterface|\PHPUnit\Framework\MockObject\MockObject $bodyListener;
 
-    /** @var UpdateListBodyListenerDecorator */
-    private $decorator;
+    private UpdateListBodyListenerDecorator $decorator;
 
     protected function setUp(): void
     {
         $this->request = new Request();
         $this->request->headers->set('Content-Type', 'text/html');
 
-        $this->event = new GetResponseEvent(
+        $this->event = new RequestEvent(
             $this->createMock(HttpKernelInterface::class),
             $this->request,
             HttpKernelInterface::MASTER_REQUEST
@@ -46,11 +42,11 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
     }
 
 
-    public function testOnKernelRequestWithNonApiRequest()
+    public function testOnKernelRequestWithNonApiRequest(): void
     {
         $this->bodyListener->expects(self::once())
             ->method('onKernelRequest')
-            ->willReturnCallback(function (GetResponseEvent $event) {
+            ->willReturnCallback(function (RequestEvent $event) {
                 self::assertEquals(
                     'text/html',
                     $event->getRequest()->headers->get('Content-Type')
@@ -62,14 +58,14 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text/html', $this->request->headers->get('Content-Type'));
     }
 
-    public function testOnKernelRequestWithItemAction()
+    public function testOnKernelRequestWithItemAction(): void
     {
         $this->request->setMethod(Request::METHOD_PATCH);
         $this->request->attributes->set('_route', 'item_route');
 
         $this->bodyListener->expects(self::once())
             ->method('onKernelRequest')
-            ->willReturnCallback(function (GetResponseEvent $event) {
+            ->willReturnCallback(function (RequestEvent $event) {
                 self::assertEquals(
                     'text/html',
                     $event->getRequest()->headers->get('Content-Type')
@@ -81,14 +77,14 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text/html', $this->request->headers->get('Content-Type'));
     }
 
-    public function testOnKernelRequestWithNonUpdateListAction()
+    public function testOnKernelRequestWithNonUpdateListAction(): void
     {
         $this->request->setMethod(Request::METHOD_GET);
         $this->request->attributes->set('_route', self::LIST_ROUTE_NAME);
 
         $this->bodyListener->expects(self::once())
             ->method('onKernelRequest')
-            ->willReturnCallback(function (GetResponseEvent $event) {
+            ->willReturnCallback(function (RequestEvent $event) {
                 self::assertEquals(
                     'text/html',
                     $event->getRequest()->headers->get('Content-Type')
@@ -100,7 +96,7 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text/html', $this->request->headers->get('Content-Type'));
     }
 
-    public function testOnKernelRequestWithUpdateListActionAndFormUrlencodedContentType()
+    public function testOnKernelRequestWithUpdateListActionAndFormUrlencodedContentType(): void
     {
         $this->request->setMethod(Request::METHOD_PATCH);
         $this->request->attributes->set('_route', self::LIST_ROUTE_NAME);
@@ -108,7 +104,7 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
 
         $this->bodyListener->expects(self::once())
             ->method('onKernelRequest')
-            ->willReturnCallback(function (GetResponseEvent $event) {
+            ->willReturnCallback(function (RequestEvent $event) {
                 self::assertEquals(
                     'application/x-www-form-urlencoded',
                     $event->getRequest()->headers->get('Content-Type')
@@ -120,14 +116,14 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('application/x-www-form-urlencoded', $this->request->headers->get('Content-Type'));
     }
 
-    public function testOnKernelRequestWithUpdateListAction()
+    public function testOnKernelRequestWithUpdateListAction(): void
     {
         $this->request->setMethod(Request::METHOD_PATCH);
         $this->request->attributes->set('_route', self::LIST_ROUTE_NAME);
 
         $this->bodyListener->expects(self::once())
             ->method('onKernelRequest')
-            ->willReturnCallback(function (GetResponseEvent $event) {
+            ->willReturnCallback(function (RequestEvent $event) {
                 self::assertEquals(
                     'application/x-www-form-urlencoded',
                     $event->getRequest()->headers->get('Content-Type')

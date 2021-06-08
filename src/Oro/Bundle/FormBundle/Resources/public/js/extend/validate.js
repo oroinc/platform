@@ -482,30 +482,49 @@ define(function(require, exports, module) {
 
             this.addWrapper(this.toShow).css('display', '');
 
-            const updateListElement = ($element, isValid) => {
-                $element.attr('aria-invalid', isValid);
-                $element.trigger({
-                    type: 'validate-element',
-                    errorClass: ERROR_CLASS_NAME,
-                    isValid: isValid
+            const updateListElement = ($elements, invalid) => {
+                $elements.each((index, el) => {
+                    $(el)
+                        .attr('aria-invalid', invalid)
+                        .trigger({
+                            type: 'validate-element',
+                            errorClass: ERROR_CLASS_NAME,
+                            invalid
+                        });
                 });
             };
 
             if (this.errorList.length) {
                 this.errorList
-                    .forEach(item => updateListElement($(item.element), true));
+                    .forEach(item => {
+                        let $elements = $(`[name="${item.element.getAttribute('name')}"]`);
+
+                        if (!$elements.length) {
+                            $elements = $(item.element);
+                        }
+
+                        updateListElement($elements, true);
+                    });
             }
 
             if (this.toHide.length) {
                 this.toHide.each((i, el) => {
-                    const id = el.getAttribute('id');
+                    let id = el.getAttribute('id');
 
                     if (!id) {
                         return;
                     }
 
                     // find element by original ID without "-error" postfix
-                    updateListElement($('#' + el.getAttribute('id').slice(0, -6)), false);
+                    id = id.slice(0, -6);
+
+                    let $elements = $(`[name="${id}"]`);
+
+                    if (!$elements.length) {
+                        $elements = $(document.getElementById(id));
+                    }
+
+                    updateListElement($elements, false);
                 });
             }
         },

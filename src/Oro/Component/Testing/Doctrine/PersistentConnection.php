@@ -83,7 +83,17 @@ class PersistentConnection extends Connection
      */
     public function rollBack()
     {
-        $this->wrapTransactionNestingLevel('rollBack');
+        try {
+            $this->wrapTransactionNestingLevel('rollBack');
+        } catch (\PDOException $exception) {
+            if ($this->getDatabasePlatform() instanceof MySqlPlatform) {
+                // For MySql transactions with DDL are committed automatically and rollBack throws \PDOException,
+                // that is ignored to make DB isolation work the same for all supported DB platforms.
+                $this->setPersistentTransactionNestingLevel($this->getTransactionNestingLevel());
+            } else {
+                throw $exception;
+            }
+        }
     }
 
     /**

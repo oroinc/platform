@@ -7,7 +7,6 @@ use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\UIBundle\Provider\ControllerClassProvider;
-use Symfony\Bundle\FrameworkBundle\Controller\ControllerNameParser;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -16,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class HelpLinkProvider
 {
-    private const FORMAT          = '%server%/%vendor%/%bundle%/%controller%_%action%';
+    private const FORMAT          = '%server%/%vendor%/%controller%_%action%';
     private const GROUP_SEPARATOR = '/';
 
     /** @var array */
@@ -30,9 +29,6 @@ class HelpLinkProvider
 
     /** @var ControllerClassProvider */
     private $controllerClassProvider;
-
-    /** @var ControllerNameParser */
-    private $parser;
 
     /** @var VersionHelper */
     private $helper;
@@ -57,7 +53,6 @@ class HelpLinkProvider
      * @param ConfigurationProvider $configProvider
      * @param RequestStack $requestStack
      * @param ControllerClassProvider $controllerClassProvider
-     * @param ControllerNameParser $parser
      * @param VersionHelper $helper
      * @param CacheProvider $cache
      */
@@ -66,7 +61,6 @@ class HelpLinkProvider
         ConfigurationProvider $configProvider,
         RequestStack $requestStack,
         ControllerClassProvider $controllerClassProvider,
-        ControllerNameParser $parser,
         VersionHelper $helper,
         CacheProvider $cache
     ) {
@@ -74,7 +68,6 @@ class HelpLinkProvider
         $this->configProvider = $configProvider;
         $this->requestStack = $requestStack;
         $this->controllerClassProvider = $controllerClassProvider;
-        $this->parser = $parser;
         $this->helper = $helper;
         $this->cache = $cache;
     }
@@ -135,7 +128,7 @@ class HelpLinkProvider
             $config['vendor'] = $config['prefix'] . self::GROUP_SEPARATOR . $config['vendor'];
         }
 
-        $keys = ['server', 'vendor', 'bundle', 'controller', 'action', 'uri'];
+        $keys = ['server', 'vendor', 'controller', 'action', 'uri'];
         $replaceParams = [];
         foreach ($keys as $key) {
             $replaceParams['%' . $key . '%'] = $config[$key] ?? '';
@@ -143,7 +136,7 @@ class HelpLinkProvider
 
         if (isset($config['uri'])) {
             $link = strtr('%server%/%uri%', $replaceParams);
-        } elseif (isset($config['vendor'], $config['bundle'], $config['controller'], $config['action'])) {
+        } elseif (isset($config['vendor'], $config['controller'], $config['action'])) {
             $link = strtr(self::FORMAT, $replaceParams);
         } else {
             $link = $config['server'];
@@ -162,7 +155,7 @@ class HelpLinkProvider
             $link
         );
 
-        return $this->appendVersion(preg_replace('/(^:)\/+/', '/', $link));
+        return $this->appendVersion(preg_replace('/(^:)\/+|\\\/', '/', $link));
     }
 
     /**
@@ -264,7 +257,6 @@ class HelpLinkProvider
     private function mergeVendorsAndResourcesConfig(array &$resultConfig, array $controllerData)
     {
         $vendor = $controllerData['vendor'];
-        $bundle = $controllerData['bundle'];
         $controller = $controllerData['controller'];
         $action = $controllerData['action'];
 
@@ -274,17 +266,12 @@ class HelpLinkProvider
             'key' => 'vendor'
         ];
         $configData[] = [
-            'id' => $bundle,
-            'section' => 'resources',
-            'key' => 'bundle'
-        ];
-        $configData[] = [
-            'id' => $bundle . ':' . $controller,
+            'id' => $controller,
             'section' => 'resources',
             'key' => 'controller'
         ];
         $configData[] = [
-            'id' => sprintf('%s:%s:%s', $bundle, $controller, $action),
+            'id' => sprintf('%s::%s', $controller, $action),
             'section' => 'resources',
             'key' => 'action'
         ];
@@ -322,7 +309,7 @@ class HelpLinkProvider
     }
 
     /**
-     * Parses request controller and returns vendor, bundle, controller, action
+     * Parses request controller and returns vendor, controller, action
      *
      * @param string $controller
      * @return array
@@ -337,16 +324,14 @@ class HelpLinkProvider
             return $this->parserCache[$controller];
         }
 
-        $controllerActionKey = $this->parser->build($controller);
         $controllerNameParts = explode('::', $controller);
-        $vendorName = current(explode('\\', $controllerNameParts[0]));
-        list($bundleName, $controllerName, $actionName) = explode(':', $controllerActionKey);
+        $controllerName = $controllerNameParts[0];
+        $vendorName = current(explode('\\', $controllerName));
 
         return $this->parserCache[$controller] = [
             'vendor' => $vendorName,
-            'bundle' => $bundleName,
             'controller' => $controllerName,
-            'action' => $actionName,
+            'action' => $controllerNameParts[1],
         ];
     }
 }

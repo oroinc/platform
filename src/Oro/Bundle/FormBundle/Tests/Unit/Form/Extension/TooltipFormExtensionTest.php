@@ -75,7 +75,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->any())
             ->method('hasTrans')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $view = new FormView();
         $this->extension->buildView($view, $form, $options);
@@ -141,7 +141,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->with('TestClass', 'testField')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with('TestClass', 'testField')
@@ -187,7 +187,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->with('TestClass', 'testField')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with('TestClass', 'testField')
@@ -197,14 +197,12 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('description')
             ->willReturn($tooltip);
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(2))
             ->method('hasTrans')
-            ->with($tooltip, 'messages')
-            ->willReturn(false);
-        $this->translator->expects($this->at(1))
-            ->method('hasTrans')
-            ->with($tooltip, 'tooltips')
-            ->willReturn(true);
+            ->willReturnMap([
+                [$tooltip, 'messages', null, false],
+                [$tooltip, 'tooltips', null, true]
+            ]);
 
         $view = new FormView();
         $this->extension->buildView($view, $form, []);
@@ -235,7 +233,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects($this->any())
             ->method('hasConfig')
             ->with('TestClass', 'testField')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with('TestClass', 'testField')

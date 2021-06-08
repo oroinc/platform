@@ -318,6 +318,8 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             $this->sendErrorNotification($body, $e->getMessage());
 
             return false;
+        } finally {
+            @unlink($filePath);
         }
 
         return $files;

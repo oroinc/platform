@@ -22,7 +22,6 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -30,30 +29,24 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EntityReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ManagerRegistry|MockObject */
-    protected $managerRegistry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $managerRegistry;
 
-    /** @var ContextRegistry|MockObject */
-    protected $contextRegistry;
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
 
-    /** @var OwnershipMetadataProviderInterface|MockObject */
-    protected $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
     /** @var EntityReaderTestAdapter */
-    protected $reader;
+    private $reader;
 
     protected function setUp(): void
     {
-        $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getByStepExecution'])
-            ->getMock();
-
-        $this->ownershipMetadataProvider = $this->getMockBuilder(OwnershipMetadataProviderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
             $this->managerRegistry,
@@ -61,51 +54,60 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    private function getMockStepExecution($context): StepExecution
+    {
+        $stepExecution = $this->createMock(StepExecution::class);
+
+        $this->contextRegistry->expects(self::any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+
+        return $stepExecution;
+    }
+
     public function testReadMockIterator()
     {
         $iterator = $this->createMock(\Iterator::class);
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
         $barEntity = $this->createMock(\ArrayObject::class);
         $bazEntity = $this->createMock(\ArrayAccess::class);
 
-        $iterator->expects(static::at(0))->method('rewind');
-
-        $iterator->expects(static::at(1))->method('valid')->willReturn(true);
-        $iterator->expects(static::at(2))->method('current')->willReturn($fooEntity);
-        $iterator->expects(static::at(3))->method('next');
-
-        $iterator->expects(static::at(4))->method('valid')->willReturn(true);
-        $iterator->expects(static::at(5))->method('current')->willReturn($barEntity);
-        $iterator->expects(static::at(6))->method('next');
-
-        $iterator->expects(static::at(7))->method('valid')->willReturn(true);
-        $iterator->expects(static::at(8))->method('current')->willReturn($bazEntity);
-        $iterator->expects(static::at(9))->method('next');
-
-        $iterator->expects(static::at(10))->method('valid')->willReturn(false);
-        $iterator->expects(static::at(11))->method('valid')->willReturn(false);
+        $iterator->expects(self::once())
+            ->method('rewind');
+        $iterator->expects(self::exactly(5))
+            ->method('valid')
+            ->willReturnOnConsecutiveCalls(true, true, true, false, false);
+        $iterator->expects(self::exactly(3))
+            ->method('current')
+            ->willReturnOnConsecutiveCalls($fooEntity, $barEntity, $bazEntity);
+        $iterator->expects(self::exactly(3))
+            ->method('next');
 
         $this->reader->setSomeSourceIterator($iterator);
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::exactly(3))->method('incrementReadOffset');
-        $context->expects(static::exactly(3))->method('incrementReadCount');
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('incrementReadOffset');
+        $context->expects(self::exactly(3))
+            ->method('incrementReadCount');
 
-        $stepExecution = $this->getMockStepExecution($context);
-        $this->reader->setStepExecution($stepExecution);
+        $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        static::assertEquals($fooEntity, $this->reader->read());
-        static::assertEquals($barEntity, $this->reader->read());
-        static::assertEquals($bazEntity, $this->reader->read());
-        static::assertNull($this->reader->read());
-        static::assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->reader->read());
+        self::assertEquals($barEntity, $this->reader->read());
+        self::assertEquals($bazEntity, $this->reader->read());
+        self::assertNull($this->reader->read());
+        self::assertNull($this->reader->read());
     }
 
     public function testReadRealIterator()
     {
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
         $barEntity = $this->createMock(\ArrayObject::class);
@@ -115,18 +117,19 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setSomeSourceIterator($iterator);
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::exactly(3))->method('incrementReadOffset');
-        $context->expects(static::exactly(3))->method('incrementReadCount');
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('incrementReadOffset');
+        $context->expects(self::exactly(3))
+            ->method('incrementReadCount');
 
-        $stepExecution = $this->getMockStepExecution($context);
-        $this->reader->setStepExecution($stepExecution);
+        $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        static::assertEquals($fooEntity, $this->reader->read());
-        static::assertEquals($barEntity, $this->reader->read());
-        static::assertEquals($bazEntity, $this->reader->read());
-        static::assertNull($this->reader->read());
-        static::assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->reader->read());
+        self::assertEquals($barEntity, $this->reader->read());
+        self::assertEquals($bazEntity, $this->reader->read());
+        self::assertNull($this->reader->read());
+        self::assertNull($this->reader->read());
     }
 
     public function testReadFailsWhenNoSourceIterator()
@@ -134,99 +137,139 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Reader must be configured with source');
 
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
         $this->reader->read();
     }
 
     public function testSetStepExecutionWithQueryBuilder()
     {
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::at(0))->method('hasOption')->with('entityName')->willReturn(false);
-        $context->expects(static::at(1))->method('hasOption')->with('queryBuilder')->willReturn(true);
-        $context->expects(static::at(2))->method('getOption')->with('queryBuilder')->willReturn($queryBuilder);
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(2))
+            ->method('hasOption')
+            ->willReturnMap([
+                ['entityName', false],
+                ['queryBuilder', true]
+            ]);
+        $context->expects(self::once())
+            ->method('getOption')
+            ->with('queryBuilder')
+            ->willReturn($queryBuilder);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        static::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
-        static::assertEquals($queryBuilder, $this->reader->getSourceIterator()->getSource());
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($queryBuilder, $this->reader->getSourceIterator()->getSource());
     }
 
     public function testSetStepExecutionWithQuery()
     {
-        $configuration = $this->getMockBuilder(Configuration::class)->disableOriginalConstructor()->getMock();
-        $configuration->expects(static::once())->method('getDefaultQueryHints')->willReturn([]);
-        $configuration->expects(static::once())->method('isSecondLevelCacheEnabled')->willReturn(false);
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects(self::once())
+            ->method('getDefaultQueryHints')
+            ->willReturn([]);
+        $configuration->expects(self::once())
+            ->method('isSecondLevelCacheEnabled')
+            ->willReturn(false);
 
-        /** @var EntityManager|MockObject $em */
-        $em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $em->expects(static::exactly(2))->method('getConfiguration')->willReturn($configuration);
+        $em = $this->createMock(EntityManager::class);
+        $em->expects(self::exactly(2))
+            ->method('getConfiguration')
+            ->willReturn($configuration);
 
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
         $query = new Query($em);
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::at(0))->method('hasOption')->with('entityName')->willReturn(false);
-        $context->expects(static::at(1))->method('hasOption')->with('queryBuilder')->willReturn(false);
-        $context->expects(static::at(2))->method('hasOption')->with('query')->willReturn(true);
-        $context->expects(static::at(3))->method('getOption')->with('query')->willReturn($query);
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('hasOption')
+            ->willReturnMap([
+                ['entityName', false],
+                ['queryBuilder', false],
+                ['query', true]
+            ]);
+        $context->expects(self::once())
+            ->method('getOption')
+            ->with('query')
+            ->willReturn($query);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        static::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
-        static::assertEquals($query, $this->reader->getSourceIterator()->getSource());
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
     public function testSetStepExecutionWithEntityName()
     {
         $entityName = 'entityName';
 
-        $classMetadata = $this->getMockBuilder(ClassMetadata::class)->disableOriginalConstructor()->getMock();
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
-        $classMetadata->expects(static::once())->method('getAssociationMappings')->willReturn([]);
-        $classMetadata->expects(static::once())->method('getIdentifierFieldNames')->willReturn(['id']);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn([]);
+        $classMetadata->expects(self::once())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
 
-        $emConfiguration = $this->getMockBuilder(Configuration::class)->disableOriginalConstructor()->getMock();
+        $emConfiguration = $this->createMock(Configuration::class);
 
-        /** @var EntityManager|MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $entityManager->expects(static::once())->method('getClassMetadata')
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
-        $entityManager->expects(static::any())->method('getConfiguration')->willReturn($emConfiguration);
+        $entityManager->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($emConfiguration);
 
         $query = new Query($entityManager);
 
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)->disableOriginalConstructor()->getMock();
-        $queryBuilder->expects(static::any())->method('getQuery')->willReturn($query);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::any())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
-        $repository->expects(static::once())->method('createQueryBuilder')
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
             ->with('o')
             ->willReturn($queryBuilder);
 
-        $entityManager->expects(static::once())->method('getRepository')
+        $entityManager->expects(self::once())
+            ->method('getRepository')
             ->with($entityName)
             ->willReturn($repository);
 
-        $this->managerRegistry->expects(static::once())->method('getManagerForClass')
+        $this->managerRegistry->expects(self::once())
+            ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::at(0))->method('hasOption')->with('entityName')->willReturn(true);
-        $context->expects(static::at(1))->method('getOption')->with('entityName')->willReturn($entityName);
-        $context->expects(static::at(3))->method('getOption')->with('ids', [])->willReturn([]);
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::once())
+            ->method('hasOption')
+            ->with('entityName')
+            ->willReturn(true);
+        $context->expects(self::exactly(3))
+            ->method('getOption')
+            ->willReturnMap([
+                ['entityName', null, $entityName],
+                ['ids', [], []]
+            ]);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        static::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
-        static::assertEquals($query, $this->reader->getSourceIterator()->getSource());
+        self::assertInstanceOf(BufferedIdentityQueryResultIterator::class, $this->reader->getSourceIterator());
+        self::assertEquals($query, $this->reader->getSourceIterator()->getSource());
     }
 
     public function testSetStepExecutionFailsWhenHasNoRequiredOptions()
@@ -236,26 +279,25 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
         );
 
-        $this->managerRegistry->expects(static::never())->method(static::anything());
+        $this->managerRegistry->expects(self::never())
+            ->method(self::anything());
 
-        $context = $this->getMockBuilder(ContextInterface::class)->getMock();
-        $context->expects(static::exactly(3))->method('hasOption')->willReturn(false);
+        $context = $this->createMock(ContextInterface::class);
+        $context->expects(self::exactly(3))
+            ->method('hasOption')
+            ->willReturn(false);
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
     }
 
     public function testSetSourceEntityName()
     {
-        $name = '\stdClass';
+        $name = \stdClass::class;
 
-        $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $classMetadata = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetadata->expects(static::once())
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())
             ->method('getAssociationMappings')
             ->willReturn([
                 'testSingle'   => ['fieldName' => 'testSingle'],
@@ -263,7 +305,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ]);
         $classMetadata->expects($this->exactly(2))
             ->method('isAssociationWithSingleJoinColumn')
-            ->with(static::isType('string'))
+            ->with(self::isType('string'))
             ->willReturnMap([
                 ['testSingle', true],
                 ['testMultiple', false],
@@ -272,26 +314,39 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
 
-        $queryBuilder->expects(static::once())->method('addSelect')->with('_testSingle');
-        $queryBuilder->expects(static::once())->method('leftJoin')->with('o.testSingle', '_testSingle');
-        $queryBuilder->expects(static::once())->method('orderBy')->with('o.id', 'ASC');
+        $queryBuilder->expects(self::once())
+            ->method('addSelect')
+            ->with('_testSingle');
+        $queryBuilder->expects(self::once())
+            ->method('leftJoin')
+            ->with('o.testSingle', '_testSingle');
+        $queryBuilder->expects(self::once())
+            ->method('orderBy')
+            ->with('o.id', 'ASC');
 
-        $repository = $this->getMockBuilder(EntityRepository::class)->disableOriginalConstructor()->getMock();
-        $repository->expects(static::once())
+        $repository = $this->createMock(EntityRepository::class);
+        $repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('o')
             ->willReturn($queryBuilder);
 
-        $emConfiguration = $this->getMockBuilder(Configuration::class)->disableOriginalConstructor()->getMock();
+        $emConfiguration = $this->createMock(Configuration::class);
 
-        /** @var EntityManager|MockObject $entityManager */
-        $entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $entityManager = $this->createMock(EntityManager::class);
 
-        $entityManager->expects(static::once())->method('getRepository')->with($name)->willReturn($repository);
-        $entityManager->expects(static::once())->method('getClassMetadata')->with($name)->willReturn($classMetadata);
-        $entityManager->expects(static::any())->method('getConfiguration')->willReturn($emConfiguration);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->with($name)
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($name)
+            ->willReturn($classMetadata);
+        $entityManager->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($emConfiguration);
 
-        $this->managerRegistry->expects(static::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($name)
             ->willReturn($entityManager);
@@ -300,47 +355,31 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $organization = new Organization();
         $ownershipMetadata = new OwnershipMetadata('', '', '', 'organization');
-        $this->ownershipMetadataProvider->expects(static::once())
+        $this->ownershipMetadataProvider->expects(self::once())
             ->method('getMetadata')
             ->willReturn($ownershipMetadata);
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('andWhere')
             ->with('o.organization = :organization')
             ->willReturn($queryBuilder);
-        $queryBuilder->expects(static::once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('organization', $organization)
             ->willReturn($queryBuilder);
-        $queryBuilder->expects(static::any())->method('getQuery')->willReturn($query);
+        $queryBuilder->expects(self::any())
+            ->method('getQuery')
+            ->willReturn($query);
 
         $this->reader->setSourceEntityName($name, $organization);
     }
 
-    /**
-     * @param mixed $context
-     * @return MockObject|StepExecution
-     */
-    protected function getMockStepExecution($context)
-    {
-        $stepExecution = $this->getMockBuilder(StepExecution::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry->expects(static::any())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->willReturn($context);
-
-        return $stepExecution;
-    }
-
     public function testSetNullIterator()
     {
-        $iterator = $this->createMock('\Iterator');
+        $iterator = $this->createMock(\Iterator::class);
         $this->reader->setSourceIterator($iterator);
-        static::assertSame($iterator, $this->reader->getSourceIterator());
+        self::assertSame($iterator, $this->reader->getSourceIterator());
         $this->reader->setSourceIterator();
-        static::assertNull($this->reader->getSourceIterator());
+        self::assertNull($this->reader->getSourceIterator());
     }
 
     public function testGetIds()
@@ -351,27 +390,26 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $classMetadata = $this->createMock(ClassMetadata::class);
 
-        $classMetadata->expects(static::once())
+        $classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $classMetadata->expects(static::once())
+        $classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
 
         $emConfiguration = $this->createMock(Configuration::class);
 
-        /** @var EntityManagerInterface|MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(static::exactly(2))
+        $entityManager->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
-        $entityManager->expects(static::any())
+        $entityManager->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($emConfiguration);
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(static::once())
+        $query->expects(self::once())
             ->method('getResult')
             ->with(AbstractQuery::HYDRATE_ARRAY)
             ->willReturn([
@@ -380,37 +418,35 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
                 3 => 'c',
             ]);
 
-        /** @var QueryBuilder|MockObject $queryBuilder */
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(static::exactly(2))
+        $queryBuilder->expects(self::exactly(2))
             ->method('getQuery')
             ->willReturn($query);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects(static::once())
+        $repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('o ', 'o.id')
             ->willReturn($queryBuilder);
 
-        $entityManager->expects(static::once())
+        $entityManager->expects(self::once())
             ->method('getRepository')
             ->with($entityName)
             ->willReturn($repository);
 
-        $this->managerRegistry->expects(static::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
 
-        /** @var EventDispatcherInterface|MockObject $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(static::once())
+        $dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(new ExportPreGetIds($queryBuilder, $options), Events::BEFORE_EXPORT_GET_IDS);
 
         $this->reader->setDispatcher($dispatcher);
 
-        static::assertEquals($result, $this->reader->getIds($entityName, $options));
+        self::assertEquals($result, $this->reader->getIds($entityName, $options));
     }
 
     public function testGetIdsCompositeKey()
@@ -423,40 +459,43 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $classMetadata = $this->createMock(ClassMetadata::class);
 
-        $classMetadata->expects(static::once())
+        $classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id', 'name']);
-        $classMetadata->expects(static::never())
+        $classMetadata->expects(self::never())
             ->method('getSingleIdentifierFieldName');
 
-        /** @var EntityManagerInterface|MockObject $entityManager */
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(static::once())
+        $entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($entityName)
             ->willReturn($classMetadata);
-        $entityManager->expects(static::never())->method('getConfiguration');
+        $entityManager->expects(self::never())
+            ->method('getConfiguration');
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(static::never())->method('getResult');
+        $query->expects(self::never())
+            ->method('getResult');
 
-        /** @var QueryBuilder|MockObject $queryBuilder */
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects(static::never())->method('getQuery');
+        $queryBuilder->expects(self::never())
+            ->method('getQuery');
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects(static::never())->method('createQueryBuilder');
+        $repository->expects(self::never())
+            ->method('createQueryBuilder');
 
-        $entityManager->expects(static::never())->method('getRepository');
+        $entityManager->expects(self::never())
+            ->method('getRepository');
 
-        $this->managerRegistry->expects(static::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
 
-        /** @var EventDispatcherInterface|MockObject $dispatcher */
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $dispatcher->expects(static::never())->method('dispatch');
+        $dispatcher->expects(self::never())
+            ->method('dispatch');
 
         $this->reader->setDispatcher($dispatcher);
 

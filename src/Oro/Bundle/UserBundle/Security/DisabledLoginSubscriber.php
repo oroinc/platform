@@ -6,7 +6,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Exception\CredentialsResetException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Security;
@@ -16,17 +16,13 @@ use Symfony\Component\Security\Core\Security;
  */
 class DisabledLoginSubscriber implements EventSubscriberInterface
 {
-    /** @var TokenStorageInterface */
-    protected $tokenStorage  = false;
+    protected TokenStorageInterface|bool $tokenStorage = false;
 
     /** @var array Disallowed auth statuses */
-    protected static $disallowed = [
+    protected static array $disallowed = [
         UserManager::STATUS_EXPIRED,
     ];
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(TokenStorageInterface $tokenStorage)
     {
         $this->tokenStorage = $tokenStorage;
@@ -35,17 +31,14 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => 'onKernelRequest',
         ];
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (null === $token = $this->tokenStorage->getToken()) {
             return;

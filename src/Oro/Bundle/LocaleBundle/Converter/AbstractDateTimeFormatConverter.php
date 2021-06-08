@@ -217,16 +217,19 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     protected function convertFormat($format)
     {
-        $newFormat = '';
-        $start = 0;
-
         $formatMatch = array_merge($this->defaultFormatMatch, $this->formatMatch);
-        $tokens = preg_split("/[\s:,\.\/\x{00a0}]+/u", $format, -1, PREG_SPLIT_OFFSET_CAPTURE);
-        foreach ($tokens as $token) {
-            $newFormat .= substr($format, $start, $token[1] - $start);
-            $newFormat .= $formatMatch[$token[0]] ?? $token[0];
+        $quotedNeedles = array_map(static fn (string $key) => preg_quote($key, '/'), array_keys($formatMatch));
+        $pattern = '/(?:\b)+(?<token>' . implode('|', $quotedNeedles) . ')(?:\b)+/u';
+        preg_match_all($pattern, $format, $matches, PREG_OFFSET_CAPTURE);
 
-            $start = strlen($token[0]) + $token[1];
+        $newFormat = $format;
+        foreach (array_reverse($matches['token']) as [$token, $position]) {
+            // Converts byte offset into char offset.
+            $position = mb_strlen(substr($format, 0, $position));
+            // Replaces a token.
+            $newFormat = mb_substr($newFormat, 0, $position)
+                . ($formatMatch[$token] ?? $token)
+                . mb_substr($newFormat, $position + mb_strlen($token));
         }
 
         return $newFormat;

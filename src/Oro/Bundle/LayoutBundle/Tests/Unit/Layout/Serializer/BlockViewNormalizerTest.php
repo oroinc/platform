@@ -74,7 +74,6 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
                     'vars' => [
                         'id' => 'root',
                         'foo' => 'bar',
-                        'attr' => [],
                     ],
                     'children' => [
                         [
@@ -179,11 +178,11 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     public function denormalizeWithoutObjectsInVarsProvider()
     {
         $child11 = $this->createBlockView('child11', ['title' => 'test']);
-        $child1 = $this->createBlockView('child1', [], [$child11]);
+        $child1 = $this->createBlockView('child1', [], ['child11' => $child11]);
         $root = $this->createBlockView(
             'root',
             ['foo' => 'bar'],
-            [$child1]
+            ['child1' => $child1]
         );
 
         $blocks = [
@@ -269,8 +268,12 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
             'id' => 'root',
             'block' => $expectedView,
             'foo' => [
-                'bar' => $bar
-            ]
+                'bar' => $bar,
+            ],
+            'visible' => true,
+            'hidden' => false,
+            'attr' => [],
+            'translation_domain' => 'messages',
         ];
 
         $expectedView->blocks = $expectedView->vars['blocks'] = new BlockViewCollection([
@@ -293,11 +296,18 @@ class BlockViewNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $view = new BlockView();
         $view->blocks = new BlockViewCollection([$id => $view]);
-        $view->vars = array_merge($vars, [
-            'id' => $id,
-            'block' => $view,
-            'blocks' => $view->blocks
-        ]);
+        $view->vars = array_merge(
+            $vars,
+            [
+                'id' => $id,
+                'block' => $view,
+                'blocks' => $view->blocks,
+                'visible' => true,
+                'hidden' => false,
+                'attr' => [],
+                'translation_domain' => 'messages',
+            ]
+        );
         $view->children = $children;
         foreach ($children as $child) {
             $child->parent = $view;

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
+use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
 {
@@ -79,27 +80,22 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $templateManager->expects($this->at(0))
-            ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
         $repository1->expects($this->once())
             ->method('fillEntityData')
             ->with('test1', $this->identicalTo($entity1))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity2) {
-                        $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
-                    }
-                )
-            );
-        $templateManager->expects($this->at(1))
-            ->method('getEntityRepository')
-            ->with('Test\Entity2')
-            ->will($this->returnValue($repository2));
+            ->willReturnCallback(function () use ($entity2) {
+                $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
+            });
         $repository2->expects($this->once())
             ->method('fillEntityData')
             ->with('test2', $this->identicalTo($entity2));
+
+        $templateManager->expects($this->exactly(2))
+            ->method('getEntityRepository')
+            ->willReturnMap([
+                ['Test\Entity1', $repository1],
+                ['Test\Entity2', $repository2]
+            ]);
 
         $data = $this->entityRegistry->getData($templateManager, 'Test\Entity1', 'test1');
         $data = iterator_to_array($data);
@@ -127,41 +123,29 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $templateManager->expects($this->at(0))
-            ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
-        $repository1->expects($this->at(0))
+        $repository1->expects($this->exactly(2))
             ->method('fillEntityData')
-            ->with('test1', $this->identicalTo($entity1))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity2) {
-                        $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
-                    }
-                )
+            ->withConsecutive(['test1', $this->identicalTo($entity1)], ['test3', $this->identicalTo($entity3)])
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(function () use ($entity2) {
+                    $this->entityRegistry->addEntity('Test\Entity2', 'test2', $entity2);
+                }),
+                new ReturnCallback(function () {
+                })
             );
-        $templateManager->expects($this->at(1))
-            ->method('getEntityRepository')
-            ->with('Test\Entity2')
-            ->will($this->returnValue($repository2));
         $repository2->expects($this->once())
             ->method('fillEntityData')
             ->with('test2', $this->identicalTo($entity2))
-            ->will(
-                $this->returnCallback(
-                    function ($key, $entity) use ($entity3) {
-                        $this->entityRegistry->addEntity('Test\Entity1', 'test3', $entity3);
-                    }
-                )
-            );
-        $templateManager->expects($this->at(2))
+            ->willReturnCallback(function () use ($entity3) {
+                $this->entityRegistry->addEntity('Test\Entity1', 'test3', $entity3);
+            });
+
+        $templateManager->expects($this->exactly(3))
             ->method('getEntityRepository')
-            ->with('Test\Entity1')
-            ->will($this->returnValue($repository1));
-        $repository1->expects($this->at(1))
-            ->method('fillEntityData')
-            ->with('test3', $this->identicalTo($entity3));
+            ->willReturnMap([
+                ['Test\Entity1', $repository1],
+                ['Test\Entity2', $repository2]
+            ]);
 
         $data = $this->entityRegistry->getData($templateManager, 'Test\Entity1');
         $data = iterator_to_array($data);

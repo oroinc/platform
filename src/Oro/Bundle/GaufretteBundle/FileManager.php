@@ -31,6 +31,12 @@ class FileManager
 
     private const DIRECTORY_SEPARATOR = '/';
 
+    /** @var array */
+    private $tmpFiles = [];
+
+    /** @var bool */
+    private $clearTempFilesCallbackRegistered = false;
+
     /** @var Filesystem */
     private $filesystem;
 
@@ -63,6 +69,31 @@ class FileManager
             $this->subDirectory = $subDirectory;
             $this->useSubDirectory = true;
         }
+    }
+
+    public function __destruct()
+    {
+        $this->clearTempFiles();
+    }
+
+    public function clearTempFiles()
+    {
+        foreach (array_keys($this->tmpFiles) as $tmpFile) {
+            @unlink($tmpFile);
+        }
+
+        $this->tmpFiles = [];
+    }
+
+    private function rememberTempFile(string $file)
+    {
+        if (!$this->clearTempFilesCallbackRegistered) {
+            // In case of unexpected exit(); call or maximum execution time reaching temp files should be removed
+            register_shutdown_function([$this, 'clearTempFiles']);
+            $this->clearTempFilesCallbackRegistered = true;
+        }
+
+        $this->tmpFiles[$file] = true;
     }
 
     /**
@@ -390,6 +421,14 @@ class FileManager
             return;
         }
 
+        // delete temp file created by file manager
+        if (\in_array($fileName, $this->tmpFiles, true)) {
+            unset($this->tmpFiles[$fileName]);
+            @unlink($fileName);
+
+            return;
+        }
+
         $realFileName = $this->getFileNameWithSubDirectory($fileName);
         if ($this->filesystem->has($realFileName) && !$this->filesystem->isDirectory($realFileName)) {
             $this->filesystem->delete($realFileName);
@@ -571,6 +610,7 @@ class FileManager
         if (false === @file_put_contents($tmpFileName, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $tmpFileName), 0, null, $tmpFileName);
         }
+        $this->rememberTempFile($tmpFileName);
 
         return new ComponentFile($tmpFileName, false);
     }
@@ -604,6 +644,7 @@ class FileManager
         } finally {
             $srcStream->close();
         }
+        $this->rememberTempFile($tmpFileName);
 
         return new ComponentFile($tmpFileName, false);
     }

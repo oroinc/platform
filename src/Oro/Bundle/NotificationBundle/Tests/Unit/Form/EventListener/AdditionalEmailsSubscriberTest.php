@@ -6,7 +6,7 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
 use Oro\Bundle\NotificationBundle\Provider\ChainAdditionalEmailAssociationProvider;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\EmailHolderTestEntity;
-use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\FakeEntity;
+use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\Entity\NotEmailHolderTestEntity;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -51,7 +51,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                     [
                         'non_email_holder_entity_field' => [
                             'label'        => 'nonEmailField',
-                            'target_class' => FakeEntity::class
+                            'target_class' => NotEmailHolderTestEntity::class
                         ],
                         'email_holder_entity_field'     => [
                             'label'        => 'EmailField',
@@ -60,7 +60,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 [
-                    FakeEntity::class,
+                    NotEmailHolderTestEntity::class,
                     [
                         'non_email_holder_entity_field1' => [
                             'label'        => 'nonEmailField1',
@@ -188,7 +188,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                     [
                         'non_email_holder_entity_field' => [
                             'label'        => 'nonEmailField',
-                            'target_class' => FakeEntity::class
+                            'target_class' => NotEmailHolderTestEntity::class
                         ],
                         'email_holder_entity_field'     => [
                             'label'        => 'EmailField',
@@ -197,7 +197,7 @@ class AdditionalEmailsSubscriberTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 [
-                    FakeEntity::class,
+                    NotEmailHolderTestEntity::class,
                     [
                         'non_email_holder_entity_field1' => [
                             'label'        => 'nonEmailField1',

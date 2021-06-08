@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeDat
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeGroupData;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ConfigurableImportStrategyHelper;
+use Oro\Bundle\TestFrameworkBundle\Entity\Product;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Psr\Log\LogLevel;
 use Psr\Log\Test\TestLogger;
@@ -361,5 +362,23 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
                 LogLevel::DEBUG
             )
         );
+    }
+
+    public function testDenormalizedPropertyAwareImport()
+    {
+        $dbEntity = new Product();
+        $dbEntity->setName('Db');
+        $dbEntity->updateDenormalizedProperties();
+
+        $this->assertEquals('DB', $dbEntity->getDenormalizedName());
+        $this->assertEquals('db', $dbEntity->getNameLowercase());
+
+        $importEntity = new Product();
+        $importEntity->setName('Import');
+
+        $this->helper->importEntity($dbEntity, $importEntity, ['denormalizedName', 'nameLowercase']);
+
+        $this->assertEquals('IMPORT', $dbEntity->getDenormalizedName());
+        $this->assertEquals('import', $dbEntity->getNameLowercase());
     }
 }

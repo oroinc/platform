@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
+use Oro\Bundle\ActivityListBundle\Controller\Api\Rest\ActivityListController as RestActivityListController;
 use Oro\Bundle\ActivityListBundle\Event\ActivityConditionOptionsLoadEvent;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Provide functionality to manage activity conditions
+ *
  * @Route("/activity-list/segment")
  */
 class SegmentController extends AbstractController
@@ -24,11 +27,13 @@ class SegmentController extends AbstractController
         $params = $request->attributes->get('params', []);
         $conditionOptions = [
             'activityConditionOptions' => [
-                'listOptions'     => json_decode($this->forward(
-                    'OroActivityListBundle:Api/Rest/ActivityList:getActivityListOption',
-                    [],
-                    ['_format' => 'json']
-                )->getContent()),
+                'listOptions' => json_decode(
+                    $this->forward(
+                        RestActivityListController::class . '::getActivityListOptionAction',
+                        [],
+                        ['_format' => 'json']
+                    )->getContent()
+                ),
                 'fieldChoice' => [
                     'select2' => [
                         'placeholder' => $this->getTranslator()->trans(
