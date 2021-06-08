@@ -49,7 +49,7 @@ class IntegrationController extends AbstractController
      *      permission="CREATE",
      *      class="OroIntegrationBundle:Channel"
      * )
-     * @Template("OroIntegrationBundle:Integration:update.html.twig")
+     * @Template("@OroIntegration/Integration/update.html.twig")
      */
     public function createAction()
     {

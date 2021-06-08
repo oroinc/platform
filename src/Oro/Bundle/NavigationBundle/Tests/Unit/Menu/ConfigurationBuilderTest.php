@@ -181,10 +181,10 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                 'areas' => [],
                 'templates' => [
                     'navbar' => [
-                        'template' => 'OroNavigationBundle:Menu:navbar.html.twig'
+                        'template' => '@OroNavigation/Menu/navbar.html.twig'
                     ],
                     'dropdown' => [
-                        'template' => 'OroNavigationBundle:Menu:dropdown.html.twig'
+                        'template' => '@OroNavigation/Menu/dropdown.html.twig'
                     ]
                 ],
                 'items' => [

@@ -12,6 +12,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * Serves activity actions.
  * @Route("/activities")
  */
 class ActivityController extends AbstractController
@@ -39,13 +40,13 @@ class ActivityController extends AbstractController
             return new Response();
         }
 
-        return $this->render('OroActivityBundle:Activity:activities.html.twig', ['tabs' => $widgets]);
+        return $this->render('@OroActivity/Activity/activities.html.twig', ['tabs' => $widgets]);
     }
 
     /**
      * @Route("/{activity}/{id}/context", name="oro_activity_context")
      *
-     * @Template("OroDataGridBundle:Grid/dialog:multi.html.twig")
+     * @Template("@OroDataGrid/Grid/dialog/multi.html.twig")
      *
      * @param string $activity
      * @param string $id

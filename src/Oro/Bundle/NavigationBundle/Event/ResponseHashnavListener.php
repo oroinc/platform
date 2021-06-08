@@ -69,7 +69,7 @@ class ResponseHashnavListener
                 $response->headers->remove('location');
                 $response->setStatusCode(200);
                 $response = $this->templating->renderResponse(
-                    'OroNavigationBundle:HashNav:redirect.html.twig',
+                    '@OroNavigation/HashNav/redirect.html.twig',
                     array(
                         'full_redirect' => $isFullRedirect,
                         'location'      => $location,

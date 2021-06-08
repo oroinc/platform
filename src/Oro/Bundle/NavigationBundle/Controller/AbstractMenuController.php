@@ -228,7 +228,7 @@ abstract class AbstractMenuController extends AbstractController
     {
         $params = array_merge($params, ['form' => $form->createView()]);
 
-        return $this->render('OroNavigationBundle:menuUpdate:dialog/move.html.twig', $params);
+        return $this->render('@OroNavigation/menuUpdate/dialog/move.html.twig', $params);
     }
 
     /**

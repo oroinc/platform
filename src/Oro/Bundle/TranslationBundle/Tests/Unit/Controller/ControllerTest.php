@@ -56,7 +56,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new Controller(
             $this->translator,
             $this->templating,
-            'OroTranslationBundle:Translation:translation.js.twig',
+            '@OroTranslation/Translation/translation.html.twig',
             []
         );
 
@@ -109,7 +109,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
         $controller = new Controller(
             $this->translator,
             $this->templating,
-            'OroTranslationBundle:Translation:translation.js.twig',
+            '@OroTranslation/Translation/translation.html.twig',
             []
         );
         $result = call_user_func_array([$controller, 'renderJsTranslationContent'], $params);

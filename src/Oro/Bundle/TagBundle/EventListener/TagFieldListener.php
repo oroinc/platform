@@ -5,6 +5,9 @@ namespace Oro\Bundle\TagBundle\EventListener;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 
+/**
+ * Adds tag field information.
+ */
 class TagFieldListener
 {
     /** @var TaggableHelper */
@@ -29,7 +32,7 @@ class TagFieldListener
             $data        = $event->getData();
 
             $tagField = $environment->render(
-                'OroTagBundle::tagField.html.twig',
+                '@OroTag/tagField.html.twig',
                 ['entity' => $entity]
             );
 

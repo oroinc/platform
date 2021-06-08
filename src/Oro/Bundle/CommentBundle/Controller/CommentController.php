@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * The controller for Comment entity.
  * @Route("/comments")
  */
 class CommentController extends AbstractController
@@ -20,7 +21,7 @@ class CommentController extends AbstractController
      *
      * @AclAncestor("oro_comment_view")
      *
-     * @Template("OroCommentBundle:Comment:form.html.twig")
+     * @Template("@OroComment/Comment/form.html.twig")
      */
     public function getFormAction()
     {

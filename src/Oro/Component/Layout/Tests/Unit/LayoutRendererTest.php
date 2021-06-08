@@ -54,7 +54,7 @@ class LayoutRendererTest extends \PHPUnit\Framework\TestCase
 
     public function testSetFormTheme()
     {
-        $theme = 'MyBundle::forms.html.twig';
+        $theme = '@My/forms.html.twig';
 
         $this->formRenderer->expects($this->once())
             ->method('addDefaultThemes')

@@ -55,7 +55,7 @@ class AttributeController extends AbstractController
 
     /**
      * @Route("/save/{alias}", name="oro_attribute_save")
-     * @Template("OroEntityConfigBundle:Attribute:update.html.twig")
+     * @Template("@OroEntityConfig/Attribute/update.html.twig")
      * @param Request $request
      * @param string $alias
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse

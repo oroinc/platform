@@ -95,7 +95,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
                     'type'          => $key,
                     'field_name'    => $key,
                     'is_collection' => true,
-                    'template'      => 'OroActivityListBundle:Merge:value.html.twig',
+                    'template'      => '@OroActivityList/Merge/value.html.twig',
                     'label'         => 'oro.activity.merge.label_translated (%activity% = label_translated)',
                     'merge_modes'   => [MergeModes::ACTIVITY_UNITE, MergeModes::ACTIVITY_REPLACE]
                 ])

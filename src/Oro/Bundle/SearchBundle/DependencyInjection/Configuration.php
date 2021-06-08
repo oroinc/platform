@@ -5,6 +5,9 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration parameters recognized by SearchBundle.
+ */
 class Configuration implements ConfigurationInterface
 {
     public const DEFAULT_ENGINE = 'orm';
@@ -30,7 +33,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                 ->end()
                 ->scalarNode('item_container_template')
-                    ->defaultValue('OroSearchBundle:Datagrid:itemContainer.html.twig')
+                    ->defaultValue('@OroSearch/Datagrid/itemContainer.html.twig')
                 ->end()
             ->end();
 

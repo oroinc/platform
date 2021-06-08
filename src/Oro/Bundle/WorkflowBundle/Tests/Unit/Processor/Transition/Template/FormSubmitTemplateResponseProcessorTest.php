@@ -40,7 +40,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => null,
                     'responseCode' => 200,
@@ -65,7 +65,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => null,
                     'responseCode' => 500,
@@ -100,7 +100,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
         $this->twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig',
+                '@OroWorkflow/Widget/widget/transitionComplete.html.twig',
                 [
                     'response' => 'content3',
                     'responseCode' => 200,

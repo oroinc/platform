@@ -127,7 +127,7 @@ class LayoutTest extends LayoutTestCase
 
     public function testSetFormTheme()
     {
-        $theme = 'MyBundle::forms.html.twig';
+        $theme = '@My/forms.html.twig';
         $view = new BlockView();
         $this->renderer->expects($this->once())
             ->method('setFormTheme')

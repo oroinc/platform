@@ -47,7 +47,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            ['OroLayoutBundle:Layout/php'],
+            ['@OroLayout/Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
@@ -56,7 +56,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that TWIG resources parameter is registered'
         );
         $this->assertEquals(
-            ['OroLayoutBundle:Layout:div_layout.html.twig'],
+            ['@OroLayout/Layout/div_layout.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
         $this->assertTrue(
@@ -94,7 +94,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
                         'resources' => ['MyBundle:Layout/php']
                     ],
                     'twig'    => [
-                        'resources' => ['MyBundle:Layout:blocks.html.twig']
+                        'resources' => ['@My/Layout/blocks.html.twig']
                     ]
                 ]
             ]
@@ -118,7 +118,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            ['OroLayoutBundle:Layout/php', 'MyBundle:Layout/php'],
+            ['@OroLayout/Layout/php', 'MyBundle:Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
@@ -127,7 +127,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that TWIG resources parameter is registered'
         );
         $this->assertEquals(
-            ['OroLayoutBundle:Layout:div_layout.html.twig', 'MyBundle:Layout:blocks.html.twig'],
+            ['@OroLayout/Layout/div_layout.html.twig', '@My/Layout/blocks.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
         $this->assertTrue(

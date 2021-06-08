@@ -122,7 +122,7 @@ class NoteActivityListProvider implements
 
     public function getTemplate(): string
     {
-        return 'OroNoteBundle:Note:js/activityItemTemplate.html.twig';
+        return '@OroNote/Note/js/activityItemTemplate.html.twig';
     }
 
     public function getActivityId($entity)

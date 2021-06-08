@@ -9,10 +9,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Serves action widget actions.
+ */
 class WidgetController extends AbstractController
 {
-    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
+    const DEFAULT_FORM_TEMPLATE = '@OroAction/Operation/form.html.twig';
+    const DEFAULT_PAGE_TEMPLATE = '@OroAction/Operation/page.html.twig';
 
     /**
      * @Route("/buttons", name="oro_action_widget_buttons")

@@ -20,7 +20,7 @@ class BusinessUnitController extends AbstractController
      * Create business_unit form
      *
      * @Route("/create", name="oro_business_unit_create")
-     * @Template("OroOrganizationBundle:BusinessUnit:update.html.twig")
+     * @Template("@OroOrganization/BusinessUnit/update.html.twig")
      * @Acl(
      *      id="oro_business_unit_create",
      *      type="entity",

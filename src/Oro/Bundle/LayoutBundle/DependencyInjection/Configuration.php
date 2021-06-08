@@ -7,10 +7,13 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration parameters recognized by LayoutBundle.
+ */
 class Configuration implements ConfigurationInterface
 {
-    private const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
-    private const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
+    private const DEFAULT_LAYOUT_PHP_RESOURCE  = '@OroLayout/Layout/php';
+    private const DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';
 
     /**
      * {@inheritdoc}
@@ -94,7 +97,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('resources')
                             ->addDefaultChildrenIfNoneSet()
                             ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_TWIG_RESOURCE)->end()
-                            ->example(['MyBundle:Layout:blocks.html.twig'])
+                            ->example(['@My/Layout/blocks.html.twig'])
                             ->validate()
                                 ->ifTrue(
                                     function ($v) {

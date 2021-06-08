@@ -28,8 +28,8 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
                     'multiple'                => true,
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/Widget/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/Widget/selection.html.twig',
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/Widget/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/Widget/selection.html.twig',
                 ]
             ]
         );

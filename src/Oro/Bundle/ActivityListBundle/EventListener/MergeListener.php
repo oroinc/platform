@@ -10,6 +10,9 @@ use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Adds fields metadata for Activity types.
+ */
 class MergeListener
 {
     const TRANSLATE_KEY = 'label';
@@ -52,7 +55,7 @@ class MergeListener
                 'activity'      => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
-                'template'      => 'OroActivityListBundle:Merge:value.html.twig',
+                'template'      => '@OroActivityList/Merge/value.html.twig',
                 'is_collection' => true,
                 'label'         => $this->translator->trans(
                     'oro.activity.merge.label',

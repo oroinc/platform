@@ -97,7 +97,7 @@ class ResetController extends AbstractController
      *     requirements={"id"="\d+"}
      * )
      * @AclAncestor("password_management")
-     * @Template("OroUserBundle:Reset/dialog:forcePasswordResetConfirmation.html.twig")
+     * @Template("@OroUser/Reset/dialog/forcePasswordResetConfirmation.html.twig")
      *
      * @return array
      */
@@ -249,7 +249,7 @@ class ResetController extends AbstractController
      *     requirements={"id"="\d+"},
      *     methods={"GET", "POST"}
      * )
-     * @Template("OroUserBundle:Reset/dialog:update.html.twig")
+     * @Template("@OroUser/Reset/dialog/update.html.twig")
      * @param Request $request
      * @param User $entity
      * @return array

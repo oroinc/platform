@@ -48,7 +48,7 @@ class SearchController extends AbstractController
      * Show search block
      *
      * @Route("/search-bar", name="oro_search_bar")
-     * @Template("OroSearchBundle:Search:searchBar.html.twig")
+     * @Template("@OroSearch/Search/searchBar.html.twig")
      * @AclAncestor("oro_search")
      * @param Request $request
      * @return array
@@ -98,7 +98,7 @@ class SearchController extends AbstractController
      * @return array
      *
      * @Route("/", name="oro_search_results")
-     * @Template("OroSearchBundle:Search:searchResults.html.twig")
+     * @Template("@OroSearch/Search/searchResults.html.twig")
      *
      * @AclAncestor("oro_search")
      */

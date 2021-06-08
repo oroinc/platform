@@ -57,7 +57,7 @@ class WorkflowDefinitionController extends AbstractController
      *      "/create",
      *      name="oro_workflow_definition_create"
      * )
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
      * @Acl(
      *      id="oro_workflow_definition_create",
      *      type="entity",
@@ -77,7 +77,7 @@ class WorkflowDefinitionController extends AbstractController
      *      "/update/{name}",
      *      name="oro_workflow_definition_update"
      * )
-     * @Template("OroWorkflowBundle:WorkflowDefinition:update.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/update.html.twig")
      * @Acl(
      *      id="oro_workflow_definition_update",
      *      type="entity",
@@ -176,7 +176,7 @@ class WorkflowDefinitionController extends AbstractController
      *      name="oro_workflow_definition_view"
      * )
      * @AclAncestor("oro_workflow_definition_view")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:view.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/view.html.twig")
      *
      * @param WorkflowDefinition $workflowDefinition
      * @return array
@@ -212,7 +212,7 @@ class WorkflowDefinitionController extends AbstractController
      *
      * @Route("/activate-form/{name}", name="oro_workflow_definition_activate_from_widget")
      * @AclAncestor("oro_workflow_definition_update")
-     * @Template("OroWorkflowBundle:WorkflowDefinition:widget/activateForm.html.twig")
+     * @Template("@OroWorkflow/WorkflowDefinition/widget/activateForm.html.twig")
      *
      * @param Request $request
      * @param WorkflowDefinition $workflowDefinition

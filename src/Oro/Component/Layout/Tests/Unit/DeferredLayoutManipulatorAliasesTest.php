@@ -611,7 +611,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'test_logo')
+            ->setBlockTheme('@My/Layout/my_theme.html.twig', 'test_logo')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo')
             ->addAlias('test_logo', 'logo');
@@ -638,7 +638,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         $blockThemes = $this->rawLayoutBuilder->getRawLayout()->getBlockThemes();
         $this->assertSame(
             [
-                'logo' => ['MyBundle:Layout:my_theme.html.twig']
+                'logo' => ['@My/Layout/my_theme.html.twig']
             ],
             $blockThemes
         );

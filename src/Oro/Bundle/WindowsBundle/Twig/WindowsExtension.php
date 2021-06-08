@@ -104,7 +104,7 @@ class WindowsExtension extends AbstractExtension implements ServiceSubscriberInt
             : [];
 
         return $environment->render(
-            'OroWindowsBundle::states.html.twig',
+            '@OroWindows/states.html.twig',
             ['windowStates' => $windowsStates]
         );
     }

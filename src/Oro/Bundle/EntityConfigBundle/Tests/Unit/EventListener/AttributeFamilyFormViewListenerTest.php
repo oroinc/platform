@@ -84,7 +84,7 @@ class AttributeFamilyFormViewListenerTest extends \PHPUnit\Framework\TestCase
         $this->environment->expects($this->once())
             ->method('render')
             ->with(
-                'OroEntityConfigBundle:AttributeFamily:familyField.html.twig',
+                '@OroEntityConfig/AttributeFamily/familyField.html.twig',
                 ['form' => $formView]
             )
             ->willReturn($templateData);

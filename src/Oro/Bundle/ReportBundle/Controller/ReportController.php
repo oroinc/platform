@@ -109,7 +109,7 @@ class ReportController extends AbstractController
         }
 
         return $this->render(
-            sprintf('OroReportBundle:Report:%s/view.html.twig', strtolower($reportType)),
+            sprintf('@OroReport/Report/%s/view.html.twig', strtolower($reportType)),
             $parameters
         );
     }
@@ -141,7 +141,7 @@ class ReportController extends AbstractController
 
     /**
      * @Route("/create", name="oro_report_create")
-     * @Template("OroReportBundle:Report:update.html.twig")
+     * @Template("@OroReport/Report/update.html.twig")
      * @Acl(
      *      id="oro_report_create",
      *      type="entity",
@@ -177,7 +177,7 @@ class ReportController extends AbstractController
 
     /**
      * @Route("/clone/{id}", name="oro_report_clone", requirements={"id"="\d+"})
-     * @Template("OroReportBundle:Report:update.html.twig")
+     * @Template("@OroReport/Report/update.html.twig")
      * @AclAncestor("oro_report_create")
      *
      * @param Report $entity

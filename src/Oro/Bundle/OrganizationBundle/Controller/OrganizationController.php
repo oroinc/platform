@@ -40,7 +40,7 @@ class OrganizationController extends AbstractController
      * Edit organization form
      *
      * @Route("/update_current", name="oro_organization_update_current")
-     * @Template("OroOrganizationBundle:Organization:update.html.twig")
+     * @Template("@OroOrganization/Organization/update.html.twig")
      * @Acl(
      *      id="oro_organization_update",
      *      type="entity",

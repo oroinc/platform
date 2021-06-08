@@ -6,6 +6,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 
+/**
+ * Adds owner field to forms.
+ */
 class FormListener
 {
     protected $configManager;
@@ -42,7 +45,7 @@ class FormListener
         }
 
         $ownerField = $environment->render(
-            "OroOrganizationBundle::owner.html.twig",
+            "@OroOrganization/owner.html.twig",
             array(
                 'form'  => $form,
                 'label' => $label

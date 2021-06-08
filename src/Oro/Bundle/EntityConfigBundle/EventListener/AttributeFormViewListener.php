@@ -130,7 +130,7 @@ class AttributeFormViewListener
      */
     protected function renderAttributeEditData(Environment $twig, FormView $attributeView, FieldConfigModel $attribute)
     {
-        return $twig->render('OroEntityConfigBundle:Attribute:row.html.twig', ['child' => $attributeView]);
+        return $twig->render('@OroEntityConfig/Attribute/row.html.twig', ['child' => $attributeView]);
     }
 
     /**
@@ -189,7 +189,7 @@ class AttributeFormViewListener
     protected function renderAttributeViewData(Environment $twig, $entity, FieldConfigModel $attribute)
     {
         return $twig->render(
-            'OroEntityConfigBundle:Attribute:attributeView.html.twig',
+            '@OroEntityConfig/Attribute/attributeView.html.twig',
             ['entity' => $entity, 'field' => $attribute]
         );
     }

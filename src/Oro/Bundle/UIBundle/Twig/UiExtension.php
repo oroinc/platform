@@ -58,7 +58,7 @@ use Twig\TwigFunction;
  */
 class UiExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const SKYPE_BUTTON_TEMPLATE = 'OroUIBundle::skype_button.html.twig';
+    const SKYPE_BUTTON_TEMPLATE = '@OroUI/skype_button.html.twig';
 
     // Big number is set to guarantee Additional section is rendered at the end
     public const ADDITIONAL_SECTION_PRIORITY = 10000;
@@ -281,7 +281,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             }
 
             $additionalData[$child->vars['name']] = $environment->render(
-                'OroUIBundle::form_row.html.twig',
+                '@OroUI/form_row.html.twig',
                 ['child' => $child]
             );
         }
@@ -372,7 +372,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         }
 
         return $environment->render(
-            'OroUIBundle::widget_loader.html.twig',
+            '@OroUI/widget_loader.html.twig',
             [
                 'elementId'  => $elementId,
                 'options'    => $options,

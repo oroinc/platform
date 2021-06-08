@@ -49,7 +49,7 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
                     'entityName' => '@Oro_TestBundle_Entity_Custom@'
                 ]
             ],
-            'search_template' => 'OroEntityExtendBundle:Search:result.html.twig',
+            'search_template' => '@OroEntityExtend/Search/result.html.twig',
             'fields'          => [
                 [
                     'name'          => 'first',

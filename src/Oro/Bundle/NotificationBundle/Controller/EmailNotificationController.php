@@ -67,7 +67,7 @@ class EmailNotificationController extends AbstractController
      *      class="OroNotificationBundle:EmailNotification",
      *      permission="CREATE"
      * )
-     * @Template("OroNotificationBundle:EmailNotification:update.html.twig")
+     * @Template("@OroNotification/EmailNotification/update.html.twig")
      *
      * @param Request $request
      *

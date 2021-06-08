@@ -51,7 +51,7 @@ class ImportExportController extends AbstractController
      *
      * @Route("/import", name="oro_importexport_import_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importForm.html.twig")
+     * @Template("@OroImportExport/ImportExport/importForm.html.twig")
      *
      * @param Request $request
      *
@@ -98,7 +98,7 @@ class ImportExportController extends AbstractController
     /**
      * @Route("/import_validate_export", name="oro_importexport_import_validate_export_template_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport/widget:importValidateExportTemplate.html.twig")
+     * @Template("@OroImportExport/ImportExport/widget/importValidateExportTemplate.html.twig")
      *
      * @param Request $request
      *
@@ -191,7 +191,7 @@ class ImportExportController extends AbstractController
      *
      * @Route("/import-validate", name="oro_importexport_import_validation_form")
      * @AclAncestor("oro_importexport_import")
-     * @Template("OroImportExportBundle:ImportExport:importValidationForm.html.twig")
+     * @Template("@OroImportExport/ImportExport/importValidationForm.html.twig")
      *
      * @param Request $request
      *
@@ -351,7 +351,7 @@ class ImportExportController extends AbstractController
     /**
      * @Route("/export/config", name="oro_importexport_export_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template("OroImportExportBundle:ImportExport:configurableExport.html.twig")
+     * @Template("@OroImportExport/ImportExport/configurableExport.html.twig")
      *
      * @param Request $request
      *
@@ -390,7 +390,7 @@ class ImportExportController extends AbstractController
     /**
      * @Route("/export/template/config", name="oro_importexport_export_template_config")
      * @AclAncestor("oro_importexport_export")
-     * @Template("OroImportExportBundle:ImportExport:configurableTemplateExport.html.twig")
+     * @Template("@OroImportExport/ImportExport/configurableTemplateExport.html.twig")
      *
      * @param Request $request
      * @return array|Response

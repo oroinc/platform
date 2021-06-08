@@ -589,7 +589,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->expectExceptionMessage('Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.');
 
         $this->rawLayoutBuilder
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'root');
+            ->setBlockTheme('@My/Layout/my_theme.html.twig', 'root');
     }
 
     public function testSetRootBlockThemeForUnknownItem()
@@ -598,7 +598,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->expectExceptionMessage('Cannot set theme(s) for "" item. Reason: The root item does not exist.');
 
         $this->rawLayoutBuilder
-            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig');
+            ->setBlockTheme('@My/Layout/my_theme.html.twig');
     }
 
     public function testGetOptions()

@@ -83,11 +83,11 @@ class ConnectionController extends AbstractController
         $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
 
         if ($token) {
-            $html = $this->renderView('OroImapBundle:Form:accountTypeAuthorized.html.twig', [
+            $html = $this->renderView('@OroImap/Form/accountTypeAuthorized.html.twig', [
                 'form' => $form->createView(),
             ]);
         } else {
-            $html = $this->renderView('OroImapBundle:Form:accountTypeOther.html.twig', [
+            $html = $this->renderView('@OroImap/Form/accountTypeOther.html.twig', [
                 'form' => $form->createView(),
             ]);
         }
@@ -125,7 +125,7 @@ class ConnectionController extends AbstractController
         $userForm = $this->createForm(EmailSettingsType::class);
         $userForm->setData($user);
 
-        return $this->renderView('OroImapBundle:Connection:check.html.twig', [
+        return $this->renderView('@OroImap/Connection/check.html.twig', [
             'form' => $userForm->createView(),
         ]);
     }
@@ -147,7 +147,7 @@ class ConnectionController extends AbstractController
         $mailboxForm->setData($mailbox);
 
         return $this->renderView(
-            'OroImapBundle:Connection:checkMailbox.html.twig',
+            '@OroImap/Connection/checkMailbox.html.twig',
             [
                 'form' => $mailboxForm->createView(),
             ]

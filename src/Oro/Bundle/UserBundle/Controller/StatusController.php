@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * CRUD controller for Status entity.
  * @Route("/status")
  */
 class StatusController extends AbstractController
@@ -40,7 +41,7 @@ class StatusController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             if (!$result) {
                 return $this->render(
-                    'OroUserBundle:Status:statusForm.html.twig',
+                    '@OroUser/Status/statusForm.html.twig',
                     array(
                          'form' => $this->get('oro_user.form.status')->createView(),
                     )

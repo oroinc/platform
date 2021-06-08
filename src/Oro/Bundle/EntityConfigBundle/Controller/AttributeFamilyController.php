@@ -25,7 +25,7 @@ class AttributeFamilyController extends AbstractController
 {
     /**
      * @Route("/create/{alias}", name="oro_attribute_family_create")
-     * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
+     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
      * @param string $alias
      * @return array|RedirectResponse
      */
@@ -69,7 +69,7 @@ class AttributeFamilyController extends AbstractController
 
     /**
      * @Route("/update/{id}", name="oro_attribute_family_update")
-     * @Template("OroEntityConfigBundle:AttributeFamily:update.html.twig")
+     * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
      * @param AttributeFamily $attributeFamily
      * @return array|RedirectResponse
      */

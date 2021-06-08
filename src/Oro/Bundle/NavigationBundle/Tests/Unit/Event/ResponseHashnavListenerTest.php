@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_URL = 'http://test_url/';
-    private const TEMPLATE = 'OroNavigationBundle:HashNav:redirect.html.twig';
+    private const TEMPLATE = '@OroNavigation/HashNav/redirect.html.twig';
 
     private ResponseHashnavListener $listener;
 
@@ -124,7 +124,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $this->templating
             ->expects(self::once())
             ->method('renderResponse')
-            ->with('OroNavigationBundle:HashNav:redirect.html.twig', $expected)
+            ->with('@OroNavigation/HashNav/redirect.html.twig', $expected)
             ->willReturn($response);
 
         $this->event->expects(self::once())->method('setResponse')->with($response);

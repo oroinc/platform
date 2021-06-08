@@ -15,6 +15,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
+/**
+ * CRUD Controller for Attachments
+ */
 class AttachmentController extends AbstractController
 {
     /**
@@ -28,7 +31,7 @@ class AttachmentController extends AbstractController
      *      class="OroAttachmentBundle:Attachment",
      *      permission="VIEW"
      * )
-     * @Template("OroAttachmentBundle:Attachment:attachments.html.twig")
+     * @Template("@OroAttachment/Attachment/attachments.html.twig")
      */
     public function widgetAction($entityClass, $entityId)
     {
@@ -42,7 +45,7 @@ class AttachmentController extends AbstractController
     /**
      * @Route("attachment/create/{entityClass}/{entityId}", name="oro_attachment_create")
      *
-     * @Template("OroAttachmentBundle:Attachment:update.html.twig")
+     * @Template("@OroAttachment/Attachment/update.html.twig")
      * @Acl(
      *      id="oro_attachment_create",
      *      type="entity",
@@ -83,7 +86,7 @@ class AttachmentController extends AbstractController
      *
      * @Route("attachment/update/{id}", name="oro_attachment_update")
      *
-     * @Template("OroAttachmentBundle:Attachment:update.html.twig")
+     * @Template("@OroAttachment/Attachment/update.html.twig")
      * @Acl(
      *      id="oro_attachment_update",
      *      type="entity",

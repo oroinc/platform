@@ -32,7 +32,7 @@ class MergeController extends AbstractController
     /**
      * @Route("/{gridName}/massAction/{actionName}", name="oro_entity_merge_massaction")
      * @AclAncestor("oro_entity_merge")
-     * @Template("OroEntityMergeBundle:Merge:merge.html.twig")
+     * @Template("@OroEntityMerge/Merge/merge.html.twig")
      * @param Request $request
      * @param string $gridName
      * @param string $actionName

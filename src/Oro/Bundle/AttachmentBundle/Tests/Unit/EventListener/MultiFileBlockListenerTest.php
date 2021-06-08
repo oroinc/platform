@@ -95,7 +95,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->isFieldVisible());
         $this->assertEquals(
             [
-                'template' => 'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                'template' => '@OroAttachment/Twig/dynamicField.html.twig',
                 'fieldConfigId' => $fieldConfigId,
                 'entity' => $entity,
                 'value' => $fieldValue,
@@ -117,7 +117,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($event->isFieldVisible());
         $this->assertEquals(
             [
-                'template' => 'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                'template' => '@OroAttachment/Twig/dynamicField.html.twig',
                 'fieldConfigId' => $fieldConfigId,
                 'entity' => $entity,
                 'value' => $fieldValue,
@@ -233,12 +233,12 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
             ->method('render')
             ->will($this->returnValueMap([
                 [
-                    'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                    '@OroAttachment/Twig/dynamicField.html.twig',
                     ['data' => ['entity' => $entity, 'fieldConfigId' => $multiFileConfigId]],
                     'multiFile html'
                 ],
                 [
-                    'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                    '@OroAttachment/Twig/dynamicField.html.twig',
                     ['data' => ['entity' => $entity, 'fieldConfigId' => $multiImageConfigId]],
                     'multiImage html'
                 ],

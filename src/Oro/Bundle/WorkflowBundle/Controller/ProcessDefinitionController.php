@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * CRUD controller for ProcessDefinition entities.
  * @Route("/processdefinition")
  */
 class ProcessDefinitionController extends AbstractController
@@ -37,7 +38,7 @@ class ProcessDefinitionController extends AbstractController
      *      name="oro_process_definition_view"
      * )
      * @AclAncestor("oro_process_definition_view")
-     * @Template("OroWorkflowBundle:ProcessDefinition:view.html.twig")
+     * @Template("@OroWorkflow/ProcessDefinition/view.html.twig")
      *
      * @param ProcessDefinition $processDefinition
      * @return array

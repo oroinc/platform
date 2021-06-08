@@ -104,7 +104,7 @@ class WindowsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->environment->expects($this->once())
             ->method('render')
             ->with(
-                'OroWindowsBundle::states.html.twig',
+                '@OroWindows/states.html.twig',
                 ['windowStates' => [$windowStateFoo, $windowStateBar]]
             )
             ->will($this->returnValue($expectedOutput));
