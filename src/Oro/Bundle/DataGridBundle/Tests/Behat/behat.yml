@@ -217,10 +217,10 @@ oro_behat_extension:
       selector: '.fullscreen-popup .datagrid-manager'
 
     Select All Button:
-      selector: 'a[data-role="datagrid-settings-select-all"]'
+      selector: '[data-role="datagrid-settings-select-all"]'
 
     Deselect All Button:
-      selector: 'a[data-role="datagrid-settings-unselect-all"]'
+      selector: '[data-role="datagrid-settings-unselect-all"]'
 
     Email Address Handle:
       selector:

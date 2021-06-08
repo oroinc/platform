@@ -85,10 +85,26 @@ define(function(require) {
             const hasChanged = Boolean(_.find(models, function(model) {
                 return model.get('renderable') !== model.get('metadata').renderable;
             }));
+            const actions = [{
+                $el: this.$('[data-role="datagrid-settings-select-all"]'),
+                toApply: !hasUnrenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-unselect-all"]'),
+                toApply: !hasRenderable
+            }, {
+                $el: this.$('[data-role="datagrid-settings-reset"]'),
+                toApply: !hasChanged
+            }];
 
-            this.$('[data-role="datagrid-settings-select-all"]').toggleClass('disabled', !hasUnrenderable);
-            this.$('[data-role="datagrid-settings-unselect-all"]').toggleClass('disabled', !hasRenderable);
-            this.$('[data-role="datagrid-settings-reset"]').toggleClass('disabled', !hasChanged);
+            for (const {$el, toApply} of actions) {
+                $el.toggleClass('disabled', toApply);
+
+                if ($el.is(':button')) {
+                    $el.attr('disabled', toApply);
+                } else {
+                    $el.attr('aria-disabled', toApply);
+                }
+            }
 
             this.toggleWholeSelectButtons(hasUnrenderable);
         },
