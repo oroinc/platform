@@ -75,7 +75,8 @@ define(function(require, exports, module) {
          * @property {Object}
          */
         events: {
-            'keyup input': '_onReadCriteriaInputKey',
+            // Exclude from selection an auxiliary input inside of select2 component
+            'keyup input:not(.select2-focusser)': '_onReadCriteriaInputKey',
             'keydown [type="text"]': '_preventEnterProcessing',
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
