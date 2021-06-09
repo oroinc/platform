@@ -203,6 +203,10 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                 ['root' => ['node' => '%test.class%::CONST1']],
                 ['root' => ['node' => 'const1']],
             ],
+            'template namespace' => [
+                ['root' => ['node' => '@@OroBar/test.html.twig']],
+                ['root' => ['node' => '@OroBar/test.html.twig']],
+            ],
             'service' => [
                 ['root' => ['node' => '@test.service']],
                 ['root' => ['node' => new \stdClass()]],
