@@ -3,47 +3,50 @@
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\NotificationBundle\DependencyInjection\Compiler\EventsCompilerPass;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
-class EventsCompilerPassTest extends TestCase
+class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EventsCompilerPass */
+    private $compiler;
+
+    protected function setUp(): void
+    {
+        $this->compiler = new EventsCompilerPass();
+    }
+
     public function testProcess()
     {
-        $compilerPass = new EventsCompilerPass();
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
-        $definition = $this->createMock(Definition::class);
+        $container = new ContainerBuilder();
+        $notificationManagerDef = $container->register('oro_notification.manager');
 
-        $containerBuilder->expects($this->once())
-            ->method('findDefinition')
-            ->with('oro_notification.manager')
-            ->willReturn($definition);
+        $container->setParameter(
+            'oro_notification.events',
+            ['my_custom_event_1', 'my_custom_event_2']
+        );
 
-        $containerBuilder->expects($this->once())
-            ->method('getParameter')
-            ->with('oro_notification.events')
-            ->willReturn(['my_custom_event_1', 'my_custom_event_2']);
+        $this->compiler->process($container);
 
-        $definition->expects($this->exactly(2))
-            ->method('addTag')
-            ->withConsecutive(
-                [
-                    'kernel.event_listener',
-                    [
-                        'event' => 'my_custom_event_1',
-                        'method' => 'process',
-                    ]
-                ],
-                [
-                    'kernel.event_listener',
-                    [
-                        'event' => 'my_custom_event_2',
-                        'method' => 'process',
-                    ]
+        self::assertEquals(
+            [
+                'kernel.event_listener' => [
+                    ['event' => 'my_custom_event_1', 'method' => 'process'],
+                    ['event' => 'my_custom_event_2', 'method' => 'process']
                 ]
-            );
+            ],
+            $notificationManagerDef->getTags()
+        );
+    }
 
-        $compilerPass->process($containerBuilder);
+    public function testProcessWhenNoEvents()
+    {
+        $container = new ContainerBuilder();
+        $notificationManagerDef = $container->register('oro_notification.manager');
+
+        $container->setParameter('oro_notification.events', []);
+
+        $this->compiler->process($container);
+
+        self::assertSame([], $notificationManagerDef->getTags());
     }
 }

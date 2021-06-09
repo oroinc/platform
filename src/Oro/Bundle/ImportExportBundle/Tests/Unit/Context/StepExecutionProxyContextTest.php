@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
+namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Context;
 
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
@@ -110,12 +110,12 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
             ->method('getExecutionContext')
             ->will($this->returnValue($executionContext));
 
-        $executionContext->expects($this->at(0))
+        $executionContext->expects($this->once())
             ->method('get')
             ->with($propertyName)
             ->will($this->returnValue($expectedCount));
 
-        $executionContext->expects($this->at(1))
+        $executionContext->expects($this->once())
             ->method('put')
             ->with($propertyName, $expectedCount + 1);
 
@@ -230,16 +230,11 @@ class StepExecutionProxyContextTest extends \PHPUnit\Framework\TestCase
 
     public function testAddErrors()
     {
-        $messages = array('Error 1', 'Error 2');
+        $messages = ['Error 1', 'Error 2'];
 
         $this->stepExecution->expects($this->exactly(2))
-            ->method('addError');
-        $this->stepExecution->expects($this->at(0))
             ->method('addError')
-            ->with($messages[0]);
-        $this->stepExecution->expects($this->at(1))
-            ->method('addError')
-            ->with($messages[1]);
+            ->withConsecutive([$messages[0]], [$messages[1]]);
 
         $this->context->addErrors($messages);
     }

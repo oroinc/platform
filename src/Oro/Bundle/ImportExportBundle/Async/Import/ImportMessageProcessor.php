@@ -134,35 +134,40 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function handleImport(array $body, Job $job, JobRunner $jobRunner)
     {
-        $filePath = $this->fileManager->writeToTmpLocalStorage($body['fileName']);
-        $this->importHandler->setImportingFileName($filePath);
-        $result = $this->importHandler->handle(
-            $body['process'],
-            $body['jobName'],
-            $body['processorAlias'],
-            $body['options']
-        );
-
-        if (!empty($result['deadlockDetected'])) {
-            throw new JobRedeliveryException();
-        }
-        if (!empty($result['postponedRows'])) {
-            $fileName = $this
-                ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $body['fileName']);
-
-            $this->postponedRowsHandler->postpone($jobRunner, $job, $fileName, $body, $result);
-        }
-
-        $this->saveJobResult($job, $result);
-        $this->logger->info(
-            $this->importExportResultSummarizer->getImportSummaryMessage(
-                array_merge(['originFileName' => $body['originFileName']], $result),
+        $importFileName = $body['fileName'];
+        try {
+            $filePath = $this->fileManager->writeToTmpLocalStorage($importFileName);
+            $this->importHandler->setImportingFileName($filePath);
+            $result = $this->importHandler->handle(
                 $body['process'],
-                $this->logger
-            )
-        );
+                $body['jobName'],
+                $body['processorAlias'],
+                $body['options']
+            );
 
-        return (bool)$result['success'];
+            if (!empty($result['deadlockDetected'])) {
+                throw new JobRedeliveryException();
+            }
+            if (!empty($result['postponedRows'])) {
+                $fileName = $this
+                    ->postponedRowsHandler->writeRowsToFile($result['postponedRows'], $importFileName);
+
+                $this->postponedRowsHandler->postpone($jobRunner, $job, $fileName, $body, $result);
+            }
+
+            $this->saveJobResult($job, $result);
+            $this->logger->info(
+                $this->importExportResultSummarizer->getImportSummaryMessage(
+                    array_merge(['originFileName' => $body['originFileName']], $result),
+                    $body['process'],
+                    $this->logger
+                )
+            );
+
+            return (bool)$result['success'];
+        } finally {
+            @unlink($filePath);
+        }
     }
 
     /**

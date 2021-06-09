@@ -10,45 +10,42 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessDefinitionsConfigurator;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var ProcessConfigurationBuilder|MockObject */
+    /** @var ProcessConfigurationBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $configurationBuilder;
 
-    /** @var ManagerRegistry|MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
 
-    /** @var string|MockObject */
+    /** @var string|\PHPUnit\Framework\MockObject\MockObject */
     private $definitionClass;
+
+    /** @var ObjectRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
+
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $objectManager;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var ProcessDefinitionsConfigurator */
     private $processDefinitionsConfigurator;
 
-    /** @var ObjectRepository|MockObject */
-    private $repository;
-
-    /** @var ObjectManager|MockObject */
-    private $objectManager;
-
-    /** @var LoggerInterface|MockObject */
-    private $logger;
-
     protected function setUp(): void
     {
         $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);
-
         $this->repository = $this->createMock(ObjectRepository::class);
         $this->objectManager = $this->createMock(ObjectManager::class);
-
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->definitionClass = ProcessDefinition::class;
-
         $this->logger = $this->createMock(LoggerInterface::class);
+
+        $this->definitionClass = ProcessDefinition::class;
 
         $this->processDefinitionsConfigurator = new ProcessDefinitionsConfigurator(
             $this->configurationBuilder,
@@ -77,29 +74,31 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->with($definitionsConfiguration)
             ->willReturn([$newDefinitionExistent, $newDefinitionNonExistent]);
 
-        $this->repository->expects($this->exactly(2))->method('find')->willReturnMap([
-            ['existent', $definitionStoredExistent],
-            ['nonExistent', null]
-        ]);
+        $this->repository->expects($this->exactly(2))
+            ->method('find')
+            ->willReturnMap([
+                ['existent', $definitionStoredExistent],
+                ['nonExistent', null]
+            ]);
 
-        $this->logger->expects($this->at(0))
+        $this->logger->expects($this->exactly(2))
             ->method('info')
-            ->with(
-                '> process definition: "{definition_name}" - {action}',
-                ['definition_name' => $newDefinitionExistent->getName(), 'action' => 'updated']
-            );
-        $this->logger->expects($this->at(1))
-            ->method('info')
-            ->with(
-                '> process definition: "{definition_name}" - {action}',
-                ['definition_name' => $newDefinitionNonExistent->getName(), 'action' => 'created']
+            ->withConsecutive(
+                [
+                    '> process definition: "{definition_name}" - {action}',
+                    ['definition_name' => $newDefinitionExistent->getName(), 'action' => 'updated']
+                ],
+                [
+                    '> process definition: "{definition_name}" - {action}',
+                    ['definition_name' => $newDefinitionNonExistent->getName(), 'action' => 'created']
+                ]
             );
 
         $this->processDefinitionsConfigurator->configureDefinitions($definitionsConfiguration);
         $this->assertEquals($newDefinitionExistent, $definitionStoredExistent);
 
-        static::assertTrue($this->getDirtyPropertyValue());
-        static::assertEquals([$newDefinitionNonExistent], $this->getToPersistPropertyValue());
+        self::assertTrue($this->getDirtyPropertyValue());
+        self::assertEquals([$newDefinitionNonExistent], $this->getToPersistPropertyValue());
     }
 
     public function testFlush()
@@ -117,17 +116,20 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertManagerRegistryCalled($this->definitionClass);
-        $this->objectManager->expects($this->once())->method('persist')->with($processDefinitionToPersist);
+        $this->objectManager->expects($this->once())
+            ->method('persist')
+            ->with($processDefinitionToPersist);
         $this->objectManager->expects($this->exactly(2))
             ->method('contains')
-            ->willReturnMap(
-                [
-                    [$processDefinitionToRemove, true],
-                    [$processDefinitionToRemoveNotManaged, false]
-                ]
-            );
-        $this->objectManager->expects($this->once())->method('remove')->with($processDefinitionToRemove);
-        $this->objectManager->expects($this->once())->method('flush');
+            ->willReturnMap([
+                [$processDefinitionToRemove, true],
+                [$processDefinitionToRemoveNotManaged, false]
+            ]);
+        $this->objectManager->expects($this->once())
+            ->method('remove')
+            ->with($processDefinitionToRemove);
+        $this->objectManager->expects($this->once())
+            ->method('flush');
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -135,13 +137,14 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processDefinitionsConfigurator->flush();
 
-        static::assertFalse($this->getDirtyPropertyValue());
+        self::assertFalse($this->getDirtyPropertyValue());
     }
 
     public function testEmptyFlush()
     {
         $this->assertManagerRegistryCalled($this->definitionClass);
-        $this->objectManager->expects($this->never())->method($this->anything());
+        $this->objectManager->expects($this->never())
+            ->method($this->anything());
 
         $this->logger->expects($this->once())
             ->method('info')
@@ -150,10 +153,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
         $this->processDefinitionsConfigurator->flush();
     }
 
-    /**
-     * @param string $entityClass
-     */
-    private function assertManagerRegistryCalled($entityClass)
+    private function assertManagerRegistryCalled(string $entityClass): void
     {
         $this->managerRegistry->expects($this->any())
             ->method('getManagerForClass')
@@ -161,10 +161,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->objectManager);
     }
 
-    /**
-     * @param string $entityClass
-     */
-    private function assertObjectManagerCalledForRepository($entityClass)
+    private function assertObjectManagerCalledForRepository(string $entityClass): void
     {
         $this->objectManager->expects($this->once())
             ->method('getRepository')
@@ -185,7 +182,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
             ->with($definitionName)
             ->willReturn($definitionObject);
 
-        $this->logger->expects($this->at(0))
+        $this->logger->expects($this->once())
             ->method('info')
             ->with(
                 '> process definition: "{definition_name}" - {action}',
@@ -194,8 +191,8 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
 
         $this->processDefinitionsConfigurator->removeDefinition($definitionName);
 
-        static::assertTrue($this->getDirtyPropertyValue());
-        static::assertEquals([$definitionObject], $this->getToRemovePropertyValue());
+        self::assertTrue($this->getDirtyPropertyValue());
+        self::assertEquals([$definitionObject], $this->getToRemovePropertyValue());
     }
 
     /**

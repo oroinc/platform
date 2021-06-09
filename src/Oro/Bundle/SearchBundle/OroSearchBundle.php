@@ -4,9 +4,7 @@ namespace Oro\Bundle\SearchBundle;
 
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass;
 use Oro\Bundle\SearchBundle\Async\Topics;
-use Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
-use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -15,17 +13,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class OroSearchBundle extends Bundle
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritdoc}
+     */
     public function build(ContainerBuilder $container)
     {
-        if ($container instanceof ExtendedContainerBuilder) {
-            $container->addCompilerPass(new ListenerExcludeSearchConnectionPass());
-            $container->moveCompilerPassBefore(
-                'Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass',
-                'Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UpdateDoctrineEventHandlersPass'
-            );
-        }
-
         $addTopicPass = AddTopicMetaPass::create()
             ->add(Topics::REINDEX, 'Search index reindex')
             ->add(Topics::INDEX_ENTITIES, 'Index entities by id')

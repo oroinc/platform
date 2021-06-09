@@ -3,58 +3,63 @@
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\SwiftMailerHandlerPass;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 class SwiftMailerHandlerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var SwiftMailerHandlerPass
-     */
-    protected $compilerPass;
+    /** @var SwiftMailerHandlerPass */
+    private $compiler;
 
     protected function setUp(): void
     {
-        $this->compilerPass = new SwiftMailerHandlerPass();
+        $this->compiler = new SwiftMailerHandlerPass();
     }
 
     public function testProcessDoesntExecuteWhenMailersNotFound()
     {
-        $containerBuilder = $this->createMock(ContainerBuilder::class);
-        $containerBuilder->expects($this->any())
-            ->method('hasParameter')
-            ->with('swiftmailer.mailers')
-            ->willReturn(false);
+        $container = new ContainerBuilder();
 
-        $containerBuilder->expects($this->never())->method('getParameter');
+        $this->compiler->process($container);
     }
-
 
     public function testProcess()
     {
-        $containerBuilder = new ContainerBuilder();
-        $mailers = [
-            'foo' => 'foo.mailer',
-            'bar' => 'bar.mailer'
-        ];
-        $containerBuilder->setParameter('swiftmailer.mailers', $mailers);
+        $container = new ContainerBuilder();
+        $container->setParameter(
+            'swiftmailer.mailers',
+            [
+                'foo' => 'foo.mailer',
+                'bar' => 'bar.mailer'
+            ]
+        );
 
-        $fooDefinition = $this->createMock(Definition::class);
-        $fooDefinition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('registerPlugin', [new Reference('swiftmailer.mailer.foo.plugin.no_recipient')]);
-        $containerBuilder->setDefinition('foo.mailer', $fooDefinition);
+        $fooMailerDef = $container->register('foo.mailer');
+        $barMailerDef = $container->register('bar.mailer');
 
-        $barDefinition = $this->createMock(Definition::class);
-        $barDefinition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('registerPlugin', [new Reference('swiftmailer.mailer.bar.plugin.no_recipient')]);
-        $containerBuilder->setDefinition('bar.mailer', $barDefinition);
+        $this->compiler->process($container);
 
-        $this->compilerPass->process($containerBuilder);
+        self::assertEquals(
+            new ChildDefinition('swiftmailer.plugin.no_recipient.abstract'),
+            $container->getDefinition('swiftmailer.mailer.foo.plugin.no_recipient')
+        );
+        self::assertEquals(
+            [
+                ['registerPlugin', [new Reference('swiftmailer.mailer.foo.plugin.no_recipient')]]
+            ],
+            $fooMailerDef->getMethodCalls()
+        );
 
-        $this->assertTrue($containerBuilder->hasDefinition('swiftmailer.mailer.foo.plugin.no_recipient'));
-        $this->assertTrue($containerBuilder->hasDefinition('swiftmailer.mailer.bar.plugin.no_recipient'));
+        self::assertEquals(
+            new ChildDefinition('swiftmailer.plugin.no_recipient.abstract'),
+            $container->getDefinition('swiftmailer.mailer.bar.plugin.no_recipient')
+        );
+        self::assertEquals(
+            [
+                ['registerPlugin', [new Reference('swiftmailer.mailer.bar.plugin.no_recipient')]]
+            ],
+            $barMailerDef->getMethodCalls()
+        );
     }
 }
