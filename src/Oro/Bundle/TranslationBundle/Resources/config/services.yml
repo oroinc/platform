@@ -8,7 +8,7 @@ services:
         arguments:
             - '@translator.default'
             - '@templating'
-            - OroTranslationBundle:Translation:translation.js.twig
+            - '@@OroTranslation/Translation/translation.js.twig'
             - ""
         lazy: true
 

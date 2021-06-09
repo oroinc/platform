@@ -29,14 +29,14 @@ datagrids:
                 type: twig
                 label: oro.attachment.file.filename.label
                 frontend_type: html
-                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:sourceFileLink.html.twig'
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/sourceFileLink.html.twig'
                 data_name: sourceFile
             fileSize:
                 label: oro.attachment.file.file_size.label
                 cellClassName: 'direction-ltr'
                 type: twig
                 frontend_type: html
-                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:fileSize.html.twig'
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/fileSize.html.twig'
             mimeType:
                 label: oro.attachment.file.mime_type.label
             owner:
@@ -184,7 +184,7 @@ datagrids:
                 type: twig
                 label: oro.digitalasset.datagrid.column.file.label
                 frontend_type: html
-                template: 'OroDigitalAssetBundle:DigitalAsset/Datagrid/Property:image.html.twig'
+                template: '@OroDigitalAsset/DigitalAsset/Datagrid/Property/image.html.twig'
                 data_name: sourceFile
                 order: 10
             originalFilename:

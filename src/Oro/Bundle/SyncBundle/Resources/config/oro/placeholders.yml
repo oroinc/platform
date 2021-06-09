@@ -10,9 +10,9 @@ placeholders:
                     order: 230
     items:
         sync_js:
-            template: OroSyncBundle::sync_js.html.twig
+            template: '@@OroSync/sync_js.html.twig'
             applicable: "@oro_security.token_accessor->hasUser()"
         maintenance_js:
-            template: OroSyncBundle::maintenance_js.html.twig
+            template: '@@OroSync/maintenance_js.html.twig'
         ping_js:
-            template: OroSyncBundle::ping_js.html.twig
+            template: '@@OroSync/ping_js.html.twig'

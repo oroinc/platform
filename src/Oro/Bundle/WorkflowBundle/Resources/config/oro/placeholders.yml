@@ -7,4 +7,4 @@ placeholders:
 
     items:
         entity_workflows:
-            template: OroWorkflowBundle:Widget:entityWorkflows.html.twig
+            template: '@@OroWorkflow/Widget/entityWorkflows.html.twig'

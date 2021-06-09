@@ -3,4 +3,4 @@ charts:
         label: Advanced Chart (overridden)
         default_settings:
              chartColors: 'testColor'
-        template: SecondTestBundle:Chart:advancedChart.html.twig
+        template: '@SecondTest/Chart/advancedChart.html.twig'

@@ -24,7 +24,7 @@ datagrids:
                 type:          twig
                 label:         oro.dashboard.owner.label
                 frontend_type: html
-                template:      OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+                template:      '@OroDashboard/Dashboard/Datagrid/Property/owner.html.twig'
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime

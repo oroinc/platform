@@ -7,4 +7,4 @@ placeholders:
 
     items:
         translation_js_modules_config:
-            template: OroTranslationBundle::js_modules_config.html.twig
+            template: '@@OroTranslation/js_modules_config.html.twig'

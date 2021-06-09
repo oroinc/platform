@@ -1,2 +1,2 @@
 bundles:
-    - OroScopeBundle:Form:fields.html.twig
+    - '@OroScope/Form/fields.html.twig'

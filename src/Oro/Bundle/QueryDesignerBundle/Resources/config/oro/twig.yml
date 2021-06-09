@@ -1,2 +1,2 @@
 bundles:
-    - OroQueryDesignerBundle:Form:fields.html.twig
+    - '@OroQueryDesigner/Form/fields.html.twig'

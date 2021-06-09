@@ -58,27 +58,27 @@ datagrids:
                 label: oro.locale.localization.title.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/title.html.twig
+                template:      '@OroLocale/Localization/Datagrid/title.html.twig'
             language:
                 label: oro.locale.localization.language.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/languageCode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/languageCode.html.twig'
             formattingCode:
                 label: oro.locale.localization.formatting_code.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/formattingCode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/formattingCode.html.twig'
             rtlMode:
                 label: oro.locale.localization.rtl_mode.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/rtlMode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/rtlMode.html.twig'
             parentName:
                 label: oro.locale.localization.parent_localization.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/parentName.html.twig
+                template:      '@OroLocale/Localization/Datagrid/parentName.html.twig'
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -167,22 +167,22 @@ datagrids:
                 label: oro.locale.localization.title.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/title.html.twig
+                template:      '@OroLocale/Localization/Datagrid/title.html.twig'
             language:
                 label: oro.locale.localization.language.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/languageCode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/languageCode.html.twig'
             formattingCode:
                 label: oro.locale.localization.formatting_code.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/formattingCode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/formattingCode.html.twig'
             rtlMode:
                 label: oro.locale.localization.rtl_mode.label
                 type:          twig
                 frontend_type: html
-                template:      OroLocaleBundle:Localization:Datagrid/rtlMode.html.twig
+                template:      '@OroLocale/Localization/Datagrid/rtlMode.html.twig'
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime

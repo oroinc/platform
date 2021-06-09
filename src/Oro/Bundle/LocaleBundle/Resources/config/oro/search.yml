@@ -6,7 +6,7 @@ search:
             name:              oro_locale_localization_view
             parameters:
                 id:            id
-        search_template:       OroLocaleBundle:Localization:searchResult.html.twig
+        search_template:       '@OroLocale/Localization/searchResult.html.twig'
         fields:
             -
                 name:          id

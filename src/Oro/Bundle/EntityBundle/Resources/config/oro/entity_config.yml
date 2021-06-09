@@ -36,7 +36,7 @@ entity_config:
                         type:               html
                         label:              oro.entity.entity_config.entity.entity.items.label
                         required:           true
-                        template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
+                        template:           '@OroEntityConfig/Config/propertyLabel.html.twig'
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\TextType
                         options:
@@ -100,7 +100,7 @@ entity_config:
                         type:               html
                         label:              oro.entity.entity_config.entity.field.items.label
                         required:           true
-                        template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
+                        template:           '@OroEntityConfig/Config/propertyLabel.html.twig'
                         sortable:           true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\TextType

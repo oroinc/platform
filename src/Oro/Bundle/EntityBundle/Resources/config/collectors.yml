@@ -34,10 +34,10 @@ services:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector
         tags:
-            - { name: data_collector, template: OroEntityBundle:Collector:orm.html.twig, id: orm }
+            - { name: data_collector, template: '@OroEntity/Collector/orm.html.twig', id: orm }
 
     oro_entity.profiler.duplicate_queries_data_collector:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\DuplicateQueriesDataCollector
         tags:
-            - { name: data_collector, template: OroEntityBundle:Collector:duplicate_queries.html.twig, id: duplicate_queries }
+            - { name: data_collector, template: '@OroEntity/Collector/duplicate_queries.html.twig', id: duplicate_queries }

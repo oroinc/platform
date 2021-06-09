@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'OroUIBundle:layouts:blank/page/middle_bar.html.twig'
+            themes: '@OroUI/layouts/blank/page/middle_bar.html.twig'
         - '@addTree':
             items:
                 middle_bar:

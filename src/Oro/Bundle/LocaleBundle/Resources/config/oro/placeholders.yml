@@ -7,4 +7,4 @@ placeholders:
 
     items:
         locale_js_modules_config:
-            template: OroLocaleBundle::js_modules_config.html.twig
+            template: '@@OroLocale/js_modules_config.html.twig'

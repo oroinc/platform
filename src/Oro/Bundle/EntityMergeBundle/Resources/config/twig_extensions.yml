@@ -12,4 +12,4 @@ services:
         arguments:
             - '@twig'
             - '@event_dispatcher'
-            - 'OroEntityMergeBundle:Form:mergeValue.html.twig'
+            - '@@OroEntityMerge/Form/mergeValue.html.twig'

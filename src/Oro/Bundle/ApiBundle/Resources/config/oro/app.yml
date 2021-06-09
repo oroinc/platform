@@ -10,7 +10,7 @@ fos_rest:
 nelmio_api_doc:
     name: 'REST API'
     motd:
-        template: OroApiBundle::ApiDoc/motd.html.twig
+        template: '@OroApi/ApiDoc/motd.html.twig'
     default_sections_opened: false
     request_listener:
         enabled: false
