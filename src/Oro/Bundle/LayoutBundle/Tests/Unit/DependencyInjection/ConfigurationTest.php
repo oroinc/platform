@@ -40,7 +40,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'default' => 'twig',
                 'php' => [
                     'enabled' => true,
-                    'resources' => ['@OroLayout/Layout/php']
+                    'resources' => ['OroLayoutBundle:Layout/php']
                 ],
                 'twig' => [
                     'enabled' => true,

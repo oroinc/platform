@@ -47,7 +47,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            ['@OroLayout/Layout/php'],
+            ['OroLayoutBundle:Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
@@ -118,7 +118,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
             'Failed asserting that PHP resources parameter is registered'
         );
         $this->assertEquals(
-            ['@OroLayout/Layout/php', 'MyBundle:Layout/php'],
+            ['OroLayoutBundle:Layout/php', 'MyBundle:Layout/php'],
             $container->getParameter('oro_layout.php.resources')
         );
         // twig renderer
