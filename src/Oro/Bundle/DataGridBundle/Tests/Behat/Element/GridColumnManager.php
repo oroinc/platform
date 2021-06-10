@@ -42,13 +42,13 @@ class GridColumnManager extends Element
 
         $visibilityCheckbox = $this->getVisibilityCheckbox($title);
 
-        $this->uncheckVisibility($visibilityCheckbox);
+        $this->untickCheckbox($visibilityCheckbox);
     }
 
     /**
      * @param NodeElement $visibilityCheckbox
      */
-    private function uncheckVisibility(NodeElement $visibilityCheckbox)
+    private function untickCheckbox(NodeElement $visibilityCheckbox): void
     {
         $this->ensureManagerVisible();
 
@@ -82,8 +82,78 @@ class GridColumnManager extends Element
                 continue;
             }
 
-            $this->uncheckVisibility($this->getVisibilityCheckboxFromRow($row));
+            $this->untickCheckbox($this->getVisibilityCheckboxFromRow($row));
+
+            $shortName = $this->getColumnShortName($name);
+            $header = $this->grid->getHeader();
+            $isColumnHidden = $this->spin(fn () => (!$header->hasColumn($name) && !$header->hasColumn($shortName)), 5);
+
+            self::assertTrue(
+                $isColumnHidden,
+                sprintf('Column %s still appears in grid after disabling in column manager', $name)
+            );
         }
+    }
+
+    /**
+     * @param NodeElement $visibilityCheckbox
+     */
+    private function tickCheckbox(NodeElement $visibilityCheckbox): void
+    {
+        $this->ensureManagerVisible();
+
+        if ($visibilityCheckbox->isChecked()) {
+            return;
+        }
+
+        $visibilityCheckbox->click();
+
+        self::assertTrue($visibilityCheckbox->isChecked(), 'Can check visibility checkbox');
+    }
+
+    /**
+     * Show all columns in grid except mentioned in exceptions array
+     *
+     * @param array $exceptions
+     */
+    public function showAllColumns(array $exceptions = []): void
+    {
+        $this->ensureManagerVisible();
+
+        $rows = $this->getColumnManagerTable()->getRows();
+        foreach ($rows as $row) {
+            $name = $row->getCellValue('Name');
+
+            // Skip exceptions
+            if (in_array($name, $exceptions, true)) {
+                continue;
+            }
+
+            $this->tickCheckbox($this->getVisibilityCheckboxFromRow($row));
+
+            $shortName = $this->getColumnShortName($name);
+            $header = $this->grid->getHeader();
+            $isColumnVisible = $this->spin(fn () => ($header->hasColumn($name) || $header->hasColumn($shortName)), 5);
+
+            self::assertTrue(
+                $isColumnVisible,
+                sprintf('Column %s did not appear in grid after enabling in column manager', $name)
+            );
+        }
+    }
+
+    /**
+     * Returns first letters of each word in column name.
+     * Example: "Sample Complex Long Column Name" becomes "SCLCN"
+     *
+     * @param string $name
+     * @return string
+     */
+    public function getColumnShortName(string $name): string
+    {
+        $shortName = trim(preg_replace(['/[\W]+/', '/\s+/'], ' ', $name));
+
+        return preg_replace('/(\w)[\w]*\s?/', '$1', $shortName);
     }
 
     public function open()

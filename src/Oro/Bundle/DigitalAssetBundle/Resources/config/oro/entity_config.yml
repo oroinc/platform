@@ -1,8 +1,8 @@
 entity_config:
     attachment:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#attachment
         field:
             items:
-                # Tells whether or not to use DAM for file uploading.
                 use_dam:
                     options:
                         value_type: boolean
