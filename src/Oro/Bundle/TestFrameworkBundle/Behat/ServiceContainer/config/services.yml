@@ -108,7 +108,7 @@ services:
         arguments:
             - '@symfony2_extension.kernel'
         tags:
-            - { name: 'suite.generator', priority: 100 }
+            - { name: 'suite.generator', priority: 150 }
 
     oro_test.provider.xss_payload_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\XssPayloadProvider

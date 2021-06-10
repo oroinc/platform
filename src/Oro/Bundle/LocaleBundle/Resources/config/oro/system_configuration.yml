@@ -55,6 +55,12 @@ system_configuration:
                 constraints:
                     - NotBlank: ~
 
+        # There is no need to change this system parameter on the ORO platform.
+        # Solves backward compatibility problem and allows to add an extension point.
+        oro_locale.allow_to_round_displayed_prices_and_amounts:
+            data_type: boolean
+            type: Symfony\Component\Form\Extension\Core\Type\HiddenType
+
         oro_locale.quarter_start:
             data_type: array
             type: Oro\Bundle\LocaleBundle\Form\Type\QuarterType

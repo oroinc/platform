@@ -83,6 +83,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                             'value' => null,
                             'scope' => 'app'
                         ],
+                        Configuration::ALLOW_TO_ROUND_DISPLAYED_PRICES_AND_AMOUNT => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ]
                     ],
                     'formatting_code' => Translator::DEFAULT_LOCALE,
                     'language' => Translator::DEFAULT_LOCALE,

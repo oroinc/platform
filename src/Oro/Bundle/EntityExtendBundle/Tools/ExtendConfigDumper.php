@@ -482,12 +482,12 @@ class ExtendConfigDumper
         ];
 
         if ($type === 'Extend') {
-            $parentClassName = get_parent_class($className);
+            $parentClassName = class_exists($className) ? get_parent_class($className) : false;
             if ($parentClassName === $entityName) {
                 $parentClassName = $aliases[$entityName];
             }
             $schema['parent']  = $parentClassName;
-            $schema['inherit'] = get_parent_class($parentClassName);
+            $schema['inherit'] = class_exists($className) ? get_parent_class($parentClassName): false;
         } elseif ($extendConfig->has('inherit')) {
             $schema['inherit'] = $extendConfig->get('inherit');
         }

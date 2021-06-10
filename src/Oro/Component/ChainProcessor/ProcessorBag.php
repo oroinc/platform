@@ -141,7 +141,7 @@ class ProcessorBag implements ProcessorBagInterface
         if (!empty($this->additionalApplicableCheckers)) {
             $checkers = $this->additionalApplicableCheckers;
             krsort($checkers);
-            $checkers = array_merge(...$checkers);
+            $checkers = array_merge(...array_values($checkers));
             foreach ($checkers as $checker) {
                 $applicableChecker->addChecker($checker);
             }

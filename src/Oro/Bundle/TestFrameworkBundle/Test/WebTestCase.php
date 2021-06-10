@@ -790,7 +790,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $oroDefaultPrefix = $this->getUrl('oro_default');
 
         $replaceOroDefaultPrefixCallback = function (&$value) use ($oroDefaultPrefix, $urlParameterKey) {
-            if (!is_null($value[$urlParameterKey])) {
+            if (is_array($value) && !is_null($value[$urlParameterKey])) {
                 $value[$urlParameterKey] = str_replace(
                     '%oro_default_prefix%',
                     $oroDefaultPrefix,
@@ -869,18 +869,18 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         $replaceCallback = function (&$value) use ($randomString) {
-            if (!is_null($value)) {
+            if (is_string($value)) {
                 $value = str_replace('%str%', $randomString, $value);
             }
         };
 
         foreach ($parameters as $key => $value) {
-            array_walk(
+            array_walk_recursive(
                 $parameters[$key]['request'],
                 $replaceCallback,
                 $randomString
             );
-            array_walk(
+            array_walk_recursive(
                 $parameters[$key]['response'],
                 $replaceCallback,
                 $randomString

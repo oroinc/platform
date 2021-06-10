@@ -37,4 +37,5 @@ doctrine:
             string_functions:
                 group_concat:   Oro\ORM\Query\AST\Functions\String\GroupConcat
                 concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
+                replace:        Oro\ORM\Query\AST\Functions\String\Replace
                 cast:           Oro\ORM\Query\AST\Functions\Cast

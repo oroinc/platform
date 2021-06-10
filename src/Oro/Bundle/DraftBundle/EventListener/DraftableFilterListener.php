@@ -59,7 +59,7 @@ class DraftableFilterListener
         if (isset($parameters[0])) {
             $idParam = $parameters[0];
             if ($idParam) {
-                $idParamClass = $idParam->getClass();
+                $idParamClass = $idParam->getType();
                 if ($idParamClass) {
                     return $idParamClass->getName();
                 }

@@ -184,6 +184,8 @@ services:
         arguments:
             - '@oro_locale.settings'
             - '@oro_locale.formatter.factory.intl_number_formatter'
+        calls:
+            - [setConfigManager, ['@oro_config.manager']]
 
     oro_locale.formatter.factory.intl_number_formatter:
         class: Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory

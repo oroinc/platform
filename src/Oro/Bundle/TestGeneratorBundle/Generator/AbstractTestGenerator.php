@@ -284,7 +284,7 @@ abstract class AbstractTestGenerator
         if ($constructor) {
             $params = $constructor->getParameters();
             foreach ($params as $param) {
-                $class = $param->getClass();
+                $class = $param->getType();
                 $this->addClassToUses($class);
                 $dependencies[] = ['class' => $class ? $class->getName() : 'non_object', 'name' => $param->getName()];
             }
@@ -303,7 +303,7 @@ abstract class AbstractTestGenerator
     protected function fillArguments(\ReflectionParameter $param, $arguments)
     {
         $temp = [];
-        $class = $param->getClass();
+        $class = $param->getType();
         if ($class) {
             $this->addClassToUses($class);
             $temp['has_constructor'] = $this->classConstructorCheck($class->getConstructor());

@@ -29,7 +29,7 @@ class SoapClientTest extends TestCase
     public function testSend()
     {
         $wsdlFilePath = null;
-        $methodName = '__setLocation';
+        $methodName = '__setSoapHeaders';
         $soapOptions = ['1', '2'];
         $settings = new SoapClientSettings($wsdlFilePath, $methodName, $soapOptions);
 
