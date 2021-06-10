@@ -14,12 +14,6 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
     /** @var WorkflowTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $translationHelper;
 
@@ -34,16 +28,14 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->formFactory = $this->createMock(FormFactoryInterface::class);
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translationHelper = $this->createMock(WorkflowTranslationHelper::class);
         $this->datasourceAdapter = $this->createMock(FilterDatasourceAdapterInterface::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilderInterface::class);
 
         $this->filter = new WorkflowTranslationFilter(
-            $this->formFactory,
+            $this->createMock(FormFactoryInterface::class),
             new FilterUtility(),
-            $this->doctrine,
+            $this->createMock(ManagerRegistry::class),
             $this->translationHelper
         );
     }
@@ -85,38 +77,34 @@ class WorkflowTranslationFilterTest extends \PHPUnit\Framework\TestCase
     {
         $definition = (new WorkflowDefinition())->setName('definition1');
 
-        $this->datasourceAdapter->expects(self::at(0))
+        $this->datasourceAdapter->expects(self::exactly(2))
             ->method('generateParameterName')
-            ->with('key')
-            ->willReturn('keyParameter');
-        $this->datasourceAdapter->expects(self::at(1))
-            ->method('generateParameterName')
-            ->with('domain')
-            ->willReturn('domainParameter');
+            ->withConsecutive(['key'], ['domain'])
+            ->willReturnOnConsecutiveCalls('keyParameter', 'domainParameter');
         $this->datasourceAdapter->expects(self::exactly(3))
             ->method('expr')
             ->willReturn($this->expressionBuilder);
 
-        $this->expressionBuilder->expects(self::at(0))
+        $this->expressionBuilder->expects(self::once())
             ->method('eq')
             ->with('translationKey.domain', 'domainParameter', true)
             ->willReturn('expr1');
-        $this->expressionBuilder->expects(self::at(1))
+        $this->expressionBuilder->expects(self::once())
             ->method('like')
             ->with('translationKey.key', 'keyParameter', true)
             ->willReturn('expr2');
-        $this->expressionBuilder->expects(self::at(2))
+        $this->expressionBuilder->expects(self::once())
             ->method('andX')
             ->with('expr1', 'expr2')
             ->willReturn('expr3');
 
-        $this->datasourceAdapter->expects(self::at(5))
+        $this->datasourceAdapter->expects(self::exactly(2))
             ->method('setParameter')
-            ->with('keyParameter', 'oro.workflow.definition1%');
-        $this->datasourceAdapter->expects(self::at(6))
-            ->method('setParameter')
-            ->with('domainParameter', 'workflows');
-        $this->datasourceAdapter->expects(self::at(7))
+            ->withConsecutive(
+                ['keyParameter', 'oro.workflow.definition1%'],
+                ['domainParameter', 'workflows']
+            );
+        $this->datasourceAdapter->expects(self::once())
             ->method('addRestriction')
             ->with('expr3', FilterUtility::CONDITION_AND, false);
 

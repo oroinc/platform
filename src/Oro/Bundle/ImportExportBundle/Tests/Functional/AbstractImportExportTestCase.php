@@ -160,8 +160,8 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             $importMessageData
         );
 
-        $this->deleteTmpFile($preImportMessageData['fileName']);
-        $this->deleteTmpFile($importMessageData['fileName']);
+        $this->assertTmpFileRemoved($preImportMessageData['fileName']);
+        $this->assertTmpFileRemoved($importMessageData['fileName']);
     }
 
     /**
@@ -206,8 +206,8 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             json_decode($this->getImportExportFileContent($jobId))
         );
 
-        $this->deleteTmpFile($preImportValidateMessageData['fileName']);
-        $this->deleteTmpFile($importValidateMessageData['fileName']);
+        $this->assertTmpFileRemoved($preImportValidateMessageData['fileName']);
+        $this->assertTmpFileRemoved($importValidateMessageData['fileName']);
         $this->deleteImportExportFile($jobData['errorLogFile']);
     }
 
@@ -539,8 +539,9 @@ abstract class AbstractImportExportTestCase extends WebTestCase
     /**
      * @param string $filename
      */
-    protected function deleteTmpFile(string $filename)
+    protected function assertTmpFileRemoved(string $filename)
     {
-        unlink(FileManager::generateTmpFilePath($filename));
+        $filePath = FileManager::generateTmpFilePath($filename);
+        self::assertFileDoesNotExist($filePath);
     }
 }

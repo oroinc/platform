@@ -43,6 +43,7 @@ entity_config:
                     options:
                         auditable: false
     attribute:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#attribute
         entity:
             items:
                 has_attributes:
@@ -50,6 +51,7 @@ entity_config:
                         require_schema_update: false
                         value_type: boolean
                         default_value: false
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#attribute
         field:
             form:
                 block_config:

@@ -6,9 +6,17 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### ConfigBundle
+* The DIC compiler pass `Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ListenerExcludeConfigConnectionPass`
+  was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
+
 #### EntityMergeBundle
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.
 * The service `oro_entity_merge.strategy.delegate` was removed. Use `oro_entity_merge.strategy` instead.
+
+#### SearchBundle
+* The DIC compiler pass `Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass`
+  was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
 
 ## 5.0.0-alpha.2 (2021-05-28)
 [Show detailed list of changes](incompatibilities-5-0-alpha-2.md)
