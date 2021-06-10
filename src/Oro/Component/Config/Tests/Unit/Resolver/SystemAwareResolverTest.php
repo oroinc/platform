@@ -30,34 +30,30 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         $service1 = new TestService();
         $service2 = new TestResource('service2');
 
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('getParameter')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test.param1', 'val1'],
-                        ['test.other_param', ['val', 2]],
-                        ['test.class', 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest'],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    ['test.param1', 'val1'],
+                    ['test.other_param', ['val', 2]],
+                    ['test.class', 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest'],
+                ]
             );
-        $container->expects($this->any())
+        $container->expects(self::any())
             ->method('get')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
-                        ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
-                        ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
-                    ]
-                )
+            ->willReturnMap(
+                [
+                    ['test.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new \stdClass()],
+                    ['test.service1', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service1],
+                    ['test.other_service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $service2],
+                ]
             );
     }
 
     /**
      * @return string
      */
-    public static function func1()
+    public static function func1(): string
     {
         self::assertEmpty(func_get_args());
         return 'static_func1';
@@ -67,7 +63,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      * @param mixed $val
      * @return string
      */
-    public static function func2($val)
+    public static function func2($val): string
     {
         return 'static_func2 + ' . ((null === $val) ? 'NULL' : $val);
     }
@@ -77,7 +73,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      * @param mixed $val2
      * @return string
      */
-    public static function func3($val1, $val2)
+    public static function func3($val1, $val2): string
     {
         return 'static_func2 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2);
     }
@@ -85,7 +81,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
     /**
      * @return array
      */
-    public static function otherFunc()
+    public static function otherFunc(): array
     {
         return ['static', 'func'];
     }
@@ -95,20 +91,20 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      * @param $config
      * @param $expected
      */
-    public function testResolve($config, $expected)
+    public function testResolve($config, $expected): void
     {
         $result = $this->resolver->resolve($config, [
             'testVar' => 'test context var',
             'testArray' => ['param' => 'param from array'],
         ]);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
      * Data provider for testResolve
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function resolveProvider()
+    public function resolveProvider(): array
     {
         return [
             'empty' => [
@@ -203,7 +199,7 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                 ['root' => ['node' => '%test.class%::CONST1']],
                 ['root' => ['node' => 'const1']],
             ],
-            'template namespace' => [
+            'namespaced template' => [
                 ['root' => ['node' => '@@OroBar/test.html.twig']],
                 ['root' => ['node' => '@OroBar/test.html.twig']],
             ],

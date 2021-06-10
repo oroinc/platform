@@ -70,7 +70,7 @@ class OroDistributionExtensionTest extends \PHPUnit\Framework\TestCase
                 $parameters,
                 [
                     'twig.form.resources' => [
-                        'OroTranslationBundle:Form:fields.html.twig'
+                        '@OroTranslation/Form/fields.html.twig'
                     ]
                 ]
             )

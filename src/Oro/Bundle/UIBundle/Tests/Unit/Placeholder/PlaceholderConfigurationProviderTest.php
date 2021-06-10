@@ -56,7 +56,7 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         ];
         $items = [
             'item1'                      => [
-                'template' => 'TestBundle::test.html.twig',
+                'template' => '@@Test/test.html.twig',
             ],
             'item2'                      => [
                 'action' => 'Oro\Bundle\TestBundle\Controller\TestController::test2Action',
