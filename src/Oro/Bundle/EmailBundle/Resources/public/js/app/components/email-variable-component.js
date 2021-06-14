@@ -39,7 +39,7 @@ define(function(require) {
 
             // bind entity change handler
             this.entityChoice = $(options.entityChoice);
-            this.entityChoice.on('change.' + this.cid, _.bind(this.onEntityChange, this));
+            this.entityChoice.on('change.' + this.cid, this.onEntityChange.bind(this));
 
             this.view.render();
         },

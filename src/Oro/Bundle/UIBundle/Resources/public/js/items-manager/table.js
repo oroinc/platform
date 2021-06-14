@@ -85,9 +85,9 @@ define(function(require) {
                     });
                     return ui;
                 },
-                stop: _.bind(function(e, ui) {
+                stop: (e, ui) => {
                     this._sortCollection();
-                }, this)
+                }
             }).disableSelection();
         },
 

@@ -43,7 +43,7 @@ define(function(require) {
             this.domCache.body.val(this.initBody(this.domCache.body.val()));
             this.addForgedAsterisk();
             this.renderPromise = this.initLayout();
-            this.renderPromise.done(_.bind(this.initFields, this));
+            this.renderPromise.done(this.initFields.bind(this));
             return this;
         },
 
@@ -120,13 +120,13 @@ define(function(require) {
             const confirm = new ApplyTemplateConfirmation({
                 content: __('oro.email.emailtemplate.apply_template_confirmation_content')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 mediator.execute('showLoading');
                 this.templatesProvider.create(templateId, this.model.get('email').get('relatedEntityId'))
-                    .always(_.bind(mediator.execute, mediator, 'hideLoading'))
-                    .fail(_.bind(this.showTemplateErrorMessage, this))
-                    .done(_.bind(this.fillForm, this));
-            }, this));
+                    .always(mediator.execute.bind(mediator, 'hideLoading'))
+                    .fail(this.showTemplateErrorMessage.bind(this))
+                    .done(this.fillForm.bind(this));
+            });
             confirm.open();
         },
 
@@ -198,13 +198,13 @@ define(function(require) {
             $field.parents('.control-group.taggable-field').show();
             $field.parents('.controls').find('input.select2-input')
                 .unbind('focusout')
-                .on('focusout', _.bind(function(e) {
-                    setTimeout(_.bind(function() {
+                .on('focusout', e => {
+                    setTimeout(() => {
                         if (!$field.val()) {
                             this.hideField(fieldName, fieldValue);
                         }
-                    }, this), 200);
-                }, this))
+                    }, 200);
+                })
                 .focus();
 
             this.$('[data-ftid$="_email_to"]')
@@ -222,12 +222,12 @@ define(function(require) {
                 return;
             }
             this.$('.cc-bcc-holder').append('<span class="show' + fieldName + '">' + fieldValue + '</span>');
-            this.$('.show' + fieldName).on('click', _.bind(function(e) {
+            this.$('.show' + fieldName).on('click', e => {
                 e.stopPropagation();
                 const target = e.target;
                 $(target).remove();
                 this.showField(fieldName, fieldValue);
-            }, this));
+            });
         },
 
         addForgedAsterisk: function() {

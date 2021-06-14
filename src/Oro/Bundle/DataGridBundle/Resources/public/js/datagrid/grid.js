@@ -533,7 +533,7 @@ define(function(require) {
             let $parents = this.$('.grid-container').parents();
             if ($parents.length) {
                 $parents = $parents.add(document);
-                $parents.on('scroll' + this.eventNamespace(), _.bind(this.trigger, this, 'scroll'));
+                $parents.on('scroll' + this.eventNamespace(), this.trigger.bind(this, 'scroll'));
                 this._$boundScrollHandlerParents = $parents;
 
                 this.listenTo(this.collection, 'backgrid:sort', _.debounce(this.sort, 50), this);
@@ -940,7 +940,7 @@ define(function(require) {
                 this.listenTo(this.header.row, 'columns:reorder', function() {
                     // triggers content:update event in separate process
                     // to give time body's rows to finish reordering
-                    _.defer(_.bind(this.trigger, this, 'content:update'));
+                    _.defer(this.trigger.bind(this, 'content:update'));
                 });
             }
         },
@@ -1068,7 +1068,7 @@ define(function(require) {
             this._deferredRender();
             this.initLayout({
                 datagrid: this
-            }).always(_.bind(function() {
+            }).always(() => {
                 this.rendered = true;
                 /**
                  * Backbone event. Fired when the grid has been successfully rendered.
@@ -1082,7 +1082,7 @@ define(function(require) {
                  */
                 mediator.trigger('grid_render:complete', this.$el);
                 this._resolveDeferredRender();
-            }, this));
+            });
 
             this.rendered = true;
 

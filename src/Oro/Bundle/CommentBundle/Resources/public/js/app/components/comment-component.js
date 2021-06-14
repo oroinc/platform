@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const CommentFromView = require('orocomment/js/app/views/comment-form-view');
@@ -114,9 +113,9 @@ define(function(require) {
             // init dialog
             const dialogWidget = this.createDialog(__('oro.comment.dialog.edit_comment.title'), model);
 
-            dialogWidget.listenTo(model, 'sync', _.bind(function() {
+            dialogWidget.listenTo(model, 'sync', () => {
                 dialogWidget.remove();
-            }, this));
+            });
         },
 
         onCommentRemove: function(model) {
@@ -128,9 +127,9 @@ define(function(require) {
                 content: __('oro.comment.deleteConfirmation')
             });
 
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 model.destroy();
-            }, this));
+            });
 
             confirm.open();
         },

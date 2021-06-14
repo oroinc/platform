@@ -56,9 +56,9 @@ define(function(require) {
             const confirm = new Confirmation({
                 content: __('Are you sure you want to delete this field?')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 this.trigger('removeFormOption', this.options.data);
-            }, this));
+            });
             confirm.open();
         },
 

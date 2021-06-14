@@ -241,8 +241,8 @@ define(function(require) {
             if (this.options.view.processSavePromise) {
                 savePromise = this.options.view.processSavePromise(savePromise, cell.column.get('metadata'));
             }
-            savePromise.done(_.bind(this.onSaveSuccess, this))
-                .fail(_.bind(this.onSaveError, this))
+            savePromise.done(this.onSaveSuccess.bind(this))
+                .fail(this.onSaveError.bind(this))
                 .always(function() {
                     cell.$el.removeClass('loading');
                 });

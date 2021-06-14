@@ -3,7 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
@@ -21,8 +24,12 @@ use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
+use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -34,34 +41,34 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $aclHelper;
+    private $aclHelper;
 
     /** @var DQLNameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dqlNameFormatter;
+    private $dqlNameFormatter;
 
     /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $nameFormatter;
+    private $nameFormatter;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailOwnerProvider;
+    private $emailOwnerProvider;
 
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $addressHelper;
+    private $addressHelper;
 
     /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $emailRecipientsHelper;
+    private $emailRecipientsHelper;
 
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $indexer;
+    private $indexer;
 
     protected function setUp(): void
     {
@@ -95,67 +102,50 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->dqlNameFormatter->expects($this->once())
             ->method('getFormattedNameDQL')
-            ->with('u', 'Oro\Bundle\UserBundle\Entity\User')
-            ->will($this->returnValue('u.name'));
+            ->with('u', User::class)
+            ->willReturn('u.name');
 
-        $expressionBuiled = $this->getMockBuilder('Doctrine\ORM\Query\Expr')
-            ->disableOriginalConstructor()
-            ->setMethods(['in'])
-            ->getMock();
+        $expressionBuiled = $this->createMock(Expr::class);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $qb = $this->createMock(QueryBuilder::class);
         $qb->expects($this->once())
             ->method('setMaxResults')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('andWhere')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('expr')
-            ->will($this->returnValue($expressionBuiled));
+            ->willReturn($expressionBuiled);
 
-        $userRepository = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\Repository\UserRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $userRepository = $this->createMock(UserRepository::class);
         $userRepository->expects($this->once())
             ->method('getPrimaryEmailsQb')
-            ->will($this->returnValue($qb));
+            ->willReturn($qb);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractclass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('getResult')
-            ->will($this->returnValue($resultEmails));
+            ->willReturn($resultEmails);
 
         $this->aclHelper->expects($this->once())
             ->method('apply')
-            ->will($this->returnValue($query));
+            ->willReturn($query);
 
-        $searchQueryMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Query')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $searchQueryMock = $this->createMock(Query::class);
 
-        $searchResultMock = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $searchResultMock = $this->createMock(Item::class);
 
         $stubResult = new Result($searchQueryMock, [$searchResultMock]);
 
         $this->indexer->expects($this->once())
              ->method('simpleSearch')
-             ->will($this->returnValue($stubResult));
+             ->willReturn($stubResult);
 
-        $this->emailRecipientsHelper->getRecipients($args, $userRepository, 'u', 'Oro\Bundle\UserBundle\Entity\User');
+        $this->emailRecipientsHelper->getRecipients($args, $userRepository, 'u', User::class);
     }
 
-    /**
-     * @return array
-     */
-    public function getRecipientsDataProvider()
+    public function getRecipientsDataProvider(): array
     {
         return [
             [
@@ -180,10 +170,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::filterRecipients($args, $recipients));
     }
 
-    /**
-     * @return array
-     */
-    public function filterRecipientsDataProvider()
+    public function filterRecipientsDataProvider(): array
     {
         return [
             [
@@ -223,10 +210,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
     }
 
-    /**
-     * @return array
-     */
-    public function prepareFormRecipientIdsDataProvider()
+    public function prepareFormRecipientIdsDataProvider(): array
     {
         return [
             [
@@ -249,10 +233,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
     }
 
-    /**
-     * @return array
-     */
-    public function extractFormRecipientIdsDataProvider()
+    public function extractFormRecipientIdsDataProvider(): array
     {
         return [
             [
@@ -284,10 +265,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function recipientsFromResultProvider()
+    public function recipientsFromResultProvider(): array
     {
         return [
             [
@@ -327,10 +305,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function plainRecipientsFromResultProvider()
+    public function plainRecipientsFromResultProvider(): array
     {
         return [
             [

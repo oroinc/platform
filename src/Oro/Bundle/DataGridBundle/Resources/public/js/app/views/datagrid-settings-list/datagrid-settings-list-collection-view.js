@@ -81,7 +81,7 @@ define(function(require, exports, module) {
                 throw new TypeError('Invalid required option "filterModel"');
             }
 
-            options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
+            options.filterer = this.filterModel.filterer.bind(this.filterModel);
             DatagridSettingsListCollectionView.__super__.initialize.call(this, options);
         },
 
@@ -138,7 +138,7 @@ define(function(require, exports, module) {
                 items: 'tr',
                 tolerance: 'pointer',
                 handle: '.handle',
-                helper: function(e, ui) {
+                helper: (e, ui) => {
                     placeholder = $('<tr />', {'class': 'sortable-placeholder'});
                     ui.children().each(function() {
                         const width = $(this).width();
@@ -152,10 +152,10 @@ define(function(require, exports, module) {
                     ui.parent().append(placeholder);
                     return ui;
                 },
-                stop: _.bind(function() {
+                stop: () => {
                     placeholder.remove();
                     this.onReorder();
-                }, this)
+                }
             }).disableSelection();
         },
 

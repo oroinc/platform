@@ -50,23 +50,23 @@ define(function(require) {
                     allowMaximize: true,
                     width: 650,
                     minHeight: 100,
-                    close: _.bind(this.onDialogClose, this)
+                    close: this.onDialogClose.bind(this)
                 }
             });
 
             $tree.data('treeView').moveTriggered = true;
 
-            this.dialogWidget.once('formSave', _.bind(function(changed) {
-                $.when(_.each(changed, function(data) {
+            this.dialogWidget.once('formSave', changed => {
+                $.when(_.each(changed, data => {
                     const defer = $.Deferred();
                     $tree.jstree('move_node', data.id, data.parent, data.position);
                     $tree.jstree('uncheck_node', '#' + data.id);
 
                     return defer.resolve();
-                })).done(function() {
+                })).done(() => {
                     $tree.data('treeView').moveTriggered = false;
                 });
-            }, this));
+            });
 
             this.dialogWidget.render();
         },

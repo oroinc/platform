@@ -1,9 +1,5 @@
-define(function(require) {
-    'use strict';
+import EntityStructureDataProvider from 'oroentity/js/app/services/entity-structure-data-provider';
 
-    const EntityStructureDataProvider = require('oroentity/js/app/services/entity-structure-data-provider');
-
-    EntityStructureDataProvider.defineFilterPreset('querydesigner', {
-        optionsFilter: {exclude: false}
-    });
+EntityStructureDataProvider.defineFilterPreset('querydesigner', {
+    optionsFilter: {exclude: false}
 });

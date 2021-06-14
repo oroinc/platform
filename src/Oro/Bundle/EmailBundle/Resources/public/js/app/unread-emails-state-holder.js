@@ -13,7 +13,7 @@ define(function(require, exports, module) {
     function UnreadEmailsStateHolder() {
         this.unreadEmailsStateModel = new UnreadEmailsStateModel();
         this.emailNotificationCollection = new EmailNotificationCollection();
-        sync.subscribe(channel, _.debounce(_.bind(this._notificationHandler, this), 1000));
+        sync.subscribe(channel, _.debounce(this._notificationHandler.bind(this), 1000));
     }
     _.extend(UnreadEmailsStateHolder.prototype, {
         getModel: function() {
@@ -21,7 +21,7 @@ define(function(require, exports, module) {
         },
         _notificationHandler: function() {
             this.emailNotificationCollection.fetch({
-                success: _.bind(this._onFetchSuccess, this)
+                success: this._onFetchSuccess.bind(this)
             });
         },
         _onFetchSuccess: function(collection) {

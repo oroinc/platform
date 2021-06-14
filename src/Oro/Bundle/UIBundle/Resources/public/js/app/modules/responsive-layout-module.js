@@ -1,9 +1,5 @@
-define(function(require) {
-    'use strict';
+import _ from 'underscore';
+import mediator from 'oroui/js/mediator';
+import responsiveLayout from 'oroui/js/responsive-layout';
 
-    const _ = require('underscore');
-    const mediator = require('oroui/js/mediator');
-    const responsiveLayout = require('oroui/js/responsive-layout');
-
-    mediator.setHandler('responsive-layout:update', _.debounce(responsiveLayout.update));
-});
+mediator.setHandler('responsive-layout:update', _.debounce(responsiveLayout.update));

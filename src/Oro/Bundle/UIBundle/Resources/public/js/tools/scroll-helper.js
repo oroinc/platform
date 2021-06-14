@@ -92,7 +92,7 @@ define(function(require, exports, module) {
 
             $(document)
                 .off('touchmove.disableScroll')
-                .on('touchmove.disableScroll', _.bind(this._preventMobileScrolling, this));
+                .on('touchmove.disableScroll', this._preventMobileScrolling.bind(this));
 
             this._isBodyTouchScrollDisabled = true;
         },
@@ -450,7 +450,7 @@ define(function(require, exports, module) {
         scrollHelper._documentHeight = -1;
     });
 
-    $(window).on('scroll', _.bind(scrollHelper._setScrollDirection, scrollHelper));
+    $(window).on('scroll', scrollHelper._setScrollDirection.bind(scrollHelper));
 
     return scrollHelper;
 });

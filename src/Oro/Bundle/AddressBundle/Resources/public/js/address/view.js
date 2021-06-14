@@ -121,7 +121,7 @@ define(function(require) {
             if (this.model.get('primary') && !this.options.allowToRemovePrimary) {
                 mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
-                this.confirmClose(_.bind(this.model.destroy, this.model, {
+                this.confirmClose(this.model.destroy.bind(this.model, {
                     url: this.options.addressDeleteUrl,
                     wait: true
                 }));

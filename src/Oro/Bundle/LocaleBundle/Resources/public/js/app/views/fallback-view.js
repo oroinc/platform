@@ -127,8 +127,8 @@ define(function(require) {
             const self = this;
 
             this.getValueEl(this.$el)
-                .change(_.bind(this.cloneValueToChildrenEvent, this))
-                .keyup(_.bind(this.cloneValueToChildrenEvent, this));
+                .change(this.cloneValueToChildrenEvent.bind(this))
+                .keyup(this.cloneValueToChildrenEvent.bind(this));
 
             this.$el.find(this.options.selectors.itemValue).find('.tox-tinymce').each(function() {
                 tinyMCE.get(self.getValueEl(self.getItemEl(this)).attr('id'))
@@ -141,10 +141,10 @@ define(function(require) {
             });
 
             this.getUseFallbackEl(this.$el)
-                .change(_.bind(this.switchUseFallbackEvent, this));
+                .change(this.switchUseFallbackEvent.bind(this));
 
             this.getFallbackEl(this.$el)
-                .change(_.bind(this.switchFallbackTypeEvent, this));
+                .change(this.switchFallbackTypeEvent.bind(this));
         },
 
         /**
@@ -497,7 +497,7 @@ define(function(require) {
 
             this.$el.find(this.options.selectors.status)
                 .html(icon.html)
-                .one('click' + this.eventNamespace(), _.bind(this[icon.event], this))
+                .one('click' + this.eventNamespace(), this[icon.event].bind(this))
                 .toggleClass(this.options.statusActiveClass, this.options.expanded);
 
             const $defaultLabel = this.$el.find(this.options.selectors.defaultItem)

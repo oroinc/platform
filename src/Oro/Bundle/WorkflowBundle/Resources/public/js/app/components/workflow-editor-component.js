@@ -298,7 +298,7 @@ define(function(require) {
 
             mediator.execute('showLoading');
             this.model.save(null, {
-                success: _.bind(function() {
+                success: () => {
                     mediator.execute('hideLoading');
 
                     let redirectUrl = '';
@@ -322,8 +322,8 @@ define(function(require) {
                         );
                     });
                     mediator.execute('redirectTo', {url: redirectUrl}, {redirect: true});
-                }, this),
-                errorHandlerMessage: function(event, response) {
+                },
+                errorHandlerMessage: (event, response) => {
                     let message = __('Could not save workflow.');
                     if (response.responseJSON && response.responseJSON.error) {
                         message = response.responseJSON.error;
@@ -331,7 +331,7 @@ define(function(require) {
 
                     return message;
                 },
-                error: function(model, response) {
+                error: (model, response) => {
                     mediator.execute('hideLoading');
                 }
             });

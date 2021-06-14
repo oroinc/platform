@@ -124,25 +124,24 @@ define(function(require) {
         },
 
         onMouseDown: function(event) {
-            const _this = this;
             let currentPosition = {
                 x: event.originalEvent.screenX,
                 y: event.originalEvent.screenY
             };
-            function handleMove(event) {
-                _this.model.move(event.screenX - currentPosition.x, event.screenY - currentPosition.y);
+            const handleMove = event => {
+                this.model.move(event.screenX - currentPosition.x, event.screenY - currentPosition.y);
                 currentPosition = {
                     x: event.screenX,
                     y: event.screenY
                 };
                 return false;
-            }
-            function handleMouseUp() {
+            };
+            const handleMouseUp = () => {
                 $(document.body).removeClass('force-grabbed-cursor');
                 removeEventListener('mousemove', handleMove, true);
                 removeEventListener('mouseup', handleMouseUp, true);
                 return false;
-            }
+            };
             $(document.body).addClass('force-grabbed-cursor');
             addEventListener('mousemove', handleMove, true);
             addEventListener('mouseup', handleMouseUp, true);

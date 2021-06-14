@@ -38,7 +38,7 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            const _this = this;
+            const headerRowView = this;
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             // let descendants override itemView
             if (!this.itemView) {
@@ -47,7 +47,7 @@ define([
                     const CurrentHeaderCell = column.get('headerCell') || options.headerCell || HeaderCell;
                     const cellOptions = {
                         column: column,
-                        collection: _this.dataCollection,
+                        collection: headerRowView.dataCollection,
                         themeOptions: {
                             className: 'grid-cell grid-header-cell'
                         }
@@ -55,7 +55,7 @@ define([
                     if (column.get('name')) {
                         cellOptions.themeOptions.className += ' grid-header-cell-' + column.get('name');
                     }
-                    _this.columns.trigger('configureInitializeOptions', CurrentHeaderCell, cellOptions);
+                    headerRowView.columns.trigger('configureInitializeOptions', CurrentHeaderCell, cellOptions);
                     return new CurrentHeaderCell(cellOptions);
                 };
             }

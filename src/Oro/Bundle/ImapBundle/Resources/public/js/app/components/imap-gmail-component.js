@@ -2,7 +2,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const mediator = require('oroui/js/mediator');
     const ImapGmailView = require('oroimap/js/app/views/imap-gmail-view');
@@ -73,7 +72,7 @@ define(function(require) {
                         response_type: 'code',
                         approval_prompt: 'force'
                     },
-                    _.bind(this.handleResponseAuthCode, this)
+                    this.handleResponseAuthCode.bind(this)
                 ).then(
                     null,
                     function(reason) {

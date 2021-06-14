@@ -35,18 +35,16 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
-            const self = this;
-
             widgetManager.getWidgetInstance(
                 this.options._wid,
-                function(widget) {
-                    if (!self.options.success) {
-                        if (self.options.error) {
-                            mediator.execute('showMessage', 'error', self.options.error);
+                widget => {
+                    if (!this.options.success) {
+                        if (this.options.error) {
+                            mediator.execute('showMessage', 'error', this.options.error);
                         }
 
-                        widget.getAction(self.options.buttonName, 'adopted', function(action) {
-                            action.on('click', _.bind(self.onClick, self));
+                        widget.getAction(this.options.buttonName, 'adopted', action => {
+                            action.on('click', this.onClick.bind(this));
                         });
                     } else {
                         mediator.trigger('widget_success:' + widget.getAlias());
@@ -54,9 +52,9 @@ define(function(require) {
 
                         let response = {message: __('oro.workflow.activated')};
 
-                        if (!_.isEmpty(self.options.deactivated)) {
+                        if (!_.isEmpty(this.options.deactivated)) {
                             response = _.extend(response, {
-                                deactivatedMessage: __('oro.workflow.deactivated_list') + self.options.deactivated
+                                deactivatedMessage: __('oro.workflow.deactivated_list') + this.options.deactivated
                             });
                         }
 

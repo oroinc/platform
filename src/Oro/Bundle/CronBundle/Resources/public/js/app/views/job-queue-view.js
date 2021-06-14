@@ -30,7 +30,7 @@ define(function(require) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['intervalUpdate']));
-            this.intervalId = setInterval(_.bind(this.checkStatus, this), this.intervalUpdate);
+            this.intervalId = setInterval(this.checkStatus.bind(this), this.intervalUpdate);
             JobQueueView.__super__.initialize.call(this, options);
         },
 
@@ -61,7 +61,7 @@ define(function(require) {
 
             $loader.show();
 
-            $.getJSON($link.attr('href'), _.bind(function(data) {
+            $.getJSON($link.attr('href'), data => {
                 if (!data.error) {
                     $link.closest('div')
                         .find('span:first')
@@ -74,7 +74,7 @@ define(function(require) {
                 }
 
                 $loader.hide();
-            }, this));
+            });
         },
 
         /**
@@ -110,7 +110,7 @@ define(function(require) {
 
             $loader.show();
 
-            $.get($statusLink.attr('href'), _.bind(function(data) {
+            $.get($statusLink.attr('href'), data => {
                 data = parseInt(data, 10);
 
                 $statusLink
@@ -125,7 +125,7 @@ define(function(require) {
                 this.updateButtons(!data);
 
                 $loader.hide();
-            }, this));
+            });
         },
 
         /**

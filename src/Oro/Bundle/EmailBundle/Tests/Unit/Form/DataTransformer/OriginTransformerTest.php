@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -21,13 +22,10 @@ class OriginTransformerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->entityManagerMock = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->setMethods(['find'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityManagerMock = $this->createMock(EntityManager::class);
 
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $emailOriginHelperMock = $this->createMock('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper');
+        $emailOriginHelperMock = $this->createMock(EmailOriginHelper::class);
 
         $this->transformer = new OriginTransformer(
             $this->entityManagerMock,
@@ -52,8 +50,7 @@ class OriginTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $testOrigin = new TestEmailOrigin(1);
 
-        $this->entityManagerMock
-            ->expects($this->any())
+        $this->entityManagerMock->expects($this->any())
             ->method('find')
             ->with($this->equalTo(EmailOrigin::class), $this->equalTo(1))
             ->willReturn($testOrigin);

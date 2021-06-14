@@ -28,11 +28,11 @@ define(function(require) {
         initialize: function(options) {
             RecentEmailsContentView.__super__.initialize.call(this, options);
             $.getJSON(routing.generate('oro_email_emailorigin_list'),
-                _.bind(function(data) {
+                data => {
                     this.foldersData = this.parseFoldersData(data);
                     this.foldersData.unshift({id: 0, text: __('oro.email.recent_emails_widget.all_folders')});
                     this.render();
-                }, this)
+                }
             );
         },
 

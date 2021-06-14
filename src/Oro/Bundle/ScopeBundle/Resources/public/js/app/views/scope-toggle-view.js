@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
 
     /**
@@ -44,7 +43,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.options = $.extend(true, {}, this.options, options || {});
-            this.initLayout().done(_.bind(this.handleLayoutInit, this));
+            this.initLayout().done(this.handleLayoutInit.bind(this));
         },
 
         handleLayoutInit: function() {
@@ -55,7 +54,7 @@ define(function(require) {
             this.$scopeFields = $el.find(this.options.selectors.scopesSelector);
 
             this._toggleScopes();
-            $el.on('change', this.$useParentScope, _.bind(this._toggleScopes, this));
+            $el.on('change', this.$useParentScope, this._toggleScopes.bind(this));
         },
 
         _toggleScopes: function() {

@@ -143,51 +143,50 @@ define(function(require) {
         },
 
         render: function() {
-            const _this = this;
             SelectEditorView.__super__.render.call(this);
             const select2options = this.getSelect2Options();
             this.$('input[name=value]').inputWidget('create', 'select2', {initializeOptions: select2options});
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
-                _this.onGenericEnterKeydown(e);
-                _this.onGenericTabKeydown(e);
-                _this.onGenericArrowKeydown(e);
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), e => {
+                this.onGenericEnterKeydown(e);
+                this.onGenericTabKeydown(e);
+                this.onGenericArrowKeydown(e);
             });
 
             // must prevent selection on TAB
-            this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                const prestine = _this.prestine;
-                _this.prestine = false;
+            this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), e => {
+                const prestine = this.prestine;
+                this.prestine = false;
                 switch (e.keyCode) {
-                    case _this.ENTER_KEY_CODE:
+                    case this.ENTER_KEY_CODE:
                         if (prestine) {
                             e.stopImmediatePropagation();
                             e.preventDefault();
-                            _this.$('input[name=value]').inputWidget('close');
-                            _this.onGenericEnterKeydown(e);
+                            this.$('input[name=value]').inputWidget('close');
+                            this.onGenericEnterKeydown(e);
                         }
                         break;
-                    case _this.TAB_KEY_CODE:
+                    case this.TAB_KEY_CODE:
                         e.stopImmediatePropagation();
                         e.preventDefault();
-                        _this.$('input[name=value]').inputWidget('close');
-                        _this.onGenericTabKeydown(e);
+                        this.$('input[name=value]').inputWidget('close');
+                        this.onGenericTabKeydown(e);
                         break;
                 }
-                _this.onGenericArrowKeydown(e);
+                this.onGenericArrowKeydown(e);
             });
-            this.$('input.select2-input').bind('keydown' + this.eventNamespace(), function(e) {
+            this.$('input.select2-input').bind('keydown' + this.eventNamespace(), e => {
                 // Due to this view can be already disposed in bound first handler,
                 // we have to check if it's disposed
-                if (!_this.disposed && !_this.isChanged()) {
-                    SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
+                if (!this.disposed && !this.isChanged()) {
+                    SelectEditorView.__super__.onGenericEnterKeydown.call(this, e);
                 }
             });
-            this.$('.select2-search-choice-close').on('mousedown', function() {
-                _this._isSelection = true;
-                _this.$('.select2-choice').one('focus', function() {
-                    delete _this._isSelection;
+            this.$('.select2-search-choice-close').on('mousedown', () => {
+                this._isSelection = true;
+                this.$('.select2-choice').one('focus', () => {
+                    delete this._isSelection;
                 });
             });
         },
@@ -238,12 +237,12 @@ define(function(require) {
             if (!select2) {
                 return;
             }
-            select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
+            select2.dropdown.on('mousedown' + this.eventNamespace(), () => {
                 this._isSelection = true;// to suppress focusout event
-            }, this));
-            select2.dropdown.on('mouseup' + this.eventNamespace(), _.bind(function() {
+            });
+            select2.dropdown.on('mouseup' + this.eventNamespace(), () => {
                 delete this._isSelection;
-            }, this));
+            });
         },
 
         onSelect2Close: function(e) {
@@ -281,11 +280,11 @@ define(function(require) {
             const select2 = this.$('input[name=value]').data('select2');
 
             if (!this._isSelection && !select2 || !select2.opened()) {
-                _.defer(_.bind(function() {
+                _.defer(() => {
                     if (!this.disposed && !$.contains(this.el, document.activeElement)) {
                         SelectEditorView.__super__.onFocusout.call(this, e);
                     }
-                }, this));
+                });
             }
         },
 

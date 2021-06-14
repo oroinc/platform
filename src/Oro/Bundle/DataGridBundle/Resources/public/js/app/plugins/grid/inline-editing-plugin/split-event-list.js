@@ -70,11 +70,11 @@ define(['underscore'], function(_) {
         },
 
         generateDeclaration: function() {
-            const _this = this;
+            const splitEventList = this;
             return this.canGenerateEventsAsObject
                 ? this.generateEvents()
                 : function() {
-                    _this.generateEvents(this);
+                    splitEventList.generateEvents(this);
                 };
         }
     };

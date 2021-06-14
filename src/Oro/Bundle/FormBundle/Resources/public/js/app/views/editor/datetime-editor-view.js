@@ -124,17 +124,16 @@ define(function(require) {
         },
 
         render: function() {
-            const _this = this;
             DatetimeEditorView.__super__.render.call(this);
             // fix ESCAPE time-picker behaviour
             // must stopPropagation on ESCAPE, if time-picker was visible
-            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                if (e.keyCode === _this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
+            this.$('.timepicker-input').bindFirst('keydown' + this.eventNamespace(), e => {
+                if (e.keyCode === this.ESCAPE_KEY_CODE && $('.ui-timepicker-wrapper').css('display') === 'block') {
                     e.stopPropagation();
                 }
             });
             // fix arrows behaviour
-            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+            this.$('.timepicker-input').on('keydown' + this.eventNamespace(), this.onGenericArrowKeydown.bind(this));
 
             return this;
         },
@@ -209,10 +208,10 @@ define(function(require) {
             const isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
             $list.off(this.eventNamespace())
-                .on('mousedown' + this.eventNamespace(), _.bind(function(e) {
+                .on('mousedown' + this.eventNamespace(), e => {
                     // adds flag that blur event was as sequence of time selection in dropdown
                     this._isTimeSelection = true;
-                }, this));
+                });
         },
 
         onGenericTabKeydown: function(e) {

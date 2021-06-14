@@ -62,13 +62,13 @@ define(function(require) {
             _.each(transforms, function(rule) {
                 rule.apply();
             });
-            matrix.align().forEachCell(_.bind(function(cell) {
+            matrix.align().forEachCell(cell => {
                 const increment = cell.step.get('_is_start') ? -15 : 35;
                 cell.step.set('position', [
                     this.xIncrement * cell.x + this.xPadding,
                     this.yIncrement * cell.y + this.yPadding + increment
                 ]);
-            }, this));
+            });
         },
 
         getPositionForNew: function() {

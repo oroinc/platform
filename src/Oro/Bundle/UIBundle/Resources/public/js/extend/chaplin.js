@@ -140,7 +140,6 @@ define([
      * @override
      */
     Chaplin.CollectionView.prototype.insertView = function(item, view, position, enableAnimation) {
-        const _this = this;
         if (enableAnimation == null) {
             enableAnimation = true;
         }
@@ -169,8 +168,8 @@ define([
         this.updateVisibleItems(item, included);
         if (included && enableAnimation) {
             if (this.useCssAnimation) {
-                setTimeout(function() {
-                    return elem.addClass(_this.animationEndClass);
+                setTimeout(() => {
+                    return elem.addClass(this.animationEndClass);
                 }, 0);
             } else {
                 elem.animate({opacity: 1}, this.animationDuration);

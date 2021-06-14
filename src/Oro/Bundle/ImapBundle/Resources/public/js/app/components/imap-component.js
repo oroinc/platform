@@ -125,9 +125,9 @@ define(function(require) {
                 url: this.getUrlGetAccessToken(),
                 method: 'POST',
                 data: (code && String(code).length) ? {code: code} : {},
-                success: _.bind(this.prepareAuthorization, this),
+                success: this.prepareAuthorization.bind(this),
                 errorHandlerMessage: false,
-                error: _.bind(this.requestError, this)
+                error: this.requestError.bind(this)
             });
         },
 
@@ -179,9 +179,9 @@ define(function(require) {
                 url: this.getUrl(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.renderFormGetFolder, this),
+                success: this.renderFormGetFolder.bind(this),
                 errorHandlerMessage: false,
-                error: _.bind(this.requestError, this)
+                error: this.requestError.bind(this)
             });
         },
 
@@ -218,9 +218,9 @@ define(function(require) {
                 url: this.getUrlGetFolders(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.handlerGetFolders, this),
+                success: this.handlerGetFolders.bind(this),
                 errorHandlerMessage: false,
-                error: _.bind(this.requestError, this)
+                error: this.requestError.bind(this)
             });
         },
 

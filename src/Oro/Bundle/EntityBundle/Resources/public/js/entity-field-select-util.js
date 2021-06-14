@@ -27,7 +27,7 @@ define(['underscore'
                 });
                 let prevFieldName = chain[0];
                 const lastItemIndex = _.size(chain) - 2;
-                _.each(_.rest(chain), _.bind(function(item, index) {
+                _.each(_.rest(chain), (item, index) => {
                     data = this._getChildren(this._getField(prevFieldName, data));
                     const pair = this._getPair(item);
                     const label = index < lastItemIndex
@@ -38,7 +38,7 @@ define(['underscore'
                         label: label
                     });
                     prevFieldName = _.last(pair);
-                }, this));
+                });
             } else if (chain[0] !== '') {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
@@ -67,13 +67,13 @@ define(['underscore'
                 result = this._getField(chain[0], data);
                 data = this._getChildren(result);
                 const lastItemIndex = _.size(chain) - 2;
-                _.each(_.rest(chain), _.bind(function(item, index) {
+                _.each(_.rest(chain), (item, index) => {
                     const fieldName = _.last(this._getPair(item));
                     result = index < lastItemIndex
                         ? this._getField(fieldName, data)
                         : this._getFieldData(fieldName, data);
                     data = this._getChildren(result);
-                }, this));
+                });
             } else if (chain[0] !== '') {
                 result = this._getFieldData(chain[0], data);
             }
@@ -186,7 +186,7 @@ define(['underscore'
 
         _convertData: function(fields, entityName, parentFieldId) {
             const result = [];
-            _.each(fields, _.bind(function(field) {
+            _.each(fields, field => {
                 const fieldId = (null !== parentFieldId)
                     ? parentFieldId + '+' + entityName + '::' + field.name
                     : field.name;
@@ -214,7 +214,7 @@ define(['underscore'
                         }, _.omit(field, ['label'])));
                     }
                 }
-            }, this));
+            });
 
             return result;
         }
