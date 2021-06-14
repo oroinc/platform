@@ -2,22 +2,21 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Asset;
 
+use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 
 class DynamicAssetVersionManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
+    private $cache;
 
     /** @var DynamicAssetVersionManager */
-    protected $assetVersionManager;
+    private $assetVersionManager;
 
     protected function setUp(): void
     {
-        $this->cache               = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->disableOriginalConstructor()
-            ->setMethods(['fetch', 'save'])
-            ->getMockForAbstractClass();
+        $this->cache = $this->createMock(CacheProvider::class);
+
         $this->assetVersionManager = new DynamicAssetVersionManager($this->cache);
     }
 
