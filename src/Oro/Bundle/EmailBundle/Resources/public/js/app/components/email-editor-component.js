@@ -38,9 +38,9 @@ define(function(require) {
                 editorComponentName: this.options.editorComponentName
             });
             this.view.render();
-            this.view.renderPromise.done(_.bind(function() {
+            this.view.renderPromise.done(() => {
                 this._resolveDeferredInit();
-            }, this));
+            });
         },
 
         createEditorModelFromComponentOptions: function(options) {

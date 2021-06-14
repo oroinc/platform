@@ -39,7 +39,7 @@ define(function(require) {
             this.options = _.extend({}, this.options, options);
 
             this.$select = this.$el.find(this.options.selectSelector);
-            this.$select.on('change' + this.eventNamespace(), _.bind(this.onSelectChange, this));
+            this.$select.on('change' + this.eventNamespace(), this.onSelectChange.bind(this));
             this.$useParent = this.$el.find(this.options.useParentSelector);
 
             mediator.on('default_localization:use_parent_scope', this.onDefaultLocalizationUseParentScope, this);

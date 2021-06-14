@@ -36,7 +36,7 @@ define(function(require) {
 
             this.$button = $(this.options._sourceElement);
             this.$button
-                .on('click', _.bind(this.onClick, this));
+                .on('click', this.onClick.bind(this));
 
             const buttonOptions = this.$button.data('options') || {};
             if (buttonOptions.confirmation && buttonOptions.confirmation.component) {

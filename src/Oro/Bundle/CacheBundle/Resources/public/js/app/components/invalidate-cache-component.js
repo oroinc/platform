@@ -37,11 +37,11 @@ define(function(require) {
             this.removeInvalidationButton = $(this.options.removeInvalidationButton);
             this.form = $(this.$elem).find(this.options.form);
 
-            $(this.removeInvalidationButton).on('click', _.bind(this.onRemoveInvalidationClick, this));
-            $(this.invalidateType).on('change', _.bind(this.onSelectChange, this));
+            $(this.removeInvalidationButton).on('click', this.onRemoveInvalidationClick.bind(this));
+            $(this.invalidateType).on('change', this.onSelectChange.bind(this));
             $(this.invalidateType).trigger('change');
 
-            $(this.invalidateAt).on('change', _.bind(this.toggleRemoveInvalidationVisibility, this));
+            $(this.invalidateAt).on('change', this.toggleRemoveInvalidationVisibility.bind(this));
             $(this.invalidateAt).trigger('change');
         },
 

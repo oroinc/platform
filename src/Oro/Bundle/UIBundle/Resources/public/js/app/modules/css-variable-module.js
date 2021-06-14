@@ -1,6 +1,3 @@
-define(function(require) {
-    'use strict';
+import cssVariablesManager from 'oroui/js/css-variables-manager';
 
-    const cssVariablesManager = require('oroui/js/css-variables-manager');
-    cssVariablesManager.initialize();
-});
+cssVariablesManager.initialize();

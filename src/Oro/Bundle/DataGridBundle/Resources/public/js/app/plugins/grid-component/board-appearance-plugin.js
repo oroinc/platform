@@ -185,9 +185,9 @@ define(function(require) {
         getBoardCollection: function() {
             if (!this._collection) {
                 this._collection = new BoardDataCollection(this.main.collection.models);
-                this._collection.listenTo(this.main.collection, 'add remove reset sort', _.bind(function() {
+                this._collection.listenTo(this.main.collection, 'add remove reset sort', () => {
                     this._collection.reset(this.main.collection.models);
-                }, this));
+                });
             }
             return this._collection;
         },

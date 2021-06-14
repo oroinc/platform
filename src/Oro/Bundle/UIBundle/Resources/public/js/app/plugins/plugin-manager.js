@@ -89,7 +89,7 @@ define(function(require) {
          */
         enable: function(Constructor) {
             if (_.isArray(Constructor)) {
-                _.each(Constructor, _.bind(this.enable, this));
+                _.each(Constructor, this.enable.bind(this));
                 return;
             }
             if (!(Constructor.prototype instanceof BasePlugin)) {
@@ -111,7 +111,7 @@ define(function(require) {
          */
         disable: function(Constructor) {
             if (_.isArray(Constructor)) {
-                _.each(Constructor, _.bind(this.disable, this));
+                _.each(Constructor, this.disable.bind(this));
                 return;
             }
             const instance = this.getInstance(Constructor);

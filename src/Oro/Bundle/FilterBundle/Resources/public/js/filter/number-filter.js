@@ -58,9 +58,9 @@ define(function(require) {
         _filterArrayChoices: function() {
             this.choices = _.filter(
                 this.choices,
-                _.bind(function(item) {
+                item => {
                     return this.dataType === 'data_integer' || !this._isArrayType(item.data);
-                }, this)
+                }
             );
         },
 

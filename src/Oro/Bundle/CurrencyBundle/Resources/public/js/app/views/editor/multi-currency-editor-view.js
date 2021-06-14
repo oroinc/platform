@@ -109,7 +109,7 @@ define(function(require) {
 
         render: function() {
             MultiCurrencyEditorView.__super__.render.call(this);
-            const _this = this;
+
             if (this.isSingleCurrency()) {
                 return;
             }
@@ -122,30 +122,30 @@ define(function(require) {
                 data: {results: this.getCurrencyData()}
             };
             this.$('input[name=currency]').inputWidget('create', 'select2', {initializeOptions: select2options});
-            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), _.bind(function(e) {
+            this.$('.select2-focusser').on('keydown' + this.eventNamespace(), e => {
                 this.onGenericEnterKeydown(e);
-            }, this));
+            });
 
-            this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), function(e) {
-                const currencyPrestine = _this._currencyPrestine;
-                _this._currencyPrestine = false;
+            this.$('input.select2-input').bindFirst('keydown' + this.eventNamespace(), e => {
+                const currencyPristine = this._currencyPristine;
+                this._currencyPristine = false;
                 switch (e.keyCode) {
-                    case _this.ENTER_KEY_CODE:
-                        if (currencyPrestine || !_this._currencySelectionIsOpen) {
+                    case this.ENTER_KEY_CODE:
+                        if (currencyPristine || !this._currencySelectionIsOpen) {
                             e.stopImmediatePropagation();
                             e.preventDefault();
-                            _this.$('input[name=currency]').inputWidget('close');
-                            _this.onGenericEnterKeydown(e);
+                            this.$('input[name=currency]').inputWidget('close');
+                            this.onGenericEnterKeydown(e);
                         }
                         break;
-                    case _this.TAB_KEY_CODE:
+                    case this.TAB_KEY_CODE:
                         e.stopImmediatePropagation();
                         e.preventDefault();
-                        _this.$('input[name=currency]').inputWidget('close');
-                        _this.onGenericTabKeydown(e);
+                        this.$('input[name=currency]').inputWidget('close');
+                        this.onGenericTabKeydown(e);
                         break;
                 }
-                _this.onGenericArrowKeydown(e);
+                this.onGenericArrowKeydown(e);
             });
         },
         /**
@@ -216,28 +216,28 @@ define(function(require) {
 
         onFocusout: function(e) {
             if (!this._currencySelectionIsOpen && !this._isSelection) {
-                _.defer(_.bind(function() {
+                _.defer(() => {
                     if (!this.disposed && !$.contains(this.el, document.activeElement)) {
                         MultiCurrencyEditorView.__super__.onFocusout.call(this, e);
                     }
-                }, this));
+                });
             }
         },
 
         onCurrencySelectOpening: function() {
             this._currencySelectionIsOpen = true;
-            this._currencyPrestine = true;
+            this._currencyPristine = true;
         },
 
         onCurrencySelectOpen: function(e) {
             const select2 = this.$(e.target).data('select2');
             if (select2) {
-                select2.dropdown.on('mousedown' + this.eventNamespace(), _.bind(function() {
+                select2.dropdown.on('mousedown' + this.eventNamespace(), () => {
                     this._isSelection = true;// to suppress focusout event
-                }, this));
-                select2.dropdown.on('mouseup' + this.eventNamespace(), _.bind(function() {
+                });
+                select2.dropdown.on('mouseup' + this.eventNamespace(), () => {
                     this._isSelection = false;
-                }, this));
+                });
             }
         },
 

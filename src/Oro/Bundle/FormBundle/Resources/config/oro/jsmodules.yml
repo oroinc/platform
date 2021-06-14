@@ -10,6 +10,8 @@ aliases:
     oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
     tinymce/tinymce$: oroform/js/extend/tinymce
     xregexp$: xregexp/xregexp-all
+app-modules:
+    - oroform/js/app/modules/validator-constraints-module
 configs:
     oroform/js/extend/tinymce: {}
     oroform/js/extend/validate: {}
@@ -27,6 +29,7 @@ dynamic-imports:
         - oroform/js/app/components/inline-editable-view-component
         - oroform/js/app/components/select-create-inline-type-async-component
         - oroform/js/app/components/select-create-inline-type-component
+        - oroform/js/app/views/checkbox-view
         - oroform/js/app/views/color-table-view
         - oroform/js/app/views/default-field-value-view
         - oroform/js/app/views/editor/date-editor-view
@@ -42,7 +45,6 @@ dynamic-imports:
         - oroform/js/app/views/fields-groups-collection-view
         - oroform/js/app/views/form-loading-view
         - oroform/js/app/views/form-validate-view
-        - oroform/js/app/views/checkbox-view
         - oroform/js/app/views/simple-color-choice-view
         - oroform/js/app/views/simple-color-picker-view
         - oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view

@@ -39,7 +39,7 @@ define(function(require) {
     function subscribeModel(model) {
         if (model.id) {
             // saves bound function in order to have same callback in unsubscribeModel call
-            model['[[SetCallback]]'] = (model['[[SetCallback]]'] || _.bind(model.set, model));
+            model['[[SetCallback]]'] = (model['[[SetCallback]]'] || model.set.bind(model));
             sync.subscribe(_.result(model, 'url'), model['[[SetCallback]]']);
             model.on('remove', unsubscribeModel);
         }

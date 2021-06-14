@@ -253,19 +253,19 @@ define(function(require) {
 
         registerWidget: function() {
             const listView = this.listView;
-            mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function(widget) {
+            mediator.execute('widgets:getByIdAsync', this.options.widgetId, widget => {
                 widget.getAction('refresh', 'top', function(action) {
-                    action.on('click', _.bind(listView.refresh, listView));
+                    action.on('click', listView.refresh.bind(listView));
                 });
 
                 /**
                  * pager actions
                  */
                 widget.getAction('goto_previous', 'top', function(action) {
-                    action.on('click', _.bind(listView.goto_previous, listView));
+                    action.on('click', listView.goto_previous.bind(listView));
                 });
                 widget.getAction('goto_next', 'top', function(action) {
-                    action.on('click', _.bind(listView.goto_next, listView));
+                    action.on('click', listView.goto_next.bind(listView));
                 });
 
                 // render filters
@@ -274,7 +274,7 @@ define(function(require) {
                 } else {
                     widget.on('widgetRender', this.renderFilters, this);
                 }
-            }, this));
+            });
         }
     });
 
