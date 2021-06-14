@@ -179,8 +179,6 @@ services:
         public: true
         arguments:
             - 'import_files'
-        calls:
-            - [ setProtocol, [ 'gaufrette-readonly' ]]
 
     oro_attachment.serializer.file_normalizer:
         class: Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer
