@@ -93,6 +93,27 @@ class OroSelenium2Driver extends Selenium2Driver
 
     /**
      * @param string $xpath
+     * @return array|bool|mixed|string|void|null
+     * @throws \Behat\Mink\Exception\DriverException
+     * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+     */
+    public function getValue($xpath)
+    {
+        $element = $this->findElement($xpath);
+        $elementName = strtolower($element->name());
+        $elementType = strtolower($element->attribute('type'));
+
+        if ($elementName === 'input' && $elementType !== 'checkbox' && $elementType !== 'radio') {
+            $script = 'return ({{ELEMENT}}).value;';
+
+            return $this->executeJsOnElement($element, $script);
+        }
+
+        return parent::getValue($xpath);
+    }
+
+    /**
+     * @param string $xpath
      * @param string $value
      */
     public function typeIntoInput($xpath, $value)
@@ -101,7 +122,7 @@ class OroSelenium2Driver extends Selenium2Driver
         $elementName = strtolower($element->name());
 
         if (in_array($elementName, array('input', 'textarea'))) {
-            $existingValueLength = strlen($element->attribute('value'));
+            $existingValueLength = strlen($this->getValue($xpath));
             $value = str_repeat(Key::BACKSPACE . Key::DELETE, $existingValueLength) . $value;
         }
 
@@ -112,7 +133,7 @@ class OroSelenium2Driver extends Selenium2Driver
      * Set content tinymce editor with value
      *
      * @param Element $element Form element that was replaced by TinyMCE
-     * @param string  $value   Text for set into tiny
+     * @param string $value Text for set into tiny
      *
      * @return bool TRUE if the given element is TinyMCE; otherwise, FALSE
      */
@@ -315,11 +336,11 @@ JS;
      */
     protected function executeJsOnElement(Element $element, $script, $sync = true)
     {
-        $script  = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
+        $script = str_replace('{{ELEMENT}}', 'arguments[0]', $script);
 
         $options = array(
             'script' => $script,
-            'args'   => array(array('ELEMENT' => $element->getID())),
+            'args' => array(array('ELEMENT' => $element->getID())),
         );
 
         if ($sync) {
@@ -331,8 +352,8 @@ JS;
 
     /**
      * @param Element $element
-     * @param string  $value
-     * @param bool    $multiple
+     * @param string $value
+     * @param bool $multiple
      */
     protected function selectOptionOnElement(Element $element, $value, $multiple = false)
     {
@@ -384,7 +405,7 @@ JS;
             usleep(100000);
         } while (microtime(true) < $end && !$result);
 
-        return (bool) $result;
+        return (bool)$result;
     }
 
     /**

@@ -148,8 +148,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         $possibleElementName = $this->fixStepArgument($fieldName);
         if ($this->elementFactory->hasElement($possibleElementName)) {
-            $value = $this->createElement($possibleElementName)->getValue();
-            self::assertSame($fieldValue, $value);
+            self::assertSame($fieldValue, $this->createElement($possibleElementName)->getValue());
 
             return;
         }
