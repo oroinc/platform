@@ -62,16 +62,30 @@ class SegmentController extends AbstractController
     /**
      * @return EventDispatcherInterface
      */
-    protected function getEventDispatcher()
+    protected function getEventDispatcher(): EventDispatcherInterface
     {
-        return $this->get('event_dispatcher');
+        return $this->get(EventDispatcherInterface::class);
     }
 
     /**
      * @return TranslatorInterface
      */
-    protected function getTranslator()
+    protected function getTranslator(): TranslatorInterface
     {
-        return $this->get('translator');
+        return $this->get(TranslatorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                EventDispatcherInterface::class,
+            ]
+        );
     }
 }

@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * The controller for Schedule entity.
  * @Route("/schedule")
  */
 class ScheduleController extends AbstractController

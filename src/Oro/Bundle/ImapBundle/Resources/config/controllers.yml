@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        public: true
+
+    Oro\Bundle\ImapBundle\Controller\ConnectionController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\ImapBundle\Controller\GmailConnectionController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+
+    Oro\Bundle\ImapBundle\Controller\MicrosoftConnectionController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

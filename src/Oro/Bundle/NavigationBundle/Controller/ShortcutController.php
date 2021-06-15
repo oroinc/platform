@@ -12,11 +12,12 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
+ * Serves shortcut actions.
  * @Route("/shortcut")
  */
 class ShortcutController extends AbstractController
 {
-    protected $uris = array();
+    protected $uris = [];
 
     /**
      * @Route("actionslist", name="oro_shortcut_actionslist")
@@ -24,8 +25,7 @@ class ShortcutController extends AbstractController
      */
     public function actionslistAction()
     {
-        /** @var $provider BuilderChainProvider */
-        $provider = $this->container->get('oro_menu.builder_chain');
+        $provider = $this->get(BuilderChainProvider::class);
         /**
          * merging shortcuts and application menu
          */
@@ -34,9 +34,9 @@ class ShortcutController extends AbstractController
         $result = array_merge($this->getResults($shortcuts), $this->getResults($menuItems));
         ksort($result);
 
-        return array(
+        return [
             'actionsList'  => $result,
-        );
+        ];
     }
 
     /**
@@ -47,10 +47,10 @@ class ShortcutController extends AbstractController
     protected function getResults(ItemInterface $items)
     {
         /** @var $translator TranslatorInterface */
-        $translator = $this->get('translator');
+        $translator = $this->get(TranslatorInterface::class);
         $itemIterator = new RecursiveItemIterator($items);
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
-        $result = array();
+        $result = [];
         /** @var $item ItemInterface */
         foreach ($iterator as $key => $item) {
             if ($this->isItemAllowed($item)) {
@@ -95,6 +95,20 @@ class ShortcutController extends AbstractController
             && !in_array($item->getUri(), $this->uris)
             && $item->getUri() !== '#'
             && $item->isDisplayed()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                BuilderChainProvider::class,
+            ]
         );
     }
 }

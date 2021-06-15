@@ -11,6 +11,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD for localizations.
@@ -68,7 +69,7 @@ class LocalizationController extends AbstractController
         $response = $this->update(new Localization());
 
         if ($response instanceof RedirectResponse) {
-            $message = $this->get('translator')->trans(
+            $message = $this->get(TranslatorInterface::class)->trans(
                 'oro.translation.translation.rebuild_cache_required',
                 [
                     '%path%' => $this->generateUrl('oro_translation_translation_index'),
@@ -108,11 +109,25 @@ class LocalizationController extends AbstractController
         $form = $this->createForm(LocalizationType::class, $localization);
 
         /** @var $handler UpdateHandler */
-        $handler = $this->get('oro_form.model.update_handler');
+        $handler = $this->get(UpdateHandler::class);
         return $handler->update(
             $localization,
             $form,
-            $this->get('translator')->trans('oro.locale.controller.localization.saved.message')
+            $this->get(TranslatorInterface::class)->trans('oro.locale.controller.localization.saved.message')
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                UpdateHandler::class
+            ]
         );
     }
 }

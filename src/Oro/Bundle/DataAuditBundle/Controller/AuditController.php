@@ -51,10 +51,10 @@ class AuditController extends AbstractController
      */
     public function historyAction($entity, $id)
     {
-        return array(
+        return [
             'gridName' => 'audit-history-grid',
             'entityClass' => $entity,
             'entityId' => $id,
-        );
+        ];
     }
 }

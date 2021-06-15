@@ -47,6 +47,9 @@ services:
             - '@validator'
             - '@oro_attachment.provider.file_constraints'
 
+    Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler:
+        alias: oro_attachment.form.handler.attachment
+
     oro_attachment.form.handler.attachment:
         public: true
         class: Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler

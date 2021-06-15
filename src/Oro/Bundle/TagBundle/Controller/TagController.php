@@ -5,11 +5,16 @@ namespace Oro\Bundle\TagBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Form\Handler\TagHandler;
+use Oro\Bundle\TagBundle\Provider\StatisticProvider;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD for tags.
@@ -33,9 +38,9 @@ class TagController extends AbstractController
      */
     public function indexAction()
     {
-        return array(
+        return [
             'entity_class' => Tag::class
-        );
+        ];
     }
 
     /**
@@ -78,7 +83,7 @@ class TagController extends AbstractController
         // path to datagrid subrequest
         $from = $request->get('from');
 
-        $provider       = $this->get('oro_tag.provider.statistic');
+        $provider       = $this->get(StatisticProvider::class);
         $groupedResults = $provider->getTagEntitiesStatistic($entity);
         $selectedResult = null;
 
@@ -89,12 +94,12 @@ class TagController extends AbstractController
             }
         }
 
-        return array(
+        return [
             'tag'            => $entity,
             'from'           => $from,
             'groupedResults' => $groupedResults,
             'selectedResult' => $selectedResult
-        );
+        ];
     }
 
     /**
@@ -103,18 +108,35 @@ class TagController extends AbstractController
      */
     protected function update(Tag $entity)
     {
-        if ($this->get('oro_tag.form.handler.tag')->process($entity)) {
+        if ($this->get(TagHandler::class)->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.tag.controller.tag.saved.message')
+                $this->get(TranslatorInterface::class)->trans('oro.tag.controller.tag.saved.message')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
-        return array(
+        return [
             'entity' => $entity,
             'form' => $this->get('oro_tag.form.tag')->createView(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                TagHandler::class,
+                StatisticProvider::class,
+                'oro_tag.form.tag' => Form::class,
+            ]
         );
     }
 }

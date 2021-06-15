@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActivityBundle\Controller;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Provider\MultiGridProvider;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\UIBundle\Provider\ChainWidgetProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
+ * Serves activity actions.
  * @Route("/activities")
  */
 class ActivityController extends AbstractController
@@ -28,7 +32,7 @@ class ActivityController extends AbstractController
      */
     public function activitiesAction($entity)
     {
-        $widgetProvider = $this->get('oro_activity.widget_provider.activities');
+        $widgetProvider = $this->get(ChainWidgetProvider::class);
 
         $widgets = $widgetProvider->supports($entity)
             ? $widgetProvider->getWidgets($entity)
@@ -56,7 +60,7 @@ class ActivityController extends AbstractController
      */
     public function contextAction($activity, $id)
     {
-        $routingHelper = $this->get('oro_entity.routing_helper');
+        $routingHelper = $this->get(EntityRoutingHelper::class);
         $entity        = $routingHelper->getEntity($activity, $id);
         $entityClass   = $routingHelper->resolveEntityClass($activity);
 
@@ -64,7 +68,7 @@ class ActivityController extends AbstractController
             throw new AccessDeniedException();
         }
 
-        $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')
+        $entityClassAlias = $this->get(EntityAliasResolver::class)
             ->getPluralAlias($entityClass);
 
         return [
@@ -105,19 +109,30 @@ class ActivityController extends AbstractController
         return $this->getMultiGridProvider()->getEntitiesData($targetClasses);
     }
 
-    /**
-     * @return ActivityManager
-     */
-    protected function getActivityManager()
+    protected function getActivityManager(): ActivityManager
     {
-        return $this->get('oro_activity.manager');
+        return $this->get(ActivityManager::class);
+    }
+
+    protected function getMultiGridProvider(): MultiGridProvider
+    {
+        return $this->get(MultiGridProvider::class);
     }
 
     /**
-     * @return MultiGridProvider
+     * {@inheritdoc}
      */
-    protected function getMultiGridProvider()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_datagrid.multi_grid_provider');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ChainWidgetProvider::class,
+                EntityRoutingHelper::class,
+                EntityAliasResolver::class,
+                ActivityManager::class,
+                MultiGridProvider::class,
+            ]
+        );
     }
 }
