@@ -5,10 +5,13 @@ namespace Oro\Bundle\ImapBundle\Controller;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
+use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Controller for IMAP configuration page
@@ -74,12 +78,12 @@ class ConnectionController extends AbstractController
      */
     public function getFormAction()
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $request = $this->get('request_stack')->getCurrentRequest();
         $type = $request->get('type');
         $token = $request->get('accessToken');
         $formParentName = $request->get('formParentName');
 
-        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
+        $connectionControllerManager = $this->get(ConnectionControllerManager::class);
         $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
 
         if ($token) {
@@ -173,7 +177,7 @@ class ConnectionController extends AbstractController
         // Check if there are some nested errors
         if ($nestedErrors->count() || null === $form->getData()) {
             return [
-                $this->get('translator')->trans('oro.imap.connection.malformed_parameters.error')
+                $this->get(TranslatorInterface::class)->trans('oro.imap.connection.malformed_parameters.error')
             ];
         }
 
@@ -203,7 +207,7 @@ class ConnectionController extends AbstractController
 
         if ($origin->getImapHost() !== null) {
             $response['imap'] = [];
-            $password = $this->get('oro_security.encoder.default')->decryptData($origin->getPassword());
+            $password = $this->get(DefaultCrypter::class)->decryptData($origin->getPassword());
 
             $config = new ImapConfig(
                 $origin->getImapHost(),
@@ -214,7 +218,7 @@ class ConnectionController extends AbstractController
             );
 
             try {
-                $connector = $this->get('oro_imap.connector.factory')->createImapConnector($config);
+                $connector = $this->get(ImapConnectorFactory::class)->createImapConnector($config);
                 $this->manager = new ImapEmailFolderManager(
                     $connector,
                     $this->getDoctrine()->getManager(),
@@ -241,7 +245,8 @@ class ConnectionController extends AbstractController
                     sprintf('Could not retrieve folders via imap because of "%s"', $e->getMessage())
                 );
 
-                $response['errors'] = $this->get('translator')->trans('oro.imap.connection.retrieve_folders.error');
+                $translator = $this->get(TranslatorInterface::class);
+                $response['errors'] = $translator->trans('oro.imap.connection.retrieve_folders.error');
             }
         }
 
@@ -250,5 +255,21 @@ class ConnectionController extends AbstractController
         }
 
         return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                ImapConnectorFactory::class,
+                ConnectionControllerManager::class,
+                DefaultCrypter::class,
+            ]
+        );
     }
 }

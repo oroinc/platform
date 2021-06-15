@@ -105,6 +105,9 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
+    Oro\Bundle\UserBundle\Entity\Manager\StatusManager:
+        alias: oro_user.status_manager
+
     oro_user.status_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\StatusManager
         public: true
@@ -308,6 +311,9 @@ services:
         tags:
             - { name: oro_entity.delete_handler_extension, entity: Oro\Bundle\UserBundle\Entity\Role }
 
+    Oro\Bundle\UserBundle\Handler\ResetPasswordHandler:
+        alias: oro_user.handler.reset_password_handler
+
     oro_user.handler.reset_password_handler:
         class: Oro\Bundle\UserBundle\Handler\ResetPasswordHandler
         public: true
@@ -397,6 +403,9 @@ services:
             - '@doctrine'
             - '@oro_security.acl_helper'
             - '@oro_locale.dql.formatter.name'
+
+    Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider:
+        alias: oro_user.provider.role_privilege_category_provider
 
     oro_user.provider.role_privilege_category_provider:
         class: Oro\Bundle\UserBundle\Provider\RolePrivilegeCategoryProvider
@@ -502,6 +511,9 @@ services:
 
     Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
         alias: oro_user.provider.user_config_form_provider
+
+    Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider:
+        alias: oro_user.provider.user_logging_info_provider
 
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider

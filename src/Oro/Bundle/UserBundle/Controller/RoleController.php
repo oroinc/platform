@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Doctrine\ORM\EntityManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
+use Oro\Bundle\SyncBundle\Client\WebsocketClient;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler;
 use Oro\Bundle\UserBundle\Provider\RolePrivilegeCapabilityProvider;
@@ -11,6 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This controller covers CRUD functionality for Role entity.
@@ -117,21 +122,21 @@ class RoleController extends AbstractController
     protected function update(Role $role)
     {
         /** @var AclRoleHandler $aclRoleHandler */
-        $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler = $this->get(AclRoleHandler::class);
         $aclRoleHandler->createForm($role);
 
         if ($aclRoleHandler->process($role)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.role.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.role.message.saved')
             );
 
-            if ($this->get('oro_sync.client.connection_checker')->checkConnection()) {
-                $publisher = $this->get('oro_sync.websocket_client');
+            if ($this->get(ConnectionChecker::class)->checkConnection()) {
+                $publisher = $this->get(WebsocketClient::class);
                 $publisher->publish('oro/outdated_user_page', ['role' => $role->getRole()]);
             }
 
-            return $this->get('oro_ui.router')->redirect($role);
+            return $this->get(Router::class)->redirect($role);
         }
 
         $form = $aclRoleHandler->createView();
@@ -144,7 +149,7 @@ class RoleController extends AbstractController
                 'data' => $tabs
             ],
             'capabilitySetOptions' => $this->getRolePrivilegeCapabilityProvider()->getCapabilitySetOptions($role),
-            'privilegesConfig' => $this->container->getParameter('oro_user.privileges'),
+            'privilegesConfig' => $this->getParameter('oro_user.privileges'),
             'allow_delete' =>
                 $role->getId() &&
                 !$this->get('doctrine.orm.entity_manager')
@@ -156,16 +161,36 @@ class RoleController extends AbstractController
     /**
      * @return RolePrivilegeCategoryProvider
      */
-    protected function getRolePrivilegeCategoryProvider()
+    protected function getRolePrivilegeCategoryProvider(): RolePrivilegeCategoryProvider
     {
-        return $this->get('oro_user.provider.role_privilege_category_provider');
+        return $this->get(RolePrivilegeCategoryProvider::class);
     }
 
     /**
      * @return RolePrivilegeCapabilityProvider
      */
-    protected function getRolePrivilegeCapabilityProvider()
+    protected function getRolePrivilegeCapabilityProvider(): RolePrivilegeCapabilityProvider
     {
-        return $this->get('oro_user.provider.role_privilege_capability_provider');
+        return $this->get(RolePrivilegeCapabilityProvider::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                RolePrivilegeCategoryProvider::class,
+                RolePrivilegeCapabilityProvider::class,
+                AclRoleHandler::class,
+                ConnectionChecker::class,
+                WebsocketClient::class,
+                'doctrine.orm.entity_manager' => EntityManager::class,
+            ]
+        );
     }
 }

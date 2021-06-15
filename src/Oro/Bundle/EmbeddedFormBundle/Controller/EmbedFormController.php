@@ -8,9 +8,11 @@ use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,8 +49,7 @@ class EmbedFormController extends AbstractController
 
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
-        /** @var EmbeddedFormManager $formManager */
-        $formManager = $this->get('oro_embedded_form.manager');
+        $formManager = $this->get(EmbeddedFormManager::class);
         $form        = $formManager->createForm($formEntity->getFormType());
 
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
@@ -65,7 +66,7 @@ class EmbedFormController extends AbstractController
                 $data = [];
             }
             $event = new EmbeddedFormSubmitBeforeEvent($data, $formEntity);
-            $eventDispatcher = $this->get('event_dispatcher');
+            $eventDispatcher = $this->get(EventDispatcherInterface::class);
             $eventDispatcher->dispatch($event, EmbeddedFormSubmitBeforeEvent::EVENT_NAME);
             $this->submitPostPutRequest($form, $request);
 
@@ -79,7 +80,7 @@ class EmbedFormController extends AbstractController
             /**
              * Set owner ID (current organization) to concrete form entity
              */
-            $configProvider = $this->get('oro_entity_config.provider.ownership');
+            $configProvider = $this->get(ConfigProvider::class);
             $entityConfig = $configProvider->getConfig(get_class($entity));
             $formEntityConfig = $configProvider->getConfig(get_class($formEntity));
 
@@ -105,8 +106,7 @@ class EmbedFormController extends AbstractController
             return $redirectResponse;
         }
 
-        /** @var EmbedFormLayoutManager $layoutManager */
-        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layoutManager = $this->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($isInline);
 
@@ -131,8 +131,7 @@ class EmbedFormController extends AbstractController
         );
         $this->setCorsHeaders($formEntity, $request, $response);
 
-        /** @var EmbedFormLayoutManager $layoutManager */
-        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layoutManager = $this->get(EmbedFormLayoutManager::class);
 
         $layoutManager->setInline($request->query->getBoolean('inline'));
 
@@ -177,5 +176,22 @@ class EmbedFormController extends AbstractController
                 break;
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                'doctrine.orm.entity_manager' => EntityManager::class,
+                EmbeddedFormManager::class,
+                EventDispatcherInterface::class,
+                EmbedFormLayoutManager::class,
+                ConfigProvider::class,
+            ]
+        );
     }
 }

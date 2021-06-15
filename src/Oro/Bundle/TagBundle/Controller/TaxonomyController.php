@@ -5,10 +5,14 @@ namespace Oro\Bundle\TagBundle\Controller;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\TagBundle\Entity\Taxonomy;
+use Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD for tag taxonomies.
@@ -32,9 +36,9 @@ class TaxonomyController extends AbstractController
      */
     public function indexAction()
     {
-        return array(
+        return [
             'entity_class' => Taxonomy::class
-        );
+        ];
     }
 
     /**
@@ -102,18 +106,34 @@ class TaxonomyController extends AbstractController
      */
     protected function update(Taxonomy $entity)
     {
-        if ($this->get('oro_tag.form.handler.taxonomy')->process($entity)) {
+        if ($this->get(TaxonomyHandler::class)->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.taxonomy.controller.saved.message')
+                $this->get(TranslatorInterface::class)->trans('oro.taxonomy.controller.saved.message')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
-        return array(
+        return [
             'entity' => $entity,
             'form' => $this->get('oro_tag.form.taxonomy')->createView(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                'oro_tag.form.taxonomy' => Form::class,
+                TaxonomyHandler::class,
+            ]
         );
     }
 }

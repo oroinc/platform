@@ -15,3 +15,23 @@ services:
         tags:
             - { name: 'container.service_subscriber' }
             - { name: 'container.service_subscriber', id: oro_navigation.manager.menu_update, key: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager }
+
+    Oro\Bundle\NavigationBundle\Controller\GlobalMenuController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }
+            - { name: 'container.service_subscriber', id: oro_navigation.manager.menu_update, key: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager }
+
+    Oro\Bundle\NavigationBundle\Controller\UserMenuController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }
+            - { name: 'container.service_subscriber', id: oro_navigation.manager.menu_update, key: Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager }
+
+    Oro\Bundle\NavigationBundle\Controller\ShortcutController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: 'container.service_subscriber' }

@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages FormBundle service configuration
+ */
 class OroFormExtension extends Extension
 {
     /**
@@ -22,6 +25,7 @@ class OroFormExtension extends Extension
         $loader->load('form_type.yml');
         $loader->load('importexport.yml');
         $loader->load('services.yml');
+        $loader->load('controllers.yml');
 
         if (isset($config['html_purifier_modes'])) {
             $definition = $container->getDefinition('oro_form.provider.html_tag_provider');

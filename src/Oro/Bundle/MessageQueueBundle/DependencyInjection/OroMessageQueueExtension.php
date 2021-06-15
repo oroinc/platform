@@ -42,6 +42,7 @@ class OroMessageQueueExtension extends Extension
         $loader->load('log.yml');
         $loader->load('job.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         if (isset($config['client'])) {
             $loader->load('client.yml');

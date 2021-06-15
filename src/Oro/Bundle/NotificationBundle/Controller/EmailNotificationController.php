@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NotificationBundle\Controller;
 
+use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Form\Type\EmailNotificationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -9,6 +10,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for EmailNotification entity.
@@ -92,13 +94,30 @@ class EmailNotificationController extends AbstractController
             $form = $this->createForm(EmailNotificationType::class, $form->getData());
         }
 
-        return $this->get('oro_form.update_handler')
+        $saveMessage = $this->get(TranslatorInterface::class)
+            ->trans('oro.notification.controller.emailnotification.saved.message');
+
+        return $this->get(UpdateHandlerFacade::class)
             ->update(
                 $entity,
                 $form,
-                $this->get('translator')->trans('oro.notification.controller.emailnotification.saved.message'),
+                $saveMessage,
                 $request,
                 'oro_notification.form.handler.email_notification'
             );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                UpdateHandlerFacade::class,
+                TranslatorInterface::class,
+            ]
+        );
     }
 }

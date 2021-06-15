@@ -15,6 +15,9 @@ services:
         tags:
             - { name: oro_datagrid.extension }
 
+    Oro\Bundle\FilterBundle\Filter\FilterBag:
+        alias: oro_filter.extension.orm_filter_bag
+
     oro_filter.extension.orm_filter_bag:
         class: Oro\Bundle\FilterBundle\Filter\FilterBag
         public: true
