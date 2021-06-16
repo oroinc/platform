@@ -47,7 +47,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
             sprintf('Expected argument of type "%s", "%s" given', FieldNameLength::class, Length::class)
         );
 
-        $this->validator->validate(self::STRING, new Length(['min' => 1]));
+        $this->validator->validate(self::STRING, new Length(['min' => 1, 'allowEmptyString' => false]));
     }
 
     /**

@@ -19,8 +19,8 @@ class TestObject
 
     /**
      * @var string
-     * @Assert\Length(min=5, groups={"api"})
-     * @Assert\Length(min=3, groups={"ui"})
+     * @Assert\Length(min=5, allowEmptyString="false", groups={"api"})
+     * @Assert\Length(min=3, allowEmptyString="false", groups={"ui"})
      */
     private $description;
 
