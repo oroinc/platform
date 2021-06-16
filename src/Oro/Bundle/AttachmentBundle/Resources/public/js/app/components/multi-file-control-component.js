@@ -51,8 +51,8 @@ define(function(require) {
                 this.$lineItemSortOrder.val(1);
             }
 
-            this.$el.on('content:changed', _.bind(this._onChangeContent, this));
-            this.$el.on('content:remove', _.bind(this._onRemoveContent, this));
+            this.$el.on('content:changed', this._onChangeContent.bind(this));
+            this.$el.on('content:remove', this._onRemoveContent.bind(this));
 
             this._hideAddItemButton();
         },

@@ -20,3 +20,11 @@ services:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
+
+    Oro\Bundle\EntityConfigBundle\Controller\AttributeFamilyController:
+        calls:
+            - [setContainer, ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.extend }
+            - { name: container.service_subscriber, id: oro_entity_config.provider.attribute }

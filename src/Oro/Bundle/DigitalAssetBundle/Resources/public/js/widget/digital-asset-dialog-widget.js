@@ -76,7 +76,7 @@ define(function(require) {
         initializeWidget: function(options) {
             DigitalAssetDialogWidget.__super__.initializeWidget.call(this, options);
 
-            this.on('formReset', _.bind(this._onFormReset, this));
+            this.on('formReset', this._onFormReset.bind(this));
         },
 
         /**
@@ -126,15 +126,15 @@ define(function(require) {
 
             if (this.deferredRender) {
                 this.deferredRender
-                    .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(_.bind(function(error) {
+                    .done(this._triggerContentLoadEvents.bind(this, content))
+                    .fail(error => {
                         if (!this.disposing && !this.disposed) {
                             if (error) {
                                 errorHandler.showErrorInConsole(error);
                             }
                             this._triggerContentLoadEvents();
                         }
-                    }, this));
+                    });
             } else {
                 this._triggerContentLoadEvents();
             }

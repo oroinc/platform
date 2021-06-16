@@ -56,7 +56,7 @@ define(function(require, exports, module) {
 
             ActionManagerView.__super__.initialize.call(this, options);
 
-            this.options.$tree.one('ready.jstree.actions', _.bind(this.collectActions, this));
+            this.options.$tree.one('ready.jstree.actions', this.collectActions.bind(this));
         },
 
         collectActions: function() {

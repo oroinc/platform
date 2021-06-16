@@ -6,6 +6,9 @@ services:
         tags:
             - { name: form.type, alias: oro_comment_api }
 
+    Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi:
+        alias: oro_comment.form.comment.api
+
     oro_comment.form.comment.api:
         class: Symfony\Component\Form\Form
         public: true

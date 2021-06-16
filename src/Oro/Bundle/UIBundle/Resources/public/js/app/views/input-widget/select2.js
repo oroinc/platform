@@ -68,10 +68,8 @@ define(function(require) {
         resolveOptions: function(options) {
             Select2InputWidgetView.__super__.resolveOptions.call(this, options);
             if (this.initializeOptions.adaptContainerCssClass) {
-                this.initializeOptions.adaptContainerCssClass = _.bind(
-                    this.initializeOptions.adaptContainerCssClass,
-                    this
-                );
+                this.initializeOptions.adaptContainerCssClass =
+                    this.initializeOptions.adaptContainerCssClass.bind(this);
             }
 
             this.initializeOptions.closeOnOverlap = this.closeOnOverlap;

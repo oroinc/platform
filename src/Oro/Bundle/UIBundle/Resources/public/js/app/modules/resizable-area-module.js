@@ -1,10 +1,6 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import ResizableArea from 'oroui/js/app/plugins/plugin-resizable-area';
 
-    const $ = require('jquery');
-    const ResizableArea = require('oroui/js/app/plugins/plugin-resizable-area');
-
-    $(document).on('initLayout', function(e) {
-        ResizableArea.setPreviousState($(e.target));
-    });
+$(document).on('initLayout', function(e) {
+    ResizableArea.setPreviousState($(e.target));
 });

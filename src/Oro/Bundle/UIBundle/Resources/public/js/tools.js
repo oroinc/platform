@@ -7,8 +7,6 @@ define(function(require) {
     const tools = {};
     const iOS = /(iPad|iPhone)/.test(navigator.userAgent);
     const iPadOS = !!(navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
-    const edge = /(Edge\/)/.test(navigator.userAgent);
-    const ie11 = /(Trident\/)/.test(navigator.userAgent);
 
     /**
      * @export oroui/js/tools
@@ -249,20 +247,6 @@ define(function(require) {
          */
         isIOS: function() {
             return iOS || iPadOS;
-        },
-
-        /**
-         * Are we currently on IE 11 browser
-         */
-        isIE11: function() {
-            return ie11;
-        },
-
-        /**
-         * Are we currently on EDGE browser
-         */
-        isEDGE: function() {
-            return edge;
         },
 
         /**

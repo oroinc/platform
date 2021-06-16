@@ -124,8 +124,8 @@ define(function(require) {
             options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
             this.$frontTimeField.attr(options.timeInputAttrs);
             this.$frontTimeField.attr('data-fake-front-field', '');
-            this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
-            this.$frontTimeField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.$frontTimeField.on('keyup change', this.updateOrigin.bind(this));
+            this.$frontTimeField.on('keypress keyup change focus blur', this.checkEmpty.bind(this));
             this.checkEmpty();
             this.$frontDateField.on('blur', function(e) {
                 $(this).parent().removeClass(DATEPICKER_DROPDOWN_CLASS_NAME + ' ' + DATEPICKER_DROPUP_CLASS_NAME);

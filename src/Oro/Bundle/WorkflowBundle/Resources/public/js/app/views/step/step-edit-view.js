@@ -97,7 +97,7 @@ define(function(require) {
                     stateEnabled: false,
                     incrementalPosition: false,
                     dialogOptions: {
-                        close: _.bind(this.onCancel, this),
+                        close: this.onCancel.bind(this),
                         width: 800,
                         modal: true
                     }
@@ -110,7 +110,7 @@ define(function(require) {
             // Disable widget submit handler and set our own instead
             this.widget.form.off('submit');
             this.widget.form.validate({
-                submitHandler: _.bind(this.onStepAdd, this),
+                submitHandler: this.onStepAdd.bind(this),
                 ignore: '[type="hidden"]',
                 highlight: function(element) {
                     const tabContent = $(element).closest('.tab-pane');

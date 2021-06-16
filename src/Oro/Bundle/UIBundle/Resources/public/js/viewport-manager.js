@@ -51,7 +51,7 @@ define(function(require, exports, module) {
 
             this.viewport = {
                 isMobile: _.isMobile(),
-                isApplicable: _.bind(this.isApplicable, this)
+                isApplicable: this.isApplicable.bind(this)
             };
 
             mediator.on('layout:reposition', _.debounce(this._onResize, 50), viewportManager);

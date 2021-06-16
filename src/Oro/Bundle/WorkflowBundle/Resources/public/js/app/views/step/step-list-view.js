@@ -53,7 +53,7 @@ define(function(require) {
 
         addAllItems: function(collection) {
             this.resetView();
-            collection.each(_.bind(this.addItem, this));
+            collection.each(this.addItem.bind(this));
         },
 
         getCollection: function() {

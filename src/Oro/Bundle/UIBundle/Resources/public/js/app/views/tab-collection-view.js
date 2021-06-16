@@ -65,7 +65,7 @@ define(function(require, exports, module) {
             TabCollectionView.__super__.render.call(this);
 
             this.$el.attr('data-layout', 'separate');
-            this.initLayout().done(_.bind(this.handleLayoutInit, this));
+            this.initLayout().done(this.handleLayoutInit.bind(this));
         },
 
         handleLayoutInit: function() {

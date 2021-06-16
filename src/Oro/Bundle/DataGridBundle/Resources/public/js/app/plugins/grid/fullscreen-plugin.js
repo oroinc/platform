@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         listenFilterManager: function() {
-            const debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
+            const debouncedLayoutUpdate = _.debounce(this.updateLayout.bind(this), 10);
             this.listenTo(this.main.filterManager, 'afterUpdateList', debouncedLayoutUpdate);
             this.listenTo(this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
         },
@@ -52,7 +52,7 @@ define(function(require) {
                 // not ready to apply layout
                 // try to do that at next js cycle1
                 clearTimeout(this.updateLayoutTimeoutId);
-                this.updateLayoutTimeoutId = _.delay(_.bind(this.updateLayout, this), 0);
+                this.updateLayoutTimeoutId = _.delay(this.updateLayout.bind(this), 0);
                 return;
             } else {
                 clearTimeout(this.updateLayoutTimeoutId);

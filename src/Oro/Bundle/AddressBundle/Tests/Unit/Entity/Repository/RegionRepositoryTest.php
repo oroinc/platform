@@ -3,9 +3,12 @@
 namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\Common\EventManager;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
+use Gedmo\Exception\RuntimeException;
 use Gedmo\Translatable\TranslatableListener;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository;
@@ -13,32 +16,22 @@ use Oro\Component\DoctrineUtils\ORM\Walker\TranslatableSqlWalker;
 
 class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_NAME = 'RegionEntityName';
+    private const ENTITY_NAME = 'RegionEntityName';
 
-    /**
-     * @var RegionRepository
-     */
-    protected $repository;
+    /** @var RegionRepository */
+    private $repository;
 
-    /**
-     * @var TranslatableListener|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translatableListener;
+    /** @var TranslatableListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $translatableListener;
 
-    /**
-     * @var EventManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $eventManager;
+    /** @var EventManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventManager;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var array
-     */
-    protected $testRegions = ['one', 'two', 'three'];
+    /** @var array */
+    private $testRegions = ['one', 'two', 'three'];
 
     protected function setUp(): void
     {
@@ -70,10 +63,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('getListeners')
             ->willReturn([[$this->translatableListener]]);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['setHint', 'execute'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->exactly(2))
             ->method('setHint')
             ->withConsecutive(
@@ -87,28 +77,36 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
                 ]
             );
         $query->expects($this->once())->method('execute')
-            ->will($this->returnValue($this->testRegions));
+            ->willReturn($this->testRegions);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['select', 'from', 'where', 'orderBy', 'setParameter', 'getQuery'])
-            ->getMock();
-        $queryBuilder->expects($this->once())->method('select')->with($entityAlias)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())->method('from')->with(self::ENTITY_NAME, $entityAlias)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())->method('where')->with('r.country = :country')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())->method('orderBy')->with('r.name', 'ASC')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())->method('setParameter')->with('country', $country)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())->method('getQuery')
-            ->will($this->returnValue($query));
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with($entityAlias)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(self::ENTITY_NAME, $entityAlias)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('r.country = :country')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->with('r.name', 'ASC')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('country', $country)
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
 
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $actualRegions = $this->repository->getCountryRegions($country);
         $this->assertEquals($this->testRegions, $actualRegions);
@@ -116,7 +114,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCountryRegionsException()
     {
-        $this->expectException(\Gedmo\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The translation listener could not be found');
 
         $country = new Country('iso2Code');
@@ -125,10 +123,7 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
             ->method('getListeners')
             ->willReturn([[]]);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['setHint', 'execute'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())
             ->method('setHint')
             ->with(
@@ -136,21 +131,29 @@ class RegionRepositoryTest extends \PHPUnit\Framework\TestCase
                 TranslatableSqlWalker::class
             );
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['select', 'from', 'where', 'orderBy', 'setParameter', 'getQuery'])
-            ->getMock();
-        $queryBuilder->expects($this->once())->method('select')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('from')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('where')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('orderBy')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('setParameter')->willReturnSelf();
-        $queryBuilder->expects($this->once())->method('getQuery')
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('from')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('orderBy')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->willReturnSelf();
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
             ->willReturn($query);
 
         $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
-            ->will($this->returnValue($queryBuilder));
+            ->willReturn($queryBuilder);
 
         $this->repository->getCountryRegions($country);
     }

@@ -79,7 +79,7 @@ define(function(require) {
                 type: 'POST',
                 url: this.getUrl(),
                 data: $.param(this.prepareData(data)),
-                success: _.bind(function(response) {
+                success: response => {
                     if (response.imap) {
                         this.showMessage('success', 'oro.imap.connection.imap.success', $messageContainer);
                         this.model.set('imap', response.imap);
@@ -88,9 +88,9 @@ define(function(require) {
                         this.showMessage('success', 'oro.imap.connection.smtp.success', $messageContainer);
                         this.model.set('smtp', response.smtp);
                     }
-                }, this),
+                },
                 errorHandlerMessage: false,
-                error: _.bind(function(response) {
+                error: response => {
                     const responseJSON = response.responseJSON;
                     _.each(responseJSON.errors, function(errorMessage) {
                         messenger.notificationFlashMessage('error', errorMessage, {
@@ -98,7 +98,7 @@ define(function(require) {
                             delay: 0
                         });
                     });
-                }, this),
+                },
                 complete: function() {
                     mediator.execute('hideLoading');
                 }
@@ -117,12 +117,12 @@ define(function(require) {
             const result = [];
             const start = this.formPrefix.length;
             if (start > 0) {
-                _.each(data, _.bind(function(item) {
+                _.each(data, item => {
                     if (item.name.indexOf(this.formPrefix) === 0) {
                         item.name = this.requestPrefix + item.name.substr(start);
                         result.push(item);
                     }
-                }, this));
+                });
                 return result;
             } else {
                 return data;

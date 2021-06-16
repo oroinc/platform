@@ -1,7 +1,6 @@
 define(function(require, exports, module) {
     'use strict';
 
-    const _ = require('underscore');
     const $ = require('jquery');
     const mediator = require('oroui/js/mediator');
 
@@ -59,7 +58,7 @@ define(function(require, exports, module) {
             }
 
             content = content.split('|');
-            content.forEach(_.bind(function(value, i) {
+            content.forEach((value, i) => {
                 const name = value.match(regexp);
                 const varVal = value.match(regexpVal);
                 if (name && varVal) {
@@ -72,7 +71,7 @@ define(function(require, exports, module) {
                     }
                     mediator.trigger('css:breakpoints:fetched', breakpoint);
                 }
-            }, this));
+            });
 
             return breakpoint;
         },

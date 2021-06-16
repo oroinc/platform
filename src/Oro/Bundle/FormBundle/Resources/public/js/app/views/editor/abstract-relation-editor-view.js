@@ -56,7 +56,7 @@ define(function(require) {
             if (options.input_delay) {
                 this.input_delay = options.input_delay;
             }
-            this.debouncedMakeRequest = _.debounce(_.bind(this.makeRequest, this), this.input_delay);
+            this.debouncedMakeRequest = _.debounce(this.makeRequest.bind(this), this.input_delay);
         },
 
         getAvailableOptions: function(options) {
@@ -72,34 +72,33 @@ define(function(require) {
         },
 
         makeRequest: function(options, autoCompleteUrlParameters) {
-            const _this = this;
             if (this.disposed) {
                 return;
             }
             this.currentRequest = this.autocompleteApiAccessor.send(autoCompleteUrlParameters);
-            this.currentRequest.done(function(response) {
-                if (_this.disposed) {
+            this.currentRequest.done(response => {
+                if (this.disposed) {
                     return;
                 }
-                if (_this.currentTerm === options.term) {
+                if (this.currentTerm === options.term) {
                     if (options.term === '' && options.page === 1) {
-                        _this.availableChoices = _this.addInitialResultItem(response.results);
+                        this.availableChoices = this.addInitialResultItem(response.results);
                     } else if (options.term === '' && options.page !== 1) {
-                        _this.availableChoices = _this.filterInitialResultItem(response.results);
+                        this.availableChoices = this.filterInitialResultItem(response.results);
                     } else {
-                        _this.availableChoices = _.clone(response.results);
+                        this.availableChoices = _.clone(response.results);
                     }
                     options.callback({
-                        results: _this.availableChoices,
+                        results: this.availableChoices,
                         page: autoCompleteUrlParameters.page,
                         term: autoCompleteUrlParameters.term,
                         more: response.more
                     });
                 }
             });
-            this.currentRequest.fail(function(ajax) {
+            this.currentRequest.fail(ajax => {
                 if (ajax.statusText !== 'abort') {
-                    if (!_this.disposed) {
+                    if (!this.disposed) {
                         options.callback({
                             results: [],
                             page: autoCompleteUrlParameters.page,

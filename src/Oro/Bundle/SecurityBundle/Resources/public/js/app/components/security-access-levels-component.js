@@ -50,7 +50,7 @@ define(function(require) {
                         initSelection: function(element, callback) {
                             callback({id: $input.val(), text: $input.data('valueText')});
                         },
-                        query: _.bind(self._select2Query, self, url),
+                        query: self._select2Query.bind(self, url),
                         minimumResultsForSearch: -1
                     }
                 }).on('change.' + self.cid, function(e) {

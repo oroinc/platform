@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const Flotr = require('flotr2');
     const dataFormatter = require('orochart/js/data_formatter');
     const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
@@ -23,7 +22,7 @@ define(function(require) {
          * Sorts chart data
          */
         sortData: function() {
-            this.data.sort(_.bind(function(first, second) {
+            this.data.sort((first, second) => {
                 if (first.label === null || first.label === undefined) {
                     return -1;
                 }
@@ -33,7 +32,7 @@ define(function(require) {
                 const firstLabel = dataFormatter.parseValue(first.label, this.options.data_schema.label.type);
                 const secondLabel = dataFormatter.parseValue(second.label, this.options.data_schema.label.type);
                 return firstLabel - secondLabel;
-            }, this));
+            });
         },
 
         /**

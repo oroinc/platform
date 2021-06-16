@@ -51,7 +51,7 @@ define(function(require) {
 
     EntityFieldsUtil.errorHandler = (function() {
         const message = __('oro.entity.not_exist');
-        const handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
+        const handler = mediator.execute.bind(mediator, 'showErrorMessage', message);
         return _.throttle(handler, 100, {trailing: false});
     }());
 

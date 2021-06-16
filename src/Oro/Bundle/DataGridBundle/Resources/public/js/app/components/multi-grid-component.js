@@ -75,7 +75,7 @@ define(function(require) {
             }
 
             widgetManager.getWidgetInstanceByAlias(gridWidgetName, function(widget) {
-                widget.on('grid-row-select', _.bind(self.onRowSelect, self, widget));
+                widget.on('grid-row-select', self.onRowSelect.bind(self, widget));
             });
         },
 

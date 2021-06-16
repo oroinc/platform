@@ -119,12 +119,12 @@ define(function(require) {
                 // takes in account both class names: passed over options and defined in view's prototype
                 optionsClassName = options.className;
                 prototypeClassName = this.className;
-                options.className = _.bind(function() {
+                options.className = () => {
                     const classes = [];
                     classes.push(_.isFunction(optionsClassName) ? optionsClassName.call(this) : optionsClassName);
                     classes.push(_.isFunction(prototypeClassName) ? prototypeClassName.call(this) : prototypeClassName);
                     return classes.join(' ');
-                }, this);
+                };
             }
             TextEditorView.__super__.constructor.call(this, options);
         },
@@ -174,12 +174,12 @@ define(function(require) {
             TextEditorView.__super__.render.call(this);
             this.$el.addClass(_.result(this, 'className'));
             this.validator = this.$el.validate({
-                submitHandler: _.bind(function(form, e) {
+                submitHandler: (form, e) => {
                     if (e && e.preventDefault) {
                         e.preventDefault();
                     }
                     this.trigger('saveAction');
-                }, this),
+                },
                 errorPlacement: function(error, element) {
                     error.appendTo($(element).closest('.inline-editor-wrapper'));
                 },

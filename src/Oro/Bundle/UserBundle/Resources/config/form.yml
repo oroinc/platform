@@ -1,4 +1,7 @@
 services:
+    Oro\Bundle\UserBundle\Form\Type\UserType:
+        alias: oro_user.form.user
+
     oro_user.form.user:
         class: Symfony\Component\Form\Form
         public: true
@@ -225,6 +228,9 @@ services:
             - '@request_stack'
             - '@doctrine.orm.entity_manager'
 
+    Oro\Bundle\UserBundle\Form\Handler\ResetHandler:
+        alias: oro_user.form.handler.reset
+
     oro_user.form.handler.reset:
         class: Oro\Bundle\UserBundle\Form\Handler\ResetHandler
         public: true
@@ -232,6 +238,9 @@ services:
             - '@oro_user.form.reset'
             - '@request_stack'
             - '@oro_user.manager'
+
+    Oro\Bundle\UserBundle\Form\Handler\StatusHandler:
+        alias: oro_user.form.handler.status
 
     oro_user.form.handler.status:
         class: Oro\Bundle\UserBundle\Form\Handler\StatusHandler
@@ -263,6 +272,9 @@ services:
         calls:
             - [setRequest, ["@=service('request_stack').getCurrentRequest()"]]
             - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
+
+    Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler:
+        alias: oro_user.form.handler.set_password
 
     oro_user.form.handler.set_password:
         class: Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler

@@ -166,6 +166,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $inlineEditor = $cell->findField('value');
 
         self::assertEquals($value, $inlineEditor->getValue());
+        $cell->find('css', 'button[title="Cancel"]')->click();
     }
 
     /**
