@@ -8,6 +8,7 @@ Oro\Bundle\IntegrationBundle\Entity\Channel:
             - Length:
                 min: 3
                 max: 255
+                allowEmptyString: false
         type:
             - NotBlank: ~
         organization:

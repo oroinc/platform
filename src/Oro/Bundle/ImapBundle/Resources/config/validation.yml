@@ -6,19 +6,21 @@ Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
         imapHost:
             - NotBlank:     { groups: [Imap] }
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
                 groups: [Imap]
         imapPort:
-            - NotBlank:     { groups: [Imap] }
+            - NotBlank: { groups: [Imap] }
             - Type:
                 type: integer
                 groups: [Imap]
         smtpHost:
             - NotBlank: { groups: [Smtp] }
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
                 groups: [Smtp]
         smtpPort:
             - NotBlank: { groups: [Smtp] }

@@ -7,6 +7,7 @@ define(function(require) {
     const defaultParam = {
         minMessage: 'This value should be {{ limit }} or more.',
         maxMessage: 'This value should be {{ limit }} or less.',
+        notInRangeMessage: 'This value should be between {{ min }} and {{ max }}.',
         invalidMessage: 'This value should be a valid number.'
     };
 
@@ -35,6 +36,11 @@ define(function(require) {
             param = _.extend({}, defaultParam, param);
             if (isNaN(normalizedValue)) {
                 message = param.invalidMessage;
+            } else if (param.max !== null && param.min !== null &&
+                (normalizedValue < normalizedMin || normalizedValue > normalizedMax)) {
+                message = param.notInRangeMessage;
+                placeholders.max = numberFormatter.formatDecimal(param.max);
+                placeholders.min = numberFormatter.formatDecimal(param.min);
             } else if (param.min !== null && normalizedValue < normalizedMin) {
                 message = param.minMessage;
                 placeholders.limit = numberFormatter.formatDecimal(param.min);
