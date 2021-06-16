@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadDefaultConfig()
+    public function testLoadDefaultConfig(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -18,7 +18,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 [
                     'settings' => [
@@ -33,54 +33,45 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         );
 
         // default renderer name
-        $this->assertTrue(
+        self::assertTrue(
             $container->hasParameter('oro_layout.templating.default'),
             'Failed asserting that default templating parameter is registered'
         );
-        $this->assertEquals(
+        self::assertEquals(
             'twig',
             $container->getParameter('oro_layout.templating.default')
         );
-        // php renderer
-        $this->assertTrue(
-            $container->hasParameter('oro_layout.php.resources'),
-            'Failed asserting that PHP resources parameter is registered'
-        );
-        $this->assertEquals(
-            ['OroLayoutBundle:Layout/php'],
-            $container->getParameter('oro_layout.php.resources')
-        );
         // twig renderer
-        $this->assertTrue(
+        self::assertTrue(
             $container->hasParameter('oro_layout.twig.resources'),
             'Failed asserting that TWIG resources parameter is registered'
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['@OroLayout/Layout/div_layout.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
-        $this->assertTrue(
+        self::assertTrue(
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is registered'
         );
         // layout theme
-        $this->assertNull($container->getParameter('oro_layout.default_active_theme'));
-        $this->assertEquals(
+        self::assertNull($container->getParameter('oro_layout.default_active_theme'));
+        self::assertEquals(
             [
                 '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/theme\.yml$#',
                 '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/config/[^/]+\.yml$#'
             ],
             $container->getDefinition('oro_layout.theme_extension.resource_provider.theme')->getArgument(5)
         );
-        $this->assertEquals(
+        self::assertEquals(
             '[a-zA-Z][a-zA-Z0-9_\-:]*',
             $container->getDefinition('oro_layout.theme_extension.configuration.provider')->getArgument(3)
         );
         // debug option
-        $this->assertEquals('%kernel.debug%', $container->getParameter('oro_layout.debug'));
+        self::assertEquals('%kernel.debug%', $container->getParameter('oro_layout.debug'));
     }
 
-    public function testLoadWithTemplatingAppConfig()
+    public function testLoadWithTemplatingAppConfig(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -89,10 +80,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extensionConfig = [
             [
                 'templating' => [
-                    'default' => 'php',
-                    'php'     => [
-                        'resources' => ['MyBundle:Layout/php']
-                    ],
+                    'default' => 'twig',
                     'twig'    => [
                         'resources' => ['@My/Layout/blocks.html.twig']
                     ]
@@ -104,39 +92,30 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($extensionConfig, $container);
 
         // default renderer name
-        $this->assertTrue(
+        self::assertTrue(
             $container->hasParameter('oro_layout.templating.default'),
             'Failed asserting that default templating parameter is registered'
         );
         $this->assertEquals(
-            'php',
+            'twig',
             $container->getParameter('oro_layout.templating.default')
         );
-        // php renderer
-        $this->assertTrue(
-            $container->hasParameter('oro_layout.php.resources'),
-            'Failed asserting that PHP resources parameter is registered'
-        );
-        $this->assertEquals(
-            ['OroLayoutBundle:Layout/php', 'MyBundle:Layout/php'],
-            $container->getParameter('oro_layout.php.resources')
-        );
         // twig renderer
-        $this->assertTrue(
+        self::assertTrue(
             $container->hasParameter('oro_layout.twig.resources'),
             'Failed asserting that TWIG resources parameter is registered'
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['@OroLayout/Layout/div_layout.html.twig', '@My/Layout/blocks.html.twig'],
             $container->getParameter('oro_layout.twig.resources')
         );
-        $this->assertTrue(
+        self::assertTrue(
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is registered'
         );
     }
 
-    public function testLoadWithDisabledTwigRenderer()
+    public function testLoadWithDisabledTwigRenderer(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -145,7 +124,6 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extensionConfig = [
             [
                 'templating' => [
-                    'php'  => false,
                     'twig' => false
                 ]
             ]
@@ -155,31 +133,26 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($extensionConfig, $container);
 
         // default renderer name
-        $this->assertTrue(
+        self::assertTrue(
             $container->hasParameter('oro_layout.templating.default'),
             'Failed asserting that default templating parameter is registered'
         );
-        $this->assertEquals(
+        self::assertEquals(
             'twig',
             $container->getParameter('oro_layout.templating.default')
         );
-        // php renderer
-        $this->assertFalse(
-            $container->hasParameter('oro_layout.php.resources'),
-            'Failed asserting that PHP resources parameter is not registered'
-        );
         // twig renderer
-        $this->assertFalse(
+        self::assertFalse(
             $container->hasParameter('oro_layout.twig.resources'),
             'Failed asserting that TWIG resources parameter is not registered'
         );
-        $this->assertFalse(
+        self::assertFalse(
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is not registered'
         );
     }
 
-    public function testLoadWithActiveTheme()
+    public function testLoadWithActiveTheme(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -194,10 +167,10 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
 
-        $this->assertEquals('test', $container->getParameter('oro_layout.default_active_theme'));
+        self::assertEquals('test', $container->getParameter('oro_layout.default_active_theme'));
     }
 
-    public function testLoadWithDebugOption()
+    public function testLoadWithDebugOption(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
@@ -212,12 +185,13 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroLayoutExtension();
         $extension->load($extensionConfig, $container);
 
-        $this->assertTrue($container->getParameter('oro_layout.debug'));
+        self::assertTrue($container->getParameter('oro_layout.debug'));
     }
 
-    public function testGetAlias()
+    public function testGetAlias(): void
     {
         $extension = new OroLayoutExtension();
-        $this->assertEquals('oro_layout', $extension->getAlias());
+
+        self::assertEquals('oro_layout', $extension->getAlias());
     }
 }

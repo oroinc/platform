@@ -16,7 +16,7 @@ class NewHtmlFormatter extends HtmlFormatter
     protected function renderOne(array $data)
     {
         // use overwritten template to render correct URL to documentation root
-        return $this->engine->render('@OroApi/ApiDoc/resource.html.twig', array_merge(
+        return $this->twig->render('@OroApi/ApiDoc/resource.html.twig', array_merge(
             [
                 'data'           => $this->reformatData($data),
                 'displayContent' => true,
@@ -31,7 +31,7 @@ class NewHtmlFormatter extends HtmlFormatter
     protected function render(array $collection)
     {
         // use overwritten template to render correct URL to documentation root
-        return $this->engine->render('@OroApi/ApiDoc/resources.html.twig', array_merge(
+        return $this->twig->render('@OroApi/ApiDoc/resources.html.twig', array_merge(
             [
                 'resources' => $this->reformatDocData($collection),
                 'actions'   => $this->getActions($collection)
@@ -99,7 +99,7 @@ class NewHtmlFormatter extends HtmlFormatter
     {
         // reformat parameters (input data)
         if (array_key_exists('parameters', $data)) {
-            $data['documentation'] .= $this->engine->render(
+            $data['documentation'] .= $this->twig->render(
                 '@OroApi/ApiDoc/input.html.twig',
                 ['data' => $data['parameters']]
             );
@@ -108,7 +108,7 @@ class NewHtmlFormatter extends HtmlFormatter
 
         // reformat output
         if (array_key_exists('response', $data)) {
-            $data['documentation'] .= $this->engine->render(
+            $data['documentation'] .= $this->twig->render(
                 '@OroApi/ApiDoc/response.html.twig',
                 ['data' => $data['response']]
             );

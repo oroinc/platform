@@ -53,9 +53,8 @@ services:
             - '@Psr\Container\ContainerInterface'
             - '@Doctrine\Inflector\Inflector'
         tags:
-            - { name: container.service_subscriber, id: 'templating' }
+            - { name: container.service_subscriber, id: 'twig' }
             - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
-            - { name: container.service_subscriber, id: 'templating.name_parser' }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:

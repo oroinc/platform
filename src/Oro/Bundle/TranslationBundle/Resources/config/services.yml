@@ -7,7 +7,7 @@ services:
         public: true
         arguments:
             - '@translator.default'
-            - '@templating'
+            - '@twig'
             - '@@OroTranslation/Translation/translation.js.twig'
             - ""
         lazy: true

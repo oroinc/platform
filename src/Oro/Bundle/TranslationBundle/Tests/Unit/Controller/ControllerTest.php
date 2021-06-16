@@ -4,16 +4,17 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Controller;
 
 use Oro\Bundle\TranslationBundle\Controller\Controller;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
 
 class ControllerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
-    /** @var EngineInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $templating;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    protected $twig;
 
     /** @var array */
     protected $translations = [
@@ -30,48 +31,48 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);
-        $this->templating = $this->createMock(EngineInterface::class);
+        $this->twig = $this->createMock(Environment::class);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Please provide valid twig template as third argument');
 
-        new Controller($this->translator, $this->templating, '', []);
+        new Controller($this->translator, $this->twig, '', []);
     }
 
-    public function testIndexAction()
+    public function testIndexAction(): void
     {
         $content = 'CONTENT';
 
-        $this->templating->expects($this->once())
+        $this->twig->expects(self::once())
             ->method('render')
-            ->will($this->returnValue($content));
+            ->willReturn($content);
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('getTranslations')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
 
         $controller = new Controller(
             $this->translator,
-            $this->templating,
+            $this->twig,
             '@OroTranslation/Translation/translation.js.twig',
             []
         );
 
         /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request->expects(self::once())
             ->method('getMimeType')
             ->with('json')
-            ->will($this->returnValue('JSON'));
+            ->willReturn('JSON');
 
         $response = $controller->indexAction($request, 'en');
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertEquals($content, $response->getContent());
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('JSON', $response->headers->get('Content-Type'));
+        self::assertInstanceOf(Response::class, $response);
+        self::assertEquals($content, $response->getContent());
+        self::assertEquals(200, $response->getStatusCode());
+        self::assertEquals('JSON', $response->headers->get('Content-Type'));
     }
 
     /**
@@ -80,47 +81,43 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
      * @param $params
      * @param $expected
      */
-    public function testRenderJsTranslationContent($params, $expected)
+    public function testRenderJsTranslationContent($params, $expected): void
     {
-        $this->templating
-            ->expects($this->any())
+        $this->twig
+            ->expects(self::any())
             ->method('render')
-            ->will(
-                $this->returnCallback(
-                    function () {
-                        $params = func_get_arg(1);
-                        return $params['json'];
-                    }
-                )
+            ->willReturnCallback(
+                function () {
+                    $params = func_get_arg(1);
+                    return $params['json'];
+                }
             );
 
 
         $this->translator
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getTranslations')
-            ->will(
-                $this->returnCallback(
-                    function ($domains) {
-                        return array_intersect_key($this->translations, array_flip($domains));
-                    }
-                )
+            ->willReturnCallback(
+                function ($domains) {
+                    return array_intersect_key($this->translations, array_flip($domains));
+                }
             );
 
         $controller = new Controller(
             $this->translator,
-            $this->templating,
+            $this->twig,
             '@OroTranslation/Translation/translation.js.twig',
             []
         );
         $result = call_user_func_array([$controller, 'renderJsTranslationContent'], $params);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
      * @return array
      */
-    public function dataProviderRenderJsTranslationContent()
+    public function dataProviderRenderJsTranslationContent(): array
     {
         return [
             [

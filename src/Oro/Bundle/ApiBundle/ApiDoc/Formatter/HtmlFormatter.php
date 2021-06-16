@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
 use Oro\Bundle\ApiBundle\ApiDoc\SecurityContextInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Symfony\Component\Config\FileLocatorInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Base HTML formatter that can be used for all types of REST API views.
@@ -23,8 +23,8 @@ class HtmlFormatter extends AbstractFormatter
     /** @var FileLocatorInterface */
     protected $fileLocator;
 
-    /** @var EngineInterface */
-    protected $engine;
+    /** @var Environment */
+    protected $twig;
 
     /** @var string */
     protected $apiName;
@@ -88,11 +88,11 @@ class HtmlFormatter extends AbstractFormatter
     }
 
     /**
-     * @param EngineInterface $engine
+     * @param Environment $twig
      */
-    public function setTemplatingEngine(EngineInterface $engine)
+    public function setTwig(Environment $twig)
     {
-        $this->engine = $engine;
+        $this->twig = $twig;
     }
 
     /**
@@ -220,7 +220,7 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function renderOne(array $data)
     {
-        return $this->engine->render('@NelmioApiDoc/resource.html.twig', array_merge(
+        return $this->twig->render('@NelmioApiDoc/resource.html.twig', array_merge(
             [
                 'data'           => $data,
                 'displayContent' => true,
@@ -234,7 +234,7 @@ class HtmlFormatter extends AbstractFormatter
      */
     protected function render(array $collection)
     {
-        return $this->engine->render('@NelmioApiDoc/resources.html.twig', array_merge(
+        return $this->twig->render('@NelmioApiDoc/resources.html.twig', array_merge(
             [
                 'resources' => $collection,
             ],

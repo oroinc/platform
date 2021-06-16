@@ -42,7 +42,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         return $container;
     }
 
-    public function testRegisterThemeConfigExtensions()
+    public function testRegisterThemeConfigExtensions(): void
     {
         $container = $this->getContainer();
 
@@ -59,7 +59,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRegisterThemeConfigExtensionsWhenNoExtensions()
+    public function testRegisterThemeConfigExtensionsWhenNoExtensions(): void
     {
         $container = $this->getContainer();
 
@@ -71,7 +71,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureLayoutExtension()
+    public function testConfigureLayoutExtension(): void
     {
         $container = $this->getContainer();
 
@@ -159,25 +159,23 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRegisterRenderers()
+    public function testRegisterRenderers(): void
     {
         $container = $this->getContainer();
 
-        $container->register('oro_layout.php.layout_renderer');
         $container->register('oro_layout.twig.layout_renderer');
 
         $this->compiler->process($container);
 
         self::assertEquals(
             [
-                ['addRenderer', ['php', new Reference('oro_layout.php.layout_renderer')]],
                 ['addRenderer', ['twig', new Reference('oro_layout.twig.layout_renderer')]]
             ],
             $container->getDefinition('oro_layout.layout_factory_builder')->getMethodCalls()
         );
     }
 
-    public function testRegisterRenderersWhenNoRenderers()
+    public function testRegisterRenderersWhenNoRenderers(): void
     {
         $container = $this->getContainer();
 
@@ -189,7 +187,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBlockTypeWithoutAlias()
+    public function testBlockTypeWithoutAlias(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "block1" service.');
@@ -202,7 +200,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testBlockTypeExtensionWithoutAlias()
+    public function testBlockTypeExtensionWithoutAlias(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "extension1" service.');
@@ -215,7 +213,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testLayoutUpdateWithoutId()
+    public function testLayoutUpdateWithoutId(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "id" is required for "update1" service.');
@@ -228,7 +226,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testDataProviderWithoutAlias()
+    public function testDataProviderWithoutAlias(): void
     {
         $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
         $this->expectExceptionMessage('Tag attribute "alias" is required for "dataProvider1" service.');
@@ -241,7 +239,7 @@ class ConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testServiceLocatorFilledWithServicesInCompilerPass()
+    public function testServiceLocatorFilledWithServicesInCompilerPass(): void
     {
         $container = $this->getContainer();
         $serviceLocator = $container->getDefinition('oro_layout.layout.service_locator');

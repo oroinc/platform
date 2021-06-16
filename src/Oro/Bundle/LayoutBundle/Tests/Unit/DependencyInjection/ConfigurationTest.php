@@ -8,14 +8,14 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    public function testGetConfigTreeBuilder(): void
     {
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf(TreeBuilder::class, $treeBuilder);
+        self::assertInstanceOf(TreeBuilder::class, $treeBuilder);
     }
 
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
         $configuration = new Configuration();
         $processor     = new Processor();
@@ -38,10 +38,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'view' => ['annotations' => true],
             'templating' => [
                 'default' => 'twig',
-                'php' => [
-                    'enabled' => true,
-                    'resources' => ['OroLayoutBundle:Layout/php']
-                ],
                 'twig' => [
                     'enabled' => true,
                     'resources' => ['@OroLayout/Layout/div_layout.html.twig']
@@ -49,6 +45,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             ],
             'debug' => '%kernel.debug%'
         ];
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, []));
+        self::assertEquals($expected, $processor->processConfiguration($configuration, []));
     }
 }

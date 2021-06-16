@@ -6,12 +6,12 @@ use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateReference;
+use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\Loader\LoaderInterface;
 
 class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,9 +19,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
 
     private ViewEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
-    private DelegatingEngine|\PHPUnit\Framework\MockObject\MockObject $templating;
-
-    private TemplateNameParserInterface|\PHPUnit\Framework\MockObject\MockObject $templateNameParser;
+    private Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
 
     private TemplateListener $listener;
 
@@ -34,8 +32,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getRequest')
             ->willReturn($this->request);
 
-        $this->templating = $this->createMock(DelegatingEngine::class);
-        $this->templateNameParser = $this->createMock(TemplateNameParserInterface::class);
+        $this->twig = $this->createMock(Environment::class);
 
         $loader = $this->createMock(FilesystemLoader::class);
         $loader->expects(self::any())
@@ -47,8 +44,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         $container->expects(self::any())
             ->method('get')
             ->willReturnMap([
-                ['templating', $this->templating],
-                ['templating.name_parser', $this->templateNameParser],
+                ['twig', $this->twig],
                 ['twig.loader.native_filesystem', $loader]
             ]);
 
@@ -59,17 +55,13 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider controllerDataProvider
      *
      * @param TemplateReference|string $inputTemplate
-     * @param TemplateReference|string $expectedTemplate
-     * @param TemplateReference|null $parsedTemplate
+     * @param TemplateReference $expectedTemplate
      */
-    public function testOnKernelControllerPath($inputTemplate, $expectedTemplate, $parsedTemplate = null): void
-    {
+    public function testOnKernelControllerPath(
+        TemplateReference|string $inputTemplate,
+        TemplateReference $expectedTemplate
+    ): void {
         $this->request->attributes->set('_template', $inputTemplate);
-
-        $this->templateNameParser->expects($parsedTemplate ? self::once() : self::never())
-            ->method('parse')
-            ->with($inputTemplate)
-            ->willReturn($parsedTemplate);
 
         $this->listener->onKernelView($this->event);
         self::assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
@@ -79,61 +71,60 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'exist legacy controller' => [
-                'inputTemplate' => $this->templateWithController('legacy-controller'),
-                'expectedTemplate' => $this->templateWithController('LegacyController'),
+                'inputTemplate' => $this->templateWithController('@TestBundle/legacy-controller/test.html.twig'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/LegacyController/test.html.twig'),
             ],
             'exist legacy controller with legacy action (underscore)' => [
-                'inputTemplate' => $this->templateWithController('legacy-controller', 'legacy_action'),
-                'expectedTemplate' => $this->templateWithController('LegacyController', 'legacyAction'),
+                'inputTemplate' => $this->templateWithController(
+                    '@TestBundle/legacy-controller/legacy_action.html.twig'
+                ),
+                'expectedTemplate' => $this->templateWithController(
+                    '@TestBundle/LegacyController/legacyAction.html.twig'
+                ),
             ],
             'exist legacy controller with legacy action (hyphen)' => [
-                'inputTemplate' => $this->templateWithController('legacy_controller', 'legacy-action'),
-                'expectedTemplate' => $this->templateWithController('LegacyController', 'legacyAction'),
+                'inputTemplate' => $this->templateWithController(
+                    '@TestBundle/legacy_controller/legacy-action.html.twig'
+                ),
+                'expectedTemplate' => $this->templateWithController(
+                    '@TestBundle/LegacyController/legacyAction.html.twig'
+                ),
             ],
             'manual template reference' => [
-                'inputTemplate' => $this->templateWithController('LegacyController', 'legacy_action'),
-                'expectedTemplate' => $this->templateWithController('LegacyController', 'legacy_action'),
-            ],
-            'exist legacy controller for another reference object' => [
-                'inputTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    '@TestBundle/legacy-controller/test_action.html.twig',
-                    'twig'
+                'inputTemplate' => $this->templateWithController(
+                    '@TestBundle/LegacyController/legacy_action.html.twig'
                 ),
-                'expectedTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    '@TestBundle/LegacyController/testAction.html.twig',
-                    'twig'
+                'expectedTemplate' => $this->templateWithController(
+                    '@TestBundle/LegacyController/legacy_action.html.twig'
                 ),
             ],
             'exist legacy controller in string' => [
                 'inputTemplate' => '@TestBundle/legacy-controller/test.html.twig',
-                'expectedTemplate' => $this->templateWithController('LegacyController'),
-                'parsedTemplate' => $this->templateWithController('legacy-controller'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/LegacyController/test.html.twig'),
             ],
             'exist legacy controller in formatted string' => [
                 'inputTemplate' => 'TestBundle:legacy-controller:test.html.twig',
-                'expectedTemplate' => $this->templateWithController('LegacyController'),
-                'parsedTemplate' => $this->templateWithController('legacy-controller'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/LegacyController/test.html.twig'),
             ],
             'exist new controller' => [
-                'inputTemplate' => $this->templateWithController('new-controller'),
-                'expectedTemplate' => $this->templateWithController('new-controller'),
+                'inputTemplate' => $this->templateWithController('@TestBundle/new-controller/test.html.twig'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/new-controller/test.html.twig'),
             ],
             'exist new controller with action' => [
-                'inputTemplate' => $this->templateWithController('new-controller', 'new_action'),
-                'expectedTemplate' => $this->templateWithController('new-controller', 'new_action'),
+                'inputTemplate' => $this->templateWithController('@TestBundle/new-controller/new_action.html.twig'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/new-controller/new_action.html.twig'),
             ],
             'exist new controller in string' => [
                 'inputTemplate' => '@TestBundle/new-controller/test.html.twig',
-                'expectedTemplate' => $this->templateWithController('new-controller'),
-                'parsedTemplate' => $this->templateWithController('new-controller'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/new-controller/test.html.twig'),
             ],
             'both controllers' => [
-                'inputTemplate' => $this->templateWithController('both-controller'),
-                'expectedTemplate' => $this->templateWithController('both-controller'),
+                'inputTemplate' => $this->templateWithController('@TestBundle/both-controller/test.html.twig'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/both-controller/test.html.twig'),
             ],
             'not exist controller' => [
-                'inputTemplate' => $this->templateWithController('not-exist-controller'),
-                'expectedTemplate' => $this->templateWithController('not-exist-controller'),
+                'inputTemplate' => $this->templateWithController('@TestBundle/not-exist-controller/test.html.twig'),
+                'expectedTemplate' => $this->templateWithController('@TestBundle/not-exist-controller/test.html.twig'),
             ],
         ];
     }
@@ -142,21 +133,22 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider templateDataProvider
      * @param bool $containerExists
      * @param bool $widgetExists
-     * @param mixed $inputTemplate
-     * @param TemplateReference|string $expectedTemplate
+     * @param TemplateReference|Template|string $inputTemplate
+     * @param TemplateReference|Template $expectedTemplate
      * @param string $requestAttribute
      */
     public function testOnKernelViewWidgetTemplate(
         bool $containerExists,
         bool $widgetExists,
-        $inputTemplate,
-        $expectedTemplate,
+        TemplateReference|Template|string $inputTemplate,
+        TemplateReference|Template $expectedTemplate,
         string $requestAttribute
     ): void {
         $this->request->$requestAttribute->set('_widgetContainer', 'container');
         $this->request->attributes->set('_template', $inputTemplate);
 
-        $this->templating->expects(self::atLeastOnce())
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects(self::atLeastOnce())
             ->method('exists')
             ->willReturnMap([
                 [(string)$this->templateWithContainer('container'), $containerExists],
@@ -164,11 +156,9 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
                 ['@TestBundle/Default/container/test.html.twig', $containerExists],
                 ['@TestBundle/Default/widget/test.html.twig', $widgetExists],
             ]);
-
-        $this->templateNameParser->expects(self::any())
-            ->method('parse')
-            ->with('TestBundle:Default:test.html.twig')
-            ->willReturn($this->templateWithContainer());
+        $this->twig->expects(self::atLeastOnce())
+            ->method('getLoader')
+            ->willReturn($loader);
 
         $this->listener->onKernelView($this->event);
         self::assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
@@ -240,7 +230,7 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
             'template name as string' => [
                 'containerExists' => true,
                 'widgetExists' => false,
-                'inputTemplate' => 'TestBundle:Default:test.html.twig',
+                'inputTemplate' => '@TestBundle/Default/test.html.twig',
                 'expectedTemplate' => $this->templateWithContainer('container'),
                 'requestAttribute' => 'query'
             ],
@@ -254,34 +244,8 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
             'template object with template name as string' => [
                 'containerExists' => true,
                 'widgetExists' => false,
-                'inputTemplate' => new Template(['template' => 'TestBundle:Default:test.html.twig']),
+                'inputTemplate' => new Template(['template' => '@TestBundle/Default/test.html.twig']),
                 'expectedTemplate' => new Template(['template' => $this->templateWithContainer('container')]),
-                'requestAttribute' => 'query'
-            ],
-            'basic template reference' => [
-                'containerExists' => true,
-                'widgetExists' => false,
-                'inputTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    'TestBundle:Default:test.html.twig',
-                    'twig'
-                ),
-                'expectedTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    'TestBundle:Default:container/test.html.twig',
-                    'twig'
-                ),
-                'requestAttribute' => 'query'
-            ],
-            'new format for basic template reference' => [
-                'containerExists' => true,
-                'widgetExists' => false,
-                'inputTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    '@TestBundle/Default/test.html.twig',
-                    'twig'
-                ),
-                'expectedTemplate' => new \Symfony\Component\Templating\TemplateReference(
-                    '@TestBundle/Default/container/test.html.twig',
-                    'twig'
-                ),
                 'requestAttribute' => 'query'
             ],
         ];
@@ -294,21 +258,17 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     private function templateWithContainer(?string $container = null): TemplateReference
     {
         return new TemplateReference(
-            'TestBundle',
-            'Default',
-            ($container ? $container . '/'  : '') . 'test',
-            'html',
+            '@TestBundle/Default/' . ($container ? $container . '/'  : '') . 'test.html.twig',
             'twig'
         );
     }
 
     /**
-     * @param string $controller
-     * @param string $action
+     * @param string $name
      * @return TemplateReference
      */
-    private function templateWithController(string $controller, string $action = 'test'): TemplateReference
+    private function templateWithController(string $name): TemplateReference
     {
-        return new TemplateReference('TestBundle', $controller, $action, 'html', 'twig');
+        return new TemplateReference($name, 'twig');
     }
 }

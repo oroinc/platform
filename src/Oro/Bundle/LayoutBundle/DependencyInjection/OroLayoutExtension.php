@@ -37,13 +37,6 @@ class OroLayoutExtension extends Extension
             'oro_layout.templating.default',
             $config['templating']['default']
         );
-        if ($config['templating']['php']['enabled']) {
-            $loader->load('php_renderer.yml');
-            $container->setParameter(
-                'oro_layout.php.resources',
-                $config['templating']['php']['resources']
-            );
-        }
         if ($config['templating']['twig']['enabled']) {
             $loader->load('twig_renderer.yml');
             $container->setParameter(

@@ -12,7 +12,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    private const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
     private const DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';
 
     /**
@@ -67,29 +66,6 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('default')->defaultValue('twig')->end()
-                ->arrayNode('php')
-                    ->canBeDisabled()
-                    ->fixXmlConfig('resource')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_PHP_RESOURCE)->end()
-                            ->example(['MyBundle:Layout/php'])
-                            ->validate()
-                                ->ifTrue(
-                                    function ($v) {
-                                        return !in_array(self::DEFAULT_LAYOUT_PHP_RESOURCE, $v);
-                                    }
-                                )
-                                ->then(
-                                    function ($v) {
-                                        return array_merge([self::DEFAULT_LAYOUT_PHP_RESOURCE], $v);
-                                    }
-                                )
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
                 ->arrayNode('twig')
                     ->canBeDisabled()
                     ->fixXmlConfig('resource')

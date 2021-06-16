@@ -7,6 +7,7 @@ use Oro\Bundle\LayoutBundle\Form\TwigRendererEngine;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormView;
 use Twig\Environment;
+use Twig\Template;
 
 class TwigRendererEngineTest extends RendererEngineTest
 {
@@ -41,7 +42,7 @@ class TwigRendererEngineTest extends RendererEngineTest
         /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock('Symfony\Component\Form\FormView');
         $view->vars['cache_key'] = 'cache_key';
-        $template = $this->createMock('\Twig_Template');
+        $template = $this->createMock(Template::class);
         $template->expects($this->once())
             ->method('getTemplateName')
             ->will($this->returnValue('theme'));

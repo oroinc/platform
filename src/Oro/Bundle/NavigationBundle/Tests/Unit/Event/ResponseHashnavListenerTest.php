@@ -3,11 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Twig\Environment;
 
 class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +20,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 
     private Response $response;
 
-    private EngineInterface|\PHPUnit\Framework\MockObject\MockObject $templating;
+    private Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
 
     private ResponseEvent|\PHPUnit\Framework\MockObject\MockObject $event;
 
@@ -30,7 +30,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->response = new Response();
         $this->request  = Request::create(self::TEST_URL);
-        $this->request->headers->add(array(ResponseHashnavListener::HASH_NAVIGATION_HEADER => true));
+        $this->request->headers->add([ResponseHashnavListener::HASH_NAVIGATION_HEADER => true]);
         $this->event = $this->createMock(ResponseEvent::class);
 
         $this->event->expects(self::any())
@@ -42,7 +42,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->response);
 
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $this->templating = $this->createMock(EngineInterface::class);
+        $this->twig = $this->createMock(Environment::class);
         $this->listener = $this->getListener(false);
     }
 
@@ -59,7 +59,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
     public function testHashRequestWOUser(): void
     {
         $this->response->setStatusCode(302);
-        $this->response->headers->add(array('location' => self::TEST_URL));
+        $this->response->headers->add(['location' => self::TEST_URL]);
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
@@ -68,8 +68,9 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $this->event->expects(self::once())
             ->method('setResponse');
 
-        $this->templating->expects(self::once())
-            ->method('renderResponse')
+        $template = 'rendered_template_content';
+        $this->twig->expects(self::once())
+            ->method('render')
             ->with(
                 self::TEMPLATE,
                 [
@@ -77,7 +78,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
                     'location'      => self::TEST_URL
                 ]
             )
-            ->willReturn(new Response());
+            ->willReturn($template);
 
         $this->listener->onResponse($this->event);
     }
@@ -95,8 +96,9 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $this->event->expects(self::once())
             ->method('setResponse');
 
-        $this->templating->expects(self::once())
-            ->method('renderResponse')
+        $template = 'rendered_template_content';
+        $this->twig->expects(self::once())
+            ->method('render')
             ->with(
                 self::TEMPLATE,
                 [
@@ -104,7 +106,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
                     'location'      => self::TEST_URL
                 ]
             )
-            ->willReturn(new Response());
+            ->willReturn($template);
 
         $this->listener->onResponse($this->event);
     }
@@ -117,26 +119,27 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testFullRedirectProducedInProdEnv(): void
     {
-        $expected = array('full_redirect' => 1, 'location' => self::TEST_URL);
-        $this->response->headers->add(array('location' => self::TEST_URL));
-        $response = new Response();
+        $expected = ['full_redirect' => 1, 'location' => self::TEST_URL];
+        $this->response->headers->add(['location' => self::TEST_URL]);
         $this->response->setStatusCode(503);
-        $this->templating
-            ->expects(self::once())
-            ->method('renderResponse')
-            ->with('@OroNavigation/HashNav/redirect.html.twig', $expected)
-            ->willReturn($response);
 
-        $this->event->expects(self::once())->method('setResponse')->with($response);
+        $template = 'rendered_template_content';
+        $this->twig
+            ->expects(self::once())
+            ->method('render')
+            ->with('@OroNavigation/HashNav/redirect.html.twig', $expected)
+            ->willReturn($template);
+
+        $this->event->expects(self::once())->method('setResponse')->with($this->response);
         $this->listener->onResponse($this->event);
     }
 
     public function testFullRedirectNotProducedInDevEnv(): void
     {
         $listener = $this->getListener(true);
-        $this->response->headers->add(array('location' => self::TEST_URL));
+        $this->response->headers->add(['location' => self::TEST_URL]);
         $this->response->setStatusCode(503);
-        $this->templating->expects(self::never())->method('renderResponse');
+        $this->twig->expects(self::never())->method('render');
 
         $this->event->expects(self::once())->method('setResponse');
         $listener->onResponse($this->event);
@@ -144,7 +147,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
 
     private function getListener($isDebug): ResponseHashnavListener
     {
-        return new ResponseHashnavListener($this->tokenStorage, $this->templating, $isDebug);
+        return new ResponseHashnavListener($this->tokenStorage, $this->twig, $isDebug);
     }
 
     private function serverErrorHandle(): void
@@ -152,8 +155,9 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
         $this->event->expects(self::once())
             ->method('setResponse');
 
-        $this->templating->expects(self::once())
-            ->method('renderResponse')
+        $template = 'rendered_template_content';
+        $this->twig->expects(self::once())
+            ->method('render')
             ->with(
                 self::TEMPLATE,
                 [
@@ -161,7 +165,7 @@ class ResponseHashnavListenerTest extends \PHPUnit\Framework\TestCase
                     'location'      => self::TEST_URL
                 ]
             )
-            ->willReturn(new Response());
+            ->willReturn($template);
 
         $this->listener->onResponse($this->event);
     }
