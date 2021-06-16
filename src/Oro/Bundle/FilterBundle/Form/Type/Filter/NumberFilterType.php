@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -83,7 +84,8 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                     $options = $form->get('value')->getConfig()->getOptions();
                     $form->remove('value');
                     $form->add('value', TextType::class, [
-                        'label' => $options['label'], 'required' => $options['required']
+                        'label' => $options['label'],
+                        'required' => $options['required']
                     ]);
                 }
             }
@@ -110,18 +112,25 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 
         $resolver->setDefaults(
             [
-                'field_type'        => NumberType::class,
-                'operator_choices'  => $operatorChoices,
-                'data_type'         => self::DATA_INTEGER,
+                'field_type' => NumberType::class,
+                'operator_choices' => $operatorChoices,
+                'data_type' => self::DATA_INTEGER,
                 self::OPTION_KEY_FORMATTER_OPTION => []
             ]
         );
+        $resolver->setNormalizer('field_options', function (Options $options, $fieldOptions) {
+            if ($options['data_type'] !== self::DATA_INTEGER && $options['field_type'] === NumberType::class) {
+                $fieldOptions['limit_decimals'] = false;
+            }
+
+            return $fieldOptions;
+        });
     }
 
     /**
-     * @param FormView      $view
+     * @param FormView $view
      * @param FormInterface $form
-     * @param array         $options
+     * @param array $options
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
@@ -139,6 +148,9 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
                 break;
             case self::DATA_DECIMAL:
                 $formatterOptions['grouping'] = true;
+                if (isset($options['field_options']['scale'])) {
+                    $formatterOptions['decimals'] = $options['field_options']['scale'];
+                }
                 break;
             case self::DATA_INTEGER:
             default:
@@ -158,5 +170,6 @@ class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
         $view->vars['array_separator'] = self::ARRAY_SEPARATOR;
         $view->vars['array_operators'] = self::ARRAY_TYPES;
         $view->vars['data_type'] = $dataType;
+        $view->vars['limit_decimals'] = $options['field_options']['limit_decimals'] ?? false;
     }
 }

@@ -66,7 +66,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
             [
                 'defaultOptions' => [
                     'field_type' => NumberType::class,
-                    'operator_choices'  => [
+                    'operator_choices' => [
                         'oro.filter.form.label_type_equal' => NumberFilterType::TYPE_EQUAL,
                         'oro.filter.form.label_type_not_equal' => NumberFilterType::TYPE_NOT_EQUAL,
                         'oro.filter.form.label_type_greater_equal' => NumberFilterType::TYPE_GREATER_EQUAL,
@@ -120,9 +120,9 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
     {
         return [
             'not formatted number' => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789],
-                'viewData'      => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.6789],
+                'viewData' => [
                     'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.6789'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
@@ -132,10 +132,10 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'field_options' => ['grouping' => true, 'scale' => 2]
                 ],
             ],
-            'formatted number'     => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68],
-                'viewData'      => [
+            'formatted number' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345.68],
+                'viewData' => [
                     'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,345.68'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
@@ -145,15 +145,15 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'field_options' => ['grouping' => true, 'scale' => 2]
                 ],
             ],
-            'integer'              => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
+            'integer' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12345],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345'],
                     'formatter_options' => [
-                        'decimals'         => 0,
-                        'grouping'         => false,
-                        'orderSeparator'   => '',
+                        'decimals' => 0,
+                        'grouping' => false,
+                        'orderSeparator' => '',
                         'decimalSeparator' => '.',
                     ],
                     'array_separator' => ',',
@@ -162,18 +162,18 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
                 'customOptions' => [
                     'field_type' => IntegerType::class,
-                    'data_type'  => NumberFilterType::DATA_INTEGER
+                    'data_type' => NumberFilterType::DATA_INTEGER
                 ],
             ],
-            'integer IN'              => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
-                'formData'      => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+            'integer IN' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+                'formData' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_IN, 'value' => '1,2,5'],
                     'formatter_options' => [
-                        'decimals'         => 0,
-                        'grouping'         => false,
-                        'orderSeparator'   => '',
+                        'decimals' => 0,
+                        'grouping' => false,
+                        'orderSeparator' => '',
                         'decimalSeparator' => '.',
                     ],
                     'array_separator' => ',',
@@ -182,18 +182,18 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
                 'customOptions' => [
                     'field_type' => IntegerType::class,
-                    'data_type'  => NumberFilterType::DATA_INTEGER
+                    'data_type' => NumberFilterType::DATA_INTEGER
                 ],
             ],
-            'integer NOT IN'              => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
-                'formData'      => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+            'integer NOT IN' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+                'formData' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_NOT_IN, 'value' => '1,2,5'],
                     'formatter_options' => [
-                        'decimals'         => 0,
-                        'grouping'         => false,
-                        'orderSeparator'   => '',
+                        'decimals' => 0,
+                        'grouping' => false,
+                        'orderSeparator' => '',
                         'decimalSeparator' => '.',
                     ],
                     'array_separator' => ',',
@@ -202,58 +202,58 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 ],
                 'customOptions' => [
                     'field_type' => IntegerType::class,
-                    'data_type'  => NumberFilterType::DATA_INTEGER
+                    'data_type' => NumberFilterType::DATA_INTEGER
                 ],
             ],
-            'percent_float'        => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+            'percent_float' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12.34'],
                     'formatter_options' => [
-                        'grouping'         => true,
+                        'grouping' => true,
                         'orderSeparator'   => ',',
                         'decimalSeparator' => '.',
-                        'percent'          => true
+                        'percent' => true
                     ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::PERCENT
                 ],
                 'customOptions' => [
-                    'data_type'  => NumberFilterType::PERCENT
+                    'data_type' => NumberFilterType::PERCENT
                 ],
             ],
-            'percent_int'          => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
+            'percent_int' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12'],
                     'formatter_options' => [
-                        'grouping'         => true,
+                        'grouping' => true,
                         'orderSeparator'   => ',',
                         'decimalSeparator' => '.',
-                        'percent'          => true
+                        'percent' => true
                     ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
                     'data_type' => NumberFilterType::PERCENT
                 ],
                 'customOptions' => [
-                    'data_type'  => NumberFilterType::PERCENT
+                    'data_type' => NumberFilterType::PERCENT
                 ],
             ],
-            'money'                => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
-                'formData'      => [
-                    'type'  => NumberFilterType::TYPE_EQUAL,
+            'money' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.67890'],
+                'formData' => [
+                    'type' => NumberFilterType::TYPE_EQUAL,
                     'value' => 12345.68
                 ],
-                'viewData'      => [
-                    'value'             => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12345.68'],
                     'formatter_options' => [
-                        'grouping'         => true,
-                        'orderSeparator'   => ' ',
+                        'grouping' => true,
+                        'orderSeparator' => ' ',
                         'decimalSeparator' => '.',
                     ],
                     'array_separator' => ',',
@@ -261,17 +261,17 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     'data_type' => NumberFilterType::DATA_DECIMAL
                 ],
                 'customOptions' => [
-                    'field_type'        => MoneyType::class,
-                    'data_type'         => NumberFilterType::DATA_DECIMAL,
+                    'field_type' => MoneyType::class,
+                    'data_type' => NumberFilterType::DATA_DECIMAL,
                     'formatter_options' => [
                         'orderSeparator' => ' '
                     ]
                 ],
             ],
-            'invalid format'       => [
-                'bindData'      => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'],
-                'formData'      => ['type' => NumberFilterType::TYPE_EQUAL],
-                'viewData'      => [
+            'invalid format' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL],
+                'viewData' => [
                     'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 'abcd.67890'],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
@@ -407,7 +407,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                 'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,34'],
                 'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
                 'viewData' => [
-                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,34'],
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,340'],
                     'formatter_options' => [
                         'grouping' => true,
                         'orderSeparator' => '.',
@@ -416,10 +416,33 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
-                    'data_type' => NumberFilterType::PERCENT
+                    'data_type' => NumberFilterType::PERCENT,
+                    'limit_decimals' => false
                 ],
                 'customOptions' => [
-                    'data_type' => NumberFilterType::PERCENT
+                    'data_type' => NumberFilterType::PERCENT,
+                    'field_options' => ['scale' => 3]
+                ],
+            ],
+            'decimal' => [
+                'bindData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,34'],
+                'formData' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => 12.34],
+                'viewData' => [
+                    'value' => ['type' => NumberFilterType::TYPE_EQUAL, 'value' => '12,340'],
+                    'formatter_options' => [
+                        'grouping' => true,
+                        'orderSeparator' => '.',
+                        'decimalSeparator' => ',',
+                        'decimals' => 3
+                    ],
+                    'array_separator' => ',',
+                    'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
+                    'data_type' => NumberFilterType::DATA_DECIMAL,
+                    'limit_decimals' => false
+                ],
+                'customOptions' => [
+                    'data_type' => NumberFilterType::DATA_DECIMAL,
+                    'field_options' => ['scale' => 3]
                 ],
             ],
             'percent_int' => [
@@ -435,7 +458,8 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
                     ],
                     'array_separator' => ',',
                     'array_operators' => [NumberFilterType::TYPE_IN, NumberFilterType::TYPE_NOT_IN],
-                    'data_type' => NumberFilterType::PERCENT
+                    'data_type' => NumberFilterType::PERCENT,
+                    'limit_decimals' => false
                 ],
                 'customOptions' => [
                     'data_type' => NumberFilterType::PERCENT

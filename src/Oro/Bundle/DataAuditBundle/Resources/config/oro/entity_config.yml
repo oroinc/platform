@@ -1,5 +1,6 @@
 entity_config:
     dataaudit:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#dataaudit
         entity:
             items:
                 auditable:
@@ -24,13 +25,10 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.entity.items.auditable
-
-                    # this attribute can be used to prohibit changing the auditable state (no matter whether
-                    # it is enabled or not) for the entity
-                    # if TRUE than the current state cannot be changed
-                    immutable: # boolean
+                    immutable:
                         options:
                             auditable: false
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#dataaudit
         field:
             items:
                 auditable:
@@ -53,14 +51,9 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable
-
-                    # this attribute can be used to prohibit changing the auditable state (no matter whether
-                    # it is enabled or not) for the entity field
-                    # if TRUE than the current state cannot be changed
-                    immutable: # boolean
+                    immutable:
                         options:
                             auditable: false
-
                 propagate:
                     options:
                         value_type:         boolean
@@ -82,10 +75,6 @@ entity_config:
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.propagate
                             tooltip:        oro.dataaudit.entity_config.field.items.propagate.tooltip
-
-                    # this attribute can be used to prohibit changing the auditable state (no matter whether
-                    # it is enabled or not) for the entity field
-                    # if TRUE than the current state cannot be changed
-                    immutable: # boolean
+                    immutable:
                         options:
                             auditable: false

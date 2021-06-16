@@ -8,6 +8,9 @@ use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer as BaseTransformer;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Replaces Symfony NumberToLocalizedStringTransformer with Oro NumberToLocalizedStringTransformer view transformer.
@@ -57,6 +60,23 @@ class NumberTypeExtension extends AbstractTypeExtension
                 $builder->addViewTransformer($viewTransformer);
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('limit_decimals', true);
+        $resolver->setAllowedTypes('limit_decimals', 'bool');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['attr']['data-limit-decimals'] = (int)$options['limit_decimals'];
     }
 
     /**
