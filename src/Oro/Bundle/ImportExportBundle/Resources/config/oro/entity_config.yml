@@ -1,5 +1,6 @@
 entity_config:
     importexport:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#importexport
         field:
             form:
                 block_config:
@@ -7,7 +8,6 @@ entity_config:
                         title:              oro.importexport.entity_config.block_title
                         priority:           30
             items:
-                # custom field header, by default field label is used
                 header:
                     options:
                         value_type:         string
@@ -18,7 +18,6 @@ entity_config:
                             required:       false
                             block:          import_export
                             tooltip:        oro.importexport.entity_config.header.tooltip
-                # field order in result file
                 order:
                     options:
                         value_type:         integer
@@ -26,11 +25,9 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
                         options:
                             label:          oro.importexport.entity_config.order.label
-                            scale:          0
                             empty_data:     ''
                             required:       false
                             block:          import_export
-                # is field will be used to find existing entity
                 identity:
                     options:
                         value_type:         integer
@@ -44,7 +41,6 @@ entity_config:
                             required:       false
                             block:          import_export
                             tooltip:        oro.importexport.entity_config.identity.tooltip
-                # is field must be excluded from import/export
                 excluded:
                     options:
                         value_type:         boolean
@@ -58,7 +54,6 @@ entity_config:
                             placeholder:    false
                             required:       false
                             block:          import_export
-                # is relation must be represented by all it's fields
                 full:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
@@ -73,8 +68,6 @@ entity_config:
                             required:       false
                             block:          import_export
                             tooltip:        'oro.importexport.entity_config.full.tooltip'
-
-                # is relation field should be processed as scalar value when exporting data
                 process_as_scalar:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]

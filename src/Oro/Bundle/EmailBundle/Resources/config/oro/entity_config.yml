@@ -1,5 +1,6 @@
 entity_config:
     email:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#email
         field:
             items:
                 available_in_template:
@@ -17,6 +18,7 @@ entity_config:
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
     attachment:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#attachment
         entity:
             items:
                 auto_link_attachments:

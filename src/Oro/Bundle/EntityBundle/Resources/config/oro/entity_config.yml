@@ -1,5 +1,6 @@
 entity_config:
     entity:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#entity
         entity:
             form:
                 block_config:
@@ -12,7 +13,6 @@ entity_config:
                     other:
                         title:              oro.entity_config.block_titles.other.label
                         priority:           -255
-
             items:
                 icon:
                     options:
@@ -44,7 +44,6 @@ entity_config:
                             block:          general
                             required:       true
                             strip_tags:     true
-
                 plural_label:
                     options:
                         translatable:       true
@@ -61,7 +60,6 @@ entity_config:
                             block:          general
                             required:       true
                             strip_tags:     true
-
                 description:
                     options:
                         translatable:       true
@@ -76,6 +74,7 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#entity
         field:
             form:
                 block_config:
@@ -85,7 +84,6 @@ entity_config:
                     other:
                         title:              oro.entity_config.block_titles.other.label
                         priority:           -255
-
             items:
                 label:
                     options:
@@ -110,7 +108,6 @@ entity_config:
                             block:          general
                             required:       true
                             strip_tags:     true
-
                 description:
                     options:
                         translatable:       true
@@ -126,8 +123,8 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
-
     datagrid:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#datagrid
         field:
             items:
                 is_visible:
@@ -153,7 +150,6 @@ entity_config:
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
                             tooltip:        oro.entity.entity_config.datagrid.field.items.is_visible.tooltip
-
                 show_filter:
                     options:
                         value_type:         boolean
@@ -188,25 +184,22 @@ entity_config:
                             required:       false
 
     form:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#form
         entity:
             items:
-                # form type for specific entity
                 form_type:
                     options: []
-                # form options for specific entity
                 form_options:
                     options:
                         auditable: false
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#form
         field:
             items:
-                # form type for specific field
                 form_type:
                     options: []
-                # form options for specific field
                 form_options:
                     options:
                         auditable: false
-                # is form enabled for specific field
                 is_enabled:
                     options:
                         value_type:         boolean
@@ -226,7 +219,7 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.form.field.items.is_enabled
-
+    # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#view
     view:
         field:
             items:
@@ -239,7 +232,6 @@ entity_config:
                                 scope:      extend
                             code:           owner
                             value:          Custom
-
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
@@ -263,30 +255,26 @@ entity_config:
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.priority
                             required:       false
-
     grouping:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#grouping
         entity:
             items:
-                # it allows to group entities. An entity can be included in several groups
-                groups: # array of strings
+                groups:
                     options: []
-
     dictionary:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#dictionary
         entity:
             items:
-                # specify the list of fields for which the virtual fields can be created
-                # if not specified the virtual fields are created for all fields, except identifier ones
-                virtual_fields: # array of strings
+                virtual_fields:
                     options:
                         auditable: false
-                # specify the list of fields used for searching in the reports filter
-                search_fields: # array of strings
+                search_fields:
                     options:
                         auditable: false
-                # specify representation field used for rendering titles for search items in the reports filter
-                representation_field: # string
+                representation_field:
                     options:
                         auditable: false
     fallback:
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#fallback
         entity:
             items: ~
