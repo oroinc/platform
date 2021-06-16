@@ -230,7 +230,7 @@ class DashboardController extends AbstractController
     public function widgetAction($widget, $bundle, $name)
     {
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }
@@ -260,7 +260,7 @@ class DashboardController extends AbstractController
         );
 
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $params
         );
     }
@@ -290,7 +290,7 @@ class DashboardController extends AbstractController
         );
 
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $params
         );
     }

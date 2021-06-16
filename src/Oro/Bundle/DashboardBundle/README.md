@@ -14,7 +14,7 @@ dashboards:
             description: Text                                # description of widget
             acl:        acl_resource                         # acl resource of dashboard
             route:      oro_dashboard_itemized_widget        # widget route
-            route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad } # additional route parameters
+            route_parameters: { bundle: OroDashboard, name: quickLaunchpad } # additional route parameters
             isNew: true                                      # show or not "New" label next to the title
  
     # Configuration of dashboards
@@ -190,7 +190,7 @@ dashboards:
         recent_calls:                               # register a widget
             label:      orocrm.dashboard.recent_calls.title
             route:      oro_dashboard_widget        # you can use existing controller to render your TWIG template
-            route_parameters: { bundle: OroCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
+            route_parameters: { bundle: OroCall, name: recentCalls }   # just specify a bundle and a TWIG template name
             acl:        oro_call_view
 ```
  
