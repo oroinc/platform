@@ -62,13 +62,13 @@ define(function(require) {
 
         connect: function() {
             FlowchartViewerWorkflowView.__super__.connect.call(this);
-            this.jsPlumbInstance.batch(_.bind(function() {
+            this.jsPlumbInstance.batch(() => {
                 this.$el.addClass(this.className);
                 const transitionOverlayView = this.transitionOverlayView;
                 const connectionOptions = _.extend({}, this.defaultConnectionOptions);
                 const StepView = this.stepView;
                 const TransitionView = this.transitionView;
-                const _this = this;
+                const areaView = this;
                 const steps = this.model.get('steps');
                 const stepCollectionView = new BaseCollectionView({
                     el: this.$el,
@@ -77,7 +77,7 @@ define(function(require) {
                     // pass areaView to each model
                     itemView: function(options) {
                         options = _.extend({
-                            areaView: _this
+                            areaView
                         }, options);
                         return new StepView(options);
                     },
@@ -90,7 +90,7 @@ define(function(require) {
                     // pass areaView to each model
                     itemView: function(options) {
                         options = _.extend({
-                            areaView: _this,
+                            areaView,
                             stepCollection: steps,
                             stepCollectionView: stepCollectionView,
                             transitionOverlayView: transitionOverlayView,
@@ -103,7 +103,7 @@ define(function(require) {
 
                 this.subview('stepCollectionView', stepCollectionView);
                 this.subview('transitionCollectionView', transitionCollectionView);
-            }, this));
+            });
 
             // tell zoomable-area to update zoom level
             this.$el.trigger('autozoom');

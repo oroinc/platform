@@ -27,6 +27,9 @@ services:
             - ~
             - Oro\Bundle\NoteBundle\Form\Type\NoteApiType
 
+    Oro\Bundle\NoteBundle\Form\Handler\NoteHandler:
+        alias: oro_note.form.handler.note
+
     oro_note.form.handler.note:
         class: Oro\Bundle\NoteBundle\Form\Handler\NoteHandler
         public: true

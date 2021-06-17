@@ -97,7 +97,7 @@ define(function(require) {
         _buildSelectContent: function(fields) {
             let sFields = '';
             let sRelations = '';
-            _.each(fields, _.bind(function(field) {
+            _.each(fields, field => {
                 if (_.isUndefined(field.relation_type)) {
                     if (_.isUndefined(this.exclude) ||
                         !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
@@ -106,7 +106,7 @@ define(function(require) {
                 } else {
                     sRelations += this.optionTemplate(field);
                 }
-            }, this));
+            });
 
             if (sRelations === '') {
                 return sFields;

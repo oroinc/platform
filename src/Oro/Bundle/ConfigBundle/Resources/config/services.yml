@@ -80,6 +80,9 @@ services:
         calls:
             - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
 
+    Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider:
+        alias: oro_config.provider.system_configuration.form_provider
+
     oro_config.provider.system_configuration.form_provider:
         class: Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
         public: true

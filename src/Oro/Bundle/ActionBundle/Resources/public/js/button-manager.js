@@ -109,18 +109,17 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
-            const self = this;
             if (this.options.hasDialog) {
                 const options = this._getDialogOptions();
                 if (this.options.showDialog) {
                     loadModules(this.options.jsDialogWidget, function(Widget) {
                         const _widget = new Widget(options);
-                        Backbone.listenTo(_widget, 'formSave', _.bind(function(response) {
+                        Backbone.listenTo(_widget, 'formSave', response => {
                             this.isFormSaveInProgress = true;
                             _widget.hide();
-                            self.doResponse(response, e);
+                            this.doResponse(response, e);
                             this.isFormSaveInProgress = false;
-                        }, this));
+                        });
                         _widget.render();
                     }, this);
                 } else {
@@ -137,17 +136,17 @@ define(function(require) {
                         dataType: 'json'
                     };
                     $.ajax(this.options.executionUrl, ajaxOptions)
-                        .done(_.bind(this.ajaxDone, this))
-                        .fail(_.bind(this.ajaxFail, this));
+                        .done(this.ajaxDone.bind(this))
+                        .fail(this.ajaxFail.bind(this));
                 } else {
                     if (this.options.requestMethod === 'POST') {
                         $.post(this.options.executionUrl, null, 'json')
-                            .done(_.bind(this.ajaxDone, this))
-                            .fail(_.bind(this.ajaxFail, this));
+                            .done(this.ajaxDone.bind(this))
+                            .fail(this.ajaxFail.bind(this));
                     } else {
                         $.getJSON(this.options.executionUrl)
-                            .done(_.bind(this.ajaxDone, this))
-                            .fail(_.bind(this.ajaxFail, this));
+                            .done(this.ajaxDone.bind(this))
+                            .fail(this.ajaxFail.bind(this));
                     }
                 }
             }
@@ -192,9 +191,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doResponse: function(response, e) {
-            const callback = _.bind(function() {
+            const callback = () => {
                 this._showFlashMessages(response);
-            }, this);
+            };
 
             if (response.redirectUrl) {
                 const redirectOptions = {redirect: true};
@@ -357,7 +356,7 @@ define(function(require) {
 
             options.dialogOptions.close = _.wrap(
                 options.dialogOptions.close,
-                _.bind(this.onDialogClose, this)
+                this.onDialogClose.bind(this)
             );
 
             return options;

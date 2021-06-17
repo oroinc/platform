@@ -36,7 +36,8 @@ define(function(require) {
                 formatterOptions: {},
                 arraySeparator: ',',
                 arrayOperators: [],
-                dataType: 'data_integer'
+                dataType: 'data_integer',
+                limitDecimals: false
             });
 
             this._filterArrayChoices();
@@ -58,9 +59,9 @@ define(function(require) {
         _filterArrayChoices: function() {
             this.choices = _.filter(
                 this.choices,
-                _.bind(function(item) {
+                item => {
                     return this.dataType === 'data_integer' || !this._isArrayType(item.data);
-                }, this)
+                }
             );
         },
 
@@ -210,11 +211,12 @@ define(function(require) {
         },
 
         _initInputWidget: function() {
-            if (this.formatter.decimals) {
-                _.each(this.$el.find('input[type="number"]:not([data-precision])'), function(field) {
+            _.each(this.$el.find('input[type="number"]'), function(field) {
+                if (this.formatter.decimals) {
                     $(field).attr('data-precision', this.formatter.decimals);
-                }, this);
-            }
+                }
+                $(field).attr('data-limit-decimals', this.limitDecimals);
+            }, this);
 
             this.$el.inputWidget('seekAndCreate');
         }

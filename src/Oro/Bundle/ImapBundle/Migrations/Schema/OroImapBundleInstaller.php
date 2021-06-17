@@ -18,7 +18,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -38,21 +38,17 @@ class OroImapBundleInstaller implements Installation
         $this->addOroEmailFolderImapForeignKeys($schema);
         $this->addOroEmailImapForeignKeys($schema);
         $this->addOriginOauthType($schema);
-        $this->alterTokenFieldsSize($schema);
+        $this->changeEmailTokensLength($schema);
     }
 
     /**
      * @param Schema $schema
      */
-    private function alterTokenFieldsSize(Schema $schema): void
+    private function changeEmailTokensLength(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
-        $table->changeColumn('access_token', [
-            'length' => 2048
-        ]);
-        $table->changeColumn('refresh_token', [
-            'length' => 2048
-        ]);
+        $table->changeColumn('access_token', ['length' => 8192]);
+        $table->changeColumn('refresh_token', ['length' => 8192]);
     }
 
     /**

@@ -5,40 +5,39 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilters;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'testEntityClass';
-    const WORKFLOW_NAME = 'test_workflow';
+    private const ENTITY_CLASS = 'testEntityClass';
+    private const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowDefinitionRepository|MockObject */
+    /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $entityRepository;
 
-    /** @var EntityManager|MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowAssembler|MockObject */
+    /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $assembler;
 
-    /** @var WorkflowDefinitionFilters|MockObject */
+    /** @var WorkflowDefinitionFilters|\PHPUnit\Framework\MockObject\MockObject */
     private $filters;
 
-    /** @var WorkflowDefinitionFilterInterface|MockObject */
+    /** @var WorkflowDefinitionFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $filter;
 
     /** @var WorkflowRegistry */
@@ -46,66 +45,30 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityRepository
-            = $this->getMockBuilder(WorkflowDefinitionRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->entityRepository = $this->createMock(WorkflowDefinitionRepository::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->assembler = $this->createMock(WorkflowAssembler::class);
+        $this->filters = $this->createMock(WorkflowDefinitionFilters::class);
+        $this->filter = $this->createMock(WorkflowDefinitionFilterInterface::class);
 
         $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->entityRepository);
 
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('getEntityManagerForClass')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->entityManager);
 
-        $this->assembler = $this->getMockBuilder(WorkflowAssembler::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['assemble'])
-            ->getMock();
-
-        $this->filters = $this->getMockBuilder(WorkflowDefinitionFilters::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->filter = $this->createMock(WorkflowDefinitionFilterInterface::class);
-
-        $this->registry = new class($this->doctrineHelper, $this->assembler, $this->filters) extends WorkflowRegistry {
-            public function xgetWorkflowByName(): array
-            {
-                return $this->workflowByName;
-            }
-        };
+        $this->registry = new WorkflowRegistry($doctrineHelper, $this->assembler, $this->filters);
     }
 
-    protected function tearDown(): void
-    {
-        unset(
-            $this->entityRepository,
-            $this->doctrineHelper,
-            $this->entityManager,
-            $this->configManager,
-            $this->assembler,
-            $this->filters,
-            $this->filter,
-            $this->registry
-        );
-    }
-
-    /**
-     * @param WorkflowDefinition|null $workflowDefinition
-     * @param Workflow|null $workflow
-     */
-    public function prepareAssemblerMock($workflowDefinition = null, $workflow = null)
-    {
+    private function prepareAssemblerMock(
+        WorkflowDefinition $workflowDefinition = null,
+        Workflow $workflow = null
+    ): void {
         if ($workflowDefinition && $workflow) {
             $this->assembler->expects($this->once())
                 ->method('assemble')
@@ -124,73 +87,79 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $newDefinition = new WorkflowDefinition();
         $newDefinition->setName(self::WORKFLOW_NAME)->setLabel('New Workflow');
 
-        /** @var Workflow $workflow */
-        $workflow = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Workflow')
+        $workflow = $this->getMockBuilder(Workflow::class)
             ->disableOriginalConstructor()
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
         $workflow->setDefinition($oldDefinition);
 
-        $this->entityRepository->expects($this->at(0))
+        $this->entityRepository->expects($this->exactly(2))
             ->method('find')
             ->with(self::WORKFLOW_NAME)
-            ->will($this->returnValue($oldDefinition));
-        $this->entityRepository->expects($this->at(1))
-            ->method('find')
-            ->with(self::WORKFLOW_NAME)
-            ->will($this->returnValue($newDefinition));
+            ->willReturnOnConsecutiveCalls($oldDefinition, $newDefinition);
         $this->prepareAssemblerMock($oldDefinition, $workflow);
         $this->setUpEntityManagerMock($oldDefinition, false);
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection([$this->filter]));
-        $this->filter->expects($this->once())->method('filter')
-            ->with(new ArrayCollection([$oldDefinition]))->willReturn(new ArrayCollection([$oldDefinition]));
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$this->filter]));
+        $this->filter->expects($this->once())
+            ->method('filter')
+            ->with(new ArrayCollection([$oldDefinition]))
+            ->willReturn(new ArrayCollection([$oldDefinition]));
 
         $this->assertEquals($workflow, $this->registry->getWorkflow(self::WORKFLOW_NAME));
         $this->assertEquals($newDefinition, $workflow->getDefinition());
-        static::assertEquals([self::WORKFLOW_NAME => $workflow], $this->registry->xgetWorkflowByName());
+        $this->assertEquals(
+            [self::WORKFLOW_NAME => $workflow],
+            ReflectionUtil::getPropertyValue($this->registry, 'workflowByName')
+        );
     }
 
     public function testGetWorkflowAndFilteredItem()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectException(WorkflowNotFoundException::class);
         $this->expectExceptionMessage('Workflow "test_workflow" not found');
 
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
-        $this->entityRepository->expects($this->once())->method('find')
-            ->with(self::WORKFLOW_NAME)->willReturn($workflowDefinition);
+        $this->entityRepository->expects($this->once())
+            ->method('find')
+            ->with(self::WORKFLOW_NAME)
+            ->willReturn($workflowDefinition);
 
         $this->prepareAssemblerMock();
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection([$this->filter]));
-        $this->filter->expects($this->once())->method('filter')
-            ->with(new ArrayCollection([$workflowDefinition]))->willReturn(new ArrayCollection());
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$this->filter]));
+        $this->filter->expects($this->once())
+            ->method('filter')
+            ->with(new ArrayCollection([$workflowDefinition]))
+            ->willReturn(new ArrayCollection());
 
         $this->registry->getWorkflow(self::WORKFLOW_NAME);
     }
 
     public function testGetWorkflowNoUpdatedEntity()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectException(WorkflowNotFoundException::class);
         $this->expectExceptionMessage('Workflow "test_workflow" not found');
 
         $workflow = $this->createWorkflow(self::WORKFLOW_NAME);
         $workflowDefinition = $workflow->getDefinition();
 
-        $this->entityRepository->expects($this->at(0))
+        $this->entityRepository->expects($this->exactly(2))
             ->method('find')
             ->with(self::WORKFLOW_NAME)
-            ->will($this->returnValue($workflowDefinition));
-        $this->entityRepository->expects($this->at(1))
-            ->method('find')
-            ->with(self::WORKFLOW_NAME)
-            ->will($this->returnValue(null));
+            ->willReturnOnConsecutiveCalls($workflowDefinition, null);
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
         $this->setUpEntityManagerMock($workflowDefinition, false);
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection());
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection());
 
         $this->registry->getWorkflow(self::WORKFLOW_NAME);
     }
@@ -207,7 +176,9 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
         $this->setUpEntityManagerMock($workflowDefinition);
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection());
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection());
 
         $this->assertEquals(
             new ArrayCollection([self::WORKFLOW_NAME => $workflow]),
@@ -217,17 +188,16 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasWorkflowsByEntityClassDataProvider
-     *
-     * @param array $definitions
-     * @param bool $expected
      */
-    public function testHasActiveWorkflowsByEntityClass(array $definitions, $expected)
+    public function testHasActiveWorkflowsByEntityClass(array $definitions, bool $expected)
     {
         $this->entityRepository->expects($this->once())
             ->method('findActiveForRelatedEntity')
             ->with(self::ENTITY_CLASS)
             ->willReturn($definitions);
-        $this->filters->expects($this->any())->method('getFilters')->willReturn(new ArrayCollection());
+        $this->filters->expects($this->any())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection());
 
         $this->assertEquals($expected, $this->registry->hasActiveWorkflowsByEntityClass(self::ENTITY_CLASS));
     }
@@ -244,7 +214,9 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->prepareAssemblerMock($workflowDefinition, $workflow);
         $this->setUpEntityManagerMock($workflowDefinition);
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection());
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection());
 
         $this->assertEquals(
             new ArrayCollection([self::WORKFLOW_NAME => $workflow]),
@@ -254,45 +226,35 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider hasWorkflowsByEntityClassDataProvider
-     *
-     * @param array $definitions
-     * @param bool $expected
      */
-    public function testHasWorkflowsByEntityClass(array $definitions, $expected)
+    public function testHasWorkflowsByEntityClass(array $definitions, bool $expected)
     {
         $this->entityRepository->expects($this->once())
             ->method('findForRelatedEntity')
             ->with(self::ENTITY_CLASS)
             ->willReturn($definitions);
-        $this->filters->expects($this->any())->method('getFilters')->willReturn(new ArrayCollection());
+        $this->filters->expects($this->any())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection());
 
         $this->assertEquals($expected, $this->registry->hasWorkflowsByEntityClass(self::ENTITY_CLASS));
     }
 
-    /**
-     * @return array
-     */
-    public function hasWorkflowsByEntityClassDataProvider()
+    public function hasWorkflowsByEntityClassDataProvider(): array
     {
-        $workflow = $this->createWorkflow(self::WORKFLOW_NAME, self::ENTITY_CLASS);
-
         return [
             'no workflows' => [
                 'definitions' => [],
                 'expected' => false,
             ],
             'with workflows' => [
-                'definitions' => [$workflow],
+                'definitions' => [$this->createWorkflow(self::WORKFLOW_NAME, self::ENTITY_CLASS)],
                 'expected' => true,
             ],
         ];
     }
 
     /**
-     * @param array $groups
-     * @param array $activeDefinitions
-     * @param array|Workflow[] $expectedWorkflows
-     * @param WorkflowDefinitionFilterInterface $filter
      * @dataProvider getActiveWorkflowsByActiveGroupsDataProvider
      */
     public function testGetActiveWorkflowsByActiveGroups(
@@ -301,19 +263,32 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         array $expectedWorkflows,
         WorkflowDefinitionFilterInterface $filter
     ) {
-        foreach ($expectedWorkflows as $at => $workflow) {
-            $this->assembler->expects($this->at($at))
-                ->method('assemble')
-                ->with($workflow->getDefinition())
-                ->willReturn($workflow);
-            $this->setUpEntityManagerMock($workflow->getDefinition());
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+
+        $workflowDefinitionExpectations = [];
+        foreach ($expectedWorkflows as $workflow) {
+            $workflowDefinitionExpectations[] = [$workflow->getDefinition()];
         }
+        $this->assembler->expects($this->exactly(count($expectedWorkflows)))
+            ->method('assemble')
+            ->withConsecutive(...$workflowDefinitionExpectations)
+            ->willReturnOnConsecutiveCalls(...$expectedWorkflows);
+        $unitOfWork->expects($this->exactly(count($expectedWorkflows)))
+            ->method('isInIdentityMap')
+            ->withConsecutive(...$workflowDefinitionExpectations)
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork);
 
         $this->entityRepository->expects($this->once())
             ->method('findActive')
             ->willReturn($activeDefinitions);
 
-        $this->filters->expects($this->any())->method('getFilters')->willReturn(new ArrayCollection([$filter]));
+        $this->filters->expects($this->any())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$filter]));
 
         $this->assertEquals(
             $expectedWorkflows,
@@ -321,20 +296,17 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getActiveWorkflowsByActiveGroupsDataProvider()
+    public function getActiveWorkflowsByActiveGroupsDataProvider(): array
     {
         $workflow1 = $this->createWorkflow('test_workflow1', self::ENTITY_CLASS);
         $workflowDefinition1 = $workflow1->getDefinition();
         $workflowDefinition1->setExclusiveActiveGroups(['group1']);
-        $filter1 = $this->createDefinitionFilterMock(
+        $filter1 = $this->createDefinitionFilter(
             new ArrayCollection([]),
             new ArrayCollection([])
         );
 
-        $filter2 = $this->createDefinitionFilterMock(
+        $filter2 = $this->createDefinitionFilter(
             new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
             new ArrayCollection(['test_workflow1' => $workflowDefinition1])
         );
@@ -342,7 +314,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $workflow2 = $this->createWorkflow('test_workflow2', self::ENTITY_CLASS);
         $workflowDefinition2 = $workflow2->getDefinition();
         $workflowDefinition2->setExclusiveActiveGroups(['group2', 'group3']);
-        $filter3 = $this->createDefinitionFilterMock(
+        $filter3 = $this->createDefinitionFilter(
             new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
             new ArrayCollection([])
         );
@@ -375,11 +347,13 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $workflowDefinition = $workflow->getDefinition();
         $workflowDefinition->setExclusiveActiveGroups(['group1']);
 
-        $filter = $this->createDefinitionFilterMock(
+        $filter = $this->createDefinitionFilter(
             new ArrayCollection([self::WORKFLOW_NAME => $workflowDefinition]),
             new ArrayCollection([self::WORKFLOW_NAME => $workflowDefinition])
         );
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection([$filter]));
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$filter]));
 
         $this->entityRepository->expects($this->once())
             ->method('findActive')
@@ -399,11 +373,13 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $workflowDefinition = $workflow->getDefinition();
         $workflowDefinition->setExclusiveActiveGroups(['group1']);
 
-        $filter = $this->createDefinitionFilterMock(
+        $filter = $this->createDefinitionFilter(
             new ArrayCollection([self::WORKFLOW_NAME => $workflowDefinition]),
             new ArrayCollection([])
         );
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection([$filter]));
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$filter]));
 
         $this->entityRepository->expects($this->once())
             ->method('findActive')
@@ -431,63 +407,43 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
             ->method('findActive')
             ->willReturn([$workflowDefinition1, $workflowDefinition2]);
 
-        $filter = $this->createDefinitionFilterMock(
+        $filter = $this->createDefinitionFilter(
             new ArrayCollection(['test_workflow1' => $workflowDefinition1]),
             new ArrayCollection()
         );
 
-        $this->filters->expects($this->once())->method('getFilters')->willReturn(new ArrayCollection([$filter]));
+        $this->filters->expects($this->once())
+            ->method('getFilters')
+            ->willReturn(new ArrayCollection([$filter]));
 
         $this->assertEmpty($this->registry->getActiveWorkflowsByActiveGroups(['group1']));
     }
 
-    /**
-     * @param Collection $in
-     * @param Collection $out
-     * @return WorkflowDefinitionFilterInterface|MockObject
-     */
-    private function createDefinitionFilterMock(Collection $in, Collection $out)
+    private function createDefinitionFilter(Collection $in, Collection $out): WorkflowDefinitionFilterInterface
     {
         $filter = $this->createMock(WorkflowDefinitionFilterInterface::class);
-        $filter->expects($this->any())->method('filter')->with($in)->willReturn($out);
+        $filter->expects($this->any())
+            ->method('filter')
+            ->with($in)
+            ->willReturn($out);
 
         return $filter;
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @param boolean $isEntityKnown
-     */
-    protected function setUpEntityManagerMock($workflowDefinition, $isEntityKnown = true)
+    private function setUpEntityManagerMock(WorkflowDefinition $workflowDefinition, bool $isEntityKnown = true): void
     {
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $unitOfWork->expects($this->any())->method('isInIdentityMap')->with($workflowDefinition)
-            ->will($this->returnValue($isEntityKnown));
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $unitOfWork->expects($this->any())
+            ->method('isInIdentityMap')
+            ->with($workflowDefinition)
+            ->willReturn($isEntityKnown);
 
-        $this->entityManager->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
+        $this->entityManager->expects($this->any())
+            ->method('getUnitOfWork')
+            ->willReturn($unitOfWork);
     }
 
-    protected function setUpEntityManagerMockAllKnown()
-    {
-        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $unitOfWork->expects($this->any())->method('isInIdentityMap')->with()->willReturn(true);
-
-        $this->entityManager->expects($this->any())->method('getUnitOfWork')
-            ->will($this->returnValue($unitOfWork));
-    }
-
-    /**
-     * @param string $workflowName
-     *
-     * @param string|null $relatedEntity
-     * @return Workflow|MockObject
-     */
-    protected function createWorkflow($workflowName, $relatedEntity = null)
+    private function createWorkflow(string $workflowName, string $relatedEntity = null): Workflow
     {
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($workflowName);
@@ -496,12 +452,20 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
             $workflowDefinition->setRelatedEntity($relatedEntity);
         }
 
-        return $this->createWorkflowFromDefinition($workflowDefinition);
+        $workflow = $this->createMock(Workflow::class);
+        $workflow->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($workflowDefinition);
+        $workflow->expects($this->any())
+            ->method('getName')
+            ->willReturn($workflowDefinition->getName());
+
+        return $workflow;
     }
 
     public function testGetWorkflowNotFoundException()
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException::class);
+        $this->expectException(WorkflowNotFoundException::class);
         $this->expectExceptionMessage('Workflow "not_existing_workflow" not found');
 
         $workflowName = 'not_existing_workflow';
@@ -513,27 +477,5 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
         $this->prepareAssemblerMock();
 
         $this->registry->getWorkflow($workflowName);
-    }
-
-    /**
-     * @param WorkflowDefinition $definition
-     * @return Workflow|MockObject
-     */
-    private function createWorkflowFromDefinition(WorkflowDefinition $definition)
-    {
-        /** @var Workflow|MockObject $workflow */
-        $workflow = $this->getMockBuilder(Workflow::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $workflow->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-
-        $workflow->expects($this->any())
-            ->method('getName')
-            ->willReturn($definition->getName());
-
-        return $workflow;
     }
 }

@@ -2,16 +2,20 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Form\Handler\NoteHandler;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for Note entity.
@@ -80,7 +84,7 @@ class NoteController extends AbstractController
      */
     public function infoAction(Request $request, Note $entity, $renderContexts)
     {
-        $attachmentProvider = $this->get('oro_attachment.provider.attachment');
+        $attachmentProvider = $this->get(AttachmentProvider::class);
         $attachment = $attachmentProvider->getAttachmentInfo($entity);
 
         return [
@@ -155,42 +159,52 @@ class NoteController extends AbstractController
             'saved'  => false
         ];
 
-        if ($this->get('oro_note.form.handler.note')->process($entity)) {
+        if ($this->get(NoteHandler::class)->process($entity)) {
             $responseData['saved'] = true;
             $responseData['model'] = $this->getNoteManager()->getEntityViewModel($entity);
         }
         $responseData['form']        = $this->getForm()->createView();
         $responseData['formAction']  = $formAction;
+        $translator = $this->get(TranslatorInterface::class);
         if ($entity->getId()) {
-            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.save.label');
+            $responseData['submitLabel'] = $translator->trans('oro.note.save.label');
         } else {
-            $responseData['submitLabel'] = $this->get('translator')->trans('oro.note.add.label');
+            $responseData['submitLabel'] = $translator->trans('oro.note.add.label');
         }
 
         return $responseData;
     }
 
-    /**
-     * @return FormInterface
-     */
-    public function getForm()
+    public function getForm(): FormInterface
     {
         return $this->get('oro_note.form.note');
     }
 
-    /**
-     * @return NoteManager
-     */
-    protected function getNoteManager()
+    protected function getNoteManager(): NoteManager
     {
-        return $this->get('oro_note.manager');
+        return $this->get(NoteManager::class);
+    }
+
+    protected function getEntityRoutingHelper(): EntityRoutingHelper
+    {
+        return $this->get(EntityRoutingHelper::class);
     }
 
     /**
-     * @return EntityRoutingHelper
+     * {@inheritdoc}
      */
-    protected function getEntityRoutingHelper()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_entity.routing_helper');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                AttachmentProvider::class,
+                NoteHandler::class,
+                NoteManager::class,
+                EntityRoutingHelper::class,
+                'oro_note.form.note' => Form::class,
+            ]
+        );
     }
 }

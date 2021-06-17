@@ -187,7 +187,7 @@ define(function(require) {
          * Execute action
          */
         execute: function() {
-            this._confirmationExecutor(_.bind(this.executeConfiguredAction, this));
+            this._confirmationExecutor(this.executeConfiguredAction.bind(this));
         },
 
         executeConfiguredAction: function() {

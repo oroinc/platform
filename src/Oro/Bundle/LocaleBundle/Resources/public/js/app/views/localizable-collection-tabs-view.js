@@ -129,7 +129,7 @@ define(function(require) {
                 .on('focus', function(e) {
                     $(e.currentTarget).data('prevValue', e.currentTarget.value);
                 })
-                .change(_.bind(this.switchFallbackTypeEvent, this));
+                .change(this.switchFallbackTypeEvent.bind(this));
         },
 
         /**

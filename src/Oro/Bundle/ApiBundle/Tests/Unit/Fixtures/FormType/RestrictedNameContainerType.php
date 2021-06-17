@@ -15,7 +15,7 @@ class RestrictedNameContainerType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $options['name_options']['constraints'][] = new Assert\Length(['min' => 5]);
+        $options['name_options']['constraints'][] = new Assert\Length(['min' => 5, 'allowEmptyString' => false]);
 
         $builder
             ->add('name', TextType::class, $options['name_options']);

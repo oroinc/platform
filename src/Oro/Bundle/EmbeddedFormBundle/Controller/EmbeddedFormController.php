@@ -9,11 +9,13 @@ use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Embedded Form Controller
@@ -126,13 +128,13 @@ class EmbeddedFormController extends AbstractController
      */
     public function infoAction(EmbeddedForm $entity)
     {
-        return array(
+        return [
             'entity'  => $entity
-        );
+        ];
     }
 
     /**
-     * @param EmbeddedForm $entity
+     * @param EmbeddedForm|null $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     protected function update(EmbeddedForm $entity = null)
@@ -152,26 +154,39 @@ class EmbeddedFormController extends AbstractController
 
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.embeddedform.controller.saved_message')
+                $this->get(TranslatorInterface::class)->trans('oro.embeddedform.controller.saved_message')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         $formManager = $this->getFormManager();
-        return array(
+        return [
             'entity' => $entity,
             'defaultCss' => $formManager->getDefaultCssByType($entity->getFormType()),
             'defaultSuccessMessage' => $formManager->getDefaultSuccessMessageByType($entity->getFormType()),
             'form' => $form->createView()
-        );
+        ];
+    }
+
+    protected function getFormManager(): EmbeddedFormManager
+    {
+        return $this->get(EmbeddedFormManager::class);
     }
 
     /**
-     * @return EmbeddedFormManager
+     * {@inheritdoc}
      */
-    protected function getFormManager()
+    public static function getSubscribedServices()
     {
-        return $this->get('oro_embedded_form.manager');
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                EmbeddedFormManager::class,
+                'doctrine.orm.entity_manager' => EntityManager::class,
+            ]
+        );
     }
 }

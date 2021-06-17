@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
 use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -16,7 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
- * CRUD Controller for Attachments
+ * The controller for Attachment entity.
  */
 class AttachmentController extends AbstractController
 {
@@ -35,7 +36,7 @@ class AttachmentController extends AbstractController
      */
     public function widgetAction($entityClass, $entityId)
     {
-        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+        $entityClass = $this->getEntityRoutingHelper()->resolveEntityClass($entityClass);
         return [
             'entityId'    => $entityId,
             'entityField' => ExtendHelper::buildAssociationName($entityClass),
@@ -131,7 +132,7 @@ class AttachmentController extends AbstractController
             $responseData['update'] = true;
         }
 
-        if ($this->get('oro_attachment.form.handler.attachment')->process($form)) {
+        if ($this->get(AttachmentHandler::class)->process($form)) {
             $responseData['saved'] = true;
         } else {
             $responseData['form']       = $form->createView();
@@ -144,16 +145,31 @@ class AttachmentController extends AbstractController
     /**
      * @return EntityRoutingHelper
      */
-    protected function getEntityRoutingHelper()
+    protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
-        return $this->get('oro_entity.routing_helper');
+        return $this->get(EntityRoutingHelper::class);
     }
 
     /**
      * @return AttachmentManager
      */
-    protected function getAttachmentManager()
+    protected function getAttachmentManager(): AttachmentManager
     {
-        return $this->get('oro_attachment.manager');
+        return $this->get(AttachmentManager::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                EntityRoutingHelper::class,
+                AttachmentHandler::class,
+                AttachmentManager::class,
+            ]
+        );
     }
 }

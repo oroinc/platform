@@ -93,7 +93,7 @@ define(function(require) {
                 });
             });
 
-            $.when(...optionsProcessedPromises).always(_.bind(function() {
+            $.when(...optionsProcessedPromises).always(() => {
                 /**
                  * #2. Init datagrid
                  */
@@ -137,7 +137,7 @@ define(function(require) {
                         self.grid.trigger('shown');
                     });
                 });
-            }, this));
+            });
         },
 
         /**
@@ -309,13 +309,13 @@ define(function(require) {
             this.grid = grid;
             grid.render();
             if (this.changeAppearanceEnabled) {
-                grid.on('changeAppearance', _.bind(this.onChangeAppearance, this));
-                collection.on('updateState', _.bind(function() {
+                grid.on('changeAppearance', this.onChangeAppearance.bind(this));
+                collection.on('updateState', () => {
                     if (this.currentAppearanceKey !== collection.state.appearanceType ||
                         this.currentAppearanceId !== collection.state.appearanceData.id) {
                         this.selectAppearanceById(collection.state.appearanceData.id);
                     }
-                }, this));
+                });
             }
             mediator.trigger('datagrid:rendered', grid);
 

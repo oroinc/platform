@@ -1,65 +1,55 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\MaintenanceListenerPriorityCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class MaintenanceListenerPriorityCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MaintenanceListenerPriorityCompilerPass */
     private $compiler;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerBuilder */
-    private $container;
-
     protected function setUp(): void
     {
         $this->compiler = new MaintenanceListenerPriorityCompilerPass();
-        $this->container = $this->createMock(ContainerBuilder::class);
     }
 
-    /**
-     * @dataProvider processDataProvider
-     *
-     * @param array $tags
-     * @param array $expectedTags
-     */
-    public function testProcess(array $tags, array $expectedTags): void
+    public function testProcessNoTags(): void
     {
-        $definition = new Definition();
-        $definition->setTags($tags);
+        $container = new ContainerBuilder();
+        $maintenanceListenerDef = $container->register('lexik_maintenance.listener');
 
-        $this->container
-            ->expects($this->once())
-            ->method('getDefinition')
-            ->with('lexik_maintenance.listener')
-            ->willReturn($definition);
+        $this->compiler->process($container);
 
-        $this->compiler->process($this->container);
-
-        $this->assertEquals($expectedTags, $definition->getTags());
+        $this->assertSame([], $maintenanceListenerDef->getTags());
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider(): array
+    public function testProcessForKernelEvent(): void
     {
-        return [
-            [
-                'tags' => ['kernel.event_listener' => [['event' => 'kernel.request']]],
-                'expectedTags' => ['kernel.event_listener' => [['event' => 'kernel.request', 'priority' => 512]]],
-            ],
-            [
-                'tags' => ['kernel.event_listener' => [['event' => 'sample.event']]],
-                'expectedTags' => ['kernel.event_listener' => [['event' => 'sample.event']]],
-            ],
-            [
-                'tags' => [],
-                'expectedTags' => [],
-            ],
-        ];
+        $container = new ContainerBuilder();
+        $maintenanceListenerDef = $container->register('lexik_maintenance.listener')
+            ->addTag('kernel.event_listener', ['event' => 'kernel.request']);
+
+        $this->compiler->process($container);
+
+        $this->assertSame(
+            ['kernel.event_listener' => [['event' => 'kernel.request', 'priority' => 512]]],
+            $maintenanceListenerDef->getTags()
+        );
+    }
+
+    public function testProcessForNotKernelEvent(): void
+    {
+        $container = new ContainerBuilder();
+        $maintenanceListenerDef = $container->register('lexik_maintenance.listener')
+            ->addTag('kernel.event_listener', ['event' => 'sample.event']);
+
+        $this->compiler->process($container);
+
+        $this->assertSame(
+            ['kernel.event_listener' => [['event' => 'sample.event']]],
+            $maintenanceListenerDef->getTags()
+        );
     }
 }

@@ -73,7 +73,7 @@ define(function(require) {
         delegateEvents: function(events) {
             AbstractInputWidgetView.__super__.delegateEvents.call(this, events);
             if (this.refreshOnChange) {
-                this._addEvent('change', _.bind(this.refresh, this));
+                this._addEvent('change', this.refresh.bind(this));
             }
         },
 
@@ -95,7 +95,7 @@ define(function(require) {
             this.$el.data('inputWidget', this)
                 .attr('data-bound-input-widget', this.widgetFunctionName || 'no-name');
             if (!this.widgetFunction && this.widgetFunctionName) {
-                this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
+                this.widgetFunction = this.$el[this.widgetFunctionName].bind(this.$el);
             }
 
             if (this.containerClassSuffix) {

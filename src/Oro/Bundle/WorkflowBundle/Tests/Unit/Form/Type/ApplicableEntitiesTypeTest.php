@@ -11,15 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConnector;
+    private $entityConnector;
 
     /** @var ApplicableEntitiesType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {
-        $this->entityConnector = $this->getMockBuilder(WorkflowEntityConnector::class)
-            ->disableOriginalConstructor()->getMock();
+        $this->entityConnector = $this->createMock(WorkflowEntityConnector::class);
 
         $this->type = new ApplicableEntitiesType($this->entityConnector);
     }
@@ -38,17 +37,14 @@ class ApplicableEntitiesTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->type->configureOptions($resolver);
 
-        $this->entityConnector->expects($this->at(0))
+        $this->entityConnector->expects($this->exactly(2))
             ->method('isApplicableEntity')
-            ->with(StubEntity::class)
-            ->willReturn(true);
+            ->willReturnMap([
+                [StubEntity::class, true],
+                [\stdClass::class, false]
+            ]);
 
-        $this->entityConnector->expects($this->at(1))
-            ->method('isApplicableEntity')
-            ->with(\stdClass::class)
-            ->willReturn(false);
-
-        $result = $resolver->resolve([]);
+        $result = $resolver->resolve();
 
         $this->assertEquals(
             [

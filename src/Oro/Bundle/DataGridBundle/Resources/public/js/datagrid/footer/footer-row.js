@@ -27,15 +27,15 @@ define([
 
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            const _this = this;
+            const footerRowView = this;
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(itemViewOptions) {
                     const column = itemViewOptions.model;
-                    const FooterCell = column.get('footerCell') || options.footerCell || _this.footerCell;
+                    const FooterCell = column.get('footerCell') || options.footerCell || footerRowView.footerCell;
                     const cellOptions = {
                         column: column,
-                        collection: _this.dataCollection,
+                        collection: footerRowView.dataCollection,
                         rowName: options.rowName,
                         themeOptions: {
                             className: 'grid-cell grid-footer-cell'
@@ -44,7 +44,7 @@ define([
                     if (column.get('name')) {
                         cellOptions.themeOptions.className += ' grid-footer-cell-' + column.get('name');
                     }
-                    _this.columns.trigger('configureInitializeOptions', FooterCell, cellOptions);
+                    footerRowView.columns.trigger('configureInitializeOptions', FooterCell, cellOptions);
                     return new FooterCell(cellOptions);
                 };
             }

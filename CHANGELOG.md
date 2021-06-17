@@ -1,4 +1,4 @@
-Please refer first to [UPGRADE.md](UPGRADE.md) for the most important items that should be addressed before attempting to upgrade or during the upgrade of a vanilla Oro application.
+The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
@@ -6,9 +6,17 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### ConfigBundle
+* The DIC compiler pass `Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\ListenerExcludeConfigConnectionPass`
+  was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
+
 #### EntityMergeBundle
 * The service `oro_entity_merge.accessor.delegate` was removed. Use `oro_entity_merge.accessor` instead.
 * The service `oro_entity_merge.strategy.delegate` was removed. Use `oro_entity_merge.strategy` instead.
+
+#### SearchBundle
+* The DIC compiler pass `Oro\Bundle\SearchBundle\DependencyInjection\Compiler\ListenerExcludeSearchConnectionPass`
+  was removed. It is unneeded since the `doctrine.exclude_listener_connections` DIC parameter is no longer in use.
 
 ## 5.0.0-alpha.2 (2021-05-28)
 [Show detailed list of changes](incompatibilities-5-0-alpha-2.md)
@@ -26,13 +34,20 @@ The current file describes significant changes in the code that may affect the u
   As result, all SCSS variables available from global scope, no need to import them manually into local style from a bundle.
   All inputs are imported in following order `**/settings/**`, `**/variables/**` and rest of styles, that allows to modify variable's value before it is used. That is aimed to simplify customization.
 
+#### FormBundle
+ * validator `oroform/js/validator/url` is excluded from JS-build for blank theme, due to it is too heavy and not in use on the front. It can be included again in custom theme if needed.
+
+#### ValidationBundle
+ * validator `orovalidation/js/validator/url` is excluded from JS-build for blank theme, due to it is too heavy and not in use on the front. It can be included again in custom theme if needed.
+  
 #### @oroinc/webpack-config-builder
 * Platform now requires updated version of `@oroinc/webpack-config-builder` package which is migrated to Webpack 5. See [Webpack migration guide](https://webpack.js.org/migrate/5/).
 
 ### Removed
 
 #### UIBundle
-* A separate styles build for third-party libraries with RTL support was removed for back-office themes. Now, RTL styles are build the same way as for Layout Themes. See [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support/#configure-theme) 
+* A separate styles build for third-party libraries with RTL support was removed for back-office themes. Now, RTL styles are build the same way as for Layout Themes. See [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support/#configure-theme)
+* `isIE11` and `isEDGE` methods are removed from `oroui/js/tools` module
 
 ## 5.0.0-alpha.1 (2021-03-31)
 [Show detailed list of changes](incompatibilities-5-0-alpha-1.md)

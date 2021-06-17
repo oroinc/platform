@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * The controller for Job entity.
  * @Route("/jobs")
  */
 class JobController extends AbstractController

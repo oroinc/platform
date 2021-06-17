@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Controller;
 
 use Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler;
+use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Autocomplete search controller for Activities.
@@ -31,7 +33,7 @@ class AutocompleteController extends AbstractController
     public function autocompleteAction(Request $request, $activity)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get('validator');
+        $validator           = $this->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
         $code                = 200;
         $result              = [
@@ -47,7 +49,7 @@ class AutocompleteController extends AbstractController
             }
         }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -59,8 +61,7 @@ class AutocompleteController extends AbstractController
             throw new HttpException($code, implode(', ', $result['errors']));
         }
 
-        /** @var ContextSearchHandler $searchHandler */
-        $searchHandler = $this->get('oro_activity.form.handler.autocomplete');
+        $searchHandler = $this->get(ContextSearchHandler::class);
         $searchHandler->setClass($activity);
 
         return new JsonResponse($searchHandler->search(
@@ -69,5 +70,20 @@ class AutocompleteController extends AbstractController
             $autocompleteRequest->getPerPage(),
             $autocompleteRequest->isSearchById()
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ValidatorInterface::class,
+                Security::class,
+                ContextSearchHandler::class,
+            ]
+        );
     }
 }

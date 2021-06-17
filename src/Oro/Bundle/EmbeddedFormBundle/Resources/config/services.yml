@@ -11,6 +11,9 @@ services:
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
 
+    Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager:
+        alias: oro_embedded_form.manager
+
     oro_embedded_form.manager:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
         public: true
@@ -36,6 +39,9 @@ services:
 
     oro_embedded_form.layout_manager:
         synthetic: true
+
+    Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager:
+        alias: oro_embedded_form.embed_form_layout_manager
 
     oro_embedded_form.embed_form_layout_manager:
         class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager

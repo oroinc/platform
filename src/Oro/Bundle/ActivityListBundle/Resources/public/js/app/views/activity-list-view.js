@@ -306,13 +306,13 @@ define(function(require) {
 
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function() {
+                    success: () => {
                         this._initPager();
                         this._hideLoading();
-                    }, this),
-                    error: _.bind(function(collection, response) {
+                    },
+                    error: (collection, response) => {
                         this._showLoadItemsError(response.responseJSON || {});
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showLoadItemsError(err);
@@ -350,11 +350,11 @@ define(function(require) {
                                 contentLoadedPromises.push(deferredContentLoading);
                                 view.model.once(
                                     'change:isContentLoading',
-                                    _.bind(function(view, deferredContentLoading) {
+                                    function(view, deferredContentLoading) {
                                         // reset height
                                         view.$el.height('');
                                         deferredContentLoading.resolve();
-                                    }, this, view, deferredContentLoading)
+                                    }.bind(null, view, deferredContentLoading)
                                 );
                             }
                         }
@@ -363,9 +363,9 @@ define(function(require) {
                 delete this.oldViewStates;
             }
 
-            $.when(...contentLoadedPromises).done(_.bind(function() {
+            $.when(...contentLoadedPromises).done(() => {
                 this._hideLoading();
-            }, this));
+            });
 
             return result;
         },
@@ -384,13 +384,13 @@ define(function(require) {
                 return;
             }
             model.loadContentHTML(url)
-                .fail(_.bind(function(response) {
+                .fail(response => {
                     if (response.status === 403) {
                         this._showForbiddenActivityDataError(response.responseJSON || {});
                     } else {
                         this._showLoadItemsError(response.responseJSON || {});
                     }
-                }, this));
+                });
         },
 
         _editItem: function(model, extraOptions) {
@@ -409,9 +409,9 @@ define(function(require) {
                     url: this._getUrl('itemEdit', model),
                     title: unescapeHTML(model.get('subject')),
                     dialogOptions: {
-                        close: _.bind(function() {
+                        close: () => {
                             delete this.itemEditDialog;
-                        }, this)
+                        }
                     }
                 });
                 this.itemEditDialog = new DialogWidget(dialogConfiguration);
@@ -424,9 +424,9 @@ define(function(require) {
             const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 this._onItemDelete(model);
-            }, this));
+            });
             confirm.open();
         },
 
@@ -449,20 +449,20 @@ define(function(require) {
                 model.destroy({
                     wait: true,
                     url: this._getUrl('itemDelete', model),
-                    success: _.bind(function() {
+                    success: () => {
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
                         mediator.trigger('widget_success:activity_list:item:delete');
 
                         this._reload();
-                    }, this),
-                    error: _.bind(function(model, response) {
+                    },
+                    error: (model, response) => {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
                         }
                         this._hideLoading();
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showDeleteItemError(err);

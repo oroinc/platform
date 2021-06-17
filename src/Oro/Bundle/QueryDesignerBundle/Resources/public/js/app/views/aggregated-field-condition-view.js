@@ -82,14 +82,14 @@ define(function(require) {
 
         _compileSelectionTpl: function(template) {
             const compiledTemplate = _.template(template);
-            return _.bind(function(data) {
+            return data => {
                 let result = compiledTemplate(data);
                 const func = this._getCurrentFunc();
                 if (func && func.name) {
                     result += ' (' + func.name + ')';
                 }
                 return result;
-            }, this);
+            };
         },
 
         applicableConditionsCallback: function(result, fieldId) {
@@ -104,9 +104,9 @@ define(function(require) {
         fieldChoiceResultsCallback: function() {
             return _.map(
                 this._getAggregatedColumns(),
-                _.bind(function(model) {
+                model => {
                     return this._buildColumnDataItem(model);
-                }, this)
+                }
             );
         },
 

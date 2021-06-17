@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\ConfigBundle\Controller;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Form\Handler\ConfigHandler;
+use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SyncBundle\Content\DataUpdateTopicSender;
+use Oro\Bundle\SyncBundle\Content\TagGeneratorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Controller for system config functionality
@@ -34,7 +40,7 @@ class ConfigurationController extends AbstractController
      */
     public function systemAction(Request $request, $activeGroup = null, $activeSubGroup = null)
     {
-        $provider = $this->get('oro_config.provider.system_configuration.form_provider');
+        $provider = $this->get(SystemConfigurationFormProvider::class);
 
         list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
 
@@ -44,22 +50,22 @@ class ConfigurationController extends AbstractController
         if ($activeSubGroup !== null) {
             $form = $provider->getForm($activeSubGroup);
 
-            if ($this->get('oro_config.form.handler.config')->process($form, $request)) {
+            if ($this->get(ConfigHandler::class)->process($form, $request)) {
                 $this->get('session')->getFlashBag()->add(
                     'success',
-                    $this->get('translator')->trans('oro.config.controller.config.saved.message')
+                    $this->get(TranslatorInterface::class)->trans('oro.config.controller.config.saved.message')
                 );
 
                 // outdate content tags, it's only special case for generation that are not covered by NavigationBundle
                 $taggableData = ['name' => 'system_configuration', 'params' => [$activeGroup, $activeSubGroup]];
-                $tagGenerator = $this->get('oro_sync.content.tag_generator');
-                $dataUpdateTopicSender = $this->get('oro_sync.content.data_update_topic_sender');
+                $tagGenerator = $this->get(TagGeneratorInterface::class);
+                $dataUpdateTopicSender = $this->get(DataUpdateTopicSender::class);
 
                 $dataUpdateTopicSender->send($tagGenerator->generate($taggableData));
 
                 // recreate form to drop values for fields with use_parent_scope_value
                 $form = $provider->getForm($activeSubGroup);
-                $form->setData($this->get('oro_config.global')->getSettingsByForm($form));
+                $form->setData($this->get(ConfigManager::class)->getSettingsByForm($form));
             }
         }
 
@@ -72,5 +78,23 @@ class ConfigurationController extends AbstractController
             'scopeEntityClass' => null,
             'scopeEntityId'  => null
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                SystemConfigurationFormProvider::class,
+                ConfigHandler::class,
+                TagGeneratorInterface::class,
+                DataUpdateTopicSender::class,
+                ConfigManager::class,
+            ]
+        );
     }
 }

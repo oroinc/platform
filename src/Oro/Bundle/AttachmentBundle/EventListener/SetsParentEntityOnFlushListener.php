@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\EventListener;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
@@ -261,7 +262,7 @@ class SetsParentEntityOnFlushListener
     {
         $value = $this->propertyAccessor->getValue($entity, $fieldName);
 
-        if ($associationType & ClassMetadata::TO_MANY) {
+        if (($associationType & ClassMetadata::TO_MANY) && $value instanceof Collection) {
             // Field value is Collection of File entities.
             $value = array_map(
                 static function ($obj) {

@@ -166,6 +166,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $inlineEditor = $cell->findField('value');
 
         self::assertEquals($value, $inlineEditor->getValue());
+        $cell->find('css', 'button[title="Cancel"]')->click();
     }
 
     /**
@@ -2126,6 +2127,29 @@ TEXT;
         $columnManager = $this->getGridColumnManager($this->getGrid($gridName));
         $columnManager->open();
         $columnManager->hideAllColumns($exceptions);
+        $columnManager->close();
+    }
+
+    /**
+     * Show all columns in grid except mentioned
+     *
+     * @When /^(?:|I) show all columns in grid except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I) show all columns in "(?P<gridName>[^"]+)" except (?P<exceptions>(?:[^"]|\\")*)$/
+     * @When /^(?:|I) show all columns in grid$/
+     * @When /^(?:|I) show all columns in "(?P<gridName>[^"]+)"$/
+     *
+     * @param string $exceptions
+     * @param string|null $gridName
+     */
+    public function iShowAllColumnsInGrid($exceptions = '', $gridName = null): void
+    {
+        $exceptions = explode(',', $exceptions);
+        $exceptions = array_map('trim', $exceptions);
+        $exceptions = array_filter($exceptions);
+
+        $columnManager = $this->getGridColumnManager($this->getGrid($gridName));
+        $columnManager->open();
+        $columnManager->showAllColumns($exceptions);
         $columnManager->close();
     }
 

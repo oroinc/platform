@@ -4,9 +4,13 @@ namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
+use Oro\Bundle\UIBundle\Route\Router;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Controller for Integrations config page
@@ -80,7 +85,7 @@ class IntegrationController extends AbstractController
     {
         if ($integration->isEnabled()) {
             try {
-                $this->get('oro_integration.genuine_sync_scheduler')->schedule(
+                $this->get(GenuineSyncScheduler::class)->schedule(
                     $integration->getId(),
                     null,
                     ['force' => (bool)$request->get('force', false)]
@@ -94,13 +99,13 @@ class IntegrationController extends AbstractController
                 $status = Response::HTTP_OK;
                 $response = [
                     'successful' => true,
-                    'message'    => $this->get('translator')->trans(
+                    'message'    => $this->get(TranslatorInterface::class)->trans(
                         'oro.integration.scheduled',
                         ['%url%' => $checkJobProgressUrl]
                     )
                 ];
             } catch (\Exception $e) {
-                $this->get('logger')->error(
+                $this->get(LoggerInterface::class)->error(
                     sprintf(
                         'Failed to schedule integration synchronization. Integration Id: %s.',
                         $integration->getId()
@@ -111,14 +116,14 @@ class IntegrationController extends AbstractController
                 $status = Response::HTTP_BAD_REQUEST;
                 $response = [
                     'successful' => false,
-                    'message'    => $this->get('translator')->trans('oro.integration.sync_error')
+                    'message'    => $this->getTranslator()->trans('oro.integration.sync_error')
                 ];
             }
         } else {
             $status = Response::HTTP_OK;
             $response = [
                 'successful' => false,
-                'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated')
+                'message'    => $this->getTranslator()->trans('oro.integration.sync_error_integration_deactivated')
             ];
         }
 
@@ -132,15 +137,15 @@ class IntegrationController extends AbstractController
      */
     protected function update(Integration $integration)
     {
-        $formHandler = $this->get('oro_integration.form.handler.integration');
+        $formHandler = $this->get(ChannelHandler::class);
 
         if ($formHandler->process($integration)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
+                $this->getTranslator()->trans('oro.integration.controller.integration.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($integration);
+            return $this->get(Router::class)->redirect($integration);
         }
 
         $form = $formHandler->getForm();
@@ -149,5 +154,30 @@ class IntegrationController extends AbstractController
             'entity' => $integration,
             'form'   => $form->createView()
         ];
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                GenuineSyncScheduler::class,
+                LoggerInterface::class,
+                ChannelHandler::class,
+                Router::class,
+            ]
+        );
     }
 }

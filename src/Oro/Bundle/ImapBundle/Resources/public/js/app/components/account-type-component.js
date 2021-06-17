@@ -61,7 +61,7 @@ define(function(require) {
                     type: value,
                     formParentName: this.formParentName
                 },
-                success: _.bind(this.templateLoaded, this)
+                success: this.templateLoaded.bind(this)
             });
         },
 
@@ -74,7 +74,7 @@ define(function(require) {
                     type: value.type,
                     token: value.token
                 },
-                success: _.bind(this.templateLoaded, this)
+                success: this.templateLoaded.bind(this)
             });
         },
 

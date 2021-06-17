@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
+use Oro\Bundle\ActionBundle\Handler\OperationFormHandler;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
+use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,10 +28,10 @@ class WidgetController extends AbstractController
      */
     public function buttonsAction()
     {
-        $buttonSearchContext = $this->get('oro_action.provider.button_search_context')->getButtonSearchContext();
+        $buttonSearchContext = $this->get(ButtonSearchContextProvider::class)->getButtonSearchContext();
 
         return [
-            'buttons' => $this->get('oro_action.provider.button')->findAvailable($buttonSearchContext),
+            'buttons' => $this->get(ButtonProvider::class)->findAvailable($buttonSearchContext),
         ];
     }
 
@@ -42,7 +45,7 @@ class WidgetController extends AbstractController
      */
     public function formAction(Request $request, $operationName)
     {
-        $handler = $this->get('oro_action.form.handler.operation_button');
+        $handler = $this->get(OperationFormHandler::class);
 
         $result = $handler->process($operationName, $request, $this->get('session')->getFlashBag());
 
@@ -69,5 +72,20 @@ class WidgetController extends AbstractController
         }
 
         return $template;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ButtonSearchContextProvider::class,
+                ButtonProvider::class,
+                OperationFormHandler::class,
+            ]
+        );
     }
 }

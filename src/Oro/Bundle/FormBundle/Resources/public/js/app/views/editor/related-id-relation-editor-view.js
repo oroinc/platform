@@ -141,7 +141,6 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            const _this = this;
             const options = _.omit(RelatedIdRelationEditorView.__super__.getSelect2Options.call(this), 'data');
 
             return _.extend(options, {
@@ -153,25 +152,25 @@ define(function(require) {
                 formatResult: function(item) {
                     return item.label;
                 },
-                initSelection: function(element, callback) {
-                    callback(_this.getInitialResultItem());
+                initSelection: (element, callback) => {
+                    callback(this.getInitialResultItem());
                 },
-                query: function(options) {
-                    _this.currentTerm = options.term;
-                    if (_this.currentRequest && _this.currentRequest.term !== '' &&
-                        _this.currentRequest.state() !== 'resolved') {
-                        _this.currentRequest.abort();
+                query: options => {
+                    this.currentTerm = options.term;
+                    if (this.currentRequest && this.currentRequest.term !== '' &&
+                        this.currentRequest.state() !== 'resolved') {
+                        this.currentRequest.abort();
                     }
-                    const autoCompleteUrlParameters = _.extend(_this.model.toJSON(), {
+                    const autoCompleteUrlParameters = _.extend(this.model.toJSON(), {
                         term: options.term,
                         page: options.page,
-                        per_page: _this.perPage
+                        per_page: this.perPage
                     });
                     if (options.term !== '' &&
-                        !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
-                        _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
+                        !this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
+                        this.debouncedMakeRequest(options, autoCompleteUrlParameters);
                     } else {
-                        _this.makeRequest(options, autoCompleteUrlParameters);
+                        this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
             });

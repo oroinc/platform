@@ -381,13 +381,13 @@ define(function(require) {
             const model = this._getModelForDelete(e.currentTarget);
 
             const confirm = new this.DeleteConfirmation(this.defaults.DeleteConfirmationOptions);
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 model.destroy({wait: true});
                 model.once('sync', function() {
                     this._showFlashMessage('success', __('oro.datagrid.gridView.deleted'));
                     mediator.trigger('datagrid:' + this.gridName + ':views:remove', model);
                 }, this);
-            }, this));
+            });
 
             confirm.open();
 

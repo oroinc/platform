@@ -29,7 +29,7 @@ class ProcessDefinitionController extends AbstractController
      */
     public function indexAction()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -46,11 +46,11 @@ class ProcessDefinitionController extends AbstractController
     public function viewAction(ProcessDefinition $processDefinition)
     {
         $triggers = $this->getRepository('OroWorkflowBundle:ProcessTrigger')
-            ->findBy(array('definition' => $processDefinition));
-        return array(
+            ->findBy(['definition' => $processDefinition]);
+        return [
             'entity'   => $processDefinition,
             'triggers' => $triggers
-        );
+        ];
     }
 
     /**

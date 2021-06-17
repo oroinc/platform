@@ -80,7 +80,7 @@ define(function(require) {
             ActionComponentDropdownLauncher.__super__.render.call(this);
             if (this.allowDialog) {
                 this.$('.dropdown-toggle').dropdown('dispose');
-                this.$('.dropdown-toggle').on('click' + this.eventNamespace(), _.bind(this.openDialogWidget, this));
+                this.$('.dropdown-toggle').on('click' + this.eventNamespace(), this.openDialogWidget.bind(this));
             }
             this.componentOptions._sourceElement = this.$('.dropdown-menu');
             const Component = this.componentConstructor;

@@ -64,23 +64,15 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
         $fooItem = $this->createMock(\stdClass::class);
         $barItem = $this->createMock(\ArrayObject::class);
 
-        $this->detachFixer->expects($this->at(0))
+        $this->detachFixer->expects($this->exactly(2))
             ->method('fixEntityAssociationFields')
-            ->with($fooItem, 1);
+            ->withConsecutive([$fooItem, 1], [$barItem, 1]);
 
-        $this->detachFixer->expects($this->at(1))
-            ->method('fixEntityAssociationFields')
-            ->with($barItem, 1);
-
-        $this->entityManager->expects($this->at(0))
+        $this->entityManager->expects($this->exactly(2))
             ->method('persist')
-            ->with($fooItem);
+            ->withConsecutive([$fooItem], [$barItem]);
 
-        $this->entityManager->expects($this->at(1))
-            ->method('persist')
-            ->with($barItem);
-
-        $this->entityManager->expects($this->at(2))
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
         /** @var StepExecution $stepExecution */
@@ -99,7 +91,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue($context));
 
         if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
-            $this->entityManager->expects($this->at(3))
+            $this->entityManager->expects($this->once())
                 ->method('clear');
         }
 

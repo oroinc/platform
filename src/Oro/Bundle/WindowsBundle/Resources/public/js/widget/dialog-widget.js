@@ -399,7 +399,7 @@ define(function(require, exports, module) {
             let dialogOptions;
             if (!this.widget) {
                 dialogOptions = _.extend({}, this.options.dialogOptions);
-                dialogOptions.stateChange = _.bind(this.handleStateChange, this);
+                dialogOptions.stateChange = this.handleStateChange.bind(this);
                 if (dialogOptions.state !== 'minimized') {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
@@ -427,14 +427,14 @@ define(function(require, exports, module) {
             DialogWidget.__super__.show.call(this);
 
             this._fixDialogMinHeight(true);
-            this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
+            this.widget.on('dialogmaximize dialogrestore', () => {
                 this._fixDialogMinHeight(true);
                 this.widget.trigger('resize');
-            }, this));
-            this.widget.on('dialogminimize', _.bind(function() {
+            });
+            this.widget.on('dialogminimize', () => {
                 this._fixDialogMinHeight(false);
                 this.widget.trigger('resize');
-            }, this));
+            });
         },
 
         hide: function() {
@@ -462,20 +462,20 @@ define(function(require, exports, module) {
             ].join(' ');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
+                this.widget.on(resizeEvents, this._fixScrollableHeight.bind(this));
             }
         },
 
         _setMaxSize: function() {
             this.widget.off('.set-max-size-events');
-            this.widget.on('dialogresizestart.set-max-size-events', _.bind(function() {
+            this.widget.on('dialogresizestart.set-max-size-events', () => {
                 const dialog = this.widget.closest('.ui-dialog');
                 const containerEl = this.getLimitToContainer();
                 dialog.css({
                     maxWidth: containerEl.clientWidth,
                     maxHeight: containerEl.clientHeight
                 });
-            }, this));
+            });
         },
 
         _fixDialogMinHeight: function(isEnabled) {

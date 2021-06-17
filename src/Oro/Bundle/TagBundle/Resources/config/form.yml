@@ -115,6 +115,9 @@ services:
         factory: ['@form.factory', createNamed]
         arguments: ["oro_tag_taxonomy_form", Oro\Bundle\TagBundle\Form\Type\TaxonomyType]
 
+    Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler:
+        alias: oro_tag.form.handler.taxonomy
+
     oro_tag.form.handler.taxonomy:
         class: Oro\Bundle\TagBundle\Form\Handler\TaxonomyHandler
         public: true

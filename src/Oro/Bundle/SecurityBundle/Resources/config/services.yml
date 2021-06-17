@@ -335,6 +335,9 @@ services:
         tags:
             - { name: twig.extension }
 
+    Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter:
+        alias: oro_security.encoder.default
+
     oro_security.encoder.default:
         class: Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter
         public: true
@@ -443,6 +446,9 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
+    Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory:
+        alias: oro_security.token.factory.username_password_organization
+
     oro_security.token.factory.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory
         public: true
@@ -455,6 +461,9 @@ services:
 
     oro_security.token.factory.organization_rememberme:
         class: Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory
+
+    Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser:
+        alias: oro_security.authentication.organization_guesser
 
     oro_security.authentication.organization_guesser:
         class: Oro\Bundle\SecurityBundle\Authentication\Guesser\OrganizationGuesser

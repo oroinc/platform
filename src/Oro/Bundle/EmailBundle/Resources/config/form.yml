@@ -81,6 +81,9 @@ services:
         tags:
             - { name: form.type, alias: oro_email_system_template_list }
 
+    Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler:
+        alias: oro_email.form.handler.emailtemplate
+
     oro_email.form.handler.emailtemplate:
         class: Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler
         public: true
@@ -194,6 +197,9 @@ services:
             - '@oro_imap.manager_registry.registry'
         tags:
             - { name: form.type, alias: oro_email_mailbox }
+
+    Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler:
+        alias: oro_email.form.handler.mailbox
 
     oro_email.form.handler.mailbox:
         class: Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
