@@ -122,22 +122,14 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('getReader')
             ->willReturn($reader);
 
-        $this->fileManager->expects(self::at(0))
+        $this->fileManager->expects(self::exactly(2))
             ->method('writeToTmpLocalStorage')
-            ->with('test1.csv')
-            ->willReturn('test1.csv');
-        $this->fileManager->expects(self::at(1))
+            ->withConsecutive(['test1.csv'], ['test2.csv'])
+            ->willReturnArgument(0);
+        $this->fileManager->expects(self::exactly(2))
             ->method('fixNewLines')
-            ->with('test1.csv')
-            ->willReturn('test1.csv');
-        $this->fileManager->expects(self::at(2))
-            ->method('writeToTmpLocalStorage')
-            ->with('test2.csv')
-            ->willReturn('test2.csv');
-        $this->fileManager->expects(self::at(3))
-            ->method('fixNewLines')
-            ->with('test2.csv')
-            ->willReturn('test2.csv');
+            ->withConsecutive(['test1.csv'], ['test2.csv'])
+            ->willReturnArgument(0);
 
         $exceptionMessage = 'Exception message';
         $exception = new \Exception($exceptionMessage);

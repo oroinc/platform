@@ -135,11 +135,11 @@ define([
 
             // initialize state
             this._state = this._createState(options.state);
-            this._state.on('change', _.bind(this.trigger, this, 'stateChange'));
+            this._state.on('change', this.trigger.bind(this, 'stateChange'));
 
             // initialize route
             this._route = this._createRoute(options.routeParameters);
-            this._route.on('change', _.bind(this.trigger, this, 'routeChange'));
+            this._route.on('change', this.trigger.bind(this, 'routeChange'));
             this._route.on('change', this.checkUrlChange, this);
 
             // listen base events

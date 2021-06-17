@@ -1,4 +1,7 @@
 services:
+    Oro\Bundle\ActivityBundle\Manager\ActivityManager:
+        alias: oro_activity.manager
+
     oro_activity.manager:
         class: Oro\Bundle\ActivityBundle\Manager\ActivityManager
         public: true
@@ -37,6 +40,9 @@ services:
         class: Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension
         tags:
             - { name: oro_migration.extension, extension_name: activity }
+
+    Oro\Bundle\UIBundle\Provider\ChainWidgetProvider:
+        alias: oro_activity.widget_provider.activities
 
     oro_activity.widget_provider.activities:
         class: Oro\Bundle\UIBundle\Provider\ChainWidgetProvider
@@ -132,6 +138,9 @@ services:
         arguments:
             - '@security.authorization_checker'
             - '@oro_entity.delete_handler_access_denied_exception_factory'
+
+    Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler:
+        alias: oro_activity.form.handler.autocomplete
 
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler

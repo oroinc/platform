@@ -59,12 +59,12 @@ define(function(require) {
             this._searchForResults = _.debounce(this._searchForResults.bind(this), this.debounceWait);
 
             const thisOptions = {
-                selection_template: _.bind(this.renderSelection, this),
+                selection_template: this.renderSelection.bind(this),
                 config: {
-                    source: _.bind(this.source, this),
-                    matcher: _.bind(this.matcher, this),
-                    updater: _.bind(this.updater, this),
-                    sorter: _.bind(this.sorter, this),
+                    source: this.source.bind(this),
+                    matcher: this.matcher.bind(this),
+                    updater: this.updater.bind(this),
+                    sorter: this.sorter.bind(this),
                     show: this.show,
                     hide: this.hide
                 }

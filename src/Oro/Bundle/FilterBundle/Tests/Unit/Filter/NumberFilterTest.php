@@ -118,7 +118,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         $this->filter->init('test-filter', [
             FilterUtility::DATA_NAME_KEY => 'field_name',
-            FilterUtility::DIVISOR_KEY   => 100
+            FilterUtility::DIVISOR_KEY => 100
         ]);
 
         $ds = $this->getFilterDatasource();
@@ -146,89 +146,89 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'GREATER_EQUAL' => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_GREATER_EQUAL,
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_EQUAL,
                     'value' => 1
                 ],
                 'expected' => [
                     'where' => 'field_name >= 1'
                 ]
             ],
-            'GREATER_THAN'  => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_GREATER_THAN,
+            'GREATER_THAN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_THAN,
                     'value' => 2
                 ],
                 'expected' => [
                     'where' => 'field_name > 2'
                 ]
             ],
-            'EQUAL'         => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_EQUAL,
+            'EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_EQUAL,
                     'value' => 3
                 ],
                 'expected' => [
                     'where' => 'field_name = 3'
                 ]
             ],
-            'NOT_EQUAL'     => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_NOT_EQUAL,
+            'NOT_EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_EQUAL,
                     'value' => 4
                 ],
                 'expected' => [
                     'where' => 'field_name <> 4'
                 ]
             ],
-            'LESS_EQUAL'    => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_LESS_EQUAL,
+            'LESS_EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_EQUAL,
                     'value' => 5
                 ],
                 'expected' => [
                     'where' => 'field_name <= 5'
                 ]
             ],
-            'LESS_THAN'     => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_LESS_THAN,
+            'LESS_THAN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_THAN,
                     'value' => 6
                 ],
                 'expected' => [
                     'where' => 'field_name < 6'
                 ]
             ],
-            'EMPTY'         => [
-                'data'     => [
-                    'type'  => FilterUtility::TYPE_EMPTY,
+            'EMPTY' => [
+                'data' => [
+                    'type' => FilterUtility::TYPE_EMPTY,
                     'value' => null
                 ],
                 'expected' => [
                     'where' => 'field_name IS NULL'
                 ]
             ],
-            'NOT_EMPTY'     => [
-                'data'     => [
-                    'type'  => FilterUtility::TYPE_NOT_EMPTY,
+            'NOT_EMPTY' => [
+                'data' => [
+                    'type' => FilterUtility::TYPE_NOT_EMPTY,
                     'value' => null
                 ],
                 'expected' => [
                     'where' => 'field_name IS NOT NULL'
                 ]
             ],
-            'IN'            => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_IN,
+            'IN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_IN,
                     'value' => '1, 3,4,5'
                 ],
                 'expected' => [
                     'where' => 'field_name IN(1,3,4,5)'
                 ]
             ],
-            'NOT IN'        => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_NOT_IN,
+            'NOT IN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_IN,
                     'value' => '1, 2, 3, 5'
                 ],
                 'expected' => [
@@ -242,79 +242,79 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'GREATER_EQUAL' => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_GREATER_EQUAL,
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_EQUAL,
                     'value' => 1
                 ],
                 'expected' => [
                     'where' => 'field_name >= 100'
                 ]
             ],
-            'GREATER_THAN'  => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_GREATER_THAN,
+            'GREATER_THAN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_GREATER_THAN,
                     'value' => 2
                 ],
                 'expected' => [
                     'where' => 'field_name > 200'
                 ]
             ],
-            'NO_TYPE'         => [
-                'data'     => [
+            'NO_TYPE' => [
+                'data' => [
                     'value' => 3
                 ],
                 'expected' => [
                     'where' => 'field_name = 300'
                 ]
             ],
-            'EQUAL'         => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_EQUAL,
+            'EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_EQUAL,
                     'value' => 3
                 ],
                 'expected' => [
                     'where' => 'field_name = 300'
                 ]
             ],
-            'NOT_EQUAL'     => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_NOT_EQUAL,
+            'NOT_EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_NOT_EQUAL,
                     'value' => 4
                 ],
                 'expected' => [
                     'where' => 'field_name <> 400'
                 ]
             ],
-            'LESS_EQUAL'    => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_LESS_EQUAL,
+            'LESS_EQUAL' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_EQUAL,
                     'value' => 5
                 ],
                 'expected' => [
                     'where' => 'field_name <= 500'
                 ]
             ],
-            'LESS_THAN'     => [
-                'data'     => [
-                    'type'  => NumberFilterType::TYPE_LESS_THAN,
+            'LESS_THAN' => [
+                'data' => [
+                    'type' => NumberFilterType::TYPE_LESS_THAN,
                     'value' => 6
                 ],
                 'expected' => [
                     'where' => 'field_name < 600'
                 ]
             ],
-            'EMPTY'         => [
-                'data'     => [
-                    'type'  => FilterUtility::TYPE_EMPTY,
+            'EMPTY' => [
+                'data' => [
+                    'type' => FilterUtility::TYPE_EMPTY,
                     'value' => null
                 ],
                 'expected' => [
                     'where' => 'field_name IS NULL'
                 ]
             ],
-            'NOT_EMPTY'     => [
-                'data'     => [
-                    'type'  => FilterUtility::TYPE_NOT_EMPTY,
+            'NOT_EMPTY' => [
+                'data' => [
+                    'type' => FilterUtility::TYPE_NOT_EMPTY,
                     'value' => null
                 ],
                 'expected' => [
@@ -327,23 +327,23 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     public function parseDataProvider()
     {
         return [
-            'invalid data, no array'                   => [
+            'invalid data, no array' => [
                 false,
                 false
             ],
-            'invalid data, no value'                   => [
+            'invalid data, no value' => [
                 [],
                 false
             ],
-            'invalid data, not numeric value'          => [
+            'invalid data, not numeric value' => [
                 ['value' => 'value', 'type' => NumberFilterType::TYPE_EQUAL],
                 false
             ],
-            'valid data, type is TYPE_EMPTY'           => [
+            'valid data, type is TYPE_EMPTY' => [
                 ['value' => null, 'type' => FilterUtility::TYPE_EMPTY],
                 ['value' => null, 'type' => FilterUtility::TYPE_EMPTY],
             ],
-            'valid data, type is TYPE_NOT_EMPTY'       => [
+            'valid data, type is TYPE_NOT_EMPTY' => [
                 ['value' => null, 'type' => FilterUtility::TYPE_NOT_EMPTY],
                 ['value' => null, 'type' => FilterUtility::TYPE_NOT_EMPTY],
             ],
@@ -366,6 +366,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
         $view->vars['array_separator'] = ',';
         $view->vars['array_operators'] = [9, 10];
         $view->vars['data_type'] = 'data_integer';
+        $view->vars['limit_decimals'] = true;
         $view->children['type'] = $typeView;
 
         $this->formFactory->expects($this->any())
@@ -376,17 +377,18 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($view);
 
         $expected = [
-            'name'             => 'test-filter',
-            'label'            => 'Test-filter',
-            'choices'          => [],
-            'lazy'             => false,
+            'name' => 'test-filter',
+            'label' => 'Test-filter',
+            'choices' => [],
+            'lazy' => false,
             'formatterOptions' => [
                 'decimals' => 0,
                 'grouping' => false
             ],
-            'arraySeparator'   => ',',
-            'arrayOperators'   => [9, 10],
-            'dataType'         => 'data_integer'
+            'arraySeparator' => ',',
+            'arrayOperators' => [9, 10],
+            'dataType' => 'data_integer',
+            'limitDecimals' => true
         ];
         $this->assertEquals($expected, $this->filter->getMetadata());
     }

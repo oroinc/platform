@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityPaginationBundle\Manager\MessageManager;
 use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,14 +76,14 @@ class EntityPaginationController extends AbstractController
      * @return JsonResponse
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function getLink($entityName, $scope, $routeName, $navigation)
+    protected function getLink($entityName, $scope, $routeName, $navigation): JsonResponse
     {
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
-        $navigationService = $this->get('oro_entity_pagination.navigation');
+        $doctrineHelper = $this->get(DoctrineHelper::class);
+        $navigationService = $this->get(EntityPaginationNavigation::class);
 
         $params = $this->get('request_stack')->getCurrentRequest()->query->all();
 
-        $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
+        $entityName = $this->get(EntityRoutingHelper::class)->resolveEntityClass($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
         $message = null;
 
@@ -110,7 +113,7 @@ class EntityPaginationController extends AbstractController
                     $params[$identifier] = $entityId;
                 }
 
-                $messageManager = $this->get('oro_entity_pagination.message_manager');
+                $messageManager = $this->get(MessageManager::class);
 
                 if (!$result->isAvailable()) {
                     $message = $messageManager->getNotAvailableMessage($entity, $scope);
@@ -123,5 +126,21 @@ class EntityPaginationController extends AbstractController
         $url = $this->generateUrl($routeName, $params);
 
         return new JsonResponse(['url' => $url, 'message' => $message]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                DoctrineHelper::class,
+                EntityPaginationNavigation::class,
+                EntityRoutingHelper::class,
+                MessageManager::class,
+            ]
+        );
     }
 }

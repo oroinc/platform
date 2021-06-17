@@ -63,6 +63,9 @@ services:
         tags:
             - { name: oro_menu.builder }
 
+    Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler:
+        alias: oro_navigation.tree.menu_update_tree_handler
+
     oro_navigation.tree.menu_update_tree_handler:
         class: Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler
         public: true

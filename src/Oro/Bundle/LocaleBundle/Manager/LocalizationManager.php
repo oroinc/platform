@@ -107,7 +107,7 @@ class LocalizationManager implements WarmableConfigCacheInterface, ClearableConf
                 $cache[$row['id']] = [
                     'languageCode' => $row['language'],
                     'formattingCode' => $row['formatting'],
-                    'rtlMode' => $row['rtl'],
+                    'rtlMode' => (bool)$row['rtl'], # cast to boolean as Mysql stores value as TINYINT(1)
                 ];
             }
         }

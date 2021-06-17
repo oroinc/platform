@@ -327,6 +327,9 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
 
+    Oro\Bundle\EmailBundle\Provider\EmailRenderer:
+        alias: oro_email.email_renderer
+
     oro_email.email_renderer:
         class: Oro\Bundle\EmailBundle\Provider\EmailRenderer
         public: true
@@ -939,6 +942,9 @@ services:
         alias: 'oro_email.manager.notification'
         public: true
 
+    Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider:
+        alias: oro_email.datagrid.origin_folder.provider
+
     oro_email.datagrid.origin_folder.provider:
         class: Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider
         public: true
@@ -1000,6 +1006,9 @@ services:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_email.mailbox.process_storage }
             - { name: container.service_subscriber, id: oro_workflow.process.process_handler }
+
+    Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler:
+        alias: oro_email.autocomplete.mailbox_user_search_handler
 
     oro_email.autocomplete.mailbox_user_search_handler:
         class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler
@@ -1263,6 +1272,9 @@ services:
         arguments:
             - '@oro_locale.provider.preferred_localization_provider'
             - '@oro_email.provider.email_template_content_provider'
+
+    Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider:
+        alias: oro_email.provider.email_template_content_provider
 
     oro_email.provider.email_template_content_provider:
         class: 'Oro\Bundle\EmailBundle\Provider\EmailTemplateContentProvider'

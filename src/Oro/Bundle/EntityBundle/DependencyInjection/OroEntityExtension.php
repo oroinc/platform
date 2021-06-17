@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages EntityBundle service configuration
+ */
 class OroEntityExtension extends Extension
 {
     public const DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME = 'oro_entity.default_query_cache_lifetime';
@@ -31,6 +34,7 @@ class OroEntityExtension extends Extension
         $loader->load('fallbacks.yml');
         $loader->load('services_api.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');

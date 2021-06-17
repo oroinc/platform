@@ -121,9 +121,9 @@ define(function(require) {
         },
 
         onCollectionSyncStateChange: function() {
-            _.defer(_.bind(function() {
+            _.defer(() => {
                 this.$el.trigger('content:changed');
-            }, this));
+            });
         }
     });
 

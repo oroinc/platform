@@ -3,44 +3,38 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TranslationBundle\DependencyInjection\Compiler\DebugTranslatorPass;
+use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DebugTranslatorPassTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param bool $enabled
-     * @dataProvider processDataProvider
-     */
-    public function testProcess($enabled)
+    /** @var DebugTranslatorPass */
+    private $compiler;
+
+    protected function setUp(): void
     {
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('getParameter')
-            ->with(DebugTranslatorPass::DEBUG_TRANSLATOR_PARAMETER)
-            ->will($this->returnValue($enabled));
-
-        if ($enabled) {
-            $containerBuilder->expects($this->once())
-                ->method('setParameter')
-                ->with('translator.class', DebugTranslatorPass::DEBUG_TRANSLATOR_CLASS);
-        } else {
-            $containerBuilder->expects($this->never())
-                ->method('setParameter');
-        }
-
-        $compiler = new DebugTranslatorPass();
-        $compiler->process($containerBuilder);
+        $this->compiler = new DebugTranslatorPass();
     }
 
-    /**
-     * @return array
-     */
-    public function processDataProvider()
+    public function testProcessWhenDebugTranslatorDisabled()
     {
-        return [
-            'enabled'  => [true],
-            'disabled' => [false],
-        ];
+        $container = new ContainerBuilder();
+        $container->setParameter('oro_translation.debug_translator', false);
+        $container->setParameter('translator.class', 'Translator');
+
+        $this->compiler->process($container);
+
+        self::assertEquals('Translator', $container->getParameter('translator.class'));
+    }
+
+    public function testProcessWhenDebugTranslatorEnabled()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('oro_translation.debug_translator', true);
+        $container->setParameter('translator.class', 'Translator');
+
+        $this->compiler->process($container);
+
+        self::assertEquals(DebugTranslator::class, $container->getParameter('translator.class'));
     }
 }

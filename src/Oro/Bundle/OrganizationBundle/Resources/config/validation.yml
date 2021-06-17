@@ -11,17 +11,18 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
         - Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnit: ~
     properties:
         name:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                max:        255
+                max: 255
         phone:
             - Length:
-                max:        100
+                max: 100
         email:
             - Length:
-                min:        6
-                max:        255
-            - Email:        ~
+                min: 6
+                max: 255
+                allowEmptyString: false
+            - Email: ~
         website:
             - Url:
                 protocols: ['http', 'https']

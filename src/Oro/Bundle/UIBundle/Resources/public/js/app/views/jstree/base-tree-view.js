@@ -186,7 +186,7 @@ define(function(require) {
                 },
                 state: {
                     key: this.viewGroup,
-                    filter: _.bind(this.onFilter, this)
+                    filter: this.onFilter.bind(this)
                 },
                 plugins: ['state', 'wholerow']
             };
@@ -221,11 +221,11 @@ define(function(require) {
             _.each(treeEvents, function(callback, event) {
                 if (this[callback]) {
                     this.$tree.off(event + '.treeEvents');
-                    this.$tree.on(event + '.treeEvents', _.bind(this[callback], this));
+                    this.$tree.on(event + '.treeEvents', this[callback].bind(this));
                 }
             }, this);
 
-            this.$tree.one('ready.jstree', _.bind(this.onReady, this));
+            this.$tree.one('ready.jstree', this.onReady.bind(this));
         },
 
         onReady: function() {
@@ -279,7 +279,7 @@ define(function(require) {
                     show_only_matches: true,
                     show_only_matches_children: false,
                     case_sensitive: false,
-                    search_callback: _.bind(this.searchCallback, this)
+                    search_callback: this.searchCallback.bind(this)
                 };
             }
 
@@ -502,10 +502,10 @@ define(function(require) {
             }
             const selectedNode = data.node;
             if (selectedNode) {
-                selectedNode.parents.reverse().slice(1).forEach(_.bind(function(parentId) {
+                selectedNode.parents.reverse().slice(1).forEach(parentId => {
                     const node = this.jsTreeInstance.get_node(parentId);
                     this.hideNeighbors(node, 0);
-                }, this));
+                });
             }
             this.jsTreeInstance.close_all(selectedNode);
         },
@@ -541,11 +541,11 @@ define(function(require) {
 
         onBeforeOpen: function(event, data) {
             if (this.jsTreeInstance.settings.autohideNeighbors) {
-                data.node.children.forEach(_.bind(function(nodeId) {
+                data.node.children.forEach(nodeId => {
                     if (!this.jsTreeInstance.is_leaf(nodeId)) {
                         this.jsTreeInstance.close_node(nodeId);
                     }
-                }, this));
+                });
             }
             mediator.trigger(this.viewGroup + ':highlight-text:update', this.searchValue ? this.searchValue : '');
         },
@@ -569,9 +569,7 @@ define(function(require) {
          * @returns {Array} children of the node;
          */
         getChildren: function(node) {
-            return node.children.map(_.bind(function(itemId) {
-                return this.jsTreeInstance.get_node(itemId);
-            }, this));
+            return node.children.map(itemId => this.jsTreeInstance.get_node(itemId));
         },
 
         /**
@@ -588,9 +586,9 @@ define(function(require) {
             const parent = this.jsTreeInstance.get_node(node.parent);
 
             return this.getChildren(parent)
-                .filter(_.bind(function(item) {
+                .filter(item => {
                     return item.id !== node.id;
-                }, this));
+                });
         },
 
         /**
@@ -603,11 +601,11 @@ define(function(require) {
         showNeighbors: function(node, animationDuration) {
             animationDuration = animationDuration || this.jsTreeInstance.settings.core.animation;
 
-            this.getNeighbors(node).forEach(_.bind(function(item) {
+            this.getNeighbors(node).forEach(item => {
                 this.jsTreeInstance
                     .get_node(item.id, true)
                     .fadeIn(animationDuration);
-            }, this));
+            });
 
             return node;
         },
@@ -621,11 +619,11 @@ define(function(require) {
          */
         hideNeighbors: function(node, animationDuration) {
             animationDuration = animationDuration || this.jsTreeInstance.settings.core.animation;
-            this.getNeighbors(node).forEach(_.bind(function(neighbor) {
+            this.getNeighbors(node).forEach(neighbor => {
                 this.jsTreeInstance
                     .get_node(neighbor.id, true)
                     .fadeOut(animationDuration);
-            }, this));
+            });
 
             return node;
         },
@@ -648,7 +646,7 @@ define(function(require) {
             }
 
             this.loadingMask.show();
-            this.apiAccessor.send(params).then(_.bind(this._updateTreeFromData, this));
+            this.apiAccessor.send(params).then(this._updateTreeFromData.bind(this));
         },
 
         /**

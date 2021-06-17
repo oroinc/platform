@@ -43,7 +43,7 @@ define([
                 this.useDirectLauncherLink = options.useDirectLauncherLink;
             }
 
-            this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
+            this.on('preExecute', this._preExecuteSubscriber.bind(this));
 
             if (options.parameters) {
                 this.parameters = options.parameters;

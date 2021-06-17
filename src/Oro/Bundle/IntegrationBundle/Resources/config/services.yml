@@ -50,6 +50,9 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_integration.manager.types_registry'
 
+    Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler:
+        alias: oro_integration.form.handler.integration
+
     oro_integration.form.handler.integration:
         class: Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler
         public: true

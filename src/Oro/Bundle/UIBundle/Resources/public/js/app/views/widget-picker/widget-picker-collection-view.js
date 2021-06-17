@@ -27,7 +27,7 @@ define(function(require) {
                 throw new Error('Missing required "filterModel" option');
             }
             _.extend(this, _.pick(options, ['filterModel', 'loadWidget']));
-            options.filterer = _.bind(this.filterModel.filterer, this.filterModel);
+            options.filterer = this.filterModel.filterer.bind(this.filterModel);
             WidgetPickerCollectionView.__super__.initialize.call(this, options);
         },
 
@@ -73,7 +73,7 @@ define(function(require) {
          * @protected
          */
         _startLoading: function() {
-            return _.bind(function() {
+            return () => {
                 if (this.disposed) {
                     return;
                 }
@@ -81,7 +81,7 @@ define(function(require) {
                 _.each(this.getItemViews(), function(itemView) {
                     itemView.trigger('unblock_add_btn');
                 });
-            }, this);
+            };
         }
     });
 

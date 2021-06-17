@@ -149,7 +149,7 @@
 
         font-size: 15px;
         color: $primary-inverse;
-        background-color: $tab-switcher-button-color;
+        background-color: $help-slide-btn-background-color;
         text-decoration: none;
         outline: none;
 
@@ -157,7 +157,7 @@
         transition: color .1s, background .1s, box-shadow .1s;
 
         @include hover-focus-active() {
-            background: $tab-switcher-button-color-hover;
+            background: $help-slide-btn--hover-background-color;
         }
     }
 }

@@ -155,7 +155,7 @@ define(function(require) {
         const initPromise = this.initPageComponents(options);
         if (!this.deferredRender) {
             this._deferredRender();
-            initPromise.always(_.bind(this._resolveDeferredRender, this));
+            initPromise.always(this._resolveDeferredRender.bind(this));
         }
         return initPromise.fail(function(e) {
             console.error(e);
@@ -188,11 +188,11 @@ define(function(require) {
     Backbone.View.prototype._resolveDeferredRender = function() {
         if (this.deferredRender) {
             const promises = [];
-            const resolve = _.bind(function() {
+            const resolve = () => {
                 pageVisibilityTracker.clearTimeout(this.deferredRender.timeoutID);
                 this.deferredRender.resolve(this);
                 delete this.deferredRender;
-            }, this);
+            };
 
             if (this.subviews.length) {
                 _.each(this.subviews, function(subview) {

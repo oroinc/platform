@@ -3,7 +3,6 @@ define(function(require) {
 
     const Flotr = require('flotr2');
     const BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    const _ = require('underscore');
 
     /**
      * @class orochart.app.components.PieChartComponent
@@ -85,7 +84,7 @@ define(function(require) {
                 showPercentInTooltip = !!(parseInt(settings.showPercentInTooltip) || settings.showPercentInTooltip > 0);
             }
 
-            const trackFormatter = _.bind(showPercentInTooltip ? this.percentFormatter : this.valueFormatter, this);
+            const trackFormatter = (showPercentInTooltip ? this.percentFormatter : this.valueFormatter).bind(this);
 
             for (const i in data) {
                 if (data.hasOwnProperty(i)) {

@@ -13,35 +13,25 @@ use Symfony\Component\Serializer\Serializer;
 
 class BlockViewCacheTest extends LayoutTestCase
 {
+    private const CONTEXT_HASH_VALUE = 'context_hash_value';
+
     /** @var BlockView */
-    protected $blockView;
+    private $blockView;
 
-    /**
-     * @var BlockViewCache
-     */
-    protected $blockViewCache;
+    /** @var BlockViewCache */
+    private $blockViewCache;
 
-    /**
-     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $cacheProvider;
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheProvider;
 
-    /**
-     * @var Serializer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $serializer;
+    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
+    private $serializer;
 
-    const CONTEXT_HASH_VALUE = 'context_hash_value';
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->blockView = new BlockView();
 
-        $this->cacheProvider = $this->getMockBuilder(CacheProvider::class)
-            ->setMethods(['fetch', 'contains', 'save', 'deleteAll'])->getMockForAbstractClass();
+        $this->cacheProvider = $this->createMock(CacheProvider::class);
 
         $normalizer = new ObjectNormalizer();
         $this->serializer = new Serializer([$normalizer], [new JsonEncoder()]);
@@ -52,15 +42,13 @@ class BlockViewCacheTest extends LayoutTestCase
 
     public function testSave()
     {
-        $context = $this->getMockBuilder(LayoutContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(LayoutContext::class);
 
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
-        $this->cacheProvider->expects(static::once())
+        $this->cacheProvider->expects(self::once())
             ->method('save')
             ->with($this::CONTEXT_HASH_VALUE, '[]');
 
@@ -69,15 +57,13 @@ class BlockViewCacheTest extends LayoutTestCase
 
     public function testFetchNonCached()
     {
-        $context = $this->getMockBuilder(LayoutContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(LayoutContext::class);
 
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
-        $this->cacheProvider->expects(static::once())
+        $this->cacheProvider->expects(self::once())
             ->method('fetch')
             ->with($this::CONTEXT_HASH_VALUE)
             ->willReturn(false);
@@ -87,20 +73,18 @@ class BlockViewCacheTest extends LayoutTestCase
 
     public function testFetchCached()
     {
-        $context = $this->getMockBuilder(LayoutContext::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $context = $this->createMock(LayoutContext::class);
 
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
-        $this->cacheProvider->expects(static::once())
+        $this->cacheProvider->expects(self::once())
             ->method('fetch')
             ->with($this::CONTEXT_HASH_VALUE)
             ->willReturn('[]');
 
-        $context->expects(static::once())
+        $context->expects(self::once())
             ->method('getHash')
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
@@ -111,7 +95,7 @@ class BlockViewCacheTest extends LayoutTestCase
 
     public function testReset()
     {
-        $this->cacheProvider->expects(static::once())
+        $this->cacheProvider->expects(self::once())
             ->method('deleteAll');
 
         $this->blockViewCache->reset();

@@ -50,9 +50,9 @@ define(function(require) {
 
             loadModules('oroworkflow/transition-dialog-widget', function(Widget) {
                 const _widget = new Widget(dialogOptions);
-                Backbone.listenTo(_widget, 'widgetRemove', _.bind(function() {
+                Backbone.listenTo(_widget, 'widgetRemove', () => {
                     resetInProgress();
-                }, this));
+                });
 
                 _widget.render();
             });

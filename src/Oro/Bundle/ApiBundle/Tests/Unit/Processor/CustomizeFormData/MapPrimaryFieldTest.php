@@ -544,7 +544,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
             $config,
             $data,
             ['enabledRole' => '1'],
-            ['constraints' => [new Assert\Length(['min' => 3])]],
+            ['constraints' => [new Assert\Length(['min' => 3, 'allowEmptyString' => false])]],
             RestrictedNameContainerType::class
         );
         self::assertTrue($form->isSynchronized());
@@ -579,7 +579,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
                     ['name' => 'role2']
                 ]
             ],
-            ['constraints' => [new Assert\Length(['min' => 3])]]
+            ['constraints' => [new Assert\Length(['min' => 3, 'allowEmptyString' => false])]]
         );
         self::assertTrue($form->isSynchronized());
         self::assertFalse($form->isValid());

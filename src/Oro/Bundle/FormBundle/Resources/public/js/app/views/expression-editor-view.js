@@ -76,11 +76,11 @@ define(function(require) {
             this.$el.typeahead({
                 minLength: 0,
                 items: 20,
-                select: _.bind(this._typeaheadSelect, this),
-                source: _.bind(this._typeaheadSource, this),
-                lookup: _.bind(this._typeaheadLookup, this),
-                highlighter: _.bind(this._typeaheadHighlighter, this),
-                updater: _.bind(this._typeaheadUpdater, this)
+                select: this._typeaheadSelect.bind(this),
+                source: this._typeaheadSource.bind(this),
+                lookup: this._typeaheadLookup.bind(this),
+                highlighter: this._typeaheadHighlighter.bind(this),
+                updater: this._typeaheadUpdater.bind(this)
             });
 
             this.typeahead = this.$el.data('typeahead');
@@ -261,7 +261,7 @@ define(function(require) {
 
             this.$el.after(dataSource.$widget).trigger('content:changed');
 
-            dataSource.$field.on('change', _.bind(function() {
+            dataSource.$field.on('change', () => {
                 if (!dataSource.active) {
                     return;
                 }
@@ -271,7 +271,7 @@ define(function(require) {
                     .change().focus();
 
                 this.el.selectionStart = this.el.selectionEnd = this.autocompleteData.position;
-            }, this));
+            });
 
             return dataSource;
         },

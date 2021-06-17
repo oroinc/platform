@@ -215,7 +215,7 @@ define([
                     tagName: this.options.addressTagName,
                     isAddressHtmlFormatted: this.options.isAddressHtmlFormatted
                 });
-                addressView.on('edit', _.bind(this.editAddress, this));
+                addressView.on('edit', this.editAddress.bind(this));
                 this.$addressesContainer.append(addressView.render().$el);
             }
         },
@@ -240,25 +240,22 @@ define([
                         resizable: false,
                         width: 585,
                         autoResize: true,
-                        close: _.bind(function() {
+                        close: () => {
                             delete this.addressEditDialog;
-                        }, this)
+                        }
                     }
                 });
                 this.addressEditDialog.render();
-                mediator.on(
-                    'page:request',
-                    _.bind(function() {
-                        if (this.addressEditDialog) {
-                            this.addressEditDialog.remove();
-                        }
-                    }, this)
-                );
-                this.addressEditDialog.on('formSave', _.bind(function() {
+                mediator.on('page:request', () => {
+                    if (this.addressEditDialog) {
+                        this.addressEditDialog.remove();
+                    }
+                });
+                this.addressEditDialog.on('formSave', () => {
                     this.addressEditDialog.remove();
                     messenger.notificationFlashMessage('success', __('Address saved'));
                     this.reloadAddresses();
-                }, this));
+                });
             }
         },
 

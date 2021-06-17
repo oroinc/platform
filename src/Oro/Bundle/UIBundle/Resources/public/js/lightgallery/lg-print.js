@@ -26,10 +26,8 @@ define(['jquery', 'lightgallery'], function($) {
     };
 
     Print.prototype.print = function() {
-        const _this = this;
-
-        this.core.$outer.find('.lg-print').on('click.lg', function() {
-            _this.printCurrentSlide();
+        this.core.$outer.find('.lg-print').on('click.lg', () => {
+            this.printCurrentSlide();
         });
     };
 

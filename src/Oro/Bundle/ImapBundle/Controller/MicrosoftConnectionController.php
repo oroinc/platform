@@ -5,11 +5,13 @@ namespace Oro\Bundle\ImapBundle\Controller;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailMicrosoftOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides check-connection and access token endpoints for OAuth
@@ -58,7 +60,7 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
     private function storeResponse(Response $response): Response
     {
         /** @var SessionInterface $session */
-        $session = $this->container->get('session');
+        $session = $this->get('session');
         $session->set(self::KEY_ACCESS_TOKEN, $response->getContent());
 
         $response = new Response();
@@ -76,11 +78,11 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
     private function restoreResponse(): Response
     {
         /** @var SessionInterface $session */
-        $session = $this->container->get('session');
+        $session = $this->get('session');
         $token = $session->get(self::KEY_ACCESS_TOKEN);
         $response = json_decode($token, true);
         if (!$token || !$response || !array_key_exists('refresh_token', $response)) {
-            $error = $this->container->get('translator')->trans('oro.imap.oauth.manager.microsoft.error.token');
+            $error = $this->get(TranslatorInterface::class)->trans('oro.imap.oauth.manager.microsoft.error.token');
             $response = [
                 'error' => $error
             ];
@@ -107,9 +109,7 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
     private function appendProfileData(array $originalResponse): array
     {
         /** @var Oauth2ManagerInterface $manager */
-        $manager = $this
-            ->container
-            ->get('oro_imap.manager_registry.registry')
+        $manager = $this->get(OAuth2ManagerRegistry::class)
             ->getManager(AccountTypeModel::ACCOUNT_TYPE_MICROSOFT);
 
         $accessTokenData = $manager
@@ -122,5 +122,18 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
         ]);
 
         return array_merge($newResponse);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                OAuth2ManagerRegistry::class,
+            ]
+        );
     }
 }

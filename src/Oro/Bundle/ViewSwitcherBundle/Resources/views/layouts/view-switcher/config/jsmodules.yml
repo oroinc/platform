@@ -1,7 +1,3 @@
-entry:
-    app:
-        - oroui/js/app
-        - oroui/js/app/services/app-ready-load-modules
 aliases:
     asap$: asap/asap
     backbone$: backbone/backbone
@@ -26,6 +22,10 @@ dynamic-imports:
     oroviewswitcher:
         - orotranslation/js/translator
         - oroui/js/messenger
+entry:
+    app:
+        - oroui/js/app
+        - oroui/js/app/services/app-ready-load-modules
 map:
     "*":
         backbone: oroui/js/extend/backbone

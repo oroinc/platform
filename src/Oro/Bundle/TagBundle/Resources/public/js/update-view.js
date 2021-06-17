@@ -76,14 +76,14 @@ define(function(require) {
 
             this._prepareCollections();
 
-            const onCollectionChange = _.bind(function() {
+            const onCollectionChange = () => {
                 this.render();
                 this._updateHiddenInputs();
-            }, this);
+            };
             this.listenTo(this.getCollection(), 'add', onCollectionChange);
             this.listenTo(this.getCollection(), 'remove', onCollectionChange);
 
-            $(this.options.autocompleteFieldId).on('change', _.bind(this._addItem, this));
+            $(this.options.autocompleteFieldId).on('change', this._addItem.bind(this));
         },
 
         /**

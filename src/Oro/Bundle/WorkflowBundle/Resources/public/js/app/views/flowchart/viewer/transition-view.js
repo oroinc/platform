@@ -71,11 +71,11 @@ define(function(require) {
         },
 
         connect: function() {
-            const debouncedUpdate = _.debounce(_.bind(function() {
+            const debouncedUpdate = _.debounce(() => {
                 if (!this.disposed) {
                     this.updateStepTransitions();
                 }
-            }, this), 50);
+            }, 50);
             this.listenTo(this.model, 'change', debouncedUpdate);
             this.listenTo(this.stepCollection, 'add', debouncedUpdate);
             this.listenTo(this.stepCollection, 'change', debouncedUpdate);
@@ -168,7 +168,7 @@ define(function(require) {
                 overlays: [
                     ['Custom', {
                         id: 'overlay',
-                        create: _.bind(function(connection) {
+                        create: connection => {
                             const overlay = connection.getOverlay('overlay');
                             connection.overlayView = overlayView = new this.transitionOverlayView({
                                 model: transitionModel,
@@ -179,7 +179,7 @@ define(function(require) {
                             overlayView.render();
                             overlay.cssClass = _.result(overlayView, 'className');
                             return overlayView.$el;
-                        }, this),
+                        },
                         visible: overlayIsVisible,
                         location: 0.5
                     }]

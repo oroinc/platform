@@ -1,4 +1,7 @@
 services:
+    Oro\Bundle\NoteBundle\Entity\Manager\NoteManager:
+        alias: oro_note.manager
+
     oro_note.manager:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
         public: true

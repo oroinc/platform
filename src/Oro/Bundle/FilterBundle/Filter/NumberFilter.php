@@ -76,6 +76,7 @@ class NumberFilter extends AbstractFilter
 
         return $data;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -255,6 +256,7 @@ class NumberFilter extends AbstractFilter
         $metadata['arraySeparator'] = $formView->vars['array_separator'];
         $metadata['arrayOperators'] = $formView->vars['array_operators'];
         $metadata['dataType'] = $formView->vars['data_type'];
+        $metadata['limitDecimals'] = $formView->vars['limit_decimals'] ?? false;
 
         return $metadata;
     }

@@ -62,7 +62,7 @@ define(function(require) {
             e.preventDefault();
 
             this.dialogWidget = new DigitalAssetDialogWidget(this.options.widgetOptions);
-            this.dialogWidget.once('grid-row-select', _.bind(this.onGridRowSelect, this));
+            this.dialogWidget.once('grid-row-select', this.onGridRowSelect.bind(this));
             this.dialogWidget.render();
         },
 

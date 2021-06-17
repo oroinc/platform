@@ -11,15 +11,15 @@ define(function(require) {
     const FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function(grid) {
             this.grid = grid;
-            this.grid.on('shown', _.bind(this.onGridShown, this));
-            this.grid.on('changeAppearance', _.bind(function() {
+            this.grid.on('shown', this.onGridShown.bind(this));
+            this.grid.on('changeAppearance', () => {
                 // remove header height cache
                 delete this.headerHeight;
-            }, this));
+            });
 
-            this.selectMode = _.bind(this.selectMode, this);
-            this.checkLayout = _.bind(this.checkLayout, this);
-            this.fixHeaderCellWidth = _.bind(this.fixHeaderCellWidth, this);
+            this.selectMode = this.selectMode.bind(this);
+            this.checkLayout = this.checkLayout.bind(this);
+            this.fixHeaderCellWidth = this.fixHeaderCellWidth.bind(this);
         },
 
         onGridShown: function() {
@@ -92,11 +92,11 @@ define(function(require) {
         },
 
         supportDropdowns: function() {
-            const debouncedHideDropdowns = _.debounce(_.bind(function() {
+            const debouncedHideDropdowns = _.debounce(() => {
                 this.domCache.thead.find('.show > [data-toggle="dropdown"]').trigger('tohide.bs.dropdown');
-            }, this), 100, true);
+            }, 100, true);
             // use capture phase to scroll dropdown toggle into view before dropdown will be opened
-            this.$grid[0].addEventListener('click', _.bind(function(e) {
+            this.$grid[0].addEventListener('click', e => {
                 const dropdownToggle = $(e.target).closest('[data-toggle="dropdown"]');
                 if (dropdownToggle.length && dropdownToggle.parent().is('thead:first .dropdown:not(.show)')) {
                     // this will hide dropdowns and ignore next calls to it
@@ -104,15 +104,15 @@ define(function(require) {
                     this.isHeaderDropdownVisible = true;
                     scrollHelper.scrollIntoView(dropdownToggle[0], void 0, 10, 10);
                 }
-            }, this), true);
-            this.$grid.on('hide.bs.dropdown', '.dropdown.show', _.bind(function() {
+            }, true);
+            this.$grid.on('hide.bs.dropdown', '.dropdown.show', () => {
                 this.isHeaderDropdownVisible = false;
                 this.selectMode();
-            }, this));
-            this.domCache.gridContainer.parents().add(document).on('scroll.float-thead', _.bind(function() {
+            });
+            this.domCache.gridContainer.parents().add(document).on('scroll.float-thead', () => {
                 debouncedHideDropdowns();
                 this.checkLayout();
-            }, this));
+            });
 
             this.domCache.gridScrollableContainer.on('updateScroll', this.selectMode.bind(this));
         },
@@ -469,13 +469,12 @@ define(function(require) {
                 return;
             }
             if (this.currentFloatTheadMode in {relative: true, fixed: true}) {
-                const _this = this;
                 this.fixHeaderCellWidth();
-                scrollHelper.scrollIntoView(cell.el, function(el, rect) {
-                    if (_this.domCache.gridScrollableContainer &&
-                        _this.domCache.gridScrollableContainer.length &&
-                        el === _this.domCache.gridScrollableContainer[0]) {
-                        rect.top += _this.headerHeight;
+                scrollHelper.scrollIntoView(cell.el, (el, rect) => {
+                    if (this.domCache.gridScrollableContainer &&
+                        this.domCache.gridScrollableContainer.length &&
+                        el === this.domCache.gridScrollableContainer[0]) {
+                        rect.top += this.headerHeight;
                     }
                 });
                 e.preventDefault();

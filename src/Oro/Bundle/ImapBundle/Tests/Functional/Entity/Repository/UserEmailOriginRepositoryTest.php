@@ -90,15 +90,22 @@ class UserEmailOriginRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getOriginsData
+     *
+     * @param callable $qbCallback
+     * @param callable $getTokenCallback
+     * @param $expectedCount
      */
-    public function testGetOrigins(callable $qbCallback, int $expectedCount): void
+    public function testGetOrigins(callable $qbCallback, callable $getTokenCallback, $expectedCount): void
     {
         $this->loadFixtures([LoadTypedUserEmailOriginData::class]);
 
         /** @var UserEmailOriginRepository $repo */
         $repo = $this->doctrineHeler->getEntityRepositoryForClass(UserEmailOrigin::class);
-        $qb = $qbCallback($repo);
-        $this->assertCount($expectedCount, $qb->getQuery()->execute());
+        $tokens = $qbCallback($repo)->getQuery()->execute();
+        $this->assertCount($expectedCount, $tokens);
+        foreach ($tokens as $token) {
+            $this->assertEquals(8192, strlen($getTokenCallback($token)));
+        }
     }
 
     /**
@@ -108,35 +115,33 @@ class UserEmailOriginRepositoryTest extends WebTestCase
     {
         return [
             [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithAccessTokens('gmail');
-                },
-                1
-            ], [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithAccessTokens('microsoft');
-                },
-                1
-            ], [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithAccessTokens();
-                },
-                2
-            ], [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithRefreshTokens('gmail');
-                },
-                1
-            ], [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithRefreshTokens('microsoft');
-                },
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens('gmail'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
                 1
             ],
             [
-                function (UserEmailOriginRepository $repo) {
-                    return $repo->getAllOriginsWithRefreshTokens();
-                },
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens('microsoft'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithAccessTokens(),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getAccessToken(),
+                2
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens('gmail'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens('microsoft'),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
+                1
+            ],
+            [
+                fn (UserEmailOriginRepository $repo) => $repo->getAllOriginsWithRefreshTokens(),
+                fn (UserEmailOrigin $emailOrigin) => $emailOrigin->getRefreshToken(),
                 2
             ]
         ];

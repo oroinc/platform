@@ -6,6 +6,9 @@ app-modules:
     - orolocale/js/app/modules/locale-module
 configs:
     orolocale/js/locale-settings: {}
+dynamic-imports:
+    commons:
+        - orolocale/js/formatter/datetime
 map:
     "*":
         moment: orolocale/js/moment-l10n

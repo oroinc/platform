@@ -65,7 +65,7 @@ define([
             PageMainMenuView.__super__.delegateEvents.call(this, events);
 
             // can't use event delegation, in some cases bubbling will be break
-            this.$('a').on('click' + this.eventNamespace(), _.bind(this._onMenuItemClick, this));
+            this.$('a').on('click' + this.eventNamespace(), this._onMenuItemClick.bind(this));
         },
 
         undelegateEvents: function() {

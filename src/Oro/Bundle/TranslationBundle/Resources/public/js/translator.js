@@ -114,7 +114,7 @@ define(function(require, exports, module) {
          * Due to it's underscore mixin, it can be used inside templates
          * @returns {string}
          */
-        __: _.bind(Translator.get, Translator)
+        __: Translator.get.bind(Translator)
     });
 
     /**

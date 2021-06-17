@@ -48,7 +48,7 @@ define([
          * @param {Backbone.Collection} options.collection
          */
         initialize: function(options) {
-            const debouncedUpdateState = _.bind(_.debounce(this.updateState, 50), this);
+            const debouncedUpdateState = _.debounce(this.updateState.bind(this), 50);
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
@@ -93,9 +93,9 @@ define([
         delegateEvents: function(events) {
             SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
             // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
-            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onDropdownClick, this));
+            this.$('.dropdown-menu').on('click' + this.eventNamespace(), this.onDropdownClick.bind(this));
             // binds event handlers directly to checkbox, because a toggle-dropdown stops event propagation
-            this.$('[data-select]:checkbox').on('click' + this.eventNamespace(), _.bind(this.onCheckboxClick, this));
+            this.$('[data-select]:checkbox').on('click' + this.eventNamespace(), this.onCheckboxClick.bind(this));
             return this;
         },
 
