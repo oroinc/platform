@@ -96,8 +96,12 @@ class ImportExportContext extends OroFeatureContext implements
     public function gatherContexts(BeforeScenarioScope $scope)
     {
         $environment = $scope->getEnvironment();
-        $this->oroMainContext = $environment->getContext(OroMainContext::class);
-        $this->emailContext = $environment->getContext(EmailContext::class);
+        if ($environment->hasContextClass(OroMainContext::class)) {
+            $this->oroMainContext = $environment->getContext(OroMainContext::class);
+        }
+        if ($environment->hasContextClass(EmailContext::class)) {
+            $this->emailContext = $environment->getContext(EmailContext::class);
+        }
     }
 
     /**
