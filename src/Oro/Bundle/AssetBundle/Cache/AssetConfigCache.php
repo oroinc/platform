@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AssetBundle\Cache;
 
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -20,6 +21,8 @@ class AssetConfigCache implements WarmableInterface
      */
     private $webpackDevServerOptions;
 
+    private ThemeManager $themeManager;
+
     /**
      * @param KernelInterface $kernel
      * @param array           $webpackDevServerOptions
@@ -32,6 +35,11 @@ class AssetConfigCache implements WarmableInterface
         $this->webpackDevServerOptions = $webpackDevServerOptions;
     }
 
+    public function setThemeManager(ThemeManager $themeManager): void
+    {
+        $this->themeManager = $themeManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -40,6 +48,8 @@ class AssetConfigCache implements WarmableInterface
         $config['paths'] = $this->getBundlesPath();
         $config['devServerOptions'] = $this->webpackDevServerOptions;
         $config['assetVersion'] = $this->kernel->getContainer()->getParameter('assets_version');
+
+        $config['themes'] = array_keys($this->themeManager->getEnabledThemes());
 
         @file_put_contents($this->getFilePath($cacheDir), \json_encode($config, JSON_UNESCAPED_SLASHES));
     }

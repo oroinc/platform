@@ -23,6 +23,8 @@ services:
         arguments:
             - '@oro_layout.theme_factory'
             - '@oro_layout.theme_extension.configuration.provider'
+        calls:
+            - ['setEnabledThemes', ['%oro_layout.enabled_themes%']]
 
     oro_layout.loader:
         class:  Oro\Component\Layout\Loader\LayoutUpdateLoader

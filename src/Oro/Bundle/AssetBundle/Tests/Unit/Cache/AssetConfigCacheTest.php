@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AssetBundle\Tests\Unit\Cache;
 
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,7 +36,9 @@ class AssetConfigCacheTest extends TestCase
             ->method('getContainer')
             ->willReturn($container);
 
+        $manager = $this->getThemeManagerMock();
         $warmer = new AssetConfigCache($kernel, self::WEBPACK_DEV_SERVER_OPTIONS);
+        $warmer->setThemeManager($manager);
         $tempDir = $this->getTempDir('cache');
         $warmer->warmUp($tempDir);
         $file = $tempDir.'/asset-config.json';
@@ -54,5 +57,14 @@ class AssetConfigCacheTest extends TestCase
             ->willReturn($path);
 
         return $bundle;
+    }
+
+    protected function getThemeManagerMock(): ThemeManager
+    {
+        $manager = $this->createMock(ThemeManager::class);
+        $manager->method('getEnabledThemes')
+            ->willReturn([]);
+
+        return $manager;
     }
 }

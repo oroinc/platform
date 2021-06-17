@@ -7,6 +7,8 @@ services:
         arguments:
             - '@kernel'
             - '%oro_asset.webpack_dev_server_options%'
+        calls:
+            - ['setThemeManager', ['@oro_layout.theme_manager']]
 
     oro_asset_bundle.asset_config.cache_warmer:
         class: Oro\Bundle\AssetBundle\Cache\AssetConfigCacheWarmer

@@ -47,8 +47,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'resources' => ['OroLayoutBundle:Layout:div_layout.html.twig']
                 ]
             ],
-            'debug' => '%kernel.debug%'
+            'debug' => '%kernel.debug%',
+            "enabled_themes" => []
         ];
+
         $this->assertEquals($expected, $processor->processConfiguration($configuration, []));
     }
 }

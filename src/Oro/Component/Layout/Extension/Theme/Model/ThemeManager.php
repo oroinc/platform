@@ -17,6 +17,11 @@ class ThemeManager
     private $instances = [];
 
     /**
+     * @var string[]
+     */
+    private array $enabledThemes;
+
+    /**
      * @param ThemeFactoryInterface       $themeFactory
      * @param ThemeDefinitionBagInterface $themeDefinitionBag
      */
@@ -28,6 +33,11 @@ class ThemeManager
         $this->themeDefinitionBag = $themeDefinitionBag;
     }
 
+    public function setEnabledThemes(array $enabledThemes): void
+    {
+        $this->enabledThemes = $enabledThemes;
+    }
+
     /**
      * Returns all known themes names
      *
@@ -36,6 +46,21 @@ class ThemeManager
     public function getThemeNames()
     {
         return $this->themeDefinitionBag->getThemeNames();
+    }
+
+    public function getEnabledThemes($groups = null): array
+    {
+        $themes = $this->getAllThemes($groups);
+
+        if ($this->enabledThemes !== []) {
+            $enabledThemes = array_intersect_key($themes, array_flip($this->enabledThemes));
+
+            if ($enabledThemes !== []) {
+                return $enabledThemes;
+            }
+        }
+
+        return $themes;
     }
 
     /**
