@@ -1,4 +1,7 @@
 services:
+    Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory:
+        alias: oro_imap.connector.factory
+
     oro_imap.connector.factory:
         class: Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
         public: true
@@ -189,6 +192,9 @@ services:
         tags:
             - { name: 'oro_imap.oauth2_manager' }
 
+    Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager:
+        alias: oro_imap.manager.controller.connection
+
     oro_imap.manager.controller.connection:
         class: Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager
         public: true
@@ -307,6 +313,9 @@ services:
             - '@oro_imap.manager.checker.imap_settings'
         tags:
             - { name: validator.constraint_validator }
+
+    Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry:
+        alias: oro_imap.manager_registry.registry
 
     oro_imap.manager_registry.registry:
         public: true

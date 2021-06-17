@@ -27,6 +27,13 @@ class NumberTypeExtensionTest extends FormIntegrationTestCase
 
         self::assertArrayHasKey('value', $view->vars);
         self::assertEquals(self::FORMATTED_VALUE, $view->vars['value']);
+
+        self::assertArrayHasKey('attr', $view->vars);
+        self::assertArrayHasKey('data-limit-decimals', $view->vars['attr']);
+        self::assertEquals(self::FORMATTED_VALUE, $view->vars['value']);
+        self::assertEquals(1, $view->vars['attr']['data-limit-decimals']);
+
+        self::assertTrue($form->getConfig()->getOption('limit_decimals'));
     }
 
     protected function getTypeExtensions(): array

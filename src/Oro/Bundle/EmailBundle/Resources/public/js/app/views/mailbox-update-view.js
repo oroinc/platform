@@ -36,7 +36,7 @@ define([
             const passwordField = $('input[name="oro_email_mailbox[origin][password]"]');
             passwordField.val(passwordHolderField.val());
 
-            this.listenTo(mediator, 'change:systemMailBox:email', _.bind(this.onChangeEmail, this));
+            this.listenTo(mediator, 'change:systemMailBox:email', this.onChangeEmail.bind(this));
         },
 
         changeHandler: function(event) {

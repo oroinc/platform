@@ -60,7 +60,7 @@ Feature:  Digital asset management
       | Allowed MIME types    | [image/jpeg, image/png] |
       | Use DAM               | Yes                     |
     When I save and create new form
-    Then I should see "This value should be 2,047 or less."
+    Then I should see "This value should be between 1 and 2,047."
     And I fill form with:
       | File Size (MB) | 5 |
     When I save and create new form

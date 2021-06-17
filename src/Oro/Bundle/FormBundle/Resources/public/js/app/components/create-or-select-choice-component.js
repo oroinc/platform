@@ -47,7 +47,7 @@ define(function(require) {
             if (this.editable) {
                 this.requiredOptions.push('editRoute');
             }
-            const missingProperties = _.filter(this.requiredOptions, _.negate(_.bind(options.hasOwnProperty, options)));
+            const missingProperties = _.filter(this.requiredOptions, _.negate(options.hasOwnProperty.bind(options)));
             if (missingProperties.length) {
                 throw new Error(
                     'Following properties are required but weren\'t passed: ' +
@@ -66,10 +66,10 @@ define(function(require) {
             this.$dialog.css('top', 0);
             this.editRoute = options.editRoute;
 
-            this.$existingEntity.on('change', _.bind(this._onEntityChange, this));
-            this.$existingEntity.on('change', _.bind(this._retrieveEntityData, this));
-            this.$existingEntity.on('change', _.bind(this._cleanEntityData, this));
-            this.$mode.on('change', _.bind(this._updateNewEntityVisibility, this));
+            this.$existingEntity.on('change', this._onEntityChange.bind(this));
+            this.$existingEntity.on('change', this._retrieveEntityData.bind(this));
+            this.$existingEntity.on('change', this._cleanEntityData.bind(this));
+            this.$mode.on('change', this._updateNewEntityVisibility.bind(this));
 
             this._onEntityChange({val: this.$existingEntityInput.val()});
         },
@@ -139,11 +139,11 @@ define(function(require) {
 
             this._setLoading(true);
             $.get(route)
-                .done(_.bind(this._setNewEntityForm, this))
-                .fail(_.bind(this._handleDataRequestError, this))
-                .always(_.bind(function() {
+                .done(this._setNewEntityForm.bind(this))
+                .fail(this._handleDataRequestError.bind(this))
+                .always(() => {
                     this._setLoading(false);
-                }, this));
+                });
         },
 
         /**
@@ -214,7 +214,7 @@ define(function(require) {
             /*
              * For each input element in added form, create new name to match naming scheme.
              */
-            $data.find(':input').each(_.bind(function(index, element) {
+            $data.find(':input').each((index, element) => {
                 const $element = $(element);
                 let inputName = $element.attr('name');
                 inputName = inputName.substr(inputName.indexOf('['));
@@ -234,7 +234,7 @@ define(function(require) {
                         $modifiedField.val($element.val()).change();
                     }
                 }
-            }, this));
+            });
 
             if (this.disabledEditForm) {
                 this.$newEntity.find(':input').each(function() {
@@ -316,10 +316,10 @@ define(function(require) {
                 delete this.loadingMask;
             }
 
-            this.$existingEntity.off('change', _.bind(this._onEntityChange, this));
-            this.$existingEntity.off('change', _.bind(this._retrieveEntityData, this));
-            this.$existingEntity.off('change', _.bind(this._cleanEntityData, this));
-            this.$mode.off('change', _.bind(this._updateNewEntityVisibility, this));
+            this.$existingEntity.off('change', this._onEntityChange.bind(this));
+            this.$existingEntity.off('change', this._retrieveEntityData.bind(this));
+            this.$existingEntity.off('change', this._cleanEntityData.bind(this));
+            this.$mode.off('change', this._updateNewEntityVisibility.bind(this));
 
             CreateOrSelectChoiceComponent.__super__.dispose.call(this);
         }

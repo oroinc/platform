@@ -3,8 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Controller\Configuration;
 
 use FOS\RestBundle\Controller\Annotations\Delete;
+use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
+use Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
+use Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler;
+use Oro\Bundle\FormBundle\Autocomplete\Security;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for the mailboxes functionality.
@@ -57,24 +64,24 @@ class MailboxController extends AbstractController
      */
     private function update(Mailbox $mailbox, Request $request)
     {
-        $provider = $this->get('oro_config.provider.system_configuration.form_provider');
+        $provider = $this->get(SystemConfigurationFormProvider::class);
 
         list($activeGroup, $activeSubGroup) = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
 
         $jsTree = $provider->getJsTree();
 
-        $handler = $this->get('oro_email.form.handler.mailbox');
+        $handler = $this->get(MailboxHandler::class);
 
         if ($handler->process($mailbox)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans(
+                $this->get(TranslatorInterface::class)->trans(
                     'oro.email.mailbox.action.saved',
                     ['%mailbox%' => $mailbox->getLabel()]
                 )
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
+            return $this->get(Router::class)->redirectAfterSave(
                 [
                     'route' => 'oro_email_mailbox_update',
                     'parameters' => ['id' => $mailbox->getId()]
@@ -145,7 +152,7 @@ class MailboxController extends AbstractController
     public function searchUsersAction(Request $request, $organizationId)
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get('validator');
+        $validator           = $this->get(ValidatorInterface::class);
         $isXmlHttpRequest    = $request->isXmlHttpRequest();
         $code                = 200;
         $result              = [
@@ -160,7 +167,7 @@ class MailboxController extends AbstractController
             }
         }
 
-        if (!$this->get('oro_form.autocomplete.security')->isAutocompleteGranted($autocompleteRequest->getName())) {
+        if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
             $result['errors'][] = 'Access denied.';
         }
 
@@ -172,7 +179,7 @@ class MailboxController extends AbstractController
             throw new HttpException($code, implode(', ', $result['errors']));
         }
 
-        $searchHandler = $this->get('oro_email.autocomplete.mailbox_user_search_handler');
+        $searchHandler = $this->get(MailboxUserSearchHandler::class);
         $searchHandler->setOrganizationId($organizationId);
 
         return new JsonResponse(
@@ -200,6 +207,25 @@ class MailboxController extends AbstractController
                     'activeGroup' => self::ACTIVE_GROUP,
                     'activeSubGroup' => self::ACTIVE_SUBGROUP,
                 ]
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                ValidatorInterface::class,
+                Security::class,
+                MailboxUserSearchHandler::class,
+                MailboxHandler::class,
+                SystemConfigurationFormProvider::class,
             ]
         );
     }

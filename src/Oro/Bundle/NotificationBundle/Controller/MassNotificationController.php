@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The controller for MassNotification entity.
@@ -56,7 +57,7 @@ class MassNotificationController extends AbstractController
      */
     public function infoAction(MassNotification $massNotification)
     {
-        $translator = $this->get('translator');
+        $translator = $this->get(TranslatorInterface::class);
         $statusLabel = $massNotification->getStatus() == MassNotification::STATUS_FAILED ?
             $translator->trans('oro.notification.massnotification.status.failed') :
             $translator->trans('oro.notification.massnotification.status.success');
@@ -65,5 +66,18 @@ class MassNotificationController extends AbstractController
             'entity'      => $massNotification,
             'statusLabel' => $statusLabel
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+            ]
+        );
     }
 }

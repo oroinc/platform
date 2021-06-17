@@ -1,7 +1,10 @@
-define([
-    'jquery', 'underscore', 'orotranslation/js/translator', 'xregexp', 'jquery.validate'
-], function($, _, __, XRegExp) {
+define(function(require) {
     'use strict';
+
+    const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
+    const XRegExp = require('xregexp');
+    require('jquery.validate');
 
     const defaultParam = {
         message: 'This value is not a valid URL.'

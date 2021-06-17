@@ -32,9 +32,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->workflowAclMetadataProvider = new WorkflowAclMetadataProvider(
             $this->doctrine,
@@ -47,19 +45,10 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
      */
     private function loadWorkflowExpectations()
     {
-        $em = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo = $this->getMockBuilder(EntityRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $qb = $this->getMockBuilder(QueryBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getArrayResult'])
-            ->getMockForAbstractClass();
+        $em = $this->createMock(EntityManager::class);
+        $repo = $this->createMock(EntityRepository::class);
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = $this->createMock(AbstractQuery::class);
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with(WorkflowDefinition::class)

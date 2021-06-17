@@ -24,6 +24,9 @@ services:
             - '%kernel.cache_dir%/oro/entity.php'
             - '%kernel.debug%'
 
+    Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry:
+        alias: oro_entity.delete_handler_registry
+
     oro_entity.delete_handler_registry:
         class: Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry
         public: true
@@ -472,6 +475,9 @@ services:
             - '@oro_entity.entity_class_name_provider'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
+
+    Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager:
+        alias: oro_entity.manager.dictionary.api
 
     oro_entity.manager.dictionary.api:
         class: Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager

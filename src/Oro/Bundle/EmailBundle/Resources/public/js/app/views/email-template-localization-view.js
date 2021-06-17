@@ -43,13 +43,13 @@ define([
 
             mediator.on(
                 this.eventToParent('localized-template:field-change'),
-                _.bind(this.onParentFieldChange, this),
+                this.onParentFieldChange.bind(this),
                 this
             );
 
             mediator.on(
                 this.eventToChildren('localized-template:field-fallback'),
-                _.bind(this.onChangeInput, this),
+                this.onChangeInput.bind(this),
                 this
             );
 
@@ -64,14 +64,14 @@ define([
                     if (field.$fallback.length) {
                         field.$fallback.on(
                             'change' + this.eventNamespace(),
-                            _.bind(this.processFallback, this, fieldName)
+                            this.processFallback.bind(this, fieldName)
                         );
                     }
 
                     if (field.$input.length) {
                         field.$input.on(
                             'change' + this.eventNamespace(),
-                            _.bind(this.onChangeInput, this, fieldName)
+                            this.onChangeInput.bind(this, fieldName)
                         );
 
                         field.editor = tinyMCE.get(field.$input.attr('id'));
@@ -79,7 +79,7 @@ define([
                         if (field.editor) {
                             field.editor.on(
                                 'Change',
-                                _.bind(this.onChangeInput, this, fieldName)
+                                this.onChangeInput.bind(this, fieldName)
                             );
                         }
                     }

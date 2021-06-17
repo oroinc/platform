@@ -74,14 +74,13 @@ define(function(require) {
             const info = this.getCurrentCellInfo();
             let columnI;
             let rowI;
-            const _this = this;
 
             if (info.column.last) {
                 if (info.row.last) {
                     // navigate to next page
-                    return this.getNextPage().then(function() {
-                        _this.current = _this.findCellByIndexOrNext(0, 0, 1);
-                        return _this.current;
+                    return this.getNextPage().then(() => {
+                        this.current = this.findCellByIndexOrNext(0, 0, 1);
+                        return this.current;
                     });
                 }
                 rowI = info.row.i + 1;
@@ -98,15 +97,14 @@ define(function(require) {
 
         nextRow: function() {
             const info = this.getCurrentCellInfo();
-            const _this = this;
             const rowI = info.row.i + 1;
             const columnI = info.column.i;
 
             if (info.row.last) {
                 // navigate to next page
-                return this.getNextPage().then(function() {
-                    _this.current = _this.findCellByIndexOrNext(0, columnI, 1);
-                    return _this.current;
+                return this.getNextPage().then(() => {
+                    this.current = this.findCellByIndexOrNext(0, columnI, 1);
+                    return this.current;
                 });
             }
 
@@ -119,15 +117,14 @@ define(function(require) {
             const info = this.getCurrentCellInfo();
             let columnI;
             let rowI;
-            const _this = this;
 
             if (info.column.first) {
                 if (info.row.first) {
                     // navigate to prev page
-                    return this.getPreviousPage().then(function() {
-                        _this.current =
-                            _this.findCellByIndexOrNext(_this.rows.length - 1, _this.columns.length - 1, -1);
-                        return _this.current;
+                    return this.getPreviousPage().then(() => {
+                        this.current =
+                            this.findCellByIndexOrNext(this.rows.length - 1, this.columns.length - 1, -1);
+                        return this.current;
                     });
                 }
                 rowI = info.row.i - 1;
@@ -144,16 +141,15 @@ define(function(require) {
 
         prevRow: function() {
             const info = this.getCurrentCellInfo();
-            const _this = this;
 
             const rowI = info.row.i - 1;
             const columnI = info.column.i;
 
             if (info.row.first) {
                 // navigate to prev page
-                return this.getPreviousPage().then(function() {
-                    _this.current = _this.findCellByIndexOrNext(_this.rows.length - 1, columnI, -1);
-                    return _this.current;
+                return this.getPreviousPage().then(() => {
+                    this.current = this.findCellByIndexOrNext(this.rows.length - 1, columnI, -1);
+                    return this.current;
                 });
             }
 

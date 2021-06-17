@@ -34,7 +34,7 @@ define(function(require) {
 
             this.$exportTemplateButton = this.$el;
 
-            this.$exportTemplateButton.on('click' + this.eventNamespace(), _.bind(this.onExportTemplateClick, this));
+            this.$exportTemplateButton.on('click' + this.eventNamespace(), this.onExportTemplateClick.bind(this));
 
             this.routeOptions = {
                 options: this.options.routeOptions,

@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as BaseControll
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Translation Controller
@@ -45,8 +46,7 @@ class TranslationController extends BaseController
      */
     public function resetMassAction($gridName, $actionName, Request $request)
     {
-        /** @var MassActionDispatcher $massActionDispatcher */
-        $massActionDispatcher = $this->get('oro_datagrid.mass_action.dispatcher');
+        $massActionDispatcher = $this->get(MassActionDispatcher::class);
 
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
@@ -55,12 +55,27 @@ class TranslationController extends BaseController
                 $response->getOptions()
             );
         } catch (LogicException $e) {
+            $translator = $this->get(TranslatorInterface::class);
             $data = [
                 'successful' => false,
-                'message' => $this->get('translator')->trans('oro.translation.action.reset.nothing_to_reset'),
+                'message' => $translator->trans('oro.translation.action.reset.nothing_to_reset'),
             ];
         }
 
         return new JsonResponse($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                MassActionDispatcher::class,
+            ]
+        );
     }
 }

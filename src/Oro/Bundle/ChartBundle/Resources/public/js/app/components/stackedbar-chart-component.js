@@ -45,7 +45,7 @@ define(function(require) {
 
         setupPanning: function(initialGraph, container, series) {
             let graph = initialGraph;
-            const drawGraph = _.bind(this.drawGraph, this);
+            const drawGraph = this.drawGraph.bind(this);
             let start;
 
             Flotr.EventAdapter.observe(container, 'flotr:mousedown', function(e) {
@@ -95,19 +95,19 @@ define(function(require) {
                     track: true,
                     relative: false,
                     position: 'ne',
-                    trackFormatter: _.bind(this.trackFormatter, this)
+                    trackFormatter: this.trackFormatter.bind(this)
                 },
                 yaxis: {
                     autoscale: true,
                     autoscaleMargin: 0.3,
                     noTicks: 2,
-                    tickFormatter: _.bind(this.YTickFormatter, this),
+                    tickFormatter: this.YTickFormatter.bind(this),
                     title: options.data_schema.value.label
                 },
                 xaxis: {
                     min: xSize.min,
                     max: xSize.max,
-                    tickFormatter: _.bind(this.XTickFormatter, this),
+                    tickFormatter: this.XTickFormatter.bind(this),
                     title: options.data_schema.label.label
                 },
                 grid: {

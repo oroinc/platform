@@ -68,8 +68,6 @@ define(function(require) {
         },
 
         onChangeSelectedOrganization: function(data) {
-            const that = this;
-
             if (data.add) {
                 this.organizations[data.organizationId] = data.organizationId;
             } else {
@@ -78,8 +76,8 @@ define(function(require) {
                 let values = this.view.$el.val();
                 values = values.split(',');
 
-                const checkedOrganization = values.filter(function(value) {
-                    const selectedValue = that.getValueFromSelectedData(parseInt(value));
+                const checkedOrganization = values.filter(value => {
+                    const selectedValue = this.getValueFromSelectedData(parseInt(value));
                     if (selectedValue) {
                         return parseInt(selectedValue.organization_id) === parseInt(data.organizationId);
                     }

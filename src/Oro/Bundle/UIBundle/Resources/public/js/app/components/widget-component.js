@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const mediator = require('oroui/js/mediator');
     const loadModules = require('oroui/js/app/services/load-modules');
@@ -62,7 +61,7 @@ define(function(require) {
                     this._bindOpenEvent();
                 } else {
                     this._deferredInit();
-                    this.openWidget().done(_.bind(this._resolveDeferredInit, this));
+                    this.openWidget().done(this._resolveDeferredInit.bind(this));
                 }
             }
         },
@@ -84,18 +83,18 @@ define(function(require) {
          */
         _bindOpenEvent: function() {
             const eventName = this.options.createOnEvent;
-            const handler = _.bind(function(e) {
+            const handler = e => {
                 e.preventDefault();
                 this.openWidget();
-            }, this);
+            };
             this.$element.on(eventName + '.' + this.cid, handler);
 
-            mediator.on('widget_dialog:stateChange', _.bind(function(widget, data) {
+            mediator.on('widget_dialog:stateChange', (widget, data) => {
                 if (this.previousWidgetData && this.previousWidgetData.id === widget.getWid()) {
                     this.previousWidgetData.open = data.state === 'minimized';
                     this.previousWidgetData.widget = widget;
                 }
-            }, this));
+            });
         },
 
         /**
@@ -159,10 +158,10 @@ define(function(require) {
 
             if (!this.options.multiple) {
                 this.opened = true;
-                this.listenTo(widget, 'widgetRemove', _.bind(function() {
+                this.listenTo(widget, 'widgetRemove', () => {
                     this.opened = false;
                     delete this.view;
-                }, this));
+                });
 
                 if (widget.isEmbedded()) {
                     // save reference to widget (only for a single + embedded instance)
@@ -180,8 +179,8 @@ define(function(require) {
 
             if (widget.deferredRender) {
                 widget.deferredRender
-                    .done(_.bind(deferredOpen.resolve, deferredOpen))
-                    .fail(_.bind(deferredOpen.reject, deferredOpen));
+                    .done(deferredOpen.resolve.bind(deferredOpen))
+                    .fail(deferredOpen.reject.bind(deferredOpen));
             } else {
                 deferredOpen.resolve(widget);
             }

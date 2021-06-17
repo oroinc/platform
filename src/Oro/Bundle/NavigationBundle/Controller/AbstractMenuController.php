@@ -4,22 +4,31 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
+use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
+use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
+use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
+use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\UIBundle\Form\Type\TreeMoveType;
 use Oro\Bundle\UIBundle\Model\TreeCollection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The base class for menu related controllers.
@@ -40,9 +49,9 @@ abstract class AbstractMenuController extends AbstractController
     /**
      * @return MenuUpdateManager
      */
-    protected function getMenuUpdateManager()
+    protected function getMenuUpdateManager(): MenuUpdateManager
     {
-        return $this->get('oro_navigation.manager.menu_update');
+        return $this->get(MenuUpdateManager::class);
     }
 
     /**
@@ -109,7 +118,7 @@ abstract class AbstractMenuController extends AbstractController
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
-        $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
+        $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $this->getMenuUpdateManager()->createMenuUpdate(
             $menu,
@@ -134,7 +143,7 @@ abstract class AbstractMenuController extends AbstractController
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
-        $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context, false);
+        $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context, false);
         $menu = $this->getMenu($menuName, $context);
         $menuUpdate = $this->getMenuUpdateManager()->findOrCreateMenuUpdate($menu, $key, $scope);
 
@@ -160,7 +169,7 @@ abstract class AbstractMenuController extends AbstractController
 
         $menu = $this->getMenu($menuName, $context);
 
-        $handler = $this->get('oro_navigation.tree.menu_update_tree_handler');
+        $handler = $this->get(MenuUpdateTreeHandler::class);
         $treeItems = $handler->getTreeItemList($menu, true);
 
         $collection = new TreeCollection();
@@ -185,7 +194,7 @@ abstract class AbstractMenuController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var EntityManager $entityManager */
             $entityManager = $this->getDoctrine()->getManagerForClass($this->getEntityClass());
-            $scope = $this->get('oro_scope.scope_manager')->findOrCreate($this->getScopeType(), $context);
+            $scope = $this->get(ScopeManager::class)->findOrCreate($this->getScopeType(), $context);
             $updates = $this->getMenuUpdateManager()->moveMenuItems(
                 $menu,
                 $collection->source,
@@ -195,10 +204,11 @@ abstract class AbstractMenuController extends AbstractController
             );
 
             foreach ($updates as $update) {
-                $errors = $this->get('validator')->validate($update);
+                $errors = $this->get(ValidatorInterface::class)->validate($update);
                 if (count($errors)) {
                     $form->addError(new FormError(
-                        $this->get('translator')->trans('oro.navigation.menuupdate.validation_error_message')
+                        $this->get(TranslatorInterface::class)
+                            ->trans('oro.navigation.menuupdate.validation_error_message')
                     ));
                     return $this->renderMoveDialog($responseData, $form);
                 }
@@ -246,7 +256,7 @@ abstract class AbstractMenuController extends AbstractController
 
         $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
 
-        $response = $this->get('oro_form.model.update_handler')->update(
+        $response = $this->get(UpdateHandler::class)->update(
             $menuUpdate,
             $form,
             $this->getSavedSuccessMessage()
@@ -271,7 +281,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function normalizeContext(array $context)
     {
-        return $this->get('oro_scope.context_normalizer')->normalizeContext($context);
+        return $this->get(ContextNormalizer::class)->normalizeContext($context);
     }
 
     /**
@@ -280,7 +290,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function denormalizeContext(array $context)
     {
-        return $this->get('oro_scope.context_normalizer')->denormalizeContext($this->getScopeType(), $context);
+        return $this->get(ContextNormalizer::class)->denormalizeContext($this->getScopeType(), $context);
     }
 
     /**
@@ -296,10 +306,10 @@ abstract class AbstractMenuController extends AbstractController
             BuilderChainProvider::MENU_LOCAL_CACHE_PREFIX => 'edit_'
         ];
 
-        $configurationRootMenuKeys = array_keys($this->get('oro_navigation.configuration.provider')->getMenuTree());
+        $configurationRootMenuKeys = array_keys($this->get(ConfigurationProvider::class)->getMenuTree());
         $isMenuFromConfiguration = in_array($menuName, $configurationRootMenuKeys, true);
 
-        $menu = $this->get('oro_menu.builder_chain')->get($menuName, $options);
+        $menu = $this->get(BuilderChainProvider::class)->get($menuName, $options);
 
         if (!$isMenuFromConfiguration && !count($menu->getChildren())) {
             throw $this->createNotFoundException(sprintf("Menu \"%s\" not found.", $menuName));
@@ -314,7 +324,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function createMenuTree($menu)
     {
-        return $this->get('oro_navigation.tree.menu_update_tree_handler')->createTree($menu);
+        return $this->get(MenuUpdateTreeHandler::class)->createTree($menu);
     }
 
     /**
@@ -323,7 +333,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function dispatchMenuUpdateChangeEvent($menuName, array $context)
     {
-        $this->get('event_dispatcher')->dispatch(
+        $this->get(EventDispatcherInterface::class)->dispatch(
             new MenuUpdateChangeEvent($menuName, $context),
             MenuUpdateChangeEvent::NAME
         );
@@ -350,7 +360,7 @@ abstract class AbstractMenuController extends AbstractController
      */
     protected function getContextFromRequest(Request $request, array $allowedKeys = [])
     {
-        return $this->get('oro_scope.context_request_helper')->getFromRequest($request, $allowedKeys);
+        return $this->get(ContextRequestHelper::class)->getFromRequest($request, $allowedKeys);
     }
 
     /**
@@ -359,5 +369,28 @@ abstract class AbstractMenuController extends AbstractController
     protected function getSavedSuccessMessage()
     {
         return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                ScopeManager::class,
+                MenuUpdateTreeHandler::class,
+                ValidatorInterface::class,
+                TranslatorInterface::class,
+                UpdateHandler::class,
+                ContextNormalizer::class,
+                ConfigurationProvider::class,
+                BuilderChainProvider::class,
+                EventDispatcherInterface::class,
+                ContextRequestHelper::class,
+                MenuUpdateManager::class,
+            ]
+        );
     }
 }

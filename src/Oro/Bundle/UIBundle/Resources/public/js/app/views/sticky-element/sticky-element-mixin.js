@@ -28,7 +28,7 @@ define(function(require) {
             const stickyOptions = this.stickyOptions = _.defaults(options.stickyOptions || {}, this.stickyOptions);
 
             if ($el && stickyOptions.enabled) {
-                this._setStickyPosition = _.bind(requestAnimationFrame, window, _.bind(this._setStickyPosition, this));
+                this._setStickyPosition = requestAnimationFrame.bind(window, this._setStickyPosition.bind(this));
 
                 $el.addClass(stickyOptions.stickyClass);
 

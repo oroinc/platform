@@ -38,7 +38,7 @@ define(function(require) {
             this.$tagsHolder = this.$('.tags-holder');
 
             // process filter action binding
-            this.$('.tag-sort-actions a').click(_.bind(this.filter, this));
+            this.$('.tag-sort-actions a').click(this.filter.bind(this));
         },
 
         /**

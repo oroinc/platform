@@ -5,35 +5,30 @@ define(function(require) {
     const Cell = require('./jpm-cell');
 
     function Matrix(options) {
-        const that = this;
         const steps = options.workflow.get('steps');
         const orders = _.uniq(steps.pluck('order'));
 
         this.workflow = options.workflow;
         this.width = 8;
-        this.cells = _.range(orders.length).map(
-            function() {
-                return _.range(that.width).map(function() {
-                    return [];
-                });
-            }
-        );
+        this.cells = _.range(orders.length).map(() => {
+            return _.range(this.width).map(() => []);
+        });
         this.cellMap = {};
         this.transitions = {};
-        this.workflow.get('transitions').each(function(transition) {
-            that.transitions[transition.get('name')] = transition;
+        this.workflow.get('transitions').each(transition => {
+            this.transitions[transition.get('name')] = transition;
         });
         this.connections = [];
-        steps.each(function(step) {
-            _.each(step.get('allowed_transitions'), function(transitionName) {
-                const transition = that.transitions[transitionName];
+        steps.each(step => {
+            _.each(step.get('allowed_transitions'), transitionName => {
+                const transition = this.transitions[transitionName];
                 let target;
                 if (transition) {
-                    target = steps.find(function(item) {
+                    target = steps.find(item => {
                         return item.get('name') === transition.get('step_to');
                     });
                     if (target) {
-                        that.connections.push({
+                        this.connections.push({
                             from: step.get('name'),
                             to: target.get('name')
                         });
@@ -78,9 +73,9 @@ define(function(require) {
                 minY = Math.min(minY, cell.y);
             });
             if (minY > 0 || minX > 0) {
-                this.forEachCell(_.bind(function(cell) {
+                this.forEachCell(cell => {
                     this.move(cell, cell.x - minX, cell.y - minY);
-                }, this));
+                });
             }
             return this;
         },
@@ -120,9 +115,9 @@ define(function(require) {
             for (row = 0; row < this.cells.length; row++) {
                 for (col = 0; col < this.cells[row].length; col++) {
                     if (this.cells[row][col].length) {
-                        _.each(this.cells[row][col], _.bind(function(item) {
+                        _.each(this.cells[row][col], item => {
                             item.setChildren(this.findChildren(item));
-                        }, this));
+                        });
                     }
                 }
             }
@@ -130,12 +125,12 @@ define(function(require) {
 
         findChildren: function(parent) {
             const children = [];
-            parent.step.getAllowedTransitions(this.workflow).each(_.bind(function(transition) {
+            parent.step.getAllowedTransitions(this.workflow).each(transition => {
                 const cell = this.findCell(transition.get('step_to'));
                 if (cell && children.indexOf(cell) < 0) {
                     children.push(cell);
                 }
-            }, this));
+            });
             return children;
         }
     });

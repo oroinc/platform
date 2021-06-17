@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Controller;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroup;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
+use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Entity Attribute Family Controller
@@ -32,7 +37,7 @@ class AttributeFamilyController extends AbstractController
     public function createAction($alias)
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
-        $attributeManager = $this->get('oro_entity_config.manager.attribute_manager');
+        $attributeManager = $this->get(AttributeManager::class);
 
         $this->ensureEntityConfigSupported($entityConfigModel);
 
@@ -50,14 +55,15 @@ class AttributeFamilyController extends AbstractController
             $defaultGroup->addAttributeRelation($attributeGroupRelation);
         }
 
+        $translator = $this->getTranslator();
         $defaultGroup->setDefaultLabel(
-            $this->get('translator')->trans('oro.entity_config.form.default_group_label')
+            $translator->trans('oro.entity_config.form.default_group_label')
         );
         $attributeFamily->addAttributeGroup($defaultGroup);
 
         $response = $this->update(
             $attributeFamily,
-            $this->get('translator')->trans('oro.entity_config.controller.attribute_family.message.saved')
+            $translator->trans('oro.entity_config.controller.attribute_family.message.saved')
         );
 
         if (is_array($response)) {
@@ -75,11 +81,12 @@ class AttributeFamilyController extends AbstractController
      */
     public function updateAction(AttributeFamily $attributeFamily)
     {
-        $successMsg = $this->get('translator')->trans('oro.entity_config.attribute_family.message.updated');
+        $translator = $this->getTranslator();
+        $successMsg = $translator->trans('oro.entity_config.attribute_family.message.updated');
         $response = $this->update($attributeFamily, $successMsg);
 
         if (is_array($response)) {
-            $alias = $this->get('oro_entity.entity_alias_resolver')->getAlias($attributeFamily->getEntityClass());
+            $alias = $this->get(EntityAliasResolver::class)->getAlias($attributeFamily->getEntityClass());
             $response['entityAlias'] = $alias;
         }
 
@@ -96,7 +103,7 @@ class AttributeFamilyController extends AbstractController
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
         $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
-        $handler = $this->get('oro_form.model.update_handler');
+        $handler = $this->get(UpdateHandler::class);
 
         return $handler->update($attributeFamily, $form, $message);
     }
@@ -109,12 +116,14 @@ class AttributeFamilyController extends AbstractController
      */
     public function indexAction($alias)
     {
+        $entityClass = $this->get(EntityAliasResolver::class)->getClassByAlias($alias);
+
         return [
             'params' => [
-                'entity_class' => $this->get('oro_entity.entity_alias_resolver')->getClassByAlias($alias),
+                'entity_class' => $entityClass,
             ],
             'alias' => $alias,
-            'entity_class' => $this->get('oro_entity.entity_alias_resolver')->getClassByAlias($alias),
+            'entity_class' => $entityClass,
             'attributeFamiliesLabel' => sprintf('oro.%s.menu.%s_attribute_families', $alias, $alias)
         ];
     }
@@ -128,16 +137,17 @@ class AttributeFamilyController extends AbstractController
      */
     public function deleteAction(AttributeFamily $attributeFamily)
     {
+        $translator = $this->getTranslator();
         if ($this->isGranted('delete', $attributeFamily)) {
-            $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+            $doctrineHelper = $this->get(DoctrineHelper::class);
             $entityManager = $doctrineHelper->getEntityManagerForClass(AttributeFamily::class);
             $entityManager->remove($attributeFamily);
             $entityManager->flush();
             $successful = true;
-            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.deleted');
+            $message = $translator->trans('oro.entity_config.attribute_family.message.deleted');
         } else {
             $successful = false;
-            $message = $this->get('translator')->trans('oro.entity_config.attribute_family.message.cant_delete');
+            $message = $translator->trans('oro.entity_config.attribute_family.message.cant_delete');
         }
 
         return new JsonResponse(['message' => $message, 'successful' => $successful]);
@@ -151,7 +161,7 @@ class AttributeFamilyController extends AbstractController
      */
     public function viewAction(AttributeFamily $attributeFamily)
     {
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
+        $aliasResolver = $this->get(EntityAliasResolver::class);
 
         return [
             'entity' => $attributeFamily,
@@ -165,10 +175,10 @@ class AttributeFamilyController extends AbstractController
      */
     private function getEntityByAlias($alias)
     {
-        $aliasResolver = $this->get('oro_entity.entity_alias_resolver');
+        $aliasResolver = $this->get(EntityAliasResolver::class);
         $entityClass = $aliasResolver->getClassByAlias($alias);
 
-        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
+        $doctrineHelper = $this->get(DoctrineHelper::class);
 
         return $doctrineHelper->getEntityRepository(EntityConfigModel::class)
             ->findOneBy(['className' => $entityClass]);
@@ -189,8 +199,35 @@ class AttributeFamilyController extends AbstractController
 
         if (!$extendConfig->is('is_extend') || !$attributeConfig->is('has_attributes')) {
             throw new BadRequestHttpException(
-                $this->get('translator')->trans('oro.entity_config.attribute.entity_not_supported')
+                $this->getTranslator()->trans('oro.entity_config.attribute.entity_not_supported')
             );
         }
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    private function getTranslator(): TranslatorInterface
+    {
+        return $this->get(TranslatorInterface::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                UpdateHandler::class,
+                EntityAliasResolver::class,
+                AttributeManager::class,
+                DoctrineHelper::class,
+                'oro_entity_config.provider.extend' => ConfigProvider::class,
+                'oro_entity_config.provider.attribute' => ConfigProvider::class,
+            ]
+        );
     }
 }

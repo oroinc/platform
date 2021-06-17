@@ -25,8 +25,6 @@ configs:
     orofilter/js/plugins/filters-toggle-plugin: {}
 dynamic-imports:
     orodatagrid:
-        - orofilter/js/datafilter-builder
-    orofilter:
         - oro/filter/abstract-filter
         - oro/filter/boolean-filter
         - oro/filter/choice-filter
@@ -41,6 +39,7 @@ dynamic-imports:
         - oro/filter/number-range-filter
         - oro/filter/select-filter
         - oro/filter/text-filter
+        - orofilter/js/datafilter-builder
 map:
     "*":
         orofilter/templates/filter/choice-filter.html: orofilter/blank/templates/filters/choice-filter.html
