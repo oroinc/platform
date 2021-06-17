@@ -134,7 +134,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                     const match = key.match(delegateEventSplitter);
                     let eventName = match[1];
                     const selector = match[2];
-                    method = _.bind(method, this);
+                    method = method.bind(this);
                     eventName += '.delegateWidgetEvents' + this.cid;
                     if (selector === '') {
                         this.widget.on(eventName, method);

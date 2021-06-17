@@ -99,16 +99,16 @@ define(function(require) {
             const list = this.list;
             mediator.execute('widgets:getByIdAsync', options.widgetId, function(widget) {
                 widget.getAction('expand_all', 'adopted', function(action) {
-                    action.on('click', _.bind(list.expandAll, list));
+                    action.on('click', list.expandAll.bind(list));
                 });
                 widget.getAction('collapse_all', 'adopted', function(action) {
-                    action.on('click', _.bind(list.collapseAll, list));
+                    action.on('click', list.collapseAll.bind(list));
                 });
                 widget.getAction('refresh', 'adopted', function(action) {
-                    action.on('click', _.bind(list.refresh, list));
+                    action.on('click', list.refresh.bind(list));
                 });
                 widget.getAction('toggle_sorting', 'adopted', function(action) {
-                    action.on('click', _.bind(list.toggleSorting, list));
+                    action.on('click', list.toggleSorting.bind(list));
                 });
             });
         }

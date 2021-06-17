@@ -43,7 +43,7 @@ define(function(require) {
         },
 
         render: function() {
-            this.initLayout().then(_.bind(this.afterLayoutInit, this));
+            this.initLayout().then(this.afterLayoutInit.bind(this));
         },
 
         afterLayoutInit: function() {
@@ -129,15 +129,9 @@ define(function(require) {
                         !_.isNull(this.options.emailVariableView)
                     ) {
                         const tinymceInstance = component.view.tinymceInstance;
-                        $(tinymceInstance.getBody()).on(
-                            'blur',
-                            _.bind(
-                                function(e) {
-                                    $(tinymceInstance.targetElm).trigger(e);
-                                },
-                                this
-                            )
-                        );
+                        $(tinymceInstance.getBody()).on('blur', e => {
+                            $(tinymceInstance.targetElm).trigger(e);
+                        });
                     }
                 });
             }

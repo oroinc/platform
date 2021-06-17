@@ -12,6 +12,8 @@ dynamic-imports:
         - oro/select2-acl-user-autocomplete-component
     orodatagrid:
         - oro/datagrid/cell/action-permissions-cell
+    oroform-validate:
+        - orouser/js/validator/password-complexity
     orouser:
         - oro/select2-acl-user-multiselect-component
         - orouser/js/app/views/user-reset-password-view
@@ -22,5 +24,3 @@ dynamic-imports:
         - orouser/js/tools/acl-users-search-api-accessor
         - orouser/js/views/role-view
         - orouser/js/views/user-apikey-gen-view
-    oroform-validate:
-        - orouser/js/validator/password-complexity

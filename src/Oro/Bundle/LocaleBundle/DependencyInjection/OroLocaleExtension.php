@@ -10,6 +10,9 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages LocaleBundle service configuration
+ */
 class OroLocaleExtension extends Extension
 {
     public const PARAMETER_FORMATTING_CODE = 'oro_locale.formatting_code';
@@ -36,6 +39,7 @@ class OroLocaleExtension extends Extension
         $loader->load('cache.yml');
         $loader->load('services_api.yml');
         $loader->load('commands.yml');
+        $loader->load('controllers.yml');
     }
 
     /**

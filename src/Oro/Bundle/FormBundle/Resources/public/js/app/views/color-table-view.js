@@ -32,13 +32,13 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
         _getPickerOptions: function(options) {
             options = ColorTableView.__super__._getPickerOptions.call(this, options.picker);
             return _.extend(options, {
-                change: _.bind(function(hex, opacity) {
+                change: (hex, opacity) => {
                     if (this.$current && this.$current.data('color') !== hex) {
                         this.$el.simplecolorpicker('replaceColor', this.$current.data('color'), hex, this.$current);
                         this.$current.data('color', hex);
                         this.$current.css('color', colorUtil.getContrastColor(hex));
                     }
-                }, this)
+                }
             });
         },
 
@@ -55,7 +55,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
          * @inheritDoc
          */
         _addPickerHandlers: function() {
-            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {
+            this.$parent.on('click.' + this.cid, 'span.color', e => {
                 e.preventDefault();
                 if (!this.$el.is(':disabled') && !$(e.currentTarget).is(this.$current)) {
                     this.$current = $(e.currentTarget);
@@ -64,7 +64,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
                     this.$picker.minicolors('value', this.$current.data('color'));
                     this.$picker.minicolors('show');
                 }
-            }, this));
+            });
         }
     });
 

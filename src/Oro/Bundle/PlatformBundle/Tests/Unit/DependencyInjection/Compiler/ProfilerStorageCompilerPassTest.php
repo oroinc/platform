@@ -10,71 +10,43 @@ use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 
 class ProfilerStorageCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
     /** @var ProfilerStorageCompilerPass */
-    private $compilerPass;
+    private $compiler;
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerBuilder::class);
-        $this->compilerPass = new ProfilerStorageCompilerPass();
+        $this->compiler = new ProfilerStorageCompilerPass();
     }
 
     public function testSetProfileStorageDecorator(): void
     {
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('profiler.storage')
-            ->willReturn(true);
+        $container = new ContainerBuilder();
+        $profilerStorageDef = $container->register('profiler.storage', FileProfilerStorage::class)
+            ->addArgument('%profiler.storage.dsn%');
 
-        $this->container->expects($this->once())
-            ->method('getDefinition')
-            ->with('profiler.storage')
-            ->willReturn(new Definition(FileProfilerStorage::class, ['%profiler.storage.dsn%']));
+        $this->compiler->process($container);
 
-        $definition = new Definition(RepeatableFileProfilerStorage::class, ['%profiler.storage.dsn%']);
-        $definition->setDecoratedService('profiler.storage');
-
-        $this->container->expects($this->once())
-            ->method('setDefinition')
-            ->with('oro_platform.profiler.storage', $definition);
-
-        $this->compilerPass->process($this->container);
+        $expectedSef = (new Definition(RepeatableFileProfilerStorage::class, $profilerStorageDef->getArguments()))
+            ->setDecoratedService('profiler.storage');
+        self::assertEquals($expectedSef, $container->getDefinition('oro_platform.profiler.storage'));
     }
 
     public function testNotSetDecoratorWhenParentNotExist(): void
     {
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('profiler.storage')
-            ->willReturn(false);
+        $container = new ContainerBuilder();
 
-        $this->container->expects($this->never())
-            ->method('getDefinition');
+        $this->compiler->process($container);
 
-        $this->container->expects($this->never())
-            ->method('setDefinition');
-
-        $this->compilerPass->process($this->container);
+        self::assertFalse($container->hasDefinition('oro_platform.profiler.storage'));
     }
 
     public function testNotSetDecoratorWhenParentNotFileStorage(): void
     {
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with('profiler.storage')
-            ->willReturn(true);
+        $container = new ContainerBuilder();
+        $container->register('profiler.storage', \stdClass::class);
 
-        $this->container->expects($this->once())
-            ->method('getDefinition')
-            ->with('profiler.storage')
-            ->willReturn(new Definition(\stdClass::class));
+        $this->compiler->process($container);
 
-        $this->container->expects($this->never())
-            ->method('setDefinition');
-
-        $this->compilerPass->process($this->container);
+        self::assertFalse($container->hasDefinition('oro_platform.profiler.storage'));
     }
 }

@@ -2,7 +2,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const scriptjs = require('scriptjs');
     const BaseComponent = require('oroui/js/app/components/base/component');
     const GoogleSyncCheckboxView = require('oroimap/js/app/views/google-sync-checkbox-view');
@@ -48,12 +47,12 @@ define(function(require) {
                     client_id: this.$clientIdElement.val(),
                     scope: this.scopes.join(' '),
                     immediate: false
-                }, _.bind(this.checkAuthorization, this));
+                }, this.checkAuthorization.bind(this));
         },
 
         checkAuthorization: function(result) {
             this.view.setToken(result);
-            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
+            gapi.client.load('gmail', 'v1', this.requestProfile.bind(this));
         },
 
         requestProfile: function() {
@@ -61,7 +60,7 @@ define(function(require) {
                 userId: 'me'
             });
 
-            request.execute(_.bind(this.responseProfile, this));
+            request.execute(this.responseProfile.bind(this));
         },
 
         responseProfile: function(response) {

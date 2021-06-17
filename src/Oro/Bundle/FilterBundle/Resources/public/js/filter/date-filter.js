@@ -373,12 +373,12 @@ define(function(require, exports, module) {
             if (value) {
                 this._updateTooltipVisibility(value.part);
             }
-            this.on('update', _.bind(function() {
+            this.on('update', () => {
                 const value = this.getValue();
                 if (value) {
                     this._updateTooltipVisibility(value.part);
                 }
-            }, this));
+            });
 
             this.$el.inputWidget('seekAndCreate');
 

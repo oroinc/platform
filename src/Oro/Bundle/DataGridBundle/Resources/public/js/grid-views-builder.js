@@ -62,10 +62,10 @@ define(function(require, exports, module) {
             if (_.isString(self.GridViewsView)) {
                 self.buildViews = _.wrap(self.buildViews, function(buildViews, grid) {
                     loadModules(this.GridViewsView)
-                        .then(_.bind(function(GridViewsView) {
+                        .then(GridViewsView => {
                             this.GridViewsView = GridViewsView;
                             buildViews.call(this, grid);
-                        }, this));
+                        });
                 });
             }
 

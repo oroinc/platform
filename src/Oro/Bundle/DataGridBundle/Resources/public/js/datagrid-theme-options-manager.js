@@ -20,7 +20,7 @@ define(function(require) {
             const configurator = _.extend({
                 gridThemeOptions: gridThemeOptions
             }, this);
-            return _.bind(configurator.configure, configurator);
+            return configurator.configure.bind(configurator);
         },
 
         configure: function(view, options, parentView) {
@@ -45,12 +45,12 @@ define(function(require) {
                 });
             }
 
-            _.each(themeOptions, _.bind(function(value, option) {
+            _.each(themeOptions, (value, option) => {
                 const configurator = option + 'Option';
                 if (_.isFunction(this[configurator])) {
                     this[configurator](view, options, value, parentView);
                 }
-            }, this));
+            });
         },
 
         mergeOption: function(view, options, key, value, mergeCallback) {

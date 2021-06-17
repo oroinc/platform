@@ -64,13 +64,11 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setContainerMock($id, \stdClass $testTypeFormatter)
     {
-        $this->container
-            ->expects($this->at(0))
+        $this->container->expects($this->once())
             ->method('has')
             ->with($id)
             ->willReturn(true);
-        $this->container
-            ->expects($this->at(1))
+        $this->container->expects($this->once())
             ->method('get')
             ->with($id)
             ->willReturn($testTypeFormatter);

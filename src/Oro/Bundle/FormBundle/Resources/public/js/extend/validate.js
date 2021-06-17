@@ -368,11 +368,11 @@ define(function(require, exports, module) {
 
         collectPristineValues: function() {
             this.pristineValues = {};
-            this.elementsOf(this.currentForm).each(_.bind(function(index, element) {
+            this.elementsOf(this.currentForm).each((index, element) => {
                 if (!this.checkable(element) && element.name) {
                     this.pristineValues[element.name] = element.value;
                 }
-            }, this));
+            });
         },
 
         isPristine: function(element) {
@@ -688,28 +688,6 @@ define(function(require, exports, module) {
             }
         }
     });
-
-    // general validation methods
-    const methods = [
-        'oroform/js/validator/count',
-        'oroform/js/validator/date',
-        'oroform/js/validator/datetime',
-        'oroform/js/validator/email',
-        'oroform/js/validator/length',
-        'oroform/js/validator/notblank',
-        'oroform/js/validator/notnull',
-        'oroform/js/validator/number',
-        'oroform/js/validator/numeric-range',
-        'oroform/js/validator/range',
-        'oroform/js/validator/open-range',
-        'oroform/js/validator/regex',
-        'oroform/js/validator/repeated',
-        'oroform/js/validator/time',
-        'oroform/js/validator/url',
-        'oroform/js/validator/type',
-        'oroform/js/validator/callback'
-    ];
-    $.validator.loadMethod(methods);
 
     /**
      * Extend original dataRules method and implements

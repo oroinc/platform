@@ -112,17 +112,17 @@ define(function(require) {
             if (this.options.value) {
                 this.setFormState(this.options.value);
             }
-            this.view.getDatePickerWidget().on('mousedown' + this.eventNamespace(), _.bind(function() {
+            this.view.getDatePickerWidget().on('mousedown' + this.eventNamespace(), () => {
                 this._isDateSelection = true;
-            }, this));
+            });
             // fix enter behaviour
             const $input = this.$('.hasDatepicker');
             $input.bindFirst('keydown' + this.eventNamespace(),
-                _.bind(this.onGenericEnterKeydown, this));
+                this.onGenericEnterKeydown.bind(this));
             // fix esc behaviour
-            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericEscapeKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), this.onGenericEscapeKeydown.bind(this));
             // fix arrows behaviour
-            $input.on('keydown' + this.eventNamespace(), _.bind(this.onGenericArrowKeydown, this));
+            $input.on('keydown' + this.eventNamespace(), this.onGenericArrowKeydown.bind(this));
         },
 
         onGenericEnterKeydown: function(e) {

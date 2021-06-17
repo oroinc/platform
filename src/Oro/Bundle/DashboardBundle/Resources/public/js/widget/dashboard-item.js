@@ -245,14 +245,13 @@ define([
          * Trigger remove action
          */
         onRemoveFromDashboard: function() {
-            const that = this;
             const confirm = new DeleteConfirmation({
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
 
-            confirm.on('ok', function() {
-                that.trigger('removeFromDashboard', that.$el, that);
-                mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);
+            confirm.on('ok', () => {
+                this.trigger('removeFromDashboard', this.$el, this);
+                mediator.trigger('widget:dashboard:removeFromDashboard:' + this.getWid(), this.$el, this);
             });
             confirm.open();
         },

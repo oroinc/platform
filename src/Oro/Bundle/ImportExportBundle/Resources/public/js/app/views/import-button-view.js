@@ -49,7 +49,7 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
 
             this.$importButton = this.$el;
-            this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
+            this.$importButton.on('click' + this.eventNamespace(), this.onImportClick.bind(this));
 
             this.routeOptions = {
                 alias: this.options.alias,

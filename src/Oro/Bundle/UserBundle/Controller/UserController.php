@@ -2,13 +2,19 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UIBundle\Route\Router;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Form\Handler\UserHandler;
 use Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType;
+use Oro\Bundle\UserBundle\Form\Type\UserType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +22,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This controller covers CRUD functionality for User entity.
@@ -41,7 +49,7 @@ class UserController extends AbstractController
     {
         return $this->view(
             $user,
-            $this->get('oro_security.token_accessor')->getUserId() === $user->getId()
+            $this->get(TokenAccessorInterface::class)->getUserId() === $user->getId()
         );
     }
 
@@ -120,7 +128,7 @@ class UserController extends AbstractController
      */
     public function createAction()
     {
-        $user = $this->get('oro_user.manager')->createUser();
+        $user = $this->get(UserManager::class)->createUser();
 
         return $this->update($user);
     }
@@ -169,18 +177,18 @@ class UserController extends AbstractController
      */
     private function update(User $entity)
     {
-        if ($this->get('oro_user.form.handler.user')->process($entity)) {
+        if ($this->get(UserHandler::class)->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.user.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.user.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
             'entity'       => $entity,
-            'form'         => $this->get('oro_user.form.user')->createView(),
+            'form'         => $this->get(UserType::class)->createView(),
             'allow_delete' => $entity->getId() && $this->isDeleteGranted($entity)
         ];
     }
@@ -232,7 +240,7 @@ class UserController extends AbstractController
      */
     private function getUserApi(User $user)
     {
-        $userManager  = $this->get('oro_user.manager');
+        $userManager  = $this->get(UserManager::class);
         if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
             $userApi = new UserApi();
             $userApi->setUser($user);
@@ -249,7 +257,7 @@ class UserController extends AbstractController
     private function getOrganization()
     {
         /** @var UsernamePasswordOrganizationToken $token */
-        $token = $this->get('security.token_storage')->getToken();
+        $token = $this->get(TokenStorageInterface::class)->getToken();
 
         return $token->getOrganization();
     }
@@ -261,7 +269,7 @@ class UserController extends AbstractController
      */
     private function isDeleteGranted(User $entity): bool
     {
-        return $this->get('oro_entity.delete_handler_registry')
+        return $this->get(EntityDeleteHandlerRegistry::class)
             ->getHandler(User::class)
             ->isDeleteGranted($entity);
     }
@@ -273,7 +281,7 @@ class UserController extends AbstractController
      */
     private function isUserApiGenAllowed(User $entity)
     {
-        return $this->get('oro_security.token_accessor')->getUserId() === $entity->getId()
+        return $this->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
                || $this->isGranted('MANAGE_API_KEY', $entity);
     }
 
@@ -291,5 +299,25 @@ class UserController extends AbstractController
 
         $em->persist($userApi);
         $em->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                TokenAccessorInterface::class,
+                UserManager::class,
+                EntityDeleteHandlerRegistry::class,
+                UserType::class,
+                UserHandler::class,
+                TokenStorageInterface::class
+            ]
+        );
     }
 }

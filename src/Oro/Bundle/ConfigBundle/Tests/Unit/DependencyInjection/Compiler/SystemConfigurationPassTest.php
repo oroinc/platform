@@ -13,10 +13,10 @@ use Symfony\Component\DependencyInjection\Definition;
 class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SystemConfigurationPass */
-    protected $compiler;
+    private $compiler;
 
     /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
+    private $container;
 
     protected function setUp(): void
     {
@@ -36,18 +36,18 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->setBundles($bundles);
         $this->container->expects($this->once())
             ->method('getExtensions')
-            ->will($this->returnValue(['test_bundle' => null]));
+            ->willReturn(['test_bundle' => null]);
 
         $config = [
             SettingsBuilder::RESOLVED_KEY => true,
-            'some_field' => [
+            'some_field'                  => [
                 'value' => 'some_val',
                 'scope' => 'app',
             ],
-            'some_another_field' => [
+            'some_another_field'          => [
                 'value' => 'some_another_val',
             ],
-            'service_another_field' => [
+            'service_another_field'       => [
                 'value' => null,
             ],
         ];
@@ -55,39 +55,37 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->container->expects($this->once())
             ->method('getExtensionConfig')
             ->with('test_bundle')
-            ->willReturn([[
-                'settings' => $config,
-            ]]);
+            ->willReturn([
+                [
+                    'settings' => $config,
+                ]
+            ]);
 
-        $defaultProviderMock = $this->createDefinitionMock();
+        $defaultProviderMock = $this->createMock(Definition::class);
 
-        $bagServiceDef = $this->createDefinitionMock();
-        $configBagServiceDef = $this->createDefinitionMock();
+        $bagServiceDef = $this->createMock(Definition::class);
+        $configBagServiceDef = $this->createMock(Definition::class);
         $this->container->expects($this->once())
             ->method('findTaggedServiceIds')
             ->willReturn([
-                'first_scope_service' => [
+                'first_scope_service'  => [
                     ['scope' => 'app', 'priority' => 100],
                 ],
                 'second_scope_service' => [
                     ['scope' => 'user', 'priority' => -100],
                 ],
             ]);
-        $apiManagerServiceDef = $this->createDefinitionMock();
-        $configManagerServiceDef = $this->createDefinitionMock();
+        $apiManagerServiceDef = $this->createMock(Definition::class);
+        $configManagerServiceDef = $this->createMock(Definition::class);
         $this->container->expects($this->exactly(4))
             ->method('getDefinition')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['oro_config.config_definition_bag', $bagServiceDef],
-                        ['oro_config.config_bag', $configBagServiceDef],
-                        ['oro_config.manager.api', $apiManagerServiceDef],
-                        ['oro_config.manager', $configManagerServiceDef],
-                        ['oro_config.default_provider', $defaultProviderMock],
-                    ]
-                )
-            );
+            ->willReturnMap([
+                ['oro_config.config_definition_bag', $bagServiceDef],
+                ['oro_config.config_bag', $configBagServiceDef],
+                ['oro_config.manager.api', $apiManagerServiceDef],
+                ['oro_config.manager', $configManagerServiceDef],
+                ['oro_config.default_provider', $defaultProviderMock],
+            ]);
         $apiManagerServiceDef->expects($this->exactly(2))
             ->method('addMethodCall');
 
@@ -97,26 +95,24 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $configBagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'))
-            ->willReturnCallback(
-                function ($index, $argument) {
-                    self::assertEquals(
-                        ['Test\Class::method'],
-                        $argument['groups']['group_with_scalar_configurator_and_handler']['configurator']
-                    );
-                    self::assertEquals(
-                        ['Test\Class::method'],
-                        $argument['groups']['group_with_scalar_configurator_and_handler']['handler']
-                    );
-                    self::assertEquals(
-                        ['Test\Class::method'],
-                        $argument['groups']['group_with_array_configurator_and_handler']['configurator']
-                    );
-                    self::assertEquals(
-                        ['Test\Class::method'],
-                        $argument['groups']['group_with_array_configurator_and_handler']['handler']
-                    );
-                }
-            );
+            ->willReturnCallback(function ($index, $argument) {
+                self::assertEquals(
+                    ['Test\Class::method'],
+                    $argument['groups']['group_with_scalar_configurator_and_handler']['configurator']
+                );
+                self::assertEquals(
+                    ['Test\Class::method'],
+                    $argument['groups']['group_with_scalar_configurator_and_handler']['handler']
+                );
+                self::assertEquals(
+                    ['Test\Class::method'],
+                    $argument['groups']['group_with_array_configurator_and_handler']['configurator']
+                );
+                self::assertEquals(
+                    ['Test\Class::method'],
+                    $argument['groups']['group_with_array_configurator_and_handler']['handler']
+                );
+            });
 
         $mainServiceAlias = $this->createMock(Alias::class);
         $mainServiceAlias->expects($this->once())
@@ -149,35 +145,37 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
         $this->container->expects(static::once())
             ->method('getExtensionConfig')
             ->with('test_bundle')
-            ->willReturn([[
-                'settings' => [
-                    'resolved' => true,
-                    'some_field' => [
-                        'value' => 'some_val',
-                        'scope' => 'app',
+            ->willReturn([
+                [
+                    'settings' => [
+                        'resolved'              => true,
+                        'some_field'            => [
+                            'value' => 'some_val',
+                            'scope' => 'app',
+                        ],
+                        'some_another_field'    => [
+                            'value' => 'some_another_val',
+                        ],
+                        'service_another_field' => [
+                            'value' => '@oro_config.default_provider',
+                        ],
                     ],
-                    'some_another_field' => [
-                        'value' => 'some_another_val',
-                    ],
-                    'service_another_field' => [
-                        'value' => '@oro_config.default_provider',
-                    ],
-                ],
-            ]]);
+                ]
+            ]);
 
         $this->container->expects($this->once())
             ->method('hasDefinition')
             ->with('oro_config.default_provider')
             ->willReturn(true);
 
-        $defaultProviderMock = $this->createDefinitionMock();
+        $defaultProviderMock = $this->createMock(Definition::class);
 
-        $bagServiceDef = $this->createDefinitionMock();
-        $configBagServiceDef = $this->createDefinitionMock();
+        $bagServiceDef = $this->createMock(Definition::class);
+        $configBagServiceDef = $this->createMock(Definition::class);
         $this->container->expects(static::once())
             ->method('findTaggedServiceIds')
             ->willReturn([
-                'first_scope_service' => [
+                'first_scope_service'  => [
                     ['scope' => 'app', 'priority' => 100],
                 ],
                 'second_scope_service' => [
@@ -185,30 +183,28 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $apiManagerServiceDef = $this->createDefinitionMock();
-        $configManagerServiceDef = $this->createDefinitionMock();
+        $apiManagerServiceDef = $this->createMock(Definition::class);
+        $configManagerServiceDef = $this->createMock(Definition::class);
         $this->container->expects(static::exactly(5))
             ->method('getDefinition')
-            ->willReturnMap(
-                [
-                    ['oro_config.config_definition_bag', $bagServiceDef],
-                    ['oro_config.config_bag', $configBagServiceDef],
-                    ['oro_config.manager.api', $apiManagerServiceDef],
-                    ['oro_config.manager', $configManagerServiceDef],
-                    ['oro_config.default_provider', $defaultProviderMock],
-                ]
-            );
+            ->willReturnMap([
+                ['oro_config.config_definition_bag', $bagServiceDef],
+                ['oro_config.config_bag', $configBagServiceDef],
+                ['oro_config.manager.api', $apiManagerServiceDef],
+                ['oro_config.manager', $configManagerServiceDef],
+                ['oro_config.default_provider', $defaultProviderMock],
+            ]);
 
         $bagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), [
                 'test_bundle' => [
-                    'resolved' => true,
-                    'some_field' => [
+                    'resolved'              => true,
+                    'some_field'            => [
                         'value' => 'some_val',
                         'scope' => 'app',
                     ],
-                    'some_another_field' => [
+                    'some_another_field'    => [
                         'value' => 'some_another_val',
                     ],
                     'service_another_field' => [
@@ -232,13 +228,5 @@ class SystemConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ->willReturn($mainServiceAlias);
 
         $this->compiler->process($this->container);
-    }
-
-    /**
-     * @return Definition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createDefinitionMock()
-    {
-        return $this->createMock(Definition::class);
     }
 }

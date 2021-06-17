@@ -38,7 +38,7 @@ define(function(require) {
 
         initialize: function(main, options) {
             this.activeEditorComponents = [];
-            this.patchCellConstructor = _.bind(this.patchCellConstructor, this);
+            this.patchCellConstructor = this.patchCellConstructor.bind(this);
             this.hasChanges = this.hasChanges.bind(this);
             InlineEditingPlugin.__super__.initialize.call(this, main, options);
         },
@@ -113,9 +113,9 @@ define(function(require) {
             const confirmModal = new Modal(this.modalOptions);
             const deferredConfirmation = $.Deferred();
 
-            deferredConfirmation.always(_.bind(function() {
+            deferredConfirmation.always(() => {
                 this.stopListening(confirmModal);
-            }, this));
+            });
 
             this.listenTo(confirmModal, 'ok', function() {
                 deferredConfirmation.resolve();
@@ -133,7 +133,7 @@ define(function(require) {
         beforeGridCollectionFetch: function(collection, options) {
             if (this.hasChanges()) {
                 const deferredConfirmation = this.confirmNavigation();
-                deferredConfirmation.then(_.bind(this.removeActiveEditorComponents, this));
+                deferredConfirmation.then(this.removeActiveEditorComponents.bind(this));
                 options.waitForPromises.push(deferredConfirmation.promise());
             } else {
                 this.removeActiveEditorComponents();
@@ -409,21 +409,20 @@ define(function(require) {
         },
 
         editCellByIteratorMethod: function(iteratorMethod, cell) {
-            const _this = this;
             const fromPreviousCell = iteratorMethod === 'prev';
             this.trigger('lockUserActions', true);
             const cellIterator = new CellIterator(this.main, cell);
-            function checkEditable(cell) {
-                if (!_this.isEditable(cell)) {
+            const checkEditable = cell => {
+                if (!this.isEditable(cell)) {
                     return cellIterator[iteratorMethod]().then(checkEditable);
                 }
                 return cell;
-            }
-            cellIterator[iteratorMethod]().then(checkEditable).done(function(cell) {
-                _this.enterEditMode(cell, fromPreviousCell);
-                _this.trigger('lockUserActions', false);
-            }).fail(function(obj, status) {
-                _this.trigger('lockUserActions', false);
+            };
+            cellIterator[iteratorMethod]().then(checkEditable).done(cell => {
+                this.enterEditMode(cell, fromPreviousCell);
+                this.trigger('lockUserActions', false);
+            }).fail((obj, status) => {
+                this.trigger('lockUserActions', false);
             });
         },
 

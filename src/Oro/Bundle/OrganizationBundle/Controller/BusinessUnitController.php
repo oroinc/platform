@@ -2,13 +2,18 @@
 
 namespace Oro\Bundle\OrganizationBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Form\Handler\BusinessUnitHandler;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\UIBundle\Route\Router;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This controller covers CRUD functionality for Business Unit entity.
@@ -108,13 +113,13 @@ class BusinessUnitController extends AbstractController
      */
     private function update(BusinessUnit $entity)
     {
-        if ($this->get('oro_organization.form.handler.business_unit')->process($entity)) {
+        if ($this->get(BusinessUnitHandler::class)->process($entity)) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.business_unit.controller.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.business_unit.controller.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirect($entity);
+            return $this->get(Router::class)->redirect($entity);
         }
 
         return [
@@ -151,8 +156,25 @@ class BusinessUnitController extends AbstractController
      */
     private function isDeleteGranted(BusinessUnit $entity): bool
     {
-        return $this->get('oro_entity.delete_handler_registry')
+        return $this->get(EntityDeleteHandlerRegistry::class)
             ->getHandler(BusinessUnit::class)
             ->isDeleteGranted($entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                Router::class,
+                EntityDeleteHandlerRegistry::class,
+                BusinessUnitHandler::class,
+                'oro_organization.form.business_unit' => Form::class,
+            ]
+        );
     }
 }

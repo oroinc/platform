@@ -236,13 +236,7 @@ class SegmentFilterTest extends OrmTestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @param string $state
-     *
-     * @return Config
-     */
-    private function createExtendConfig($className, $state)
+    private function createExtendConfig(string $className, string $state): Config
     {
         $configId = new EntityConfigId('extend', $className);
         $config = new Config($configId);
@@ -253,10 +247,7 @@ class SegmentFilterTest extends OrmTestCase
 
     private function prepareRepo()
     {
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['execute', 'getSQL'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
 
         $query->expects(self::any())
             ->method('execute')

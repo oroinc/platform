@@ -82,7 +82,7 @@ define([
          */
         getGridEvents: function() {
             const events = {};
-            events['datagrid:change:' + this.gridName] = _.bind(this._onModelEdited, this);
+            events['datagrid:change:' + this.gridName] = this._onModelEdited.bind(this);
             return events;
         },
 

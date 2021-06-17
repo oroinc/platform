@@ -19,7 +19,7 @@ define(function(require) {
             'click [data-name="clear-default"]': 'clearDefault',
             'content:remove': function() {
                 // execute right after content removed
-                _.defer(_.bind(this.updateClearDefault, this));
+                _.defer(this.updateClearDefault.bind(this));
             }
         },
 
@@ -59,7 +59,7 @@ define(function(require) {
                 tolerance: 'pointer',
                 delay: 100,
                 containment: 'parent',
-                stop: _.bind(this.reindexValues, this)
+                stop: this.reindexValues.bind(this)
             });
         },
 

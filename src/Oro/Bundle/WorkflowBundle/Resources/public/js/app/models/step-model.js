@@ -58,24 +58,24 @@ define(function(require) {
                     );
                 }
 
-                const onTransitionAdd = _.bind(function(transition) {
+                const onTransitionAdd = transition => {
                     const transitionName = transition.get('name');
                     if (_.indexOf(allowedTransitionsAttr, transitionName) === -1) {
                         this.get('allowed_transitions').push(transitionName);
                     }
-                }, this);
+                };
 
                 this.listenTo(this.allowedTransitions, 'add', onTransitionAdd);
 
-                this.listenTo(this.allowedTransitions, 'reset', _.bind(function(transitions) {
+                this.listenTo(this.allowedTransitions, 'reset', transitions => {
                     this.set('allowed_transitions', []);
                     _.each(transitions.models, onTransitionAdd);
-                }, this));
+                });
 
-                this.listenTo(this.allowedTransitions, 'remove', _.bind(function(transition) {
+                this.listenTo(this.allowedTransitions, 'remove', transition => {
                     const transitionName = transition.get('name');
                     this.set('allowed_transitions', _.without(this.get('allowed_transitions'), transitionName));
-                }, this));
+                });
             }
 
             return this.allowedTransitions;

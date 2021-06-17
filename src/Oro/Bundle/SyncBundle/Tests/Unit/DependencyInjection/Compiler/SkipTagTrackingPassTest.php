@@ -4,68 +4,37 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\SkipTagTrackingPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
     /** @var SkipTagTrackingPass */
-    protected $skipTagTrackingPass;
+    private $compiler;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerBuilder::class);
-
-        $this->skipTagTrackingPass = new SkipTagTrackingPass();
+        $this->compiler = new SkipTagTrackingPass();
     }
 
     public function testProcessWithoutService()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue(false));
+        $container = new ContainerBuilder();
 
-        $this->container
-            ->expects($this->never())
-            ->method('getDefinition');
-
-        $this->skipTagTrackingPass->process($this->container);
+        $this->compiler->process($container);
     }
 
     public function testProcess()
     {
-        $this->container
-            ->expects($this->once())
-            ->method('hasDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue(true));
+        $container = new ContainerBuilder();
+        $listenerDef = $container->register('oro_sync.event_listener.doctrine_tag');
+
+        $this->compiler->process($container);
 
         $skippedEntityClasses = [];
-
-        /** @var Definition|\PHPUnit\Framework\MockObject\MockObject $definition */
-        $definition = $this->createMock(Definition::class);
-        $definition->expects($this->any())
-            ->method('addMethodCall')
-            ->with('markSkipped')
-            ->willReturnCallback(function ($method, array $arguments) use (&$skippedEntityClasses) {
-                $skippedEntityClasses[] = $arguments[0];
-            });
-
-        $this->container
-            ->expects($this->once())
-            ->method('getDefinition')
-            ->with($this->equalTo(SkipTagTrackingPass::SERVICE_ID))
-            ->will($this->returnValue($definition));
-
-        $this->skipTagTrackingPass->process($this->container);
-
+        foreach ($listenerDef->getMethodCalls() as [$methodName, $methodArguments]) {
+            if ('markSkipped' === $methodName) {
+                $skippedEntityClasses[] = $methodArguments[0];
+            }
+        }
         self::assertEquals(
             [
                 'Oro\Bundle\DataAuditBundle\Entity\Audit',

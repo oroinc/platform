@@ -1,14 +1,13 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const UnreadEmailsStateHolder = require('oroemail/js/app/unread-emails-state-holder');
     return {
         init: function(deferred, options) {
-            options.gridPromise.done(_.bind(function(grid) {
-                UnreadEmailsStateHolder.getModel().on('change:ids', _.bind(this._changeHandler, this, grid.collection));
+            options.gridPromise.done(grid => {
+                UnreadEmailsStateHolder.getModel().on('change:ids', this._changeHandler.bind(this, grid.collection));
                 deferred.resolve();
-            }, this)).fail(function() {
+            }).fail(function() {
                 deferred.reject();
             });
         },

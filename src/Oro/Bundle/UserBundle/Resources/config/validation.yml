@@ -8,15 +8,17 @@ Oro\Bundle\UserBundle\Entity\User:
         - Oro\Bundle\UserBundle\Validator\Constraints\UserAuthenticationFieldsConstraint: ~
     properties:
         username:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
         email:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                min:        6
-                max:        255
+                min: 6
+                max: 255
+                allowEmptyString: false
             - Email:        ~
         plainPassword:
             - NotBlank:
@@ -67,10 +69,6 @@ Oro\Bundle\UserBundle\Entity\Group:
             - NotBlank:     ~
             - Length:
                 max:        30
-#        roles:
-#            - Count:
-#                min:        1
-#                minMessage: "You must select at least {{ limit }} role"
 
 Oro\Bundle\UserBundle\Entity\Email:
     properties:

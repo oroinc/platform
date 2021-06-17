@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use Oro\Bundle\UserBundle\Entity\Manager\StatusManager;
 use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Form\Handler\StatusHandler;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CRUD controller for Status entity.
@@ -21,7 +25,7 @@ class StatusController extends AbstractController
      */
     public function indexAction()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -34,7 +38,7 @@ class StatusController extends AbstractController
     {
         $result = false;
 
-        if ($this->get('oro_user.form.handler.status')->process($this->getUser(), new Status(), true)) {
+        if ($this->get(StatusHandler::class)->process($this->getUser(), new Status(), true)) {
             $result = true;
         }
 
@@ -42,9 +46,9 @@ class StatusController extends AbstractController
             if (!$result) {
                 return $this->render(
                     '@OroUser/Status/statusForm.html.twig',
-                    array(
+                    [
                          'form' => $this->get('oro_user.form.status')->createView(),
-                    )
+                    ]
                 );
             } else {
                 return new Response((string) $result);
@@ -52,15 +56,15 @@ class StatusController extends AbstractController
         } elseif ($result) {
             $this->get('session')->getFlashBag()->add(
                 'success',
-                $this->get('translator')->trans('oro.user.controller.status.message.saved')
+                $this->get(TranslatorInterface::class)->trans('oro.user.controller.status.message.saved')
             );
 
             return $this->redirect($this->generateUrl('oro_user_status_list'));
         }
 
-        return array(
+        return [
             'form' => $this->get('oro_user.form.status')->createView(),
-        );
+        ];
     }
 
     /**
@@ -69,7 +73,7 @@ class StatusController extends AbstractController
      */
     public function deleteAction(Status $status)
     {
-        if ($this->get('oro_user.status_manager')->deleteStatus($this->getUser(), $status, true)) {
+        if ($this->get(StatusManager::class)->deleteStatus($this->getUser(), $status, true)) {
             $this->get('session')->getFlashBag()->add('success', 'Status deleted');
         } else {
             $this->get('session')->getFlashBag()->add('alert', 'Status is not deleted');
@@ -84,7 +88,7 @@ class StatusController extends AbstractController
      */
     public function setCurrentStatusAction(Status $status)
     {
-        $this->get('oro_user.status_manager')->setCurrentStatus($this->getUser(), $status);
+        $this->get(StatusManager::class)->setCurrentStatus($this->getUser(), $status);
         $this->get('session')->getFlashBag()->add('success', 'Status set');
 
         return $this->redirect($this->generateUrl('oro_user_status_list'));
@@ -96,9 +100,25 @@ class StatusController extends AbstractController
      */
     public function clearCurrentStatusAction()
     {
-        $this->get('oro_user.status_manager')->setCurrentStatus($this->getUser());
+        $this->get(StatusManager::class)->setCurrentStatus($this->getUser());
         $this->get('session')->getFlashBag()->add('success', 'Status unset');
 
         return $this->redirect($this->generateUrl('oro_user_status_list'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                TranslatorInterface::class,
+                StatusHandler::class,
+                StatusManager::class,
+                'oro_user.form.status' => Form::class,
+            ]
+        );
     }
 }

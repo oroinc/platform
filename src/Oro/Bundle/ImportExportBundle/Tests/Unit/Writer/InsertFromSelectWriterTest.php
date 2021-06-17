@@ -58,13 +58,12 @@ class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
         $this->writer->setEntityName($entityName);
         $this->writer->setFields($fields);
 
-        $this->queryExecutor->expects($this->at(0))
+        $this->queryExecutor->expects($this->exactly(2))
             ->method('execute')
-            ->with($entityName, $fields, $firstQueryBuilder);
-
-        $this->queryExecutor->expects($this->at(1))
-            ->method('execute')
-            ->with($entityName, $fields, $secondQueryBuilder);
+            ->withConsecutive(
+                [$entityName, $fields, $firstQueryBuilder],
+                [$entityName, $fields, $secondQueryBuilder]
+            );
 
         $this->writer->write($items);
     }

@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Oro\Bundle\EmailBundle\Datagrid\OriginFolderFilterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
+ * Serves EmailOrigin actions.
  * @Route("/emailorigin")
  */
 class OriginController extends AbstractController
@@ -22,7 +24,20 @@ class OriginController extends AbstractController
      */
     public function listAction()
     {
-        $originProvider = $this->get('oro_email.datagrid.origin_folder.provider');
+        $originProvider = $this->get(OriginFolderFilterProvider::class);
         return new JsonResponse($originProvider->getListTypeChoices(true));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                OriginFolderFilterProvider::class,
+            ]
+        );
     }
 }

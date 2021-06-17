@@ -67,20 +67,14 @@ class ImportExportController extends AbstractController
 
         if ($this->handleRequest($request, $importForm)) {
             /** @var ImportData $data */
-            $data           = $importForm->getData();
-            $file           = $data->getFile();
-            $processorAlias = $data->getProcessorAlias();
-            if ($file->getClientOriginalExtension() === 'csv') {
-                $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
-            }
-            $fileName = $this->getFileManager()->saveImportingFile($file);
+            [$originalFileName, $processorAlias, $fileName] = $this->getImportData($importForm);
 
             return $this->forward(
                 __CLASS__ . '::importProcessAction',
                 [
                     'processorAlias' => $processorAlias,
                     'fileName' => $fileName,
-                    'originFileName' => $file->getClientOriginalName()
+                    'originFileName' => $originalFileName
                 ],
                 $request->query->all()
             );
@@ -135,13 +129,7 @@ class ImportExportController extends AbstractController
         if ($entityName && null !== $importForm) {
             if ($this->handleRequest($request, $importForm)) {
                 /** @var ImportData $data */
-                $data           = $importForm->getData();
-                $file           = $data->getFile();
-                $processorAlias = $data->getProcessorAlias();
-                if ($file->getClientOriginalExtension() === 'csv') {
-                    $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
-                }
-                $fileName = $this->getFileManager()->saveImportingFile($file);
+                [$originalFileName, $processorAlias, $fileName] = $this->getImportData($importForm);
 
                 $importForward = ImportExportController::class . '::importProcessAction';
                 $validateForward = ImportExportController::class . '::importValidateAction';
@@ -153,7 +141,7 @@ class ImportExportController extends AbstractController
                     [
                         'processorAlias' => $processorAlias,
                         'fileName' => $fileName,
-                        'originFileName' => $file->getClientOriginalName()
+                        'originFileName' => $originalFileName
                     ],
                     $request->query->all()
                 );
@@ -207,8 +195,8 @@ class ImportExportController extends AbstractController
 
         if ($this->handleRequest($request, $importForm)) {
             /** @var ImportData $data */
-            $data           = $importForm->getData();
-            $file           = $data->getFile();
+            $data = $importForm->getData();
+            $file = $data->getFile();
             $processorAlias = $data->getProcessorAlias();
 
             $fileName = $this->getFileManager()->saveImportingFile($file);
@@ -431,7 +419,7 @@ class ImportExportController extends AbstractController
     public function templateExportAction($processorAlias, Request $request)
     {
         $jobName = $request->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
-        $result  = $this->getExportHandler()->getExportResult(
+        $result = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
@@ -546,7 +534,7 @@ class ImportExportController extends AbstractController
     }
 
     /**
-     * @param Request       $request
+     * @param Request $request
      * @param FormInterface $form
      *
      * @return bool
@@ -580,5 +568,27 @@ class ImportExportController extends AbstractController
                 ImportExportResultSummarizer::class,
             ]
         );
+    }
+
+    /**
+     * @param FormInterface $importForm
+     * @return array
+     */
+    private function getImportData(FormInterface $importForm): array
+    {
+        $data = $importForm->getData();
+        $file = $data->getFile();
+        $originalFileName = $file->getClientOriginalName();
+        $processorAlias = $data->getProcessorAlias();
+
+        if ($file->getClientOriginalExtension() === 'csv') {
+            $file = $this->getCsvFileHandler()->normalizeLineEndings($file);
+            $fileName = $this->getFileManager()->saveImportingFile($file);
+            @unlink($file->getRealPath());
+        } else {
+            $fileName = $this->getFileManager()->saveImportingFile($file);
+        }
+
+        return [$originalFileName, $processorAlias, $fileName];
     }
 }

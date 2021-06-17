@@ -21,6 +21,7 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
      */
     public function load(ObjectManager $manager)
     {
+        $token = $this->generateToken();
         $data = [
             self::USER_EMAIL_ORIGIN_GMAIL_1 => [
                 'mailboxName' => 'Test Mailbox Gmail 1',
@@ -31,13 +32,13 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
                 'mailboxName' => 'Test Mailbox Gmail 2',
                 'owner' => 'simple_user',
                 'accountType' => 'gmail',
-                'accessToken' => 'sampleToken'
+                'accessToken' => $token
             ],
             self::USER_EMAIL_ORIGIN_GMAIL_3 => [
                 'mailboxName' => 'Test Mailbox Gmail 3',
                 'owner' => 'simple_user',
                 'accountType' => 'gmail',
-                'refreshToken' => 'sampleToken'
+                'refreshToken' => $token
             ],
             self::USER_EMAIL_ORIGIN_MICROSOFT_1 => [
                 'mailboxName' => 'Test Mailbox Microsoft 1',
@@ -48,13 +49,13 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
                 'mailboxName' => 'Test Mailbox Microsoft 2',
                 'owner' => 'simple_user2',
                 'accountType' => 'microsoft',
-                'accessToken' => 'sampleToken'
+                'accessToken' => $token
             ],
             self::USER_EMAIL_ORIGIN_MICROSOFT_3 => [
                 'mailboxName' => 'Test Mailbox Microsoft 3',
                 'owner' => 'simple_user2',
                 'accountType' => 'microsoft',
-                'refreshToken' => 'sampleToken'
+                'refreshToken' => $token
             ]
         ];
 
@@ -85,5 +86,16 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
         }
 
         $manager->flush();
+    }
+
+    /**
+     * @param int $length
+     *
+     * @throws \Exception
+     * @return string
+     */
+    private function generateToken(int $length = 8192): string
+    {
+        return bin2hex(random_bytes($length / 2));
     }
 }

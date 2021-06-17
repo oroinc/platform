@@ -10,3 +10,9 @@ services:
             - { name: container.service_subscriber, id: 'oro_config.user' }
             - { name: container.service_subscriber, id: 'oro_filter.extension.orm_filter_bag' }
             - { name: container.service_subscriber, id: 'oro_activity_list.provider.chain' }
+
+    Oro\Bundle\ActivityListBundle\Controller\SegmentController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

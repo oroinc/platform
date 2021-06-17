@@ -123,13 +123,13 @@ define(function(require) {
                 if (!_.isFunction(template)) {
                     template = _.template(template);
                 }
-                select2Opts.formatSelection = _.bind(function(item) {
+                select2Opts.formatSelection = item => {
                     let result;
                     if (item !== null) {
                         result = this.formatChoice(item.id, template);
                     }
                     return result;
-                }, this);
+                };
             }
             _.extend(select2Opts, {
                 initSelection: function(element, callback) {

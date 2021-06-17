@@ -27,9 +27,9 @@ aliases:
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.numeric$: jquery-numeric/jquery.numeric
-    jquery.select2$: '@oroinc/select2/select2'
+    jquery.select2$: "@oroinc/select2/select2"
     jquery.timepicker$: timepicker/jquery.timepicker
-    jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
+    jquery.uniform$: "@oroinc/jquery.uniform/src/js/jquery.uniform"
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
@@ -60,7 +60,6 @@ configs:
     oroui/js/app/components/base/component-container-mixin: {}
     oroui/js/app/components/tabs-component: {}
     oroui/js/app/plugins/styled-scroll-bar: {}
-    oroui/js/app/views/flash-message-view: {}
     oroui/js/app/views/page/messages-view: {}
     oroui/js/app/views/tab-collection-view: {}
     oroui/js/app/views/tab-item-view: {}
@@ -71,14 +70,10 @@ configs:
     oroui/js/extend/scriptjs: {}
     oroui/js/fuzzy-search: {}
     oroui/js/modal: {}
-    oroui/js/tools/highlighter/highlighter-favicon: {}
-    oroui/js/tools/highlighter/highlighter-title: {}
     oroui/js/tools/scroll-helper: {}
     oroui/js/viewport-manager: {}
 dynamic-imports:
-    polyfills:
-        - whatwg-fetch
-    oroui:
+    commons:
         - controllers/page-controller
         - oro/block-widget
         - oroui/blank/js/extend/bootstrap
@@ -91,6 +86,7 @@ dynamic-imports:
         - oroui/js/app/components/viewport-component
         - oroui/js/app/components/widget-component
         - oroui/js/app/components/widget-form-component
+        - oroui/js/app/plugins/base/plugin
         - oroui/js/app/views/datepicker/datepicker-view
         - oroui/js/app/views/datepicker/datetimepicker-view
         - oroui/js/app/views/element-value-copy-to-clipboard-view
@@ -116,6 +112,7 @@ dynamic-imports:
         - oroui/js/tools/api-accessor
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
+        - whatwg-fetch
 map:
     "*":
         alert.js: bootstrap-alert
