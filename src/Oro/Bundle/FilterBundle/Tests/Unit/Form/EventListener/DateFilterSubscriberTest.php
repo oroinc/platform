@@ -48,23 +48,21 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private function getUtcDate(string $dateTime): string
     {
-        return (new \DateTime($dateTime, new \DateTimeZone(self::TIMEZONE)))
-            ->setTimezone(new \DateTimeZone('UTC'))
-            ->format('Y-m-d H:i:00\Z');
+        return (new \DateTime($dateTime, new \DateTimeZone('UTC')))->format('Y-m-d H:i:00\Z');
     }
 
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         self::assertEquals(
             [
                 FormEvents::PRE_SUBMIT => 'preSubmit',
-                FormEvents::SUBMIT     => 'submit'
+                FormEvents::SUBMIT => 'submit'
             ],
             DateFilterSubscriber::getSubscribedEvents()
         );
     }
 
-    public function testPreSubmitWithCustomFormTimeZoneConfig()
+    public function testPreSubmitWithCustomFormTimeZoneConfig(): void
     {
         $data = ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01 12:00:00']];
         $submitContext = new DateFilterSubmitContext();
@@ -73,20 +71,21 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $formConfig = $this->createMock(FormConfigInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form->expects(self::any())
+        $form
+            ->expects(self::any())
             ->method('get')
             ->with(self::equalTo('value'))
             ->willReturn($valueForm);
-        $form->expects(self::any())
+        $form
+            ->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig->expects(self::exactly(2))
+        $formConfig
+            ->expects(self::once())
             ->method('getOption')
-            ->willReturnMap([
-                ['time_zone', null, 'UTC'],
-                ['submit_context', null, $submitContext]
-            ]);
-        $valueForm->expects(self::any())
+            ->willReturnMap([['submit_context', null, $submitContext]]);
+        $valueForm
+            ->expects(self::any())
             ->method('all')
             ->willReturn(['start' => 'start subform']);
 
@@ -110,7 +109,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
      * @param array $valueSubforms
      * @param array $shouldAddFields
      */
-    public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = [])
+    public function testPreSubmit(array $data, array $expectedData, $valueSubforms = [], $shouldAddFields = []): void
     {
         $submitContext = new DateFilterSubmitContext();
         $form = $this->createMock(FormInterface::class);
@@ -118,19 +117,19 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $valueForm = $this->createMock(FormInterface::class);
         $event = new FormEvent($form, $data);
 
-        $form->expects(self::any())
+        $form
+            ->expects(self::any())
             ->method('get')
             ->with(self::equalTo('value'))
             ->willReturn($valueForm);
-        $form->expects(self::any())
+        $form
+            ->expects(self::any())
             ->method('getConfig')
             ->willReturn($formConfig);
-        $formConfig->expects(self::exactly(2))
+        $formConfig
+            ->expects(self::once())
             ->method('getOption')
-            ->willReturnMap([
-                ['time_zone', null, null],
-                ['submit_context', null, $submitContext]
-            ]);
+            ->willReturnMap([['submit_context', null, $submitContext]]);
         $valueForm->expects(self::any())
             ->method('all')
             ->willReturn($valueSubforms);
@@ -177,7 +176,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
                 ['start' => 'start subform']
             ],
-            'should process date value'                                           => [
+            'should process date value' => [
                 ['part' => DateModifierInterface::PART_VALUE, 'value' => ['start' => '2001-01-01']],
                 [
                     'part' => DateModifierInterface::PART_VALUE,
@@ -187,93 +186,93 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
                 ],
                 ['start' => 'start subform']
             ],
-            'should process day of week'                                          => [
+            'should process day of week' => [
                 ['part' => DateModifierInterface::PART_DOW, 'value' => ['start' => 2, 'end' => 5]],
                 ['part' => DateModifierInterface::PART_DOW, 'value' => ['start' => 2, 'end' => 5]],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process weeks'                                                => [
+            'should process weeks' => [
                 [
-                    'part'  => DateModifierInterface::PART_WEEK,
+                    'part' => DateModifierInterface::PART_WEEK,
                     'value' => ['start' => 3, 'end' => sprintf('{{%d}}', DateModifierInterface::VAR_THIS_WEEK)]
                 ],
                 [
-                    'part'  => DateModifierInterface::PART_WEEK,
+                    'part' => DateModifierInterface::PART_WEEK,
                     'value' => ['start' => 3, 'end' => $weekNumber]
                 ],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process months'                                               => [
+            'should process months' => [
                 [
-                    'part'  => DateModifierInterface::PART_MONTH,
+                    'part' => DateModifierInterface::PART_MONTH,
                     'value' => ['start' => 3, 'end' => null]
                 ],
                 ['part' => DateModifierInterface::PART_MONTH, 'value' => ['start' => 3, 'end' => null]],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process quarters'                                             => [
+            'should process quarters' => [
                 [
-                    'part'  => DateModifierInterface::PART_QUARTER,
+                    'part' => DateModifierInterface::PART_QUARTER,
                     'value' => ['start' => 3, 'end' => '2001-12-31']
                 ],
                 ['part' => DateModifierInterface::PART_QUARTER, 'value' => ['start' => 3, 'end' => 4]],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process years'                                                => [
+            'should process years' => [
                 [
-                    'part'  => DateModifierInterface::PART_YEAR,
+                    'part' => DateModifierInterface::PART_YEAR,
                     'value' => ['start' => 2001, 'end' => 2014]
                 ],
                 ['part' => DateModifierInterface::PART_YEAR, 'value' => ['start' => 2001, 'end' => 2014]],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process days'                                                 => [
+            'should process days' => [
                 [
-                    'part'  => DateModifierInterface::PART_DAY,
+                    'part' => DateModifierInterface::PART_DAY,
                     'value' => ['start' => 1, 'end' => 12]
                 ],
                 ['part' => DateModifierInterface::PART_DAY, 'value' => ['start' => 1, 'end' => 12]],
                 ['start' => 'start subform', 'end' => 'end subform'],
                 ['start' => null, 'end' => null]
             ],
-            'should process day of year'                                          => [
+            'should process day of year' => [
                 [
-                    'part'  => DateModifierInterface::PART_DOY,
+                    'part' => DateModifierInterface::PART_DOY,
                     'value' => ['start' => 23]
                 ],
                 ['part' => DateModifierInterface::PART_DOY, 'value' => ['start' => 23]],
                 ['start' => 'start subform'],
                 ['start' => null]
             ],
-            'should process date start of the year value with equals'             => [
+            'should process date start of the year value with equals' => [
                 [
-                    'part'  => DateModifierInterface::PART_VALUE,
-                    'type'  => AbstractDateFilterType::TYPE_EQUAL,
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
                     'value' => ['start' => '{{' . DateModifierInterface::VAR_SOY . '}}']
                 ],
                 [
-                    'part'  => DateModifierInterface::PART_VALUE,
-                    'type'  => AbstractDateFilterType::TYPE_BETWEEN,
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_BETWEEN,
                     'value' => [
-                        'start' => '{{' . DateModifierInterface::VAR_SOY . '}}',
+                        'start' => $yearNumber . '-01-01 00:00',
                         'end' => $yearNumber . '-01-02 00:00'
                     ]
                 ]
             ],
-            'should process date start of the year value with not equals'         => [
+            'should process date start of the year value with not equals' => [
                 [
-                    'part'  => DateModifierInterface::PART_VALUE,
-                    'type'  => AbstractDateFilterType::TYPE_NOT_EQUAL,
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_NOT_EQUAL,
                     'value' => ['end' => '{{' . DateModifierInterface::VAR_SOY . '}}']
                 ],
                 [
-                    'part'  => DateModifierInterface::PART_VALUE,
-                    'type'  => AbstractDateFilterType::TYPE_NOT_BETWEEN,
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_NOT_BETWEEN,
                     'value' => [
                         'end' => $yearNumber . '-01-02 00:00',
                         'start' => '{{' . DateModifierInterface::VAR_SOY . '}}'
@@ -282,13 +281,13 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
             ],
             'should change part to "value" with "this day without year" variable' => [
                 [
-                    'part'  => DateModifierInterface::PART_MONTH,
-                    'type'  => AbstractDateFilterType::TYPE_EQUAL,
+                    'part' => DateModifierInterface::PART_MONTH,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
                     'value' => ['start' => '{{' . DateModifierInterface::VAR_THIS_DAY_W_Y . '}}']
                 ],
                 [
-                    'part'  => DateModifierInterface::PART_VALUE,
-                    'type'  => AbstractDateFilterType::TYPE_EQUAL,
+                    'part' => DateModifierInterface::PART_VALUE,
+                    'type' => AbstractDateFilterType::TYPE_EQUAL,
                     'value' => ['start' => '{{' . DateModifierInterface::VAR_THIS_DAY_W_Y . '}}']
                 ]
             ],

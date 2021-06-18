@@ -11,6 +11,9 @@ use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class ThemeManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -24,11 +27,15 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array                      $definitions
      * @param ThemeFactoryInterface|null $factory
+     * @param array                      $enabledThemes
      *
      * @return ThemeManager
      */
-    private function createManager(array $definitions = [], ThemeFactoryInterface $factory = null)
-    {
+    private function createManager(
+        array $definitions = [],
+        ThemeFactoryInterface $factory = null,
+        array $enabledThemes = []
+    ) {
         $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
         $themeDefinitionBag->expects($this->any())
             ->method('getThemeNames')
@@ -39,7 +46,7 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
                 return $definitions[$themeName] ?? null;
             });
 
-        return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag);
+        return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag, $enabledThemes);
     }
 
 
@@ -64,6 +71,61 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
         $manager = $this->createManager();
 
         $manager->getTheme('unknown');
+    }
+
+    public function testGenOnlyEnabledThemes()
+    {
+        $this->factory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createMock(Theme::class));
+
+        $manager = $this->createManager(
+            [
+                'base' => [],
+                'default' => [],
+                'custom' => []
+            ],
+            null,
+            ['default', 'base']
+        );
+
+        $this->assertCount(2, $manager->getEnabledThemes());
+    }
+
+    public function testEmptyEnabledThemes()
+    {
+        $this->factory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createMock(Theme::class));
+
+        $manager = $this->createManager(
+            [
+                'base' => [],
+                'default' => [],
+                'custom' => []
+            ]
+        );
+
+        $this->assertCount(3, $manager->getEnabledThemes());
+    }
+
+    public function testEnabledThemesWithWrongNames()
+    {
+        $this->factory->expects($this->any())
+            ->method('create')
+            ->willReturn($this->createMock(Theme::class));
+
+        $manager = $this->createManager(
+            [
+                'base' => [],
+                'default' => [],
+                'custom' => []
+            ],
+            null,
+            ['theme1', 'theme2']
+        );
+
+        $this->assertCount(3, $manager->getEnabledThemes());
     }
 
     public function testGetThemeObject()

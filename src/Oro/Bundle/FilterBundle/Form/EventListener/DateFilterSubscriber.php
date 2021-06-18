@@ -82,9 +82,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $children = array_keys($form->get('value')->all());
-        $data = $this->dateFilterModifier
-            ->setTimeZone($config->getOption('time_zone'))
-            ->modify($data, $children);
+        $data = $this->dateFilterModifier->modify($data, $children);
         // replace value form children to needed sub forms in case when part is selected
         if (array_key_exists($data['part'], static::$partChoicesMap)) {
             $min = static::$partChoicesMap[$data['part']][0];

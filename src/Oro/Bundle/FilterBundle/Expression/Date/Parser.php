@@ -28,7 +28,7 @@ class Parser
      *
      * @return mixed
      */
-    public function parse($tokens, $returnRawToken = false, $timeZone = null)
+    public function parse($tokens, $returnRawToken = false)
     {
         $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
@@ -43,7 +43,7 @@ class Parser
                 $result = $a->{$method}($b);
                 array_push($stack, $result);
             } else {
-                $stack[] = new ExpressionResult($token, $timeZone ?? $this->localeSettings->getTimeZone());
+                $stack[] = new ExpressionResult($token, $this->localeSettings->getTimeZone());
             }
         }
 

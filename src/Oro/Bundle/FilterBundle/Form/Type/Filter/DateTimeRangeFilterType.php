@@ -46,9 +46,6 @@ class DateTimeRangeFilterType extends AbstractDateFilterType
         $resolver->setDefaults(
             [
                 'field_type' => DateTimeRangeType::class,
-                // Allows to specify which time zone to use when creating filter data.
-                // If option is null, the time zone specified in the system configuration (localization) is used.
-                'time_zone' => 'UTC',
                 'widget_options' => [
                     'showDatevariables' => true,
                     'showTime' => true,
