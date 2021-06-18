@@ -13,14 +13,14 @@ define(function(require) {
         organizations: {},
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BUTreeAutocompleteComponent(options) {
             BUTreeAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             BUTreeAutocompleteComponent.__super__.initialize.call(this, options);

@@ -8,7 +8,7 @@ define(function(require) {
 
     const DraggableSortingView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DraggableSortingView(options) {
             DraggableSortingView.__super__.constructor.call(this, options);

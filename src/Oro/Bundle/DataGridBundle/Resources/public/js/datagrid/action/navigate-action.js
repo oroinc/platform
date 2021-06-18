@@ -24,7 +24,7 @@ define([
         useDirectLauncherLink: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NavigateAction(options) {
             NavigateAction.__super__.constructor.call(this, options);

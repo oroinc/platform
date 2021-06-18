@@ -16,7 +16,7 @@ define([
         className: 'date-cell',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateCell(options) {
             DateCell.__super__.constructor.call(this, options);

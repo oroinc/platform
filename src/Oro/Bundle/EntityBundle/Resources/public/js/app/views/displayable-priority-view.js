@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DisplayablePriorityView(options) {
             DisplayablePriorityView.__super__.constructor.call(this, options);

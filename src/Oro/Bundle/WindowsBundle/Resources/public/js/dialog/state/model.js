@@ -8,7 +8,7 @@ define(['backbone'], function(Backbone) {
      */
     const WindowsModel = Backbone.Model.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WindowsModel(attrs, options) {
             WindowsModel.__super__.constructor.call(this, attrs, options);

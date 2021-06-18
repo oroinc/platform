@@ -13,7 +13,7 @@ define(function(require) {
      */
     const ViewComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ViewComponent(options) {
             ViewComponent.__super__.constructor.call(this, options);

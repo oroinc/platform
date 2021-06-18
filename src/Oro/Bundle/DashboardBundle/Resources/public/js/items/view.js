@@ -32,14 +32,14 @@ define([
         itemSelect: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardItemsView(options) {
             DashboardItemsView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {

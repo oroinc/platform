@@ -10,7 +10,7 @@ define(function(require) {
         limitPropertyName: 'max_results',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SearchSuggestionCollection(...args) {
             SearchSuggestionCollection.__super__.constructor.apply(this, args);

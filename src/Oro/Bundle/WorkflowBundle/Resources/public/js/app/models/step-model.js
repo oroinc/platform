@@ -19,7 +19,7 @@ define(function(require) {
 
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StepModel(attrs, options) {
             StepModel.__super__.constructor.call(this, attrs, options);

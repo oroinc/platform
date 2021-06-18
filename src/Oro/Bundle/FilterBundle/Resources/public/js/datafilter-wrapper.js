@@ -25,10 +25,11 @@ define([
             this.setElement(this._getWrapperTemplate()({
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
-                criteriaHint: this._getCriteriaHint(),
                 canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue(),
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                criteriaHint: this._getCriteriaHint(),
+                ...this.getCriteriaProperties()
             }));
 
             this._appendFilter($filter);

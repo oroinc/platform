@@ -6,14 +6,14 @@ define(function(require) {
 
     const Select2BuTreeAutocompleteView = Select2AutocompleteView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2BuTreeAutocompleteView(options) {
             Select2BuTreeAutocompleteView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$el.on('input-widget:init', _.bind(this.setPlaceholder, this));

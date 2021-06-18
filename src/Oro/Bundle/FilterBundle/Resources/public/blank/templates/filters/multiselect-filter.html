@@ -1,5 +1,14 @@
+<% var selectorId = _.uniqueId('selector-'); %>
+<% var criteriaId = _.uniqueId('criteria-'); %>
 <div class="filter-item" data-multiselect-filter-template>
-    <div class="filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
+    <div id="<%- selectorId %>"
+         class="filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>"
+         tabindex="0"
+         role="button"
+     <% if (renderMode === 'toggle-mode') { %>
+         aria-controls="<%- criteriaId %>"
+     <% } %>
+    >
 
         <% if (showLabel) { %>
             <span class="filter-item-label"><%- label %></span>
@@ -32,11 +41,11 @@
                 </option>
             <% }); %>
         </select>
-        <div class="filter-criteria-selector-icon-wrap">
-            <span class="filter-criteria-selector-icon" aria-hidden="true"></span>
+        <div class="filter-criteria-selector-icon-wrap" aria-hidden="true">
+            <span class="filter-criteria-selector-icon"></span>
         </div>
     </div>
     <% if (renderMode === 'toggle-mode') { %>
-        <div class="filter-criteria"></div>
+        <div id="<%- criteriaId %>" class="filter-criteria" aria-labelledby="<%- selectorId %>"></div>
     <% } %>
 </div>

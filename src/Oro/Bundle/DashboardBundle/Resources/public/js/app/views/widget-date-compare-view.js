@@ -15,7 +15,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetDateCompareView(options) {
             WidgetDateCompareView.__super__.constructor.call(this, options);

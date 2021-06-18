@@ -11,7 +11,7 @@ define(function(require) {
             '<span class="separator">|</span><a href="<%=url %>"><%=_.__("Read") %></a>'),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NewEmailFlashMessageComponent(options) {
             NewEmailFlashMessageComponent.__super__.constructor.call(this, options);

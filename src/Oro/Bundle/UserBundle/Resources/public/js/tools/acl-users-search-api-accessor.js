@@ -17,7 +17,7 @@ define(function(require) {
 
     const AclUsersSearchApiAccessor = SearchApiAccessor.extend(/** @lends AclUsersSearchApiAccessor.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AclUsersSearchApiAccessor(options) {
             AclUsersSearchApiAccessor.__super__.constructor.call(this, options);

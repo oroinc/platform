@@ -9,7 +9,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartStateModel(...args) {
             FlowchartStateModel.__super__.constructor.apply(this, args);

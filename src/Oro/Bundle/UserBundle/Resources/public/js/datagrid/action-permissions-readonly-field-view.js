@@ -17,7 +17,7 @@ define(function(require) {
         permissionView: PermissionReadOnlyView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionPermissionsReadonlyFieldView(options) {
             ActionPermissionsReadonlyFieldView.__super__.constructor.call(this, options);

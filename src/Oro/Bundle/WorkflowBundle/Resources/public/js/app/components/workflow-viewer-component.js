@@ -24,7 +24,7 @@ define(function(require) {
         _initPromises: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowViewerComponent(options) {
             this._initPromises = [];
@@ -32,7 +32,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             WorkflowViewerComponent.__super__.initialize.call(this, options);
@@ -67,7 +67,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

@@ -8,7 +8,7 @@ define(function(require) {
 
     const DataAuditConditionView = FieldConditionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DataAuditConditionView(options) {
             DataAuditConditionView.__super__.constructor.call(this, options);

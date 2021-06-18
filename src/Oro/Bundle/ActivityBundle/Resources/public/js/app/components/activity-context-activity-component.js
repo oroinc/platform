@@ -11,14 +11,14 @@ define(function(require) {
         contextsView: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextActivityComponent(options) {
             ActivityContextActivityComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this._deferredInit();

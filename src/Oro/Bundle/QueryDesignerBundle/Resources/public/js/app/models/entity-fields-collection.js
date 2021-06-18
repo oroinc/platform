@@ -12,14 +12,14 @@ define(function(require) {
         dataProvider: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityFieldsCollection(...args) {
             EntityFieldsCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             if (!options || !(options.dataProvider instanceof EntityStructureDataProvider)) {
@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _prepareModel: function(attrs, options) {
             options.dataProvider = this.dataProvider;
@@ -38,7 +38,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         clone: function() {
             return new this.constructor(this.models, {dataProvider: this.dataProvider});

@@ -14,34 +14,34 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TextEditorView(options) {
             TextEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         focus: function(atEnd) {
             this.$('[name=value]').setCursorToEnd().focus();
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getValue: function() {
             return this.$('[name=value]').val();
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         rethrowEvent: function(e) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onGenericKeydown: function(e) {
             this.onGenericEnterKeydown(e);
@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         onGenericEnterKeydown: function(e) {
             if (e.keyCode === this.ENTER_KEY_CODE && (e.ctrlKey || e.shiftKey)) {

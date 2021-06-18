@@ -38,7 +38,7 @@ define(function(require) {
         $resizableEl: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(main, options) {
             this.options = _.extend(this.defaults, options);
@@ -59,7 +59,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

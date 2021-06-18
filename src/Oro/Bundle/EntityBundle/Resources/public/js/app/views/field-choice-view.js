@@ -46,14 +46,14 @@ define(function(require) {
         include: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FieldChoiceView(options) {
             FieldChoiceView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             options = $.extend(true, {}, this.defaultOptions, options);

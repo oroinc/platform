@@ -67,7 +67,7 @@ define(function(require) {
         confirmModalModulePromise: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);

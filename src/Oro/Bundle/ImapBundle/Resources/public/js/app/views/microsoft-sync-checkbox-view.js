@@ -38,14 +38,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MicrosoftSyncCheckboxView(options) {
             MicrosoftSyncCheckboxView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.$errorMessage = this.$el.find(options.errorMessage);

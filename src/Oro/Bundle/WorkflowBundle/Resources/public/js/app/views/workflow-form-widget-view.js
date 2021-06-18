@@ -17,14 +17,14 @@ define(function(require) {
         optionNames: BaseView.prototype.optionNames.concat(['widgetAlias', 'saveAndTransitButtonSelector']),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowFormWidgetView(options) {
             WorkflowFormWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this._bindEvents();

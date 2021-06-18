@@ -16,7 +16,7 @@ define([
         processCallback: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CallbackListener(...args) {
             CallbackListener.__super__.constructor.apply(this, args);

@@ -5,7 +5,7 @@ define([
 
     const PageUserMenuView = PageRegionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageUserMenuView(options) {
             PageUserMenuView.__super__.constructor.call(this, options);

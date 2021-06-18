@@ -19,7 +19,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationCollection(...args) {
             EmailNotificationCollection.__super__.constructor.apply(this, args);

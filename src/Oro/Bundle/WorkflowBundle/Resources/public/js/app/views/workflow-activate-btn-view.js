@@ -21,14 +21,14 @@ define(function(require) {
         $el: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowActivateBtnView(options) {
             WorkflowActivateBtnView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             WorkflowActivateBtnView.__super__.initialize.call(this, options);

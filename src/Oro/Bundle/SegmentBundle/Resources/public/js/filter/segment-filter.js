@@ -57,7 +57,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SegmentFilter(options) {
             SegmentFilter.__super__.constructor.call(this, options);
@@ -86,7 +86,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             this._setInputValue(this.inputSelector, value.value);
@@ -94,7 +94,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {

@@ -6,7 +6,7 @@ define(function(require) {
 
     const PinbarCollection = BaseCollection.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PinbarCollection(...args) {
             PinbarCollection.__super__.constructor.apply(this, args);

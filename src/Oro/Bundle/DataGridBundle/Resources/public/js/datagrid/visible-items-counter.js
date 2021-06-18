@@ -34,7 +34,7 @@ define([
         transTemplate: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function VisibleItemsCounter(options) {
             VisibleItemsCounter.__super__.constructor.call(this, options);

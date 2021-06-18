@@ -154,7 +154,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'filters:update mediator': '_onChangeFilterSelect',
@@ -162,7 +162,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FiltersManager(options) {
             FiltersManager.__super__.constructor.call(this, options);
@@ -242,7 +242,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             if (!_.isEmpty(this.filters)) {
@@ -308,7 +308,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

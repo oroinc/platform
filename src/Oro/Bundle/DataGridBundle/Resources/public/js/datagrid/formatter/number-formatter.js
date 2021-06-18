@@ -34,7 +34,7 @@ define(function(require) {
         style: 'decimal',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         fromRaw: function(rawData) {
             if (rawData === void 0 || rawData === null || rawData === '') {
@@ -47,7 +47,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         toRaw: function(formattedData) {
             let rawData = null;

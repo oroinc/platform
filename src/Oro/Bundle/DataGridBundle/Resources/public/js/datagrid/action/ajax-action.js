@@ -15,7 +15,7 @@ define([
         requestType: 'POST',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AjaxAction(options) {
             AjaxAction.__super__.constructor.call(this, options);

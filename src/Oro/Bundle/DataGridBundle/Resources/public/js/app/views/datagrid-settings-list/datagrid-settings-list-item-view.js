@@ -33,14 +33,14 @@ define(function(require) {
         addSorting: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListItemView(options) {
             DatagridSettingsListItemView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsListItemView.__super__.render.call(this);
@@ -67,7 +67,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const searchString = this.filterModel.get('search');

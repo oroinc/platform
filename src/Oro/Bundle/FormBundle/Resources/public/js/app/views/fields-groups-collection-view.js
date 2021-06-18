@@ -13,7 +13,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FieldsGroupsCollectionView(options) {
             FieldsGroupsCollectionView.__super__.constructor.call(this, options);

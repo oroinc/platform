@@ -10,12 +10,12 @@ define(function(require) {
 
     const ColumnHeaderView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'board-column-header',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: require('tpl-loader!../../../../templates/board/column-header-view.html'),
 
@@ -25,14 +25,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnHeaderView(options) {
             ColumnHeaderView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.boardCollection = options.boardCollection;

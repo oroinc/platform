@@ -13,21 +13,21 @@ define(
         const TagsReportFilter = DictionaryFilter.extend({
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             criteriaValueSelectors: {
                 type: 'select[name="tag_part"]'
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             constructor: function TagsReportFilter(options) {
                 TagsReportFilter.__super__.constructor.call(this, options);
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             initialize: function(options) {
                 this.entityClass = this.filterParams.entityClass.replace(/\\/g, '_');

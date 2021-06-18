@@ -72,7 +72,7 @@ define(function(require) {
         formName: void 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ApiAccessor(options) {
             ApiAccessor.__super__.constructor.call(this, options);

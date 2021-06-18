@@ -1,9 +1,19 @@
+<% var selectorId = _.uniqueId('selector-'); %>
+<% var criteriaId = _.uniqueId('criteria-'); %>
 <div class="filter-item" data-filter-wrapper-template>
-    <div class="filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>" data-zoom-disable>
+    <div id="<%- selectorId %>"
+         class="filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>"
+         data-zoom-disable
+         tabindex="0"
+         role="button"
+     <% if (renderMode === 'toggle-mode') { %>
+         aria-controls="<%- criteriaId %>"
+     <% } %>
+    >
         <% if (showLabel) { %><span class="filter-item-label"><%- label %></span><% } %><span class="filter-item-hint"></span>
-        <div class="filter-criteria-selector-icon-wrap">
-            <span class="filter-criteria-selector-icon" aria-hidden="true"></span>
+        <div class="filter-criteria-selector-icon-wrap" aria-hidden="true">
+            <span class="filter-criteria-selector-icon"></span>
         </div>
     </div>
-    <div class="filter-criteria <% if (renderMode !== 'toggle-mode') { %>dropdown-menu<% } %>"></div>
+    <div id="<%- criteriaId %>" class="filter-criteria <% if (renderMode !== 'toggle-mode') { %>dropdown-menu<% } %>" aria-labelledby="<%- selectorId %>"></div>
 </div>

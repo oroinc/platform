@@ -44,14 +44,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationCollectionView(options) {
             EmailNotificationCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             EmailNotificationCollectionView.__super__.initialize.call(this, options);

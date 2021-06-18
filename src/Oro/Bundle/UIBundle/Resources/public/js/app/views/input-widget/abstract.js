@@ -42,14 +42,14 @@ define(function(require) {
         overrideJqueryMethods: ['val', 'hide', 'show', 'focus', 'width'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractInputWidgetView(options) {
             AbstractInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.resolveOptions(options);
@@ -106,7 +106,7 @@ define(function(require) {
         /**
          * Destroy widget
          *
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

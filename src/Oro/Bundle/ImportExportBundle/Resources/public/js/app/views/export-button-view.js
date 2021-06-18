@@ -25,14 +25,14 @@ define(function(require) {
         importExportManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExportButtonView(options) {
             ExportButtonView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);

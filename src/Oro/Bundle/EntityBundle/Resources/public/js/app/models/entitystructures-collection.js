@@ -13,7 +13,7 @@ define(function(require) {
         type: 'entitystructures',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityStructuresCollection(data, options) {
             EntityStructuresCollection.__super__.constructor.call(this, data, options);

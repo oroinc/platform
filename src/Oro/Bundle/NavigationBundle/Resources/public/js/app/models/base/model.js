@@ -17,7 +17,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseNavigationItemModel(attrs, options) {
             BaseNavigationItemModel.__super__.constructor.call(this, attrs, options);

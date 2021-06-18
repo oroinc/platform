@@ -17,7 +17,7 @@ define(function(require) {
         tabIds: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function CapabilitySetComponent(options) {
             CapabilitySetComponent.__super__.constructor.call(this, options);

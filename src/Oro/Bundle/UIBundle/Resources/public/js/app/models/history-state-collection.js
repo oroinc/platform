@@ -8,7 +8,7 @@ define(function(require) {
         model: HistoryStateModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HistoryStateCollection(...args) {
             HistoryStateCollection.__super__.constructor.apply(this, args);

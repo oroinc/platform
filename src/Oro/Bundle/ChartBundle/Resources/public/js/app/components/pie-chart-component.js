@@ -12,7 +12,7 @@ define(function(require) {
      */
     const PieChartComponent = BaseChartComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PieChartComponent(options) {
             PieChartComponent.__super__.constructor.call(this, options);

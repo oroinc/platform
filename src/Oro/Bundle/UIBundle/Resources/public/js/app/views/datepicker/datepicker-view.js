@@ -54,7 +54,7 @@ define(function(require) {
         emptyClassName: 'input--empty',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatePickerView(options) {
             DatePickerView.__super__.constructor.call(this, options);

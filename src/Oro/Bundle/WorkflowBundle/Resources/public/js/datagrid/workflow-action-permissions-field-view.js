@@ -6,7 +6,7 @@ define(function(require) {
 
     const WorkflowActionPermissionsFieldView = ActionPermissionsFieldView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowActionPermissionsFieldView(options) {
             WorkflowActionPermissionsFieldView.__super__.constructor.call(this, options);

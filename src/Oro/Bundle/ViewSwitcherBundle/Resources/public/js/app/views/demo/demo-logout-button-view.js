@@ -17,7 +17,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DemoLogoutButtonView(options) {
             this._debouncedRender = _.debounce(this.render.bind(this), 0);

@@ -20,7 +20,7 @@ define(function(require) {
 
     const ZoomStateModel = BaseModel.extend(/** @lends ZoomStateModel.prototype */{
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @member {Object}
          */
         defaults: function() {
@@ -70,14 +70,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ZoomStateModel(attrs, options) {
             ZoomStateModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(attributes, options) {
             ZoomStateModel.__super__.initialize.call(this, attributes, options);

@@ -13,14 +13,14 @@ define(function(require) {
         countNewEmail: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MobileEmailNotificationView(options) {
             MobileEmailNotificationView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             MobileEmailNotificationView.__super__.initialize.call(this, options);
@@ -28,7 +28,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             const $emailsMenuItem = $('#user-menu .oro-email-user-emails a');

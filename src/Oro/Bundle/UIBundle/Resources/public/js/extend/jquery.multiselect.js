@@ -5,7 +5,7 @@ define(function(require) {
     const _ = require('underscore');
     const mask = require('oroui/js/dropdown-mask');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
-    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes');
+    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes').default;
     require('jquery-ui/widget');
     require('jquery.multiselect');
 
@@ -17,15 +17,34 @@ define(function(require) {
 
         _create(...args) {
             this._uniqueName = _.uniqueId(this.widgetName);
-            this.outerTrigger = this.options.outerTrigger;
+            this.$outerTrigger = $(this.options.outerTrigger);
             this.initialValue = this.element.val();
+
             const superResult = this._superApply(args);
-            this.button.attr({
-                'id': this._uniqueName,
-                'aria-haspopup': true,
-                'aria-expanded': false
-            });
-            this.menu.attr('aria-labelledby', this._uniqueName);
+            const labelledby = [];
+
+            if (this.button.is(':tabbable')) {
+                this.button.attr({
+                    'id': this._uniqueName,
+                    'aria-haspopup': true,
+                    'aria-expanded': false
+                });
+                labelledby.push(this._uniqueName);
+            }
+
+            if (this.$outerTrigger.length) {
+                this.$outerTrigger.attr({
+                    'id': this.$outerTrigger.attr('id') || this._uniqueName,
+                    'aria-haspopup': true,
+                    'aria-expanded': false
+                });
+                labelledby.push(this.$outerTrigger.attr('id'));
+            }
+
+            if (labelledby.length) {
+                this.menu.attr('aria-labelledby', labelledby.join(' '));
+            }
+
             return superResult;
         },
 
@@ -67,7 +86,7 @@ define(function(require) {
                     case KEY_CODES.ARROW_LEFT:
                     case KEY_CODES.ARROW_RIGHT:
                         e.preventDefault();
-                        this._traverse(e.which, this);
+                        this._traverse(e.which, e.currentTarget);
                         break;
                     case KEY_CODES.ENTER:
                     case KEY_CODES.SPACE:
@@ -122,16 +141,26 @@ define(function(require) {
                     .onhide(this.close.bind(this));
             }
             this.button.attr('aria-expanded', true);
+            this.$outerTrigger.attr('aria-expanded', true);
         },
 
-        /**
-         * Remove all handlers before closing menu
-         * @override
-         */
-        close(...args) {
+        close() {
             mask.hide();
             this.button.attr('aria-expanded', false);
-            return this._superApply(args);
+            this.$outerTrigger.attr('aria-expanded', false);
+
+            const superResult = this._superApply();
+
+            if ($.contains(this.menu[0], document.activeElement)) {
+                this.button.trigger('focus');
+
+                // move focus to $outerTrigger element in case own multiselect button is hidden
+                if (!this.button.is(':tabbable')) {
+                    this.$outerTrigger.trigger('focus');
+                }
+            }
+
+            return superResult;
         },
 
         /**
@@ -153,8 +182,9 @@ define(function(require) {
                 this._super(init);
                 this.menu.find('.ui-multiselect-checkboxes').scrollTop(scrollTop);
             }
-            this.headerLinkContainer.attr('role', 'presentation');
-            this.menu.find('.ui-multiselect-checkboxes').attr('role', 'presentation');
+            this.menu.find('.ui-multiselect-checkboxes').attr({
+                'aria-label': this.options.listAriaLabel ? this.options.listAriaLabel : null
+            });
         },
 
         getChecked() {
@@ -197,8 +227,8 @@ define(function(require) {
             const isButton = !!$target.closest(this.button).length;
             let isOuterTrigger = false;
 
-            if (this.outerTrigger && (this.outerTrigger instanceof $) && this.outerTrigger.length) {
-                isOuterTrigger = !!$target.closest(this.outerTrigger).length;
+            if (this.$outerTrigger.length) {
+                isOuterTrigger = !!$target.closest(this.$outerTrigger).length;
             }
 
             return !isMenu &&

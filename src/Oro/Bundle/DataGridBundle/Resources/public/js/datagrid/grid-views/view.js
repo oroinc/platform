@@ -105,7 +105,7 @@ define(function(require) {
         adjustDocumentTitle: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function GridViewsView(options) {
             GridViewsView.__super__.constructor.call(this, options);
@@ -167,7 +167,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

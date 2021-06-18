@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageLayoutView(options) {
             PageLayoutView.__super__.constructor.call(this, options);
@@ -34,7 +34,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this.$el.attr({'data-layout': 'separate'});

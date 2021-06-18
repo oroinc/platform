@@ -19,7 +19,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentLink(options) {
             EmailAttachmentLink.__super__.constructor.call(this, options);

@@ -21,7 +21,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MailboxUpdateView(options) {
             MailboxUpdateView.__super__.constructor.call(this, options);

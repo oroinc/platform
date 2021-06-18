@@ -33,7 +33,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _create: function() {
             this._super();

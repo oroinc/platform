@@ -44,7 +44,7 @@ define(function(require) {
 
         /**
          * Select today Date takes in account system timezone
-         * @inheritDoc
+         * @inheritdoc
          */
         $.datepicker.constructor.prototype._gotoToday = function(id) {
             const inst = this._getInst($(id)[0]);
@@ -64,7 +64,7 @@ define(function(require) {
 
         /**
          * Today Date highlight takes in account system timezone
-         * @inheritDoc
+         * @inheritdoc
          */
         $.datepicker.constructor.prototype._updateDatepicker = function(inst) {
             const today = moment.tz(localeSettings.getTimeZone());

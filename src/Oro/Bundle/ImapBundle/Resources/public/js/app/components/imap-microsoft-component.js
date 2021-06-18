@@ -45,14 +45,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImapMicrosoftComponent(options) {
             ImapMicrosoftComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.popup = options.popup || this.popup;
@@ -104,7 +104,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         prepareDataForForm: function(values) {
             const data = {

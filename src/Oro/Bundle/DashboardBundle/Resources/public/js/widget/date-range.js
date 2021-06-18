@@ -23,7 +23,7 @@ define(function(require) {
         domCache: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'change select': 'skipOnChangeFilterTypeHandler',
@@ -33,19 +33,19 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoUpdateRangeFilterType: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetConfigDateRangeFilter(options) {
             WidgetConfigDateRangeFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             WidgetConfigDateRangeFilter.__super__.initialize.call(this, options);
@@ -189,7 +189,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
@@ -207,7 +207,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _updateDOMValue: function() {
             return this._writeDOMValue(this._formatRawValue(this.getValue()));

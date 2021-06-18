@@ -27,14 +27,14 @@ define(function(require) {
         contextView: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiGridComponent(options) {
             MultiGridComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = options;

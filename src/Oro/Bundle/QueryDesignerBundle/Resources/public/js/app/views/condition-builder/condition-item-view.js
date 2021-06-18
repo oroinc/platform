@@ -14,7 +14,7 @@ define(function(require) {
         requiredOptions: AbstractConditionContainerView.prototype.requiredOptions.concat(['view', 'viewOptions']),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConditionItemView(options) {
             ConditionItemView.__super__.constructor.call(this, options);

@@ -58,7 +58,7 @@ define(function(require) {
         holders: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiUseResourceManager(options) {
             this.holders = [];
@@ -122,7 +122,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.isCreated) {

@@ -11,14 +11,14 @@ define(function(require) {
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FormLoadingView(options) {
             FormLoadingView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const self = this;

@@ -84,7 +84,7 @@ define(function() {
             },
 
             /**
-             * @inheritDoc
+             * @inheritdoc
              */
             hasOwnProperty: function(sKey) {
                 return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\='))

@@ -14,7 +14,7 @@ define(function(require) {
      */
     const ActivityContextComponent = MultiGridComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActivityContextComponent(options) {
             ActivityContextComponent.__super__.constructor.call(this, options);

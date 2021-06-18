@@ -8,7 +8,7 @@ define(function(require) {
         animationDuration: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BarCollectionView(options) {
             BarCollectionView.__super__.constructor.call(this, options);

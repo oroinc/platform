@@ -9,7 +9,7 @@ define(function(require) {
         fieldItemView: FieldView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WorkflowActionPermissionsRowView(options) {
             WorkflowActionPermissionsRowView.__super__.constructor.call(this, options);

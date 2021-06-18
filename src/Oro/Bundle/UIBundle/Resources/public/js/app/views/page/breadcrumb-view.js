@@ -23,7 +23,7 @@ define(function(require) {
         data: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageBreadcrumbView(options) {
             PageBreadcrumbView.__super__.constructor.call(this, options);

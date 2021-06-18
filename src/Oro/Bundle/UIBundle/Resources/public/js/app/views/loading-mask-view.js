@@ -41,14 +41,14 @@ define(function(require) {
         hideTimeoutId: undefined,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function LoadingMaskView(options) {
             LoadingMaskView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
@@ -62,7 +62,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const data = {
@@ -166,7 +166,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
