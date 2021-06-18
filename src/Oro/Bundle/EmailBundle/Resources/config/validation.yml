@@ -6,12 +6,13 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
         - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax: ~
     properties:
         name:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                min:        3
-                max:        255
+                min: 3
+                max: 255
+                allowEmptyString: false
         type:
-            - NotBlank:     ~
+            - NotBlank: ~
         organization:
             - NotBlank: ~
         translations:

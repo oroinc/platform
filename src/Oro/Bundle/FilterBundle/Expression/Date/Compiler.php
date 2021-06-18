@@ -22,12 +22,11 @@ class Compiler
     /**
      * @param string $string
      * @param bool $returnRawToken
-     * @param string|null $timeZone
      *
      * @return ExpressionResult
      */
-    public function compile(string $string, $returnRawToken = false, ?string $timeZone = null)
+    public function compile(string $string, $returnRawToken = false)
     {
-        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken, $timeZone);
+        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken);
     }
 }

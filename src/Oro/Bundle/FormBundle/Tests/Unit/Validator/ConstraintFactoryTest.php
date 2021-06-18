@@ -33,8 +33,8 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                 'options'       => null,
             ],
             'custom class name' => [
-                'expectedClass' => new Length(['min' => 2, 'max' => 255]),
-                'name'          => 'Symfony\Component\Validator\Constraints\Length',
+                'expectedClass' => new Length(['min' => 2, 'max' => 255, 'allowEmptyString' => false]),
+                'name'          => Length::class,
                 'options'       => ['min' => 2, 'max' => 255],
             ],
         ];
@@ -97,7 +97,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected'    => [
-                    new Length(['min' => 1, 'max' => 2])
+                    new Length(['min' => 1, 'max' => 2, 'allowEmptyString' => false])
                 ]
             ],
         ];

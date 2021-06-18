@@ -17,15 +17,23 @@ class ThemeManager
     private $instances = [];
 
     /**
+     * @var string[]
+     */
+    private array $enabledThemes;
+
+    /**
      * @param ThemeFactoryInterface       $themeFactory
      * @param ThemeDefinitionBagInterface $themeDefinitionBag
+     * @param string[] $enabledThemes
      */
     public function __construct(
         ThemeFactoryInterface $themeFactory,
-        ThemeDefinitionBagInterface $themeDefinitionBag
+        ThemeDefinitionBagInterface $themeDefinitionBag,
+        array $enabledThemes
     ) {
         $this->themeFactory = $themeFactory;
         $this->themeDefinitionBag = $themeDefinitionBag;
+        $this->enabledThemes = $enabledThemes;
     }
 
     /**
@@ -36,6 +44,21 @@ class ThemeManager
     public function getThemeNames()
     {
         return $this->themeDefinitionBag->getThemeNames();
+    }
+
+    public function getEnabledThemes($groups = null): array
+    {
+        $themes = $this->getAllThemes($groups);
+
+        if ($this->enabledThemes !== []) {
+            $enabledThemes = array_intersect_key($themes, array_flip($this->enabledThemes));
+
+            if ($enabledThemes !== []) {
+                return $enabledThemes;
+            }
+        }
+
+        return $themes;
     }
 
     /**

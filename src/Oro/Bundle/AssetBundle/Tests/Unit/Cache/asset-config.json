@@ -1,1 +1,1 @@
-{"paths":["first\/bundle\/path","second\/bundle\/path"], "devServerOptions":["webpack_dev_server_options"], "assetVersion":"testAssetVersion"}
+{"paths":["first\/bundle\/path","second\/bundle\/path"], "devServerOptions":["webpack_dev_server_options"], "assetVersion":"testAssetVersion","themes":[]}

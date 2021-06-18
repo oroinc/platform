@@ -190,7 +190,11 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
             ->add('field1', TextType::class, ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
-            ->add('field2', TextType::class, ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
+            ->add(
+                'field2',
+                TextType::class,
+                ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4, 'allowEmptyString' => false])]]
+            )
             ->getForm();
         $form->submit(
             [
