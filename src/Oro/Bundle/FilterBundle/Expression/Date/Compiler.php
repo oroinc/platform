@@ -28,6 +28,6 @@ class Compiler
      */
     public function compile(string $string, $returnRawToken = false, ?string $timeZone = null)
     {
-        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken, $timeZone);
+        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken);
     }
 }

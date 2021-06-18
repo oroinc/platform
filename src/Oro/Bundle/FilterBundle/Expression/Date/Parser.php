@@ -43,7 +43,7 @@ class Parser
                 $result = $a->{$method}($b);
                 array_push($stack, $result);
             } else {
-                $stack[] = new ExpressionResult($token, $timeZone ?? $this->localeSettings->getTimeZone());
+                $stack[] = new ExpressionResult($token, $this->localeSettings->getTimeZone());
             }
         }
 
