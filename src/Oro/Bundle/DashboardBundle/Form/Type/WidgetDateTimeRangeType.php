@@ -61,8 +61,7 @@ class WidgetDateTimeRangeType extends AbstractType
         $resolver->setDefaults(
             [
                 'compile_date' => false,
-                'field_type'   => WidgetDateRangeValueType::class,
-                'time_zone' => null,
+                'field_type'   => WidgetDateRangeValueType::class
             ]
         );
     }

@@ -25,10 +25,10 @@ class CompilerTest extends \PHPUnit\Framework\TestCase
         $parserMock
             ->expects($this->once())
             ->method('parse')
-            ->with($tokens, false, 'UTC')
+            ->with($tokens, false)
             ->willReturn($expectedResult);
 
         $compiler = new Compiler($lexerMock, $parserMock);
-        $this->assertSame($expectedResult, $compiler->compile($inputString, false, 'UTC'));
+        $this->assertSame($expectedResult, $compiler->compile($inputString, false));
     }
 }
