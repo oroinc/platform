@@ -59,14 +59,14 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FilterHint(options) {
             FilterHint.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!options.filter) {
@@ -90,7 +90,7 @@ define(function(require, exports, module) {
             }));
 
             if (this.filter.selectWidget) {
-                this.filter.selectWidget.multiselect('getButton').hide();
+                this.filter.selectWidget.multiselect('getButton').hide().attr('aria-hidden', true);
             }
 
             if (this.selectors.outerHintContainer) {

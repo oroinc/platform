@@ -38,7 +38,7 @@ define(function(require) {
         id: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         defaults: function() {
             return {
@@ -64,7 +64,7 @@ define(function(require) {
         _meta: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityModel(data, options) {
             options = options || {};
@@ -84,7 +84,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(data, options) {
             if (!_.isEmpty(_.omit(this.attributes, 'id'))) {
@@ -95,7 +95,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -193,14 +193,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         url: function(method, params) {
             return routing.generate(this.ROUTE[method], _.defaults({entity: this.type, id: this.id}, params));
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         parse: function(resp, options) {
             if (this.type !== resp.data.type) {

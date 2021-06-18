@@ -20,14 +20,14 @@ define(function(require) {
         ],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailFolderTreeView(options) {
             EmailFolderTreeView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.each(this.requiredOptions, function(optionName) {

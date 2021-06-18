@@ -126,14 +126,14 @@ define(function(require, exports, module) {
         applicationUrl: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'demo-page-action:logout mediator': 'onLogout'
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DeviceSwitcherView(options) {
             DeviceSwitcherView.__super__.constructor.call(this, options);

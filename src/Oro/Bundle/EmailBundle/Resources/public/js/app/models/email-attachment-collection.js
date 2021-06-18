@@ -11,7 +11,7 @@ define(function(require) {
         model: EmailAttachmentModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentCollection(...args) {
             EmailAttachmentCollection.__super__.constructor.apply(this, args);

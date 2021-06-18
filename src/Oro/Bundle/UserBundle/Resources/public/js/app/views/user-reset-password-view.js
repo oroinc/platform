@@ -31,7 +31,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UserResetPasswordView(options) {
             UserResetPasswordView.__super__.constructor.call(this, options);

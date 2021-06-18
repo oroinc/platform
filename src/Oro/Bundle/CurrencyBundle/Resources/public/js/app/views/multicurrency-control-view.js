@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MultiCurrencyControlView(options) {
             MultiCurrencyControlView.__super__.constructor.call(this, options);

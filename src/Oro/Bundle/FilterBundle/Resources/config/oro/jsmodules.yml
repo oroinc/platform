@@ -41,3 +41,6 @@ dynamic-imports:
         - oro/filter/number-range-filter
         - oro/filter/select-filter
         - oro/filter/text-filter
+map:
+    "*":
+        oro/filter-settings: orofilter/js/filter/filter-settings

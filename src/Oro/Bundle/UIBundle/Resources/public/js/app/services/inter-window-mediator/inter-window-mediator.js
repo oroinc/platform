@@ -11,7 +11,7 @@ define(function(require) {
 
     const InterWindowMediator = BaseClass.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function InterWindowMediator() {
             this.onStorageChange = this.onStorageChange.bind(this);
@@ -20,7 +20,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             InterWindowMediator.__super__.initialize.call(this, options);
@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

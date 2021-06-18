@@ -20,7 +20,7 @@ define(function(require) {
         dispatched: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MapAction(options) {
             MapAction.__super__.constructor.call(this, options);

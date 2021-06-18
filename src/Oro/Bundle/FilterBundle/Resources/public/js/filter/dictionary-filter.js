@@ -84,14 +84,14 @@ define(function(require) {
         dictionarySearchRoute: 'oro_dictionary_search',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DictionaryFilter(options) {
             DictionaryFilter.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             // Each filter should have own copy,
@@ -111,7 +111,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         reset: function() {
             DictionaryFilter.__super__.reset.call(this);
@@ -224,7 +224,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _renderCriteria: function() {
             this.renderTemplate();
@@ -254,7 +254,8 @@ define(function(require) {
                 selectedChoice: value.type,
                 choices: this.choices,
                 name: this.name,
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                ...this.getCriteriaProperties()
             }));
 
             this._appendFilter($filter);
@@ -357,7 +358,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         isEmptyValue: function() {
             if (this.isEmptyType(this.value.type)) {
@@ -369,7 +370,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getParts: function() {
             const value = _.extend({}, this.emptyValue, this.getValue());
@@ -439,14 +440,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             let value;
@@ -462,7 +463,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getSelectedChoiceLabel: function(property, value) {
             let selectedChoiceLabel = '';
@@ -480,7 +481,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _getCriteriaHint: function() {
             const value = this._getDisplayValue();
@@ -524,7 +525,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _hideCriteria: function() {
             this.$el.find(this.elementSelector).inputWidget('close');

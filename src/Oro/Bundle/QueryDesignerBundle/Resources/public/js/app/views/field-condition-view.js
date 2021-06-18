@@ -13,7 +13,7 @@ define(function(require) {
 
     const FieldConditionView = AbstractConditionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FieldConditionView(options) {
             FieldConditionView.__super__.constructor.call(this, options);

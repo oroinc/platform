@@ -28,7 +28,7 @@ define(function(require) {
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HiddenInitializationView(options) {
             HiddenInitializationView.__super__.constructor.call(this, options);

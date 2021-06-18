@@ -11,7 +11,7 @@ define(function(require) {
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ConditionsGroupView(options) {
             ConditionsGroupView.__super__.constructor.call(this, options);

@@ -40,14 +40,14 @@ define(function(require) {
         DEFAULT_PER_PAGE: 20,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AbstractRelationEditorView(options) {
             AbstractRelationEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             AbstractRelationEditorView.__super__.initialize.call(this, options);

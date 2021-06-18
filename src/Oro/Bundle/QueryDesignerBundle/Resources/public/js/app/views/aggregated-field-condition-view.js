@@ -7,7 +7,7 @@ define(function(require) {
 
     const AggregatedFieldConditionView = FieldConditionView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AggregatedFieldConditionView(options) {
             AggregatedFieldConditionView.__super__.constructor.call(this, options);

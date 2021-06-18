@@ -153,7 +153,7 @@ define(function(require) {
         autohideNeighbors: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseTreeView(options) {
             this.onBeforeOpen = _.debounce(this.onBeforeOpen, this.searchTimeout);

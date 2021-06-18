@@ -6,14 +6,14 @@ define(function(require) {
 
     const Select2ParentBusinessUnitsAutocompleteComponent = Select2TreeAutocompleteComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2ParentBusinessUnitsAutocompleteComponent(options) {
             Select2ParentBusinessUnitsAutocompleteComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             let params = {

@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function TagUpdateView(options) {
             TagUpdateView.__super__.constructor.call(this, options);

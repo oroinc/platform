@@ -12,14 +12,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarModel(data, options) {
             SidebarModel.__super__.constructor.call(this, data, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(data, options) {
             _.extend(this, _.pick(options, ['urlRoot']));

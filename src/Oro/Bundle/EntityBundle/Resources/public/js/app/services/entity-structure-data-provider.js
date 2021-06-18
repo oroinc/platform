@@ -163,14 +163,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EntityStructureDataProvider(options) {
             EntityStructureDataProvider.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @param {Object} options
          * @param {EntityStructuresCollection} options.collection
          * @param {string} [options.rootEntity] class name of root entity
@@ -205,7 +205,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             delete this.collection;

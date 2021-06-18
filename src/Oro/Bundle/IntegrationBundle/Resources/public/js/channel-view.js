@@ -31,7 +31,7 @@ define([
         requiredOptions: ['transportTypeSelector', 'typeSelector', 'fieldsSets', 'formSelector'],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ChanelView(options) {
             ChanelView.__super__.constructor.call(this, options);

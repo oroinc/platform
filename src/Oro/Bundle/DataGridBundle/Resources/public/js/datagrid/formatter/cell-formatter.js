@@ -15,7 +15,7 @@ define(['underscore', 'backgrid', 'oroui/js/tools/text-util'
 
     _.extend(CellFormatter.prototype, {
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         fromRaw: function(rawData) {
             if (rawData === null) {

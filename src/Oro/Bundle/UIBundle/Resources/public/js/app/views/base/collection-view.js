@@ -24,14 +24,14 @@ define([
         showLoadingForce: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function BaseCollectionView(options) {
             BaseCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'loadingContainerSelector',

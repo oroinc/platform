@@ -4,6 +4,7 @@ define(function(require, exports, module) {
     const template = require('tpl-loader!orofilter/templates/filter/select-filter.html');
     const $ = require('jquery');
     const _ = require('underscore');
+    const __ = require('orotranslation/js/translator');
     const AbstractFilter = require('oro/filter/abstract-filter');
     const MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
@@ -139,7 +140,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectFilter(options) {
             SelectFilter.__super__.constructor.call(this, options);
@@ -180,7 +181,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -195,7 +196,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         getTemplateData: function() {
             const options = this.choices.slice(0);
@@ -210,7 +211,9 @@ define(function(require, exports, module) {
                 canDisable: this.canDisable,
                 selected: _.extend({}, this.emptyValue, this.value),
                 isEmpty: this.isEmpty(),
-                renderMode: this.renderMode
+                renderMode: this.renderMode,
+                criteriaClass: this.getExtraCriteriaClass(),
+                ...this.getCriteriaProperties()
             };
         },
 
@@ -255,7 +258,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         hide: function() {
             // when the filter has been opened and becomes invisible - close multiselect too
@@ -273,6 +276,7 @@ define(function(require, exports, module) {
          */
         _initializeSelectWidget: function() {
             const position = this._getSelectWidgetPosition();
+            const {selectOptionsListAriaLabel} = this.getCriteriaProperties();
 
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
@@ -314,7 +318,8 @@ define(function(require, exports, module) {
                         }
                     }, this),
                     appendTo: this._appendToContainer(),
-                    refreshNotOpened: this.templateTheme !== ''
+                    refreshNotOpened: this.templateTheme !== '',
+                    listAriaLabel: selectOptionsListAriaLabel
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch,
                 filterLabel: this.label
@@ -453,7 +458,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.call(this, newValue, oldValue);
@@ -463,7 +468,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(value) {
             this._setInputValue(this.inputSelector, value.value);
@@ -471,7 +476,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _readDOMValue: function() {
             return {
@@ -489,7 +494,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _isDOMValueChanged: function() {
             const thisDOMValue = this._readDOMValue();
@@ -498,6 +503,17 @@ define(function(require, exports, module) {
                 !_.isNull(thisDOMValue.value) &&
                 !_.isEqual(this.value, thisDOMValue)
             );
+        },
+
+        getCriteriaProperties() {
+            const data = SelectFilter.__super__.getCriteriaProperties.call(this);
+
+            return {
+                ...data,
+                selectOptionsListAriaLabel: __('oro.filter.select.options_list.aria_label', {
+                    label: this.label
+                })
+            };
         }
     });
 

@@ -40,7 +40,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RoleView(options) {
             RoleView.__super__.constructor.call(this, options);
@@ -70,7 +70,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

@@ -14,7 +14,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function StickyNoteSetupView(options) {
             StickyNoteSetupView.__super__.constructor.call(this, options);

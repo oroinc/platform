@@ -14,14 +14,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowchartJsPlumbOverlayView(options) {
             FlowchartJsPlumbOverlayView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!(options.areaView instanceof FlowchartJsPlumbAreaView)) {

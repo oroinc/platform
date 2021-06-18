@@ -23,14 +23,14 @@ define(function(require) {
         $clearButton: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function UniformFileInputWidgetView(options) {
             UniformFileInputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initializeWidget: function(options) {
             UniformFileInputWidgetView.__super__.initializeWidget.call(this, options);
@@ -51,7 +51,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disposeWidget: function() {
             this.getClearButton().off(this.eventNamespace());
@@ -90,7 +90,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         findContainer: function() {
             return this.$el.parent('.uploader');

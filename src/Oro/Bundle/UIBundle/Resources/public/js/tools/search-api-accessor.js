@@ -21,7 +21,7 @@ define(function(require) {
         DEFAULT_HTTP_METHOD: 'GET',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SearchApiAccessor(options) {
             SearchApiAccessor.__super__.constructor.call(this, options);
@@ -49,7 +49,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         prepareUrlParameters: function(urlParameters) {
             SearchApiAccessor.__super__.prepareUrlParameters.call(this, urlParameters);

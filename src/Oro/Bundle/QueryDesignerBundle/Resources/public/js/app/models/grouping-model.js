@@ -11,7 +11,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ColumnModel(...args) {
             ColumnModel.__super__.constructor.apply(this, args);

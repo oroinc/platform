@@ -21,14 +21,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SidebarWidgetContainerModel(attrs, options) {
             SidebarWidgetContainerModel.__super__.constructor.call(this, attrs, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this.stateSnapshot = this.get('state');

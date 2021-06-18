@@ -26,14 +26,14 @@ define(function(require) {
         removeBtn: '.removeRow.btn-link',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeGroupComponent(options) {
             AttributeGroupComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             AttributeGroupComponent.__super__.initialize.call(this, options);

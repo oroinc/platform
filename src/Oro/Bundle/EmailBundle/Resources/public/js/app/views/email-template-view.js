@@ -17,14 +17,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailTemplateView(options) {
             EmailTemplateView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function() {
             this.template = _.template($('#emailtemplate-chooser-template').html());

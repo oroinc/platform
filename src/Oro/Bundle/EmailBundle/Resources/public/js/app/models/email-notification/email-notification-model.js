@@ -26,7 +26,7 @@ define(function(require) {
         linkFromName: '',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailNotificationModel(...args) {
             EmailNotificationModel.__super__.constructor.apply(this, args);

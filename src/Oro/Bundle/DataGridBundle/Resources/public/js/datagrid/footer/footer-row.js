@@ -12,7 +12,7 @@ define([
         animationDuration: 0,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FooterRow(options) {
             FooterRow.__super__.constructor.call(this, options);
@@ -53,7 +53,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

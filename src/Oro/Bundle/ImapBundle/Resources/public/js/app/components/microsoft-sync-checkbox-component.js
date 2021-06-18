@@ -30,14 +30,14 @@ define(function(require) {
         ],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function MicrosoftSyncCheckbox(options) {
             MicrosoftSyncCheckbox.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.routeAccessToken = options.routeAccessToken;
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             $('form[name="microsoft_settings"] :input[id*="microsoft_settings_oro_microsoft_integration"]')

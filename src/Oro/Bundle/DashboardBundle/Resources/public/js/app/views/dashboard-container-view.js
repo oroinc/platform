@@ -45,7 +45,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardContainerView(options) {
             DashboardContainerView.__super__.constructor.call(this, options);

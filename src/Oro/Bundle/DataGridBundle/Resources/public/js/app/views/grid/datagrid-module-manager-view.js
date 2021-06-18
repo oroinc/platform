@@ -79,14 +79,14 @@ define(function(require, exports, module) {
         _defaultState: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridModuleManagerView(options) {
             DatagridModuleManagerView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!(options.columns instanceof Backgrid.Columns)) {
@@ -107,7 +107,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -121,7 +121,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function(options) {
             // index of first manageable column

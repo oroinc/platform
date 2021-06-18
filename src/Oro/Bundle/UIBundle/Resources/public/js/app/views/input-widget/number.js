@@ -27,7 +27,7 @@ define(function(require) {
         allowZero: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberInputWidgetView(options) {
             NumberInputWidgetView.__super__.constructor.call(this, options);

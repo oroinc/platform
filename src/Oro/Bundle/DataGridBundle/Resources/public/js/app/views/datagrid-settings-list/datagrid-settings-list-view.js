@@ -12,22 +12,22 @@ define(function(require) {
      */
     const DatagridSettingsListView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'dropdown-menu',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="datagrid-settings-select-all"]': 'onSelectAll',
@@ -37,7 +37,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change:renderable collection': 'onRenderableChange',
@@ -45,14 +45,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListView(options) {
             DatagridSettingsListView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             DatagridSettingsListView.__super__.initialize.call(this, options);
@@ -63,7 +63,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsListView.__super__.render.call(this);

@@ -7,7 +7,7 @@ define(function(require) {
     const EmailAttachmentContextView = BaseView.extend({
         optionNames: BaseView.prototype.optionNames.concat(['enableAttachmentSelector']),
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function EmailAttachmentContextView(options) {
             this.$enableAttachment = $(options.el).closest('form').find(options.enableAttachmentSelector);
@@ -16,7 +16,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             EmailAttachmentContextView.__super__.initialize.call(this, options);

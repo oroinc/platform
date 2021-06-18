@@ -12,7 +12,7 @@ define(function(require) {
         defaults: _.extend({}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DateTimePickerView(options) {
             DateTimePickerView.__super__.constructor.call(this, options);

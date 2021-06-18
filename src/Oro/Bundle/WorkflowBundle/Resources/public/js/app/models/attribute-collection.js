@@ -8,7 +8,7 @@ define(function(require) {
         model: AttributeModel,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function AttributeCollection(...args) {
             AttributeCollection.__super__.constructor.apply(this, args);

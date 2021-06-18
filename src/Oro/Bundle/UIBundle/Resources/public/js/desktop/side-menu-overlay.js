@@ -11,17 +11,17 @@ define(function(require) {
 
     const SideMenuOverlayView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         className: 'side-menu-overlay',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="overlay-close"]': 'close',
@@ -30,7 +30,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'page:beforeChange mediator': 'onBeforeChange',
@@ -44,7 +44,7 @@ define(function(require) {
         timeout: 100,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SideMenuOverlayView(options) {
             this.onSearch = _.debounce(this.onSearch, this.timeout);
@@ -52,14 +52,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             SideMenuOverlayView.__super__.render.call(this);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function(events) {
             SideMenuOverlayView.__super__.delegateEvents.call(this, events);
@@ -83,7 +83,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         undelegateEvents: function() {
             SideMenuOverlayView.__super__.undelegateEvents.call(this);
@@ -290,7 +290,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

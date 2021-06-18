@@ -14,14 +14,14 @@ define(function(require) {
 
     const DemoHelpCarouselView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         autoRender: true,
 
         className: 'help-carousel',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         template: template,
 
@@ -33,7 +33,7 @@ define(function(require) {
         expiredDelay: 1000 * 60 * 60 * 48,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click [data-role="close"]': 'onClose'
@@ -44,14 +44,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DemoHelpCarouselView(options) {
             DemoHelpCarouselView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -77,7 +77,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DemoHelpCarouselView.__super__.render.call(this);

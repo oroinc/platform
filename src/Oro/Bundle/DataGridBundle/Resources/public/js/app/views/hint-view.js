@@ -17,7 +17,7 @@ define(function(require) {
 
     const HintView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         noWrap: true,
 
@@ -32,14 +32,14 @@ define(function(require) {
         textEl: '[data-grid-header-cell-text]',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HintView(options) {
             HintView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const whiteList = ['offsetOfEl', 'textEl', 'popoverConfig'];
@@ -107,7 +107,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

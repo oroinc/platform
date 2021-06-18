@@ -18,7 +18,7 @@ define(function(require) {
         wrapHintValue: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function NumberFilter(options) {
             NumberFilter.__super__.constructor.call(this, options);
@@ -45,7 +45,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -65,7 +65,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatRawValue: function(value) {
             const formatted = _.clone(value);
@@ -76,7 +76,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _formatDisplayValue: function(value) {
             const formatted = _.clone(value);
@@ -153,7 +153,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _writeDOMValue: function(data) {
             this._initInputWidget();
@@ -162,7 +162,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {boolean}
          * @private
          */

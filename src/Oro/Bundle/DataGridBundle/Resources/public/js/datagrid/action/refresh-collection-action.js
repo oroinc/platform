@@ -15,7 +15,7 @@ define([
         collection: undefined,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function RefreshCollectionAction(options) {
             RefreshCollectionAction.__super__.constructor.call(this, options);

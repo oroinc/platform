@@ -15,14 +15,14 @@ define(function(require) {
         minVisibleColumnsQuantity: 1,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListCollection(...args) {
             DatagridSettingsListCollection.__super__.constructor.apply(this, args);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(models, options) {
             _.extend(this, _.pick(options, ['minVisibleColumnsQuantity']));
@@ -35,7 +35,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         reset: function(...args) {
             DatagridSettingsListCollection.__super__.reset.apply(this, args);

@@ -30,7 +30,7 @@ define(function(require, exports, module) {
         fallbackSelector: config.fallbackSelector,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         events: {
             'click tbody tr [data-role=moveUp]': 'onMoveUp',
@@ -38,7 +38,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         listen: {
             'change collection': 'filter',
@@ -66,14 +66,14 @@ define(function(require, exports, module) {
         addSorting: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatagridSettingsListCollectionView(options) {
             DatagridSettingsListCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             _.extend(this, _.pick(options, ['orderShift', 'filterModel', 'addSorting']));
@@ -86,7 +86,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             this.listenTo(this.filterModel, 'change', this.filter);
@@ -94,7 +94,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             DatagridSettingsListCollectionView.__super__.render.call(this);
@@ -114,7 +114,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          * @returns {*}
          */
         getTemplateData: function() {
@@ -209,7 +209,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         toggleFallback: function() {
             const hasVisibleItems = Boolean(this.visibleItems.length);

@@ -13,7 +13,7 @@ define(function(require) {
 
     const HighlightTextView = BaseView.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         optionNames: BaseView.prototype.optionNames.concat([
             'text', 'toggleSelectors', 'viewGroup', 'notFoundClass',
@@ -121,14 +121,14 @@ define(function(require) {
         viewGroup: '',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HighlightTextView(options) {
             HighlightTextView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.findHighlightClass = '.' + this.highlightClass;
@@ -147,7 +147,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             this.clear();

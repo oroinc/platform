@@ -7,7 +7,7 @@ define(function(require) {
 
     const PasswordGenerateComponent = BaseComponent.extend({
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PasswordGenerateComponent(options) {
             PasswordGenerateComponent.__super__.constructor.call(this, options);

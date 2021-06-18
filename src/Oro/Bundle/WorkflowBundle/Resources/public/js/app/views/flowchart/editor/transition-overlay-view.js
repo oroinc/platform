@@ -13,14 +13,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function FlowChartEditorTransitionOverlayView(options) {
             FlowChartEditorTransitionOverlayView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.stepFrom = options.stepFrom;

@@ -58,7 +58,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DatetimeFilter(options) {
             DatetimeFilter.__super__.constructor.call(this, options);
@@ -103,16 +103,32 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
-        _getPickerConfigurationOptions: function(options) {
-            DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
-            _.extend(options, {
+        _getPickerConfigurationOptions: function(optionsToMerge, parameters) {
+            DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, optionsToMerge, parameters);
+
+            const {startTimeFieldAriaLabel, endTimeFieldAriaLabel} = this.getCriteriaProperties();
+            const labelsMap = {
+                start: startTimeFieldAriaLabel,
+                end: endTimeFieldAriaLabel
+            };
+            let ariaLabel = null;
+
+            if (labelsMap[parameters.criteriaValueName]) {
+                ariaLabel = labelsMap[parameters.criteriaValueName];
+            }
+
+            _.extend(optionsToMerge, {
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
                 timezone: 'UTC',
-                timeInputAttrs: config.timeInputAttrs
+                timeInputAttrs: {
+                    'aria-label': ariaLabel,
+                    ...config.timeInputAttrs
+                }
             });
-            return options;
+
+            return optionsToMerge;
         },
 
         /**
@@ -158,7 +174,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (this.isUpdatable(newValue, oldValue)) {
@@ -189,6 +205,20 @@ define(function(require, exports, module) {
             } else {
                 this.$('.timepicker-input').addClass('hide');
             }
+        },
+
+        getCriteriaProperties() {
+            const data = DatetimeFilter.__super__.getCriteriaProperties.call(this);
+
+            return {
+                ...data,
+                startTimeFieldAriaLabel: __('oro.filter.datetime.start_field.aria_label', {
+                    label: this.label
+                }),
+                endTimeFieldAriaLabel: __('oro.filter.datetime.end_field.aria_label', {
+                    label: this.label
+                })
+            };
         }
     });
 

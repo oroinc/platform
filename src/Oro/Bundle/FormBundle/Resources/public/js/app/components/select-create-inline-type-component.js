@@ -10,14 +10,14 @@ define(function(require) {
         ViewConstructor: SelectCreateInlineTypeView,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function SelectCreateInlineTypeComponent(options) {
             SelectCreateInlineTypeComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             SelectCreateInlineTypeComponent.__super__.initialize.call(this, options);

@@ -24,14 +24,14 @@ define(function(require, exports, module) {
         tempFavicon: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function HighlighterFavicon(options) {
             HighlighterFavicon.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             const names = _.keys(defaults);
@@ -42,7 +42,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

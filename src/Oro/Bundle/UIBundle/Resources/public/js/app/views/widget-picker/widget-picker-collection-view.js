@@ -10,14 +10,14 @@ define(function(require) {
         isWidgetLoadingInProgress: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function WidgetPickerCollectionView(options) {
             WidgetPickerCollectionView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             if (!options.loadWidget) {
@@ -32,7 +32,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateListeners: function() {
             this.listenTo(this.filterModel, 'change', this.filter);
@@ -40,7 +40,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initItemView: function(model) {
             const view = WidgetPickerCollectionView.__super__.initItemView.call(this, model);

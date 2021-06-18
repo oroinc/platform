@@ -47,14 +47,14 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ContentSidebarView(options) {
             ContentSidebarView.__super__.constructor.call(this, options);
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         initialize: function(options) {
             if (this.resizableSidebar) {
@@ -67,7 +67,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * {@inheritDoc}
+         * @inheritdoc
          */
         render: function() {
             if (this.fixSidebarHeight && !tools.isMobile()) {
@@ -146,7 +146,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.pluginManager) {

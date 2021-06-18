@@ -27,14 +27,14 @@ define(function(require) {
         $websiteSelect: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2AutocompleteEnabledLocalizationComponent(options) {
             Select2AutocompleteEnabledLocalizationComponent.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
@@ -46,7 +46,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         makeQuery: function(query) {
             return [query, this.$websiteSelect.val()].join(this.options.delimiter);

@@ -23,7 +23,7 @@ define(function(request) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ReportChartView(options) {
             const $el = $(options.el);

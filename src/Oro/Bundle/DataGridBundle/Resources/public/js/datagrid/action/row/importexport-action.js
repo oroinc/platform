@@ -33,14 +33,14 @@ define([
         importExportManager: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ImportExportAction(options) {
             ImportExportAction.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             ImportExportAction.__super__.initialize.call(this, options);
@@ -63,7 +63,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         execute: function() {
             switch (this.type) {

@@ -530,7 +530,7 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         destroy: function() {
             // this.resetForm(); -- original reset form is to heavy,

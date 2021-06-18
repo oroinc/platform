@@ -18,7 +18,7 @@ define(function(require) {
         domCache: null,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(grid, options) {
             _.extend(this, _.pick(options || {}, ['viewport']));
@@ -34,14 +34,14 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         eventNamespace: function() {
             return StickedScrollbarPlugin.__super__.eventNamespace.call(this) + '.stickedScrollbar';
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         enable: function() {
             if (this.enabled || !this.grid.rendered || !this.isApplicable(viewportManager.getViewport())) {
@@ -73,7 +73,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         disable: function() {
             if (!this.enabled) {
@@ -87,7 +87,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

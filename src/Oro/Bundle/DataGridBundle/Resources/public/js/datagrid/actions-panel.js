@@ -22,7 +22,7 @@ define(function(require) {
         launchers: [],
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ActionsPanel(options) {
             ActionsPanel.__super__.constructor.call(this, options);
@@ -46,7 +46,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {

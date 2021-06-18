@@ -38,14 +38,14 @@ define(function(require) {
         destroyOptions: 'destroy',
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2InputWidgetView(options) {
             Select2InputWidgetView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             // fix select2.each2 bug, when empty string is FALSE

@@ -156,7 +156,7 @@ define([
         onePagePagination: false,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function PageableCollection(...args) {
             PageableCollection.__super__.constructor.apply(this, args);
@@ -427,7 +427,7 @@ define([
 
         /**
          * Method is overridden to have in collection models with not unique id
-         * @inheritDoc
+         * @inheritdoc
          */
         // Update a collection by `set`-ing a new list of models, adding new ones,
         // removing models that are no longer present, and merging models that
@@ -573,7 +573,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         _checkState: function(state) {
             const mode = this.mode;

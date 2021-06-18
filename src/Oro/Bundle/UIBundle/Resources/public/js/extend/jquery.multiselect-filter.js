@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes');
+    const KEY_CODES = require('oroui/js/tools/keyboard-key-codes').default;
     require('jquery-ui/widget');
     require('jquery.multiselect.filter');
 

@@ -44,14 +44,14 @@ define(function(require) {
         delay: 50,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function ExpressionEditorView(options) {
             ExpressionEditorView.__super__.constructor.call(this, options);
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         initialize: function(options) {
             this.util = new ExpressionEditorUtil(options);
@@ -88,7 +88,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         dispose: function() {
             if (this.disposed) {
@@ -109,7 +109,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         delegateEvents: function(events) {
             const result = ExpressionEditorView.__super__.delegateEvents.call(this, events);

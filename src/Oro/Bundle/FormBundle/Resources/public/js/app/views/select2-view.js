@@ -19,7 +19,7 @@ define(function(require) {
         autoRender: true,
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2View(options) {
             Select2View.__super__.constructor.call(this, options);

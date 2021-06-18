@@ -12,7 +12,7 @@ define(function(require) {
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function Select2ValidationMessageHandlerView(options) {
             Select2ValidationMessageHandlerView.__super__.constructor.call(this, options);

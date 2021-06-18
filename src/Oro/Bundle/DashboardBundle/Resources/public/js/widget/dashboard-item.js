@@ -66,7 +66,7 @@ define([
         }),
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         constructor: function DashboardItemWidget(options) {
             DashboardItemWidget.__super__.constructor.call(this, options);
@@ -94,7 +94,7 @@ define([
         },
 
         /**
-         * @inheritDoc
+         * @inheritdoc
          */
         render: function() {
             if (!this.state.expanded) {
