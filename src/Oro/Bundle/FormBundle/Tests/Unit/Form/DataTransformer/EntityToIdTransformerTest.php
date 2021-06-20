@@ -18,18 +18,20 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
+
+    protected function setUp(): void
+    {
+        $this->entityManager = $this->createMock(EntityManager::class);
+    }
 
     /**
      * @dataProvider transformDataProvider
-     *
-     * @param string $property
-     * @param mixed $value
-     * @param mixed $expectedValue
      */
-    public function testTransform($property, $value, $expectedValue)
+    public function testTransform(string $property, $value, $expectedValue)
     {
-        $transformer = new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', $property, null);
+        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', $property, null);
         $this->assertEquals($expectedValue, $transformer->transform($value));
     }
 
@@ -38,7 +40,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         return [
             'default' => [
                 'id',
-                $this->createMockEntity('id', 1),
+                $this->createEntity(1),
                 1
             ],
             'empty' => [
@@ -54,19 +56,19 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "object", "string" given');
 
-        $transformer = new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
+        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', null);
         $transformer->transform('invalid value');
     }
 
     public function testReverseTransformEmpty()
     {
-        $transformer = new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', null);
+        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', null);
         $this->assertNull($transformer->reverseTransform(''));
     }
 
     public function testReverseTransform()
     {
-        $entity = $this->createMockEntity('id', 1);
+        $entity = $this->createEntity(1);
 
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
@@ -107,7 +109,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformQueryBuilder()
     {
-        $entity = $this->createMockEntity('id', 1);
+        $entity = $this->createEntity(1);
 
         $repository = $this->createMock(EntityRepository::class);
 
@@ -177,7 +179,7 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "NULL" given');
 
-        $entity = $this->createMockEntity('id', 1);
+        $entity = $this->createEntity(1);
 
         $repository = $this->createMock(EntityRepository::class);
 
@@ -233,35 +235,17 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "callable", "string" given');
 
-        new EntityToIdTransformer($this->getMockEntityManager(), 'TestClass', 'id', 'uncallable');
+        new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', 'uncallable');
     }
 
-    /**
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMockEntityManager()
+    private function createEntity(int $id): \stdClass
     {
-        if (!$this->entityManager) {
-            $this->entityManager = $this->createMock(EntityManager::class);
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * Create mock entity by id property name and value
-     *
-     * @param string $property
-     * @param mixed $value
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createMockEntity($property, $value)
-    {
-        $getter = 'get' . ucfirst($property);
-        $result = $this->getMockBuilder(\stdClass::class)->setMethods([$getter])->getMock();
+        $result = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $result->expects($this->any())
-            ->method($getter)
-            ->willReturn($value);
+            ->method('getId')
+            ->willReturn($id);
 
         return $result;
     }

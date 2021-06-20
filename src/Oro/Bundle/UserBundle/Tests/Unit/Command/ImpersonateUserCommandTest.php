@@ -12,11 +12,10 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\Testing\Command\CommandTestingTrait;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Console\Tester\CommandTester;
 
-class ImpersonateUserCommandTest extends TestCase
+class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
 {
     use CommandTestingTrait;
 
@@ -73,7 +72,7 @@ class ImpersonateUserCommandTest extends TestCase
 
         $this->assertProducedError(
             $commandTester,
-            \sprintf('User with username "%s" does not exist.', static::USERNAME)
+            \sprintf('User with username "%s" does not exist.', self::USERNAME)
         );
     }
 
@@ -85,17 +84,15 @@ class ImpersonateUserCommandTest extends TestCase
 
         $this->assertProducedError(
             $commandTester,
-            \sprintf('Unsupported user type, the user "%s" cannot be impersonated.', static::USERNAME)
+            \sprintf('Unsupported user type, the user "%s" cannot be impersonated.', self::USERNAME)
         );
     }
 
-    //region Setup and helpers
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
 
-        /** @noinspection PhpParamsInspection */
         $this->command = new ImpersonateUserCommand(
             $this->managerRegistry,
             $this->createMock(Router::class),
@@ -110,43 +107,44 @@ class ImpersonateUserCommandTest extends TestCase
         string $authStatusId = null,
         string $userClass = null,
         bool $nullUserStub = null,
-        $userStub = null
+        object $userStub = null
     ) {
         if (null === $userStub && true !== $nullUserStub) {
-            /** @var User|\PHPUnit\Framework\MockObject\MockObject $userStub */
             $userStub = $this->getMockBuilder($userClass ?? User::class)
                 ->disableOriginalConstructor()
-                ->setMethods(['getAuthStatus', 'isEnabled'])
+                ->onlyMethods(['isEnabled'])
+                ->addMethods(['getAuthStatus'])
                 ->getMock();
-            $userStub->method('isEnabled')
+            $userStub->expects($this->any())
+                ->method('isEnabled')
                 ->willReturn($userEnabled ?? true);
-            $userStub->method('getAuthStatus')
+            $userStub->expects($this->any())
+                ->method('getAuthStatus')
                 ->willReturn(new TestEnumValue(
                     $authStatusId ?? UserManager::STATUS_ACTIVE,
                     $authStatusId ?? UserManager::STATUS_ACTIVE
                 ));
         }
-        $this->userManager->method('findUserByUsername')
+        $this->userManager->expects($this->any())
+            ->method('findUserByUsername')
             ->willReturn($userStub);
 
         $managerStub = $this->createMock(EntityManager::class);
-        $this->managerRegistry->method('getManagerForClass')
+        $this->managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
             ->willReturn($managerStub);
     }
 
     private function executeCommand(): CommandTester
     {
         return $this->doExecuteCommand($this->command, [
-            'username' => static::USERNAME,
+            'username' => self::USERNAME,
         ]);
     }
-    //endregion
 
-    //region Assertions
     private function assertReturnsSuccessAndSuggestsUrl(CommandTester $commandTester)
     {
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains($commandTester, 'open the following URL');
     }
-    //endregion
 }

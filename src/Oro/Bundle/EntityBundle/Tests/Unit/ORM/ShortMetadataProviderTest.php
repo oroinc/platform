@@ -12,28 +12,19 @@ use Oro\Bundle\EntityBundle\ORM\ShortMetadataProvider;
 
 class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|AbstractClassMetadataFactory
-     */
-    private function getClassMetadataFactory()
-    {
-        return $this->getMockBuilder(AbstractClassMetadataFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getCacheDriver', 'getAllMetadata'])
-            ->getMockForAbstractClass();
-    }
-
     public function testGetAllShortMetadataWithEmptyCache()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->getClassMetadataFactory();
+        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
         $cacheDriver = $this->createMock(Cache::class);
 
         $metadata1 = new ClassMetadata('Test\Entity1');
         $metadata2 = new ClassMetadata('Test\Entity2');
         $metadata2->isMappedSuperclass = true;
         $metadata3 = $this->createMock(ClassMetadataInterface::class);
-        $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
+        $metadata3->expects($this->once())
+            ->method('getName')
+            ->willReturn('Test\Entity3');
         $metadata11 = new ClassMetadata('Test\Entity11');
 
         $expectedResult = [
@@ -81,7 +72,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetAllShortMetadataWhenDataExistInCache()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->getClassMetadataFactory();
+        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
         $cacheDriver = $this->createMock(Cache::class);
 
         $expectedResult = [
@@ -125,13 +116,15 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetAllShortMetadataWithoutCache()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->getClassMetadataFactory();
+        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
 
         $metadata1 = new ClassMetadata('Test\Entity1');
         $metadata2 = new ClassMetadata('Test\Entity2');
         $metadata2->isMappedSuperclass = true;
         $metadata3 = $this->createMock(ClassMetadataInterface::class);
-        $metadata3->expects($this->once())->method('getName')->willReturn('Test\Entity3');
+        $metadata3->expects($this->once())
+            ->method('getName')
+            ->willReturn('Test\Entity3');
         $metadata11 = new ClassMetadata('Test\Entity11');
 
         $expectedResult = [
@@ -167,7 +160,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsRequested()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->getClassMetadataFactory();
+        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
         $cacheDriver = $this->createMock(Cache::class);
 
         $manager->expects($this->any())
@@ -197,7 +190,7 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetAllShortMetadataWhenLoadMetadataThrowsExceptionIgnoreExceptionsIsNotRequested()
     {
         $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->getClassMetadataFactory();
+        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
         $cacheDriver = $this->createMock(Cache::class);
 
         $exception = new \ReflectionException('some exception');
