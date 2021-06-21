@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Tests\Unit\Entity;
 use Oro\Bundle\AddressBundle\Entity\AbstractAddress;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -13,54 +13,41 @@ use Oro\Component\Testing\Unit\EntityTrait;
  */
 class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, $value)
     {
         $address = $this->createAddress();
 
-        call_user_func_array(array($address, 'set' . ucfirst($property)), array($value));
-        $this->assertEquals($value, call_user_func_array(array($address, 'get' . ucfirst($property)), array()));
+        call_user_func_array([$address, 'set' . ucfirst($property)], [$value]);
+        $this->assertEquals($value, call_user_func_array([$address, 'get' . ucfirst($property)], []));
     }
 
-    /**
-     * Data provider with entity properties
-     *
-     * @return array
-     */
-    public function propertiesDataProvider()
+    public function propertiesDataProvider(): array
     {
-        $countryMock = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
-
+        $country = $this->createMock(Country::class);
+        $region = $this->createMock(Region::class);
         $createdDateTime = new \DateTime();
 
-        return array(
-            'country'      => array('country', $countryMock),
-            'city'         => array('city', 'city'),
-            'created'      => array('created', $createdDateTime),
-            'firstName'    => array('firstName', 'first_name'),
-            'label'        => array('label', 'Shipping'),
-            'lastName'     => array('lastName', 'last name'),
-            'middleName'   => array('middleName', 'middle name'),
-            'namePrefix'   => array('namePrefix', 'name prefix'),
-            'nameSuffix'   => array('nameSuffix', 'name suffix'),
-            'organization' => array('organization', 'Oro Inc.'),
-            'postalCode'   => array('postalCode', '12345'),
-            'region'       => array('region', $regionMock),
-            'regionText'   => array('regionText', 'test region'),
-            'street'       => array('street', 'street'),
-            'street2'      => array('street2', 'street2'),
-            'updated'      => array('updated', $createdDateTime),
-        );
+        return [
+            'country'      => ['country', $country],
+            'city'         => ['city', 'city'],
+            'created'      => ['created', $createdDateTime],
+            'firstName'    => ['firstName', 'first_name'],
+            'label'        => ['label', 'Shipping'],
+            'lastName'     => ['lastName', 'last name'],
+            'middleName'   => ['middleName', 'middle name'],
+            'namePrefix'   => ['namePrefix', 'name prefix'],
+            'nameSuffix'   => ['nameSuffix', 'name suffix'],
+            'organization' => ['organization', 'Oro Inc.'],
+            'postalCode'   => ['postalCode', '12345'],
+            'region'       => ['region', $region],
+            'regionText'   => ['regionText', 'test region'],
+            'street'       => ['street', 'street'],
+            'street2'      => ['street2', 'street2'],
+            'updated'      => ['updated', $createdDateTime],
+        ];
     }
 
     public function testBeforeSave()
@@ -98,12 +85,10 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('New York', $address->getRegionName());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Region $region */
-        $region = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Region')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getName'))
-            ->getMock();
-        $region->expects($this->once())->method('getName')->will($this->returnValue('California'));
+        $region = $this->createMock(Region::class);
+        $region->expects($this->once())
+            ->method('getName')
+            ->willReturn('California');
         $address->setRegion($region);
 
         $this->assertEquals('California', $address->getRegionName());
@@ -115,12 +100,10 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('', $address->getRegionCode());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Region $region */
-        $region = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Region')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getCode'))
-            ->getMock();
-        $region->expects($this->once())->method('getCode')->will($this->returnValue('CA'));
+        $region = $this->createMock(Region::class);
+        $region->expects($this->once())
+            ->method('getCode')
+            ->willReturn('CA');
         $address->setRegion($region);
 
         $this->assertEquals('CA', $address->getRegionCode());
@@ -132,12 +115,10 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('', $address->getCountryName());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getName'))
-            ->getMock();
-        $country->expects($this->once())->method('getName')->will($this->returnValue('USA'));
+        $country = $this->createMock(Country::class);
+        $country->expects($this->once())
+            ->method('getName')
+            ->willReturn('USA');
         $address->setCountry($country);
 
         $this->assertEquals('USA', $address->getCountryName());
@@ -149,12 +130,10 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('', $address->getCountryIso2());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getIso2Code'))
-            ->getMock();
-        $country->expects($this->once())->method('getIso2Code')->will($this->returnValue('US'));
+        $country = $this->createMock(Country::class);
+        $country->expects($this->once())
+            ->method('getIso2Code')
+            ->willReturn('US');
         $address->setCountry($country);
 
         $this->assertEquals('US', $address->getCountryIso2());
@@ -166,12 +145,10 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals('', $address->getCountryIso2());
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Country $country */
-        $country = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getIso3Code'))
-            ->getMock();
-        $country->expects($this->once())->method('getIso3Code')->will($this->returnValue('USA'));
+        $country = $this->createMock(Country::class);
+        $country->expects($this->once())
+            ->method('getIso3Code')
+            ->willReturn('USA');
         $address->setCountry($country);
 
         $this->assertEquals('USA', $address->getCountryIso3());
@@ -180,7 +157,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider toStringDataProvider
      */
-    public function testToString(array $actualData, $expected)
+    public function testToString(array $actualData, string $expected)
     {
         $address = $this->createAddress();
 
@@ -193,75 +170,61 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $address->__toString());
     }
 
-    /**
-     * @return array
-     */
-    public function toStringDataProvider()
+    public function toStringDataProvider(): array
     {
-        return array(
-            array(
-                array(
+        return [
+            [
+                [
                     'firstName' => 'FirstName',
                     'lastName' => 'LastName',
                     'street' => 'Street',
-                    'region' => $this->createMockRegion('some region'),
+                    'region' => $this->getRegion('some region'),
                     'postalCode' => '12345',
-                    'country' => $this->createMockCountry('Ukraine'),
-                ),
+                    'country' => $this->getCountry('Ukraine'),
+                ],
                 'FirstName LastName , Street   some region , Ukraine 12345'
-            ),
-            array(
-                array(
+            ],
+            [
+                [
                     'firstName' => '',
                     'lastName' => 'LastName',
                     'street' => 'Street',
-                    'region' => $this->createMockRegion('some region'),
+                    'region' => $this->getRegion('some region'),
                     'postalCode' => '',
-                    'country' => $this->createMockCountry('Ukraine'),
-                ),
+                    'country' => $this->getCountry('Ukraine'),
+                ],
                 'LastName , Street   some region , Ukraine'
-            ),
-            array(
-                array(
+            ],
+            [
+                [
                     'firstName' => '',
                     'lastName' => '',
                     'street' => '',
                     'region' => '',
                     'postalCode' => '',
                     'country' => '',
-                ),
+                ],
                 ''
-            ),
-        );
+            ],
+        ];
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createMockCountry($name)
+    private function getCountry(string $name): Country
     {
-        $result = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $result = $this->createMock(Country::class);
         $result->expects($this->any())
             ->method('__toString')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $result;
     }
 
-    /**
-     * @param string $name
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createMockRegion($name)
+    private function getRegion(string $name): Region
     {
-        $result = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
+        $result = $this->createMock(Region::class);
         $result->expects($this->any())
             ->method('__toString')
-            ->will($this->returnValue($name));
+            ->willReturn($name);
 
         return $result;
     }
@@ -270,10 +233,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
     {
         $address = $this->createAddress();
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Region $region */
-        $region = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Region')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $region = $this->createMock(Region::class);
         $address->setRegion($region);
         $this->assertEquals($region, $address->getRegion());
         $address->setRegionText('text region');
@@ -288,81 +248,60 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider emptyCheckPropertiesDataProvider
-     * @param string $property
-     * @param mixed $value
     */
-    public function testIsNotEmpty($property, $value)
+    public function testIsNotEmpty(string $property, $value)
     {
         $address = $this->createAddress();
-        call_user_func_array(array($address, 'set' . ucfirst($property)), array($value));
+        call_user_func_array([$address, 'set' . ucfirst($property)], [$value]);
         $this->assertFalse($address->isEmpty());
     }
 
-    /**
-     * Data provider with entity properties
-     *
-     * @return array
-     */
-    public function emptyCheckPropertiesDataProvider()
+    public function emptyCheckPropertiesDataProvider(): array
     {
-        $countryMock = $this->getMockBuilder('Oro\Bundle\AddressBundle\Entity\Country')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $regionMock = $this->createMock('Oro\Bundle\AddressBundle\Entity\Region');
-        return array(
-            'lastName' => array('lastName', 'last name'),
-            'firstName' => array('firstName', 'first_name'),
-            'street' => array('street', 'street'),
-            'street2' => array('street2', 'street2'),
-            'city' => array('city', 'city'),
-            'region' => array('region', $regionMock),
-            'regionText' => array('regionText', 'test region'),
-            'postalCode' => array('postalCode', '12345'),
-            'country' => array('country', $countryMock),
-        );
+        $country = $this->createMock(Country::class);
+        $region = $this->createMock(Region::class);
+
+        return [
+            'lastName' => ['lastName', 'last name'],
+            'firstName' => ['firstName', 'first_name'],
+            'street' => ['street', 'street'],
+            'street2' => ['street2', 'street2'],
+            'city' => ['city', 'city'],
+            'region' => ['region', $region],
+            'regionText' => ['regionText', 'test region'],
+            'postalCode' => ['postalCode', '12345'],
+            'country' => ['country', $country],
+        ];
     }
 
     /**
      * @dataProvider isEqualDataProvider
-     *
-     * @param AbstractAddress $one
-     * @param mixed $two
-     * @param bool $expectedResult
      */
-    public function testIsEqual(AbstractAddress $one, $two, $expectedResult)
+    public function testIsEqual(AbstractAddress $one, ?AbstractAddress $two, bool $expectedResult)
     {
         $this->assertEquals($expectedResult, $one->isEqual($two));
     }
 
-    /**
-     * @return array
-     */
-    public function isEqualDataProvider()
+    public function isEqualDataProvider(): array
     {
         $one = $this->createAddress();
 
-        return array(
-            array($one, $one, true),
-            array($this->createAddress(100), $this->createAddress(100), true),
-            array($this->createAddress(), $this->createAddress(), false),
-            array($this->createAddress(100), $this->createAddress(), false),
-            array($this->createAddress(), null, false),
-        );
+        return [
+            [$one, $one, true],
+            [$this->createAddress(100), $this->createAddress(100), true],
+            [$this->createAddress(), $this->createAddress(), false],
+            [$this->createAddress(100), $this->createAddress(), false],
+            [$this->createAddress(), null, false],
+        ];
     }
 
-    /**
-     * @param int|null $id
-     * @return AbstractAddress|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function createAddress($id = null)
+    private function createAddress(int $id = null): AbstractAddress
     {
-        /** @var AbstractAddress $result */
-        $result = $this->getMockForAbstractClass('Oro\Bundle\AddressBundle\Entity\AbstractAddress');
-
+        $address = $this->getMockForAbstractClass(AbstractAddress::class);
         if (null !== $id) {
-            $this->setValue($result, 'id', $id);
+            ReflectionUtil::setId($address, $id);
         }
 
-        return $result;
+        return $address;
     }
 }

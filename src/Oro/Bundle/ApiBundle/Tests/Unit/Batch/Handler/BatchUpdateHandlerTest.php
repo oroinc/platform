@@ -35,11 +35,11 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $this->processor = $this->getMockBuilder(BatchUpdateProcessor::class)
             ->disableOriginalConstructor()
-            ->setMethods(['process'])
+            ->onlyMethods(['process'])
             ->getMock();
         $this->itemProcessor = $this->getMockBuilder(BatchUpdateItemProcessor::class)
             ->disableOriginalConstructor()
-            ->setMethods(['process'])
+            ->onlyMethods(['process'])
             ->getMock();
         $this->fileManager = $this->createMock(FileManager::class);
 

@@ -6,14 +6,13 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ContextAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ContextAccessor
-     */
-    protected $contextAccessor;
+    /** @var ContextAccessor */
+    private $contextAccessor;
 
     protected function setUp(): void
     {
@@ -31,10 +30,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $this->contextAccessor->getValue($context, $value));
     }
 
-    /**
-     * @return array
-     */
-    public function getValueDataProvider()
+    public function getValueDataProvider(): array
     {
         return [
             'get_simple_value' => [
@@ -48,17 +44,17 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
                 'expectedValue' => 'bar'
             ],
             'get_property_from_object' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'value' => new PropertyPath('foo'),
                 'expectedValue' => 'bar'
             ],
             'get_nested_property_from_object' => [
-                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
                 'value' => new PropertyPath('foo.bar'),
                 'expectedValue' => 'baz'
             ],
             'get_unknown_property' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'value' => new PropertyPath('baz'),
                 'expectedValue' => null
             ],
@@ -80,52 +76,49 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $actualValue);
     }
 
-    /**
-     * @return array
-     */
-    public function setValueDataProvider()
+    public function setValueDataProvider(): array
     {
         return [
             'set_simple_new_property' => [
-                'context' => $this->createObject([]),
+                'context' => new ItemStub([]),
                 'property' => new PropertyPath('test'),
                 'value' => 'value',
                 'expectedValue' => 'value'
             ],
             'set_simple_existing_property_text_path' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'property' => new PropertyPath('foo'),
                 'value' => 'test',
                 'expectedValue' => 'test'
             ],
             'set_existing_property_to_new' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'property' => new PropertyPath('test'),
                 'value' => new PropertyPath('foo'),
                 'expectedValue' => 'bar'
             ],
             'set_existing_property_to_existing' => [
-                'context' => $this->createObject(['foo' => 'bar', 'test' => 'old']),
+                'context' => new ItemStub(['foo' => 'bar', 'test' => 'old']),
                 'property' => new PropertyPath('test'),
                 'value' => new PropertyPath('foo'),
                 'expectedValue' => 'bar'
             ],
             'nested_property_from_object_to_new' => [
-                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
                 'property' => new PropertyPath('test'),
                 'value' => new PropertyPath('foo.bar'),
                 'expectedValue' => 'baz'
             ],
             'nested_property_from_object_to_existing' => [
-                'context' => $this->createObject(
-                    ['test' => 'old', 'foo' => $this->createObject(['bar' => 'baz'])]
+                'context' => new ItemStub(
+                    ['test' => 'old', 'foo' => new ItemStub(['bar' => 'baz'])]
                 ),
                 'property' => new PropertyPath('test'),
                 'value' => new PropertyPath('foo.bar'),
                 'expectedValue' => 'baz'
             ],
             'unknown_property' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'property' => new PropertyPath('test'),
                 'value' => new PropertyPath('baz'),
                 'expectedValue' => null
@@ -147,39 +140,36 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $actualValue);
     }
 
-    /**
-     * @return array
-     */
-    public function hasValueDataProvider()
+    public function hasValueDataProvider(): array
     {
         return [
             'not_has' => [
-                'context' => $this->createObject([]),
+                'context' => new ItemStub([]),
                 'value' => new PropertyPath('test'),
                 'expectedValue' => false
             ],
             'not_has_nested' => [
-                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
                 'value' => new PropertyPath('data[foo].baz'),
                 'expectedValue' => false
             ],
             'has_as_array_syntax' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'value' => new PropertyPath('data[foo]'),
                 'expectedValue' => true
             ],
             'has_as_object_syntax' => [
-                'context' => $this->createObject(['foo' => 'bar']),
+                'context' => new ItemStub(['foo' => 'bar']),
                 'value' => new PropertyPath('data[foo]'),
                 'expectedValue' => true
             ],
             'has_nested' => [
-                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
                 'value' => new PropertyPath('data[foo].data'),
                 'expectedValue' => true
             ],
             'has_nested_nested' => [
-                'context' => $this->createObject(['foo' => $this->createObject(['bar' => 'baz'])]),
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
                 'value' => new PropertyPath('data[foo].data.bar'),
                 'expectedValue' => true
             ],
@@ -188,13 +178,10 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueNoSuchProperty()
     {
-        $context = $this->createObject([]);
+        $context = new ItemStub([]);
         $value = new PropertyPath('test');
 
-        $propertyAccessor = $this->getMockBuilder('Symfony\Component\PropertyAccess\PropertyAccessor')
-            ->disableOriginalConstructor()
-            ->setMethods(['getValue'])
-            ->getMock();
+        $propertyAccessor = $this->createMock(PropertyAccessor::class);
         $propertyAccessor->expects($this->once())
             ->method('getValue')
             ->with($context, $value)
@@ -203,15 +190,5 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
         ReflectionUtil::setPropertyValue($this->contextAccessor, 'propertyAccessor', $propertyAccessor);
 
         $this->assertNull($this->contextAccessor->getValue($context, $value));
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return ItemStub
-     */
-    protected function createObject(array $data)
-    {
-        return new ItemStub($data);
     }
 }

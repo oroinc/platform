@@ -5,6 +5,8 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -12,42 +14,35 @@ use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OrmManyRelationBuilderTest extends OrmTestCase
 {
-    const NS = 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\\';
+    private const NS = 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\\';
 
     /** @var EntityManagerMock */
-    protected $em;
+    private $em;
 
     /** @var OrmManyRelationBuilder */
-    protected $builder;
+    private $builder;
 
     /** @var int */
-    protected $paramIndex;
+    private $paramIndex;
 
     protected function setUp(): void
     {
-        $reader         = new AnnotationReader();
-        $metadataDriver = new AnnotationDriver(
-            $reader,
-            'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
-        );
-
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl($metadataDriver);
-        $this->em->getConfiguration()->setEntityNamespaces(
-            [
-                'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
-            ]
-        );
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
+        ));
+        $this->em->getConfiguration()->setEntityNamespaces([
+            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
+        ]);
 
-        $doctrine = $this->getMockBuilder('Doctrine\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->will($this->returnValue($this->em));
+            ->willReturn($this->em);
 
         $this->paramIndex = 0;
-        $this->builder    = new OrmManyRelationBuilder($doctrine);
+        $this->builder = new OrmManyRelationBuilder($doctrine);
     }
 
     public function testSupports()
@@ -59,7 +54,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         );
         $this->assertFalse(
             $this->builder->supports(
-                $this->createMock('Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface')
+                $this->createMock(FilterDatasourceAdapterInterface::class)
             )
         );
     }
@@ -67,7 +62,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprSimple($inverse)
+    public function testBuildComparisonExprSimple(bool $inverse)
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -94,7 +89,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildNullValueExprSimple($inverse)
+    public function testBuildNullValueExprSimple(bool $inverse)
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
@@ -121,7 +116,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprWithSimpleJoin($inverse)
+    public function testBuildComparisonExprWithSimpleJoin(bool $inverse)
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')
@@ -150,7 +145,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     /**
      * @dataProvider inverseProvider
      */
-    public function testBuildComparisonExprWithUnidirectionalJoin($inverse)
+    public function testBuildComparisonExprWithUnidirectionalJoin(bool $inverse)
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')
@@ -180,7 +175,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         );
     }
 
-    public function inverseProvider()
+    public function inverseProvider(): array
     {
         return [
             [false],
@@ -188,21 +183,15 @@ class OrmManyRelationBuilderTest extends OrmTestCase
         ];
     }
 
-    /**
-     * @param QueryBuilder $qb
-     *
-     * @return OrmFilterDatasourceAdapter
-     */
-    protected function getFilterDatasourceAdapter(QueryBuilder $qb)
+    private function getFilterDatasourceAdapter(QueryBuilder $qb): OrmFilterDatasourceAdapter
     {
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
-        $ds = $this->getMockBuilder('Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter')
-            ->setMethods(['generateParameterName'])
+        $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
+            ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
             ->getMock();
         $ds->expects($this->any())
             ->method('generateParameterName')
-            ->will($this->returnValue(sprintf('param%d', ++$this->paramIndex)));
+            ->willReturn(sprintf('param%d', ++$this->paramIndex));
 
         return $ds;
     }

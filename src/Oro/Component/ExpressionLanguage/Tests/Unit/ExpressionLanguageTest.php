@@ -11,10 +11,8 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
 class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExpressionLanguage
-     */
-    protected $expressionLanguage;
+    /** @var ExpressionLanguage */
+    private $expressionLanguage;
 
     protected function setUp(): void
     {
@@ -24,34 +22,30 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
     public function testCachedParse()
     {
         $savedParsedExpression = null;
-        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemMock = $this->createMock(CacheItemInterface::class);
-        $expressionLanguage = new ExpressionLanguage($cacheMock);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $expressionLanguage = new ExpressionLanguage($cache);
 
-        $cacheMock
-            ->expects($this->exactly(2))
+        $cache->expects($this->exactly(2))
             ->method('getItem')
             ->with('1%20%2B%201%2F%2F')
-            ->willReturn($cacheItemMock);
-        $cacheItemMock
-            ->expects($this->exactly(2))
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
-            }));
-        $cacheItemMock
-            ->expects($this->exactly(1))
+            });
+        $cacheItem->expects($this->once())
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($expression) use (&$savedParsedExpression) {
+            ->willReturnCallback(function ($expression) use (&$savedParsedExpression) {
                 $savedParsedExpression = $expression;
 
                 return true;
-            }));
-        $cacheMock
-            ->expects($this->exactly(1))
+            });
+        $cache->expects($this->once())
             ->method('save')
-            ->with($cacheItemMock);
+            ->with($cacheItem);
 
         $parsedExpression = $expressionLanguage->parse('1 + 1', []);
         $this->assertSame($savedParsedExpression, $parsedExpression);
@@ -99,37 +93,29 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider shortCircuitProviderEvaluateDataProvider
-     *
-     * @param string $expression
-     * @param array $values
-     * @param bool $expected
      */
-    public function testShortCircuitOperatorsEvaluate($expression, array $values, $expected)
+    public function testShortCircuitOperatorsEvaluate(string $expression, array $values, bool $expected)
     {
         $this->assertEquals($expected, $this->expressionLanguage->evaluate($expression, $values));
     }
 
     /**
      * @dataProvider shortCircuitProviderCompileDataProvider
-     *
-     * @param string $expression
-     * @param array $names
-     * @param bool $expected
      */
-    public function testShortCircuitOperatorsCompile($expression, array $names, $expected)
+    public function testShortCircuitOperatorsCompile(string $expression, array $names, bool $expected)
     {
         $result = null;
         eval(sprintf('$result = %s;', $this->expressionLanguage->compile($expression, $names)));
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function shortCircuitProviderEvaluateDataProvider()
+    public function shortCircuitProviderEvaluateDataProvider(): array
     {
-        $object = $this->getMockBuilder('stdClass')->setMethods(['foo'])->getMock();
-        $object->expects($this->never())->method('foo');
+        $object = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['foo'])
+            ->getMock();
+        $object->expects($this->never())
+            ->method('foo');
 
         return [
             ['false and object.foo', ['object' => $object], false],
@@ -139,10 +125,7 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function shortCircuitProviderCompileDataProvider()
+    public function shortCircuitProviderCompileDataProvider(): array
     {
         return [
             ['false and foo', ['foo' => 'foo'], false],
@@ -163,33 +146,29 @@ class ExpressionLanguageTest extends \PHPUnit\Framework\TestCase
     public function testCachingWithDifferentNamesOrder()
     {
         $savedParsedExpressions = [];
-        $cacheMock = $this->createMock(CacheItemPoolInterface::class);
-        $cacheItemMock = $this->createMock(CacheItemInterface::class);
-        $expressionLanguage = new ExpressionLanguage($cacheMock);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $expressionLanguage = new ExpressionLanguage($cache);
         $key = 'a%20%2B%20b%2F%2Fa%7CB%3Ab';
 
-        $cacheMock
-            ->expects($this->exactly(2))
+        $cache->expects($this->exactly(2))
             ->method('getItem')
             ->with($key)
-            ->willReturn($cacheItemMock);
-        $cacheItemMock
-            ->expects($this->exactly(2))
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->exactly(2))
             ->method('get')
-            ->will($this->returnCallback(function () use (&$savedParsedExpressions, $key) {
-                return isset($savedParsedExpressions[$key]) ? $savedParsedExpressions[$key] : null;
-            }));
-        $cacheItemMock
-            ->expects($this->exactly(1))
+            ->willReturnCallback(function () use (&$savedParsedExpressions, $key) {
+                return $savedParsedExpressions[$key] ?? null;
+            });
+        $cacheItem->expects($this->once())
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->will($this->returnCallback(function ($expression) use (&$savedParsedExpressions, $key) {
+            ->willReturnCallback(function ($expression) use (&$savedParsedExpressions, $key) {
                 $savedParsedExpressions[$key] = $expression;
-            }));
-        $cacheMock
-            ->expects($this->exactly(1))
+            });
+        $cache->expects($this->once())
             ->method('save')
-            ->with($cacheItemMock);
+            ->with($cacheItem);
 
         $expression = 'a + b';
         $expressionLanguage->compile($expression, ['a', 'B' => 'b']);
