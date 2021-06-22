@@ -102,6 +102,34 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
     }
 
+    public function testHasTriggerBuiltWithoutData()
+    {
+        $cacheProvider = $this->createMock(CacheProvider::class);
+        $cacheProvider->expects(self::once())
+            ->method('deleteAll');
+        $cacheProvider->expects(self::exactly(2))
+            ->method('fetch')
+            ->withConsecutive(
+                [EventTriggerCache::BUILT],
+                [EventTriggerCache::DATA]
+            )
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
+        $cacheProvider->expects(self::exactly(2))
+            ->method('save')
+            ->withConsecutive(
+                [EventTriggerCache::DATA, $this->testTriggerData],
+                [EventTriggerCache::BUILT, true]
+            );
+
+        $this->prepareRegistryForBuild($this->testTriggerData);
+        $this->cache->setProvider($cacheProvider);
+
+        $this->assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
+    }
+
     public function testHasTriggerNoProvider()
     {
         $this->expectException(\LogicException::class);
