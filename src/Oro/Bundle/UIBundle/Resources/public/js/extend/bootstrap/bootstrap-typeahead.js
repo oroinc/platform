@@ -79,7 +79,26 @@ define(function(require) {
             if (!this.query) {
                 return item;
             }
-            return origTypeahead.prototype.highlighter.call(this, item);
+
+            const root = document.createElement('div');
+            root.innerHTML = item;
+
+            const nested = element => {
+                element.childNodes.forEach(node => {
+                    if (node.nodeType === 3) {
+                        const query = this.query.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&');
+                        node.nodeValue = node.nodeValue.replace(
+                            new RegExp('(' + query + ')', 'ig'),
+                            '[strong]$&[/strong]'
+                        );
+                        return;
+                    }
+                    nested(node);
+                });
+            };
+            nested(root);
+
+            return root.innerHTML.replace(/\[strong\](.*?)\[\/strong\]/gi, '<strong>$1</strong>');
         }
     };
 
