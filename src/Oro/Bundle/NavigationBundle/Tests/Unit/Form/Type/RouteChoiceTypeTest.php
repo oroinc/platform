@@ -16,39 +16,24 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
-    /**
-     * @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TitleReaderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $readerRegistry;
 
-    /**
-     * @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TitleTranslator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
-    /**
-     * @var TitleService|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
     private $titleService;
 
-    /**
-     * @var Cache|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /**
-     * @var RouteChoiceType
-     */
+    /** @var RouteChoiceType */
     private $formType;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
@@ -81,8 +66,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
 
-        $this->readerRegistry
-            ->expects($this->never())
+        $this->readerRegistry->expects($this->never())
             ->method($this->anything());
 
         $this->cache->expects($this->once())
@@ -124,8 +108,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $this->router->expects($this->never())
             ->method('getRouteCollection');
 
-        $this->readerRegistry
-            ->expects($this->never())
+        $this->readerRegistry->expects($this->never())
             ->method($this->anything());
 
         $this->cache->expects($this->once())
@@ -164,10 +147,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedChoices, $resolvedOptions['choices']);
     }
 
-    /**
-     * @return RouteCollection
-     */
-    protected function getRouteCollection()
+    private function getRouteCollection(): RouteCollection
     {
         $routeCollection = new RouteCollection();
 

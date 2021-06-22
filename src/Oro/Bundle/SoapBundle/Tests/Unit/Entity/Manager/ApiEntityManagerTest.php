@@ -3,8 +3,13 @@
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,51 +19,42 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
      * @param  \PHPUnit\Framework\MockObject\MockObject $objectManager
      * @return ApiEntityManager
      */
-    protected function createApiEntityManager($class, $metadata = null, $objectManager = null)
+    private function createApiEntityManager($class, $metadata = null, $objectManager = null)
     {
         if (!$metadata) {
-            $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getName'))
-                ->getMock();
+            $metadata = $this->createMock(ClassMetadata::class);
         }
         $metadata->expects($this->any())
             ->method('getName')
-            ->will($this->returnValue($class));
+            ->willReturn($class);
 
         if (!$objectManager) {
-            $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-                ->disableOriginalConstructor()
-                ->setMethods(array('getClassMetadata'))
-                ->getMock();
+            $objectManager = $this->createMock(EntityManager::class);
         }
         $objectManager->expects($this->any())
             ->method('getClassMetadata')
             ->with($class)
-            ->will($this->returnValue($metadata));
+            ->willReturn($metadata);
 
         return new ApiEntityManager($class, $objectManager);
     }
 
     public function testGetEntityId()
     {
-        $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
+        $className = Entity::class;
 
         $entity = new Entity();
         $entity->id = 1;
         $entity->name = 'entityName';
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(array($className))
-            ->setMethods(['getSingleIdentifierFieldName', 'getIdentifierValues', 'getName'])
-            ->getMock();
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
-            ->will($this->returnValue('id'));
+            ->willReturn('id');
         $metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)
-            ->will($this->returnValue(array('id' => $entity->id)));
+            ->willReturn(['id' => $entity->id]);
 
         $manager = $this->createApiEntityManager($className, $metadata);
         $this->assertEquals($entity->id, $manager->getEntityId($entity));
@@ -69,48 +65,34 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetSimpleFilteredList()
     {
-        $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
+        $className = Entity::class;
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(array($className))
-            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues', 'getName'))
-            ->getMock();
-
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array('id')));
+            ->willReturn(['id']);
 
-        $queryBuilder = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository', 'getName'))
-            ->getMock();
+        $objectManager = $this->createMock(EntityManager::class);
 
         $criteria = ['gender' => 'male'];
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $objectManager
-            ->expects($this->once())
+        $objectManager->expects($this->once())
             ->method('getRepository')
             ->with($this->equalTo($className))
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
         $queryBuilder->expects($this->once())
             ->method('addCriteria');
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->once())
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
@@ -125,39 +107,27 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetCriteriaFilteredList()
     {
-        $className = 'Oro\Bundle\SoapBundle\Tests\Unit\Entity\Manager\Stub\Entity';
+        $className = Entity::class;
 
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->setConstructorArgs(array($className))
-            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues', 'getName'))
-            ->getMock();
-
+        $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->once())
             ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array('id')));
+            ->willReturn(['id']);
 
-        $queryBuilder = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository'))
-            ->getMock();
+        $objectManager = $this->createMock(EntityManager::class);
 
         $criteria = new Criteria();
-        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $objectManager
-            ->expects($this->once())
+        $objectManager->expects($this->once())
             ->method('getRepository')
             ->with($this->equalTo($className))
-            ->will($this->returnValue($repository));
+            ->willReturn($repository);
 
         $queryBuilder->expects($this->once())
             ->method('addCriteria')
@@ -165,9 +135,7 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 
         $manager = $this->createApiEntityManager($className, $metadata, $objectManager);
 
-        $eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $eventDispatcher = $this->createMock(EventDispatcher::class);
         $eventDispatcher->expects($this->once())
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
@@ -179,9 +147,9 @@ class ApiEntityManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityIdIncorrectInstance()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('xpected instance of \DateTime');
+        $this->expectExceptionMessage('Expected instance of DateTime');
 
-        $manager = $this->createApiEntityManager('\DateTime');
+        $manager = $this->createApiEntityManager(\DateTime::class);
         $manager->getEntityId(new Entity());
     }
 }

@@ -34,37 +34,37 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var EmailActivityListProvider */
-    protected $emailActivityListProvider;
+    private $emailActivityListProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenAccessor;
+    private $tokenAccessor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $router;
+    private $router;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mailboxProcessStorage;
+    private $mailboxProcessStorage;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $activityAssociationHelper;
+    private $activityAssociationHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $commentAssociationHelper;
+    private $commentAssociationHelper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
+    private $featureChecker;
 
     protected function setUp(): void
     {
@@ -79,10 +79,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->mailboxProcessStorage = $this->createMock(MailboxProcessStorage::class);
         $this->activityAssociationHelper = $this->createMock(ActivityAssociationHelper::class);
         $this->commentAssociationHelper = $this->createMock(CommentAssociationHelper::class);
-        $this->featureChecker = $this->getMockBuilder(FeatureChecker::class)
-            ->setMethods(['isFeatureEnabled'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
 
         $this->emailActivityListProvider = new EmailActivityListProvider(
             $this->doctrineHelper,
@@ -117,7 +114,6 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($fromEmailAddress);
         $email->addEmailUser($emailUser);
 
-        /** @var ActivityList $activityListMock */
         $activityListMock = $this->createMock(ActivityList::class);
         $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineHelper->expects($this->once())
@@ -156,7 +152,6 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $email->setFromEmailAddress($fromEmailAddress);
         $email->addEmailUser($emailUser);
 
-        /** @var ActivityList $activityListMock */
         $activityListMock = $this->createMock(ActivityList::class);
         $repository = $this->createMock(ObjectRepository::class);
         $this->doctrineHelper->expects($this->once())
@@ -188,25 +183,22 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailActivityListProvider->setFeatureChecker($this->featureChecker);
         $this->emailActivityListProvider->addFeature('email');
 
-        $mock = $this->getMockBuilder(FeatureCheckerHolderTrait::class)->setMethods(['isFeaturesEnabled'])
+        $mock = $this->getMockBuilder(FeatureCheckerHolderTrait::class)
+            ->onlyMethods(['isFeaturesEnabled'])
             ->getMockForTrait();
 
         $mock->expects($this->any())
             ->method('isFeaturesEnabled')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($mock->isFeaturesEnabled());
     }
 
     /**
      * @dataProvider getDataProvider
-     *
-     * @param EntityMetadata $metadata
-     * @param bool $expected
      */
-    public function testGetData(EntityMetadata $metadata = null, $expected)
+    public function testGetData(?EntityMetadata $metadata, $expected)
     {
-        /** @var ActivityList|\PHPUnit\Framework\MockObject\MockObject $activityList */
         $activityList = $this->createMock(ActivityList::class);
         $activityList->expects($this->once())
             ->method('getRelatedActivityId')
@@ -278,18 +270,15 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf(
             'Argument must be instance of "%s", "%s" given',
-            \Oro\Bundle\EmailBundle\Entity\Email::class,
-            \Oro\Bundle\ActivityListBundle\Entity\ActivityList::class
+            Email::class,
+            ActivityList::class
         ));
 
         $entity = new ActivityList();
         $this->emailActivityListProvider->getGroupedEntities($entity, EmailAddress::class, 1);
     }
 
-    /**
-     * @return array
-     */
-    public function getDataProvider()
+    public function getDataProvider(): array
     {
         $metadata = new EntityMetadata(User::class);
         $metadata->routes = ['view' => 'test_route'];

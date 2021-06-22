@@ -27,43 +27,37 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use ContextAwareTest;
 
-    /** @var CountQueryBuilderOptimizer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optimizer;
-
     /** @var TotalHeaderHandler|\PHPUnit\Framework\MockObject\MockObject */
-    protected $handler;
+    private $handler;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     protected function setUp(): void
     {
-        $this->optimizer = $this->createMock(CountQueryBuilderOptimizer::class);
-        $this->optimizer->expects($this->any())->method('getCountQueryBuilder')
-            ->with($this->isInstanceOf(\Doctrine\ORM\QueryBuilder::class))->willReturnArgument(0);
+        $optimizer = $this->createMock(CountQueryBuilderOptimizer::class);
+        $optimizer->expects($this->any())
+            ->method('getCountQueryBuilder')
+            ->with($this->isInstanceOf(\Doctrine\ORM\QueryBuilder::class))
+            ->willReturnArgument(0);
 
-        $this->handler = $this->getMockBuilder('Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler')
-            ->setConstructorArgs([$this->optimizer])
-            ->setMethods(['calculateCount'])
+        $this->handler = $this->getMockBuilder(TotalHeaderHandler::class)
+            ->setConstructorArgs([$optimizer])
+            ->onlyMethods(['calculateCount'])
             ->getMock();
 
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects($this->any())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $configuration->expects($this->any())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->em = $this->createMock(EntityManager::class);
         $this->em->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->handler, $this->optimizer, $this->em);
+            ->willReturn($configuration);
     }
 
     public function testSupportsWithTotalCountAndAction()
@@ -126,7 +120,8 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $testCount = 22;
 
-        $this->handler->expects($this->never())->method('calculateCount');
+        $this->handler->expects($this->never())
+            ->method('calculateCount');
 
         $context = $this->createContext();
         $context->set(
@@ -148,9 +143,12 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
 
         $query = new Query($this->em);
         $qb    = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $qb->expects($this->once())->method('getQuery')
+        $qb->expects($this->once())
+            ->method('getQuery')
             ->willReturn($query);
-        $this->handler->expects($this->once())->method('calculateCount')->with($query)
+        $this->handler->expects($this->once())
+            ->method('calculateCount')
+            ->with($query)
             ->willReturn($testCount);
 
         $context = $this->createContext();
@@ -167,7 +165,8 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $testCount = 22;
 
         $query = new Query($this->em);
-        $this->handler->expects($this->once())->method('calculateCount')
+        $this->handler->expects($this->once())
+            ->method('calculateCount')
             ->with($this->isInstanceOf(Query::class))
             ->willReturn($testCount);
 
@@ -189,31 +188,36 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects($this->once())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $configuration->expects($this->once())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
-        $em->expects($this->once())->method('getConnection')
-            ->will($this->returnValue($conn));
-        $conn->expects($this->once())->method('createQueryBuilder')
-            ->will($this->returnValue($dbalQb));
+        $em->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($conn);
+        $conn->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($dbalQb);
 
         $qb = new SqlQueryBuilder($em, $this->createMock(ResultSetMapping::class));
 
-        $dbalQb->expects($this->once())->method('setMaxResults')
+        $dbalQb->expects($this->once())
+            ->method('setMaxResults')
             ->with($this->identicalTo(null))
-            ->will($this->returnSelf());
-        $dbalQb->expects($this->once())->method('setFirstResult')
+            ->willReturnSelf();
+        $dbalQb->expects($this->once())
+            ->method('setFirstResult')
             ->with($this->identicalTo(null))
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
-        $this->handler->expects($this->once())->method('calculateCount')
+        $this->handler->expects($this->once())
+            ->method('calculateCount')
             ->with($this->isInstanceOf(SqlQuery::class))
             ->willReturn($testCount);
 
@@ -233,28 +237,31 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $configuration = $this->createMock(Configuration::class);
         $configuration->expects($this->any())
             ->method('getDefaultQueryHints')
-            ->will($this->returnValue([]));
+            ->willReturn([]);
         $configuration->expects($this->once())
             ->method('isSecondLevelCacheEnabled')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
             ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
+            ->willReturn($configuration);
 
         $query  = new SqlQuery($em);
         $dbalQb = $this->createMock(SqlQueryBuilder::class);
         $query->setSqlQueryBuilder($dbalQb);
 
-        $dbalQb->expects($this->once())->method('setMaxResults')
+        $dbalQb->expects($this->once())
+            ->method('setMaxResults')
             ->with($this->identicalTo(null))
-            ->will($this->returnSelf());
-        $dbalQb->expects($this->once())->method('setFirstResult')
+            ->willReturnSelf();
+        $dbalQb->expects($this->once())
+            ->method('setFirstResult')
             ->with($this->identicalTo(null))
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
-        $this->handler->expects($this->once())->method('calculateCount')
+        $this->handler->expects($this->once())
+            ->method('calculateCount')
             ->with($this->isInstanceOf(SqlQuery::class))
             ->willReturn($testCount);
 
@@ -272,32 +279,43 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
         $testCount = 22;
 
         $entityClass = 'Test\Class';
-        $controller  = $this->createMock(EntityManagerAwareInterface::class);
-        $context     = $this->createContext($controller);
-        $om          = $this->createMock(ObjectManager::class);
-        $metadata    = $this->createMock(ClassMetadata::class);
-        $repo        = $this->createMock(EntityRepository::class);
+        $controller = $this->createMock(EntityManagerAwareInterface::class);
+        $context = $this->createContext($controller);
+        $om = $this->createMock(ObjectManager::class);
+        $metadata = $this->createMock(ClassMetadata::class);
+        $repo = $this->createMock(EntityRepository::class);
 
-        $metadata->expects($this->any())->method('getName')->willReturn($entityClass);
+        $metadata->expects($this->any())
+            ->method('getName')
+            ->willReturn($entityClass);
 
-        $om->expects($this->once())->method('getClassMetadata')->with($entityClass)
+        $om->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($entityClass)
             ->willReturn($metadata);
-        $om->expects($this->once())->method('getRepository')->with($entityClass)
+        $om->expects($this->once())
+            ->method('getRepository')
+            ->with($entityClass)
             ->willReturn($repo);
 
         $manager = new ApiEntityManager($entityClass, $om);
-        $controller->expects($this->once())->method('getManager')
+        $controller->expects($this->once())
+            ->method('getManager')
             ->willReturn($manager);
 
         $qb = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $repo->expects($this->once())->method('createQueryBuilder')
+        $repo->expects($this->once())
+            ->method('createQueryBuilder')
             ->willReturn($qb);
 
         $query = new Query($this->em);
-        $qb->expects($this->once())->method('getQuery')
+        $qb->expects($this->once())
+            ->method('getQuery')
             ->willReturn($query);
 
-        $this->handler->expects($this->once())->method('calculateCount')->with($query)
+        $this->handler->expects($this->once())
+            ->method('calculateCount')
+            ->with($query)
             ->willReturn($testCount);
 
         $this->handler->handle($context);

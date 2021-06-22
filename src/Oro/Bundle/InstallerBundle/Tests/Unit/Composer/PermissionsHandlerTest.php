@@ -4,49 +4,42 @@ namespace Oro\Bundle\InstallerBundle\Tests\Unit\Composer;
 
 use Oro\Bundle\InstallerBundle\Composer\PermissionsHandler;
 use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Process\Process;
 
 class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /**
-     * @var PermissionsHandler
-     */
-    protected $handler;
+    /** @var PermissionsHandler */
+    private $handler;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $process;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $process;
 
-    /**
-     * @var string
-     */
-    protected $directory;
+    /** @var string */
+    private $directory;
 
     protected function setUp(): void
     {
         $this->process = $this
-            ->getMockBuilder('Symfony\Component\Process\Process')
+            ->getMockBuilder(Process::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->directory = $this->getTempDir('permissions_handler');
 
         $this->handler = $this->getMockBuilder(PermissionsHandler::class)
-            ->setMethods(['getProcess'])
+            ->onlyMethods(['getProcess'])
             ->getMock();
     }
 
     public function testSetPermissionsSetfacl()
     {
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->handler
-            ->expects($this->exactly(3))
+        $this->handler->expects($this->exactly(3))
             ->method('getProcess')
             ->with(
                 $this->callback(
@@ -76,23 +69,20 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $this->handler->setPermissionsSetfacl($this->directory);
     }
 
     public function testSetPermissionsChmod()
     {
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->handler
-            ->expects($this->exactly(3))
+        $this->handler->expects($this->exactly(3))
             ->method('getProcess')
             ->with(
                 $this->callback(
@@ -114,30 +104,26 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $this->handler->setPermissionsChmod($this->directory);
     }
 
     public function testSetPermissions()
     {
-        $this->handler
-            ->expects($this->any())
+        $this->handler->expects($this->any())
             ->method('getProcess')
             ->willReturn($this->process);
 
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('isSuccessful')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
-        $this->process
-            ->expects($this->atLeastOnce())
+        $this->process->expects($this->atLeastOnce())
             ->method('getOutput')
-            ->will($this->returnValue(PermissionsHandler::USER));
+            ->willReturn(PermissionsHandler::USER);
 
         $result = $this->handler->setPermissions($this->directory);
 

@@ -9,14 +9,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var TransitionTranslationHelper */
-    protected $helper;
+    private $helper;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);
@@ -25,21 +22,17 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider processTransitionTranslationsProvider
      */
     public function testProcessTransitionTranslations(array $inputData, array $expectedData)
     {
         $this->translator->expects($this->any())
             ->method('trans')
-            ->will($this->returnValueMap($inputData['translates']));
+            ->willReturnMap($inputData['translates']);
 
-        /* @var Transition $transition */
         $transition = $this->getMockBuilder(Transition::class)
             ->disableOriginalConstructor()
-            ->setMethods(['__construct'])
+            ->onlyMethods(['__construct'])
             ->getMock();
 
         $transition->setLabel($inputData['label']);
@@ -56,10 +49,8 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function processTransitionTranslationsProvider()
+    public function processTransitionTranslationsProvider(): array
     {
         return [
             'full labels' => [

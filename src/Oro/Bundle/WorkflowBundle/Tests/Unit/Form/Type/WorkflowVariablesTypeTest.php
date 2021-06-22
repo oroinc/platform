@@ -97,7 +97,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->method('addModelTransformer')
             ->with($this->isInstanceOf(WorkflowVariableDataTransformer::class));
 
-        /** @var FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
             ->method('create')
@@ -112,12 +111,6 @@ class WorkflowVariablesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array             $submitData
-     * @param WorkflowData      $formData
-     * @param array             $formOptions
-     * @param array             $childrenOptions
-     * @param array             $guessedData
      */
     public function testSubmit(
         array $submitData,
