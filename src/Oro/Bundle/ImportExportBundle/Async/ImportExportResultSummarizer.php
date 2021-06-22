@@ -1,6 +1,8 @@
 <?php
+
 namespace Oro\Bundle\ImportExportBundle\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -35,14 +37,31 @@ class ImportExportResultSummarizer
     protected $fileManager;
 
     /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /**
      * @param Router $router
      * @param ConfigManager $configManager
+     * @param FileManager $fileManager
      */
-    public function __construct(Router $router, ConfigManager $configManager, FileManager $fileManager)
-    {
+    public function __construct(
+        Router $router,
+        ConfigManager $configManager,
+        FileManager $fileManager
+    ) {
         $this->router = $router;
         $this->configManager = $configManager;
         $this->fileManager = $fileManager;
+    }
+
+    /**
+     * @param ManagerRegistry $registry
+     */
+    public function setRegistry(ManagerRegistry $registry)
+    {
+        $this->registry = $registry;
     }
 
     /**
@@ -76,7 +95,7 @@ class ImportExportResultSummarizer
 
         $data['url'] = $this->getDownloadUrl($job->getId());
         $data['downloadLogUrl'] = $this->getDownloadErrorLogUrl($job->getId());
-        if (! $data['success']) {
+        if (!$data['success']) {
             $data['url'] = $data['downloadLogUrl'];
         }
 
@@ -86,30 +105,28 @@ class ImportExportResultSummarizer
     /**
      * @param Job $job
      *
+     * @return null|string
      * @throws FileNotFound
      *
-     * @return null|string
      */
     public function getErrorLog(Job $job)
     {
         $errorLog = null;
         $job = $job->isRoot() ? $job : $job->getRootJob();
-        foreach ($job->getChildJobs() as $childrenJob) {
-            $childrenJobData = $childrenJob->getData();
-            if (empty($childrenJobData) || !array_key_exists('errorLogFile', $childrenJobData)) {
-                continue;
-            }
-            $fileName = $childrenJobData['errorLogFile'];
 
-            if (! $this->fileManager->isFileExist($fileName)) {
-                $errorLog .=  sprintf('Log file of job id: "%s" was not found.', $childrenJob->getId()) . PHP_EOL;
+        $repo = $this->registry->getRepository(Job::class);
+        foreach ($repo->getChildJobErrorLogFiles($job) as $childrenJobData) {
+            $fileName = $childrenJobData['error_log_file'];
+
+            if (!$this->fileManager->isFileExist($fileName)) {
+                $errorLog .= sprintf('Log file of job id: "%s" was not found.', $childrenJobData['id']) . PHP_EOL;
                 continue;
             }
 
             $errorLog .= implode(
                 PHP_EOL,
                 json_decode($this->fileManager->getContent($fileName), true)
-            ). PHP_EOL;
+            ) . PHP_EOL;
         }
 
         return $errorLog;
@@ -209,7 +226,7 @@ class ImportExportResultSummarizer
 
             $data['readsCount'] += $childrenJobData['readsCount'];
             $data['errorsCount'] += $childrenJobData['errorsCount'];
-            $data['success']  += $childrenJobData['success'];
+            $data['success'] += $childrenJobData['success'];
             $data['entities'] = isset($childrenJobData['entities']) ? $childrenJobData['entities'] : $data['entities'];
         }
 
@@ -238,7 +255,7 @@ class ImportExportResultSummarizer
                 );
                 break;
             case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
-                $message =  sprintf(
+                $message = sprintf(
                     'Import validation of the %s from %s is completed.
                     Success: %s.
                     Info: %s.
