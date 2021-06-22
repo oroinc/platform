@@ -18,21 +18,21 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider logProvider
-     * @param array $logs
-     * @param string $expectedContent
      */
-    public function testLog(array $logs, $expectedContent)
+    public function testLog(array $logs, string $expectedContent)
     {
         $tempDir = $this->getTempDir('behat_js_log');
-        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
-        $jsLogSubscriber = $this
-            ->getMockBuilder(JsLogSubscriber::class)
+        $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)
             ->setConstructorArgs([new Mink(), $tempDir])
-            ->setMethods(['getLogs', 'getUrl'])
+            ->onlyMethods(['getLogs', 'getUrl'])
             ->getMock();
-        $jsLogSubscriber->method('getLogs')->willReturn($logs);
-        $jsLogSubscriber->method('getUrl')->willReturn('example.com');
-        $jsLogSubscriber->log($this->getEventMock());
+        $jsLogSubscriber->expects($this->any())
+            ->method('getLogs')
+            ->willReturn($logs);
+        $jsLogSubscriber->expects($this->any())
+            ->method('getUrl')
+            ->willReturn('example.com');
+        $jsLogSubscriber->log($this->getEvent());
 
         $expectedLogFile = $tempDir . DIRECTORY_SEPARATOR . 'behat_browser.log';
         $this->assertFileExists($expectedLogFile);
@@ -42,20 +42,20 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testEmptyLog()
     {
         $tempDir = $this->getTempDir('behat_js_log');
-        /** @var JsLogSubscriber|\PHPUnit\Framework\MockObject\MockObject $jsLogSubscriber */
-        $jsLogSubscriber = $this
-            ->getMockBuilder(JsLogSubscriber::class)
+        $jsLogSubscriber = $this->getMockBuilder(JsLogSubscriber::class)
             ->setConstructorArgs([new Mink(), $tempDir])
-            ->setMethods(['getLogs'])
+            ->onlyMethods(['getLogs'])
             ->getMock();
-        $jsLogSubscriber->method('getLogs')->willReturn([]);
-        $jsLogSubscriber->log($this->getEventMock());
+        $jsLogSubscriber->expects($this->any())
+            ->method('getLogs')
+            ->willReturn([]);
+        $jsLogSubscriber->log($this->getEvent());
 
         $expectedLogFile = $tempDir . DIRECTORY_SEPARATOR . 'behat_browser.log';
         $this->assertFileDoesNotExist($expectedLogFile);
     }
 
-    public function logProvider()
+    public function logProvider(): array
     {
         return [
             'regular log' => [
@@ -93,10 +93,7 @@ class JsLogSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return AfterStepTested
-     */
-    private function getEventMock()
+    private function getEvent(): AfterStepTested
     {
         return new AfterStepTested(
             $this->createMock(Environment::class),

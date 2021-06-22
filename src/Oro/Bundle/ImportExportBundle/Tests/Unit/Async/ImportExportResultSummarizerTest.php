@@ -2,21 +2,55 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\Routing\Router;
 
 class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCanBeConstructedWithRequiredAttributes()
+    /**
+     * @var Router|MockObject
+     */
+    private $router;
+
+    /**
+     * @var ConfigManager|MockObject
+     */
+    private $configManager;
+
+    /**
+     * @var FileManager|MockObject
+     */
+    private $fileManager;
+
+    /**
+     * @var ManagerRegistry|MockObject
+     */
+    private $registry;
+
+    /**
+     * @var ImportExportResultSummarizer
+     */
+    private $summirizer;
+
+    protected function setUp(): void
     {
-        new ImportExportResultSummarizer(
-            $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $this->createFileManagerMock()
+        $this->router = $this->createMock(Router::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
+        $this->fileManager = $this->createMock(FileManager::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
+
+        $this->summirizer = new ImportExportResultSummarizer(
+            $this->router,
+            $this->configManager,
+            $this->fileManager,
+            $this->registry
         );
     }
 
@@ -58,13 +92,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob2->setData($result);
         $job->addChildJob($childJob2);
 
-        $consolidateService = new ImportExportResultSummarizer(
-            $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $this->createFileManagerMock()
-        );
-
-        $result = $consolidateService->getSummaryResultForNotification($job, 'import.csv');
+        $result = $this->summirizer->getSummaryResultForNotification($job, 'import.csv');
 
         $this->assertEquals($expectedData, $result);
     }
@@ -112,78 +140,55 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob2->setData($data);
         $job->addChildJob($childJob2);
 
-        $router = $this->createRouterMock();
-        $router
-            ->expects($this->once())
+        $this->router->expects($this->once())
             ->method('generate')
             ->with(
                 $this->equalTo('oro_importexport_job_error_log'),
                 $this->equalTo(['jobId' => $job->getId()])
             )
-            ->willReturn('/log/12345')
-        ;
+            ->willReturn('/log/12345');
 
-        $configManager = $this->createConfigManagerMock();
-        $configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with('oro_ui.application_url')
-            ->willReturn('http://127.0.0.1')
-        ;
+            ->willReturn('http://127.0.0.1');
 
-        $consolidateService = new ImportExportResultSummarizer(
-            $router,
-            $configManager,
-            $this->createFileManagerMock()
-        );
-
-        $result = $consolidateService->getSummaryResultForNotification($job, 'import.csv');
+        $result = $this->summirizer->getSummaryResultForNotification($job, 'import.csv');
 
         $this->assertEquals($expectedData, $result);
     }
 
     public function testShouldReturnErrorLog()
     {
-        $data = [
-            'success' => true,
-            'errorLogFile' => 'test.json',
-            'counts' => [
-                'add' => 2,
-                'errors' => 1,
-                'replace' => 1,
-                'process' => 4,
-                'read' => 4,
-            ],
-        ];
-
         $job = new Job();
         $job->setId(1);
-        $childJob1 = new Job();
-        $childJob1->setData($data);
-        $job->addChildJob($childJob1);
-        $childJob2 = new Job();
-        $childJob2->setId(2);
-        $childJob2->setData(array_merge($data, ['errorLogFile' => 'test2.json']));
-        $job->addChildJob($childJob2);
 
-        $fileManager = $this->createFileManagerMock();
-        $fileManager->expects($this->exactly(2))
+        $repo = $this->createMock(JobRepository::class);
+        $repo->expects($this->once())
+            ->method('getChildJobErrorLogFiles')
+            ->with($job)
+            ->willReturn([
+                ['id' => 1, 'error_log_file' => 'test.json'],
+                ['id' => 2, 'error_log_file' => 'test2.json']
+            ]);
+
+        $this->registry->expects($this->once())
+            ->method('getRepository')
+            ->with(Job::class)
+            ->willReturn($repo);
+
+        $this->fileManager->expects($this->exactly(2))
             ->method('isFileExist')
             ->willReturnMap([
                 ['test.json', true],
                 ['test2.json', false]
             ]);
-        $fileManager->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('getContent')
             ->with('test.json')
             ->willReturn(json_encode(['Tests error in import.']));
 
-        $consolidateService = new ImportExportResultSummarizer(
-            $this->createRouterMock(),
-            $this->createConfigManagerMock(),
-            $fileManager
-        );
-        $summary = $consolidateService->getErrorLog($job);
+        $summary = $this->summirizer->getErrorLog($job);
 
         $this->assertEquals("Tests error in import.\nLog file of job id: \"2\" was not found.\n", $summary);
     }
@@ -204,8 +209,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
             'jobName' => 'test.job.name',
         ];
 
-        $consolidateService = $this->createConsolidatedService($jobId);
-
+        $this->assertUrlCalls();
         $rootJob = new Job();
         $rootJob->setId($jobId);
         $rootJob->setName('test.job.name');
@@ -223,7 +227,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         ]);
         $chunkJob->setData([]);
 
-        $result = $consolidateService->processSummaryExportResultForNotification($rootJob, 'export_result');
+        $result = $this->summirizer->processSummaryExportResultForNotification($rootJob, 'export_result');
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -243,8 +247,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
             'jobName' => 'test.job.name',
         ];
 
-        $consolidateService = $this->createConsolidatedService();
-
+        $this->assertUrlCalls();
         $rootJob = new Job();
         $rootJob->setId(1);
         $rootJob->setName('test.job.name');
@@ -255,44 +258,17 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
         $childJob->setData([]);
         $chunkJob->setData([]);
 
-        $result = $consolidateService->processSummaryExportResultForNotification($rootJob, 'export_result');
+        $result = $this->summirizer->processSummaryExportResultForNotification($rootJob, 'export_result');
 
         $this->assertEquals($expectedResult, $result);
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Router
-     */
-    private function createRouterMock()
-    {
-        return $this->createMock(Router::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConfigManager
-     */
-    private function createConfigManagerMock()
-    {
-        return $this->createMock(ConfigManager::class);
-    }
-
-    /**
-    * @return \PHPUnit\Framework\MockObject\MockObject|FileManager
-    */
-    private function createFileManagerMock()
-    {
-        return $this->createMock(FileManager::class);
-    }
-
-    /**
      * @param int $jobId
-     *
-     * @return ImportExportResultSummarizer
      */
-    private function createConsolidatedService($jobId = 1)
+    private function assertUrlCalls(int $jobId = 1)
     {
-        $routerMock = $this->createRouterMock();
-        $routerMock->expects($this->exactly(2))
+        $this->router->expects($this->exactly(2))
             ->method('generate')
             ->withConsecutive(
                 ['oro_importexport_export_download', ['jobId' => $jobId]],
@@ -307,19 +283,10 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
                 })
             );
 
-        $configManagerMock = $this->createConfigManagerMock();
-        $configManagerMock
+        $this->configManager
             ->expects($this->exactly(2))
             ->method('get')
             ->with('oro_ui.application_url')
             ->willReturn('127.0.0.1');
-
-        $consolidateService = new ImportExportResultSummarizer(
-            $routerMock,
-            $configManagerMock,
-            $this->createFileManagerMock()
-        );
-
-        return $consolidateService;
     }
 }

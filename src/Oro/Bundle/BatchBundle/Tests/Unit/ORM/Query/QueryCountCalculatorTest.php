@@ -35,21 +35,15 @@ class QueryCountCalculatorTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $this->statement = $this->getMockBuilder(Statement::class)
-            ->setMethods(['fetch', 'fetchColumn', 'closeCursor'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->statement = $this->createMock(Statement::class);
 
-        $driverConnection = $this->getMockBuilder(DriverConnection::class)
-            ->setMethods(['query'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
+        $driverConnection = $this->createMock(DriverConnection::class);
         $driverConnection->expects($this->any())
             ->method('query')
             ->willReturn($this->statement);
 
         $this->connection = $this->getMockBuilder(Connection::class)
-            ->setMethods(['executeQuery'])
+            ->onlyMethods(['executeQuery'])
             ->setConstructorArgs([[], new DriverMock()])
             ->getMock();
 
@@ -64,12 +58,6 @@ class QueryCountCalculatorTest extends OrmTestCase
         ]);
     }
 
-    /**
-     * @param string     $dql
-     * @param array|null $params
-     *
-     * @return Query
-     */
     private function getQuery(string $dql, array $params = null): Query
     {
         $query = new Query($this->em);
@@ -332,7 +320,6 @@ class QueryCountCalculatorTest extends OrmTestCase
      */
     public function testCalculateCountForSqlQuery(string $sql, bool $useWalker = null)
     {
-        /** @var SqlQueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb */
         $qb = $this->createMock(SqlQueryBuilder::class);
 
         $query = new SqlQuery($this->em);
@@ -343,15 +330,15 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->willReturn($sql);
         $qb->expects($this->once())
             ->method('resetQueryParts')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('select')
             ->with('COUNT(*)')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('from')
             ->with('(' . $sql . ')', 'count_query')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('execute')
             ->willReturn($this->statement);
@@ -363,7 +350,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, $useWalker));
     }
 
-    public function getSqlCountDataProvider()
+    public function getSqlCountDataProvider(): array
     {
         return [
             [

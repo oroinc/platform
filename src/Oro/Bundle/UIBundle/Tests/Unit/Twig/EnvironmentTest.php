@@ -16,7 +16,8 @@ use Twig\Source;
  */
 class EnvironmentTest extends \PHPUnit\Framework\TestCase
 {
-    use TempDirExtension, TwigExtensionTestCaseTrait;
+    use TempDirExtension;
+    use TwigExtensionTestCaseTrait;
 
     public function testAutoescapeOption()
     {
@@ -92,7 +93,7 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $twig->getGlobals();
         $twig->addGlobal('foo', 'bar');
         $template = $twig->loadTemplate('test');
-        $this->assertEquals('bar', $template->render(array()));
+        $this->assertEquals('bar', $template->render([]));
     }
 
     public function testExtensionsAreNotInitializedWhenRenderingACompiledTemplate()
@@ -116,18 +117,16 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         file_put_contents($cache, $twig->compileSource($source));
 
         // check that extensions won't be initialized when rendering a template that is already in the cache
-        /** @var Environment|\PHPUnit\Framework\MockObject\MockObject $twig */
-        $twig = $this
-            ->getMockBuilder(Environment::class)
-            ->setConstructorArgs(array(new ArrayLoader(['test' => '{{ foo }}']), $options))
-            ->setMethods(array('initExtensions'))
-            ->getMock()
-        ;
+        $twig = $this->getMockBuilder(Environment::class)
+            ->setConstructorArgs([new ArrayLoader(['test' => '{{ foo }}']), $options])
+            ->addMethods(['initExtensions'])
+            ->getMock();
 
-        $twig->expects($this->never())->method('initExtensions');
+        $twig->expects($this->never())
+            ->method('initExtensions');
 
         // render template
-        $output = $twig->render('test', array('foo' => 'bar'));
+        $output = $twig->render('test', ['foo' => 'bar']);
         $this->assertEquals('bar', $output);
 
         unlink($cache);
@@ -154,7 +153,8 @@ class EnvironmentTest extends \PHPUnit\Framework\TestCase
         $templateName = __FUNCTION__;
 
         $loader = $this->getLoader();
-        $loader->method('getSourceContext')
+        $loader->expects($this->any())
+            ->method('getSourceContext')
             ->willReturn(new Source('', ''));
 
         $cache = $this->createMock(CacheInterface::class);

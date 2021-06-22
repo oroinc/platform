@@ -10,13 +10,13 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextNormalizer */
-    protected $contextNormalizer;
+    private $contextNormalizer;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var ScopeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $scopeManager;
+    private $scopeManager;
 
     protected function setUp(): void
     {
@@ -27,12 +27,16 @@ class ContextNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeContext()
     {
-        $entity1 = $this->getMockBuilder(\stdClass::class)->setMethods(['getId'])->getMock();
+        $entity1 = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity1->expects($this->once())
             ->method('getId')
             ->willReturn(101);
 
-        $entity2 = $this->getMockBuilder(\stdClass::class)->setMethods(['getId'])->getMock();
+        $entity2 = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity2->expects($this->once())
             ->method('getId')
             ->willReturn(102);

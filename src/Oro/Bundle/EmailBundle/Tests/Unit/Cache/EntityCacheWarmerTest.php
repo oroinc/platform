@@ -72,7 +72,7 @@ class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $kernel = $this->createMock(KernelInterface::class);
         $warmer = $this->getMockBuilder(EntityCacheWarmer::class)
             ->setConstructorArgs([$storage, 'SomeDir', 'Test\SomeNamespace', 'Test%sProxy', $kernel])
-            ->setMethods(['createFilesystem', 'createTwigEnvironment', 'writeCacheFile'])
+            ->onlyMethods(['createFilesystem', 'createTwigEnvironment', 'writeCacheFile'])
             ->getMock();
 
         $fs = $this->createMock(Filesystem::class);
@@ -109,7 +109,7 @@ class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 $this->getWriteCacheFileParameters('.orm.yml')
             );
 
-        $warmer->warmup('');
+        $warmer->warmUp('');
         $this->assertFalse($warmer->isOptional());
     }
 }

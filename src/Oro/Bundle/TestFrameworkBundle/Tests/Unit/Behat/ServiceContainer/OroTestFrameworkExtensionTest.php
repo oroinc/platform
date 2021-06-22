@@ -3,6 +3,9 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Symfony2Extension\Suite\SymfonySuiteGenerator;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\MessageQueueBundle\Consumption\CacheState;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
@@ -35,9 +38,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processBundleAutoloadProvider
-     * @param array $suiteConfig
-     * @param array $bundlesConfig
-     * @param array $expectedSuiteConfig
      */
     public function testProcessBundleAutoload(array $suiteConfig, array $bundlesConfig, array $expectedSuiteConfig)
     {
@@ -50,10 +50,8 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $config = $this->processConfig($config);
 
-        /** @var OroTestFrameworkExtension|\PHPUnit\Framework\MockObject\MockObject $extension */
-        $extension = $this
-            ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
-            ->setMethods(['hasValidPaths', 'hasDirectory'])
+        $extension = $this->getMockBuilder(OroTestFrameworkExtension::class)
+            ->onlyMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
         $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
         $extension->load($containerBuilder, $config);
@@ -68,7 +66,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoad()
     {
         $containerBuilder = $this->getContainerBuilder([]);
-        $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
+        $sharedContexts = [OroMainContext::class];
 
         $config = ['oro_test' => [
             'shared_contexts' => $sharedContexts,
@@ -88,10 +86,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('oro_test', $extension->getConfigKey());
     }
 
-    /**
-     * @return array
-     */
-    public function processBundleAutoloadProvider()
+    public function processBundleAutoloadProvider(): array
     {
         return [
             'All bundle was configured' => [
@@ -157,7 +152,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                     'OroFormBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/Features'],
                         ],
                     ],
@@ -173,14 +168,14 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
                     'OroBaseBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/var/www/OroBaseBundle/Features'],
                         ],
                     ],
                     'OroExtendBundle' => [
                         'type' => 'symfony_bundle',
                         'settings' => [
-                            'contexts' => ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'],
+                            'contexts' => [OroMainContext::class],
                             'paths' => ['/var/www/OroExtendBundle/Features'],
                         ],
                     ],
@@ -269,31 +264,27 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertArrayHasKey('MyElement2', $elements);
     }
 
-    /**
-     * @param array $bundlesConfig
-     * @return ContainerBuilder
-     */
-    private function getContainerBuilder(array $bundlesConfig)
+    private function getContainerBuilder(array $bundlesConfig): ContainerBuilder
     {
         $containerBuilder = new ContainerBuilder();
 
         $kernel = new KernelStub($this->getTempDir('test_kernel_logs'), $bundlesConfig);
         $kernel->getContainer()->set(
             'oro_entity.entity_alias_resolver',
-            $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            $this->getMockBuilder(EntityAliasResolver::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
         $kernel->getContainer()->set(
             'oro_security.owner.metadata_provider.chain',
-            $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface')
+            $this->getMockBuilder(OwnershipMetadataProviderInterface::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
         $kernel->getContainer()->set('logger', new NullLogger());
         $kernel->getContainer()->set(
             'oro_message_queue.consumption.cache_state',
-            $this->getMockBuilder('Oro\Bundle\MessageQueueBundle\Consumption\CacheState')
+            $this->getMockBuilder(CacheState::class)
                 ->disableOriginalConstructor()
                 ->getMock()
         );
@@ -307,9 +298,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         return $containerBuilder;
     }
 
-    /**
-     * @param ContainerBuilder $containerBuilder
-     */
     private function updateNelmioServiceDefinitions(ContainerBuilder $containerBuilder): void
     {
         $nelmioServices = [
@@ -330,11 +318,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->setDefinition('file_locator', new Definition(FileLocator::class));
     }
 
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function processConfig(array $config = [])
+    private function processConfig(array $config = []): array
     {
         $tree = new TreeBuilder('oro_test');
         $extension = new OroTestFrameworkExtension();

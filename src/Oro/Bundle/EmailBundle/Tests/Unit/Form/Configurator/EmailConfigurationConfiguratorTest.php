@@ -24,14 +24,10 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
     private const OLD_PASSWORD = 'old_password';
     private const NEW_PASSWORD = 'new_password';
 
-    /**
-     * @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private static $encryptor;
 
-    /**
-     * @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private static $validator;
 
     protected function setUp(): void
@@ -45,7 +41,8 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
     {
         $builder = $this->createFormBuilder();
 
-        self::$encryptor->expects(self::never())->method('encryptData');
+        self::$encryptor->expects(self::never())
+            ->method('encryptData');
 
         $builder->add('otherField', FormFieldType::class);
         $form = $builder->getForm();
@@ -60,7 +57,8 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $passwordKey = $this->getSmtpPasswordFieldKey();
         $builder->add($passwordKey, FormFieldType::class);
 
-        self::$encryptor->expects(self::never())->method('encryptData');
+        self::$encryptor->expects(self::never())
+            ->method('encryptData');
 
         $builder->getForm()->submit([]);
 
@@ -77,8 +75,7 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         $passwordKey = $this->getSmtpPasswordFieldKey();
         $builder->add($passwordKey, FormFieldType::class);
 
-        self::$encryptor
-            ->expects(self::once())
+        self::$encryptor->expects(self::once())
             ->method('encryptData')
             ->with(self::NEW_PASSWORD)
             ->willReturn(self::ENCRYPTED_PASSWORD);
@@ -146,13 +143,11 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
      */
     public function getExtensions()
     {
-        /** @var ConfigSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(ConfigSubscriber::class)
-            ->setMethods(['__construct', 'preSubmit'])
+            ->onlyMethods(['__construct', 'preSubmit'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var ContainerInterface $container */
         $container = $this->createMock(ContainerInterface::class);
 
         $formType = new FormType($subscriber, $container);
@@ -167,29 +162,17 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * This method is used as configurator option.
-     *
-     * @param FormBuilderInterface $builder
-     * @param $options
-     */
     public static function configure(FormBuilderInterface $builder, $options): void
     {
         $emailConfigurationConfigurator = new EmailConfigurationConfigurator(self::$encryptor, self::$validator);
         $emailConfigurationConfigurator->configure($builder, $options);
     }
 
-    /**
-     * @return string
-     */
     private function getConfiguratorOption(): string
     {
         return sprintf('%s::configure', EmailConfigurationConfiguratorTest::class);
     }
 
-    /**
-     * @return FormBuilderInterface
-     */
     private function createFormBuilder(): FormBuilderInterface
     {
         return $this->factory->createNamedBuilder(
@@ -206,20 +189,12 @@ class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @return string
-     */
     private function getSmtpPasswordFieldKey(): string
     {
         return $this->getConfigKey(Configuration::KEY_SMTP_SETTINGS_PASS);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return string
-     */
-    private function getConfigKey($name): string
+    private function getConfigKey(string $name): string
     {
         return Configuration::getConfigKeyByName(
             $name,

@@ -4,8 +4,8 @@ namespace Oro\Bundle\SegmentBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentRepository;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Form\Type\SegmentChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -40,10 +40,7 @@ class SegmentChoiceTypeTest extends \PHPUnit\Framework\TestCase
             'choices' => ['First Segment' => 1, 'Second Segment' => 5],
         ];
 
-        $repo = $this->getMockBuilder(ObjectRepository::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['findByEntity', 'find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])
-            ->getMock();
+        $repo = $this->createMock(SegmentRepository::class);
         $repo->expects($this->once())
             ->method('findByEntity')
             ->with($this->aclHelper, self::ENTITY_CLASS)

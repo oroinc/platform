@@ -21,39 +21,44 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     use EntityTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
-    protected $provider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $registry;
+    private $provider;
 
     /** @var LanguageSelectType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
 
         $metadata = $this->createMock(ClassMetadataInfo::class);
-        $metadata->expects($this->any())->method('getSingleIdentifierFieldName')->willReturn('id');
+        $metadata->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
 
         $repository = $this->createMock(ObjectRepository::class);
-        $repository->expects($this->any())->method('find')->willReturnMap(
-            [
+        $repository->expects($this->any())
+            ->method('find')
+            ->willReturnMap([
                 [42, $this->getEntity(Language::class, ['id' => 42, 'code' => 'en'])]
-            ]
-        );
+            ]);
 
         $manager = $this->createMock(EntityManager::class);
-        $manager->expects($this->any())->method('getClassMetadata')->with(Language::class)->willReturn($metadata);
-        $manager->expects($this->any())->method('getRepository')->with(Language::class)->willReturn($repository);
+        $manager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with(Language::class)
+            ->willReturn($metadata);
+        $manager->expects($this->any())
+            ->method('getRepository')
+            ->with(Language::class)
+            ->willReturn($repository);
 
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
             ->method('getManagerForClass')
             ->with(Language::class)
             ->willReturn($manager);
 
-        $this->formType = new LanguageSelectType($this->provider, $this->registry);
+        $this->formType = new LanguageSelectType($this->provider, $registry);
         parent::setUp();
     }
 
@@ -71,7 +76,10 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
     {
         $data =  ['English' => '1', 'Spain' => '2'];
 
-        $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
+        $this->provider->expects($this->once())
+            ->method('getLanguageChoices')
+            ->with(true)
+            ->willReturn($data);
 
         $form = $this->factory->create(LanguageSelectType::class);
 
@@ -88,15 +96,15 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param string $submittedData
-     * @param object $expectedData
      */
-    public function testSubmit($submittedData, $expectedData)
+    public function testSubmit(string $submittedData, object $expectedData)
     {
         $data =  ['English' => 42, 'Spain' => 2];
 
-        $this->provider->expects($this->once())->method('getLanguageChoices')->with(true)->willReturn($data);
+        $this->provider->expects($this->once())
+            ->method('getLanguageChoices')
+            ->with(true)
+            ->willReturn($data);
 
         $form = $this->factory->create(LanguageSelectType::class);
         $form->submit($submittedData);
@@ -106,10 +114,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedData, $form->getData());
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             'language entity' => [
@@ -124,11 +129,10 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions()
     {
-        $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType = $this->createMock(OroChoiceType::class);
+        $choiceType->expects($this->any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return [
             new PreloadedExtension(

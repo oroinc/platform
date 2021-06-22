@@ -16,19 +16,19 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class RouterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestQuery;
+    private $requestQuery;
 
     /** @var SymfonyRouter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $symfonyRouter;
+    private $symfonyRouter;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var Router */
-    protected $router;
+    private $router;
 
     protected function setUp(): void
     {
@@ -36,9 +36,10 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->request = $this->createMock(Request::class);
         $this->request->query = $this->requestQuery;
 
-        /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack */
         $requestStack = $this->createMock(RequestStack::class);
-        $requestStack->expects($this->any())->method('getCurrentRequest')->willReturn($this->request);
+        $requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
 
         $this->symfonyRouter = $this->createMock(SymfonyRouter::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
@@ -51,21 +52,21 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->request->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
+            ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
         $this->symfonyRouter->expects($this->once())
             ->method('generate')
-            ->will($this->returnValue($testUrl));
+            ->willReturn($testUrl);
 
         $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $redirect = $this->router->redirectAfterSave(
-            array(
+            [
                 'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            ),
-            array()
+                'parameters' => ['id' => 1],
+            ],
+            []
         );
 
         $this->assertEquals($testUrl, $redirect->getTargetUrl());
@@ -77,25 +78,25 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->request->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
+            ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
         $this->symfonyRouter->expects($this->once())
             ->method('generate')
-            ->will($this->returnValue($testUrl));
+            ->willReturn($testUrl);
 
         $entity = new \stdClass();
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('EDIT', $this->identicalTo($entity))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $redirect = $this->router->redirectAfterSave(
-            array(
+            [
                 'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            ),
-            array(),
+                'parameters' => ['id' => 1],
+            ],
+            [],
             $entity
         );
 
@@ -109,40 +110,37 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->request->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_AND_STAY));
+            ->willReturn(Router::ACTION_SAVE_AND_STAY);
 
         $this->symfonyRouter->expects($this->once())
             ->method('generate')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $parameters) use (&$testUrl1, &$testUrl2) {
-                        if ($name === 'test_route1') {
-                            return $testUrl1;
-                        } elseif ($name === 'test_route2') {
-                            return $testUrl2;
-                        } else {
-                            return '';
-                        }
-                    }
-                )
-            );
+            ->willReturnCallback(function ($name) use (&$testUrl1, &$testUrl2) {
+                if ($name === 'test_route1') {
+                    return $testUrl1;
+                }
+                if ($name === 'test_route2') {
+                    return $testUrl2;
+                }
+
+                return '';
+            });
 
         $entity = new \stdClass();
 
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')
             ->with('EDIT', $this->identicalTo($entity))
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $redirect = $this->router->redirectAfterSave(
-            array(
+            [
                 'route'      => 'test_route1',
-                'parameters' => array('id' => 1),
-            ),
-            array(
+                'parameters' => ['id' => 1],
+            ],
+            [
                 'route'      => 'test_route2',
-                'parameters' => array('id' => 1),
-            ),
+                'parameters' => ['id' => 1],
+            ],
             $entity
         );
 
@@ -155,21 +153,21 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->request->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(Router::ACTION_SAVE_CLOSE));
+            ->willReturn(Router::ACTION_SAVE_CLOSE);
 
         $this->symfonyRouter->expects($this->once())
             ->method('generate')
-            ->will($this->returnValue($testUrl));
+            ->willReturn($testUrl);
 
         $this->authorizationChecker->expects($this->never())
             ->method('isGranted');
 
         $redirect = $this->router->redirectAfterSave(
-            array(),
-            array(
+            [],
+            [
                 'route'      => 'test_route',
-                'parameters' => array('id' => 1),
-            )
+                'parameters' => ['id' => 1],
+            ]
         );
 
         $this->assertEquals($testUrl, $redirect->getTargetUrl());
@@ -179,8 +177,8 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->router->redirectAfterSave(
-            array(),
-            array()
+            [],
+            []
         );
     }
 
@@ -270,7 +268,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
 
         $this->requestQuery->expects($this->once())
             ->method('all')
-            ->will($this->returnValue($data['queryParameters']));
+            ->willReturn($data['queryParameters']);
 
         $expectedUrl = 'http://expected.com';
         $this->symfonyRouter->expects($this->once())
@@ -388,14 +386,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param int $id
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityStub($id)
+    private function getEntityStub(int $id): \stdClass
     {
-        $entity = $this->createPartialMock('StdClass', ['getId']);
+        $entity = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
         $entity->expects($this->any())
             ->method('getId')
             ->willReturn($id);

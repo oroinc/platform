@@ -3,42 +3,28 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateTimeType;
 
 class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UTCDateTimeType|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $type;
+    /** @var UTCDateTimeType */
+    private $type;
 
-    /**
-     * @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $platform;
+    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
+    private $platform;
 
     protected function setUp(): void
     {
-        // class has private constructor
-        $this->type = $this->getMockBuilder(UTCDateTimeType::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->type = new UTCDateTimeType();
 
-        $this->platform = $this->getMockBuilder(AbstractPlatform::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getDateTimeFormatString'))
-            ->getMockForAbstractClass();
+        $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform->expects($this->any())
             ->method('getDateTimeFormatString')
-            ->will($this->returnValue('Y-m-d H:i:s'));
+            ->willReturn('Y-m-d H:i:s');
     }
 
     /**
-     * @param string $sourceDateTime
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenDataProvider
      */
     public function testConvertToDatabaseValue(string $sourceDateTime, string $sourceTimeZone, string $expected)
@@ -48,10 +34,7 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToDatabaseValueWhenDataProvider()
+    public function convertToDatabaseValueWhenDataProvider(): array
     {
         return [
             'UTC' => [
@@ -97,7 +80,7 @@ class UTCDateTimeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConvertToPHPValueException()
     {
-        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
+        $this->expectException(ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);
     }
 }

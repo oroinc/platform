@@ -57,6 +57,7 @@ services:
             - '@router'
             - '@oro_config.global'
             - '@oro_importexport.file.file_manager'
+            - '@doctrine'
         public: false
 
     Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer:

@@ -22,10 +22,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
 {
     /** @var WorkflowDefinitionChoicesGroupProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $choicesProvider;
+    private $choicesProvider;
 
     /** @var WorkflowDefinitionType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {
@@ -34,19 +34,8 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->formType);
-
-        parent::tearDown();
-    }
-
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $fields
-     * @param array $submittedData
-     * @param array $expectedData
      */
     public function testSubmit(array $fields, array $submittedData, array $expectedData)
     {
@@ -78,10 +67,7 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function submitDataProvider()
+    public function submitDataProvider(): array
     {
         return [
             [
@@ -128,22 +114,14 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getBlockPrefix());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider $configProvider */
-        $configProvider = $this->getMockBuilder(ConfigProvider::class)->disableOriginalConstructor()->getMock();
-
-        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator $translator */
-        $translator = $this->getMockBuilder(Translator::class)->disableOriginalConstructor()->getMock();
-
-        $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $configProvider = $this->createMock(ConfigProvider::class);
+        $translator = $this->createMock(Translator::class);
+        $choiceType = $this->createMock(OroChoiceType::class);
+        $choiceType->expects($this->any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return array_merge(
             parent::getExtensions(),
