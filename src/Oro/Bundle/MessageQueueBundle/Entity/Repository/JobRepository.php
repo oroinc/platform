@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Entity\Repository;
 
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Component\MessageQueue\Job\Job;
@@ -12,6 +14,29 @@ use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
  */
 class JobRepository extends EntityRepository implements JobRepositoryInterface
 {
+    /**
+     * @param Job $rootJob
+     * @return array
+     */
+    public function getChildJobErrorLogFiles(Job $rootJob)
+    {
+        if ($this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof MySqlPlatform) {
+            $sql = 'SELECT id, data->>"$.errorLogFile" as error_log_file'
+                . ' FROM oro_message_queue_job'
+                . ' WHERE root_job_id = :jobId AND data->"$.errorLogFile" IS NOT NULL';
+        } else {
+            $sql = "SELECT id, data->>'errorLogFile' as error_log_file"
+                . " FROM oro_message_queue_job"
+                . " WHERE root_job_id = :jobId AND data->'errorLogFile' IS NOT NULL";
+        }
+
+        $connection = $this->getEntityManager()->getConnection();
+
+        return $connection
+            ->executeQuery($sql, ['jobId' => $rootJob->getId()], ['jobId' => Types::INTEGER])
+            ->fetchAllAssociative();
+    }
+
     /**
      * {@inheritdoc}
      *
