@@ -7,6 +7,8 @@ use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClass;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicCall;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\TestClassMagicGet;
 use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 /**
@@ -17,9 +19,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
  */
 class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     private $propertyAccessor;
 
     protected function setUp(): void
@@ -105,7 +105,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->propertyAccessor->getValue(new \stdClass(), 123);
     }
 
@@ -116,7 +116,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
@@ -139,13 +139,13 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
     public function testGetValueThrowsExceptionIfNotArrayAccess()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new \stdClass(), 'index');
     }
 
@@ -165,7 +165,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueDoesNotReadMagicCallByDefault()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new TestClassMagicCall('John'), 'magicCallProperty');
     }
 
@@ -197,7 +197,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
 
         $this->propertyAccessor->getValue($objectOrArray, $path);
@@ -205,9 +205,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueWithReadPropertyCache()
     {
-        /** @var PropertyAccessor|\PHPUnit\Framework\MockObject\MockObject $propertyAccessor */
         $propertyAccessor = $this->getMockBuilder(PropertyAccessor::class)
-            ->setMethods(['camelize'])
+            ->onlyMethods(['camelize'])
             ->getMock();
         $propertyAccessor->expects($this->once())
             ->method('camelize')
@@ -237,7 +236,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->setValue($testObject, 123, 'Updated');
@@ -250,7 +249,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetValueThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
     }
 
@@ -281,7 +280,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueThrowsExceptionIfNotArrayAccess()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->setValue($testObject, 'index', 'Updated');
@@ -289,7 +288,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException::class);
+        $this->expectException(InvalidPropertyPathException::class);
         $objectOrArray = new \stdClass();
         $objectOrArray->root = ['index' => 123];
 
@@ -307,7 +306,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueThrowsExceptionIfThereAreMissingParameters()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
 
         $this->propertyAccessor->setValue($testObject, 'publicAccessorWithMoreRequiredParameters', 'Updated');
@@ -315,7 +314,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueDoesNotUpdateMagicCallByDefault()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $author = new TestClassMagicCall('John');
 
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
@@ -339,7 +338,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
 
         $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
@@ -369,7 +368,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionForInvalidPropertyPathType()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->remove($testObject, 123);
@@ -382,7 +381,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testRemoveThrowsExceptionIfPropertyNotFound($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->remove($objectOrArray, $path);
     }
 
@@ -408,7 +407,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfNotArrayAccess()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new \stdClass();
 
         $this->propertyAccessor->remove($testObject, 'index');
@@ -416,7 +415,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfThereIsInvalidItemInGraph()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $objectOrArray = new \stdClass();
         $objectOrArray->root = ['index' => 123];
 
@@ -434,7 +433,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfThereAreMissingParameters()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
 
         $this->propertyAccessor->remove($testObject, 'publicAccessorWithMoreRequiredParameters');
@@ -442,7 +441,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfPublicPropertyHasNoUnsetter()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
 
         $this->propertyAccessor->remove($testObject, 'publicProperty');
@@ -450,7 +449,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfProtectedProperty()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
 
         $this->propertyAccessor->remove($testObject, 'protectedProperty');
@@ -458,7 +457,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveThrowsExceptionIfPrivateProperty()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $testObject = new TestClass('John');
 
         $this->propertyAccessor->remove($testObject, 'privateProperty');
@@ -466,7 +465,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveDoesNotUpdateMagicCallByDefault()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $author = new TestClassMagicCall('John');
 
         $this->propertyAccessor->remove($author, 'magicCallProperty');
@@ -490,7 +489,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testRemoveThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException::class);
+        $this->expectException(NoSuchPropertyException::class);
         $this->expectExceptionMessage('PropertyAccessor requires a graph of objects or arrays to operate on');
 
         $this->propertyAccessor->remove($objectOrArray, $path);
@@ -789,9 +788,8 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueWithWritePropertyCache()
     {
-        /** @var PropertyAccessor|\PHPUnit\Framework\MockObject\MockObject $propertyAccessor */
         $propertyAccessor = $this->getMockBuilder(PropertyAccessor::class)
-            ->setMethods(['camelize'])
+            ->onlyMethods(['camelize'])
             ->getMock();
         $propertyAccessor->expects($this->once())
             ->method('camelize')

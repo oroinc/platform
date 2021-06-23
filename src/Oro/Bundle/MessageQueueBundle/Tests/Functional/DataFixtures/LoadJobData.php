@@ -65,7 +65,8 @@ class LoadJobData extends AbstractFixture implements ContainerAwareInterface
         self::JOB_8 => [
             'name' => self::JOB_8,
             'status' => Job::STATUS_CANCELLED,
-            'root_job' => self::JOB_5
+            'root_job' => self::JOB_5,
+            'data' => ['errorLogFile' => 'error_file.json']
         ],
         self::JOB_9 => [
             'name' => self::JOB_9,

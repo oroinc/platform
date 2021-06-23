@@ -2,10 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowStepSelectType;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowTranslationHelper;
@@ -22,19 +28,19 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
-    protected $workflowRegistry;
+    private $workflowRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
-    protected $repository;
+    private $repository;
 
     /** @var WorkflowStepSelectType */
-    protected $type;
+    private $type;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|Translator */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|MessageCatalogueInterface */
-    protected $translatorCatalogue;
+    private $translatorCatalogue;
 
     protected function setUp(): void
     {
@@ -43,12 +49,14 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->translatorCatalogue = $this->createMock(MessageCatalogueInterface::class);
 
         $this->translator = $this->createMock(Translator::class);
-        $this->translator->expects($this->any())->method('getCatalogue')->willReturn($this->translatorCatalogue);
-        $this->translator->expects($this->any())->method('trans')->willReturnCallback(
-            function ($label) {
+        $this->translator->expects($this->any())
+            ->method('getCatalogue')
+            ->willReturn($this->translatorCatalogue);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(function ($label) {
                 return 'transtaled_' . $label;
-            }
-        );
+            });
 
         $this->repository = $this->createMock(EntityRepository::class);
 
@@ -57,37 +65,33 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
-        $classMetadata = $this->getMockBuilder('\Doctrine\Persistence\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $classMetadata->expects($this->any())->method('getIdentifierFieldNames')->willReturn(['id']);
-        $classMetadata->expects($this->any())->method('getTypeOfField')->willReturn('integer');
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $classMetadata->expects($this->any())
+            ->method('getTypeOfField')
+            ->willReturn('integer');
         $classMetadata->expects($this->any())
             ->method('getName')
-            ->willReturn('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep');
+            ->willReturn(WorkflowStep::class);
 
-        $mockEntityManager = $this->getMockBuilder('\Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mockEntityManager->expects($this->any())->method('getRepository')->willReturn($this->repository);
-        $mockEntityManager->expects($this->any())->method('getClassMetadata')->willReturn($classMetadata);
+        $mockEntityManager = $this->createMock(EntityManager::class);
+        $mockEntityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($this->repository);
+        $mockEntityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
-        $mockRegistry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
-            ->disableOriginalConstructor()
-            ->setMethods(['getManagerForClass'])
-            ->getMock();
-        $mockRegistry->expects($this->any())->method('getManagerForClass')->willReturn($mockEntityManager);
+        $mockRegistry = $this->createMock(Registry::class);
+        $mockRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($mockEntityManager);
 
-        $mockEntityType = $this->getMockBuilder('Symfony\Bridge\Doctrine\Form\Type\EntityType')
-            ->setMethods(['getName'])
-            ->setConstructorArgs([$mockRegistry])
-            ->getMock();
-        $mockEntityType->expects($this->any())->method('getName')->willReturn('entity');
+        $mockEntityType = new EntityType($mockRegistry);
 
         return [
             new PreloadedExtension(
@@ -112,8 +116,6 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider incorrectOptionsDataProvider
-     *
-     * @param $options
      */
     public function testNormalizersException(array $options)
     {
@@ -126,7 +128,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     public function testNormalizersByWorkflowName()
     {
         $options = ['workflow_name' => 'test'];
-        $workflow = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Model\Workflow');
+        $workflow = $this->getWorkflowDefinitionAwareClass(Workflow::class);
 
         $this->workflowRegistry->expects($this->once())
             ->method('getWorkflow')
@@ -140,8 +142,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     public function testNormalizersByEntityClass()
     {
-        $options = ['workflow_entity_class' => '\stdClass'];
-        $workflow = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Model\Workflow');
+        $options = ['workflow_entity_class' => \stdClass::class];
+        $workflow = $this->getWorkflowDefinitionAwareClass(Workflow::class);
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')
@@ -155,9 +157,9 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     public function testFinishViewWithOneWorkflow()
     {
-        $step1 = $this->getWorkflowDefinitionAwareClassMock(WorkflowStep::class);
-        $step2 = $this->getWorkflowDefinitionAwareClassMock(WorkflowStep::class);
-        $step3 = $this->getWorkflowDefinitionAwareClassMock(WorkflowStep::class);
+        $step1 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class);
+        $step2 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class);
+        $step3 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class);
 
         $view = new FormView();
         $view->vars['choices'] = [
@@ -173,13 +175,11 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->translatorCatalogue->expects($this->exactly(3))
             ->method('has')
-            ->willReturnMap(
-                [
-                    ['step1label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, true],
-                    ['step2label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, false],
-                    ['step3label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, true]
-                ]
-            );
+            ->willReturnMap([
+                ['step1label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, true],
+                ['step2label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, false],
+                ['step3label', WorkflowTranslationHelper::TRANSLATION_DOMAIN, true]
+            ]);
 
         $this->type->finishView($view, $this->createMock(FormInterface::class), ['workflow_name' => 'test']);
 
@@ -190,8 +190,8 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     public function testFinishViewWithMoreThanOneWorkflow()
     {
-        $step1 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'wf_l1');
-        $step2 = $this->getWorkflowDefinitionAwareClassMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowStep', 'wf_l2');
+        $step1 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class, 'wf_l1');
+        $step2 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class, 'wf_l2');
 
         $view = new FormView();
         $view->vars['choices'] = [
@@ -201,15 +201,17 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->workflowRegistry->expects($this->once())
             ->method('getActiveWorkflowsByEntityClass')
-            ->with('\stdClass')
+            ->with(\stdClass::class)
             ->willReturn(new ArrayCollection([new \stdClass(), new \stdClass()]));
 
-        $this->translatorCatalogue->expects($this->any())->method('has')->willReturn(true);
+        $this->translatorCatalogue->expects($this->any())
+            ->method('has')
+            ->willReturn(true);
 
         $this->type->finishView(
             $view,
-            $this->createMock('Symfony\Component\Form\Test\FormInterface'),
-            ['workflow_entity_class' => '\stdClass']
+            $this->createMock(\Symfony\Component\Form\Test\FormInterface::class),
+            ['workflow_entity_class' => \stdClass::class]
         );
 
         $this->assertEquals('transtaled_wf_l1: transtaled_step1label', $view->vars['choices'][0]->label);
@@ -223,68 +225,76 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
         $this->type->finishView(
             new FormView(),
-            $this->createMock('Symfony\Component\Form\Test\FormInterface'),
+            $this->createMock(\Symfony\Component\Form\Test\FormInterface::class),
             []
         );
     }
 
     /**
-     * @param string $class
-     * @param string $definitionLabel
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Workflow|WorkflowStep
+     * @return Workflow|WorkflowStep
      */
-    protected function getWorkflowDefinitionAwareClassMock($class, $definitionLabel = null)
+    private function getWorkflowDefinitionAwareClass(string $class, string $definitionLabel = null)
     {
-        $definition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $definition->expects($this->any())->method('getLabel')->willReturn($definitionLabel);
+        $definition = $this->createMock(WorkflowDefinition::class);
+        $definition->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($definitionLabel);
 
-        $object = $this->getMockBuilder($class)->disableOriginalConstructor()->getMock();
-        $object->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $object = $this->createMock($class);
+        $object->expects($this->any())
+            ->method('getDefinition')
+            ->willReturn($definition);
 
         return $object;
     }
 
-    protected function assertQueryBuilderCalled()
+    private function assertQueryBuilderCalled()
     {
         $func = new Expr\Func('ws.definition IN', ':workflowDefinitions');
 
-        /** @var Expr|\PHPUnit\Framework\MockObject\MockObject $expr */
-        $expr = $this->getMockBuilder('Doctrine\ORM\Query\Expr')->disableOriginalConstructor()->getMock();
+        $expr = $this->createMock(Expr::class);
         $expr->expects($this->once())
             ->method('in')
             ->with('ws.definition', ':workflowDefinitions')
             ->willReturn($func);
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $qb->expects($this->any())->method('orderBy')->willReturnSelf();
-        $qb->expects($this->once())->method('where')->with($func)->willReturnSelf();
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->any())
+            ->method('orderBy')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('where')
+            ->with($func)
+            ->willReturnSelf();
         $qb->expects($this->once())
             ->method('setParameter')
             ->with('workflowDefinitions', $this->isType('array'))
             ->willReturnSelf();
-        $qb->expects($this->any())->method('getParameters')->willReturn(new ArrayCollection());
-        $qb->expects($this->any())->method('expr')->willReturn($expr);
+        $qb->expects($this->any())
+            ->method('getParameters')
+            ->willReturn(new ArrayCollection());
+        $qb->expects($this->any())
+            ->method('expr')
+            ->willReturn($expr);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['execute'])
-            ->getMockForAbstractClass();
-        $query->expects($this->any())->method('execute')->willReturn([]);
-        $query->expects($this->any())->method('getSQL')->willReturn('SQL QUERY');
-        $qb->expects($this->any())->method('getQuery')->willReturn($query);
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects($this->any())
+            ->method('execute')
+            ->willReturn([]);
+        $query->expects($this->any())
+            ->method('getSQL')
+            ->willReturn('SQL QUERY');
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->repository->expects($this->once())->method('createQueryBuilder')->with('ws')->willReturn($qb);
+        $this->repository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('ws')
+            ->willReturn($qb);
     }
 
-    /**
-     * @return array
-     */
-    public function incorrectOptionsDataProvider()
+    public function incorrectOptionsDataProvider(): array
     {
         return [
             [

@@ -48,7 +48,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     {
         $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
-            ->setMethods(['isSynchronized', 'isSubmitted'])
+            ->onlyMethods(['isSynchronized', 'isSubmitted'])
             ->getMock();
 
         $form->expects(self::any())
@@ -156,7 +156,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
 
         $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])
-            ->setMethods(['setData'])
+            ->onlyMethods(['setData'])
             ->getMock();
 
         $form->expects(self::once())

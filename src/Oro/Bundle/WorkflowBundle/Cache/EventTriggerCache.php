@@ -97,10 +97,8 @@ class EventTriggerCache
     {
         $this->assertConfigured();
 
-        if (!$this->isBuilt()) {
+        if (!$this->isBuilt() || false === ($data = $this->provider->fetch(self::DATA))) {
             $data = $this->build();
-        } else {
-            $data = $this->provider->fetch(self::DATA);
         }
 
         return !empty($data[$entityClass]) && in_array($event, $data[$entityClass], true);

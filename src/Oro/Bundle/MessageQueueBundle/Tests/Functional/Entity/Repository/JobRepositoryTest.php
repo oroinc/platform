@@ -23,6 +23,15 @@ class JobRepositoryTest extends WebTestCase
         $this->loadFixtures([LoadJobData::class]);
     }
 
+    public function testGetChildJobErrorLogFiles()
+    {
+        $job = $this->getReference(LoadJobData::JOB_5);
+        $expectedChildJob = $this->getReference(LoadJobData::JOB_8);
+
+        $filesData = $this->getJobRepository()->getChildJobErrorLogFiles($job);
+        $this->assertEquals([['id' => $expectedChildJob->getId(), 'error_log_file' => 'error_file.json']], $filesData);
+    }
+
     public function testFindJobById(): void
     {
         $job = $this->getReference(LoadJobData::JOB_1);

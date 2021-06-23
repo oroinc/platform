@@ -29,9 +29,8 @@ class CollectionTypeTest extends ApiFormTypeTestCase
 
     public function testShouldUseAdder()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -71,7 +70,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -111,9 +110,8 @@ class CollectionTypeTest extends ApiFormTypeTestCase
 
     public function testShouldUpdateExistingEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -150,9 +148,8 @@ class CollectionTypeTest extends ApiFormTypeTestCase
 
     public function testShouldUseRemoverWhenRemoveAllItems()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();
@@ -188,9 +185,8 @@ class CollectionTypeTest extends ApiFormTypeTestCase
 
     public function testShouldValidateEntryEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
-            ->setMethods(['addGroup', 'removeGroup'])
+            ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();
 
         $group1 = new Group();

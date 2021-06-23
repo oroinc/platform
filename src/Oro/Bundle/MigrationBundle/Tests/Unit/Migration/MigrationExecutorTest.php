@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\MigrationExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -15,8 +17,10 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrat
 
 class MigrationExecutorTest extends AbstractTestMigrationExecutor
 {
+    private const TEST_PACKAGE_NAMESPACE = 'Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\\';
+
     /** @var MigrationExecutor */
-    protected $executor;
+    private $executor;
 
     protected function setUp(): void
     {
@@ -42,7 +46,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $migrations = ['InvalidIndexMigration'];
         $migrationsToExecute = [];
         foreach ($migrations as $migration) {
-            $migrationClass = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\' . $migration;
+            $migrationClass = self::TEST_PACKAGE_NAMESPACE . $migration;
             $migrationsToExecute[] = new MigrationState(new $migrationClass());
         }
 
@@ -71,7 +75,7 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
         $migrations = ['IndexMigration', 'UpdatedColumnIndexMigration'];
         $migrationsToExecute = [];
         foreach ($migrations as $migration) {
-            $migrationClass = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\' . $migration;
+            $migrationClass = self::TEST_PACKAGE_NAMESPACE . $migration;
             $migrationsToExecute[] = new MigrationState(new $migrationClass());
         }
         $migrationsToExecute[] = new MigrationState(new Test1BundleInstallation());
@@ -105,20 +109,18 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     {
         $schema = new Schema();
 
-        $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
+        $platform = $this->getMockBuilder(AbstractPlatform::class)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
 
         $schemaUpdateQuery = new SqlSchemaUpdateMigrationQuery('ALTER TABLE');
 
-        $migration = $this->createMock('Oro\Bundle\MigrationBundle\Migration\Migration');
+        $migration = $this->createMock(Migration::class);
         $migration->expects($this->once())
             ->method('up')
-            ->willReturnCallback(
-                function (Schema $schema, QueryBag $queries) use ($schemaUpdateQuery) {
-                    $queries->addQuery($schemaUpdateQuery);
-                }
-            );
+            ->willReturnCallback(function (Schema $schema, QueryBag $queries) use ($schemaUpdateQuery) {
+                $queries->addQuery($schemaUpdateQuery);
+            });
 
         $this->assertEmpty($schema->getTables());
         $this->executor->executeUpMigration($schema, $platform, $migration);
@@ -126,9 +128,9 @@ class MigrationExecutorTest extends AbstractTestMigrationExecutor
     }
 
     /**
-     * @return Table[]
+     * {@inheritDoc}
      */
-    protected function getTables()
+    protected function getTables(): array
     {
         return [
             new Table(

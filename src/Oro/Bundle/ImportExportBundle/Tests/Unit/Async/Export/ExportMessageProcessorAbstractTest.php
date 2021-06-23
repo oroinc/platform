@@ -35,7 +35,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $this->processor = $this->getMockBuilder(ExportMessageProcessorAbstract::class)
             ->setConstructorArgs([$this->jobRunner, $this->fileManager, $this->logger])
-            ->setMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
+            ->onlyMethods(['getSubscribedTopics', 'handleExport', 'getMessageBody'])
             ->getMock();
     }
 
@@ -52,23 +52,18 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectMessageIfGetMessageBodyReturnFalse()
     {
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getMessageBody')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $message = new Message();
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function runDelayedJobResultProvider()
+    public function runDelayedJobResultProvider(): array
     {
         return [
             [ true, ExportMessageProcessorAbstract::ACK ],
@@ -78,27 +73,21 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider runDelayedJobResultProvider
-     * @param string $jobResult
-     * @param string $expectedResult
      */
-    public function testShouldReturnMessageStatusDependsOfJobResult($jobResult, $expectedResult)
+    public function testShouldReturnMessageStatusDependsOfJobResult(bool $jobResult, string $expectedResult)
     {
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with($this->equalTo(1))
-            ->willReturn($jobResult)
-        ;
+            ->willReturn($jobResult);
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getMessageBody')
-            ->willReturn(['jobId' => 1])
-        ;
+            ->willReturn(['jobId' => 1]);
 
         $message = new Message();
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -109,38 +98,29 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
         $job = new Job();
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with($this->equalTo(1))
-            ->will($this->returnCallback(function ($jobId, $callback) use ($job) {
+            ->willReturnCallback(function ($jobId, $callback) use ($job) {
                 return $callback($this->jobRunner, $job);
-            }))
-        ;
+            });
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('info')
-            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'))
-        ;
+            ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getMessageBody')
-            ->willReturn(['jobId' => 1])
-        ;
-        $this->processor
-            ->expects($this->once())
+            ->willReturn(['jobId' => 1]);
+        $this->processor->expects($this->once())
             ->method('handleExport')
             ->with($this->equalTo(['jobId' => 1]))
-            ->willReturn($exportResult)
-        ;
+            ->willReturn($exportResult);
 
-        $this->fileManager
-            ->expects($this->never())
+        $this->fileManager->expects($this->never())
             ->method('writeToStorage');
 
-        $result = $this->processor->process(new Message(), $this->createSessionMock());
+        $result = $this->processor->process(new Message(), $this->createMock(SessionInterface::class));
 
         $this->assertEquals(ExportMessageProcessorAbstract::ACK, $result);
         $this->assertArrayNotHasKey('errorLogFile', $job->getData());
@@ -148,7 +128,7 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldSaveJobResultWhenErrors(): void
     {
-        $this->processor = $this->mockProcessor(
+        $this->processor = $this->getProcessor(
             $job = new Job(),
             $exportResult = [
                 'success' => false,
@@ -158,59 +138,38 @@ class ExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('info')
             ->with('Export result. Success: No. ReadsCount: 1. ErrorsCount: 1');
 
-        $this->fileManager
-            ->expects($this->once())
+        $this->fileManager->expects($this->once())
             ->method('writeToStorage')
-            ->with(json_encode($exportResult['errors']));
+            ->with(json_encode($exportResult['errors'], JSON_THROW_ON_ERROR));
 
-        $result = $this->processor->process(new Message(), $this->createSessionMock());
+        $result = $this->processor->process(new Message(), $this->createMock(SessionInterface::class));
 
         $this->assertEquals(ExportMessageProcessorAbstract::REJECT, $result);
         $this->assertArrayHasKey('errorLogFile', $job->getData());
     }
 
-    /**
-     * @param Job $job
-     * @param array $exportResult
-     *
-     * @return ExportMessageProcessorAbstract
-     */
-    private function mockProcessor(Job $job, array $exportResult): ExportMessageProcessorAbstract
+    private function getProcessor(Job $job, array $exportResult): ExportMessageProcessorAbstract
     {
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects($this->once())
             ->method('runDelayed')
             ->with($jobId = 1, $this->isType(IsType::TYPE_CALLABLE))
-            ->willReturnCallback(
-                function ($jobId, $callback) use ($job) {
-                    return $callback($this->jobRunner, $job);
-                }
-            );
+            ->willReturnCallback(function ($jobId, $callback) use ($job) {
+                return $callback($this->jobRunner, $job);
+            });
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('getMessageBody')
             ->willReturn(['jobId' => $jobId]);
 
-        $this->processor
-            ->expects($this->once())
+        $this->processor->expects($this->once())
             ->method('handleExport')
             ->with(['jobId' => $jobId])
             ->willReturn($exportResult);
 
         return $this->processor;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

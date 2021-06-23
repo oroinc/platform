@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Model\Strategy;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Model\MergeModes;
 use Oro\Bundle\ActivityListBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\ActivityListBundle\Model\Strategy\UniteStrategy;
@@ -18,24 +21,19 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
 class UniteStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ReplaceStrategy */
-    protected $strategy;
+    private $strategy;
 
     /** @var ActivityListManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $activityListManager;
+    private $activityListManager;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $doctrineHelper;
 
     protected function setUp(): void
     {
-        $activityListManager = 'Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager';
-        $this->activityListManager = $this->getMockBuilder($activityListManager)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $activityListManager = ActivityListManager::class;
+        $this->activityListManager = $this->createMock($activityListManager);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->strategy = new UniteStrategy($this->activityListManager, $this->doctrineHelper);
     }
@@ -68,37 +66,31 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $fieldData = new FieldData($entityData, new FieldMetadata());
         $fieldData->setMode(MergeModes::ACTIVITY_UNITE);
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(['getQuery', 'getResult'])
-            ->getMock();
+        $query = $this->createMock(AbstractQuery::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->expects($this->any())
             ->method('getQuery')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->any())
+            ->willReturn($query);
+        $query->expects($this->any())
             ->method('getResult')
-            ->will($this->returnValue([
+            ->willReturn([
                 ['id' => 1, 'relatedActivityId' => 11],
                 ['id' => 3, 'relatedActivityId' => 2]
-            ]));
+            ]);
 
-        $repository = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ActivityListRepository::class);
         $repository->expects($this->any())
             ->method('getActivityListQueryBuilderByActivityClass')
             ->willReturn($queryBuilder);
         $repository->expects($this->any())
             ->method('findBy')
-            ->willReturn($this->returnValue([]));
+            ->willReturn([]);
 
-        $this->doctrineHelper
-            ->expects($this->any())
+        $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->willReturn($repository);
 
-        $this->activityListManager
-            ->expects($this->exactly(2))
+        $this->activityListManager->expects($this->exactly(2))
             ->method('replaceActivityTargetWithPlainQuery');
 
         $this->strategy->merge($fieldData);

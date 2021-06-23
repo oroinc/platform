@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -21,25 +22,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $variableNormalizer;
+    /** @var WorkflowVariableNormalizer|\PHPUnit\Framework\MockObject\MockObject */
+    private $variableNormalizer;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $variableGuesser;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $variableGuesser;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var \Oro\Bundle\WorkflowBundle\Model\Workflow|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflow;
+    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflow;
 
     protected function setUp(): void
     {
@@ -48,7 +41,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $this->variableNormalizer = $this->getMockBuilder(WorkflowVariableNormalizer::class)
             ->setConstructorArgs([[$attributeNormalizer], $this->createMock(ManagerRegistry::class)])
-            ->setMethods(['denormalizeVariable'])
+            ->onlyMethods(['denormalizeVariable'])
             ->getMock();
         $this->variableNormalizer->setSerializer($serializer);
 
@@ -62,7 +55,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         $variableManager = $this->createMock(VariableManager::class);
 
         $this->workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getName', 'getVariables', 'getDefinition'])
+            ->onlyMethods(['getName', 'getVariables', 'getDefinition'])
             ->setConstructorArgs([
                 $doctrineHelper,
                 $aclManager,
@@ -75,17 +68,13 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $this->workflow->expects($this->any())
             ->method('getDefinition')
-            ->willReturn($this->getWorkflowDefinition());
+            ->willReturn($this->createMock(WorkflowDefinition::class));
     }
 
     /**
      * @dataProvider invalidOptionsDataProvider
-     *
-     * @param array  $configuration
-     * @param string $exception
-     * @param string $message
      */
-    public function testAssembleRequiredOptionException($configuration, $exception, $message)
+    public function testAssembleRequiredOptionException(array $configuration, string $exception, string $message)
     {
         $this->expectException($exception);
 
@@ -109,18 +98,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         $assembler->assemble($this->workflow, $configuration);
     }
 
-    /**
-     * @return WorkflowDefinition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getWorkflowDefinition()
-    {
-        return $this->createMock(WorkflowDefinition::class);
-    }
-
-    /**
-     * @return array
-     */
-    public function invalidOptionsDataProvider()
+    public function invalidOptionsDataProvider(): array
     {
         return [
             'no_options' => [
@@ -180,12 +158,8 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationDataProvider
-     *
-     * @param array    $configuration
-     * @param Variable $expectedVariable
-     * @param array    $guessedParameters
      */
-    public function testAssemble($configuration, $expectedVariable, array $guessedParameters = [])
+    public function testAssemble(array $configuration, Variable $expectedVariable, array $guessedParameters = [])
     {
         $variableConfig = $configuration;
         $configuration = [
@@ -213,7 +187,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         );
         $variables = $assembler->assemble($this->workflow, $configuration);
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
+        $this->assertInstanceOf(ArrayCollection::class, $variables);
         $this->assertCount(1, $variables);
         $this->assertTrue($variables->containsKey($expectedVariable->getName()));
         $this->assertEquals($expectedVariable, $variables->get($expectedVariable->getName()));
@@ -221,9 +195,8 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function configurationDataProvider()
+    public function configurationDataProvider(): array
     {
         return [
             'string' => [
@@ -332,11 +305,8 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider configurationEntityIdentifierProvider
-     *
-     * @param array    $configuration
-     * @param Variable $expectedVariable
      */
-    public function testEntityIdentifierAssemble($configuration, $expectedVariable)
+    public function testEntityIdentifierAssemble(array $configuration, Variable $expectedVariable)
     {
         $configuration = [
             'variable_definitions' => [
@@ -355,7 +325,7 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         );
         $variables = $assembler->assemble($this->workflow, $configuration);
 
-        $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $variables);
+        $this->assertInstanceOf(ArrayCollection::class, $variables);
         $this->assertCount(1, $variables);
         $this->assertTrue($variables->containsKey($expectedVariable->getName()));
         $this->assertEquals($expectedVariable, $variables->get($expectedVariable->getName()));
@@ -364,9 +334,8 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function configurationEntityIdentifierProvider()
+    public function configurationEntityIdentifierProvider(): array
     {
         return [
             'entity_id_field' => [
@@ -392,26 +361,15 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     * @param string $type
-     * @param mixed  $value
-     * @param array  $options
-     * @param string $propertyPath
-     * @param array  $entityAcl
-     *
-     * @return Variable
-     */
-    protected function getVariable(
-        $name,
-        $label,
-        $type,
+    private function getVariable(
+        string $name,
+        string $label,
+        string $type,
         $value,
         array $options = [],
-        $propertyPath = null,
+        string $propertyPath = null,
         array $entityAcl = []
-    ) {
+    ): Variable {
         $variable = new Variable();
         $variable
             ->setName($name)

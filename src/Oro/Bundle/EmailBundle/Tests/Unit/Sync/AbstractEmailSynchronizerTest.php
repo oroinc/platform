@@ -77,7 +77,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'resetHangedOrigins',
                 'findOriginToSync',
                 'createSynchronizationProcessor',
@@ -112,7 +112,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'resetHangedOrigins',
                 'findOriginToSync',
                 'createSynchronizationProcessor',
@@ -155,7 +155,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
                 $this->knownEmailAddressCheckerFactory,
                 $this->emailEntityBuilder
             ])
-            ->setMethods([
+            ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',
                 'changeOriginSyncState',
@@ -193,7 +193,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',
                 'changeOriginSyncState',
@@ -228,7 +228,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',
                 'changeOriginSyncState',
@@ -269,7 +269,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $sync = $this->getMockBuilder(TestEmailSynchronizer::class)
             ->disableOriginalConstructor()
-            ->setMethods([
+            ->onlyMethods([
                 'findOriginToSync',
                 'createSynchronizationProcessor',
                 'changeOriginSyncState',
@@ -554,7 +554,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->sync->scheduleSyncOriginsJob([1,2,3]);
     }
 
-    public function changeOriginSyncStateProvider()
+    public function changeOriginSyncStateProvider(): array
     {
         return [
             [AbstractEmailSynchronizer::SYNC_CODE_FAILURE, false],

@@ -51,12 +51,12 @@ class ImportMessageProcessor implements MessageProcessorInterface
     protected $postponedRowsHandler;
 
     /**
-     * @param JobRunner                    $jobRunner
+     * @param JobRunner $jobRunner
      * @param ImportExportResultSummarizer $importExportResultSummarizer
-     * @param LoggerInterface              $logger
-     * @param FileManager                  $fileManager
-     * @param ImportHandler                $importHandler
-     * @param PostponedRowsHandler         $postponedRowsHandler
+     * @param LoggerInterface $logger
+     * @param FileManager $fileManager
+     * @param ImportHandler $importHandler
+     * @param PostponedRowsHandler $postponedRowsHandler
      */
     public function __construct(
         JobRunner $jobRunner,
@@ -79,7 +79,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if (! $body = $this->getNormalizeBody($message)) {
+        if (!$body = $this->getNormalizeBody($message)) {
             $this->logger->critical('Got invalid message');
 
             return self::REJECT;
@@ -109,7 +109,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
     {
         $body = JSON::decode($message->getBody());
 
-        if (! isset(
+        if (!isset(
             $body['fileName'],
             $body['jobName'],
             $body['processorAlias'],
@@ -122,13 +122,13 @@ class ImportMessageProcessor implements MessageProcessorInterface
         }
 
         return array_replace_recursive([
-                'options' => []
-            ], $body);
+            'options' => []
+        ], $body);
     }
 
     /**
-     * @param array     $body
-     * @param Job       $job
+     * @param array $body
+     * @param Job $job
      * @param JobRunner $jobRunner
      * @return bool
      */
@@ -176,11 +176,11 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function saveJobResult(Job $job, array $data)
     {
-        if (isset($data['errors']) && ! empty(($data['errors']))) {
+        if (isset($data['errors']) && !empty(($data['errors']))) {
             $data['errorLogFile'] = $this->saveToStorageErrorLog($data['errors']);
         }
 
-        unset($data['message'], $data['importInfo'], $data['errors']);
+        unset($data['message'], $data['importInfo'], $data['errors'], $data['postponedRows']);
 
         $job->setData($data);
     }
@@ -195,7 +195,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
         $fileManager = $this->fileManager;
         $errorAsJson = json_encode($errors);
 
-        $fileName = str_replace('.', '', uniqid('import')) .'.json';
+        $fileName = str_replace('.', '', uniqid('import')) . '.json';
 
         $fileManager->writeToStorage($errorAsJson, $fileName);
 

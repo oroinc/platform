@@ -1,38 +1,43 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Validator\Constraints;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntityValidator;
-use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SourceEntityValidatorTest extends \PHPUnit\Framework\TestCase
+class SourceEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var SourceEntityValidator
-     */
-    protected $validator;
-
-    protected function setUp(): void
+    protected function createValidator()
     {
-        $doctrineHelper = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineHelper
-            ->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
             ->method('isEntityEqual')
-            ->will(
-                $this->returnCallback(
-                    function ($entity, $other) {
-                        return $entity->getId() === $other->getId();
-                    }
-                )
-            );
+            ->willReturnCallback(function ($entity, $other) {
+                return $entity->getId() === $other->getId();
+            });
 
-        $this->validator = new SourceEntityValidator($doctrineHelper);
+        return new SourceEntityValidator($doctrineHelper);
+    }
+
+    private function createFieldData($sourceEntity)
+    {
+        $fieldData = $this->createMock(FieldData::class);
+        $fieldData->expects($this->any())
+            ->method('getSourceEntity')
+            ->willReturn($sourceEntity);
+        if ($sourceEntity) {
+            $fieldData->expects($this->any())
+                ->method('getFieldName')
+                ->willReturn('field-' . $sourceEntity->getId());
+        }
+
+        return $fieldData;
     }
 
     /**
@@ -40,15 +45,14 @@ class SourceEntityValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidArgument($value, $expectedExceptionMessage)
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
-        $constraint = $this
-            ->createMock('Oro\Bundle\EntityMergeBundle\Validator\Constraints\SourceEntity');
+        $constraint = new SourceEntity();
         $this->validator->validate($value, $constraint);
     }
 
-    public function invalidArgumentProvider()
+    public function invalidArgumentProvider(): array
     {
         return [
             'bool'    => [
@@ -84,97 +88,59 @@ class SourceEntityValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider validArgumentProvider
-     */
-    public function testValidate($entityData, $addViolation, $sourceEntity)
+    public function testValid()
     {
-        $context = $this->createMock(ExecutionContext::class);
+        $sourceEntity = new EntityStub('entity-0');
 
-        $context->expects($this->$addViolation())
-            ->method('addViolation');
-
-        $constraint = $this->createMock(SourceEntity::class);
-        $this->validator->initialize($context);
-
-        $entityData
-            ->expects($this->any())
-            ->method('getFields')
-            ->will(
-                $this->returnValue(
-                    [
-                        $this->createFieldData($sourceEntity)
-                    ]
-                )
-            );
-
-        $this->validator->validate($entityData, $constraint);
-    }
-
-    public function validArgumentProvider()
-    {
-        return [
-            'valid'     => [
-                'entityData'   => $this->createEntityData(),
-                'addViolation' => 'never',
-                'sourceEntity' => new EntityStub('entity-0'),
-            ],
-            'non-valid' => [
-                'entityData'   => $this->createEntityData(),
-                'addViolation' => 'once',
-                'sourceEntity' => new EntityStub('non-valid'),
-            ],
-            'non-valid-type' => [
-                'entityData'   => $this->createEntityData(),
-                'addViolation' => 'never',
-                'sourceEntity' => null,
-            ],
-        ];
-    }
-
-    /**
-     * @return object
-     */
-    private function createEntityData()
-    {
-        $entityData = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Data\EntityData')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $entityData
-            ->expects($this->any())
+        $entityData = $this->createMock(EntityData::class);
+        $entityData->expects($this->any())
             ->method('getEntities')
-            ->will(
-                $this->returnValue(
-                    [
-                        new EntityStub('entity-0'),
-                        new EntityStub('entity-1'),
-                    ]
-                )
-            );
+            ->willReturn([new EntityStub('entity-0'), new EntityStub('entity-1')]);
+        $entityData->expects($this->any())
+            ->method('getFields')
+            ->willReturn([$this->createFieldData($sourceEntity)]);
 
-        return $entityData;
+        $constraint = new SourceEntity();
+        $this->validator->validate($entityData, $constraint);
+
+        $this->assertNoViolation();
     }
 
-    protected function createFieldData($sourceEntity)
+    public function testNonValidType()
     {
-        $fieldData = $this
-            ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldData')
-            ->setMethods(['getSourceEntity', 'getFieldName'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $sourceEntity = null;
 
-        $fieldData->expects($this->any())
-            ->method('getSourceEntity')
-            ->will($this->returnValue($sourceEntity));
+        $entityData = $this->createMock(EntityData::class);
+        $entityData->expects($this->any())
+            ->method('getEntities')
+            ->willReturn([new EntityStub('entity-0'), new EntityStub('entity-1')]);
+        $entityData->expects($this->any())
+            ->method('getFields')
+            ->willReturn([$this->createFieldData($sourceEntity)]);
 
-        if ($sourceEntity) {
-            $fieldData->expects($this->any())
-                ->method('getFieldName')
-                ->will($this->returnValue('field-' . $sourceEntity->getId()));
-        }
+        $constraint = new SourceEntity();
+        $this->validator->validate($entityData, $constraint);
 
-        return $fieldData;
+        $this->assertNoViolation();
+    }
+
+    public function testNomValid()
+    {
+        $sourceEntity = new EntityStub('non-valid');
+
+        $entityData = $this->createMock(EntityData::class);
+        $entityData->expects($this->any())
+            ->method('getEntities')
+            ->willReturn([new EntityStub('entity-0'), new EntityStub('entity-1')]);
+        $entityData->expects($this->any())
+            ->method('getFields')
+            ->willReturn([$this->createFieldData($sourceEntity)]);
+
+        $constraint = new SourceEntity();
+        $this->validator->validate($entityData, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ limit }}', 'field-non-valid')
+            ->assertRaised();
     }
 }

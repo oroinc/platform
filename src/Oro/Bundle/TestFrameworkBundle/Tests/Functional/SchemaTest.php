@@ -6,11 +6,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\SchemaValidator;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\ORM\DatabasePlatformInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\MigrationBundle\Entity\DataMigration;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @group schema
@@ -90,15 +90,7 @@ class SchemaTest extends WebTestCase
         $this->overrideRemoveNamespacedAssets();
         $this->overrideSchemaDiff();
 
-        $ignoredQueries = [
-            DatabasePlatformInterface::DATABASE_MYSQL => [
-                'ALTER TABLE oro_email_origin DROP ews_server, DROP ews_user_email',
-            ],
-            DatabasePlatformInterface::DATABASE_POSTGRESQL => [
-                'ALTER TABLE oro_email_origin DROP ews_server',
-                'ALTER TABLE oro_email_origin DROP ews_user_email',
-            ]
-        ];
+        $ignoredQueries = Yaml::parseFile(__DIR__ . DIRECTORY_SEPARATOR . 'ignored_queries.yml');
 
         foreach ($this->getEntityManagers() as $em) {
             $schemaTool = new SchemaTool($em);
@@ -107,8 +99,8 @@ class SchemaTest extends WebTestCase
             $queries = $schemaTool->getUpdateSchemaSql($allMetadata, true);
 
             $platform = $em->getConnection()->getDatabasePlatform()->getName();
-            if (array_key_exists($platform, $ignoredQueries)) {
-                $queries = array_diff($queries, $ignoredQueries[$platform]);
+            if (array_key_exists($platform, $ignoredQueries['ignored_queries'])) {
+                $queries = array_diff($queries, $ignoredQueries['ignored_queries'][$platform]);
             }
 
             self::assertEmpty($queries, implode("\n", $queries));

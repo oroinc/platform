@@ -53,13 +53,22 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     protected function setUp(): void
     {
-        $this->workflowRegistry = $this->createWorkflowRegistryMock();
-        $this->attributeGuesser = $this->createAttributeGuesserMock();
-        $this->defaultValuesListener = $this->createDefaultValuesListenerMock();
-        $this->formInitListener = $this->createFormInitListenerMock();
-        $this->requiredAttributesListener = $this->createRequiredAttributesListenerMock();
-        $this->dispatcher = $this->createDispatcherMock();
-        $this->propertyPathSecurityHelper = $this->createPropertyPathSecurityHelper();
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->attributeGuesser = $this->createMock(AttributeGuesser::class);
+        $this->defaultValuesListener = $this->getMockBuilder(DefaultValuesListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'setDefaultValues'])
+            ->getMock();
+        $this->formInitListener = $this->getMockBuilder(FormInitListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'executeInitAction'])
+            ->getMock();
+        $this->requiredAttributesListener = $this->getMockBuilder(RequiredAttributesListener::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['initialize', 'onPreSetData', 'onSubmit'])
+            ->getMock();
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->propertyPathSecurityHelper = $this->createMock(PropertyPathSecurityHelper::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->type = $this->createWorkflowAttributesType(
@@ -72,6 +81,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             $this->propertyPathSecurityHelper,
             $this->translator
         );
+
         parent::setUp();
     }
 
@@ -239,10 +249,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         if (!empty($formOptions['form_init'])) {
             $this->formInitListener->expects($this->once())
                 ->method('initialize')
-                ->with(
-                    $formOptions['workflow_item'],
-                    $formOptions['form_init']
-                );
+                ->with($formOptions['workflow_item'], $formOptions['form_init']);
         } else {
             $this->formInitListener->expects($this->never())
                 ->method($this->anything());

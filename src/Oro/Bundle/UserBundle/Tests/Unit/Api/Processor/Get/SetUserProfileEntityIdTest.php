@@ -10,11 +10,11 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class SetUserProfileEntityIdTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
     /** @var SetUserProfileEntityId */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {
@@ -54,21 +54,20 @@ class SetUserProfileEntityIdTest extends GetProcessorTestCase
 
     public function testProcessWithSupportedUserType()
     {
-        $token = $this->createMock(TokenInterface::class);
         $userId = 123;
-        $user = $this->getMockBuilder(AbstractUser::class)
-            ->setMethods(['getId'])
-            ->getMockForAbstractClass();
+        $user = $this->createMock(AbstractUser::class);
+        $user->expects(self::once())
+            ->method('getId')
+            ->willReturn($userId);
+
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
 
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
-        $token->expects(self::once())
-            ->method('getUser')
-            ->willReturn($user);
-        $user->expects(self::once())
-            ->method('getId')
-            ->willReturn($userId);
 
         $this->processor->process($this->context);
 

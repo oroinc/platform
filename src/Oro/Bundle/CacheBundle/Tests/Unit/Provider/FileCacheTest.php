@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
+use Oro\Bundle\CacheBundle\Provider\PhpFileCache;
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\TempDirExtension;
@@ -11,25 +13,20 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     use TempDirExtension;
 
     /**
-     * @param string $cacheClass
-     * @param string $id
-     * @param string $namespace
-     * @param string $expectedFileName
-     *
      * @dataProvider getFilenameProvider
      */
-    public function testGetFilename($cacheClass, $id, $namespace, $expectedFileName)
+    public function testGetFilename(string $cacheClass, string $id, ?string $namespace, string $expectedFileName)
     {
         $directory = $this->getTempDir('file_cache');
 
         $cache = $this->getMockBuilder($cacheClass)
             ->setConstructorArgs([$directory, '.ext'])
-            ->setMethods(['fetch', 'getNamespace'])
+            ->onlyMethods(['fetch', 'getNamespace'])
             ->getMock();
 
         $cache->expects($this->any())
             ->method('getNamespace')
-            ->will($this->returnValue($namespace));
+            ->willReturn($namespace);
 
         $result = ReflectionUtil::callMethod($cache, 'getFilename', [$id]);
         $this->assertEquals(
@@ -39,23 +36,20 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $cacheClass
-     *
      * @dataProvider syncProvider
      */
-    public function testSync($cacheClass)
+    public function testSync(string $cacheClass)
     {
         $namespace = '123';
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|SyncCacheInterface $cache */
+        /** @var SyncCacheInterface|\PHPUnit\Framework\MockObject\MockObject $cache */
         $cache = $this->getMockBuilder($cacheClass)
             ->disableOriginalConstructor()
-            ->setMethods(['setNamespace', 'getNamespace'])
+            ->onlyMethods(['setNamespace', 'getNamespace'])
             ->getMock();
-
         $cache->expects($this->once())
             ->method('getNamespace')
-            ->will($this->returnValue($namespace));
+            ->willReturn($namespace);
         $cache->expects($this->once())
             ->method('setNamespace')
             ->with($namespace);
@@ -63,44 +57,41 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
         $cache->sync();
     }
 
-    /**
-     * @return array
-     */
-    public static function getFilenameProvider()
+    public static function getFilenameProvider(): array
     {
         return [
             [
-                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
+                FilesystemCache::class,
                 'test',
                 null,
                 '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
-                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
+                FilesystemCache::class,
                 'test',
                 'namespace',
                 'namespace' . DIRECTORY_SEPARATOR . '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
-                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
+                FilesystemCache::class,
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
                 'namespace' . DIRECTORY_SEPARATOR . 'd3' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
             [
-                'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
+                PhpFileCache::class,
                 'test',
                 null,
                 '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
-                'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
+                PhpFileCache::class,
                 'test',
                 'namespace',
                 'namespace' . DIRECTORY_SEPARATOR . '9f' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
-                'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
+                PhpFileCache::class,
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
                 'namespace' . DIRECTORY_SEPARATOR . 'd3' . DIRECTORY_SEPARATOR . 'testfile.ext',
@@ -108,14 +99,11 @@ class FileCacheTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public static function syncProvider()
+    public static function syncProvider(): array
     {
         return [
-            ['Oro\Bundle\CacheBundle\Provider\FilesystemCache'],
-            ['Oro\Bundle\CacheBundle\Provider\PhpFileCache'],
+            [FilesystemCache::class],
+            [PhpFileCache::class],
         ];
     }
 }

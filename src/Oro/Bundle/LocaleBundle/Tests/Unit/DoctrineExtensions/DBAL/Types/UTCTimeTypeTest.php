@@ -3,42 +3,28 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DoctrineExtensions\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Types\ConversionException;
 use Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType;
 
 class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UTCTimeType|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $type;
+    /** @var UTCTimeType */
+    private $type;
 
-    /**
-     * @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $platform;
+    /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
+    private $platform;
 
     protected function setUp(): void
     {
-        // class has private constructor
-        $this->type = $this->getMockBuilder(UTCTimeType::class)
-            ->setMethods(null)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->type = new UTCTimeType();
 
-        $this->platform = $this->getMockBuilder(AbstractPlatform::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimeFormatString'])
-            ->getMockForAbstractClass();
+        $this->platform = $this->createMock(AbstractPlatform::class);
         $this->platform->expects($this->any())
             ->method('getTimeFormatString')
-            ->will($this->returnValue('H:i:s'));
+            ->willReturn('H:i:s');
     }
 
     /**
-     * @param string $sourceTime
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenNoDstDataProvider
      */
     public function testConvertToDatabaseValueWhenNoDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
@@ -47,10 +33,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToDatabaseValueWhenNoDstDataProvider()
+    public function convertToDatabaseValueWhenNoDstDataProvider(): array
     {
         return [
             'UTC' => [
@@ -82,10 +65,6 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $sourceTime
-     * @param string $sourceTimeZone
-     * @param string $expected
-     *
      * @dataProvider convertToDatabaseValueWhenDstDataProvider
      */
     public function testConvertToDatabaseValueWhenDst(?string $sourceTime, ?string $sourceTimeZone, ?string $expected)
@@ -94,10 +73,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->type->convertToDatabaseValue($source, $this->platform));
     }
 
-    /**
-     * @return array
-     */
-    public function convertToDatabaseValueWhenDstDataProvider()
+    public function convertToDatabaseValueWhenDstDataProvider(): array
     {
         return [
             'positive shift with DST' => [
@@ -128,7 +104,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testConvertToPHPValueException()
     {
-        $this->expectException(\Doctrine\DBAL\Types\ConversionException::class);
+        $this->expectException(ConversionException::class);
         $this->type->convertToPHPValue('qwerty', $this->platform);
     }
 }
