@@ -177,6 +177,8 @@ services:
     oro_layout.layout_update_generator.extension.theme_relative_path:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ThemesRelativePathGeneratorExtension
         public: false
+        arguments:
+            - '%kernel.project_dir%'
 
     oro_layout.layout_update_generator.php:
         class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator
