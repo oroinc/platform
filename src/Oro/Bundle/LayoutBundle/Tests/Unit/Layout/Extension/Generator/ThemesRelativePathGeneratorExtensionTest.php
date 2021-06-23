@@ -108,18 +108,7 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
             'themes_null_and_relative' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => [null, 'sub/update.html.twig']]]]],
                 'filename' => __DIR__.'/data/layout.yml',
-                'expectedSource' => [
-                    'actions' => [
-                        [
-                            '@setBlockTheme' => [
-                                'themes' => [
-                                    null,
-                                    $namespacedThemeName,
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
+                'expectedSource' => ['actions' => [['@setBlockTheme' => ['themes' => [null, $namespacedThemeName]]]]],
             ],
             'themes_relative_with_cd' => [
                 'source' => ['actions' => [['@setBlockTheme' => ['themes' => '../data/sub/update.html.twig']]]],
