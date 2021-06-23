@@ -222,7 +222,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         // generate conversion rules and backend header
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
+            if (!$this->isFieldAvailableForExport($entityName, $fieldName)) {
                 continue;
             }
 
