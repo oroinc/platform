@@ -2,9 +2,7 @@ app-modules:
     - oroquerydesigner/js/app/modules/entity-filter-preset-module
     - oroquerydesigner/js/app/modules/validator-constraints-module
 dynamic-imports:
-    oroform-validate:
-        - oroquerydesigner/js/validator/not-empty-filters
-    oroquerydesigner:
+    commons:
         - oroquerydesigner/js/app/components/condition-builder-component
         - oroquerydesigner/js/app/views/aggregated-field-condition-view
         - oroquerydesigner/js/app/views/date-grouping-view
@@ -12,3 +10,4 @@ dynamic-imports:
         - oroquerydesigner/js/app/views/function-choice-view
         - oroquerydesigner/js/dictionary-filter-initialized
         - oroquerydesigner/js/enum-filter-initialized
+        - oroquerydesigner/js/validator/not-empty-filters

@@ -5,7 +5,7 @@ aliases:
 app-modules:
     - oroentity/js/app/modules/entity-model-module
 dynamic-imports:
-    oroentity:
+    commons:
         - oroentity/js/app/views/displayable-priority-view
         - oroentity/js/app/views/entity-field-fallback
         - oroentity/js/app/views/field-choice-view

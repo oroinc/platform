@@ -1,11 +1,11 @@
-define([
-    'jquery',
-    'underscore',
-    'tinymce/tinymce',
-    'oroui/js/mediator',
-    'oroui/js/app/views/base/view'
-], function($, _, tinyMCE, mediator, BaseView) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tinyMCE = require('tinymce/tinymce');
+    const mediator = require('oroui/js/mediator');
+    const BaseView = require('oroui/js/app/views/base/view');
 
     const EmailTemplateLocalizationView = BaseView.extend({
         options: {
