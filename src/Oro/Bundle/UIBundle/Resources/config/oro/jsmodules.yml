@@ -97,7 +97,7 @@ configs:
     oroui/js/tools/scroll-helper: {}
     oroui/js/viewport-manager: {}
 dynamic-imports:
-    oroui:
+    commons:
         - controllers/page-controller
         - jquery
         - jquery.cookie
@@ -124,7 +124,6 @@ dynamic-imports:
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select
         - oroui/js/app/views/jstree/action-manager-view
-        - oroui/js/app/views/jstree/base-tree-view
         - oroui/js/app/views/jstree/move-action-view
         - oroui/js/app/views/page-center-title-view
         - oroui/js/app/views/page/before-content-addition-view
@@ -152,8 +151,9 @@ dynamic-imports:
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
         - underscore
-    polyfills:
         - whatwg-fetch
+    jstree:
+        - oroui/js/app/views/jstree/base-tree-view
 entry:
     app:
         - oroui/js/app

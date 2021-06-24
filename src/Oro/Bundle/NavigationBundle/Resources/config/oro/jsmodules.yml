@@ -5,7 +5,7 @@ app-modules:
 configs:
     oronavigation/js/routes-loader: {}
 dynamic-imports:
-    oronavigation:
+    commons:
         - oronavigation/js/app/components/favorite-component
         - oronavigation/js/app/components/pin-component
         - oronavigation/js/app/views/history-view
@@ -13,5 +13,6 @@ dynamic-imports:
         - oronavigation/js/app/views/navigation-menu-view
         - oronavigation/js/app/views/page-state-view
         - oronavigation/js/app/views/shortcuts-view
-        - oronavigation/js/app/views/tree-manage-view
         - routing
+    jstree:
+        - oronavigation/js/app/views/tree-manage-view

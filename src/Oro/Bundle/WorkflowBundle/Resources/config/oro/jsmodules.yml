@@ -10,8 +10,8 @@ dynamic-imports:
     orodatagrid:
         - oro/datagrid/action/workflow-activate-action
         - oro/datagrid/action/workflow-deactivate-action
+        - oroworkflow/js/datagrid/workflow-datagrid-builder
     oroworkflow:
-        - oro/datagrid/action/workflow-deactivate-action
         - oroworkflow/js/app/components/activate-form-widget-component
         - oroworkflow/js/app/components/button-component
         - oroworkflow/js/app/components/workflow-editor-component
@@ -22,7 +22,6 @@ dynamic-imports:
         - oroworkflow/js/app/views/workflow-activate-btn-view
         - oroworkflow/js/app/views/workflow-deactivate-btn-view
         - oroworkflow/js/app/views/workflow-form-widget-view
-        - oroworkflow/js/datagrid/workflow-datagrid-builder
         - oroworkflow/transition-dialog-widget
 map:
     "*":
