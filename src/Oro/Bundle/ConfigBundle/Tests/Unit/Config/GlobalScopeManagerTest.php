@@ -30,8 +30,20 @@ class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getScopedEntityName()
+    protected function getScopedEntityName(): string
     {
         return 'app';
+    }
+
+    public function testGetScopeIdFromEntity(): void
+    {
+        $entity = $this->getScopedEntity();
+        $this->assertSame(0, $this->manager->getScopeIdFromEntity($entity));
+    }
+
+    public function testGetScopeIdFromUnsupportedEntity(): void
+    {
+        $entity = new \stdClass();
+        $this->assertSame(0, $this->manager->getScopeIdFromEntity($entity));
     }
 }

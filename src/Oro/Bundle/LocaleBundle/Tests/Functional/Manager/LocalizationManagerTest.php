@@ -4,6 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Functional\Manager;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
@@ -12,6 +13,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class LocalizationManagerTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     protected function setUp(): void
     {
         $this->initClient();
@@ -68,7 +71,7 @@ class LocalizationManagerTest extends WebTestCase
 
         $manager = new LocalizationManager(
             $doctrineHelper,
-            $this->getContainer()->get('oro_config.global'),
+            self::getConfigManager('global'),
             $cache
         );
 

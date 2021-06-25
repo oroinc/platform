@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
+
 /**
  * Provides methods to enable and disable API feature.
- * It is expected that this trait will be used in classes that have "getConfigManager()" method.
  */
 trait ApiFeatureTrait
 {
+    use ConfigManagerAwareTestTrait;
+
     /**
      * Enables API feature.
      *
@@ -15,7 +18,7 @@ trait ApiFeatureTrait
      */
     protected function enableApiFeature(string $featureName = 'oro_api.web_api'): void
     {
-        $configManager = $this->getConfigManager();
+        $configManager = self::getConfigManager('global');
         $configManager->set($featureName, true);
         $configManager->flush();
     }
@@ -27,7 +30,7 @@ trait ApiFeatureTrait
      */
     protected function disableApiFeature(string $featureName = 'oro_api.web_api'): void
     {
-        $configManager = $this->getConfigManager();
+        $configManager = self::getConfigManager('global');
         $configManager->set($featureName, false);
         $configManager->flush();
     }
