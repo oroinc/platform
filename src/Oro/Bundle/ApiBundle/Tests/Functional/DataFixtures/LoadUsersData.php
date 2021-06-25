@@ -59,7 +59,7 @@ class LoadUsersData extends AbstractFixture implements DependentFixtureInterface
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->addBusinessUnit($businessUnit1)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
         $this->setReference('subordinate_bu_user', $user);
@@ -75,7 +75,7 @@ class LoadUsersData extends AbstractFixture implements DependentFixtureInterface
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->addBusinessUnit($businessUnit)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user1);
         $this->setReference('default_bu_user', $user1);
@@ -91,7 +91,7 @@ class LoadUsersData extends AbstractFixture implements DependentFixtureInterface
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->addBusinessUnit($businessUnit2)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user2);
         $this->setReference('root_bu_user', $user2);

@@ -43,7 +43,7 @@ class ControllersTest extends WebTestCase
         //$form['oro_user_user_form[tags][owner]'] = 'tags1';
         //$form['oro_user_user_form[tags][all]'] = null;
         $form['oro_user_user_form[groups][0]']->tick();
-        $form['oro_user_user_form[roles][0]']->tick();
+        $form['oro_user_user_form[userRoles][0]']->tick();
         //$form['oro_user_user_form[values][company][varchar]'] = 'company';
         $form['oro_user_user_form[owner]'] = 1;
         $form['oro_user_user_form[inviteUser]'] = false;
@@ -79,7 +79,7 @@ class ControllersTest extends WebTestCase
         $form['oro_user_user_form[birthday]'] = '2013-01-02';
         $form['oro_user_user_form[email]'] = 'test@test.com';
         $form['oro_user_user_form[groups][1]']->tick();
-        $form['oro_user_user_form[roles][1]']->tick();
+        $form['oro_user_user_form[userRoles][1]']->tick();
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

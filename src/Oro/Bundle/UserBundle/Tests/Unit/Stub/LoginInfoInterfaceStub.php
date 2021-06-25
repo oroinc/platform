@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Oro\Bundle\UserBundle\Entity\LoginInfoInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
 {
@@ -140,6 +140,14 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
+    public function getUserRoles(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPassword()
     {
         return $this->password;
@@ -172,7 +180,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function addRole(Role $role)
+    public function addUserRole(Role $role)
     {
         return $this;
     }

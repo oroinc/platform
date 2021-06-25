@@ -117,7 +117,7 @@
     {% set dataBlocks = dataBlocks|merge(oro_form_additional_data(form, 'Additional'|trans)) %}
 
     {% set hasGroups = form.groups is defined %}
-    {% set hasRoles = form.roles is defined %}
+    {% set hasRoles = form.userRoles is defined %}
     {% if hasGroups or hasRoles %}
         {% set userGroups %}
             {% if hasGroups %}
@@ -128,7 +128,7 @@
         {% set userRoles %}
             {% if hasRoles %}
                 <div class="form-horizontal" id="roles-list">
-                    {{ form_row(form.roles, {attr: { class: 'horizontal' } }) }}
+                    {{ form_row(form.userRoles, {attr: { class: 'horizontal' } }) }}
                 </div>
             {% endif %}
         {% endset %}

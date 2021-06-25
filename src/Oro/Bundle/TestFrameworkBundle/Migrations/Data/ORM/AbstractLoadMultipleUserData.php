@@ -103,10 +103,10 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
                 ->setEnabled(true)
                 ->addApiKey($apiKey);
 
-            foreach ($item['roles'] as $role) {
+            foreach ($item['userRoles'] as $role) {
                 /** @var Role $roleEntity */
                 $roleEntity = $this->getReference($role);
-                $user->addRole($roleEntity);
+                $user->addUserRole($roleEntity);
             }
 
             $userManager->updateUser($user);

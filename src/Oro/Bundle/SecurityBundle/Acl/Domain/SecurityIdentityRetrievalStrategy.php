@@ -29,7 +29,7 @@ class SecurityIdentityRetrievalStrategy implements SecurityIdentityRetrievalStra
             }
         }
 
-        foreach ($token->getRoles() as $role) {
+        foreach ($token->getRoleNames() as $role) {
             $sids[] = new RoleSecurityIdentity($role);
         }
 

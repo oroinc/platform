@@ -24,7 +24,7 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
 
         $this->initClient();
 
-        $this->aclHelper = $this->getContainer()->get('oro_security.acl_helper');
+        $this->aclHelper = self::getContainer()->get('oro_security.acl_helper');
     }
 
     /**
@@ -42,21 +42,12 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
             }
         }
 
-        $this->assertTrue(
+        self::assertTrue(
             $found,
             sprintf(
                 'GridView with id "%d" not found in array "%s"',
                 $needle->getId(),
-                implode(
-                    ', ',
-                    array_map(
-                        function ($item) {
-                            /** @var AbstractGridView|AbstractGridViewUser $item */
-                            return $item->getId();
-                        },
-                        $haystack
-                    )
-                )
+                implode(', ', array_map(static fn ($item) => $item->getId(), $haystack))
             )
         );
     }
@@ -89,10 +80,10 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
             false,
             'main',
             $user->getOrganization(),
-            $user->getRoles()
+            $user->getUserRoles()
         );
 
-        $this->getContainer()->get('security.token_storage')->setToken($token);
+        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 
     /**
@@ -100,7 +91,7 @@ abstract class AbstractDataGridRepositoryTest extends WebTestCase
      */
     protected function getUserRepository()
     {
-        return $this->getContainer()
+        return self::getContainer()
             ->get('doctrine')
             ->getManagerForClass('OroUserBundle:User')
             ->getRepository('OroUserBundle:User');

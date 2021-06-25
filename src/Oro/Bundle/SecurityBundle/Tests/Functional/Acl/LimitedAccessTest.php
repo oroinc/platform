@@ -54,7 +54,7 @@ class LimitedAccessTest extends WebTestCase
                 ->setUsername($userName)
                 ->setEmail($userEmail)
                 ->setPlainPassword($userPwd)
-                ->addRole($role)
+                ->addUserRole($role)
                 ->setOrganization($organization)
                 ->addOrganization($organization)
                 ->setFirstName('Test')

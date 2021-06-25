@@ -104,7 +104,7 @@ class UserTypeTest extends WebTestCase
         $form['oro_user_user_form[plainPassword][second]'] = $plainPassword;
         $form['oro_user_user_form[passwordGenerate]'] = empty($plainPassword);
         $form['oro_user_user_form[inviteUser]'] = true;
-        $form['oro_user_user_form[roles][0]']->tick();
+        $form['oro_user_user_form[userRoles][0]']->tick();
 
         $this->client->submit($form);
 

@@ -9,6 +9,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+/**
+ * Provides owner ids for the specified widget options.
+ */
 class OwnerHelper
 {
     /** @var ManagerRegistry */
@@ -196,7 +199,7 @@ class OwnerHelper
         $qb = $this->registry->getRepository('OroUserBundle:User')
             ->createQueryBuilder('u')
             ->select('DISTINCT(u.id)')
-            ->join('u.roles', 'r');
+            ->join('u.userRoles', 'r');
         QueryBuilderUtil::applyOptimizedIn($qb, 'r.id', $roleIds);
 
         $result = array_map('current', $qb->getQuery()->getResult());

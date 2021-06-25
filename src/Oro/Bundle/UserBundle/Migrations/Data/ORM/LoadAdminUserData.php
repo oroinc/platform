@@ -11,6 +11,9 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Loads default admin user.
+ */
 class LoadAdminUserData extends AbstractFixture implements DependentFixtureInterface, ContainerAwareInterface
 {
     const DEFAULT_ADMIN_USERNAME = 'admin';
@@ -73,7 +76,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
             ->setEnabled(true)
             ->setOwner($businessUnit)
             ->setPlainPassword(md5(uniqid(mt_rand(), true)))
-            ->addRole($adminRole)
+            ->addUserRole($adminRole)
             ->addBusinessUnit($businessUnit)
             ->setOrganization($organization)
             ->addOrganization($organization);

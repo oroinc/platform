@@ -34,7 +34,7 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements Conta
             ->setLastName('Towards')
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
 
@@ -46,7 +46,7 @@ class LoadUsersWithSameEmailInLowercase extends AbstractFixture implements Conta
             ->setLastName('Backwards')
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user2);
 

@@ -10,7 +10,7 @@ request:
     enabled: true
     plainPassword: 123123q
     lastLogin: ~
-    roles: [3]
+    userRoles: [3]
     groups: ~
     owner: 1
 response:

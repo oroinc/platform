@@ -88,7 +88,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnUserByOAuthIdWhenUserFound()
     {
         $user = new User();
-        $user->addRole(new Role());
+        $user->addUserRole(new Role());
 
         $userResponse = $this->getUserResponse();
 
@@ -110,7 +110,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnUserByOAuthIdWhenUserFoundAndEmailIsAllowed()
     {
         $user = new User();
-        $user->addRole(new Role());
+        $user->addUserRole(new Role());
 
         $userResponse = $this->getUserResponse();
 
@@ -152,7 +152,7 @@ class OAuthUserProviderTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('The user is disabled.');
 
         $user = new User();
-        $user->addRole(new Role());
+        $user->addUserRole(new Role());
         $user->setEnabled(false);
 
         $userResponse = $this->getUserResponse();

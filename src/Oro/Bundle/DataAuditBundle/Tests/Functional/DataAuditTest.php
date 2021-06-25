@@ -41,9 +41,9 @@ class DataAuditTest extends WebTestCase
             self::AUTH_PW,
             'main',
             $this->findAdmin()->getOrganization(),
-            $this->findAdmin()->getRoles()
+            $this->findAdmin()->getUserRoles()
         );
-        $this->getContainer()->get('security.token_storage')->setToken($token);
+        self::getContainer()->get('security.token_storage')->setToken($token);
 
         $this->getOptionalListenerManager()->enableListener(
             'oro_dataaudit.listener.send_changed_entities_to_message_queue'
@@ -53,7 +53,7 @@ class DataAuditTest extends WebTestCase
     protected function tearDown(): void
     {
         /** @var Registry $doctrine */
-        $doctrine = $this->getContainer()->get('doctrine');
+        $doctrine = self::getContainer()->get('doctrine');
         $entityManager = $doctrine->getManager();
         /** @var AuditRepository $repository */
         $repository = $doctrine->getRepository(Audit::class);
@@ -80,7 +80,7 @@ class DataAuditTest extends WebTestCase
         }
 
         /** @var DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getContainer()->get('oro_entity.doctrine_helper');
+        $doctrineHelper = self::getContainer()->get('oro_entity.doctrine_helper');
 
         /** @var FieldConfigModel[] $fields */
         $fields = $doctrineHelper
@@ -108,7 +108,7 @@ class DataAuditTest extends WebTestCase
             $missingMethods[] = $methodName;
         }
 
-        $this->assertEmpty($missingMethods, sprintf('Tests are missing: %s', implode(', ', $missingMethods)));
+        self::assertEmpty($missingMethods, sprintf('Tests are missing: %s', implode(', ', $missingMethods)));
     }
 
     public function testArray()
@@ -123,7 +123,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>{&quot;0&quot;:1,&quot;1&quot;:2}</s>' .
@@ -145,7 +145,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>1</s>&nbsp;2',
@@ -165,12 +165,12 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->processMessages();
-        $this->assertStoredAuditCount(0);
+        self::assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
 
         $storedValue = $owner->getBinaryProperty();
-        $this->assertEquals('Test', pack('H*', base_convert($storedValue, 2, 16)));
+        self::assertEquals('Test', pack('H*', base_convert($storedValue, 2, 16)));
     }
 
     public function testBlob()
@@ -187,10 +187,10 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->processMessages();
-        $this->assertStoredAuditCount(0);
+        self::assertStoredAuditCount(0);
 
         $owner = $em->find(TestAuditDataOwner::class, $owner->getId());
-        $this->assertIsResource($owner->getBlobProperty());
+        self::assertIsResource($owner->getBlobProperty());
     }
 
     public function testBoolean()
@@ -205,7 +205,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>No</s>&nbsp;Yes',
@@ -225,7 +225,7 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->processMessages();
-        $this->assertStoredAuditCount(0);
+        self::assertStoredAuditCount(0);
     }
 
     public function testCryptedString()
@@ -239,7 +239,7 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->processMessages();
-        $this->assertStoredAuditCount(0);
+        self::assertStoredAuditCount(0);
     }
 
     public function testCurrency()
@@ -254,7 +254,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>USD</s>&nbsp;EUR',
@@ -274,7 +274,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>Jan 1, 2019</s>&nbsp;Jan 2, 2019',
@@ -294,7 +294,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM',
@@ -314,7 +314,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>Jan 1, 2019, 12:00 AM</s>&nbsp;Jan 2, 2019, 12:00 AM',
@@ -334,7 +334,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>0.001</s>&nbsp;0.002',
@@ -354,7 +354,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>2</s>&nbsp;3',
@@ -379,7 +379,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>0.001</s>&nbsp;0.002',
@@ -400,7 +400,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() =>
@@ -426,7 +426,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>2</s>&nbsp;3',
@@ -447,7 +447,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>{&quot;0&quot;:1,&quot;1&quot;:2}</s>' .
@@ -474,7 +474,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -514,7 +514,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
@@ -547,7 +547,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
@@ -580,7 +580,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -615,7 +615,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataChild::class => [
                     $child->getId() => '<s>childString</s>&nbsp;childString2',
@@ -644,7 +644,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -680,7 +680,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
@@ -711,7 +711,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -748,7 +748,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
@@ -777,7 +777,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataChild::class => [
                     $child->getId() => '<s>childString</s>&nbsp;childString2',
@@ -806,7 +806,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
@@ -853,7 +853,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -908,7 +908,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -941,7 +941,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -979,7 +979,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1018,7 +1018,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1076,7 +1076,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1103,7 +1103,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>1.01</s>&nbsp;1.02',
@@ -1124,7 +1124,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>1.01</s>&nbsp;1.02',
@@ -1144,7 +1144,7 @@ class DataAuditTest extends WebTestCase
         $em->flush();
 
         $this->processMessages();
-        $this->assertStoredAuditCount(0);
+        self::assertStoredAuditCount(0);
     }
 
     public function testOneToMany()
@@ -1164,7 +1164,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1203,7 +1203,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
@@ -1236,7 +1236,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => sprintf('Item #%s&quot; removed', $child->getId()),
@@ -1269,7 +1269,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1304,7 +1304,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataChild::class => [
                     $child->getId() => [
@@ -1340,7 +1340,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1376,7 +1376,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>ownerString</s>&nbsp;ownerString2',
@@ -1408,7 +1408,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1447,7 +1447,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1485,7 +1485,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1525,7 +1525,7 @@ class DataAuditTest extends WebTestCase
         $em->persist($child);
         $em->flush();
 
-        $this->assertEquals([], $this->getSentMessages());
+        self::assertEquals([], $this->getSentMessages());
     }
 
     public function testOneToOneRemoveCascade()
@@ -1552,7 +1552,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $ownerId => [
@@ -1594,7 +1594,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $ownerId => [
@@ -1636,7 +1636,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $ownerId => [
@@ -1678,7 +1678,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $ownerId => [
@@ -1720,7 +1720,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $ownerId => [
@@ -1757,7 +1757,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1794,7 +1794,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages(false, true);
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1827,7 +1827,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1863,7 +1863,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1893,7 +1893,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataChild::class => [
                     $child->getId() => [
@@ -1924,7 +1924,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => [
@@ -1946,7 +1946,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>0.01</s>&nbsp;0.02',
@@ -1972,7 +1972,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>2, 3</s>&nbsp;3, 4',
@@ -1993,7 +1993,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>2</s>&nbsp;3',
@@ -2014,7 +2014,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>string1</s>&nbsp;string2',
@@ -2035,7 +2035,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>string1</s>&nbsp;string2',
@@ -2055,7 +2055,7 @@ class DataAuditTest extends WebTestCase
 
         $this->processMessages();
 
-        $this->assertData(
+        self::assertData(
             [
                 TestAuditDataOwner::class => [
                     $owner->getId() => '<s>12:00 AM</s>&nbsp;12:00 AM',
@@ -2121,28 +2121,28 @@ class DataAuditTest extends WebTestCase
     {
         $response = $this->client->requestGrid('audit-grid');
         $result = self::getJsonResponseContent($response, 200, $response->getContent());
-        $this->assertArrayHasKey('data', $result);
+        self::assertArrayHasKey('data', $result);
         $data = $result['data'];
 
         foreach ($data as $audit) {
-            $this->assertArrayHasKey('objectClass', $audit);
-            $this->assertArrayHasKey('objectId', $audit);
+            self::assertArrayHasKey('objectClass', $audit);
+            self::assertArrayHasKey('objectId', $audit);
 
-            $this->assertArrayHasKey($audit['objectClass'], $expects);
-            $this->assertArrayHasKey($audit['objectId'], $expects[$audit['objectClass']]);
+            self::assertArrayHasKey($audit['objectClass'], $expects);
+            self::assertArrayHasKey($audit['objectId'], $expects[$audit['objectClass']]);
 
             $expect = $expects[$audit['objectClass']][$audit['objectId']];
             unset($expects[$audit['objectClass']][$audit['objectId']]);
             if (empty($expects[$audit['objectClass']])) {
                 unset($expects[$audit['objectClass']]);
             }
-            $this->assertNotEmpty($expect);
+            self::assertNotEmpty($expect);
 
             foreach ((array)$expect as $contains) {
-                static::assertStringContainsString($contains, $audit['data']);
+                self::assertStringContainsString($contains, $audit['data']);
             }
         }
-        $this->assertEquals([], $expects);
+        self::assertEquals([], $expects);
     }
 
     /**
@@ -2163,13 +2163,13 @@ class DataAuditTest extends WebTestCase
         }
 
         /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
+        $connection = self::getContainer()->get('oro_message_queue.transport.connection');
         $session = $connection->createSession();
 
         foreach ($processors as $processorId) {
             /** @var AbstractAuditProcessor|TopicSubscriberInterface $processor */
-            $processor = $this->getContainer()->get($processorId);
-            $this->assertInstanceOf(AbstractAuditProcessor::class, $processor);
+            $processor = self::getContainer()->get($processorId);
+            self::assertInstanceOf(AbstractAuditProcessor::class, $processor);
 
             foreach ($processor::getSubscribedTopics() as $topic) {
                 $message = $this->getSentMessage($topic);

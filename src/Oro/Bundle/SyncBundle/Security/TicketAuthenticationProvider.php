@@ -5,12 +5,13 @@ namespace Oro\Bundle\SyncBundle\Security;
 use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDigestGeneratorInterface;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken as Token;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
@@ -80,8 +81,13 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
         }
 
         return null !== $user
-            ? new TicketToken($user, $ticketDigest, $this->providerKey, $user->getRoles())
+            ? new TicketToken($user, $ticketDigest, $this->providerKey, $this->getRoles($user))
             : new AnonymousTicketToken($ticketDigest, self::USERNAME_NONE_PROVIDED);
+    }
+
+    private function getRoles(SymfonyUserInterface $user): array
+    {
+        return $user instanceof UserInterface ? $user->getUserRoles() : $user->getRoles();
     }
 
     /**
@@ -126,9 +132,9 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
     /**
      * @param TokenInterface $token
      *
-     * @return UserInterface|null
+     * @return SymfonyUserInterface|null
      */
-    private function fetchUser(TokenInterface $token): ?UserInterface
+    private function fetchUser(TokenInterface $token): ?SymfonyUserInterface
     {
         $user = null;
         $username = $token->getUsername();

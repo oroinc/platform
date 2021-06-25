@@ -134,7 +134,7 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
                 ->setPlainPassword($item['email'])
                 ->setEmail($item['email'])
                 ->setFirstName($item['email'])
-                ->addRole($role)
+                ->addUserRole($role)
                 ->setLastName($item['email'])
                 ->setOrganization($organization)
                 ->addOrganization($organization)

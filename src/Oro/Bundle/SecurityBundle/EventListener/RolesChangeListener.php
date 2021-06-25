@@ -25,7 +25,7 @@ class RolesChangeListener
     /**
      * @param string $rolesFieldName
      */
-    public function __construct(string $rolesFieldName = 'roles')
+    public function __construct(string $rolesFieldName = 'userRoles')
     {
         $this->rolesFieldName = $rolesFieldName;
     }

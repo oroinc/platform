@@ -46,7 +46,7 @@ class RelationCalculatorTest extends WebTestCase
 
         // assert test data
         $this->assertEquals($maxGroups, $this->relationCalculator->getMaxRelatedEntities($entityName, 'groups'));
-        $this->assertEquals($maxRoles, $this->relationCalculator->getMaxRelatedEntities($entityName, 'roles'));
+        $this->assertEquals($maxRoles, $this->relationCalculator->getMaxRelatedEntities($entityName, 'userRoles'));
         $this->assertEquals(
             $maxBusinessUnits,
             $this->relationCalculator->getMaxRelatedEntities($entityName, 'businessUnits')

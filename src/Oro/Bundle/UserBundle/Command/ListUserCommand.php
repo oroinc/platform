@@ -101,7 +101,7 @@ HELP
 
         if (!empty($input->getOption('roles'))) {
             $builder
-                ->leftJoin('u.roles', 'r')
+                ->leftJoin('u.userRoles', 'r')
                 ->leftJoin('u.auth_status', 'au')
                 ->andWhere('r.label IN (:roles)')
                 ->setParameter('roles', $input->getOption('roles'));
@@ -127,7 +127,7 @@ HELP
             ),
             $user->getFirstName(),
             $user->getLastName(),
-            implode(', ', $user->getRoles())
+            implode(', ', $user->getUserRoles())
         ];
     }
 }

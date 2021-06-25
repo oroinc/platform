@@ -43,7 +43,7 @@ class ActivityListManagerTest extends WebTestCase
             'admin',
             'key',
             $organization,
-            $user->getRoles()
+            $user->getUserRoles()
         );
 
         self::getContainer()->get('security.token_storage')->setToken($adminToken);

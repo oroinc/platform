@@ -76,8 +76,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user->setId(123);
         $role1 = new Role('ROLE_1');
         $role2 = new Role('ROLE_2');
-        $user->addRole($role1);
-        $user->addRole($role2);
+        $user->addUserRole($role1);
+        $user->addUserRole($role2);
         $token = new OrganizationToken($organization, [$role1, $role2]);
         $token->setUser($user);
 
@@ -97,9 +97,9 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $role1 = new Role('ROLE_1');
         $role2 = new Role('ROLE_2');
         $role3 = new Role('ROLE_3');
-        $user->addRole($role1);
-        $user->addRole($role2);
-        $user->addRole($role3);
+        $user->addUserRole($role1);
+        $user->addUserRole($role2);
+        $user->addUserRole($role3);
 
         $organizationRepo = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()

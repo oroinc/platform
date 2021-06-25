@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-use Symfony\Component\Security\Core\Role\Role;
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
+/**
+ * Represents the interface that all user classes must implement.
+ */
 interface UserInterface extends AdvancedUserInterface
 {
     /**
@@ -42,5 +45,10 @@ interface UserInterface extends AdvancedUserInterface
      *
      * @return UserInterface
      */
-    public function addRole(Role $role);
+    public function addUserRole(Role $role);
+
+    /**
+     * @return Role[]
+     */
+    public function getUserRoles(): array;
 }
