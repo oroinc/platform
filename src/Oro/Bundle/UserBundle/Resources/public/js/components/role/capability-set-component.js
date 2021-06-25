@@ -46,7 +46,7 @@ define(function(require) {
                 const itemsCollection = new BaseCollection(group.items, {
                     model: PermissionModel
                 });
-                this.listenTo(itemsCollection, 'change', _.bind(this.onAccessLevelChange, this, group.group));
+                this.listenTo(itemsCollection, 'change', this.onAccessLevelChange.bind(this, group.group));
                 return _.extend({}, group, {
                     editable: !options.readonly,
                     items: itemsCollection
@@ -60,14 +60,14 @@ define(function(require) {
             this.view = new CapabilitiesView({
                 el: options._sourceElement,
                 collection: new BaseCollection(groups),
-                filterer: _.bind(function(model) {
+                filterer: model => {
                     const group = model.get('group');
                     const currentCategory = this.currentCategory;
                     if (currentCategory.id === capabilityCategories.GENERAL) {
                         return group && !_.contains(options.tabIds, group);
                     }
                     return currentCategory.id === capabilityCategories.COMMON || group === currentCategory.id;
-                }, this)
+                }
             });
 
             this.listenTo(mediator, 'role:entity-category:changed', this.onCategoryChange);

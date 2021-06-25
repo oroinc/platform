@@ -181,7 +181,7 @@ define(function(require) {
                 hasDefault: this.options.defaultElement,
                 template: this.elementTemplate
             });
-            entityView.on('removal', _.bind(this.handleRemove, this));
+            entityView.on('removal', this.handleRemove.bind(this));
             this.$entitiesContainer.append(entityView.render().$el);
         },
 
@@ -201,12 +201,12 @@ define(function(require) {
                         modal: true,
                         width: 1024,
                         height: 500,
-                        close: _.bind(function() {
+                        close: () => {
                             this.selectorDialog = null;
-                        }, this)
+                        }
                     }
                 });
-                this.selectorDialog.on('completeSelection', _.bind(this.processSelectedEntities, this));
+                this.selectorDialog.on('completeSelection', this.processSelectedEntities.bind(this));
                 this.selectorDialog.render();
             }
         },
@@ -226,9 +226,9 @@ define(function(require) {
         },
 
         _initWidgets: function() {
-            _.delay(_.bind(function() {
+            _.delay(() => {
                 this.$el.inputWidget('seekAndCreate');
-            }, this));
+            });
         },
 
         processSelectedEntities: function(added, addedModels, removed) {
@@ -257,9 +257,9 @@ define(function(require) {
             this.$addedEl.val(added.join(','));
             this.$removedEl.val(removed.join(','));
 
-            _.each(addedModels, _.bind(function(model) {
+            _.each(addedModels, model => {
                 this.getCollection().add(model);
-            }, this));
+            });
             for (let i = 0; i < removed.length; i++) {
                 const model = this.getCollection().get(removed[i]);
                 if (model) {

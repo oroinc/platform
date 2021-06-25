@@ -40,8 +40,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $platform = $platform = $this->getMockBuilder(AbstractPlatform::class)
-            ->setMethods(['convertBooleans'])
+        $platform = $this->getMockBuilder(AbstractPlatform::class)
+            ->onlyMethods(['convertBooleans'])
             ->getMockForAbstractClass();
         $platform->expects($this->any())
             ->method('convertBooleans')
@@ -140,7 +140,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->updateSecurityIdentity($sid, $oldName);
     }
 
-    public static function deleteSecurityIdentityProvider()
+    public static function deleteSecurityIdentityProvider(): array
     {
         return [
             [
@@ -154,7 +154,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function updateSecurityIdentityProvider()
+    public static function updateSecurityIdentityProvider(): array
     {
         return [
             [
@@ -170,7 +170,7 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public static function updateSecurityIdentityNoChangesProvider()
+    public static function updateSecurityIdentityNoChangesProvider(): array
     {
         return [
             [new UserSecurityIdentity('test', 'Acme\User'), 'test'],
@@ -182,9 +182,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
     {
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|MutableAclProvider $provider */
         $provider = $this->getMockBuilder(MutableAclProvider::class)
-            ->setMethods(['deleteAcl'])
+            ->onlyMethods(['deleteAcl'])
             ->setConstructorArgs([
                 $this->connection,
                 $this->createMock(PermissionGrantingStrategyInterface::class),
@@ -217,9 +216,8 @@ class MutableAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $oid = new ObjectIdentity('entity', 'Test\Class');
 
-        /** @var \PHPUnit\Framework\MockObject\MockObject|MutableAclProvider $provider */
         $provider = $this->getMockBuilder(MutableAclProvider::class)
-            ->setMethods(['deleteAcl'])
+            ->onlyMethods(['deleteAcl'])
             ->setConstructorArgs([
                 $this->connection,
                 $this->createMock(PermissionGrantingStrategyInterface::class),

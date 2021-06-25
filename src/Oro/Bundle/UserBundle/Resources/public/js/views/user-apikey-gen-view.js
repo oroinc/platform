@@ -79,8 +79,8 @@ define([
                 dataType: 'json'
             };
             $.ajax(url, options)
-                .done(_.bind(this.onAjaxSuccess, this))
-                .always(_.bind(this.onAjaxComplete, this));
+                .done(this.onAjaxSuccess.bind(this))
+                .always(this.onAjaxComplete.bind(this));
 
             event.stopPropagation();
             event.preventDefault();

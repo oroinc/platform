@@ -49,7 +49,7 @@ define(function(require) {
          */
         initialize: function(options) {
             WidgetConfigDateRangeFilter.__super__.initialize.call(this, options);
-            options.$form.on('submit' + this.eventNamespace(), _.bind(this.onSubmit, this));
+            options.$form.on('submit' + this.eventNamespace(), this.onSubmit.bind(this));
         },
 
         createDomCache: function() {

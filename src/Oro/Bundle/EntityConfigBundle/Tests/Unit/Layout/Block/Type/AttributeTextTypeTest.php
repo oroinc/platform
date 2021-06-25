@@ -24,15 +24,11 @@ class AttributeTextTypeTest extends BlockTypeTestCase
      */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
-        $this->attributeConfigurationProvider = $this->getMockBuilder(AttributeConfigurationProvider::class)
-            ->setMethods(['getAttributeLabel'])
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->attributeConfigurationProvider = $this->createMock(AttributeConfigurationProvider::class);
 
         $this->attributeTextType = new AttributeTextType($this->attributeConfigurationProvider);
 
-        $layoutFactoryBuilder
-            ->addType($this->attributeTextType);
+        $layoutFactoryBuilder->addType($this->attributeTextType);
 
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
     }

@@ -12,19 +12,16 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 
 class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var InvalidateTranslationCacheListener
-     */
+    /** @var InvalidateTranslationCacheListener */
     private $listener;
 
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);
+
         $this->listener = new InvalidateTranslationCacheListener($this->registry);
     }
 
@@ -41,16 +38,9 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->getMockBuilder(Cache::class)
-            ->setMethods([
-                'fetch',
-                'contains',
-                'save',
-                'delete',
-                'getStats',
-                'deleteAll'
-            ])
+            ->onlyMethods(['fetch', 'contains', 'save', 'delete', 'getStats'])
+            ->addMethods(['deleteAll'])
             ->getMock();
         $configuration->setQueryCacheImpl($cacheProvider);
         $cacheProvider->expects($this->never())
@@ -72,7 +62,6 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        /** @var Cache|\PHPUnit\Framework\MockObject\MockObject $cacheProvider */
         $cacheProvider = $this->createMock(CacheProvider::class);
         $configuration->setQueryCacheImpl($cacheProvider);
         $cacheProvider->expects($this->once())

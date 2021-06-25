@@ -34,7 +34,7 @@ Feature: Image processor settings admin configuration
     When I fill in "JPEG resize quality (%)" with "29"
     And submit form
     Then I should see validation errors:
-      | JPEG resize quality (%) | This value should be 30 or more. |
+      | JPEG resize quality (%) | This value should be between 30 and 100. |
 
   Scenario: Restore jpeg and png quality
     When check "Use default" for "JPEG resize quality (%)" field

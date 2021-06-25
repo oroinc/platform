@@ -47,18 +47,18 @@ define(function(require) {
                 type: 'POST',
                 url: this.getUrl(),
                 data: this.prepareData(data),
-                success: _.bind(function(response) {
+                success: response => {
                     if (response) {
                         this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                     } else {
                         this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
                     }
-                }, this),
+                },
                 errorHandlerMessage: false,
-                error: _.bind(function() {
+                error: () => {
                     this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
-                }, this),
-                complete: function() {
+                },
+                complete: () => {
                     mediator.execute('hideLoading');
                 }
             });
@@ -75,13 +75,13 @@ define(function(require) {
 
         prepareData: function(data) {
             const result = {};
-            _.each(data, _.bind(function(item) {
+            _.each(data, item => {
                 const pattern = /^([^\[]+\[.+_)([^\]]+)(\].*)/i;
                 if (pattern.test(item.name)) {
                     item.name = item.name.match(pattern)[2];
                     result[item.name] = item.value;
                 }
-            }, this));
+            });
             return result;
         },
 

@@ -14,19 +14,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigurationBuilder */
-    protected $configurationBuilder;
+    private $configurationBuilder;
 
     /** @var MenuFactory */
-    protected $factory;
+    private $factory;
 
     /** @var FactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $menuFactory;
+    private $menuFactory;
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
+    private $configurationProvider;
 
     protected function setUp(): void
     {
@@ -43,36 +43,24 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
             $this->configurationProvider
         );
 
-        $this->factory = $this->getMockBuilder(MenuFactory::class)
-            ->setMethods(['getRouteInfo', 'processRoute'])
-            ->getMock();
-
-        $this->factory->expects($this->any())
-            ->method('getRouteInfo')
-            ->will($this->returnValue(false));
-
-        $this->factory->expects($this->any())
-            ->method('processRoute')
-            ->will($this->returnSelf());
+        $this->factory = new MenuFactory();
     }
 
     /**
      * @dataProvider menuStructureProvider
-     * @param array $options
      */
-    public function testBuild($options)
+    public function testBuild(array $options)
     {
         $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')
             ->willReturn($options['tree']);
         $this->configurationProvider->expects(self::any())
             ->method('getMenuItems')
-            ->willReturn(isset($options['items']) ? $options['items'] : []);
+            ->willReturn($options['items'] ?? []);
 
         $menu = new MenuItem('navbar', $this->factory);
 
-        $this->eventDispatcher
-            ->expects($this->once())
+        $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(new ConfigureMenuEvent($this->menuFactory, $menu), 'oro_menu.configure.navbar');
 
@@ -89,10 +77,8 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider setAreaToExtraProvider
-     * @param array $options
-     * @param string $expectedArea
      */
-    public function testSetAreaToExtra($options, $expectedArea)
+    public function testSetAreaToExtra(array $options, string $expectedArea)
     {
         $this->configurationProvider->expects(self::once())
             ->method('getMenuTree')
@@ -107,10 +93,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedArea, $menu->getExtra('scope_type'));
     }
 
-    /**
-     * @return array
-     */
-    public function setAreaToExtraProvider()
+    public function setAreaToExtraProvider(): array
     {
         return [
             'with no scope type specified' => [
@@ -171,10 +154,7 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function menuStructureProvider()
+    public function menuStructureProvider(): array
     {
         return [
             'full_menu' => [[
@@ -290,9 +270,6 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isAllowedTreeDataProvider
-     * @param array $menuOptions
-     * @param bool $displayChildren
-     * @param bool $expected
      */
     public function testBuildExtraIsAllowed(array $menuOptions, bool $displayChildren, bool $expected)
     {
@@ -330,9 +307,6 @@ class ConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $menu->getExtra('isAllowed'));
     }
 
-    /**
-     * @return array
-     */
     public function isAllowedTreeDataProvider(): array
     {
         return [

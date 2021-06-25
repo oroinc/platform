@@ -53,8 +53,8 @@ define([
          */
         getGridEvents: function() {
             const events = AbstractGridChangeListener.__super__.getGridEvents.call(this);
-            events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
-            events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
+            events['preExecute:refresh:' + this.gridName] = this._onExecuteRefreshAction.bind(this);
+            events['preExecute:reset:' + this.gridName] = this._onExecuteResetAction.bind(this);
             return events;
         },
 
@@ -170,7 +170,7 @@ define([
                     className: 'modal modal-primary',
                     disposeOnHidden: false
                 }, options));
-                this.confirmModal[type].on('ok', _.bind(callback, this));
+                this.confirmModal[type].on('ok', callback.bind(this));
             }
             this.confirmModal[type].open();
         }

@@ -28,7 +28,7 @@ define(function(require) {
             if (options.group_title) {
                 this.group_title = options.group_title;
             }
-            this.onBeforeUnload = _.bind(this.onBeforeUnload, this);
+            this.onBeforeUnload = this.onBeforeUnload.bind(this);
             UnloadMessagesGroup.__super__.constructor.call(this, options);
         },
 

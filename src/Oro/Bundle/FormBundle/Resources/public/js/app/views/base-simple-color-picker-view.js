@@ -96,18 +96,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 control: 'wheel',
                 letterCase: 'uppercase',
                 defaultValue: this.$picker.data('color') || '#FFFFFF',
-                change: _.bind(function(hex, opacity) {
+                change: (hex, opacity) => {
                     if (this.$current) {
                         this.$current.data('color', hex);
                         this.$current.css('color', colorUtil.getContrastColor(hex));
                         this.$el.val(hex);
                     }
-                }, this),
-                hide: _.bind(function() {
+                },
+                hide: () => {
                     if (this.$current) {
                         delete this.$current;
                     }
-                }, this)
+                }
             });
         },
 
@@ -131,34 +131,34 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          */
         _addPickerActions: function() {
             this.$picker.parent().find('.minicolors-panel').append(this.pickerActionsTemplate({__: __}));
-            this.$parent.on('click.' + this.cid, 'button[data-action=cancel]', _.bind(function(e) {
+            this.$parent.on('click.' + this.cid, 'button[data-action=cancel]', e => {
                 e.preventDefault();
                 this.$picker.minicolors('hide');
-            }, this));
+            });
         },
 
         /**
          * @private
          */
         _addPickerHandlers: function() {
-            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {
+            this.$parent.on('click.' + this.cid, 'span.color', e => {
                 if (!this.$el.is(':disabled')) {
                     this.$current = $(e.currentTarget);
                 }
-            }, this));
-            this.$picker.on('click.' + this.cid, _.bind(function(e) {
+            });
+            this.$picker.on('click.' + this.cid, () => {
                 if (!this.$el.is(':disabled')) {
                     this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$picker));
                     this.$picker.minicolors('show');
                 }
-            }, this));
+            });
             // stop propagation of some events to avoid showing a minicolors picker before a user clicks on a swatch
             // it is required because we need to set a picker position before show it
             this.$picker.on('mousedown.' + this.cid + ' touchstart.' + this.cid + ' focus.' + this.cid,
-                _.bind(function(e) {
+                e => {
                     e.preventDefault();
                     e.stopPropagation();
-                }, this));
+                });
         },
 
         /**

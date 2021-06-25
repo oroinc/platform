@@ -194,6 +194,9 @@ services:
             - '@translator'
             - '@router'
 
+    Oro\Bundle\EntityConfigBundle\Manager\AttributeManager:
+        alias: oro_entity_config.manager.attribute_manager
+
     oro_entity_config.manager.attribute_manager:
         class: Oro\Bundle\EntityConfigBundle\Manager\AttributeManager
         public: true

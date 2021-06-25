@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const mediator = require('oroui/js/mediator');
     const FlowchartViewerWorkflowView = require('../viewer/workflow-view');
@@ -36,10 +35,10 @@ define(function(require) {
 
         connect: function() {
             FlowchartEditorWorkflowView.__super__.connect.call(this);
-            this.jsPlumbInstance.bind('connectionDrag', _.bind(this.onConnectionDragStart, this));
-            this.jsPlumbInstance.bind('connectionDragStop', _.bind(this.onConnectionDragStop, this));
-            this.jsPlumbInstance.bind('beforeDrop', _.bind(this.onBeforeConnectionDrop, this));
-            this.jsPlumbInstance.bind('beforeDetach', _.bind(this.onBeforeConnectionDetach, this));
+            this.jsPlumbInstance.bind('connectionDrag', this.onConnectionDragStart.bind(this));
+            this.jsPlumbInstance.bind('connectionDragStop', this.onConnectionDragStop.bind(this));
+            this.jsPlumbInstance.bind('beforeDrop', this.onBeforeConnectionDrop.bind(this));
+            this.jsPlumbInstance.bind('beforeDetach', this.onBeforeConnectionDetach.bind(this));
         },
 
         onConnectionDragStart: function(connection) {

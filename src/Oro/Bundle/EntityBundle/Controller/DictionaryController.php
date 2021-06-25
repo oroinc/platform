@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Controller;
 
+use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -27,7 +28,7 @@ class DictionaryController extends AbstractController
     public function searchAction($dictionary)
     {
         $searchQuery = $this->get('request_stack')->getCurrentRequest()->get('q');
-        $manager = $this->container->get('oro_entity.manager.dictionary.api');
+        $manager = $this->get(DictionaryApiEntityManager::class);
         $manager->setClass($manager->resolveEntityClass($dictionary, true));
         $results = $manager->findValueBySearchQuery($searchQuery);
         $responseContext = ['results' => $results];
@@ -50,11 +51,24 @@ class DictionaryController extends AbstractController
     public function valuesAction($dictionary)
     {
         $keys = $this->get('request_stack')->getCurrentRequest()->get('keys');
-        $manager = $this->container->get('oro_entity.manager.dictionary.api');
+        $manager = $this->get(DictionaryApiEntityManager::class);
         $manager->setClass($manager->resolveEntityClass($dictionary, true));
         $result = $manager->findValueByPrimaryKey($keys);
         $responseContext = ['results' => $result];
 
         return new JsonResponse($responseContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function getSubscribedServices()
+    {
+        return array_merge(
+            parent::getSubscribedServices(),
+            [
+                DictionaryApiEntityManager::class,
+            ]
+        );
     }
 }

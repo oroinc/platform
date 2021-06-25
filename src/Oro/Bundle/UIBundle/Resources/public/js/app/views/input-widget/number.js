@@ -26,6 +26,8 @@ define(function(require) {
 
         allowZero: true,
 
+        limitDecimals: true,
+
         /**
          * @inheritdoc
          */
@@ -39,6 +41,7 @@ define(function(require) {
 
         initializeWidget: function() {
             this._setPrecision();
+            this._setLimitDecimals();
             this._setAttr();
             this.$el.trigger('input');
         },
@@ -51,6 +54,11 @@ define(function(require) {
         _setPrecision: function() {
             const precision = this.$el.data('precision');
             this.precision = _.isUndefined(precision) ? null : precision;
+        },
+
+        _setLimitDecimals: function() {
+            const limitDecimals = this.$el.data('limit-decimals');
+            this.limitDecimals = _.isUndefined(limitDecimals) ? true : limitDecimals;
         },
 
         _setAttr: function() {
@@ -178,7 +186,11 @@ define(function(require) {
             // validate value start
             let regExpString = '^[+-]?([0-9]*\\' + groupingSeparator + '?)+\\' + groupingSeparator + '?';
             if (this.precision > 0) {
-                regExpString += '(\\' + decimalSeparator + '{1})?([0-9]*)?';
+                if (this.limitDecimals) {
+                    regExpString += '(\\' + decimalSeparator + '{1})?([0-9]{1,' + this.precision + '})?';
+                } else {
+                    regExpString += '(\\' + decimalSeparator + '{1})?([0-9]*)?';
+                }
             }
 
             const regExp = new RegExp(regExpString, 'g');

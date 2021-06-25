@@ -56,11 +56,11 @@ define(function(require) {
         }
         this.connect();
         // fixes premature connection close in FF on page reload
-        $(window).on('beforeunload', _.bind(function() {
+        $(window).on('beforeunload', () => {
             if (this.session) {
                 this.session.close();
             }
-        }, this));
+        });
     }
 
     Wamp.prototype = {
@@ -86,7 +86,7 @@ define(function(require) {
                             this.options.path.replace(/\/+$/, '')
                         ].join('');
                         wsuri = wsuri + '?ticket=' + encodeURIComponent(response.ticket);
-                        ab.connect(wsuri, _.bind(this.onConnect, this), _.bind(this.onHangup, this), this.options);
+                        ab.connect(wsuri, this.onConnect.bind(this), this.onHangup.bind(this), this.options);
                     }).bind(this),
                     error: (function() {
                         this.onHangup(ab.CONNECTION_UNSUPPORTED);
@@ -166,9 +166,8 @@ define(function(require) {
             if (code !== ab.CONNECTION_CLOSED) {
                 this.trigger('connection_lost', _.extend({code: code}, details));
 
-                const that = this;
-                window.setTimeout(function() {
-                    that.connect();
+                window.setTimeout(() => {
+                    this.connect();
                 }, this.retryCount * this.options.retryDelay);
             }
 

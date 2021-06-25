@@ -110,7 +110,7 @@ class Job extends BaseJob
     /**
      * @var array
      *
-     * @ORM\Column(name="data", type="json_array", nullable=true)
+     * @ORM\Column(name="data", type="json_array", nullable=true, options={"jsonb"=true})
      */
     protected $data;
 

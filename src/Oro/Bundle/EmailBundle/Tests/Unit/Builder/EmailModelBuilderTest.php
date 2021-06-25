@@ -26,69 +26,34 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailModelBuilder
-     */
-    protected $emailModelBuilder;
+    /** @var EmailModelBuilder */
+    private $emailModelBuilder;
 
-    /**
-     * @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $helper;
+    /** @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var RequestStack */
+    private $requestStack;
 
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $activityListProvider;
+    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $activityListProvider;
 
-    /**
-     * @var EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /**
-     * @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $emailAttachmentProvider;
+    /** @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailAttachmentProvider;
 
-    /**
-     * @var Email|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $email;
+    /** @var Email|\PHPUnit\Framework\MockObject\MockObject */
+    private $email;
 
-    /**
-     * @var EmailAddress|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fromEmailAddress;
-
-    /**
-     * @var EmailAddress|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fromCcEmailAddress;
-
-    /**
-     * @var Factory|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $factory;
-
-    /**
-     * @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $htmlTagHelper;
 
-    /**
-     * @var FileConstraintsProvider
-     */
+    /** @var FileConstraintsProvider */
     private $fileConstraintsProvider;
 
     protected function setUp(): void
@@ -100,23 +65,16 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->emailAttachmentProvider = $this->createMock(EmailAttachmentProvider::class);
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);
         $this->fileConstraintsProvider = $this->createMock(FileConstraintsProvider::class);
+        $this->email = $this->createMock(Email::class);
+        $this->requestStack = new RequestStack();
 
         $this->emailAttachmentProvider->expects($this->any())
             ->method('getThreadAttachments')
             ->willReturn([]);
 
-        $this->email = $this->getMockBuilder(Email::class)
-            ->setMethods(
-                ['getActivityTargets', 'getFromEmailAddress', 'getId', 'getTo', 'getCc', 'getEmailBody']
-            )
-            ->getMock();
-
         $this->email->expects($this->any())
             ->method('getActivityTargets')
             ->willReturn([]);
-
-        $this->factory = new Factory();
-        $this->requestStack = new RequestStack();
 
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
@@ -124,7 +82,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
-            $this->factory,
+            new Factory(),
             $this->requestStack,
             $this->htmlTagHelper,
             $this->fileConstraintsProvider
@@ -132,34 +90,22 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $entityClass
-     * @param $entityId
-     * @param string $from
-     * @param string $to
-     * @param $subject
-     * @param $parentEmail
-     * @param $helperDecodeClassNameCalls
-     * @param $emGetRepositoryCalls
-     * @param $helperPreciseFullEmailAddressCalls
-     * @param $helperGetUserCalls
-     * @param $helperBuildFullEmailAddress
-     *
      * @dataProvider createEmailModelProvider
      *
-     * @SuppressWarnings(PHPMD)
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testCreateEmailModel(
-        $entityClass,
-        $entityId,
-        $from,
-        $to,
-        $subject,
-        $parentEmail,
-        $helperDecodeClassNameCalls,
-        $emGetRepositoryCalls,
-        $helperPreciseFullEmailAddressCalls,
-        $helperGetUserCalls,
-        $helperBuildFullEmailAddress
+        ?string $entityClass,
+        ?int $entityId,
+        ?string $from,
+        ?string $to,
+        ?string $subject,
+        int $helperDecodeClassNameCalls,
+        int $emGetRepositoryCalls,
+        int $helperPreciseFullEmailAddressCalls,
+        int $helperGetUserCalls,
+        int $helperBuildFullEmailAddress
     ) {
         $emailModel = new EmailModel();
 
@@ -257,10 +203,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedAttachments, array_values($result->getAttachmentsAvailable()));
     }
 
-    /**
-     * @return array
-     */
-    public function createEmailModelProvider()
+    public function createEmailModelProvider(): array
     {
         return [
             [
@@ -269,7 +212,6 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
                 'from' => 'from@example.com',
                 'to' => 'to@example.com',
                 'subject' => 'Subject',
-                'parentEmailId' => $this->email,
                 'helperDecodeClassNameCalls' => 1,
                 'emGetRepositoryCalls' => 1,
                 'helperPreciseFullEmailAddressCalls' => 4,
@@ -282,7 +224,6 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
                 'from' => null,
                 'to' => null,
                 'subject' => null,
-                'parentEmailId' => null,
                 'helperDecodeClassNameCalls' => 0,
                 'emGetRepositoryCalls' => 0,
                 'helperPreciseFullEmailAddressCalls' => 0,
@@ -293,17 +234,13 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $getOwnerResult
-     * @param object $getUserResult
-     * @param int    $getToCalls
-     *
      * @dataProvider createReplyEmailModelProvider
      */
-    public function testCreateReplyEmailModel($getOwnerResult, $getUserResult, $getToCalls)
+    public function testCreateReplyEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls)
     {
-        $this->fromEmailAddress = $this->createMock(EmailAddress::class);
+        $fromEmailAddress = $this->createMock(EmailAddress::class);
 
-        $this->fromEmailAddress->expects($this->once())
+        $fromEmailAddress->expects($this->once())
             ->method('getOwner')
             ->willReturn($getOwnerResult);
 
@@ -317,7 +254,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->email->expects($this->once())
             ->method('getFromEmailAddress')
-            ->willReturn($this->fromEmailAddress);
+            ->willReturn($fromEmailAddress);
 
         $this->email->expects($this->any())
             ->method('getId');
@@ -352,10 +289,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertInstanceOf(EmailModel::class, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function createReplyEmailModelProvider()
+    public function createReplyEmailModelProvider(): array
     {
         $entityOne = $this->createMock(User::class);
         $entityTwo = $this->createMock(User::class);
@@ -377,7 +311,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('prependWith');
 
         $emailBody = $this->createMock(EmailBody::class);
-        $emailBody->expects($this->exactly(1))
+        $emailBody->expects($this->once())
             ->method('getAttachments')
             ->willReturn([]);
 
@@ -390,18 +324,14 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param object $getOwnerResult
-     * @param object $getUserResult
-     * @param int    $getToCalls
-     *
      * @dataProvider createReplyEmailModelProvider
      */
-    public function testCreateReplyAllEmailModel($getOwnerResult, $getUserResult, $getToCalls)
+    public function testCreateReplyAllEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls)
     {
-        $this->fromEmailAddress = $this->createMock(EmailAddress::class);
-        $this->fromCcEmailAddress = $this->createMock(EmailAddress::class);
+        $fromEmailAddress = $this->createMock(EmailAddress::class);
+        $fromCcEmailAddress = $this->createMock(EmailAddress::class);
 
-        $this->fromEmailAddress->expects($this->once())
+        $fromEmailAddress->expects($this->once())
             ->method('getOwner')
             ->willReturn($getOwnerResult);
 
@@ -415,7 +345,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->email->expects($this->once())
             ->method('getFromEmailAddress')
-            ->willReturn($this->fromEmailAddress);
+            ->willReturn($fromEmailAddress);
 
         $this->email->expects($this->any())
             ->method('getId');
@@ -440,7 +370,7 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $emailCcRecipient = $this->createMock(EmailRecipient::class);
         $emailCcRecipient->expects($this->once())
             ->method('getEmailAddress')
-            ->willReturn($this->fromCcEmailAddress);
+            ->willReturn($fromCcEmailAddress);
 
         $cc = new ArrayCollection();
         $cc->add($emailCcRecipient);

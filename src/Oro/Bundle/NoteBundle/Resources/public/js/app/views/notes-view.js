@@ -115,16 +115,16 @@ define(function(require) {
                 });
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function() {
+                    success: () => {
                         _.each(this.getItemViews(), function(itemView) {
                             itemView.toggle(state[itemView.model.get('id')]);
                         });
                         this._hideLoading();
-                    }, this),
+                    },
                     errorHandlerMessage: false,
-                    error: _.bind(function(collection, response) {
+                    error: (collection, response) => {
                         this._showLoadItemsError(response.responseJSON || {});
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showLoadItemsError(err);
@@ -150,9 +150,9 @@ define(function(require) {
             const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 this._onItemDelete(model);
-            }, this));
+            });
             confirm.open();
         },
 
@@ -162,18 +162,18 @@ define(function(require) {
                 model.destroy({
                     wait: true,
                     url: this._getUrl('deleteItem', model),
-                    success: _.bind(function() {
+                    success: () => {
                         this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
-                    }, this),
+                    },
                     errorHandlerMessage: false,
-                    error: _.bind(function(model, response) {
+                    error: (model, response) => {
                         if (!_.isUndefined(response.status) && response.status === 403) {
                             this._showForbiddenError(response.responseJSON || {});
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
                         }
-                    }, this)
+                    }
                 });
             } catch (err) {
                 this._showDeleteItemError(err);
@@ -211,13 +211,13 @@ define(function(require) {
                         resizable: false,
                         width: 675,
                         autoResize: true,
-                        close: _.bind(function() {
+                        close: () => {
                             delete this.itemEditDialog;
-                        }, this)
+                        }
                     }
                 });
                 this.itemEditDialog.render();
-                this.itemEditDialog.on('formSave', _.bind(function(response) {
+                this.itemEditDialog.on('formSave', response => {
                     this.itemEditDialog.remove();
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
                     let insertPosition;
@@ -228,7 +228,7 @@ define(function(require) {
                         insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
                         this.collection.add(response, {at: insertPosition});
                     }
-                }, this));
+                });
             }
         },
 

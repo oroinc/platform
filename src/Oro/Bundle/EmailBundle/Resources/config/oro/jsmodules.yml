@@ -13,26 +13,27 @@ configs:
 dynamic-imports:
     commons:
         - oro/select2-email-recipients-component
+        - oroemail/js/app/views/email-attachment-context-view
+        - oroemail/js/validator/email-address
     orodatagrid:
         - oro/datagrid/action/mark-email-mass-action
+        - oro/filter/email-string-filter
+        - oro/filter/multiselect-originfolder-filter
     oroemail:
         - oroemail/js/app/components/auto-response-rule-component
         - oroemail/js/app/components/check-smtp-connection-component
         - oroemail/js/app/components/email-attachment-component
         - oroemail/js/app/components/email-editor-component
-        - oroemail/js/app/components/email-variable-component
         - oroemail/js/app/components/folder-tree-component
         - oroemail/js/app/components/mark-unread-button
         - oroemail/js/app/components/new-email-flash-message-component
         - oroemail/js/app/components/new-email-message-component
         - oroemail/js/app/components/user-menu-email-notification-component
-        - oroemail/js/app/views/email-attachment-context-view
         - oroemail/js/app/views/email-attachment-link-view
         - oroemail/js/app/views/email-body-view
         - oroemail/js/app/views/email-field-condition-view
         - oroemail/js/app/views/email-sync-view
         - oroemail/js/app/views/email-template-editor-view
-        - oroemail/js/app/views/email-template-localization-view
         - oroemail/js/app/views/email-template-view
         - oroemail/js/app/views/email-thread-view
         - oroemail/js/app/views/email-translation-view
@@ -41,8 +42,6 @@ dynamic-imports:
         - oroemail/js/datagrid/auto-response-rules-extension
         - oroemail/js/datagrid/listen-to-read-email-extension
         - oroemail/sidebar_widgets/recent_emails/js/widget
-    orofilter:
-        - oro/filter/email-string-filter
-        - oro/filter/multiselect-originfolder-filter
-    oroform-validate:
-        - oroemail/js/validator/email-address
+    tinymce.min:
+        - oroemail/js/app/components/email-variable-component
+        - oroemail/js/app/views/email-template-localization-view

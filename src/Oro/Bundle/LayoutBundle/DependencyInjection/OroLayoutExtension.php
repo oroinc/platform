@@ -37,6 +37,10 @@ class OroLayoutExtension extends Extension
             'oro_layout.templating.default',
             $config['templating']['default']
         );
+        $container->setParameter(
+            'oro_layout.enabled_themes',
+            $config['enabled_themes']
+        );
         if ($config['templating']['php']['enabled']) {
             $loader->load('php_renderer.yml');
             $container->setParameter(

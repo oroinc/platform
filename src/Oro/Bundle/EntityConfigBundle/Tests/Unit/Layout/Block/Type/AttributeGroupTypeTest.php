@@ -23,13 +23,13 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     use EntityTrait;
 
     /** @var AttributeRenderRegistry */
-    protected $attributeRenderRegistry;
+    private $attributeRenderRegistry;
 
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeManager;
+    private $attributeManager;
 
     /** @var AttributeBlockTypeMapperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $blockTypeMapper;
+    private $blockTypeMapper;
 
     /**
      * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
@@ -37,12 +37,7 @@ class AttributeGroupTypeTest extends BlockTypeTestCase
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeRenderRegistry = new AttributeRenderRegistry();
-
-        $this->attributeManager = $this->getMockBuilder(AttributeManager::class)
-            ->setMethods(['getAttributesByGroup'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $this->attributeManager = $this->createMock(AttributeManager::class);
         $this->blockTypeMapper = $this->createMock(AttributeBlockTypeMapperInterface::class);
 
         $attributeGroupType = new AttributeGroupType(

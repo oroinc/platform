@@ -145,6 +145,9 @@ services:
         arguments:
             - [] # extensions
 
+    Oro\Bundle\ActionBundle\Handler\OperationFormHandler:
+        alias: oro_action.form.handler.operation_button
+
     oro_action.form.handler.operation_button:
         class: 'Oro\Bundle\ActionBundle\Handler\OperationFormHandler'
         public: true

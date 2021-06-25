@@ -38,9 +38,9 @@ define([
          * Execute delete model
          */
         execute: function() {
-            this.getConfirmDialog(_.bind(function() {
+            this.getConfirmDialog(() => {
                 this.doDelete(this.messages);
-            }, this)).open();
+            }).open();
         },
 
         /**

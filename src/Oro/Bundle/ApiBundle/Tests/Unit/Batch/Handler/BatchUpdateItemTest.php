@@ -25,7 +25,7 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
     {
         $this->processor = $this->getMockBuilder(BatchUpdateItemProcessor::class)
             ->disableOriginalConstructor()
-            ->setMethods(['process'])
+            ->onlyMethods(['process'])
             ->getMock();
         $this->updateContext = new BatchUpdateContext();
         $this->updateContext->setVersion('1.2');

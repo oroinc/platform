@@ -3,7 +3,7 @@ aliases:
 configs:
     oroaddress/js/region/view: {}
 dynamic-imports:
-    oroaddress:
+    orouser:
         - oroaddress/js/app/components/address-book-component
         - oroaddress/js/app/components/address-book-widget-component
         - oroaddress/js/app/views/address-collection-view

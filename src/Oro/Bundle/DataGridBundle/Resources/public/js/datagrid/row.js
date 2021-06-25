@@ -86,13 +86,13 @@ define([
         initialize: function(options) {
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
-            const _this = this;
+            const rowView = this;
             // let descendants override itemView
             if (!this.itemView) {
                 this.itemView = function(options) {
                     const column = options.model;
-                    const cellOptions = _this.getConfiguredCellOptions(column);
-                    cellOptions.model = _this.model;
+                    const cellOptions = rowView.getConfiguredCellOptions(column);
+                    cellOptions.model = rowView.model;
                     const Cell = column.get('cell');
                     const cell = new Cell(cellOptions);
                     cell.$el.attr({
@@ -301,26 +301,25 @@ define([
         },
 
         onClick: function(e) {
-            const _this = this;
             const options = {};
-            const clickFunction = function() {
-                if (_this.disposed) {
+            const clickFunction = () => {
+                if (this.disposed) {
                     return;
                 }
 
-                _this.trigger('clicked', _this, options);
-                if (_this.disposed) {
+                this.trigger('clicked', this, options);
+                if (this.disposed) {
                     return;
                 }
 
-                for (let i = 0; i < _this.subviews.length; i++) {
-                    const cell = _this.subviews[i];
+                for (let i = 0; i < this.subviews.length; i++) {
+                    const cell = this.subviews[i];
                     if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
-                        cell.onRowClicked(_this, e);
+                        cell.onRowClicked(this, e);
                     }
                 }
-                _this.$el.removeClass('mouse-down');
-                delete _this.clickTimeout;
+                this.$el.removeClass('mouse-down');
+                delete this.clickTimeout;
             };
             if (!this.clickPermit) {
                 return;
@@ -361,9 +360,9 @@ define([
                 if (this.$el.data('layout-model')) {
                     options[this.$el.data('layout-model')] = this.model;
                 }
-                this.initLayout(options).always(_.bind(function() {
+                this.initLayout(options).always(() => {
                     this._resolveDeferredRender();
-                }, this));
+                });
             } else {
                 this._resolveDeferredRender();
             }
@@ -409,9 +408,9 @@ define([
                 this.listenTo(this.model, 'backgrid:select', function(model, checked) {
                     $checkbox.prop('checked', checked);
                 });
-                $checkbox.on('change' + this.eventNamespace(), _.bind(function(e) {
+                $checkbox.on('change' + this.eventNamespace(), () => {
                     this.model.trigger('backgrid:selected', this.model, $checkbox.prop('checked'));
-                }, this));
+                });
                 $checkbox.on('click' + this.eventNamespace(), function(e) {
                     e.stopPropagation();
                 });

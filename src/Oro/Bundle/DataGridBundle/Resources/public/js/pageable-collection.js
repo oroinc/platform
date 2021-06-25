@@ -318,11 +318,11 @@ define([
             state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
-            _.each(this.additionalParameters, _.bind(function(value, key) {
+            _.each(this.additionalParameters, (value, key) => {
                 if (!_.isUndefined(state[value])) {
                     state.parameters[key] = state[value];
                 }
-            }, this));
+            });
 
             return state;
         },
@@ -701,7 +701,7 @@ define([
 
             if (options.waitForPromises.length) {
                 const deferredFetch = $.Deferred();
-                $.when(...options.waitForPromises).done(_.bind(function(...args) {
+                $.when(...options.waitForPromises).done((...args) => {
                     this._fetch(options)
                         .done(function() {
                             deferredFetch.resolveWith(this, args);
@@ -709,7 +709,7 @@ define([
                         .fail(function() {
                             deferredFetch.rejectWith(this, args);
                         });
-                }, this)).fail(function(...args) {
+                }).fail(function(...args) {
                     deferredFetch.rejectWith(this, args);
                 });
 
@@ -1048,10 +1048,10 @@ define([
             result = result || {};
 
             if (_.isFunction(result.fail)) {
-                result.fail(_.bind(function() {
+                result.fail(() => {
                     // revert state if page change fail
                     this.state = this._checkState(oldState);
-                }, this));
+                });
             }
 
             return result;

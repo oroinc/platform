@@ -37,11 +37,11 @@ define(function(require) {
             });
 
             this.dataInputSelector = options.dataInputSelector;
-            this.$el.closest('form').on('submit' + this.eventNamespace(), _.bind(this._onSubmit, this));
+            this.$el.closest('form').on('submit' + this.eventNamespace(), this._onSubmit.bind(this));
 
             this.checkAllSelector = options.checkAllSelector;
             this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
-            this.$(this.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
+            this.$(this.checkAllSelector).on('change' + this.eventNamespace(), this._onCheckAllChange.bind(this));
             this.listenTo(mediator, 'serializeFolderCollection', this._serializeFolderCollection);
         },
 

@@ -165,15 +165,15 @@ define(function(require) {
                 this._wid = this.options.wid;
             }
 
-            this.on('adoptedFormSubmitClick', _.bind(this._onAdoptedFormSubmitClick, this));
-            this.on('adoptedFormResetClick', _.bind(this._onAdoptedFormResetClick, this));
-            this.on('adoptedFormSubmit', _.bind(this._onAdoptedFormSubmit, this));
+            this.on('adoptedFormSubmitClick', this._onAdoptedFormSubmitClick.bind(this));
+            this.on('adoptedFormResetClick', this._onAdoptedFormResetClick.bind(this));
+            this.on('adoptedFormSubmit', this._onAdoptedFormSubmit.bind(this));
             if (this.options.loadingMaskEnabled) {
-                this.on('beforeContentLoad', _.bind(this._showLoading, this));
-                this.on('contentLoad', _.bind(this._hideLoading, this));
-                this.on('renderStart', _.bind(function(el) {
+                this.on('beforeContentLoad', this._showLoading.bind(this));
+                this.on('contentLoad', this._hideLoading.bind(this));
+                this.on('renderStart', el => {
                     this.loadingElement = el;
-                }, this));
+                });
             }
 
             this.actions = {};
@@ -363,9 +363,9 @@ define(function(require) {
                 this.trigger('beforeContentLoad', this);
                 form.ajaxSubmit({
                     data: this._getWidgetData(),
-                    success: _.bind(this._onContentLoad, this),
+                    success: this._onContentLoad.bind(this),
                     errorHandlerMessage: false,
-                    error: _.bind(this._onContentLoadFail, this)
+                    error: this._onContentLoadFail.bind(this)
                 });
                 this.loading = form.data('jqxhr');
             } else {
@@ -583,12 +583,12 @@ define(function(require) {
          * @private
          */
         _bindSubmitHandler: function() {
-            this.$el.parent().on('submit', _.bind(function(e) {
+            this.$el.parent().on('submit', e => {
                 if (!e.isDefaultPrevented()) {
                     this.options.submitHandler.call(this);
                 }
                 e.preventDefault();
-            }, this));
+            });
         },
 
         /**
@@ -686,8 +686,8 @@ define(function(require) {
 
             this.trigger('beforeContentLoad', this);
             this.loading = $.ajax(options)
-                .done(_.bind(this._onContentLoad, this))
-                .fail(_.bind(this._onContentLoadFail, this));
+                .done(this._onContentLoad.bind(this))
+                .fail(this._onContentLoadFail.bind(this));
         },
 
         prepareContentRequestOptions: function(data, method, url) {
@@ -789,15 +789,15 @@ define(function(require) {
             this.setContent(content, true);
             if (this.deferredRender) {
                 this.deferredRender
-                    .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(_.bind(function(error) {
+                    .done(this._triggerContentLoadEvents.bind(this, content))
+                    .fail(error => {
                         if (!this.disposing && !this.disposed) {
                             if (error) {
                                 errorHandler.showErrorInConsole(error);
                             }
                             this._triggerContentLoadEvents();
                         }
-                    }, this));
+                    });
             } else {
                 this._triggerContentLoadEvents();
             }
@@ -914,7 +914,7 @@ define(function(require) {
             this.trigger('renderComplete', this.$el, this);
             this.getLayoutElement().attr('data-layout', 'separate');
             this.initLayout(this.options.initLayoutOptions || {})
-                .done(_.bind(this._afterLayoutInit, this));
+                .done(this._afterLayoutInit.bind(this));
         },
 
         _afterLayoutInit: function() {
@@ -922,7 +922,7 @@ define(function(require) {
                 return;
             }
             if (this.deferredRender) {
-                this.deferredRender.done(_.bind(this._renderHandler, this));
+                this.deferredRender.done(this._renderHandler.bind(this));
                 this._resolveDeferredRender();
             } else {
                 this._renderHandler();

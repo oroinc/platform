@@ -113,10 +113,9 @@ define(function(require) {
         },
 
         getSelect2Options: function() {
-            const _this = this;
             const options = _.omit(TagsEditorView.__super__.getSelect2Options.call(this), 'data');
-            _this.currentData = null;
-            _this.firstPageData = {
+            this.currentData = null;
+            this.firstPageData = {
                 results: [],
                 more: false,
                 isDummy: true
@@ -137,39 +136,39 @@ define(function(require) {
                         __('oro.tag.inline_editing.new_tag') + ')</span>')
                         : '');
                 },
-                formatNoMatches: function() {
+                formatNoMatches: () => {
                     // no matches appears in following two cases only
                     // we use this message not for its original mission
-                    return _this.isLoading
+                    return this.isLoading
                         ? __('oro.tag.inline_editing.loading')
-                        : (_this.isCurrentTagSelected()
+                        : (this.isCurrentTagSelected()
                             ? __('oro.tag.inline_editing.existing_tag')
                             : __('oro.tag.inline_editing.no_matches')
                         );
                 },
-                initSelection: function(element, callback) {
-                    callback(_this.getInitialResultItem());
+                initSelection: (element, callback) => {
+                    callback(this.getInitialResultItem());
                 },
-                query: function(options) {
-                    _this.currentTerm = options.term;
-                    _this.currentPage = options.page;
-                    _this.currentCallback = options.callback;
-                    _this.isLoading = true;
+                query: options => {
+                    this.currentTerm = options.term;
+                    this.currentPage = options.page;
+                    this.currentCallback = options.callback;
+                    this.isLoading = true;
                     if (options.page === 1) {
                         // immediately show first item
-                        _this.showResults();
+                        this.showResults();
                     }
-                    options.callback = _.bind(_this.commonDataCallback, _this);
-                    if (_this.currentRequest && _this.currentRequest.term !== '' &&
-                        _this.currentRequest.state() !== 'resolved') {
-                        _this.currentRequest.abort();
+                    options.callback = this.commonDataCallback.bind(this);
+                    if (this.currentRequest && this.currentRequest.term !== '' &&
+                        this.currentRequest.state() !== 'resolved') {
+                        this.currentRequest.abort();
                     }
-                    const autoCompleteUrlParameters = _this.buildAutoCompleteUrlParameters();
+                    const autoCompleteUrlParameters = this.buildAutoCompleteUrlParameters();
                     if (options.term !== '' &&
-                        !_this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
-                        _this.debouncedMakeRequest(options, autoCompleteUrlParameters);
+                        !this.autocompleteApiAccessor.isCacheExistsFor(autoCompleteUrlParameters)) {
+                        this.debouncedMakeRequest(options, autoCompleteUrlParameters);
                     } else {
-                        _this.makeRequest(options, autoCompleteUrlParameters);
+                        this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
             });
@@ -194,7 +193,7 @@ define(function(require) {
 
         onCacheClear: function() {
             this.makeRequest({
-                callback: _.bind(this.commonDataCallback, this),
+                callback: this.commonDataCallback.bind(this),
                 term: this.currentTerm,
                 page: this.currentPage,
                 per_page: this.perPage
@@ -235,7 +234,7 @@ define(function(require) {
                         return;
                     }
                 }
-                data.results.sort(_.bind(this.tagSortCallback, this));
+                data.results.sort(this.tagSortCallback.bind(this));
             } else {
                 data = $.extend({}, this.currentData);
                 data.results = this.filterTermFromResults(this.currentTerm, data.results);

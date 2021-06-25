@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const tinyMCE = require('tinymce/tinymce');
     const BaseView = require('oroui/js/app/views/base/view');
 
@@ -48,9 +47,9 @@ define(function(require) {
          */
         render: function() {
             if (this.$(this.checkboxSelector).is(':checked')) {
-                this.$(this.checkboxSelector).filter(':checked').each(_.bind(function(i, e) {
+                this.$(this.checkboxSelector).filter(':checked').each((i, e) => {
                     this._setFieldsState($(e), true);
-                }, this));
+                });
             }
 
             return DefaultFieldValueView.__super__.render.call(this);

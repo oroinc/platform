@@ -93,7 +93,7 @@ define(function(require) {
 
         delegateEvents: function(events) {
             FlowchartJsPlumbAreaView.__super__.delegateEvents.call(this, events);
-            $(document).on('zoomchange' + this.eventNamespace(), _.bind(this.onZoomChange, this));
+            $(document).on('zoomchange' + this.eventNamespace(), this.onZoomChange.bind(this));
             return this;
         },
 

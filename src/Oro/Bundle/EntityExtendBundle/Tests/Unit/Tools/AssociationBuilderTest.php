@@ -23,13 +23,13 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
     private const SOURCE_CLASS = 'Test\SourceEntity';
     private const TARGET_CLASS = 'Test\TargetEntity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var RelationBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $relationBuilder;
 
     protected function setUp(): void
@@ -41,9 +41,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToManyRelationForNewAssociation()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
 
@@ -62,12 +61,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->once())
@@ -77,12 +74,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $builder->expects($this->once())
             ->method('getPrimaryKeyColumnNames')
@@ -126,9 +121,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToManyRelationForNewAssociationAndNoLabelForTargetEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
 
@@ -144,12 +138,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->once())
@@ -159,12 +151,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $builder->expects($this->once())
             ->method('getPrimaryKeyColumnNames')
@@ -208,9 +198,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToManyRelationForExistingAssociation()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
         $fieldName = 'target_entity_98c95332';
@@ -224,12 +213,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -259,9 +246,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToOneRelationForNewAssociation()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
 
@@ -280,12 +266,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->once())
@@ -295,12 +279,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $builder->expects($this->once())
             ->method('getPrimaryKeyColumnNames')
@@ -339,9 +321,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToOneRelationForNewAssociationAndNoLabelForTargetEntity()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
 
@@ -357,12 +338,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $entityConfigProvider = $this->createMock(ConfigProvider::class);
         $entityConfigProvider->expects($this->once())
@@ -372,12 +351,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
         $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->willReturnMap(
-                [
-                    ['extend', $extendConfigProvider],
-                    ['entity', $entityConfigProvider]
-                ]
-            );
+            ->willReturnMap([
+                ['extend', $extendConfigProvider],
+                ['entity', $entityConfigProvider]
+            ]);
 
         $builder->expects($this->once())
             ->method('getPrimaryKeyColumnNames')
@@ -416,9 +393,8 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateManyToOneRelationForExistingAssociation()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationBuilder $builder */
         $builder = $this->getMockBuilder(AssociationBuilder::class)
-            ->setMethods(['getPrimaryKeyColumnNames'])
+            ->onlyMethods(['getPrimaryKeyColumnNames'])
             ->setConstructorArgs([$this->doctrine, $this->configManager, $this->relationBuilder])
             ->getMock();
 
@@ -433,12 +409,10 @@ class AssociationBuilderTest extends \PHPUnit\Framework\TestCase
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->willReturnMap(
-                [
-                    [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
-                    [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
-                ]
-            );
+            ->willReturnMap([
+                [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+            ]);
 
         $this->configManager->expects($this->once())
             ->method('getProvider')

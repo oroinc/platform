@@ -24,14 +24,10 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
 
         $subscriber = $this->getMockSubscriber(DateFilterSubscriber::class);
 
-        $localeSettings = $this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimezone'])
-            ->getMock();
-
+        $localeSettings = $this->createMock(LocaleSettings::class);
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('UTC'));
+            ->willReturn('UTC');
 
         $types = [
             new DateRangeType($localeSettings),

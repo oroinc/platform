@@ -26,7 +26,7 @@ define(function(require) {
             CheckboxView.__super__.initialize.call(this, options);
 
             this.options = _.defaults(options || {}, this.options);
-            this.$el.closest('form').on('submit' + this.eventNamespace(), _.bind(this._onSubmit, this));
+            this.$el.closest('form').on('submit' + this.eventNamespace(), this._onSubmit.bind(this));
         },
 
         /**

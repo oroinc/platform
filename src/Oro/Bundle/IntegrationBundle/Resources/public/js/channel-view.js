@@ -58,8 +58,8 @@ define([
             }
 
             this.processSelectorState();
-            $(options.typeSelector).on('change', _.bind(this.changeHandler, this));
-            $(options.transportTypeSelector).on('change', _.bind(this.changeHandler, this));
+            $(options.typeSelector).on('change', this.changeHandler.bind(this));
+            $(options.transportTypeSelector).on('change', this.changeHandler.bind(this));
             this.memoizeValue(options.typeSelector);
             this.memoizeValue(options.transportTypeSelector);
         },
@@ -89,13 +89,13 @@ define([
                         okText: __('Yes'),
                         content: __('oro.integration.submit')
                     });
-                    confirm.on('ok', _.bind(function() {
+                    confirm.on('ok', () => {
                         this.processChange($el);
-                    }, this));
-                    confirm.on('cancel', _.bind(function() {
+                    });
+                    confirm.on('cancel', () => {
                         $el.data('cancelled', true).val(prevVal).trigger('change');
                         this.memoizeValue($el);
-                    }, this));
+                    });
                     confirm.open();
                 } else {
                     this.processChange($el);

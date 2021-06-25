@@ -67,7 +67,7 @@ define(function(require) {
         initTypeahead: function() {
             const self = this;
             this.getTypeaheadInput().typeahead({
-                source: _.bind(this.source, this),
+                source: this.source.bind(this),
                 matcher: function(item) {
                     return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
                 },
@@ -90,8 +90,7 @@ define(function(require) {
                     return beginswith.concat(caseSensitive, caseInsensitive);
                 },
                 render: function(items) {
-                    const that = this;
-                    items = $(items).map(function(i, item) {
+                    items = $(items).map((i, item) => {
                         let view;
 
                         if (item.item.dialog) {
@@ -120,7 +119,7 @@ define(function(require) {
                                 entityId: self.entityId
                             });
 
-                            view = $(that.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
+                            view = $(this.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
                             view.find('a')
                                 .attr('href', '#')
                                 .attr('class', config.aCss)
@@ -128,14 +127,14 @@ define(function(require) {
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html(that.highlighter(item.key));
+                                .html(this.highlighter(item.key));
 
                             if (config.iCss) {
                                 view.prepend('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>');
                             }
                         } else {
-                            view = $(that.options.item).attr('data-value', item.key);
-                            view.find('a').html(that.highlighter(item.key));
+                            view = $(this.options.item).attr('data-value', item.key);
+                            view.find('a').html(this.highlighter(item.key));
                         }
 
                         return view[0];
@@ -166,7 +165,7 @@ define(function(require) {
                 this.render();
             } else {
                 const url = routing.generate(this.sourceUrl, {query: query});
-                $.get(url, _.bind(function(data) {
+                $.get(url, data => {
                     this.data = data;
                     const result = [];
                     _.each(data, function(item, key) {
@@ -178,7 +177,7 @@ define(function(require) {
                     this.cache[query] = result;
                     process(result);
                     self.render();
-                }, this));
+                });
             }
         },
 

@@ -37,18 +37,18 @@ define(function(require) {
             }
 
             // show loading message, if loading takes more than 100ms
-            const showLoadingTimeout = setTimeout(_.bind(function() {
+            const showLoadingTimeout = setTimeout(() => {
                 this.$filterContainer.html('<span class="loading-indicator">' + __('Loading...') + '</span>');
-            }, this), 100);
+            }, 100);
 
             loadModules(requires, function(Filter, optionResolver) {
-                const appendFilter = _.bind(function() {
+                const appendFilter = () => {
                     clearTimeout(showLoadingTimeout);
                     const filter = new (Filter.extend(filterOptions))();
                     if (!this.disposed) {
                         this._appendFilter(filter);
                     }
-                }, this);
+                };
                 if (optionResolver) {
                     const promise = optionResolver(filterOptions, this.subview('choice-input').splitFieldId(fieldId));
                     promise.done(appendFilter);

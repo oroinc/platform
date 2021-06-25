@@ -8,11 +8,12 @@ app-modules:
 configs:
     orolocale/js/locale-settings: {}
 dynamic-imports:
-    orolocale:
+    commons:
         - oro/select2-autocomplete-enabledlocalization-component
-        - orolocale/js/app/views/fallback-view
         - orolocale/js/app/views/localization-select-view
         - orolocale/js/app/views/localizations-select-view
+    tinymce.min:
+        - orolocale/js/app/views/fallback-view
         - orolocale/js/app/views/localizable-collection-tabs-view
 map:
     "*":

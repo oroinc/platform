@@ -98,7 +98,7 @@ define(function(require) {
             const promise = this.configureFilters();
 
             this.form = this.$storage.parents('form');
-            this.form.submit(_.bind(this.onBeforeSubmit, this));
+            this.form.submit(this.onBeforeSubmit.bind(this));
 
             return promise;
         },
@@ -191,11 +191,11 @@ define(function(require) {
                 okText: __('OK')
             });
 
-            modal.open(_.bind(function() {
+            modal.open(() => {
                 // let sub-components do cleanup before submit
                 this.trigger('before-submit');
                 this.form.trigger('submit');
-            }, this));
+            });
 
             // prevent form submitting
             e.preventDefault();

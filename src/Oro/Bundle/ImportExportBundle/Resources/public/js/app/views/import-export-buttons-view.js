@@ -60,13 +60,13 @@ define(function(require) {
             this.$exportButton = this.$container.find(this.options.selectors.exportButton);
             this.$templateButton = this.$container.find(this.options.selectors.templateButton);
 
-            this.$importButton.on('click' + this.eventNamespace(), _.bind(this.onImportClick, this));
+            this.$importButton.on('click' + this.eventNamespace(), this.onImportClick.bind(this));
             this.$importValidationButton.on(
                 'click' + this.eventNamespace(),
-                _.bind(this.onImportValidationClick, this)
+                this.onImportValidationClick.bind(this)
             );
-            this.$exportButton.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
-            this.$templateButton.on('click' + this.eventNamespace(), _.bind(this.onTemplateClick, this));
+            this.$exportButton.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
+            this.$templateButton.on('click' + this.eventNamespace(), this.onTemplateClick.bind(this));
 
             this.importExportManager = new ImportExportManager(this.options.data);
         },

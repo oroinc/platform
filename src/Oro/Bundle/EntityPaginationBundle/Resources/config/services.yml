@@ -24,6 +24,9 @@ services:
         arguments:
             - '@oro_config.user'
 
+    Oro\Bundle\EntityPaginationBundle\Manager\MessageManager:
+        alias: oro_entity_pagination.message_manager
+
     oro_entity_pagination.message_manager:
         class: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager
         public: true
@@ -32,6 +35,9 @@ services:
             - '@translator'
             - '@oro_entity_pagination.navigation'
             - '@oro_entity_pagination.storage'
+
+    Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation:
+        alias: oro_entity_pagination.navigation
 
     oro_entity_pagination.navigation:
         class: Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation

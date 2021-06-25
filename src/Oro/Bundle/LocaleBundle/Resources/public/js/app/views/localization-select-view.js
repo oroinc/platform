@@ -40,7 +40,7 @@ define(function(require) {
 
             this.$select = this.$el.find(this.options.selectSelector);
             this.$useParent = this.$el.find(this.options.useParentSelector);
-            this.$useParent.on('change' + this.eventNamespace(), _.bind(this.onUseParentChange, this));
+            this.$useParent.on('change' + this.eventNamespace(), this.onUseParentChange.bind(this));
 
             mediator.on('enabled_localizations:changed', this.onEnabledLocalizationsChanged, this);
         },

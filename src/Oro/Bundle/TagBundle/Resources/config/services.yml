@@ -153,6 +153,9 @@ services:
         tags:
             - { name: oro_datagrid.extension.formatter.property, type: tag-search-result }
 
+    Oro\Bundle\TagBundle\Provider\StatisticProvider:
+        alias: oro_tag.provider.statistic
+
     oro_tag.provider.statistic:
         class: Oro\Bundle\TagBundle\Provider\StatisticProvider
         public: true

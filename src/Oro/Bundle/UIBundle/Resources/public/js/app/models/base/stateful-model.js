@@ -26,7 +26,7 @@ define(function(require) {
             }
             this.history = new HistoryModel({}, historyOptions);
             this.boundEvents = [];
-            this.debouncedOnStateChange = _.debounce(_.bind(this.onStateChange, this), 50);
+            this.debouncedOnStateChange = _.debounce(this.onStateChange.bind(this), 50);
             this.bindEvents();
         },
 

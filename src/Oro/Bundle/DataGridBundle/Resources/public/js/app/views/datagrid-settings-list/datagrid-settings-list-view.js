@@ -56,7 +56,7 @@ define(function(require) {
          */
         initialize: function(options) {
             DatagridSettingsListView.__super__.initialize.call(this, options);
-            this.filterer = _.bind(options.columnFilterModel.filterer, options.columnFilterModel);
+            this.filterer = options.columnFilterModel.filterer.bind(options.columnFilterModel);
             // to handle renderable change at once for multiple changes
             this.onRenderableChange = _.debounce(this.onRenderableChange, 0);
             this.listenTo(options.columnFilterModel, 'change', this.updateView);

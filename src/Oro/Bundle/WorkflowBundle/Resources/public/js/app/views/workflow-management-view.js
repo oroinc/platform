@@ -81,7 +81,7 @@ define(function(require) {
         },
 
         initStartStepSelector: function() {
-            const getSteps = _.bind(function(query) {
+            const getSteps = query => {
                 const steps = [];
                 _.each(this.model.get('steps').models, function(step) {
                     // starting point is not allowed to be a start step
@@ -97,7 +97,7 @@ define(function(require) {
                 }, this);
 
                 query.callback({results: steps});
-            }, this);
+            };
 
             this.$startStepEl = this.$('[name="start_step"]');
 
@@ -105,13 +105,13 @@ define(function(require) {
                 allowClear: true,
                 query: getSteps,
                 placeholder: __('Choose step...'),
-                initSelection: _.bind(function(element, callback) {
+                initSelection: (element, callback) => {
                     const startStep = this.model.getStepByName(element.val());
                     callback({
                         id: startStep.get('name'),
                         text: startStep.get('label')
                     });
-                }, this)
+                }
             };
 
             this.$startStepEl.inputWidget('create', 'select2', {initializeOptions: select2Options});

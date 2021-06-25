@@ -54,16 +54,14 @@ define(function(require) {
             this.data = this.data || [];
             if (this.lazy) {
                 this.loadedMetadata = false;
-                this.loader(
-                    _.bind(function(metadata) {
-                        this.data = metadata.data;
-                        this._updateCriteriaHint();
-                        this.loadedMetadata = true;
-                        if (this.subview('loading')) {
-                            this.subview('loading').hide();
-                        }
-                    }, this)
-                );
+                this.loader(metadata => {
+                    this.data = metadata.data;
+                    this._updateCriteriaHint();
+                    this.loadedMetadata = true;
+                    if (this.subview('loading')) {
+                        this.subview('loading').hide();
+                    }
+                });
             }
         },
 

@@ -12,14 +12,11 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DateFilterUtility */
-    protected $utility;
+    private $utility;
 
     protected function setUp(): void
     {
-        $localeSettings = $this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->setMethods(array('getTimezone', 'getFirstQuarterMonth', 'getFirstQuarterDay'))
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
         $compiler = $this->createMock(Compiler::class);
         $expressionResult = $this->createMock(ExpressionResult::class);
         $expressionResult->expects($this->any())
@@ -41,28 +38,18 @@ class DateFilterUtilityTest extends \PHPUnit\Framework\TestCase
         $this->utility = new DateFilterUtility($localeSettings, $compiler);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->utility);
-    }
-
     /**
      * @dataProvider parseDataProvider
-     *
-     * @param mixed $data
-     * @param string $fieldName
-     * @param mixed $expectedResults
      */
-    public function testParse($data, $fieldName, $expectedResults)
+    public function testParse(?array $data, string $fieldName, $expectedResults)
     {
         $this->assertEquals($expectedResults, $this->utility->parseData($fieldName, $data));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function parseDataProvider()
+    public function parseDataProvider(): array
     {
         return [
             'invalid data, not array' => [

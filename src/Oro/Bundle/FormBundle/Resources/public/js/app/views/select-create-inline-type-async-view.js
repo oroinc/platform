@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const SelectCreateInlineTypeView = require('oroform/js/app/views/select-create-inline-type-view');
 
     const SelectCreateInlineTypeAsyncView = SelectCreateInlineTypeView.extend({
@@ -24,10 +23,10 @@ define(function(require) {
 
         onCreate: function(e) {
             SelectCreateInlineTypeAsyncView.__super__.onCreate.call(this, e);
-            this.dialogWidget.once('beforeContentLoad', _.bind(function() {
+            this.dialogWidget.once('beforeContentLoad', () => {
                 this.dialogWidget.hide();
                 this.$el.addClass('loading');
-            }, this));
+            });
         },
 
         onSelect2Request: function() {

@@ -110,20 +110,20 @@ define([
 
             this.set('isContentLoading', true);
             return $.ajax(options)
-                .done(_.bind(function(data) {
+                .done(data => {
                     this.set({
                         is_loaded: true,
                         contentHTML: data,
                         isContentLoading: false
                     });
-                }, this))
-                .fail(_.bind(function(response) {
+                })
+                .fail(response => {
                     const attrs = {isContentLoading: false};
                     if (response.status === 403) {
                         attrs.is_loaded = true;
                     }
                     this.set(attrs);
-                }, this));
+                });
         }
     });
 

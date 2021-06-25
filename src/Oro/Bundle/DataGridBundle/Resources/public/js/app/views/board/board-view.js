@@ -156,9 +156,9 @@ define(function(require) {
             });
 
             // setup scroll tracking logic
-            this.setTrackScrollInterval = setInterval(_.bind(this.trackScroll, this), 300);
+            this.setTrackScrollInterval = setInterval(this.trackScroll.bind(this), 300);
             this.listenTo(this.serverCollection, 'change reset add remove',
-                _.debounce(_.bind(this.trackScroll, this), 0));
+                _.debounce(this.trackScroll.bind(this), 0));
         },
 
         /**
@@ -193,7 +193,7 @@ define(function(require) {
          * Starts intensive scroll settings tracking, usefull during d'n'd when there is no enough events
          */
         startIntensiveScrollTracking: function() {
-            this.dragTrackScrollInterval = setInterval(_.bind(this.trackScroll, this), 0);
+            this.dragTrackScrollInterval = setInterval(this.trackScroll.bind(this), 0);
         },
 
         /**
@@ -274,9 +274,9 @@ define(function(require) {
                 }
             }
             // do not break $.sortable working cycle, let it finish everything it need
-            _.defer(_.bind(function() {
+            _.defer(() => {
                 this.trigger('update', data.model, options);
-            }, this));
+            });
         },
 
         /**

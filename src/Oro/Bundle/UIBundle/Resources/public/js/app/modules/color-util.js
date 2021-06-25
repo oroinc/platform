@@ -1,8 +1,4 @@
-define(function(require) {
-    'use strict';
+import $ from 'jquery';
+import colorUtil from 'oroui/js/tools/color-util';
 
-    const $ = require('jquery');
-    const colorUtil = require('oroui/js/tools/color-util');
-
-    colorUtil.configure({DARK: $('body').css('color')});
-});
+colorUtil.configure({DARK: $('body').css('color')});

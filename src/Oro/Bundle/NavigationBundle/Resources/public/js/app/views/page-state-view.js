@@ -51,7 +51,7 @@ define(function(require) {
             });
             this.subview('confirmModal', confirmModal);
 
-            $(window).on('beforeunload' + this.eventNamespace(), _.bind(this.onWindowUnload, this));
+            $(window).on('beforeunload' + this.eventNamespace(), this.onWindowUnload.bind(this));
 
             this.isChangesLossConfirmationNeeded = this.isChangesLossConfirmationNeeded.bind(this);
             pageStateChecker.registerChecker(this.isChangesLossConfirmationNeeded);
@@ -269,7 +269,7 @@ define(function(require) {
             if (attributes.data !== currentData) {
                 this._restoreState();
             }
-            this.$el.on('change.page-state', _.bind(this._collectState, this));
+            this.$el.on('change.page-state', this._collectState.bind(this));
         },
 
         /**

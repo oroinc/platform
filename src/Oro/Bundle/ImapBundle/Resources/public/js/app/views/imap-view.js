@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
     const $ = require('jquery');
 
@@ -61,7 +60,7 @@ define(function(require) {
                 this.hideErrorMessage();
             }
 
-            this.initLayout().done(_.bind(this._resolveDeferredRender, this));
+            this.initLayout().done(this._resolveDeferredRender.bind(this));
         },
 
         /**

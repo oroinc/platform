@@ -1,15 +1,14 @@
-define([
-    'jquery',
-    'underscore',
-    'tpl-loader!oroui/templates/message-item.html',
-    'oroui/js/tools',
-    'oroui/js/tools/multi-use-resource-manager',
-    'cryptojs/sha256',
-    'oroui/js/mediator',
-    'oroui/js/error',
-    'bootstrap'
-], function($, _, template, tools, MultiUseResourceManager, SHA256, mediator, error) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const template = require('tpl-loader!oroui/templates/message-item.html');
+    const MultiUseResourceManager = require('oroui/js/tools/multi-use-resource-manager');
+    const cyrb53 = require('oroui/js/tools/cyrb53').default;
+    const mediator = require('oroui/js/mediator');
+    const error = require('oroui/js/error');
+    require('bootstrap');
 
     const defaults = {
         container: '',
@@ -136,8 +135,7 @@ define([
             let namespace = (options || {}).namespace;
 
             if (!namespace) {
-                // eslint-disable-next-line new-cap
-                namespace = SHA256(message + this.type).toString();
+                namespace = cyrb53(message + this.type).toString();
 
                 if (!options) {
                     options = {
@@ -192,12 +190,12 @@ define([
             if (!type) {
                 type = 'process';
             }
-            const _this = this;
+            const messenger = this;
             if (!groupedMessages[message]) {
                 groupedMessages[message] = new MultiUseResourceManager({
                     listen: {
                         constructResource: function() {
-                            this.alert = _this.notificationMessage(type, message, {flash: false});
+                            this.alert = messenger.notificationMessage(type, message, {flash: false});
                         },
                         disposeResource: function() {
                             this.alert.close();

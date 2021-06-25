@@ -65,7 +65,7 @@ define(function(require) {
         render: function() {
             EmailNotificationCollectionView.__super__.render.call(this);
             this.updateViewMode();
-            _.defer(_.bind(this.adjustMaxHeight, this));
+            _.defer(this.adjustMaxHeight.bind(this));
         },
 
         getTemplateData: function() {
@@ -121,7 +121,7 @@ define(function(require) {
             $.ajax({
                 method: 'POST',
                 url: routing.generate('oro_email_mark_all_as_seen', ids),
-                success: _.bind(function(response) {
+                success: response => {
                     this.collection.markAllAsRead();
                     this.collection.unreadEmailsCount = 0;
                     this.countNewEmail = 0;
@@ -129,7 +129,7 @@ define(function(require) {
                     if (response.successful) {
                         mediator.trigger('datagrid:doRefresh:user-email-grid');
                     }
-                }, this),
+                },
                 errorHandlerMessage: __('oro.email.error.mark_as_read')
             });
         },

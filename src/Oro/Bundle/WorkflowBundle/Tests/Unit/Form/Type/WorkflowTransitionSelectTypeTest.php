@@ -21,13 +21,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|WorkflowRegistry */
-    protected $workflowRegistry;
+    private $workflowRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var WorkflowTransitionSelectType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {
@@ -70,11 +70,16 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions()
     {
-        /** @var OptionsResolver|\PHPUnit\Framework\MockObject\MockObject $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())->method('setDefined')->with('workflowName');
-        $resolver->expects($this->once())->method('setAllowedTypes')->with('workflowName', ['string', 'null']);
-        $resolver->expects($this->once())->method('setNormalizer')->with('choices');
+        $resolver->expects($this->once())
+            ->method('setDefined')
+            ->with('workflowName');
+        $resolver->expects($this->once())
+            ->method('setAllowedTypes')
+            ->with('workflowName', ['string', 'null']);
+        $resolver->expects($this->once())
+            ->method('setNormalizer')
+            ->with('choices');
 
         $this->type->configureOptions($resolver);
     }
@@ -86,11 +91,8 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider incorrectOptionsDataProvider
-     *
-     * @param array $options
-     * @param string $exceptionMessage
      */
-    public function testNormalizersException(array $options, $exceptionMessage)
+    public function testNormalizersException(array $options, string $exceptionMessage)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -98,10 +100,7 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create(WorkflowTransitionSelectType::class, null, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function incorrectOptionsDataProvider()
+    public function incorrectOptionsDataProvider(): array
     {
         return [
             'empty options' => [
@@ -116,16 +115,12 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getExtensions()
     {
-        $choiceType = $this->getMockBuilder(OroChoiceType::class)
-            ->setMethods(['configureOptions', 'getParent'])
-            ->disableOriginalConstructor()
-            ->getMock();
-        $choiceType->expects($this->any())->method('getParent')->willReturn(ChoiceType::class);
+        $choiceType = $this->createMock(OroChoiceType::class);
+        $choiceType->expects($this->any())
+            ->method('getParent')
+            ->willReturn(ChoiceType::class);
 
         return [
             new PreloadedExtension(
@@ -156,16 +151,15 @@ class WorkflowTransitionSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals([new ChoiceView([], 'test', "$translatedLabel (test)")], $view->vars['choices']);
     }
 
-    /**
-     * @param string $name
-     * @param string $label
-     * @return Transition|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getTransition($name, $label)
+    private function getTransition(string $name, string $label): Transition
     {
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->any())->method('getName')->willReturn($name);
-        $transition->expects($this->any())->method('getLabel')->willReturn($label);
+        $transition->expects($this->any())
+            ->method('getName')
+            ->willReturn($name);
+        $transition->expects($this->any())
+            ->method('getLabel')
+            ->willReturn($label);
 
         return $transition;
     }

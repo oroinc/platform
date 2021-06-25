@@ -1,10 +1,16 @@
 services:
+    Oro\Bundle\FormBundle\Autocomplete\Security:
+        alias: oro_form.autocomplete.security
+
     oro_form.autocomplete.security:
         class: Oro\Bundle\FormBundle\Autocomplete\Security
         public: true
         arguments:
             - [] # autocomplete ACL resources
             - '@security.authorization_checker'
+
+    Oro\Bundle\FormBundle\Autocomplete\SearchRegistry:
+        alias: oro_form.autocomplete.search_registry
 
     oro_form.autocomplete.search_registry:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchRegistry

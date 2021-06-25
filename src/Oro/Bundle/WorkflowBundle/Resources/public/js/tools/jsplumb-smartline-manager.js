@@ -16,8 +16,8 @@ define(function(require) {
             state: {},
             connections: {}
         };
-        this.debouncedCalculateOverlays = _.debounce(_.bind(this.jsPlumbOverlayManager.calculate,
-            this.jsPlumbOverlayManager), 50);
+        this.debouncedCalculateOverlays =
+            _.debounce(this.jsPlumbOverlayManager.calculate.bind(this.jsPlumbOverlayManager), 50);
     }
 
     window.getLastRequest = function() {
@@ -92,7 +92,6 @@ define(function(require) {
         },
 
         _refreshCache: function() {
-            const _this = this;
             const connections = [];
             const rects = {};
             const graph = new Graph();
@@ -132,7 +131,7 @@ define(function(require) {
                 return a[2] - b[2];
             });
 
-            _.each(connections, function(conn) {
+            _.each(connections, conn => {
                 const finder = new Finder(graph);
 
                 finder.addTo(graph.getPathFromCid(conn[1], directions.BOTTOM_TO_TOP));
@@ -141,7 +140,7 @@ define(function(require) {
                 const path = finder.find();
                 if (path) {
                     graph.updateWithPath(path);
-                    _this.cache.connections[conn[3].connector.getId()] = {
+                    this.cache.connections[conn[3].connector.getId()] = {
                         connection: conn[3],
                         path: path
                     };
@@ -155,7 +154,7 @@ define(function(require) {
                 delete item.path;
             });
 
-            _.defer(_.bind(this.jsPlumbInstance.repaintEverything, this.jsPlumbInstance));
+            _.defer(this.jsPlumbInstance.repaintEverything.bind(this.jsPlumbInstance));
 
             this.debouncedCalculateOverlays();
 

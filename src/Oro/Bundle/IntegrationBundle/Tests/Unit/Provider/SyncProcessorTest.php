@@ -2,68 +2,54 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
+use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
+use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
+use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestContext;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Stub\TestConnector;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SyncProcessorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Integration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $integration;
+    private $integration;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
+    private $em;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $processorRegistry;
+    private $processorRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $jobExecutor;
+    private $jobExecutor;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $registry;
+    private $registry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $log;
+    private $log;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
-    /**
-     * Setup test obj and mock
-     */
     protected function setUp(): void
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(['createQueryBuilder', 'getRepository'])
-            ->getMock();
-
-        $this->processorRegistry = $this->createMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
-
-        $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry = $this->createMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->integration = $this->createMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log = $this->createMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
-        $this->eventDispatcher = $this->createMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-    }
-
-    protected function tearDown(): void
-    {
-        unset(
-            $this->em,
-            $this->eventDispatcher,
-            $this->processorRegistry,
-            $this->registry,
-            $this->jobExecutor,
-            $this->processor,
-            $this->log
-        );
+        $this->em = $this->createMock(EntityManager::class);
+        $this->processorRegistry = $this->createMock(ProcessorRegistry::class);
+        $this->jobExecutor = $this->createMock(Executor::class);
+        $this->registry = $this->createMock(TypesRegistry::class);
+        $this->integration = $this->createMock(Integration::class);
+        $this->log = $this->createMock(LoggerStrategy::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     /**
@@ -71,32 +57,24 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcess($data, $expected)
     {
-        $this->integration
-            ->expects($this->once())
+        $this->integration->expects($this->once())
             ->method('getConnectors')
             ->willReturn($data['integrationConnectors']);
-
-        $this->integration
-            ->expects($this->any())
+        $this->integration->expects($this->any())
             ->method('getId')
             ->willReturn($data['channel']);
-
-        $this->integration
-            ->expects($this->atLeastOnce())
+        $this->integration->expects($this->atLeastOnce())
             ->method('getType')
             ->willReturn($data['integrationType']);
-
-        $this->integration
-            ->expects($this->once())
+        $this->integration->expects($this->once())
             ->method('isEnabled')
             ->willReturn(true);
-        $this->registry
-            ->expects($this->any())
+
+        $this->registry->expects($this->any())
             ->method('getConnectorType')
             ->willReturnMap($data['realConnectorsMap']);
 
-        $this->processorRegistry
-            ->expects($this->any())
+        $this->processorRegistry->expects($this->any())
             ->method('getProcessorAliasesByEntity')
             ->willReturn([]);
 
@@ -114,10 +92,8 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             'Single Connector Processing' => [
@@ -282,56 +258,38 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * Return mocked sync processor
-     *
-     * @param array $mockedMethods
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|SyncProcessor
-     */
-    protected function getSyncProcessor($mockedMethods = null)
+    private function getSyncProcessor(): SyncProcessor
     {
-        $repository = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repository = $this->createMock(ChannelRepository::class);
 
-        $registry = $this->createMock('Doctrine\Persistence\ManagerRegistry');
-        $registry->expects($this->any())->method('getManager')
-            ->will($this->returnValue($this->em));
-        $registry->expects($this->any())->method('getRepository')
-            ->will($this->returnValue($repository));
+        $registry = $this->createMock(ManagerRegistry::class);
+        $registry->expects($this->any())
+            ->method('getManager')
+            ->willReturn($this->em);
+        $registry->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($repository);
 
-        return $this->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\SyncProcessor')
-            ->setMethods($mockedMethods)
-            ->setConstructorArgs([
-                $registry,
-                $this->processorRegistry,
-                $this->jobExecutor,
-                $this->registry,
-                $this->eventDispatcher,
-                $this->log
-            ])
-            ->getMock();
+        return new SyncProcessor(
+            $registry,
+            $this->processorRegistry,
+            $this->jobExecutor,
+            $this->registry,
+            $this->eventDispatcher,
+            $this->log
+        );
     }
 
-    /**
-     * @param string $type
-     * @param string $job
-     * @param string $entity
-     * @param bool   $isAllowed
-     * @param int    $order
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function prepareConnectorStub($type, $job, $entity, $isAllowed, $order)
-    {
-        $contextRegistryMock = $this->createMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
-        $contextMediatorMock = $this
-            ->getMockBuilder('Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $logger = $this->createMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+    private function prepareConnectorStub(
+        string $type,
+        string $job,
+        string $entity,
+        bool $isAllowed,
+        int $order
+    ): TestConnector {
+        $contextRegistryMock = $this->createMock(ContextRegistry::class);
+        $contextMediatorMock = $this->createMock(ConnectorContextMediator::class);
+        $logger = $this->createMock(LoggerStrategy::class);
 
         /**
          * Mock was not used because of warning in usort.

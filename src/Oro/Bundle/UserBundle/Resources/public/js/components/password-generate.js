@@ -3,7 +3,6 @@ define(function(require) {
 
     const BaseComponent = require('oroui/js/app/components/base/component');
     const $ = require('jquery');
-    const _ = require('underscore');
 
     const PasswordGenerateComponent = BaseComponent.extend({
         /**
@@ -19,7 +18,7 @@ define(function(require) {
 
             this.togglePassword();
 
-            this.$el.click(_.bind(this.togglePassword, this));
+            this.$el.click(this.togglePassword.bind(this));
         },
 
         togglePassword: function() {

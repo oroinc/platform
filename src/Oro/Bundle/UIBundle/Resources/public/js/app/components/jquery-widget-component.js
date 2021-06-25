@@ -28,12 +28,12 @@ define(function(require) {
             this.$el = options._sourceElement;
             const subPromises = _.values(options._subPromises);
             const widgetOptions = _.omit(options, ['_sourceElement', '_subPromises', 'widgetModule', 'widgetName']);
-            const initializeJqueryWidget = _.bind(function(widgetName) {
+            const initializeJqueryWidget = widgetName => {
                 widgetName = _.isString(widgetName) ? widgetName : '';
                 this.widgetName = widgetName || options.widgetName;
                 this.$el[this.widgetName](widgetOptions);
                 this._resolveDeferredInit();
-            }, this);
+            };
 
             this._deferredInit();
             if (subPromises.length) {

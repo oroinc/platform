@@ -18,26 +18,19 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /**
-     * @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $cache;
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
-    /**
-     * @var LocalizationFallbackStrategy
-     */
-    protected $strategy;
+    /** @var LocalizationFallbackStrategy */
+    private $strategy;
 
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->cache = $this->getMockBuilder(CacheProvider::class)
-            ->setMethods(['fetch', 'save', 'delete'])->getMockForAbstractClass();
+        $this->cache = $this->createMock(CacheProvider::class);
         $this->strategy = new LocalizationFallbackStrategy($this->doctrine, $this->cache);
         $this->strategy->setEntityClass(Localization::class);
     }
@@ -49,26 +42,23 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getLocaleFallbacksDataProvider
-     *
-     * @param array|null $entities
-     * @param array $localizations
      */
-    public function testGetLocaleFallbacks($entities, array $localizations)
+    public function testGetLocaleFallbacks(?array $entities, array $localizations)
     {
         $this->cache->expects($this->once())
             ->method('fetch')
             ->with(LocalizationFallbackStrategy::CACHE_KEY)
             ->willReturn(false);
-        /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject $em */
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with('Oro\Bundle\LocaleBundle\Entity\Localization')
+            ->with(Localization::class)
             ->willReturn($em);
-        /** @var LocalizationRepository|\PHPUnit\Framework\MockObject\MockObject $repository */
         $repository = $this->createMock(LocalizationRepository::class);
-        $em->expects($this->once())->method('getRepository')->with(Localization::class)->willReturn($repository);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->with(Localization::class)
+            ->willReturn($repository);
         $repository->expects($this->once())
             ->method('findRootsWithChildren')
             ->willReturn($entities);
@@ -82,10 +72,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleFallbacksDataProvider()
+    public function getLocaleFallbacksDataProvider(): array
     {
         $secondLevelLevelEn = $this->getEntity(
             Localization::class,
@@ -143,8 +130,6 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getLocaleFallbacksCacheDataProvider
-     *
-     * @param array $localizations
      */
     public function testGetLocaleFallbacksCache(array $localizations)
     {
@@ -157,10 +142,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
-    /**
-     * @return array
-     */
-    public function getLocaleFallbacksCacheDataProvider()
+    public function getLocaleFallbacksCacheDataProvider(): array
     {
         return [
             [
@@ -187,31 +169,24 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getLocaleFallbacksDataProvider
-     *
-     * @param array|null $entities
-     * @param array $localizations
      */
-    public function testWarmup($entities, array $localizations): void
+    public function testWarmup(?array $entities, array $localizations): void
     {
-        $this->doctrine
-            ->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(Localization::class)
             ->willReturn($em = $this->createMock(EntityManager::class));
 
-        $em
-            ->expects($this->once())
+        $em->expects($this->once())
             ->method('getRepository')
             ->with(Localization::class)
             ->willReturn($repository = $this->createMock(LocalizationRepository::class));
 
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('findRootsWithChildren')
             ->willReturn($entities);
 
-        $this->cache
-            ->expects($this->once())
+        $this->cache->expects($this->once())
             ->method('save')
             ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations);
 
@@ -220,25 +195,21 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testWarmupWhenInvalidFieldNameException(): void
     {
-        $this->doctrine
-            ->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(Localization::class)
             ->willReturn($em = $this->createMock(EntityManager::class));
 
-        $em
-            ->expects($this->once())
+        $em->expects($this->once())
             ->method('getRepository')
             ->with(Localization::class)
             ->willReturn($repository = $this->createMock(LocalizationRepository::class));
 
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('findRootsWithChildren')
             ->willThrowException($this->createMock(InvalidFieldNameException::class));
 
-        $this->cache
-            ->expects($this->never())
+        $this->cache->expects($this->never())
             ->method('save');
 
         $this->strategy->warmUp('sample/path');

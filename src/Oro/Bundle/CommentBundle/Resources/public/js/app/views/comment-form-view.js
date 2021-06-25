@@ -51,9 +51,9 @@ define(function(require) {
 
             this.$('form')
                 .validate();
-            this.initLayout().then(_.bind(function() {
+            this.initLayout().then(() => {
                 this._resolveDeferredRender();
-            }, this));
+            });
             this.bindData();
 
             return this;
@@ -120,7 +120,7 @@ define(function(require) {
             const confirm = new DeleteConfirmation({
                 content: this._getMessage('deleteConfirmation')
             });
-            confirm.on('ok', _.bind(this._removeAttachment, this));
+            confirm.on('ok', this._removeAttachment.bind(this));
             confirm.open();
         },
 

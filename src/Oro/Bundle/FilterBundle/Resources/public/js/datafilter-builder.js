@@ -162,14 +162,14 @@ define(function(require, exports, module) {
         },
 
         createFilterLoader: function(filterOptions) {
-            return _.bind(function(success) {
+            return success => {
                 this.filterLoaders.push({
                     name: filterOptions.name,
                     cacheId: filterOptions.cacheId,
                     success: success,
                     useCache: filterOptions.cacheId && cachedFilters[filterOptions.cacheId]
                 });
-            }, this);
+            };
         }
     };
 

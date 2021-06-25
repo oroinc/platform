@@ -50,11 +50,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-
-        $this->translationHelper = $this
-            ->getMockBuilder(ConfigTranslationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);
 
         $this->synchronizer = new EnumSynchronizer(
             $this->configManager,
@@ -67,7 +63,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncNoChanges($enumType)
+    public function testSyncNoChanges(string $enumType)
     {
         $config1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $config1->set('is_extend', true);
@@ -104,9 +100,8 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->with('Test\Entity1', 'field1')
             ->willReturn($enumFieldConfig1);
 
-        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
-            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'])
+            ->onlyMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions', 'updateEnumFieldConfig'])
             ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
@@ -124,7 +119,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncForAlreadySynchronizedField($enumType)
+    public function testSyncForAlreadySynchronizedField(string $enumType)
     {
         $enumCode = 'test_enum';
 
@@ -153,9 +148,8 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->never())
             ->method('persist');
 
-        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
-            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
+            ->onlyMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
             ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
@@ -177,7 +171,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncForNewField($enumType)
+    public function testSyncForNewField(string $enumType)
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
@@ -223,9 +217,8 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->configManager->expects($this->once())
             ->method('flush');
 
-        /** @var EnumSynchronizer|\PHPUnit\Framework\MockObject\MockObject $synchronizer */
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
-            ->setMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
+            ->onlyMethods(['applyEnumNameTrans', 'applyEnumOptions', 'applyEnumEntityOptions'])
             ->setConstructorArgs([
                 $this->configManager,
                 $this->doctrine,
@@ -249,7 +242,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedEnumFieldConfig, $enumFieldConfig);
     }
 
-    public function enumTypeProvider()
+    public function enumTypeProvider(): array
     {
         return [
             ['enum'],
@@ -970,10 +963,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($qb);
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setHint', 'getArrayResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $qb->expects($this->once())
             ->method('select')
             ->with('e.id, e.priority, e.name as label, e.default as is_default')
@@ -988,14 +978,8 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $query->expects($this->exactly(2))
             ->method('setHint')
             ->withConsecutive(
-                [
-                    Query::HINT_CUSTOM_OUTPUT_WALKER,
-                    TranslatableSqlWalker::class
-                ],
-                [
-                    TranslatableListener::HINT_TRANSLATABLE_LOCALE,
-                    $locale
-                ]
+                [Query::HINT_CUSTOM_OUTPUT_WALKER, TranslatableSqlWalker::class],
+                [TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale]
             )
             ->willReturnSelf();
         $query->expects($this->once())
@@ -1041,10 +1025,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->with('o')
             ->willReturn($qb);
-        $query = $this->getMockBuilder(AbstractQuery::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setHint', 'getResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $qb->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);

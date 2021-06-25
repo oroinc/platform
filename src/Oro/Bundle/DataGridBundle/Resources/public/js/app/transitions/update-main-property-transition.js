@@ -78,10 +78,9 @@ define(function(require) {
          * @return {{}} - board update configuration
          */
         getRestoreUpdates: function() {
-            const _this = this;
             const columns = this.boardPlugin.getColumns();
-            const initialColumn = columns.find(function(column) {
-                return column.get('ids').indexOf(_this.model.get(_this.propertyName)) !== -1;
+            const initialColumn = columns.find(column => {
+                return column.get('ids').indexOf(this.model.get(this.propertyName)) !== -1;
             });
             const itemIndex = initialColumn.get('items').indexOf(this.model);
             const insertAfter = itemIndex === 0 ? void 0 : initialColumn.get('items').at(itemIndex - 1);

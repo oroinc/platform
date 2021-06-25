@@ -5,5 +5,5 @@ app-modules:
 configs:
     oronavigation/js/routes-loader: {}
 dynamic-imports:
-    oroui:
+    commons:
         - routing

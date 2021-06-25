@@ -29,7 +29,7 @@ define(function(require) {
                 _.omit(options, '_sourceElement', '_subPromises', 'view'),
                 {el: options._sourceElement}
             );
-            const initializeView = _.bind(this._initializeView, this, viewOptions);
+            const initializeView = this._initializeView.bind(this, viewOptions);
 
             // mark element
             options._sourceElement.attr('data-bound-view', options.view);
@@ -67,7 +67,7 @@ define(function(require) {
 
             if (this.view.deferredRender) {
                 this.view.deferredRender
-                    .done(_.bind(this._resolveDeferredInit, this))
+                    .done(this._resolveDeferredInit.bind(this))
                     .fail(function(error) {
                         errorHandler.showError(error || new Error('View rendering failed'));
                         // the error is already handled, there's no need to propagate it upper

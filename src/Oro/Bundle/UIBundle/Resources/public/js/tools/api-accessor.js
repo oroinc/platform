@@ -165,7 +165,7 @@ define(function(require) {
                 data: JSON.stringify(this.formatBody(body)),
                 errorHandlerMessage: this.getErrorHandlerMessage(options)
             });
-            const resultPromise = promise.then(_.bind(this.formatResult, this), _.bind(this.onAjaxError, this));
+            const resultPromise = promise.then(this.formatResult.bind(this), this.onAjaxError.bind(this));
             if (options && options.processingMessage) {
                 mediator.execute('showProcessingMessage', options.processingMessage, resultPromise);
             }
@@ -175,7 +175,7 @@ define(function(require) {
                     apiAccessorUnloadMessagesGroup.release(options.preventWindowUnload);
                 });
             }
-            resultPromise.abort = _.bind(promise.abort, promise);
+            resultPromise.abort = promise.abort.bind(promise);
             return resultPromise;
         },
 
@@ -212,9 +212,9 @@ define(function(require) {
                         request: $.ajax(options)
                     };
                     // remove item from cache when request fails
-                    cacheRecord.request.fail(_.bind(function() {
+                    cacheRecord.request.fail(() => {
                         delete this.cache[hash];
-                    }, this));
+                    });
                 }
                 return cacheRecord.request;
             }

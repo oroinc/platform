@@ -38,7 +38,7 @@ class SoapTransportTest extends TestCase
 
         $this->soapClient = $this->getMockBuilder(\SoapClient::class)
             ->disableOriginalConstructor()
-            ->setMethods(['__soapCall', '__getLastResponseHeaders'])
+            ->onlyMethods(['__soapCall', '__getLastResponseHeaders'])
             ->getMock();
 
         $this->settings = new ParameterBag();
@@ -52,9 +52,6 @@ class SoapTransportTest extends TestCase
             ->willReturn(1);
     }
 
-    /**
-     * Test init method
-     */
     public function testInit()
     {
         $this->transport->expects($this->once())
@@ -75,10 +72,6 @@ class SoapTransportTest extends TestCase
         $this->assertEmpty($this->transport->getLastResponse());
     }
 
-    /**
-     * Test init method errors
-     *
-     */
     public function testInitErrors()
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -87,7 +80,6 @@ class SoapTransportTest extends TestCase
 
     /**
      * @dataProvider exceptionProvider
-     *
      */
     public function testMultipleAttemptException($header, $attempt, $code)
     {
@@ -108,10 +100,7 @@ class SoapTransportTest extends TestCase
         $this->transport->call('test');
     }
 
-    /**
-     * @return array
-     */
-    public function exceptionProvider()
+    public function exceptionProvider(): array
     {
         return [
             'Attempts'              => [

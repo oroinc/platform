@@ -1945,7 +1945,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
             ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])
-            ->setMethods(['process'])
+            ->onlyMethods(['process'])
             ->getMock();
         $processor->expects(self::exactly(4))
             ->method('process')
@@ -1976,7 +1976,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
             ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])
-            ->setMethods(['process'])
+            ->onlyMethods(['process'])
             ->getMock();
         $processor->expects(self::exactly(4))
             ->method('process')

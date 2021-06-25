@@ -101,7 +101,7 @@ define(function(require, exports, module) {
 
             this.collectionFilterModel = new DatagridSettingsListFilterModel();
 
-            this.render = _.bind(this.render, this, options);
+            this.render = this.render.bind(this, options);
 
             DatagridModuleManagerView.__super__.initialize.call(this, options);
         },

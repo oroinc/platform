@@ -53,7 +53,7 @@ define(function(require) {
         _onWidgetLoad: function(widget) {
             widget.getAction('add_address', 'adopted', function(action) {
                 const addressBookView = this.view;
-                action.on('click', _.bind(addressBookView.createAddress, addressBookView));
+                action.on('click', addressBookView.createAddress.bind(addressBookView));
             }.bind(this));
         }
     });

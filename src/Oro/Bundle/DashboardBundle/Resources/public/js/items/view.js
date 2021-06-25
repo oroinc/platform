@@ -107,8 +107,8 @@ define([
             $itemContainer.itemsManagerTable({
                 itemTemplate: Backbone.$(this.itemTplSelector).html(),
                 collection: filteredItems,
-                moveUpHandler: _.bind(this.moveUpHandler, this),
-                moveDownHandler: _.bind(this.moveDownHandler, this)
+                moveUpHandler: this.moveUpHandler.bind(this),
+                moveDownHandler: this.moveDownHandler.bind(this)
             });
 
             filteredItems.on('sort add', function() {

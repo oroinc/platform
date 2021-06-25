@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const BaseTreeView = require('oroui/js/app/views/jstree/base-tree-view');
 
     /**
@@ -37,8 +36,8 @@ define(function(require) {
             }
             this.$fieldSelector = $(fieldSelector);
 
-            this.$tree.on('select_node.jstree', _.bind(this.onSelect, this));
-            this.$tree.on('deselect_node.jstree', _.bind(this.onDeselect, this));
+            this.$tree.on('select_node.jstree', this.onSelect.bind(this));
+            this.$tree.on('deselect_node.jstree', this.onDeselect.bind(this));
         },
 
         /**

@@ -18,16 +18,13 @@ use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
 
 class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActivityListChainProvider */
+    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $activityListProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
     /** @var PlaceholderFilter */
@@ -40,23 +37,22 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
         $this->activityListProvider->expects($this->any())
             ->method('getTargetEntityClasses')
-            ->will($this->returnValue([TestTarget::class]));
+            ->willReturn([TestTarget::class]);
 
-        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->setMethods(['isNewEntity', 'isManageableEntity'])
+        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
+            ->onlyMethods(['isNewEntity', 'isManageableEntity'])
             ->setConstructorArgs([$this->doctrine])
             ->getMock();
-
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper->expects($this->any())
             ->method('isNewEntity')
-            ->will($this->returnCallback(function ($entity) {
+            ->willReturnCallback(function ($entity) {
                 if (method_exists($entity, 'getId')) {
                     return !(bool)$entity->getId();
                 }
 
                 throw new \RuntimeException('Something wrong');
-            }));
-        $this->doctrineHelper->expects($this->any())
+            });
+        $doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
             ->willReturnCallback(function ($entity) {
                 return !$entity instanceof TestNonManagedTarget;
@@ -67,7 +63,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter = new PlaceholderFilter(
             $this->activityListProvider,
             $this->doctrine,
-            $this->doctrineHelper,
+            $doctrineHelper,
             $this->configManager
         );
     }
@@ -127,7 +123,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
             ->method('getSupportedActivities')
             ->willReturn([$activityClass]);
 
-        $this->activityListProvider->expects($this->exactly(1))
+        $this->activityListProvider->expects($this->once())
             ->method('isApplicableTarget')
             ->with($entityClass, $activityClass)
             ->willReturn(true);
@@ -192,7 +188,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
             ->method('getSupportedActivities')
             ->willReturn([$activityClass]);
 
-        $this->activityListProvider->expects($this->exactly(1))
+        $this->activityListProvider->expects($this->once())
             ->method('isApplicableTarget')
             ->with($entityClass, $activityClass)
             ->willReturn(false);
@@ -205,7 +201,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
         $repo->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
             ->with(TestNonActiveTarget::class, 123)
@@ -235,7 +231,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
             ->method('getSupportedActivities')
             ->willReturn([$activityClass]);
 
-        $this->activityListProvider->expects($this->exactly(1))
+        $this->activityListProvider->expects($this->once())
             ->method('isApplicableTarget')
             ->with($entityClass, $activityClass)
             ->willReturn(true);
@@ -248,7 +244,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $repo = $this->createMock(ActivityListRepository::class);
         $this->doctrine->expects($this->any())
             ->method('getRepository')
-            ->will($this->returnValue($repo));
+            ->willReturn($repo);
         $repo->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
             ->with(TestNonActiveTarget::class, 123)
@@ -278,7 +274,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
             ->method('getSupportedActivities')
             ->willReturn([$activityClass]);
 
-        $this->activityListProvider->expects($this->exactly(1))
+        $this->activityListProvider->expects($this->once())
             ->method('isApplicableTarget')
             ->with($entityClass, $activityClass)
             ->willReturn(true);
@@ -310,16 +306,15 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider   isAllowedButtonProvider
-     *
-     * @param int      $pageType
-     * @param array    $widgets
-     * @param object   $entity
-     * @param int|null $configProviderSetting
-     * @param array    $expected
+     * @dataProvider isAllowedButtonProvider
      */
-    public function testIsAllowedButton($pageType, $widgets, $entity, $configProviderSetting, $expected)
-    {
+    public function testIsAllowedButton(
+        int $pageType,
+        array $widgets,
+        object $entity,
+        ?string $configProviderSetting,
+        array $expected
+    ) {
         $this->configManager->expects($this->once())
             ->method('hasConfig')
             ->with(get_class($entity))
@@ -341,10 +336,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $event->getWidgets());
     }
 
-    /**
-     * @return array
-     */
-    public function isAllowedButtonProvider()
+    public function isAllowedButtonProvider(): array
     {
         $widgets = ['array' => 'of widgets'];
         $entity  = new TestTarget(1);

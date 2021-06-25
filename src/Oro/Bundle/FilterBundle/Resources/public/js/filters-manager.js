@@ -712,19 +712,19 @@ define(function(require, exports, module) {
                 {
                     minWidth: 'none',
                     selectedText: this.addButtonHint,
-                    beforeopen: _.bind(function() {
+                    beforeopen: () => {
                         this.selectWidget.onBeforeOpenDropdown();
-                    }, this),
-                    open: _.bind(function() {
+                    },
+                    open: () => {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
-                    }, this),
-                    refresh: _.bind(function() {
+                    },
+                    refresh: () => {
                         this.selectWidget.onRefresh();
-                    }, this),
-                    close: _.bind(function() {
+                    },
+                    close: () => {
                         this.selectWidget.onClose();
-                    }, this),
+                    },
                     appendTo: this.dropdownContainer
                 },
                 this.multiselectParameters
@@ -871,7 +871,7 @@ define(function(require, exports, module) {
          */
         _onUpdateCriteriaClick: function(filter) {
             filter.once('update', this.closeDropdown, this);
-            _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
+            _.defer(filter.off.bind(filter, 'update', this.closeDropdown, this));
         },
 
         getViewMode: function() {

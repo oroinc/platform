@@ -33,7 +33,7 @@ define(function(require) {
                 this.$('[name=' + fieldName + ']').data('validation', rules);
             }, this);
             this.$el.validate({
-                submitHandler: _.bind(this.onSubmit, this)
+                submitHandler: this.onSubmit.bind(this)
             });
 
             if (!_.isMobile()) {

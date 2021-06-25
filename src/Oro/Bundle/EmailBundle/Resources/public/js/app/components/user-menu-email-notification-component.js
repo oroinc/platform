@@ -49,7 +49,7 @@ define(function(require) {
             this.countModel = new EmailNotificationCountModel({unreadEmailsCount: options.count});
             this.dropdownContainer = options._sourceElement;
 
-            this.notificationHandler = _.debounce(_.bind(this._notificationHandler, this), 1000);
+            this.notificationHandler = _.debounce(this._notificationHandler.bind(this), 1000);
             sync.subscribe(this.wsChannel, this.notificationHandler);
 
             UserMenuEmailNotificationComponent.__super__.initialize.call(this, options);

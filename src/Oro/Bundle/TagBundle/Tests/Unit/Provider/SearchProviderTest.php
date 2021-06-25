@@ -2,44 +2,44 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\TagBundle\Provider\SearchProvider;
+use Oro\Bundle\TagBundle\Security\SecurityProvider;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class SearchProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ID = 1;
-    const TEST_ENTITY_NAME = 'name';
+    private const TEST_ID = 1;
+    private const TEST_ENTITY_NAME = 'name';
 
     /** @var SearchProvider */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $mapper;
+    private $mapper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $entityManager;
+    private $entityManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $securityProvider;
+    private $securityProvider;
 
     protected function setUp(): void
     {
-        $this->entityManager    = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $this->mapper           = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()->getMock();
-        $this->securityProvider = $this->getMockBuilder('Oro\Bundle\TagBundle\Security\SecurityProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $indexer                = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\Indexer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager          = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $translator             = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->provider         = new SearchProvider(
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->mapper = $this->createMock(ObjectMapper::class);
+        $this->securityProvider = $this->createMock(SecurityProvider::class);
+        $indexer = $this->createMock(Indexer::class);
+        $configManager = $this->createMock(ConfigManager::class);
+        $translator = $this->createMock(Translator::class);
+
+        $this->provider = new SearchProvider(
             $this->entityManager,
             $this->mapper,
             $this->securityProvider,
@@ -49,55 +49,52 @@ class SearchProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->entityManager);
-        unset($this->mapper);
-        unset($this->provider);
-    }
-
     public function testGetResults()
     {
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
-            ->getMockForAbstractClass();
+        $query = $this->createMock(AbstractQuery::class);
         $query->expects($this->once())->method('getResult')
-            ->will(
-                $this->returnValue(
+            ->willReturn(
+                [
                     [
-                        [
-                            'entityName' => self::TEST_ENTITY_NAME,
-                            'recordId'   => self::TEST_ID,
-                        ]
+                        'entityName' => self::TEST_ENTITY_NAME,
+                        'recordId'   => self::TEST_ID,
                     ]
-                )
+                ]
             );
 
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()->getMock();
-        $qb->expects($this->once())->method('select')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())->method('from')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())->method('where')
-            ->will($this->returnSelf());
-        $qb->expects($this->exactly(2))->method('addGroupBy')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())->method('setParameter')
-            ->will($this->returnSelf());
-        $qb->expects($this->once())->method('getQuery')
-            ->will($this->returnValue($query));
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->expects($this->once())
+            ->method('select')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('from')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('where')
+            ->willReturnSelf();
+        $qb->expects($this->exactly(2))
+            ->method('addGroupBy')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->willReturnSelf();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->entityManager->expects($this->once())->method('createQueryBuilder')
-            ->will($this->returnValue($qb));
+        $this->entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
 
         $this->securityProvider->expects($this->once())
             ->method('applyAcl')
             ->with($qb, 't');
 
-        $this->mapper->expects($this->once())->method('getEntityConfig')->with(self::TEST_ENTITY_NAME)->willReturn([]);
+        $this->mapper->expects($this->once())
+            ->method('getEntityConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->willReturn([]);
 
-        $this->assertInstanceOf('Oro\Bundle\SearchBundle\Query\Result', $this->provider->getResults(self::TEST_ID));
+        $this->assertInstanceOf(Result::class, $this->provider->getResults(self::TEST_ID));
     }
 }

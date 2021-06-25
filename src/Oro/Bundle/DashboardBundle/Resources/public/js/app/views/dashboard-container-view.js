@@ -97,7 +97,7 @@ define(function(require) {
                 dashboardUtil.onDashboardRemove($(this).attr('data-id'));
             });
 
-            $('.dashboard-widgets-add').on('click', _.bind(this._onClickAddWidget, this));
+            $('.dashboard-widgets-add').on('click', this._onClickAddWidget.bind(this));
 
             DashboardContainerView.__super__.initialize.call(this, options);
 

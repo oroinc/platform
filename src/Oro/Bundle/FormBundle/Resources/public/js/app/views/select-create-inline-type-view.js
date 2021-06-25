@@ -72,11 +72,11 @@ define(function(require) {
                     allowMaximize: true,
                     width: 1280,
                     height: 650,
-                    close: _.bind(this.onDialogClose, this)
+                    close: this.onDialogClose.bind(this)
                 }
             });
 
-            this.dialogWidget.once('grid-row-select', _.bind(this.onGridRowSelect, this));
+            this.dialogWidget.once('grid-row-select', this.onGridRowSelect.bind(this));
             this.dialogWidget.render();
         },
 
@@ -149,7 +149,7 @@ define(function(require) {
             const eventNamespace = this.dialogWidget._wid;
             let loadingStarted = false;
             const $input = this.$(this.inputSelector);
-            const onSelect = _.bind(function() {
+            const onSelect = () => {
                 this.dialogWidget.remove();
                 this.dialogWidget = null;
 
@@ -161,7 +161,7 @@ define(function(require) {
                 }
 
                 $input.inputWidget('focus');
-            }, this);
+            };
             this.dialogWidget._showLoading();
             $input.one('select2-data-request.' + eventNamespace, function() {
                 loadingStarted = true;
@@ -188,11 +188,11 @@ define(function(require) {
                     allowMaximize: true,
                     width: 1280,
                     height: 650,
-                    close: _.bind(this.onDialogClose, this)
+                    close: this.onDialogClose.bind(this)
                 }
             });
 
-            this.dialogWidget.once('formSave', _.bind(function(id) {
+            this.dialogWidget.once('formSave', id => {
                 const $input = this.$(this.inputSelector);
                 $input.inputWidget('val', id, true);
                 this.dialogWidget.remove();
@@ -204,7 +204,7 @@ define(function(require) {
                 }
 
                 $input.inputWidget('focus');
-            }, this));
+            });
 
             this.dialogWidget.render();
         },

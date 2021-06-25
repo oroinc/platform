@@ -88,23 +88,23 @@ define(function(require) {
                     name: 'calendar',
                     icon: 'calendar',
                     label: __('oro.filter.date.tab.calendar'),
-                    isVisible: _.bind(function() {
+                    isVisible: () => {
                         return this.$variables.dateVariables('getPart') === 'value';
-                    }, this)
+                    }
                 },
                 {
                     name: 'days',
                     label: __('oro.filter.date.tab.days'),
-                    isVisible: _.bind(function() {
+                    isVisible: () => {
                         return this.$variables.dateVariables('getPart') === 'dayofweek';
-                    }, this)
+                    }
                 },
                 {
                     name: 'months',
                     label: __('oro.filter.date.tab.months'),
-                    isVisible: _.bind(function() {
+                    isVisible: () => {
                         return this.$variables.dateVariables('getPart') === 'month';
-                    }, this)
+                    }
                 },
                 {
                     name: 'variables',
@@ -156,7 +156,7 @@ define(function(require) {
             this.$dropdown.find('#' + tabName + '-' + this.cid).itemizedPicker({
                 title: title,
                 items: items,
-                onSelect: _.bind(this.onSelect, this)
+                onSelect: this.onSelect.bind(this)
             });
         },
 
@@ -254,7 +254,7 @@ define(function(require) {
             const widgetOptions = {};
             this.$calendar = this.$dropdown.find('#calendar-' + this.cid);
             _.extend(widgetOptions, options.datePickerOptions, {
-                onSelect: _.bind(this.onSelect, this)
+                onSelect: this.onSelect.bind(this)
             });
             this.$calendar.datepicker(widgetOptions);
             this.$calendar.addClass(widgetOptions.className)
@@ -293,7 +293,7 @@ define(function(require) {
         initVariablePicker: function(options) {
             const widgetOptions = {};
             _.extend(widgetOptions, options.datePickerOptions, {
-                onSelect: _.bind(this.onSelect, this)
+                onSelect: this.onSelect.bind(this)
             });
             this.$variables = this.$dropdown.find('#variables-' + this.cid);
             this.$variables.dateVariables(widgetOptions);

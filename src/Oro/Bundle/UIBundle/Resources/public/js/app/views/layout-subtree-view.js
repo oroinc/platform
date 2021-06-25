@@ -137,7 +137,7 @@ define(function(require) {
         _saveFormState: function() {
             this.formState = {};
 
-            _.each(this._getInputs(), _.bind(function(input) {
+            _.each(this._getInputs(), input => {
                 let name = input.name;
                 let value = input.value;
 
@@ -146,7 +146,7 @@ define(function(require) {
                     value = input.checked;
                 }
                 this.formState[name] = value;
-            }, this));
+            });
         },
 
         _restoreFormState: function() {
@@ -154,7 +154,7 @@ define(function(require) {
                 return;
             }
 
-            _.each(this._getInputs(), _.bind(function(input) {
+            _.each(this._getInputs(), input => {
                 let name = input.name;
                 const isRadio = $(input).is(':checkbox, :radio');
                 if (isRadio) {
@@ -172,7 +172,7 @@ define(function(require) {
                 } else {
                     $input.val(savedInput).change();
                 }
-            }, this));
+            });
         },
 
         _getInputs: function() {

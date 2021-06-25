@@ -84,8 +84,8 @@ define(function(require, exports, module) {
             this.pluginManager.create(ResizableAreaPlugin, {
                 $resizableEl: this.sidebar,
                 resizableOptions: {
-                    resize: _.bind(this._resize, this),
-                    create: _.bind(this._create, this)
+                    resize: this._resize.bind(this),
+                    create: this._create.bind(this)
                 }
             });
         },

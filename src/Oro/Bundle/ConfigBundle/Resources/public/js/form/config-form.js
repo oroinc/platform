@@ -44,7 +44,7 @@ define(function(require) {
                 this.$el.on(
                     'change',
                     'input[data-needs-page-reload]',
-                    _.bind(this._onNeedsReloadChange, this)
+                    this._onNeedsReloadChange.bind(this)
                 );
             }
             window.view = this;
@@ -105,7 +105,7 @@ define(function(require) {
             });
 
             const self = this;
-            confirm.on('ok', _.bind(function() {
+            confirm.on('ok', () => {
                 this.$el.get(0).reset();
                 this.$el.find('.select2').each(function(key, elem) {
                     $(elem).inputWidget('val', null, true);
@@ -127,7 +127,7 @@ define(function(require) {
                     const $field = $(this);
                     self.removeValidationErrors($field);
                 });
-            }, this));
+            });
 
             confirm.open();
 

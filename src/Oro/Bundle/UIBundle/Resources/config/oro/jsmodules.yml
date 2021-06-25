@@ -1,9 +1,4 @@
-entry:
-    app:
-        - oroui/js/app
-        - oroui/js/app/services/app-ready-load-modules
 aliases:
-    Fuse$: fuse.js/dist/fuse
     asap$: asap/asap
     autolinker$: autolinker/dist/Autolinker
     backbone$: backbone/backbone
@@ -30,6 +25,7 @@ aliases:
     cryptojs/sha256$: crypto-js/sha256
     datepair$: datepair.js/dist/datepair
     extend-popper$: oroui/js/extend/popper
+    Fuse$: fuse.js/dist/fuse
     jquery$: jquery/dist/jquery
     jquery-ui: jquery-ui/ui
     jquery.cookie$: jquery.cookie/jquery.cookie
@@ -40,10 +36,10 @@ aliases:
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.numeric$: jquery-numeric/jquery.numeric
-    jquery.select2$: '@oroinc/select2/select2'
+    jquery.select2$: "@oroinc/select2/select2"
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
     jquery.timepicker$: timepicker/jquery.timepicker
-    jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
+    jquery.uniform$: "@oroinc/jquery.uniform/src/js/jquery.uniform"
     lightgallery$: lightgallery/dist/js/lightgallery
     lightgallery.print$: oroui/js/lightgallery/lg-print
     module-config$: oroui/js/app/services/module-config
@@ -72,7 +68,6 @@ app-modules:
     - oroui/js/app/modules/messenger-module
     - oroui/js/app/modules/resizable-area-module
     - oroui/js/app/modules/responsive-layout-module
-#    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/viewport-module
     - oroui/js/app/modules/widgets-module
@@ -85,7 +80,6 @@ configs:
     oroui/js/app/components/tabs-component: {}
     oroui/js/app/plugins/styled-scroll-bar: {}
     oroui/js/app/views/content-sidebar-view: {}
-    oroui/js/app/views/flash-message-view: {}
     oroui/js/app/views/jstree/action-manager-view: {}
     oroui/js/app/views/page/messages-view: {}
     oroui/js/app/views/tab-collection-view: {}
@@ -103,9 +97,7 @@ configs:
     oroui/js/tools/scroll-helper: {}
     oroui/js/viewport-manager: {}
 dynamic-imports:
-    polyfills:
-        - whatwg-fetch
-    oroui:
+    commons:
         - controllers/page-controller
         - jquery
         - jquery.cookie
@@ -132,7 +124,6 @@ dynamic-imports:
         - oroui/js/app/views/input-widget/uniform-file
         - oroui/js/app/views/input-widget/uniform-select
         - oroui/js/app/views/jstree/action-manager-view
-        - oroui/js/app/views/jstree/base-tree-view
         - oroui/js/app/views/jstree/move-action-view
         - oroui/js/app/views/page-center-title-view
         - oroui/js/app/views/page/before-content-addition-view
@@ -160,6 +151,13 @@ dynamic-imports:
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
         - underscore
+        - whatwg-fetch
+    jstree:
+        - oroui/js/app/views/jstree/base-tree-view
+entry:
+    app:
+        - oroui/js/app
+        - oroui/js/app/services/app-ready-load-modules
 map:
     "*":
         alert.js: bootstrap-alert

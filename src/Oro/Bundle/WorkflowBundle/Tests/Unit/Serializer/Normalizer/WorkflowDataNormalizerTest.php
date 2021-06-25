@@ -48,7 +48,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $restrictionManager = $this->createMock(RestrictionManager::class);
         $variableManager = $this->createMock(VariableManager::class);
         $this->workflow = $this->getMockBuilder(Workflow::class)
-            ->setMethods(['getName', 'getVariables', 'getDefinition'])
+            ->onlyMethods(['getName', 'getVariables', 'getDefinition'])
             ->setConstructorArgs([
                 $doctrineHelper,
                 $aclManager,
@@ -66,20 +66,15 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->workflow->expects($this->any())
             ->method('getVariables')
-            ->will($this->returnValue(new ArrayCollection()));
+            ->willReturn(new ArrayCollection());
         $this->workflow->expects($this->any())
             ->method('getDefinition')
-            ->will($this->returnValue($workflowDefinition));
+            ->willReturn($workflowDefinition);
 
         $this->attribute = $this->createMock(Attribute::class);
     }
 
-    /**
-     * @param AttributeNormalizer[] $attributeNormalizers
-     *
-     * @return WorkflowDataNormalizer
-     */
-    private function getWorkflowDataNormalizer(array $attributeNormalizers = [])
+    private function getWorkflowDataNormalizer(array $attributeNormalizers = []): WorkflowDataNormalizer
     {
         return new WorkflowDataNormalizer($attributeNormalizers);
     }
@@ -87,17 +82,17 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionCantGetWorkflow($direction)
+    public function testNormalizeExceptionCantGetWorkflow(string $direction)
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\SerializerException::class);
+        $this->expectException(SerializerException::class);
         $this->expectExceptionMessage(\sprintf(
             'Cannot get Workflow. Serializer must implement %s',
-            \Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer::class
+            WorkflowAwareSerializer::class
         ));
 
         $data = new WorkflowData();
         $normalizer = $this->getWorkflowDataNormalizer();
-        if ($direction == 'normalization') {
+        if ($direction === 'normalization') {
             $normalizer->normalize($data);
         } else {
             $normalizer->denormalize($data, get_class($data));
@@ -107,7 +102,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionNoAttribute($direction)
+    public function testNormalizeExceptionNoAttribute(string $direction)
     {
         $data = new WorkflowData(['foo' => 'bar']);
         $workflowName = 'test_workflow';
@@ -115,20 +110,28 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $normalizer = $this->getWorkflowDataNormalizer();
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->once())->method('getWorkflow')->will($this->returnValue($this->workflow));
+        $this->serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
 
-        $this->attributeManager->expects($this->once())->method('getAttribute')->with('foo');
+        $this->attributeManager->expects($this->once())
+            ->method('getAttribute')
+            ->with('foo');
 
-        if ($direction == 'normalization') {
-            $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
-            $this->attribute->expects($this->any())->method('getName')->will($this->returnValue('foo'));
+        if ($direction === 'normalization') {
+            $this->workflow->expects($this->once())
+                ->method('getName')
+                ->willReturn($workflowName);
+            $this->attribute->expects($this->any())
+                ->method('getName')
+                ->willReturn('foo');
             $this->expectException(SerializerException::class);
             $this->expectExceptionMessage('Workflow "test_workflow" has no attribute "foo"');
             $normalizer->normalize($data);
         } else {
-            $this->attributeManager->expects($this->any())->method('getAttributes')->will(
-                $this->returnValue(new ArrayCollection(['for' => $this->attribute]))
-            );
+            $this->attributeManager->expects($this->any())
+                ->method('getAttributes')
+                ->willReturn(new ArrayCollection(['for' => $this->attribute]));
             $normalizer->denormalize($data, get_class($data));
         }
     }
@@ -136,7 +139,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
-    public function testNormalizeExceptionNoAttributeNormalizer($direction)
+    public function testNormalizeExceptionNoAttributeNormalizer(string $direction)
     {
         $workflowName = 'test_workflow';
         $attributeName = 'test_attribute';
@@ -146,23 +149,33 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->once())->method('getWorkflow')->will($this->returnValue($this->workflow));
+        $this->serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
 
-        $this->workflow->expects($this->once())->method('getName')->will($this->returnValue($workflowName));
-        $this->attributeManager->expects($this->any())->method('getAttribute')->with($attributeName)
-            ->will($this->returnValue($this->attribute));
+        $this->workflow->expects($this->once())
+            ->method('getName')
+            ->willReturn($workflowName);
+        $this->attributeManager->expects($this->any())
+            ->method('getAttribute')
+            ->with($attributeName)
+            ->willReturn($this->attribute);
 
-        $this->attributeNormalizer->expects($this->once())->method('supports' . ucfirst($direction))
-            ->with($this->workflow, $this->attribute, $data->get($attributeName))->will($this->returnValue(false));
+        $this->attributeNormalizer->expects($this->once())
+            ->method('supports' . ucfirst($direction))
+            ->with($this->workflow, $this->attribute, $data->get($attributeName))
+            ->willReturn(false);
 
-        $this->attribute->expects($this->once())->method('getName')->will($this->returnValue($attributeName));
+        $this->attribute->expects($this->once())
+            ->method('getName')
+            ->willReturn($attributeName);
 
         $this->expectException(SerializerException::class);
         $this->expectExceptionMessage(
             sprintf('Cannot handle "%s" of attribute "test_attribute" of workflow "test_workflow"', $direction)
         );
 
-        if ($direction == 'normalization') {
+        if ($direction === 'normalization') {
             $normalizer->normalize($data);
         } else {
             $normalizer->denormalize($data, get_class($data));
@@ -180,20 +193,24 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->once())->method('getWorkflow')
-            ->will($this->returnValue($this->workflow));
+        $this->serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
 
-        $this->attributeManager->expects($this->once())->method('getAttribute')
+        $this->attributeManager->expects($this->once())
+            ->method('getAttribute')
             ->with($attributeName)
-            ->will($this->returnValue($this->attribute));
+            ->willReturn($this->attribute);
 
-        $this->attributeNormalizer->expects($this->once())->method('supportsNormalization')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('supportsNormalization')
             ->with($this->workflow, $this->attribute, $data->get($attributeName))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->once())->method('normalize')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('normalize')
             ->with($this->workflow, $this->attribute, $data->get($attributeName))
-            ->will($this->returnValue($normalizedValue));
+            ->willReturn($normalizedValue);
 
         $this->assertEquals(
             [$attributeName => $normalizedValue],
@@ -210,32 +227,35 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $data = new WorkflowData([$attributeName => $denormalizedValue]);
 
-        $serializer = $this->getMockBuilder(WorkflowDataSerializer::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['normalize', 'getWorkflow'])
-            ->getMock();
+        $serializer = $this->createMock(WorkflowDataSerializer::class);
 
         $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
         $normalizer->setSerializer($serializer);
 
-        $serializer->expects($this->once())->method('getWorkflow')
-            ->will($this->returnValue($this->workflow));
+        $serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
 
-        $this->attributeManager->expects($this->once())->method('getAttribute')
+        $this->attributeManager->expects($this->once())
+            ->method('getAttribute')
             ->with($attributeName)
-            ->will($this->returnValue($this->attribute));
+            ->willReturn($this->attribute);
 
-        $this->attributeNormalizer->expects($this->once())->method('supportsNormalization')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('supportsNormalization')
             ->with($this->workflow, $this->attribute, $data->get($attributeName))
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->once())->method('normalize')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('normalize')
             ->with($this->workflow, $this->attribute, $data->get($attributeName))
-            ->will($this->returnValue($normalizedValue));
+            ->willReturn($normalizedValue);
 
         // As normalized value is not scalar - ask serializer to normalize it
-        $serializer->expects($this->once())->method('normalize')->with($normalizedValue)
-            ->will($this->returnValue($processedNormalizedValue));
+        $serializer->expects($this->once())
+            ->method('normalize')
+            ->with($normalizedValue)
+            ->willReturn($processedNormalizedValue);
 
         $this->assertEquals(
             [$attributeName => $processedNormalizedValue],
@@ -251,25 +271,29 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $this->attributeManager->expects($this->once())
             ->method('getAttributes')
-            ->will($this->returnValue(new ArrayCollection([$attributeName => $this->attribute])));
+            ->willReturn(new ArrayCollection([$attributeName => $this->attribute]));
 
         $normalizer = $this->getWorkflowDataNormalizer([$this->attributeNormalizer]);
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->once())->method('getWorkflow')
-            ->will($this->returnValue($this->workflow));
+        $this->serializer->expects($this->once())
+            ->method('getWorkflow')
+            ->willReturn($this->workflow);
 
-        $this->attributeManager->expects($this->exactly(2))->method('getAttribute')
+        $this->attributeManager->expects($this->exactly(2))
+            ->method('getAttribute')
             ->with($attributeName)
-            ->will($this->returnValue($this->attribute));
+            ->willReturn($this->attribute);
 
-        $this->attributeNormalizer->expects($this->once())->method('supportsDenormalization')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('supportsDenormalization')
             ->with($this->workflow, $this->attribute, $data[$attributeName])
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->once())->method('denormalize')
+        $this->attributeNormalizer->expects($this->once())
+            ->method('denormalize')
             ->with($this->workflow, $this->attribute, $data[$attributeName])
-            ->will($this->returnValue($expectedData->get($attributeName)));
+            ->willReturn($expectedData->get($attributeName));
 
         $this->assertEquals(
             $expectedData,
@@ -280,13 +304,13 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization($data, $expected)
+    public function testSupportsNormalization($data, bool $expected)
     {
         $normalizer = $this->getWorkflowDataNormalizer();
         $this->assertEquals($expected, $normalizer->supportsNormalization($data, 'any_value'));
     }
 
-    public function supportsNormalizationDataProvider()
+    public function supportsNormalizationDataProvider(): array
     {
         return [
             [null, false],
@@ -300,13 +324,13 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization($type, $expected)
+    public function testSupportsDenormalization(?string $type, bool $expected)
     {
         $normalizer = $this->getWorkflowDataNormalizer();
         $this->assertEquals($expected, $normalizer->supportsDenormalization('any_value', $type));
     }
 
-    public function supportsDenormalizationDataProvider()
+    public function supportsDenormalizationDataProvider(): array
     {
         return [
             [null, false],
@@ -317,7 +341,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function normalizeDirectionDataProvider()
+    public function normalizeDirectionDataProvider(): array
     {
         return [
             ['normalization'],

@@ -55,7 +55,7 @@ define(function(require) {
             if (!this.subviews.length) {
                 return;
             }
-            this.subviews[0].$el.on('click', _.bind(this.onActionClick, this));
+            this.subviews[0].$el.on('click', this.onActionClick.bind(this));
         },
 
         /**
@@ -84,18 +84,18 @@ define(function(require) {
         handlePopover: function(config) {
             const $popoverTrigger = this.subviews[0].$el;
 
-            $popoverTrigger.popover(config).on('shown.bs.popover', _.bind(function() {
+            $popoverTrigger.popover(config).on('shown.bs.popover', () => {
                 this.mapView.updateMap(this.getAddress(), this.model.get('label'));
 
-                $(document).on('mouseup', _.bind(function(e) {
+                $(document).on('mouseup', e => {
                     const $map = this.mapView.$el;
                     if (!$map.is(e.target) && !$map.has(e.target).length) {
                         $popoverTrigger.popover('dispose');
                     }
-                }, this));
-            }, this)).on('hidden.bs.popover', _.bind(function() {
+                });
+            }).on('hidden.bs.popover', () => {
                 $(document).off('mouseup', null, this);
-            }, this));
+            });
 
             $popoverTrigger.popover('show');
         },

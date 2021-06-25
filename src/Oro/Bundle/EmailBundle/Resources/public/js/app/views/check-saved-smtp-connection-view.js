@@ -2,7 +2,6 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const routing = require('routing');
     const mediator = require('oroui/js/mediator');
@@ -37,18 +36,18 @@ define(function(require) {
                         scopeId: $settingsForm.data('scope-id')
                     }
                 ),
-                success: _.bind(function(response) {
+                success: response => {
                     if (response) {
                         this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
                     } else {
                         this.showMessage('success', 'oro.email.smtp_connection.success', $messageContainer);
                     }
-                }, this),
+                },
                 errorHandlerMessage: false,
-                error: _.bind(function() {
+                error: () => {
                     this.showMessage('error', 'oro.email.smtp_connection.error', $messageContainer);
-                }, this),
-                complete: function() {
+                },
+                complete: () => {
                     mediator.execute('hideLoading');
                 }
             });

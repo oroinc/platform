@@ -10,3 +10,9 @@ services:
             - { name: container.service_subscriber, id: oro_attachment.file_manager }
             - { name: container.service_subscriber, id: oro_attachment.manager.image_resize }
             - { name: container.service_subscriber, id: oro_attachment.provider.file_name }
+
+    Oro\Bundle\AttachmentBundle\Controller\AttachmentController:
+        calls:
+            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        tags:
+            - { name: container.service_subscriber }

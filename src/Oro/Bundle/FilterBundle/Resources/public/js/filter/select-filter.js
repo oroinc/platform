@@ -169,13 +169,13 @@ define(function(require, exports, module) {
             if (this.lazy) {
                 this.loadedMetadata = false;
                 this.loader(
-                    _.bind(function(metadata) {
+                    metadata => {
                         this._setChoices(metadata.choices);
                         this.render();
                         if (this.subview('loading')) {
                             this.subview('loading').hide();
                         }
-                    }, this)
+                    }
                 );
             }
         },
@@ -285,14 +285,14 @@ define(function(require, exports, module) {
                     showCheckAll: false,
                     showUncheckAll: false,
                     outerTrigger: this.$(this.buttonSelector),
-                    selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
+                    selectedText: (numChecked, numTotal, checkedItems) => {
                         return this._getSelectedText(checkedItems);
-                    }, this),
+                    },
                     position: position,
-                    beforeopen: _.bind(function() {
+                    beforeopen: () => {
                         this.selectWidget.onBeforeOpenDropdown();
-                    }, this),
-                    open: _.bind(function() {
+                    },
+                    open: () => {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
@@ -303,20 +303,20 @@ define(function(require, exports, module) {
                         this.selectWidget.updateDropdownPosition($.extend({}, position, {
                             within: this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer
                         }));
-                    }, this),
-                    refresh: _.bind(function() {
+                    },
+                    refresh: () => {
                         this.selectWidget.onRefresh();
-                    }, this),
-                    beforeclose: _.bind(function() {
+                    },
+                    beforeclose: () => {
                         return this.closeAfterChose;
-                    }, this),
-                    close: _.bind(function() {
+                    },
+                    close: () => {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         this.trigger('hideCriteria', this);
                         if (!this.disposed) {
                             this.selectDropdownOpened = false;
                         }
-                    }, this),
+                    },
                     appendTo: this._appendToContainer(),
                     refreshNotOpened: this.templateTheme !== '',
                     listAriaLabel: selectOptionsListAriaLabel
@@ -325,11 +325,11 @@ define(function(require, exports, module) {
                 filterLabel: this.label
             });
             this.selectWidget.setViewDesign(this);
-            this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
+            this.selectWidget.getWidget().on('keyup', e => {
                 if (e.keyCode === 27 && this.autoClose !== false) {
                     this._onClickFilterArea(e);
                 }
-            }, this));
+            });
         },
 
         /**

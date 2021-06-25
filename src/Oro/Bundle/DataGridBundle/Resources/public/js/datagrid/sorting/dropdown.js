@@ -253,23 +253,23 @@ define(function(require, exports, module) {
 
         _getSelectOptionsData: function() {
             const options = [];
-            _.each(_.where(this.columns.toJSON(), {sortable: true, renderable: true}), _.bind(function(column) {
+            _.each(_.where(this.columns.toJSON(), {sortable: true, renderable: true}), column => {
                 if (this.hasSortingOrderButton) {
                     options.push({
                         label: column.label,
                         value: column.name
                     });
                 } else {
-                    _.each(this.DIRECTIONS, _.bind(function(direction) {
+                    _.each(this.DIRECTIONS, direction => {
                         options.push({
                             label: column.label,
                             sortingType: column.sortingType,
                             directionValue: direction,
                             value: column.name + this.VALUE_SEPARATOR + direction
                         });
-                    }, this));
+                    });
                 }
-            }, this));
+            });
 
             return options;
         },

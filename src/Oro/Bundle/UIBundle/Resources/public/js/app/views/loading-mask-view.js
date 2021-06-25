@@ -54,9 +54,9 @@ define(function(require) {
             _.extend(this, _.pick(options, ['loadingHint', 'hideDelay']));
             $(window).on(
                 'pagehide' + this.eventNamespace(),
-                _.bind(function() {
+                () => {
                     this.hide();
-                }, this)
+                }
             );
             LoadingMaskView.__super__.initialize.call(this, options);
         },
@@ -107,7 +107,7 @@ define(function(require) {
             } else {
                 // defer hiding if mask is visible and it is not deferred already
                 if (this.isShown() && !this.hideTimeoutId) {
-                    this.hideTimeoutId = setTimeout(_.bind(this._hide, this), this.hideDelay);
+                    this.hideTimeoutId = setTimeout(this._hide.bind(this), this.hideDelay);
                 }
             }
         },

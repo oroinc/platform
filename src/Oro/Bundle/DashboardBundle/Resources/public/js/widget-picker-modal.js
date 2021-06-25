@@ -61,7 +61,7 @@ define(function(require) {
                 this.component = new WidgetPickerComponent({
                     _sourceElement: this.$content,
                     collection: widgetPickerCollection,
-                    loadWidget: _.bind(this.loadWidget, this)
+                    loadWidget: this.loadWidget.bind(this)
                 });
             }
 

@@ -90,35 +90,33 @@ define(function(require) {
         saveAndRedirect: function() {
             const form = $('form[data-collect=true]');
             const actionInput = form.find('input[name="input_action"]');
-            const _this = this;
             $.ajax({
                 url: this.element.attr('href'),
                 type: this.element.data('request-method') || 'GET',
-                success: function(response) {
-                    _this._hideLoading();
+                success: response => {
+                    this._hideLoading();
                     actionInput.val(JSON.stringify({
                         redirectUrl: response.url
                     }));
                     form.trigger('submit');
                 },
-                error: function(xhr) {
-                    _this._hideLoading();
+                error: xhr => {
+                    this._hideLoading();
                 }
             });
         },
 
         startRedirect: function() {
             mediator.execute('showLoading');
-            const _this = this;
             $.ajax({
                 url: this.element.attr('href'),
                 type: this.element.data('request-method') || 'GET',
-                success: function(response) {
-                    _this._hideLoading();
-                    _this._processResponse(response.url, response.message);
+                success: response => {
+                    this._hideLoading();
+                    this._processResponse(response.url, response.message);
                 },
-                error: function(xhr) {
-                    _this._hideLoading();
+                error: xhr => {
+                    this._hideLoading();
                 }
             });
         },

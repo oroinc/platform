@@ -3,93 +3,87 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Reader\CsvFileReader;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
+use Oro\Component\Testing\ReflectionUtil;
 
-class CsvFileReaderTest extends TestCase
+class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextRegistry;
+
+    /** @var ImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $importHelper;
+
     /** @var CsvFileReader */
-    protected $reader;
-
-    /** @var ContextRegistry|MockObject */
-    protected $contextRegistry;
-
-    /** @var ImportStrategyHelper|MockObject */
-    protected $importHelper;
+    private $reader;
 
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);
 
-        $this->reader = new class($this->contextRegistry) extends CsvFileReader {
-            public function xisFirstLineIsHeader(): bool
-            {
-                return $this->firstLineIsHeader;
-            }
-            public function xgetDelimiter(): string
-            {
-                return $this->delimiter;
-            }
-            public function xgetEnclosure(): string
-            {
-                return $this->enclosure;
-            }
-            public function xgetEscape(): string
-            {
-                return $this->escape;
-            }
-        };
+        $this->reader = new CsvFileReader($this->contextRegistry);
         $this->reader->setImportHelper($this->importHelper);
     }
 
     /**
      * @dataProvider readSeveralEntitiesProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testEnsureThatHeaderIsCleared(array $options, array $expected)
     {
-        $context = $this->getContextWithOptionsMock($options);
-        $stepExecution = $this->getMockStepExecution($context);
+        $context = $this->getContextWithOptions($options);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
         $this->reader->initializeByContext($context);
 
-        $stepExecution->expects($this->never())
-            ->method('addReaderWarning');
         $data = [];
         //ensure that header is cleared before read
-        $this->assertNull($this->reader->getHeader());
+        self::assertNull($this->reader->getHeader());
 
         while (($dataRow = $this->reader->read($stepExecution)) !== null) {
             $data[] = $dataRow;
         }
 
-        $this->assertNull($this->reader->getHeader()); //ensured that previous data was cleared
-        $this->assertEquals($expected, $data);
+        self::assertNull($this->reader->getHeader()); //ensured that previous data was cleared
+        self::assertEquals($expected, $data);
     }
 
     public function testSetStepExecutionNoFileException()
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Configuration of reader must contain "filePath".');
 
-        $context = $this->getContextWithOptionsMock([]);
-        $this->reader->setStepExecution($this->getMockStepExecution($context));
+        $context = $this->getContextWithOptions([]);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+        $this->reader->setStepExecution($stepExecution);
     }
 
     public function testUnknownFileException()
     {
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('File "unknown_file.csv" does not exists.');
 
-        $context = $this->getContextWithOptionsMock(['filePath' => 'unknown_file.csv']);
-        $this->reader->setStepExecution($this->getMockStepExecution($context));
+        $context = $this->getContextWithOptions(['filePath' => 'unknown_file.csv']);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+        $this->reader->setStepExecution($stepExecution);
     }
 
     public function testSetStepExecution()
@@ -103,24 +97,43 @@ class CsvFileReaderTest extends TestCase
             'header' => ['one', 'two']
         ];
 
-        static::assertEquals(',', $this->reader->xgetDelimiter());
-        static::assertEquals('"', $this->reader->xgetEnclosure());
-        static::assertEquals(chr(0), $this->reader->xgetEscape());
-        static::assertTrue($this->reader->xisFirstLineIsHeader());
-        static::assertEmpty($this->reader->getHeader());
+        self::assertEquals(',', ReflectionUtil::getPropertyValue($this->reader, 'delimiter'));
+        self::assertEquals('"', ReflectionUtil::getPropertyValue($this->reader, 'enclosure'));
+        self::assertEquals(chr(0), ReflectionUtil::getPropertyValue($this->reader, 'escape'));
+        self::assertTrue(ReflectionUtil::getPropertyValue($this->reader, 'firstLineIsHeader'));
+        self::assertEmpty($this->reader->getHeader());
 
-        $context = $this->getContextWithOptionsMock($options);
-        $this->reader->setStepExecution($this->getMockStepExecution($context));
+        $context = $this->getContextWithOptions($options);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+        $this->reader->setStepExecution($stepExecution);
 
-        static::assertEquals($options['delimiter'], $this->reader->xgetDelimiter());
-        static::assertEquals($options['enclosure'], $this->reader->xgetEnclosure());
-        static::assertEquals($options['escape'], $this->reader->xgetEscape());
-        static::assertEquals($options['firstLineIsHeader'], $this->reader->xisFirstLineIsHeader());
-        static::assertEquals($options['header'], $this->reader->getHeader());
+        self::assertEquals(
+            $options['delimiter'],
+            ReflectionUtil::getPropertyValue($this->reader, 'delimiter')
+        );
+        self::assertEquals(
+            $options['enclosure'],
+            ReflectionUtil::getPropertyValue($this->reader, 'enclosure')
+        );
+        self::assertEquals(
+            $options['escape'],
+            ReflectionUtil::getPropertyValue($this->reader, 'escape')
+        );
+        self::assertEquals(
+            $options['firstLineIsHeader'],
+            ReflectionUtil::getPropertyValue($this->reader, 'firstLineIsHeader')
+        );
+        self::assertEquals(
+            $options['header'],
+            $this->reader->getHeader()
+        );
     }
 
-    /** @return array */
-    public function readSeveralEntitiesProvider()
+    public function readSeveralEntitiesProvider(): array
     {
         return [
             [
@@ -150,28 +163,28 @@ class CsvFileReaderTest extends TestCase
 
     /**
      * @dataProvider optionsDataProvider
-     * @param array $options
-     * @param array $expected
      */
-    public function testRead($options, $expected)
+    public function testRead(array $options, array $expected)
     {
-        $context = $this->getContextWithOptionsMock($options);
-        $stepExecution = $this->getMockStepExecution($context);
+        $context = $this->getContextWithOptions($options);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
         $context->expects($this->atLeastOnce())
             ->method('incrementReadOffset');
         $context->expects($this->atLeastOnce())
             ->method('incrementReadCount');
-        $stepExecution->expects($this->never())
-            ->method('addReaderWarning');
         $data = [];
         while (($dataRow = $this->reader->read($stepExecution)) !== null) {
             $data[] = $dataRow;
         }
-        $this->assertEquals($expected, $data);
+        self::assertEquals($expected, $data);
     }
 
-    public function optionsDataProvider()
+    public function optionsDataProvider(): array
     {
         return [
             [
@@ -252,18 +265,21 @@ class CsvFileReaderTest extends TestCase
 
     public function testReadWithBackslashes()
     {
-        $context = $this->getContextWithOptionsMock([
+        $context = $this->getContextWithOptions([
             'filePath' => __DIR__ . '/fixtures/import_with_backslashes.csv',
             'firstLineIsHeader' => false
         ]);
-        $stepExecution = $this->getMockStepExecution($context);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
         $data = [];
-        $row = null;
         while (($dataRow = $this->reader->read($stepExecution)) !== null) {
-            $data[] = $row = $dataRow;
+            $data[] = $dataRow;
         }
-        $this->assertEquals([['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']], $data);
+        self::assertEquals([['\\', 'other field', '\\\\', '\\notquote', 'back \\slash inside', '\"quoted\"']], $data);
     }
 
     /**
@@ -271,25 +287,25 @@ class CsvFileReaderTest extends TestCase
      */
     public function testReadError()
     {
-        $this->expectException(\Akeneo\Bundle\BatchBundle\Item\InvalidItemException::class);
+        $this->expectException(InvalidItemException::class);
         $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
 
-        $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
-        $stepExecution = $this->getMockStepExecution($context);
+        $context = $this->getContextWithOptions(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
         $this->reader->initializeByContext($context);
 
-        $context
-            ->expects($this->once())
+        $context->expects($this->once())
             ->method('incrementErrorEntriesCount');
 
-        $this->importHelper
-            ->expects($this->once())
+        $this->importHelper->expects($this->once())
             ->method('addValidationErrors')
-            ->willReturnCallback(function (array $messages, $context) {
-                $message = reset($messages);
-
-                static::assertStringContainsString('Expecting to get 3 columns, actually got 2.', $message);
+            ->willReturnCallback(function (array $messages) {
+                self::assertStringContainsString('Expecting to get 3 columns, actually got 2.', reset($messages));
             });
 
         $this->reader->read($stepExecution);
@@ -300,64 +316,38 @@ class CsvFileReaderTest extends TestCase
      */
     public function testReadErrorWithinSplitProcess()
     {
-        $this->expectException(\Akeneo\Bundle\BatchBundle\Item\InvalidItemException::class);
+        $this->expectException(InvalidItemException::class);
         $this->expectExceptionMessage('Expecting to get 3 columns, actually got 2.');
 
-        $context = $this->getContextWithOptionsMock(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
+        $context = $this->getContextWithOptions(['filePath' => __DIR__ . '/fixtures/import_incorrect.csv']);
         $this->reader->initializeByContext($context);
 
-        $context
-            ->expects($this->never())
+        $context->expects($this->never())
             ->method('incrementErrorEntriesCount');
 
-        $this->importHelper
-            ->expects($this->never())
+        $this->importHelper->expects($this->never())
             ->method('addValidationErrors');
 
         $this->reader->read($context);
     }
 
     /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $context
-     * @return \PHPUnit\Framework\MockObject\MockObject|StepExecution
+     * @return StepExecutionProxyContext|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function getMockStepExecution($context)
-    {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->setMethods(['addReaderWarning', 'getByStepExecution'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry->expects($this->any())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->will($this->returnValue($context));
-
-        return $stepExecution;
-    }
-
-    protected function getContextWithOptionsMock($options)
+    private function getContextWithOptions(array $options)
     {
         $context = $this->createMock(StepExecutionProxyContext::class);
-
         $context->expects($this->any())
             ->method('hasOption')
-            ->will(
-                $this->returnCallback(
-                    function ($option) use ($options) {
-                        return isset($options[$option]);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($option) use ($options) {
+                return isset($options[$option]);
+            });
         $context->expects($this->any())
             ->method('getOption')
-            ->will(
-                $this->returnCallback(
-                    function ($option) use ($options) {
-                        return $options[$option];
-                    }
-                )
-            );
+            ->willReturnCallback(function ($option) use ($options) {
+                return $options[$option];
+            });
+
         return $context;
     }
 }

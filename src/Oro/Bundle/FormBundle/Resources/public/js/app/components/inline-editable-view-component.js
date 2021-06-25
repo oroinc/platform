@@ -150,11 +150,11 @@ define(function(require) {
                 }
                 this.wrapper.on('start-editing', this.enterEditMode, this);
                 waitors.push(tools.loadModuleAndReplace(this.inlineEditingOptions.save_api_accessor, 'class').then(
-                    _.bind(function() {
+                    () => {
                         const ConcreteApiAccessor = this.inlineEditingOptions.save_api_accessor['class'];
                         this.saveApiAccessor = new ConcreteApiAccessor(
                             _.omit(this.inlineEditingOptions.save_api_accessor, 'class'));
-                    }, this)
+                    }
                 ));
             } else {
                 viewOptions.el = options._sourceElement;
@@ -190,7 +190,7 @@ define(function(require) {
                 });
 
                 const overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
-                this.listenTo(viewInstance, 'dispose', _.bind(overlay.remove, overlay));
+                this.listenTo(viewInstance, 'dispose', overlay.remove.bind(overlay));
             } else {
                 this.view.$el.hide();
             }
@@ -322,8 +322,8 @@ define(function(require) {
             if (this.classes.editor.processSavePromise) {
                 savePromise = this.classes.editor.processSavePromise(savePromise, this.metadata);
             }
-            savePromise.done(_.bind(InlineEditableViewComponent.onSaveSuccess, ctx))
-                .fail(_.bind(InlineEditableViewComponent.onSaveError, ctx))
+            savePromise.done(InlineEditableViewComponent.onSaveSuccess.bind(ctx))
+                .fail(InlineEditableViewComponent.onSaveError.bind(ctx))
                 .always(function() {
                     wrapper.$el.removeClass('loading');
                 });

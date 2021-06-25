@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Async\Extension\Stub;
 
+use Oro\Component\Testing\Logger\BufferingLogger;
 use ProxyManager\Proxy\LazyLoadingInterface;
-use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * This class is needed to avoid exceptions with default Logger interface.

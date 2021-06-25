@@ -18,6 +18,9 @@ services:
     Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager:
         alias: oro_organization.business_unit_manager
 
+    Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager:
+        alias: oro_organization.organization_manager
+
     oro_organization.organization_manager:
         class: Oro\Bundle\OrganizationBundle\Entity\Manager\OrganizationManager
         public: true

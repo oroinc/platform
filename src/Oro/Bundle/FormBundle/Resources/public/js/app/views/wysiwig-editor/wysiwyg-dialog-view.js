@@ -40,13 +40,13 @@ define(function(require) {
 
         render: function() {
             this._deferredRender();
-            this.initLayout().done(_.bind(function() {
+            this.initLayout().done(() => {
                 if (this.getDialogContainer().length) {
                     // there's dialog widget -- subscribe to resize event
                     this.listenTo(this.getEditorView(), 'resize', this.resizeEditor());
                 }
                 this._resolveDeferredRender();
-            }, this));
+            });
         },
 
         resizeEditor: function() {

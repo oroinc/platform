@@ -145,7 +145,7 @@ define(function(require, exports, module) {
          * @param {Object} options
          */
         initialize: function(options) {
-            const updateFavicon = _.once(_.bind(this.updateFavicon, this));
+            const updateFavicon = _.once(this.updateFavicon.bind(this));
 
             if (config.frameUrlSegment) {
                 this.frameUrlSegment = config.frameUrlSegment;
@@ -159,7 +159,7 @@ define(function(require, exports, module) {
             this.createUrlRegExp();
             this.updateCookie();
             this.createPageView(options._sourceElement[0]);
-            document.addEventListener('load', _.bind(function(e) {
+            document.addEventListener('load', e => {
                 let url;
                 let logoutLink;
                 let loginLink;
@@ -231,7 +231,7 @@ define(function(require, exports, module) {
                         }
                     }
                 }
-            }, this), true);
+            }, true);
             this.initLoadingView();
             DeviceSwitcherView.__super__.initialize.call(this, options);
         },
@@ -494,14 +494,14 @@ define(function(require, exports, module) {
             const iframe = this.getFrameWindow();
 
             // Bind click event across iframe
-            $(iframe.frameElement).contents().find(this.loadingTrigger).one('click', _.bind(function() {
+            $(iframe.frameElement).contents().find(this.loadingTrigger).one('click', () => {
                 this.loadingView.showLoader();
-            }, this));
+            });
 
             // Bind click event in the pageView
-            this.pageView.$el.find(this.loadingTrigger).one('click', _.bind(function() {
+            this.pageView.$el.find(this.loadingTrigger).one('click', () => {
                 this.loadingView.showLoader();
-            }, this));
+            });
         },
 
         /**

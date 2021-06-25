@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const DialogWidget = require('oro/dialog-widget');
     const MassAction = require('./mass-action');
     const mediator = require('oroui/js/mediator');
@@ -63,11 +62,11 @@ define(function(require) {
 
             const widget = new DialogWidget(this.frontend_options);
             widget.render();
-            widget.once('formSave', _.bind(function(data) {
+            widget.once('formSave', data => {
                 widget.remove();
                 this._showAjaxSuccessMessage(data);
                 mediator.trigger('datagrid:doReset:' + this.datagrid.name);
-            }, this));
+            });
         }
     });
 

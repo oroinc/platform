@@ -14,30 +14,27 @@ use Oro\Bundle\SearchBundle\Query\Result;
  */
 class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_VALUE = 'test_value';
-    const TEST_COUNT = 42;
+    private const TEST_VALUE = 'test_value';
+    private const TEST_COUNT = 42;
 
     /** @var IndexerQuery */
-    protected $query;
+    private $query;
 
     /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    protected $searchIndexer;
+    private $searchIndexer;
 
     /** @var Query|\PHPUnit\Framework\MockObject\MockObject */
-    protected $innerQuery;
+    private $innerQuery;
 
     /** @var array */
-    protected $testElements = [1, 2, 3];
+    private $testElements = [1, 2, 3];
 
     /** @var Criteria|\PHPUnit\Framework\MockObject\MockObject */
-    protected $criteria;
+    private $criteria;
 
     protected function setUp(): void
     {
-        $this->searchIndexer = $this->createPartialMock(
-            Indexer::class,
-            ['query']
-        );
+        $this->searchIndexer = $this->createMock(Indexer::class);
 
         $this->innerQuery = $this->getMockBuilder(Query::class)
             ->onlyMethods(['getCriteria', 'addSelect'])
@@ -61,15 +58,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->query = new IndexerQuery($this->searchIndexer, $this->innerQuery);
     }
 
-    protected function tearDown(): void
-    {
-        unset($this->searchIndexer, $this->innerQuery, $this->query);
-    }
-
-    /**
-     * @return Result
-     */
-    protected function prepareResult()
+    private function prepareResult(): Result
     {
         return new Result($this->innerQuery, $this->testElements, self::TEST_COUNT);
     }
@@ -78,7 +67,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->innerQuery->expects($this->once())
             ->method('getOrderDirection')
-            ->will($this->returnValue(self::TEST_VALUE));
+            ->willReturn(self::TEST_VALUE);
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getOrderDirection());
     }
@@ -90,7 +79,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($this->innerQuery)
-            ->will($this->returnValue($result));
+            ->willReturn($result);
 
         // two calls to assert lazy load
         $this->assertEquals($this->testElements, $this->query->execute());
@@ -110,7 +99,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->criteria->expects($this->once())
             ->method('getFirstResult')
-            ->will($this->returnValue(self::TEST_VALUE));
+            ->willReturn(self::TEST_VALUE);
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getFirstResult());
     }
@@ -128,7 +117,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->criteria->expects($this->once())
             ->method('getMaxResults')
-            ->will($this->returnValue(self::TEST_VALUE));
+            ->willReturn(self::TEST_VALUE);
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getMaxResults());
     }
@@ -140,7 +129,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->searchIndexer->expects($this->once())
             ->method('query')
             ->with($this->innerQuery)
-            ->will($this->returnValue($result));
+            ->willReturn($result);
 
         $this->assertEquals(self::TEST_COUNT, $this->query->getTotalCount());
     }
@@ -149,7 +138,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->criteria->expects($this->once())
             ->method('getOrderings')
-            ->will($this->returnValue([self::TEST_VALUE => self::TEST_VALUE]));
+            ->willReturn([self::TEST_VALUE => self::TEST_VALUE]);
 
         $this->assertEquals(self::TEST_VALUE, $this->query->getSortBy());
     }
@@ -158,7 +147,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
     {
         $this->criteria->expects($this->once())
             ->method('getOrderings')
-            ->will($this->returnValue([self::TEST_VALUE => 'ASC']));
+            ->willReturn([self::TEST_VALUE => 'ASC']);
 
         $this->assertEquals('ASC', $this->query->getSortOrder());
     }
@@ -184,7 +173,7 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
 
         $this->innerQuery->expects($this->once())
             ->method('getCriteria')
-            ->will($this->returnValue($this->criteria));
+            ->willReturn($this->criteria);
 
         $this->assertEquals($this->query, $this->query->addWhere($expression, AbstractSearchQuery::WHERE_OR));
     }

@@ -115,8 +115,8 @@ define(function(require) {
         },
 
         delegateEvents: function() {
-            const manageScroll = _.bind(this.manageScroll, this);
-            const updateCustomScrollbar = _.debounce(_.bind(this.updateCustomScrollbar, this), 50);
+            const manageScroll = this.manageScroll.bind(this);
+            const updateCustomScrollbar = _.debounce(this.updateCustomScrollbar.bind(this), 50);
 
             /*
             * For cases, when layout has full screen container with own scrollbar and window doesn't have scrollbar

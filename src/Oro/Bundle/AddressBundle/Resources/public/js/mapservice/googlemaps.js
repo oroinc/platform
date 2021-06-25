@@ -180,7 +180,7 @@ define(function(require) {
                 if (this.isEmptyFunction(this.getGeocoder().geocode)) {
                     return this.checkRenderMap();
                 }
-                this.getGeocoder().geocode({address: address}, _.bind(function(results, status) {
+                this.getGeocoder().geocode({address: address}, (results, status) => {
                     clearTimeout(timeoutId);
                     if (status === google.maps.GeocoderStatus.OK) {
                         this.mapLocationCache[address] = results[0].geometry.location;
@@ -189,9 +189,9 @@ define(function(require) {
                     } else {
                         this.mapLocationUnknown();
                     }
-                }, this));
+                });
 
-                timeoutId = _.delay(_.bind(this.checkRenderMap, this), this.mapRespondingTimeout);
+                timeoutId = _.delay(this.checkRenderMap.bind(this), this.mapRespondingTimeout);
             }
         },
 

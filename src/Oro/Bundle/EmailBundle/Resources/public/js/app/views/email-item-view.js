@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
 
     const EmailItemView = BaseView.extend({
@@ -31,7 +30,7 @@ define(function(require) {
          */
         render: function() {
             this._deferredRender();
-            this.initLayout().done(_.bind(function() {
+            this.initLayout().done(() => {
                 const commentsComponent = this.pageComponent('comments');
                 if (commentsComponent) {
                     this.commentCount = this.fetchCommentsQuantity();
@@ -39,7 +38,7 @@ define(function(require) {
                     this.updateCommentsQuantity();
                 }
                 this._resolveDeferredRender();
-            }, this));
+            });
             return this;
         },
 

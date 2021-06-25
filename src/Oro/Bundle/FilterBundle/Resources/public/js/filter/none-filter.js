@@ -171,9 +171,9 @@ define(function(require) {
             this.$(this.criteriaSelector).show();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
             this.trigger('showCriteria', this);
-            setTimeout(_.bind(function() {
+            setTimeout(() => {
                 this.popupCriteriaShowed = true;
-            }, this), 100);
+            }, 100);
         },
 
         /**
@@ -185,11 +185,11 @@ define(function(require) {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             this.trigger('hideCriteria', this);
-            setTimeout(_.bind(function() {
+            setTimeout(() => {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
                 }
-            }, this), 100);
+            }, 100);
         },
 
         /**

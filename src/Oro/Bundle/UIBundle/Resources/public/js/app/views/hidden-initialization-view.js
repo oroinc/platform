@@ -2,7 +2,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const BaseView = require('oroui/js/app/views/base/view');
 
     /**
@@ -36,9 +35,9 @@ define(function(require) {
 
         render: function() {
             this.$el.addClass('invisible');
-            this.initLayout().done(_.bind(function() {
+            this.initLayout().done(() => {
                 this.$el.removeClass('invisible');
-            }, this));
+            });
         }
     });
 

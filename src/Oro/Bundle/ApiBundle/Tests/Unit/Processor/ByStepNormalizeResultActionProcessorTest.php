@@ -11,8 +11,8 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use Oro\Component\Testing\Logger\BufferingLogger;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)

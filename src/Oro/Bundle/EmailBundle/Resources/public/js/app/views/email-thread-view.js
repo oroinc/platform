@@ -72,14 +72,14 @@ define(function(require) {
                     .empty()
                     .append('<a href="#" class="email-view-toggle-all"></a>')
                     .find(this.selectors.toggleAll)
-                    .on('click', _.bind(this.onToggleAllClick, this));
+                    .on('click', this.onToggleAllClick.bind(this));
                 this.updateToggleAllAction();
             }
             EmailTreadView.__super__.render.call(this);
 
             this._deferredRender();
             this.initEmailItemViews(this.$(this.selectors.emailItem))
-                .then(_.bind(this._resolveDeferredRender, this));
+                .then(this._resolveDeferredRender.bind(this));
 
             return this;
         },
@@ -90,7 +90,7 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onToggleAllClick: function(e) {
-            this.loadEmails().done(_.bind(this.toggleAllEmails, this));
+            this.loadEmails().done(this.toggleAllEmails.bind(this));
         },
 
         /**
@@ -156,8 +156,8 @@ define(function(require) {
             if (ids) {
                 url = routing.generate('oro_email_items_view', {ids: ids.join(',')});
                 promise = $.ajax(url)
-                    .done(_.bind(this.onDoneLoadEmails, this))
-                    .fail(_.bind(this.onFailLoadEmails, this));
+                    .done(this.onDoneLoadEmails.bind(this))
+                    .fail(this.onFailLoadEmails.bind(this));
             } else {
                 promise = $.Deferred().resolve('').promise();
             }

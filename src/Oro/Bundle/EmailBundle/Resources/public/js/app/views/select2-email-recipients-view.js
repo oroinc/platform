@@ -28,7 +28,7 @@ define(function(require) {
          */
         initialize: function(options) {
             this.$contextEl = $('[data-ftid=oro_email_email_contexts]');
-            this.$el.on('input-widget:init', _.bind(this._onSelect2Init, this));
+            this.$el.on('input-widget:init', this._onSelect2Init.bind(this));
             this._initEditation();
             Select2EmailRecipientsView.__super__.initialize.call(this, options);
         },
@@ -86,15 +86,15 @@ define(function(require) {
              * it will select currently typed text
              * (not custom selected one in case last response wasn't finished or even started)
              */
-            select2.search.on('keyup', _.bind(this._onKeyUp, this));
-            select2.search.on('paste', _.bind(this._onPaste, this));
+            select2.search.on('keyup', this._onKeyUp.bind(this));
+            select2.search.on('paste', this._onPaste.bind(this));
 
             /**
              * It will select currently typed value if enter is pressed
              * in case no response from server was ever received yet for current autocomplete
              */
-            select2.selectHighlighted = _.wrap(select2.selectHighlighted, _.bind(this._selectHighlighted, this));
-            this.clearSearch = _.bind(select2.clearSearch, select2);
+            select2.selectHighlighted = _.wrap(select2.selectHighlighted, this._selectHighlighted.bind(this));
+            this.clearSearch = select2.clearSearch.bind(select2);
             select2.clearSearch = function() {};
             this.clearSearch();
         },
@@ -128,9 +128,9 @@ define(function(require) {
         },
 
         _onPaste: function() {
-            this.select2.search.one('input', _.bind(function(e) {
+            this.select2.search.one('input', e => {
                 this._extractItemsFromString(e.currentTarget.value);
-            }, this));
+            });
         },
 
         _onSelect2Blur: function() {
@@ -145,14 +145,14 @@ define(function(require) {
          */
         _initEditation: function() {
             const $el = this.$el;
-            $el.parent('.controls').on('click', '.select2-search-choice', _.bind(function(e) {
+            $el.parent('.controls').on('click', '.select2-search-choice', e => {
                 const $choice = $(e.currentTarget);
                 this._extractItemsFromSearch();
-                $el.one('change', _.bind(function(e) {
+                $el.one('change', e => {
                     $el.inputWidget('search', e.removed.text);
-                }, this));
+                });
                 $choice.find('.select2-search-choice-close').click();
-            }, this));
+            });
         },
 
         _extractItemsFromSearch: function(withoutLast) {
@@ -173,7 +173,7 @@ define(function(require) {
                     rest = parts.pop();
                 }
                 const existingValues = _.pluck(this.select2.data(), 'text');
-                parts.forEach(_.bind(function(item) {
+                parts.forEach(item => {
                     item = item.trim();
                     if (item.length > 0) {
                         if (!_.contains(existingValues, item)) {
@@ -183,7 +183,7 @@ define(function(require) {
                             }, {noFocus: !withoutLast});
                         }
                     }
-                }, this));
+                });
             } else {
                 rest = value;
             }

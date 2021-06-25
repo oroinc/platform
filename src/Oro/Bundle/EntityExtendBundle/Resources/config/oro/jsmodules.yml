@@ -7,14 +7,13 @@ aliases:
 app-modules:
     - oroentityextend/js/app/modules/validator-constraints-module
 dynamic-imports:
-    orodatagrid:
-        - oro/datagrid/action/ajaxdeletefield-action
-        - oro/datagrid/action/ajaxrestorefield-action
-    oroform-validate:
-        - oroentityextend/js/validator/field-name-length
-    oroentityextend:
+    commons:
         - oroentityextend/js/app/views/enum-values-view
         - oroentityextend/js/bidirectional-only-for-extended-component
         - oroentityextend/js/extend-field-form-component
         - oroentityextend/js/init-entity-extend-relation
         - oroentityextend/js/schema-update-action-component
+        - oroentityextend/js/validator/field-name-length
+    orodatagrid:
+        - oro/datagrid/action/ajaxdeletefield-action
+        - oro/datagrid/action/ajaxrestorefield-action

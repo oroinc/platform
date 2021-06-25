@@ -63,7 +63,7 @@ define(function(require) {
             this.listenTo(this.model, 'change:entity', this._renderEntityVariables);
 
             this.fields = $(this.options.fieldsSelectors.join(','));
-            this.fields.on('blur', _.bind(this._updateElementsMetaData, this));
+            this.fields.on('blur', this._updateElementsMetaData.bind(this));
 
             this.lastElement = $(this.options.fieldsSelectors[this.options.defaultFieldIndex]);
         },

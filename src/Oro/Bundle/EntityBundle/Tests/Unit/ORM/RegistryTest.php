@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\Query;
 use Oro\Bundle\EntityBundle\ORM\OrmConfiguration;
@@ -14,10 +15,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RegistryTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_NAMESPACE_ALIAS    = 'Test';
-    const TEST_NAMESPACE          = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures';
-    const TEST_ENTITY_CLASS       = TestEntity::class;
-    const TEST_ENTITY_PROXY_CLASS = Proxy::class;
+    private const TEST_NAMESPACE_ALIAS = 'Test';
+    private const TEST_NAMESPACE = 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures';
+    private const TEST_ENTITY_CLASS = TestEntity::class;
+    private const TEST_ENTITY_PROXY_CLASS = Proxy::class;
 
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
@@ -38,10 +39,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|OroEntityManager
-     */
-    private function getManagerMock()
+    private function getManager(): OroEntityManager
     {
         $managerConfiguration = new OrmConfiguration();
         $managerConfiguration->addEntityNamespace(self::TEST_NAMESPACE_ALIAS, self::TEST_NAMESPACE);
@@ -53,7 +51,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
         $manager = $this->getMockBuilder(OroEntityManagerStub::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getConfiguration', 'getMetadataFactory'])
+            ->onlyMethods(['getConfiguration', 'getMetadataFactory'])
             ->getMock();
         $manager->expects(self::any())
             ->method('getConfiguration')
@@ -67,8 +65,8 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testManagerServiceCache()
     {
-        $manager1 = $this->getManagerMock();
-        $manager2 = $this->getManagerMock();
+        $manager1 = $this->getManager();
+        $manager2 = $this->getManager();
 
         $this->container->expects(self::exactly(3))
             ->method('get')
@@ -91,8 +89,8 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testManagerCache()
     {
-        $manager1 = $this->getManagerMock();
-        $manager2 = $this->getManagerMock();
+        $manager1 = $this->getManager();
+        $manager2 = $this->getManager();
 
         $this->container->expects(self::exactly(3))
             ->method('get')
@@ -138,7 +136,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
     {
         $defaultQueryCacheLifetime = 3600;
 
-        $manager = $this->getManagerMock();
+        $manager = $this->getManager();
 
         $this->container->expects(self::atLeastOnce())
             ->method('get')
@@ -155,7 +153,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testDefaultQueryCacheLifetimeWhenItWasNotSpecified()
     {
-        $manager = $this->getManagerMock();
+        $manager = $this->getManager();
 
         $this->container->expects(self::atLeastOnce())
             ->method('get')
@@ -170,7 +168,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testDefaultQueryCacheLifetimeWhenItWasSetToZero()
     {
-        $manager = $this->getManagerMock();
+        $manager = $this->getManager();
 
         $this->container->expects(self::atLeastOnce())
             ->method('get')
@@ -187,7 +185,7 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAliasNamespaceForKnownAlias()
     {
-        $manager1 = $this->getManagerMock();
+        $manager1 = $this->getManager();
 
         $this->container->expects(self::once())
             ->method('get')
@@ -202,8 +200,8 @@ class RegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAliasNamespaceForUnknownAlias()
     {
-        $this->expectException(\Doctrine\ORM\ORMException::class);
-        $manager1 = $this->getManagerMock();
+        $this->expectException(ORMException::class);
+        $manager1 = $this->getManager();
 
         $this->container->expects(self::once())
             ->method('get')

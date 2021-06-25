@@ -177,6 +177,9 @@ services:
             - '@oro_locale.settings'
             - '@translator'
 
+    Oro\Bundle\LocaleBundle\Formatter\NumberFormatter:
+        alias: oro_locale.formatter.number
+
     oro_locale.formatter.number:
         class: Oro\Bundle\LocaleBundle\Formatter\NumberFormatter
         public: true
@@ -331,6 +334,9 @@ services:
             - '@oro_locale.formatter.language_code'
             - '@oro_translation.provider.language'
             - '@oro_locale.manager.localization'
+
+    Oro\Bundle\LocaleBundle\Manager\LocalizationManager:
+        alias: oro_locale.manager.localization
 
     oro_locale.manager.localization:
         class: Oro\Bundle\LocaleBundle\Manager\LocalizationManager

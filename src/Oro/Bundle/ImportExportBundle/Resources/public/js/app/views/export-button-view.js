@@ -41,7 +41,7 @@ define(function(require) {
                 return;
             }
 
-            this.$el.on('click' + this.eventNamespace(), _.bind(this.onExportClick, this));
+            this.$el.on('click' + this.eventNamespace(), this.onExportClick.bind(this));
             this.importExportManager = new ImportExportManager(this.options);
         },
 

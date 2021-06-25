@@ -11,14 +11,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceReso
 
 class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
-    /**
-     * @var AliceReferenceResolver
-     */
+    /** @var AliceReferenceResolver */
     private $aliceReferenceResolver;
 
     protected function setUp(): void
@@ -38,15 +34,15 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $referencePath
-     * @param object $object
-     * @param bool $isContains
-     * @param object|null $objectFromDb
-     * @param mixed $expectedValue
      * @dataProvider processProvider
      */
-    public function testResolve($referencePath, $object, $isContains, $objectFromDb, $expectedValue)
-    {
+    public function testResolve(
+        string $referencePath,
+        object $object,
+        bool $isContains,
+        ?object $objectFromDb,
+        $expectedValue
+    ) {
         $this->aliceReferenceResolver->setReferences(new Collection(['ref' => $object]));
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
@@ -77,24 +73,21 @@ class AliceReferenceResolverTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue, $value);
     }
 
-    /**
-     * @return array
-     */
-    public function processProvider()
+    public function processProvider(): array
     {
         $refClassMock = new \stdClass();
         $proxyRefClassMock = $this->createMock(Proxy::class);
         $ownerId = 777;
         $ownerClassMock = $this->getMockBuilder(\stdClass::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getId'])
+            ->addMethods(['getId'])
             ->getMock();
         $ownerClassMock->expects($this->any())
             ->method('getId')
             ->willReturn($ownerId);
         $refClassMock2 = $this->getMockBuilder(\stdClass::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOwner'])
+            ->addMethods(['getOwner'])
             ->getMock();
         $refClassMock2->expects($this->any())
             ->method('getOwner')
