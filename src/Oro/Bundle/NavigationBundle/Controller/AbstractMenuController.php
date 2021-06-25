@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
@@ -359,5 +360,23 @@ abstract class AbstractMenuController extends AbstractController
     protected function getSavedSuccessMessage()
     {
         return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
+    }
+
+    /**
+     * @param MenuUpdateInterface $menuUpdate
+     * @param ItemInterface $menu
+     */
+    protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate)
+    {
+        $repo = $this->getMenuUpdateManager()->getRepository();
+        $eventDispatcher = $this->get('event_dispatcher');
+        $repo->updateDependentMenuUpdates($menuUpdate);
+
+        foreach ($repo->getDependentMenuUpdateScopes($menuUpdate) as $scope) {
+            $eventDispatcher->dispatch(
+                new MenuUpdateWithScopeChangeEvent($menuUpdate->getMenu(), $scope),
+                MenuUpdateWithScopeChangeEvent::NAME
+            );
+        }
     }
 }
