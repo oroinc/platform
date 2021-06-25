@@ -80,7 +80,7 @@ class SearchIterableResult implements IterableResultInterface
             throw new \InvalidArgumentException('$bufferSize must be greater than 0');
         }
 
-        $this->bufferSize = (int)$size;
+        $this->pageSize = (int)$size;
     }
 
     /**

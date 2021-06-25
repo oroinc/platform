@@ -247,7 +247,7 @@ class LocaleSettings
     public function getLocale()
     {
         if (null === $this->locale) {
-            $localization = $this->getLocalizationdData();
+            $localization = $this->getLocalizationData();
 
             $this->locale = $localization['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
         }
@@ -279,7 +279,7 @@ class LocaleSettings
             if ($this->themeRegistry) {
                 $theme = $this->themeRegistry->getActiveTheme();
                 if ($theme && $theme->isRtlSupport()) {
-                    $localization = $this->getLocalizationdData();
+                    $localization = $this->getLocalizationData();
 
                     $this->rtlMode = $localization['rtlMode'] ?? false;
                 }
@@ -546,7 +546,7 @@ class LocaleSettings
      */
     private function getLanguageConfigurationValue(): string
     {
-        $localization = $this->getLocalizationdData();
+        $localization = $this->getLocalizationData();
 
         return $localization['languageCode'] ?? Configuration::DEFAULT_LANGUAGE;
     }
@@ -554,7 +554,7 @@ class LocaleSettings
     /**
      * @return array
      */
-    private function getLocalizationdData(): array
+    private function getLocalizationData(): array
     {
         return $this->localizationManager->getLocalizationData(
             (int)$this->configManager->get(Configuration::getConfigKeyByName(Configuration::DEFAULT_LOCALIZATION))

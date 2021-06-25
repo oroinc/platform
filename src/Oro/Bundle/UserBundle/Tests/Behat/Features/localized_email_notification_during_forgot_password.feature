@@ -13,7 +13,7 @@ Feature: Localized email notification during forgot password
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:
       | Enabled Localizations | [English (United States), French Localization, German Localization] |
-      | Default Localization  | French Localization                                 |
+      | Default Localization  | French Localization                                                 |
     And I submit form
     Then I should see "Configuration saved" flash message
     When I go to System / User Management / Organizations

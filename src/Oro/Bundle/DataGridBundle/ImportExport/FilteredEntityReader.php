@@ -3,25 +3,29 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\ImportExportBundle\Event\Events;
-use Oro\Bundle\ImportExportBundle\Event\ExportPreGetIds;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
+use Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader\FilteredEntityIdentityReaderInterface;
 use Oro\Bundle\ImportExportBundle\Reader\BatchIdsReaderInterface;
 use Oro\Bundle\ImportExportBundle\Reader\EntityReader;
 use Oro\Bundle\ImportExportBundle\Reader\ReaderInterface;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Reader for export filtered entities.
  */
-class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
+class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, LoggerAwareInterface
 {
-    const FILTERED_RESULTS_GRID = 'filteredResultsGrid';
+    use LoggerAwareTrait;
+
+    public const FILTERED_RESULTS_GRID = 'filteredResultsGrid';
+    public const FILTERED_RESULTS_GRID_PARAMS = 'filteredResultsGridParams';
 
     /** @var Manager */
     private $datagridManager;
@@ -34,6 +38,9 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
 
     /** @var EventDispatcherInterface */
     private $eventDispatcher;
+
+    /** @var iterable|FilteredEntityIdentityReaderInterface[]|null */
+    private $entityIdentityReaders;
 
     /**
      * @param Manager $datagridManager
@@ -51,6 +58,7 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
         $this->aclHelper = $aclHelper;
         $this->entityReader = $entityReader;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -59,6 +67,14 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->entityReader->setStepExecution($stepExecution);
+    }
+
+    /**
+     * @param iterable|FilteredEntityIdentityReaderInterface[] $entityIdentityReaders
+     */
+    public function setEntityIdentityReaders(iterable $entityIdentityReaders)
+    {
+        $this->entityIdentityReaders = $entityIdentityReaders;
     }
 
     /**
@@ -74,47 +90,62 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface
      */
     public function getIds($entityName, array $options = [])
     {
-        if (!isset($options['filteredResultsGrid'], $options['filteredResultsGridParams'])) {
+        if (!isset($options[self::FILTERED_RESULTS_GRID])) {
             return $this->entityReader->getIds($entityName, $options);
         }
 
-        $qb = $this->getQueryBuilder($options['filteredResultsGrid'], $options['filteredResultsGridParams']);
+        $gridName = $options[self::FILTERED_RESULTS_GRID];
+        $queryString = $options[self::FILTERED_RESULTS_GRID_PARAMS] ?? '';
 
-        $event = new ExportPreGetIds($qb, $options);
-        $this->eventDispatcher->dispatch($event, Events::BEFORE_EXPORT_GET_IDS);
-
-        $identifier = $qb->getEntityManager()
-            ->getClassMetadata($entityName)
-            ->getSingleIdentifierFieldName();
-
-        $query = $this->aclHelper->apply($qb);
-
-        $filteredEntitiesIds = [];
-        foreach (new BufferedQueryResultIterator($query) as $entity) {
-            $filteredEntitiesIds[] = $entity[$identifier];
+        if (!is_string($queryString)) {
+            throw new LogicException(sprintf(
+                'filteredResultsGridParams parameter should be of string type, %s given.',
+                gettype($queryString)
+            ));
         }
 
-        // Return "[0]" to prevent the export of all entities from the database
-        return $filteredEntitiesIds ?: [0];
-    }
-
-    /**
-     * @param string $gridName
-     * @param string $queryString
-     * @return QueryBuilder
-     */
-    private function getQueryBuilder(string $gridName, string $queryString): QueryBuilder
-    {
         parse_str($queryString, $parameters);
 
         // Creates grid based on parameters from query string
-        $datagrid = $this->datagridManager->getDatagrid($gridName, [ParameterBag::MINIFIED_PARAMETERS => $parameters]);
+        try {
+            $datagrid = $this->datagridManager->getDatagrid(
+                $gridName,
+                [ParameterBag::MINIFIED_PARAMETERS => $parameters]
+            );
+        } catch (\Exception $exception) {
+            $this->logger->error('Unable to create datagrid.', [
+                'exception' => $exception,
+                'datagridOptions' => $options
+            ]);
 
-        /** @var OrmDatasource $datasource */
-        $datasource = $datagrid->getAcceptedDatasource();
+            return [0];
+        }
 
-        return $datasource->getQueryBuilder()
-            ->setFirstResult(null)
-            ->setMaxResults(null);
+        $entityIdentityReader = $this->getApplicableIdentityReader($datagrid, $entityName, $options);
+
+        if (!$entityIdentityReader) {
+            throw new LogicException('Applicable entity identity reader is not found');
+        }
+        return $entityIdentityReader->getIds($datagrid, $entityName, $options);
+    }
+
+    /**
+     * @param DatagridInterface $datagrid
+     * @param string $entityName
+     * @param array $options
+     * @return FilteredEntityIdentityReaderInterface|null
+     */
+    private function getApplicableIdentityReader(
+        DatagridInterface $datagrid,
+        string $entityName,
+        array $options
+    ): ?FilteredEntityIdentityReaderInterface {
+        foreach ($this->entityIdentityReaders as $entityIdentityReader) {
+            if ($entityIdentityReader->isApplicable($datagrid, $entityName, $options)) {
+                return $entityIdentityReader;
+            }
+        }
+
+        return null;
     }
 }

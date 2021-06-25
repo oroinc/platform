@@ -24,4 +24,12 @@ class GlobalScopeManager extends AbstractScopeManager
     {
         return 0;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getScopeIdFromEntity($entity)
+    {
+        return 0;
+    }
 }
