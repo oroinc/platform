@@ -5,7 +5,7 @@ Oro\Bundle\UserBundle\Entity\User:
     username: ethan
     organization: '@organization'
     organizations: ['@organization']
-    roles: ['@managerRole']
+    userRoles: ['@managerRole']
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email: ethan@example.com

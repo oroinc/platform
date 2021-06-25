@@ -5,6 +5,7 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\EventListener\MenuUpdateCacheFlusher;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
@@ -43,11 +44,7 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
     public function testOnMenuUpdateScopeChange()
     {
         $context = ['foo' => 'bar'];
-
-        /** @var MenuUpdateChangeEvent|\PHPUnit\Framework\MockObject\MockObject $event */
-        $event = $this->createMock(MenuUpdateChangeEvent::class);
-        $event->expects($this->any())->method('getMenuName')->willReturn('application_menu');
-        $event->expects($this->any())->method('getContext')->willReturn($context);
+        $event = new MenuUpdateChangeEvent('application_menu', $context);
 
         $scope = new Scope();
         $this->scopeManager->expects($this->once())
@@ -60,7 +57,20 @@ class MenuUpdateCacheFlusherTest extends \PHPUnit\Framework\TestCase
             ->method('findMenuUpdatesByScope')
             ->with('application_menu', $scope);
 
-
         $this->flusher->onMenuUpdateScopeChange($event);
+    }
+
+    public function testOnMenuUpdateWithScopeChange()
+    {
+        $scope = new Scope();
+        $event = new MenuUpdateWithScopeChangeEvent('application_menu', $scope);
+
+        $this->cache->expects($this->once())->method('delete');
+        $this->repository->expects($this->once())
+            ->method('findMenuUpdatesByScope')
+            ->with('application_menu', $scope);
+
+
+        $this->flusher->onMenuUpdateWithScopeChange($event);
     }
 }

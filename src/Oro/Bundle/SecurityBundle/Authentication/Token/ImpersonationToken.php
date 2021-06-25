@@ -3,16 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * The authentication token that is used for an user impersonation.
  */
-class ImpersonationToken extends AbstractToken implements OrganizationAwareTokenInterface
+class ImpersonationToken extends AbstractToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
 {
-    use AuthenticatedTokenTrait;
-    use OrganizationAwareTokenTrait;
+    use RolesAndOrganizationAwareTokenTrait;
 
     /**
      * @param string|object            $user         The username (like a nickname, email address, etc.),
@@ -23,7 +22,7 @@ class ImpersonationToken extends AbstractToken implements OrganizationAwareToken
      */
     public function __construct($user, Organization $organization, array $roles = [])
     {
-        parent::__construct($roles);
+        parent::__construct($this->initRoles($roles));
 
         $this->setUser($user);
         $this->setOrganization($organization);

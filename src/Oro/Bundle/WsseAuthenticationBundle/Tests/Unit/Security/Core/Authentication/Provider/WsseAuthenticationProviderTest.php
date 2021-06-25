@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub as User;
@@ -19,7 +20,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -64,8 +64,8 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token = $this->prepareTestInstance($user, self::TEST_API_KEY);
 
         $token = $this->provider->authenticate($token);
-        $this->assertTrue($token->isAuthenticated());
-        $this->assertEquals($user, $token->getUser());
+        self::assertTrue($token->isAuthenticated());
+        self::assertEquals($user, $token->getUser());
     }
 
     /**
@@ -86,7 +86,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $advancedUser->setEnabled(true);
         $advancedUser->setAuthStatus(new TestEnumValue(UserManager::STATUS_ACTIVE, UserManager::STATUS_ACTIVE));
         $role = $this->createMock(Role::class);
-        $advancedUser->setRoles([$role]);
+        $advancedUser->setUserRoles([$role]);
         $userApiKey->setUser($advancedUser);
 
         return $advancedUser;
@@ -111,21 +111,21 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         bool $isLockedUserAuthStatus
     ): void {
         if (!$isEnabledUser) {
-            $this->userChecker->expects($this->once())
+            $this->userChecker->expects(self::once())
                 ->method('checkPreAuth')
                 ->with($user)
                 ->will($this->throwException(new DisabledException('User account is disabled.')));
         }
 
         if ($isLockedUserAuthStatus) {
-            $this->userChecker->expects($this->once())
+            $this->userChecker->expects(self::once())
                 ->method('checkPreAuth')
                 ->with($user)
                 ->will($this->throwException(new LockedException('User account is locked.')));
         }
 
         $token = $this->prepareTestInstance($user, $secret);
-        $this->assertFalse($token->isAuthenticated());
+        self::assertFalse($token->isAuthenticated());
 
         $this->expectException($exceptionType);
         $this->expectExceptionMessage($exceptionString);
@@ -264,7 +264,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsSupportWithWrongTokenType(): void
     {
         $token = new AnonymousToken('test', 'test');
-        $this->assertFalse($this->provider->supports($token));
+        self::assertFalse($this->provider->supports($token));
     }
 
     public function testIsSupport(): void
@@ -273,7 +273,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token->setAttribute('firewallName', 'test');
         $token->setAttribute('nonce', $this->getNonce());
         $token->setAttribute('created', date('Y-m-d H:i:s'));
-        $this->assertTrue($this->provider->supports($token));
+        self::assertTrue($this->provider->supports($token));
     }
 
     /**
@@ -285,7 +285,7 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     private function prepareTestInstance(User $user, string $secret): Token
     {
         $this->userProvider
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('loadUserByUsername')
             ->willReturn($user);
 

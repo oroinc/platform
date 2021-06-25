@@ -88,7 +88,7 @@ Example:
                }
             ]
          },
-         "roles": {
+         "userRoles": {
             "data": [
                {
                   "type": "userroles",
@@ -512,7 +512,7 @@ Example:
 ```
 {@/request}
 
-### roles
+### userRoles
 
 #### get_subresource
 

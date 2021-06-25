@@ -12,13 +12,17 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  */
 trait AuthenticatedTokenTrait
 {
+    use RolesAwareTokenTrait {
+        getRoles as protected getUserRoles;
+    }
+
     /** @var AbstractUser */
     private $innerUser;
 
     /**
      * {@inheritdoc}
      */
-    public function setUser($user)
+    public function setUser($user): void
     {
         if ($user instanceof AbstractUser) {
             $this->innerUser = $user;
@@ -32,13 +36,13 @@ trait AuthenticatedTokenTrait
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         if ($this->innerUser instanceof AbstractUser) {
-            return $this->innerUser->getRoles();
+            return $this->innerUser->getUserRoles();
         }
 
-        return parent::getRoles();
+        return $this->getUserRoles();
     }
 
     /**
@@ -47,12 +51,7 @@ trait AuthenticatedTokenTrait
     public function getRoleNames(): array
     {
         if ($this->innerUser instanceof AbstractUser) {
-            $roleNames = [];
-            foreach ($this->innerUser->getRoles() as $role) {
-                $roleNames[] = (string) $role;
-            }
-
-            return $roleNames;
+            return $this->innerUser->getRoles();
         }
 
         return parent::getRoleNames();

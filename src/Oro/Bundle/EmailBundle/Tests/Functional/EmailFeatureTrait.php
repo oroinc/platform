@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EmailBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -10,20 +11,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 trait EmailFeatureTrait
 {
-    public function enableEmailFeature()
+    use ConfigManagerAwareTestTrait;
+
+    public function enableEmailFeature(): void
     {
-        $this->getContainer()->get('oro_config.manager')
-            ->set(Configuration::getConfigKeyByName('feature_enabled'), true);
-        $this->getContainer()->get('oro_config.manager')->flush();
+        $configManager = self::getConfigManager('global');
+        $configManager->set(Configuration::getConfigKeyByName('feature_enabled'), true);
+        $configManager->flush();
+
         $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
     }
 
 
-    public function disableEmailFeature()
+    public function disableEmailFeature(): void
     {
-        $this->getContainer()->get('oro_config.manager')
-            ->set(Configuration::getConfigKeyByName('feature_enabled'), false);
-        $this->getContainer()->get('oro_config.manager')->flush();
+        $configManager = self::getConfigManager('global');
+        $configManager->set(Configuration::getConfigKeyByName('feature_enabled'), false);
+        $configManager->flush();
+
         $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
     }
 }

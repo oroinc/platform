@@ -9,7 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Symfony\Component\Security\Core\Role\Role;
+use Oro\Bundle\SecurityBundle\Model\Role;
+use Symfony\Component\Security\Core\User\EquatableInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 /**
  * A base class for an organization aware user.
@@ -24,7 +26,8 @@ abstract class AbstractUser implements
     LoginInfoInterface,
     \Serializable,
     OrganizationAwareInterface,
-    PasswordRecoveryInterface
+    PasswordRecoveryInterface,
+    EquatableInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
@@ -144,6 +147,10 @@ abstract class AbstractUser implements
      * )
      * @ConfigField(
      *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.user.roles.label",
+     *              "description"="oro.user.roles.description"
+     *          },
      *          "dataaudit"={"auditable"=true},
      *          "importexport"={
      *              "excluded"=true
@@ -151,7 +158,7 @@ abstract class AbstractUser implements
      *      }
      * )
      */
-    protected $roles;
+    protected $userRoles;
 
     /**
      * Random string sent to the user email address in order to verify it
@@ -211,7 +218,7 @@ abstract class AbstractUser implements
     public function __construct()
     {
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
-        $this->roles = new ArrayCollection();
+        $this->userRoles = new ArrayCollection();
     }
 
     /**
@@ -419,19 +426,19 @@ abstract class AbstractUser implements
      *
      * @throws \InvalidArgumentException
      */
-    public function removeRole($role)
+    public function removeUserRole($role)
     {
         if ($role instanceof Role) {
             $roleObject = $role;
         } elseif (is_string($role)) {
-            $roleObject = $this->getRole($role);
+            $roleObject = $this->getUserRole($role);
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Symfony\Component\Security\Core\Role\Role or a string'
+                '$role must be an instance of ' . Role::class  . ' or a string'
             );
         }
         if ($roleObject) {
-            $this->roles->removeElement($roleObject);
+            $this->userRoles->removeElement($roleObject);
         }
     }
 
@@ -442,10 +449,9 @@ abstract class AbstractUser implements
      *
      * @return Role|null
      */
-    public function getRole($roleName)
+    public function getUserRole(string $roleName): ?Role
     {
-        /** @var Role $item */
-        foreach ($this->getRoles() as $item) {
+        foreach ($this->getUserRoles() as $item) {
             if ($roleName === $item->getRole()) {
                 return $item;
             }
@@ -455,13 +461,11 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return Role[]
      */
-    public function getRoles()
+    public function getUserRoles(): array
     {
-        return $this->roles->toArray();
+        return $this->userRoles->toArray();
     }
 
     /**
@@ -473,18 +477,18 @@ abstract class AbstractUser implements
      * @return AbstractUser
      * @throws \InvalidArgumentException
      */
-    public function setRoles($roles)
+    public function setUserRoles($roles)
     {
         if (!$roles instanceof Collection && !is_array($roles)) {
             throw new \InvalidArgumentException(
-                '$roles must be an instance of Symfony\Component\Security\Core\Role\Role or an array'
+                '$roles must be an instance of ' . Role::class . ' or an array'
             );
         }
 
-        $this->roles->clear();
+        $this->userRoles->clear();
 
         foreach ($roles as $role) {
-            $this->addRole($role);
+            $this->addUserRole($role);
         }
 
         return $this;
@@ -493,13 +497,23 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function addRole(Role $role)
+    public function addUserRole(Role $role)
     {
         if (!$this->hasRole($role)) {
-            $this->roles->add($role);
+            $this->userRoles->add($role);
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return string[]
+     */
+    public function getRoles()
+    {
+        return array_map(static fn (Role $role) => (string) $role, $this->getUserRoles());
     }
 
     /**
@@ -519,16 +533,16 @@ abstract class AbstractUser implements
     public function hasRole($role)
     {
         if ($role instanceof Role) {
-            $roleName = $role->getRole();
+            $roleName = (string) $role->getRole();
         } elseif (is_string($role)) {
             $roleName = $role;
         } else {
             throw new \InvalidArgumentException(
-                '$role must be an instance of Symfony\Component\Security\Core\Role\Role or a string'
+                '$role must be an instance of ' . Role::class . ' or a string'
             );
         }
 
-        return (bool)$this->getRole($roleName);
+        return (bool)$this->getUserRole($roleName);
     }
 
     /**
@@ -679,4 +693,40 @@ abstract class AbstractUser implements
      * @return Collection|OrganizationInterface[]
      */
     abstract public function getOrganizations(bool $onlyEnabled = false);
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEqualTo(SymfonyUserInterface $user): bool
+    {
+        if ($this->getPassword() !== $user->getPassword()) {
+            return false;
+        }
+
+        if ($this->getSalt() !== $user->getSalt()) {
+            return false;
+        }
+
+        if ($this->getUsername() !== $user->getUsername()) {
+            return false;
+        }
+
+        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
+            return false;
+        }
+
+        if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
+            return false;
+        }
+
+        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
+            return false;
+        }
+
+        if ($this->isEnabled() !== $user->isEnabled()) {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -68,7 +68,7 @@ datagrids:
             type: search
             query:
                 select:
-                    - text.stringValue
+                    - text.stringValue as stringValue
                     - integer.id as id
                 from:
                     - oro_test_item
@@ -82,6 +82,11 @@ datagrids:
                     type: integer
             default:
                 id: ASC
+        filters:
+            columns:
+                stringValue:
+                    type: string
+                    data_name: text.stringValue
 
     items-grid-with-export-page-size:
         source:

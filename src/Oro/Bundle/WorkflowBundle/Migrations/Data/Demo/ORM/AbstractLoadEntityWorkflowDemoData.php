@@ -157,7 +157,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         /** @var Organization $organization */
         $organization = $user->getOrganization();
 
-        $token = new UsernamePasswordOrganizationToken($user, false, 'main', $organization, $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken($user, false, 'main', $organization, $user->getUserRoles());
         $this->container->get('security.token_storage')->setToken($token);
     }
 }

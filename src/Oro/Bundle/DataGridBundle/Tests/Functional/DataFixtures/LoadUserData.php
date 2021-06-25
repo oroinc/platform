@@ -45,7 +45,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setOrganization($organization)
             ->setOrganizations(new ArrayCollection([$organization]))
             ->setOwner($organization->getBusinessUnits()->first())
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
         $this->setReference($user->getUsername(), $user);
@@ -59,7 +59,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setOrganization($organization)
             ->setOrganizations(new ArrayCollection([$organization]))
             ->setOwner($organization->getBusinessUnits()->first())
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
 

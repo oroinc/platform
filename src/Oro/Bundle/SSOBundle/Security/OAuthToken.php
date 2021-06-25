@@ -3,66 +3,19 @@
 namespace Oro\Bundle\SSOBundle\Security;
 
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOAuthToken;
-use Oro\Bundle\SecurityBundle\Authentication\Token\AuthenticatedTokenTrait;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenTrait;
+use Oro\Bundle\SecurityBundle\Authentication\Token\RolesAndOrganizationAwareTokenTrait;
+use Oro\Bundle\SecurityBundle\Authentication\Token\RolesAwareTokenInterface;
 
 /**
  * The OAuth authentication token.
  */
-class OAuthToken extends HWIOAuthToken implements OrganizationAwareTokenInterface
+class OAuthToken extends HWIOAuthToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
 {
-    use AuthenticatedTokenTrait;
-    use OrganizationAwareTokenTrait {
-        __serialize as protected traitSerialize;
-        __unserialize as protected traitUnserialize;
-    }
+    use RolesAndOrganizationAwareTokenTrait;
 
-    /**
-     * This method is required for compatibility OAuthToken with PHP <7.4
-     * @see https://github.com/hwi/HWIOAuthBundle/issues/1567
-     *
-     * {@inheritdoc}
-     */
-    public function __serialize(): array
+    public function __construct($accessToken, array $roles = [])
     {
-        static $inSerialize = false;
-
-        if ($inSerialize) {
-            return [];
-        }
-
-        $inSerialize = true;
-
-        $data = [
-            $this->traitSerialize(),
-            parent::serialize()
-        ];
-
-        $inSerialize = false;
-
-        return $data;
-    }
-
-    /**
-     * This method is required for compatibility OAuthToken with PHP <7.4
-     * @see https://github.com/hwi/HWIOAuthBundle/issues/1567
-     *
-     * {@inheritdoc}
-     */
-    public function __unserialize(array $serialized): void
-    {
-        static $isInUnserialize = false;
-
-        if ($isInUnserialize) {
-            return;
-        }
-
-        $isInUnserialize = true;
-
-        $this->traitUnserialize($serialized[0]);
-        parent::unserialize($serialized[1]);
-
-        $isInUnserialize = false;
+        parent::__construct($accessToken, $this->initRoles($roles));
     }
 }

@@ -28,7 +28,7 @@ class RestUsersTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName"     => "firstName",
                 "lastName"      => "lastName",
-                "roles"         => ["3"],
+                "userRoles"     => ["3"],
                 "owner"         => "1"
             ]
         ];

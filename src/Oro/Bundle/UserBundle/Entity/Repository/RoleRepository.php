@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
@@ -6,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Entity repository for Role entity.
+ */
 class RoleRepository extends EntityRepository
 {
     /**
@@ -19,7 +23,7 @@ class RoleRepository extends EntityRepository
         return $this->_em->createQueryBuilder()
             ->select('u')
             ->from('OroUserBundle:User', 'u')
-            ->join('u.roles', 'role')
+            ->join('u.userRoles', 'role')
             ->where('role = :role')
             ->setParameter('role', $role);
     }

@@ -27,7 +27,7 @@ Oro\Bundle\UserBundle\Entity\User:
                 groups:     [Registration, ResetPassword, Default]
         enabled:
             - NotNull:      ~
-        roles:
+        userRoles:
             - Count:
                 min:        1
                 minMessage: "You must select at least {{ limit }} role"

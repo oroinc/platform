@@ -296,7 +296,7 @@ class EntityDataControllerTest extends WebTestCase
             ],
             'entity many to many' => [
                 'Oro\Bundle\UserBundle\Entity\User',
-                'roles',
+                'userRoles',
                 ['ROLE_TEST_1', 'ROLE_TEST_2'],
                 Response::HTTP_OK
             ],

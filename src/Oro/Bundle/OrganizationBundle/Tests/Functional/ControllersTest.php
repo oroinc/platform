@@ -36,7 +36,7 @@ class ControllersTest extends WebTestCase
                 'plainPassword' => '1231231q',
                 'firstName' => 'firstName',
                 'lastName' => 'lastName',
-                'roles' => array('3'),
+                'userRoles' => array('3'),
                 'owner' => '1'
             )
         );

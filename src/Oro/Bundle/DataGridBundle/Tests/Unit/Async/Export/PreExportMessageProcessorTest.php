@@ -10,6 +10,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -21,7 +22,6 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +29,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
+        self::assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
     }
 
     /**
@@ -59,7 +59,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     {
         $logger = $this->createLoggerMock();
         $logger
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('critical')
             ->with($this->stringContains($loggerMessage));
 
@@ -76,7 +76,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = $this->createTransportMessage($messageBody);
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(PreExportMessageProcessor::REJECT, $result);
+        self::assertEquals(PreExportMessageProcessor::REJECT, $result);
     }
 
     /**
@@ -90,13 +90,13 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $childJob = $this->createJob(10, $job);
 
         $jobRunner = $this->createJobRunnerMock();
-        $jobRunner->expects($this->once())
+        $jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($this->equalTo(123), $this->equalTo($jobUniqueName))
             ->will($this->returnCallback(function ($jobId, $name, $callback) use ($jobRunner, $childJob) {
                 return $callback($jobRunner, $childJob);
             }));
-        $jobRunner->expects($this->once())
+        $jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobUniqueName . '.chunk.1')
             ->will($this->returnCallback(function ($name, $callback) use ($jobRunner, $childJob) {
@@ -104,7 +104,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             }));
 
         $dependentJobContext = $this->createDependentJobContextMock();
-        $dependentJobContext->expects($this->once())
+        $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
                 ImportExportTopics::POST_EXPORT,
@@ -121,28 +121,28 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             );
 
         $dependentJob = $this->createDependentJobMock();
-        $dependentJob->expects($this->once())
+        $dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($this->equalTo($job))
             ->willReturn($dependentJobContext);
-        $dependentJob->expects($this->once())
+        $dependentJob->expects(self::once())
             ->method('saveDependentJob')
             ->with($this->equalTo($dependentJobContext));
 
         $user = $this->createUserStub();
-        $user->expects($this->any())
+        $user->expects(self::any())
             ->method('getId')
             ->willReturn(1);
-        $user->expects($this->once())
+        $user->expects(self::once())
             ->method('getEmail');
 
         $token = $this->createTokenMock();
-        $token->expects($this->any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
 
         $tokenStorage = $this->createTokenStorageMock();
-        $tokenStorage->expects($this->any())
+        $tokenStorage->expects(self::any())
             ->method('getToken')
             ->willReturn($token);
 
@@ -157,10 +157,10 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $exportHandler = $this->createExportHandlerMock();
-        $exportHandler->expects($this->once())
+        $exportHandler->expects(self::once())
             ->method('getExportingEntityIds')
             ->willReturn([]);
-        $exportHandler->expects($this->once())
+        $exportHandler->expects(self::once())
             ->method('getEntityName')
             ->willReturn('Acme');
 
@@ -168,7 +168,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportIdFetcher($this->createExportIdFetcherMock());
         $result = $processor->process($message, $this->createSessionMock());
 
-        $this->assertEquals(PreExportMessageProcessor::ACK, $result);
+        self::assertEquals(PreExportMessageProcessor::ACK, $result);
         self::assertMessageSent(
             Topics::EXPORT,
             new Message(
@@ -302,7 +302,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
     private function createUserStub()
     {
         return $this->getMockBuilder(UserInterface::class)
-            ->onlyMethods(['getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials'])
+            ->onlyMethods(get_class_methods(UserInterface::class))
             ->addMethods(['getId', 'getEmail'])
             ->getMock();
     }

@@ -32,17 +32,23 @@ class LanguageRepositoryTest extends WebTestCase
 
         $this->loadFixtures([LoadTranslations::class]);
 
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Language::class);
+        $this->em = self::getContainer()->get('doctrine')->getManagerForClass(Language::class);
         $this->repository = $this->em->getRepository(Language::class);
 
         /* @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get('doctrine')->getManagerForClass(User::class)
+        $userRepository = self::getContainer()->get('doctrine')->getManagerForClass(User::class)
             ->getRepository(User::class);
 
         /* @var User $user */
         $user = $userRepository->findOneBy(['username' => LoadTranslationUsers::TRANSLATOR_USERNAME]);
 
-        $token = new UsernamePasswordOrganizationToken($user, false, 'k', $user->getOrganization(), $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            false,
+            'k',
+            $user->getOrganization(),
+            $user->getUserRoles()
+        );
         $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 
@@ -53,7 +59,7 @@ class LanguageRepositoryTest extends WebTestCase
             \array_keys(LoadLanguages::LANGUAGES)
         );
 
-        static::assertEqualsCanonicalizing(
+        self::assertEqualsCanonicalizing(
             \array_fill_keys($defaultAndLoadedLanguageCodes, true),
             $this->repository->getAvailableLanguageCodesAsArrayKeys()
         );
@@ -62,9 +68,9 @@ class LanguageRepositoryTest extends WebTestCase
     public function testGetAvailableLanguagesByCurrentUser()
     {
         /* @var AclHelper $aclHelper */
-        $aclHelper = $this->getContainer()->get('oro_security.acl_helper');
+        $aclHelper = self::getContainer()->get('oro_security.acl_helper');
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 $this->getReference(LoadLanguages::LANGUAGE3)
             ],
@@ -94,7 +100,7 @@ class LanguageRepositoryTest extends WebTestCase
         $result = $this->repository->getTranslationsForExport(LoadLanguages::LANGUAGE1);
 
         foreach ($expected as $translation) {
-            $this->assertTrue(in_array($translation, $result));
+            self::assertTrue(in_array($translation, $result));
         }
     }
 
@@ -110,7 +116,7 @@ class LanguageRepositoryTest extends WebTestCase
             return $lang->getCode();
         }, $this->repository->getLanguages($enabled));
 
-        $this->assertEquals($expected, $current);
+        self::assertEquals($expected, $current);
     }
 
     /**

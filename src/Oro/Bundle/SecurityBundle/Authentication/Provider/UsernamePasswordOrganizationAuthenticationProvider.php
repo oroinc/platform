@@ -67,7 +67,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
             $authenticatedToken->getCredentials(),
             $authenticatedToken->getProviderKey(),
             $organization,
-            $authenticatedToken->getRoles()
+            $user->getUserRoles()
         );
     }
 

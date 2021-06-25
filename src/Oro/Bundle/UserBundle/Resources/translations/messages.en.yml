@@ -193,6 +193,8 @@ oro:
         groups:
             label:                   Groups
             description:             The groups that the user belongs to.
+        user_roles:
+            description:             The roles assigned to the user.
         roles:
             label:                   Roles
             description:             The roles assigned to the user.

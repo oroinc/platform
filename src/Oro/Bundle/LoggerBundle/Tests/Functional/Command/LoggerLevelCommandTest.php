@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -10,6 +11,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class LoggerLevelCommandTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -20,7 +23,7 @@ class LoggerLevelCommandTest extends WebTestCase
 
     public function testRunCommandToUpdateUserScope()
     {
-        $configUser = $this->getContainer()->get('oro_config.user');
+        $configUser = self::getConfigManager('user');
         $params = ['debug', '10 days', '--user=admin@example.com'];
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for user 'admin@example.com' is successfully set to 'debug' till";
@@ -49,7 +52,7 @@ class LoggerLevelCommandTest extends WebTestCase
 
     public function testRunCommandToUpdateGlobalScope()
     {
-        $configGlobal = $this->getContainer()->get('oro_config.global');
+        $configGlobal = self::getConfigManager('global');
         $params = ['warning', '15 days'];
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for global scope is set to 'warning' till";

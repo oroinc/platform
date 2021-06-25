@@ -9,6 +9,9 @@ use Oro\Bundle\UserBundle\Entity;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
+/**
+ * Base class for loading users.
+ */
 abstract class AbstractLoadUserData extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
@@ -31,7 +34,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
             $admin = $userManager->createUser();
             $admin
                 ->setUsername('admin')
-                ->addRole($role);
+                ->addUserRole($role);
         }
 
         $admin

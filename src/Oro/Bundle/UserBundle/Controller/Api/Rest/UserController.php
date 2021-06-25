@@ -186,7 +186,7 @@ class UserController extends RestController implements ClassResourceInterface
             return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
         }
 
-        return $this->handleView($this->view($entity->getRoles(), Response::HTTP_OK));
+        return $this->handleView($this->view($entity->getUserRoles(), Response::HTTP_OK));
     }
 
     /**
@@ -275,7 +275,7 @@ class UserController extends RestController implements ClassResourceInterface
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
-            case 'roles':
+            case 'userRoles':
                 $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {

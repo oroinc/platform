@@ -6,12 +6,13 @@ use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDige
 use Oro\Bundle\SyncBundle\Security\TicketAuthenticationProvider;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
@@ -210,19 +211,12 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
-        $user = $this->createMock(UserInterface::class);
-
         $userPassword = 'sampleUserPassword';
-        $user
-            ->expects(self::once())
-            ->method('getPassword')
-            ->willReturn($userPassword);
+        $userRoles = [new Role('sampleRole')];
 
-        $userRoles = ['sampleRole'];
-        $user
-            ->expects(self::once())
-            ->method('getRoles')
-            ->willReturn($userRoles);
+        $user = (new UserStub())
+            ->setPassword($userPassword)
+            ->setUserRoles($userRoles);
 
         $this->userProvider
             ->expects(self::once())

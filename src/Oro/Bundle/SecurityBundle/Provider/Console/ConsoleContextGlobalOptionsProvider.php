@@ -81,7 +81,7 @@ class ConsoleContextGlobalOptionsProvider extends AbstractGlobalOptionsProvider
             throw new \InvalidArgumentException(\sprintf('Can\'t find user with identifier %s', $user));
         }
 
-        $token = new ConsoleToken($userEntity->getRoles());
+        $token = new ConsoleToken($userEntity->getUserRoles());
         $token->setUser($userEntity);
 
         return $token;

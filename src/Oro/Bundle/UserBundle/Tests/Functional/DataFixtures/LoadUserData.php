@@ -65,7 +65,7 @@ class LoadUserData extends AbstractFixture implements
             ->setLastName(self::SIMPLE_USER_LAST_NAME)
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
 
@@ -78,7 +78,7 @@ class LoadUserData extends AbstractFixture implements
             ->setEmail(self::SIMPLE_USER_2_EMAIL)
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user2);
 
@@ -92,7 +92,7 @@ class LoadUserData extends AbstractFixture implements
             ->setOrganization($organization)
             ->setConfirmationToken(self::CONFIRMATION_TOKEN)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($userWithToken);
 

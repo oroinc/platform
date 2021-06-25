@@ -1159,7 +1159,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
 
         $this->documentBuilder->setMetadata([
             ''        => ['has_more' => true],
-            '0.roles' => ['has_more' => true],
+            '0.userRoles' => ['has_more' => true],
             'meta1'   => 'some value'
         ]);
         $this->documentBuilder->setDataCollection([$object], $this->requestType, $metadata);

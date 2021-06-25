@@ -5,9 +5,14 @@ namespace Oro\Bundle\NavigationBundle\EventListener;
 use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 
+/**
+ * Flush menu update cache.
+ */
 class MenuUpdateCacheFlusher
 {
     /**
@@ -32,9 +37,9 @@ class MenuUpdateCacheFlusher
 
     /**
      * @param MenuUpdateRepository $repository
-     * @param CacheProvider        $cache
-     * @param ScopeManager         $scopeManager
-     * @param string               $scopeType
+     * @param CacheProvider $cache
+     * @param ScopeManager $scopeManager
+     * @param string $scopeType
      */
     public function __construct(
         MenuUpdateRepository $repository,
@@ -54,9 +59,26 @@ class MenuUpdateCacheFlusher
     public function onMenuUpdateScopeChange(MenuUpdateChangeEvent $event)
     {
         $scope = $this->scopeManager->find($this->scopeType, $event->getContext());
+        $this->flushCaches($event->getMenuName(), $scope);
+    }
+
+    /**
+     * @param MenuUpdateWithScopeChangeEvent $event
+     */
+    public function onMenuUpdateWithScopeChange(MenuUpdateWithScopeChangeEvent $event)
+    {
+        $this->flushCaches($event->getMenuName(), $event->getScope());
+    }
+
+    /**
+     * @param string $menuName
+     * @param Scope|null $scope
+     */
+    protected function flushCaches(string $menuName, ?Scope $scope): void
+    {
         if (null !== $scope) {
-            $this->cache->delete(MenuUpdateUtils::generateKey($event->getMenuName(), $scope));
-            $this->repository->findMenuUpdatesByScope($event->getMenuName(), $scope);
+            $this->cache->delete(MenuUpdateUtils::generateKey($menuName, $scope));
+            $this->repository->findMenuUpdatesByScope($menuName, $scope);
         }
     }
 }
