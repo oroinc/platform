@@ -89,8 +89,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setMessageId(123);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturn($jobResult);
@@ -115,32 +114,27 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects(self::never())
+        $this->jobRunner->expects(self::never())
             ->method('createDelayed');
 
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
 
         $dependentJobContext = $this->createMock(DependentJobContext::class);
 
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects(self::never())
+        $this->dependentJob->expects(self::never())
             ->method('saveDependentJob');
 
         $this->processor->setMessageBody($messageBody);
@@ -158,10 +152,9 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $notObject = 'not_object';
         $notUserObject = new \stdClass();
         $userWithoutRequiredMethods = $this->createMock(UserInterface::class);
-        $userWithoutGetEmailMethod = $this->createPartialMock(
-            UserInterface::class,
-            array_diff(get_class_methods(UserInterface::class), ['getEmail'])
-        );
+        $userWithoutGetEmailMethod = $this->getMockBuilder(UserInterface::class)
+            ->onlyMethods(array_diff(get_class_methods(UserInterface::class), ['getEmail']))
+            ->getMock();
 
         return [
             [$notObject],
@@ -187,38 +180,32 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects(self::never())
+        $this->jobRunner->expects(self::never())
             ->method('createDelayed');
 
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects(self::once())
+        $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
         $dependentJobContext = $this->createMock(DependentJobContext::class);
 
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects(self::never())
+        $this->dependentJob->expects(self::never())
             ->method('saveDependentJob');
 
         $this->processor->setMessageBody($messageBody);
@@ -243,42 +230,35 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobUniqueName.'.chunk.1');
 
         $user = $this->createMock(User::class);
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getId')
             ->willReturn(self::USER_ID);
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getEmail');
 
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects(self::any())
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects(self::any())
+        $this->tokenStorage->expects(self::any())
             ->method('getToken')
             ->willReturn($token);
 
         $dependentJobContext = $this->createMock(DependentJobContext::class);
-        $dependentJobContext
-            ->expects(self::once())
+        $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
                 Topics::POST_EXPORT,
@@ -290,13 +270,11 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 })
             );
 
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('saveDependentJob')
             ->with($dependentJobContext);
 
@@ -322,15 +300,13 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects(self::once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
-        $this->jobRunner
-            ->expects(self::exactly(2))
+        $this->jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
                 [$jobUniqueName.'.chunk.1'],
@@ -338,23 +314,19 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
             );
 
         $user = $this->createMock(User::class);
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getId')
             ->willReturn(self::USER_ID);
 
-        $user
-            ->expects(self::once())
+        $user->expects(self::once())
             ->method('getEmail');
 
         $token = $this->createMock(TokenInterface::class);
-        $token
-            ->expects(self::exactly(2))
+        $token->expects(self::exactly(2))
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects(self::exactly(2))
+        $this->tokenStorage->expects(self::exactly(2))
             ->method('getToken')
             ->willReturn($token);
 
@@ -371,13 +343,11 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
                 })
             );
 
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects(self::once())
+        $this->dependentJob->expects(self::once())
             ->method('saveDependentJob')
             ->with($dependentJobContext);
 
