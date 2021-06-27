@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Unit\EventListener;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\CurrencyBundle\EventListener\AclLoadFieldMetadataListener;
 use Oro\Bundle\EntityConfigBundle\Config\Config;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Grid\Formatter;
+namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\DataGrid\Formatter;
 
 use Oro\Bundle\EmbeddedFormBundle\DataGrid\Formatter\EmbeddedFormTypeProperty;
 

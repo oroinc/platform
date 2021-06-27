@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Action\Tests\Unit\Action;
+namespace Oro\Component\Action\Tests\Unit\Event;
 
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 

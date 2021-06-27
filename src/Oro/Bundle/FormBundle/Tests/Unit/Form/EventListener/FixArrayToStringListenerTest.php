@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\FormBundle\Form\EventListener\FixArrayToStringListener;
 use Symfony\Component\Form\FormEvent;

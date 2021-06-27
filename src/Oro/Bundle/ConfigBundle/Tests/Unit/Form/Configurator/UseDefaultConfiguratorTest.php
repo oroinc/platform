@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Configurator;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Configurator;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Form\Configurator\UseDefaultConfigurator;

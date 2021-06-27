@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Datagrid\Extension\MassAction;
+namespace Oro\Bundle\UserBundle\Tests\Functional\Datagrid\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
