@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Tests\EventListener;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;

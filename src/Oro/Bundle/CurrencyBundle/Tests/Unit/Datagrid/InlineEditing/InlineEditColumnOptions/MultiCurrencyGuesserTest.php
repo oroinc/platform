@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Extension\InlineEditing\InlineEditColumnOption;
+namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Datagrid\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\CurrencyBundle\Converter\CurrencyToString;
 use Oro\Bundle\CurrencyBundle\Datagrid\InlineEditing\InlineEditColumnOptions\MultiCurrencyGuesser;

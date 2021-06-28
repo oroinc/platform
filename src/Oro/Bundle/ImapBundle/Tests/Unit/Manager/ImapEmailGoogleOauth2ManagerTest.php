@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Manager;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
@@ -10,6 +10,8 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Manager\DTO\TokenInfo;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Component\Testing\ReflectionUtil;

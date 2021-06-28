@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\WsseAuthenticationBundle\Tests\Unit\DependencyInjection\Security\Factory;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\DependencyInjection\Security\Factory;
 
 use Oro\Bundle\WsseAuthenticationBundle\DependencyInjection\Security\Factory\WsseSecurityListenerFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

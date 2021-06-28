@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\TemplateFixture\Provider;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\ImportExport\TemplateFixture;
 
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressTypeFixture;

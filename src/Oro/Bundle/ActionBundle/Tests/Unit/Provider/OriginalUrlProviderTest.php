@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;

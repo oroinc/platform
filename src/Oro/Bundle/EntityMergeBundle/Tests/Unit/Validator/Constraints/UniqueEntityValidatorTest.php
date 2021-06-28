@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Validator\Constraints;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 use Oro\Bundle\EntityMergeBundle\Validator\Constraints\UniqueEntity;

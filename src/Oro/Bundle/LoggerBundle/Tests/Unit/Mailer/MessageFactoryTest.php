@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LoggerBundle\Mailer\MessageFactory;

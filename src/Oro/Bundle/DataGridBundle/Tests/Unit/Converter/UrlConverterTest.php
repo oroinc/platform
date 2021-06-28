@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\DataGridBundle\Converter\UrlConverter;
 use Symfony\Component\Routing\RouterInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\Workflow\Migration;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Migration;
 
 use Doctrine\DBAL\Connection;
 use Oro\Bundle\WorkflowBundle\Migration\RemoveProcessesQuery;

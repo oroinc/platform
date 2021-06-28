@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Processor\Tests\Unit\Transition;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;

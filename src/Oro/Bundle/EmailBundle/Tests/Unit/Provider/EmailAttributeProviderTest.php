@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Resolver;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;

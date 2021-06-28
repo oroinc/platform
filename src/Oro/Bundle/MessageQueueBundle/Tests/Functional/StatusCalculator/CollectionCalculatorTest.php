@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
+namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\StatusCalculator;
 
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
