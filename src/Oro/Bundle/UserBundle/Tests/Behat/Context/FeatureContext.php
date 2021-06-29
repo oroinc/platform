@@ -101,7 +101,12 @@ class FeatureContext extends OroFeatureContext implements
         }, 5);
 
         self::assertNotNull($error, 'Expect to find error on page, but it not found');
-        self::assertEquals('Account is locked.', $error->getText());
+        self::assertEquals(
+            'Your login was unsuccessful. '.
+            'Please check your e-mail address and password before trying again. '.
+            'If you have forgotten your password, follow "Forgot your password?" link.',
+            $error->getText()
+        );
 
         $this->oroMainContext->assertPage('Login');
         $this->getSession('system_session')->stop();

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
@@ -7,19 +8,32 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Requirements\Requirement;
 
 /**
  * Checks that the environment meets the application requirements.
  */
 class CheckRequirementsCommand extends Command
 {
+    protected const CATEGORY_MANDATORY_REQUIREMENTS = 'mandatory-requirements';
+    protected const CATEGORY_ORO_REQUIREMENTS = 'oro-requirements';
+    protected const CATEGORY_PHP_CONFIG_REQUIREMENTS = 'php-config-requirements';
+    protected const CATEGORY_RECOMMENDATIONS = 'recommendations';
+
+    protected const CATEGORIES = [
+        self::CATEGORY_MANDATORY_REQUIREMENTS => 'Mandatory requirements',
+        self::CATEGORY_PHP_CONFIG_REQUIREMENTS => 'PHP settings',
+        self::CATEGORY_ORO_REQUIREMENTS => 'Oro specific requirements',
+        self::CATEGORY_RECOMMENDATIONS => 'Optional recommendations'
+    ];
+
     protected static $defaultName = 'oro:check-requirements';
 
-    private string $projectDir;
+    protected iterable $providersIterator;
 
-    public function __construct(string $projectDir)
+    public function __construct(iterable $providersIterator)
     {
-        $this->projectDir = $projectDir;
+        $this->providersIterator = $providersIterator;
 
         parent::__construct();
     }
@@ -54,47 +68,28 @@ HELP
     {
         $output->writeln('Check system requirements');
 
-        $requirements = $this->getRequirements($input);
-        $this->renderTable($requirements->getMandatoryRequirements(), 'Mandatory requirements', $output);
-        $this->renderTable($requirements->getPhpIniRequirements(), 'PHP settings', $output);
-        $this->renderTable($requirements->getOroRequirements(), 'Oro specific requirements', $output);
-        $this->renderTable($requirements->getRecommendations(), 'Optional recommendations', $output);
+        $collections = $this->getAllCollections();
+        $failedCount = 0;
 
-        $exitCode = 0;
-        $numberOfFailedRequirements = count($requirements->getFailedRequirements());
-        if ($numberOfFailedRequirements > 0) {
-            $exitCode = 1;
-            if ($numberOfFailedRequirements > 1) {
-                $output->writeln(sprintf(
-                    '<error>Found %d not fulfilled requirements</error>',
-                    $numberOfFailedRequirements
-                ));
-            } else {
-                $output->writeln('<error>Found 1 not fulfilled requirement</error>');
+        foreach (self::CATEGORIES as $category => $label) {
+            $collection = $this->extractRequirementsByCategory($category, $collections);
+            if ($category !== self::CATEGORY_RECOMMENDATIONS) {
+                $failedCount += count($collection['failed']);
             }
-        } else {
-            $output->writeln('<info>The application meets all mandatory requirements</info>');
+
+            $this->renderTable($collection['all'], $label, $output);
         }
+
+        $exitCode = $failedCount > 0 ? 1 : 0;
+        $resultMessage = $this->getResultMessage($failedCount);
+
+        $output->writeln($resultMessage);
 
         return $exitCode;
     }
 
     /**
-     * @param InputInterface $input
-     *
-     * @return \OroRequirements
-     */
-    protected function getRequirements(InputInterface $input)
-    {
-        if (!class_exists('OroRequirements')) {
-            require_once $this->projectDir . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'OroRequirements.php';
-        }
-
-        return new \OroRequirements($input->getOption('env'));
-    }
-
-    /**
-     * @param \Requirement[]  $requirements
+     * @param Requirement[]  $requirements
      * @param string          $header
      * @param OutputInterface $output
      */
@@ -128,5 +123,51 @@ HELP
             }
             $table->render();
         }
+    }
+
+    private function getResultMessage(int $failedCount): string
+    {
+        switch (true) {
+            case $failedCount === 1:
+                return '<error>Found 1 not fulfilled requirement</error>';
+            case $failedCount > 1:
+                return sprintf('<error>Found %d not fulfilled requirements</error>', $failedCount);
+            default:
+                return '<info>The application meets all mandatory requirements</info>';
+        }
+    }
+
+    private function extractRequirementsByCategory(string $category, array $collections): array
+    {
+        $allRequirements = array_map(
+            fn ($collection) => $collection->all(),
+            $collections[$category] ?? []
+        );
+        $failedRequirements = array_map(
+            fn ($collection) => $collection->getFailedRequirements(),
+            $collections[$category] ?? []
+        );
+
+        return [
+            'all' => array_merge(...$allRequirements),
+            'failed' => array_merge(...$failedRequirements)
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    private function getAllCollections(): array
+    {
+        $collections = [];
+
+        foreach ($this->providersIterator as $provider) {
+            $collections[self::CATEGORY_MANDATORY_REQUIREMENTS][] = $provider->getMandatoryRequirements();
+            $collections[self::CATEGORY_ORO_REQUIREMENTS][] = $provider->getOroRequirements();
+            $collections[self::CATEGORY_PHP_CONFIG_REQUIREMENTS][] = $provider->getPhpIniRequirements();
+            $collections[self::CATEGORY_RECOMMENDATIONS][] = $provider->getRecommendations();
+        }
+
+        return array_map('array_filter', $collections);
     }
 }
