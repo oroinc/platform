@@ -6,7 +6,8 @@ $finder = PhpCsFixer\Finder::create()
     ->files()
     ->name('*.php')
     ->notName('*.php.twig')
-    ->notName('OroKernel.php');
+    ->notName('OroKernel.php')
+    ->exclude('InstallerBundle/Symfony/Requirements');
 
 // https://github.com/mlocati/php-cs-fixer-configurator
 return PhpCsFixer\Config::create()
