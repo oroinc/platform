@@ -401,6 +401,9 @@ HELP
         $reflection = new \ReflectionClass($className);
 
         $comment = $reflection->getDocComment();
+        if (false === $comment) {
+            return '';
+        }
 
         $comment = preg_replace('/^\s+\* @[\w0-9]+.*/msi', '', $comment);
         $comment = strtr($comment, ['/**' => '', '*/' => '']);
