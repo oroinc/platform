@@ -41,6 +41,13 @@ class TemplateListener implements ServiceSubscriberInterface
         if ($templateReference) {
             $this->resolveControllerDir($templateReference);
             $this->injectWidgetContainer($templateReference, $request);
+
+            if (!$this->getTwig()->getLoader()->exists((string) $templateReference)) {
+                $template = $request->attributes->get('_template');
+                if ($template instanceof Template) {
+                    $template->setTemplate((string) $templateReference);
+                }
+            }
         }
     }
 

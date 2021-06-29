@@ -63,6 +63,16 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     ): void {
         $this->request->attributes->set('_template', $inputTemplate);
 
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects(self::once())
+            ->method('exists')
+            ->with($expectedTemplate)
+            ->willReturn(true);
+
+        $this->twig->expects(self::once())
+            ->method('getLoader')
+            ->willReturn($loader);
+
         $this->listener->onKernelView($this->event);
         self::assertEquals($expectedTemplate, $this->request->attributes->get('_template'));
     }
@@ -246,6 +256,13 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
                 'widgetExists' => false,
                 'inputTemplate' => new Template(['template' => '@TestBundle/Default/test.html.twig']),
                 'expectedTemplate' => new Template(['template' => $this->templateWithContainer('container')]),
+                'requestAttribute' => 'query'
+            ],
+            'template object with not exists template name as string' => [
+                'containerExists' => false,
+                'widgetExists' => false,
+                'inputTemplate' => new Template(['template' => '@TestBundle/Default/test.html.twig']),
+                'expectedTemplate' => new Template(['template' => '@TestBundle/Default/test.html.twig']),
                 'requestAttribute' => 'query'
             ],
         ];
