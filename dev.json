@@ -11,14 +11,18 @@
     ],
     "require": {
         "php": "~8.0.0",
+        "ext-ctype": "*",
         "ext-dom": "*",
         "ext-gd": "*",
+        "ext-iconv": "*",
         "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pcntl": "*",
         "ext-pdo": "*",
+        "ext-simplexml": "*",
+        "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-zip": "*",
         "psr/container": "^1.0",
@@ -118,7 +122,8 @@
         "php-http/httplug-bundle": "~1.20.0",
         "salsify/json-streaming-parser": "8.2.*",
         "myclabs/deep-copy": "1.10.*",
-        "oro/redis-config": "5.0.x-dev"
+        "oro/redis-config": "5.0.x-dev",
+        "symfony/requirements-checker": "^2.0"
     },
     "require-dev": {
         "behat/behat": "~3.8.1",

@@ -4,7 +4,7 @@ services:
 
     Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand:
         arguments:
-            - '%kernel.project_dir%'
+            - !tagged_iterator oro.requirements_provider
         tags:
             - { name: console.command }
 

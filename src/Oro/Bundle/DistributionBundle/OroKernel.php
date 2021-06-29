@@ -5,9 +5,9 @@ namespace Oro\Bundle\DistributionBundle;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
+use Oro\Bundle\InstallerBundle\Provider\PlatformRequirementsProvider;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
-use OroRequirements;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
@@ -217,12 +217,10 @@ abstract class OroKernel extends Kernel
     {
         $phpVersion = phpversion();
 
-        include_once $this->getProjectDir() . '/var/OroRequirements.php';
-
-        if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
+        if (!version_compare($phpVersion, PlatformRequirementsProvider::REQUIRED_PHP_VERSION, '>=')) {
             throw new \RuntimeException(sprintf(
                 'PHP version must be at least %s (%s is installed)',
-                OroRequirements::REQUIRED_PHP_VERSION,
+                PlatformRequirementsProvider::REQUIRED_PHP_VERSION,
                 $phpVersion
             ));
         }
