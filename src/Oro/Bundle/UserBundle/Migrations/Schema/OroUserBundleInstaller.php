@@ -60,7 +60,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_5';
+        return 'v2_6';
     }
 
     /**

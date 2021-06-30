@@ -27,7 +27,7 @@ class RestInvalidUsersTest extends WebTestCase
                 'plainPassword' => '1231231q',
                 'firstName' => 'firstName',
                 'lastName' => 'lastName',
-                'roles' => ['1'],
+                'userRoles' => ['1'],
             ],
         ];
         $this->client->request(

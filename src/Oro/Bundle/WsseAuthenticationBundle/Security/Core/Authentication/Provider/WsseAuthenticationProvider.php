@@ -112,7 +112,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
                         $user,
                         $token->getCredentials(),
                         $this->providerKey,
-                        $user->getRoles()
+                        $user->getUserRoles()
                     );
                     $authenticatedToken->setOrganization($validUserApi->getOrganization());
 

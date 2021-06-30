@@ -50,7 +50,7 @@ class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAware
             ->setUsername('limited_user')
             ->setEmail('limited_user@test.com')
             ->setPlainPassword('limited_user')
-            ->addRole($role)
+            ->addUserRole($role)
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->setFirstName('Test')

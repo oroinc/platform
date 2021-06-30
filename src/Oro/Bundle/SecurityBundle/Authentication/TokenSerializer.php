@@ -9,7 +9,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * The default implementation of the security token serializer.
@@ -74,15 +73,7 @@ class TokenSerializer implements TokenSerializerInterface
      */
     private function packRoles(TokenInterface $token)
     {
-        return implode(
-            ',',
-            array_map(
-                function (Role $role) {
-                    return $role->getRole();
-                },
-                $token->getRoles()
-            )
-        );
+        return implode(',', $token->getRoleNames());
     }
 
     /**
@@ -161,7 +152,7 @@ class TokenSerializer implements TokenSerializerInterface
         }
 
         $roleObjects = [];
-        $allRoles = $user->getRoles();
+        $allRoles = $user->getUserRoles();
         foreach ($allRoles as $role) {
             if (in_array($role->getRole(), $roles, true)) {
                 $roleObjects[] = $role;

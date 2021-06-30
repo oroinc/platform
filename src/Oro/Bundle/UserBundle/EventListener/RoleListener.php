@@ -8,8 +8,11 @@ use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclSidManager;
 use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Component\DependencyInjection\ServiceLink;
-use Symfony\Component\Security\Core\Role\Role;
 
+/**
+ * Updates the security identity name for changed role.
+ * Generates unique name for the newly created role without explicitly specified role name.
+ */
 class RoleListener
 {
     /**
@@ -30,7 +33,7 @@ class RoleListener
      */
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
-        if ($eventArgs->getEntity() instanceof RoleInterface && $eventArgs->hasChangedField('role')) {
+        if ($eventArgs->getEntity() instanceof AbstractRole && $eventArgs->hasChangedField('role')) {
             $oldRoleName = $eventArgs->getOldValue('role');
             $newRoleName = $eventArgs->getNewValue('role');
             /** @var $aclSidManager AclSidManager */

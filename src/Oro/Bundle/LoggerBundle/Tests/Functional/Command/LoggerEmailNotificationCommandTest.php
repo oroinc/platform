@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class LoggerEmailNotificationCommandTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -32,7 +35,7 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
 
     public function testRunCommandToDisableNotifications()
     {
-        $configGlobal = $this->getContainer()->get('oro_config.global');
+        $configGlobal = self::getConfigManager('global');
         $configGlobal->set('oro_logger.email_notification_recipients', 'recipient1@example.com');
         $params = ['--disable'];
 

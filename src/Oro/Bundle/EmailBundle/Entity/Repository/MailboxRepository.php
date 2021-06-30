@@ -153,7 +153,7 @@ class MailboxRepository extends EntityRepository
     protected function getUserRoleIds(User $user)
     {
         // Get ids of all user roles.
-        $roles = $user->getRoles();
+        $roles = $user->getUserRoles();
         $roleList = array_map(
             function ($value) {
                 return $value->getId();

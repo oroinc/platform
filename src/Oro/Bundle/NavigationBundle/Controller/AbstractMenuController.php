@@ -8,6 +8,7 @@ use Oro\Bundle\FormBundle\Model\UpdateHandler;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
+use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Form\Type\MenuUpdateType;
 use Oro\Bundle\NavigationBundle\JsTree\MenuUpdateTreeHandler;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
@@ -369,6 +370,24 @@ abstract class AbstractMenuController extends AbstractController
     protected function getSavedSuccessMessage()
     {
         return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
+    }
+
+    /**
+     * @param MenuUpdateInterface $menuUpdate
+     * @param ItemInterface $menu
+     */
+    protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate)
+    {
+        $repo = $this->getMenuUpdateManager()->getRepository();
+        $eventDispatcher = $this->get(EventDispatcherInterface::class);
+        $repo->updateDependentMenuUpdates($menuUpdate);
+
+        foreach ($repo->getDependentMenuUpdateScopes($menuUpdate) as $scope) {
+            $eventDispatcher->dispatch(
+                new MenuUpdateWithScopeChangeEvent($menuUpdate->getMenu(), $scope),
+                MenuUpdateWithScopeChangeEvent::NAME
+            );
+        }
     }
 
     /**

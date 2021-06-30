@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TagBundle\Tests\Unit\Form\Handler;
+namespace Oro\Bundle\NotificationBundle\Tests\Unit\Form\Handler;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;

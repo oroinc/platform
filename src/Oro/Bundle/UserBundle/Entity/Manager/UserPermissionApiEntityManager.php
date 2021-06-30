@@ -127,7 +127,7 @@ class UserPermissionApiEntityManager extends ApiEntityManager
         }
 
         $this->tokenStorage->setToken(
-            new ImpersonationToken($user, $organization, $user->getRoles())
+            new ImpersonationToken($user, $organization, $user->getUserRoles())
         );
 
         return $currentToken;

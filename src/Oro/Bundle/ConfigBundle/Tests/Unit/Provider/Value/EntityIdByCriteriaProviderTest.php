@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider\Value\Entity;
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider\Value;
 
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ConfigBundle\Entity\Config;

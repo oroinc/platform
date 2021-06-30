@@ -339,6 +339,8 @@ abstract class AbstractScopeManager
      */
     public function reload($scopeIdentifier = null)
     {
+        $this->resetCache();
+
         $entityId = $this->resolveIdentifier($scopeIdentifier);
         $cacheKey = $this->getCacheKey($this->getScopedEntityName(), $entityId);
 
@@ -390,7 +392,8 @@ abstract class AbstractScopeManager
             return $this->getScopeEntityIdValue($entity);
         }
 
-        return $this->getScopeId();
+        // Must be null because we should not return any scope id if the entity is not supported as a scope entity.
+        return null;
     }
 
     /**
@@ -497,7 +500,7 @@ abstract class AbstractScopeManager
 
     /**
      * @param string $entity
-     * @param int    $entityId
+     * @param int|null $entityId
      *
      * @return string
      */
@@ -519,5 +522,10 @@ abstract class AbstractScopeManager
         }
 
         return $identifier;
+    }
+
+    protected function resetCache(): void
+    {
+        $this->cache->flushAll();
     }
 }

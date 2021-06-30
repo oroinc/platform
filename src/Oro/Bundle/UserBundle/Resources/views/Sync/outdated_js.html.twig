@@ -1,5 +1,5 @@
 {% set roles = [] %}
-{% for role in app.user.roles %}
+{% for role in app.user.userRoles %}
     {% set roles = roles|merge([role.role]) %}
 {% endfor %}
 <script type="text/javascript">

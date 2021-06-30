@@ -39,7 +39,7 @@
 
             {% if is_granted('oro_user_role_view') %}
                 {% set roles = [] %}
-                {% for entityRole in entity.roles %}
+                {% for entityRole in entity.userRoles %}
                     {% set roles = roles|merge([entityRole.label]) %}
                 {% endfor %}
                 {{ ui.renderHtmlProperty('oro.user.roles.label'|trans, roles|join('\n')|escape|nl2br) }}

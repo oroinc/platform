@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Restriction\RestrictionManager;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Restriction;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;

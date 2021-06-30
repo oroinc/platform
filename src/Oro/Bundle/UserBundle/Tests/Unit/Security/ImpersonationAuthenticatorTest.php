@@ -156,7 +156,7 @@ class ImpersonationAuthenticatorTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $organization = $this->createMock(Organization::class);
         $roles = [new Role()];
-        $user->setRoles($roles);
+        $user->setUserRoles($roles);
 
         $this->organizationGuesser->expects($this->once())
             ->method('guess')

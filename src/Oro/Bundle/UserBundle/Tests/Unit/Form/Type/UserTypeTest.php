@@ -94,7 +94,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         ];
 
         if ($permissions[self::RULE_ROLE]) {
-            $formFields[] = ['roles', EntityType::class];
+            $formFields[] = ['userRoles', EntityType::class];
         }
 
         $attr = [];

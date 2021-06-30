@@ -132,7 +132,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
             ->addSelect('u.id')
             ->addSelect('IDENTITY(u.organization)')
             ->leftJoin('u.groups', 'g')
-            ->leftJoin('u.roles', 'r')
+            ->leftJoin('u.userRoles', 'r')
             ->andWhere('r = :role')
             ->groupBy('u.id')
             ->setParameter('role', $multiInsertRole);
@@ -180,7 +180,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
                 ->setOrganization($organization)
                 ->setOrganizations(new ArrayCollection([$organization]))
                 ->setOwner($organization->getBusinessUnits()->first())
-                ->addRole($userRole)
+                ->addUserRole($userRole)
                 ->setEnabled(true)
             ;
             $userManager->updateUser($user, false);

@@ -159,7 +159,7 @@ HELP
                 throw new InvalidArgumentException('Invalid Role');
             }
 
-            $user->addRole($role);
+            $user->addUserRole($role);
         }
 
         return $this;

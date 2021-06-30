@@ -156,6 +156,11 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
                         'field_two' => 'after_new2',
                         'field_three' => 'after_new3',
                     ],
+                    [
+                        'field_one' => 'sample1',
+                        'field_two' => 'sample2',
+                        'field_three' => "sample3\nwith\nnew\nlines",
+                    ],
                 ],
             ]
         ];
@@ -206,6 +211,11 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
                         'field_two' => 'after_new2',
                         'field_three' => 'after_new3',
                     ],
+                    [
+                        'field_one' => 'sample1',
+                        'field_two' => 'sample2',
+                        'field_three' => "sample3\nwith\nnew\nlines",
+                    ],
                 ]
             ],
             [
@@ -235,6 +245,11 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
                         'h2' => 'after_new2',
                         'h3' => 'after_new3',
                     ],
+                    [
+                        'h1' => 'sample1',
+                        'h2' => 'sample2',
+                        'h3' => "sample3\nwith\nnew\nlines",
+                    ],
                 ]
             ],
             [
@@ -248,6 +263,7 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
                     ['test1', 'test2', 'test3'],
                     [],
                     ['after_new1', 'after_new2', 'after_new3'],
+                    ['sample1', 'sample2', "sample3\nwith\nnew\nlines"],
                 ]
             ],
             [

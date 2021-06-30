@@ -36,7 +36,7 @@ class OrganizationRememberMeTokenTest extends \PHPUnit\Framework\TestCase
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 
-        $user->setRoles(new ArrayCollection([$role]));
+        $user->setUserRoles(new ArrayCollection([$role]));
 
         $token = new OrganizationRememberMeToken($user, $providerKey, $secret, $organization);
 

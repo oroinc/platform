@@ -30,7 +30,7 @@ class ImpersonationTokenTest extends \PHPUnit\Framework\TestCase
         $user = $this->getEntity(User::class, ['id' => 1]);
         /** @var Role $role */
         $role = $this->getEntity(Role::class, ['id' => 2]);
-        $user->addRole($role);
+        $user->addUserRole($role);
         /** @var Organization $organization */
         $organization = $this->getEntity(Organization::class, ['id' => 3]);
 

@@ -55,7 +55,7 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
             ->setLastName('Translator')
             ->setEmail(self::TRANSLATOR_EMAIL)
             ->setPlainPassword(self::TRANSLATOR_USERNAME)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true)
             ->setUsername(self::TRANSLATOR_USERNAME)
             ->setOrganization($organization)

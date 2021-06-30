@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Log\Tests\Unit\OutputLoggerTest;
+namespace Oro\Component\Log\Tests\Unit;
 
 use Oro\Component\Log\OutputLogger;
 use Psr\Log\LogLevel;

@@ -46,7 +46,7 @@ class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase
     public function testUserWithRole()
     {
         $user = new User();
-        $user->addRole(new Role());
+        $user->addUserRole(new Role());
 
         $this->context->expects($this->never())
             ->method('addViolation');

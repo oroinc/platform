@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;

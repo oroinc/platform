@@ -100,7 +100,7 @@ class CsvFileReader extends AbstractFileReader
             $this->file->setFlags(
                 \SplFileObject::READ_CSV |
                 \SplFileObject::READ_AHEAD |
-                \SplFileObject::DROP_NEW_LINE
+                \SplFileObject::SKIP_EMPTY
             );
             $this->file->setCsvControl(
                 $this->delimiter,

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WsseAuthenticationBundle\Security;
 
-use Symfony\Component\Security\Core\Role\Role;
+use Oro\Bundle\SecurityBundle\Model\Role;
 
 /**
  * An interface for factories to create WsseToken.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\Compiler;
+namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler\TestSessionListenerCompilerPass;
 use Oro\Bundle\TestFrameworkBundle\EventListener\TestSessionListener;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model;
+namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\AccessorInterface;
 use Oro\Bundle\EntityMergeBundle\Twig\MergeExtension;

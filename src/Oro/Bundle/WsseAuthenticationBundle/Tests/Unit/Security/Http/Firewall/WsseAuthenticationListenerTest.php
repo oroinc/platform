@@ -1,6 +1,6 @@
 <?php
 
-namespace Escape\WSSEAuthenticationBundle\Tests\Security\Http\Firewall;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\WsseAuthenticationBundle\Security\Http\Firewall\WsseAuthenticationListener;
 use Oro\Bundle\WsseAuthenticationBundle\Security\WsseToken;

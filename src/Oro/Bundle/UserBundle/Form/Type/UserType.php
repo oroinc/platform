@@ -85,12 +85,12 @@ class UserType extends AbstractType
 
         if ($this->authorizationChecker->isGranted('oro_user_role_view')) {
             $builder->add(
-                'roles',
+                'userRoles',
                 EntityType::class,
                 [
                     'label'         => 'oro.user.roles.label',
                     'class'         => 'OroUserBundle:Role',
-                    'choice_label'      => 'label',
+                    'choice_label'  => 'label',
                     'query_builder' => function (EntityRepository $er) {
                         return $er->createQueryBuilder('r')
                             ->where('r.role <> :anon')
@@ -206,7 +206,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'           => 'Oro\Bundle\UserBundle\Entity\User',
+                'data_class'           => User::class,
                 'csrf_token_id'        => 'user',
                 'validation_groups'    => ['Roles', 'Default'],
                 'ownership_disabled'   => $this->isMyProfilePage

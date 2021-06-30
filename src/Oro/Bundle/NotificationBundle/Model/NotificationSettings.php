@@ -24,6 +24,18 @@ class NotificationSettings
     }
 
     /**
+     * @return string Sender Name <sender@example.org>
+     */
+    public function getSenderEmail(): string
+    {
+        return sprintf(
+            '%s <%s>',
+            $this->configManager->get('oro_notification.email_notification_sender_name'),
+            $this->configManager->get('oro_notification.email_notification_sender_email')
+        );
+    }
+
+    /**
      * @return From
      */
     public function getSender(): From

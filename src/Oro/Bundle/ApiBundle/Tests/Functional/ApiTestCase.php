@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 use Oro\Component\Testing\Logger\BufferingLogger;
@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class ApiTestCase extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
@@ -561,21 +563,6 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return $doctrine->getManager();
-    }
-
-    /**
-     * @param string|null $scope The configuration scope (e.g.: global, organization, user, etc.)
-     *                           or NULL to get the configuration manager for the current scope
-     *
-     * @return ConfigManager
-     */
-    protected function getConfigManager(?string $scope = 'global'): ConfigManager
-    {
-        if (!$scope) {
-            return self::getContainer()->get('oro_config.manager');
-        }
-
-        return self::getContainer()->get('oro_config.' . $scope);
     }
 
     /**

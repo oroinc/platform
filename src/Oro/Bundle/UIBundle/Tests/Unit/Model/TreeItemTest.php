@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Model;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Model;
 
 use Oro\Bundle\UIBundle\Model\TreeItem;
 

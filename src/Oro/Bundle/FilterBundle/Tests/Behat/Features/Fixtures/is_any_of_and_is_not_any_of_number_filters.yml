@@ -17,7 +17,7 @@ Oro\Bundle\UserBundle\Entity\User:
         salt: salt
         organization: '@organization'
         owner: '@business_unit'
-        roles: ['@adminRole']
+        userRoles: ['@adminRole']
     seoncdUser:
         username: second-user
         email: user2@example.com
@@ -27,4 +27,4 @@ Oro\Bundle\UserBundle\Entity\User:
         salt: salt
         organization: '@organization'
         owner: '@business_unit'
-        roles: ['@adminRole']
+        userRoles: ['@adminRole']

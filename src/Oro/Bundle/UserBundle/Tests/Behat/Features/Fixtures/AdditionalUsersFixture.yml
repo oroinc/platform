@@ -5,7 +5,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: test_max1
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_max1@example.com
@@ -18,7 +18,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: test_max2
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_max2@example.com
@@ -31,7 +31,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: test_phil
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: test_phil@example.com
@@ -45,7 +45,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: patrick
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         email: patrick@patrick.com

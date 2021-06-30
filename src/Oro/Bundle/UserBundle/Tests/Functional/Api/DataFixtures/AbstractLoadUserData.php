@@ -52,7 +52,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setPlainPassword($userData['plainPassword'])
                 ->setFirstName($userData['firstName'])
                 ->setLastName($userData['lastName'])
-                ->addRole($role)
+                ->addUserRole($role)
                 ->addGroup($group)
                 ->setEmail($userData['email'])
                 ->setOwner($this->getReference('business_unit'))

@@ -18,7 +18,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: user_business_unit
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@business_unit'
         businessUnits: ['@business_unit']
         enabled: true
@@ -31,7 +31,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: user_bu_main_child
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@bu_main_child'
         businessUnits: ['@bu_main_child']
         enabled: true
@@ -44,7 +44,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: user_bu_first
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@bu_first'
         businessUnits: ['@bu_first']
         enabled: true
@@ -57,7 +57,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: user_bu_first_child
         organization: '@organization'
         organizations: ['@organization']
-        roles: ['@userRole']
+        userRoles: ['@userRole']
         owner: '@bu_first_child'
         businessUnits: ['@bu_first_child']
         enabled: true

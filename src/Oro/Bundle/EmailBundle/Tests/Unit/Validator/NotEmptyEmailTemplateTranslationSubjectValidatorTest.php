@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Validators;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Validator\Constraints\NotEmptyEmailTemplateTranslationSubject;

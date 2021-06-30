@@ -1,5 +1,5 @@
 {% block oro_segment_filter_builder_row %}
-    {% if form.name is defined %}
+    {% if form.name is defined and not form.name.rendered %}
         {{ form_row(form.name, {
             'attr': {'class': 'control-group-oro_segment_filter_builder_segment_name'}
         }) }}

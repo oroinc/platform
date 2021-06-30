@@ -73,7 +73,7 @@ class Role extends ExtendRole implements \Serializable
     /**
      * @var User[]|Collection
      *
-     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="roles")
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="userRoles")
      */
     protected $users;
 

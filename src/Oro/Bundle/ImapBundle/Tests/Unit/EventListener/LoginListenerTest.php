@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ImapBundle\EventListener\LoginListener;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;

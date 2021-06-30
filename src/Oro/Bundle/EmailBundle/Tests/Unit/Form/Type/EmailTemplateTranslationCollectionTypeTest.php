@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Tests\Unit\Form;
+namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

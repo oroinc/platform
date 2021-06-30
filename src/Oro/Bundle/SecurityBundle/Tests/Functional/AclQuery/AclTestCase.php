@@ -70,7 +70,7 @@ class AclTestCase extends WebTestCase
             false,
             'main',
             $organization,
-            $user->getRoles()
+            $user->getUserRoles()
         );
         $container->get('security.token_storage')->setToken($token);
     }
