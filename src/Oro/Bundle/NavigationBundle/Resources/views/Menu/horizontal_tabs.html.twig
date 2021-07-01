@@ -18,6 +18,6 @@
 {% endblock %}
 
 {% block navbar_tabs_content %}
-    {% set options = options|merge({'template': 'OroNavigationBundle:Menu:_tabs-content.html.twig', 'depth': 1}) %}
+    {% set options = options|merge({'template': '@OroNavigation/Menu/_tabs-content.html.twig', 'depth': 1}) %}
     {{ knp_menu_render(item, options) }}
 {% endblock %}

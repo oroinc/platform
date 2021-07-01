@@ -83,23 +83,6 @@
 {% endmacro %}
 
 {#
-    Renders save and refresh button
-
-    @param Segment entity
-
-    @deprecated Since 1.10, use macros saveActionButton in @OroUI/macros.html.twig
-#}
-{% macro saveAndRefreshButton(entity) %}
-    {% import '@OroUI/macros.html.twig' as UI %}
-
-    {% if entity.id and is_granted('EDIT', entity)
-        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
-    %}
-        {{ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save and refresh', 'action': 'save_and_refresh'}) }}
-    {% endif %}
-{% endmacro %}
-
-{#
     Render JS code for report/segment init
 
     @param string   type     segment or report
