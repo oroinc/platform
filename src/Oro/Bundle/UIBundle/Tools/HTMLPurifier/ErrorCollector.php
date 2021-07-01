@@ -19,14 +19,14 @@ class ErrorCollector extends \HTMLPurifier_ErrorCollector
         foreach ($this->lines as $line => $column) {
             if ($column instanceof \HTMLPurifier_ErrorStruct) {
                 $line = $line < 0 ? 0 : $line;
-                $place = substr($value, $line, self::LENGTH);
+                $place = mb_substr($value, $line, self::LENGTH);
                 $this->getErrors($errorsList, $column, $place);
 
                 continue;
             }
 
             foreach ($column as $col => $struct) {
-                $place = substr($value, $col, self::LENGTH);
+                $place = mb_substr($value, $col, self::LENGTH);
                 $this->getErrors($errorsList, $struct, $place);
             }
         }
