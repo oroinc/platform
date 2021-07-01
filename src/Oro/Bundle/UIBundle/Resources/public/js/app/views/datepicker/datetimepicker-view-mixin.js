@@ -230,6 +230,7 @@ define(function(require) {
             this._super().updateFront.call(this);
 
             this.$frontTimeField.val(this.getFrontendFormattedTime());
+            this.checkEmpty();
             validateFieldSafely(this.$frontTimeField);
             this.updateTimeFieldState();
         },
