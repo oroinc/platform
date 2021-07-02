@@ -61,14 +61,14 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     public const EVENT_PRE_FLUSH_DATA = 'pre_flush_data';
 
     /**
-     * This event is dispatched after data successfully are flushed into the database
+     * This event is dispatched after data are successfully flushed into the database
      * but before the database transaction is committed.
      * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
      */
     public const EVENT_POST_FLUSH_DATA = 'post_flush_data';
 
     /**
-     * This event is dispatched after data successfully are flushed into the database,
+     * This event is dispatched after data are successfully flushed into the database,
      * and the database transaction is committed.
      * It can be used to perform some not crucial operations after data are saved into the database.
      * It means that failure of these operations will not roll back data saved into the database.
