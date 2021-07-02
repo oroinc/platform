@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\EventListener;
 
+use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\UIBundle\EventListener\TemplateListener;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
+use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReference;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -44,11 +46,13 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         $container->expects(self::any())
             ->method('get')
             ->willReturnMap([
-                ['twig', $this->twig],
+                [Inflector::class, (new InflectorFactory())->build()],
+                [Environment::class, $this->twig],
+                [TemplateNameParser::class, new TemplateNameParser()],
                 ['twig.loader.native_filesystem', $loader]
             ]);
 
-        $this->listener = new TemplateListener($container, (new InflectorFactory())->build());
+        $this->listener = new TemplateListener($container);
     }
 
     /**
