@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update;
 
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -14,15 +15,13 @@ class SaveEntity implements ProcessorInterface
 {
     public const OPERATION_NAME = 'save_existing_entity';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private FlushDataHandlerInterface $flushDataHandler;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, FlushDataHandlerInterface $flushDataHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->flushDataHandler = $flushDataHandler;
     }
 
     /**
@@ -30,7 +29,7 @@ class SaveEntity implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SingleItemContext $context */
+        /** @var UpdateContext $context */
 
         if ($context->isProcessed(self::OPERATION_NAME)) {
             // the entity was already saved
@@ -44,12 +43,15 @@ class SaveEntity implements ProcessorInterface
         }
 
         $em = $this->doctrineHelper->getEntityManager($entity, false);
-        if (!$em) {
+        if (null === $em) {
             // only manageable entities are supported
             return;
         }
 
-        $em->flush();
+        $this->flushDataHandler->flushData(
+            $em,
+            new FlushDataHandlerContext([$context], $context->getSharedData())
+        );
 
         $context->setProcessed(self::OPERATION_NAME);
     }

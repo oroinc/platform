@@ -3,31 +3,31 @@
 namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\ChainProcessor\ParameterBag;
 
 /**
  * The flush data handler for ORM entities.
  */
 class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
 {
-    /** @var string */
-    private $entityClass;
+    private string $entityClass;
+    private DoctrineHelper $doctrineHelper;
+    private FlushDataHandlerInterface $flushDataHandler;
+    private ?EntityManagerInterface $entityManager = null;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var EntityManagerInterface|null */
-    private $entityManager;
-
-    /**
-     * @param string         $entityClass
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(string $entityClass, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        string $entityClass,
+        DoctrineHelper $doctrineHelper,
+        FlushDataHandlerInterface $flushDataHandler
+    ) {
         $this->entityClass = $entityClass;
         $this->doctrineHelper = $doctrineHelper;
+        $this->flushDataHandler = $flushDataHandler;
     }
 
     /**
@@ -51,28 +51,36 @@ class BatchFlushDataHandler implements BatchFlushDataHandlerInterface
             throw new \LogicException('The flush data is not started.');
         }
 
+        $itemTargetContexts = [];
+        $staredData = null;
         foreach ($items as $item) {
             $itemContext = $item->getContext();
-            if ($itemContext->getTargetAction() === ApiAction::CREATE && !$itemContext->hasErrors()) {
-                $itemTargetContext = $itemContext->getTargetContext();
-                if (null !== $itemTargetContext) {
-                    $entity = $itemTargetContext->getResult();
-                    if (null !== $entity) {
-                        $this->entityManager->persist($entity);
-                    }
+            if ($itemContext->hasErrors()) {
+                continue;
+            }
+            $itemTargetContext = $itemContext->getTargetContext();
+            if (null === $itemTargetContext) {
+                continue;
+            }
+            $itemEntity = $itemTargetContext->getResult();
+            if (!\is_object($itemEntity)) {
+                continue;
+            }
+            if ($itemTargetContext instanceof FormContext) {
+                $itemTargetContexts[] = $itemTargetContext;
+                if (null === $staredData) {
+                    $staredData = $itemTargetContext->getSharedData();
                 }
+            }
+            if ($itemContext->getTargetAction() === ApiAction::CREATE) {
+                $this->entityManager->persist($itemEntity);
             }
         }
 
-        $this->entityManager->getConnection()->beginTransaction();
-        try {
-            $this->entityManager->flush();
-            $this->entityManager->getConnection()->commit();
-        } catch (\Throwable $e) {
-            $this->entityManager->getConnection()->rollBack();
-
-            throw $e;
-        }
+        $this->flushDataHandler->flushData(
+            $this->entityManager,
+            new FlushDataHandlerContext($itemTargetContexts, $staredData ?? new ParameterBag())
+        );
     }
 
     /**

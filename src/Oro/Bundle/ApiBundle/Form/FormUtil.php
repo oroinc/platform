@@ -213,6 +213,23 @@ class FormUtil
     }
 
     /**
+     * Asserts the given form is a root form and it is already submitted.
+     *
+     * @param FormInterface $form
+     *
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
+     */
+    public static function assertSubmittedRootForm(FormInterface $form): void
+    {
+        if (!$form->isRoot()) {
+            throw new \InvalidArgumentException('The root form is expected.');
+        }
+        if (!$form->isSubmitted()) {
+            throw new \InvalidArgumentException('The submitted form is expected.');
+        }
+    }
+
+    /**
      * @param ConstraintViolation $violation
      *
      * @return FormError

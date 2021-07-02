@@ -16,6 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
 {
@@ -151,23 +152,145 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
-    public function testIsPrimaryEntityRequest()
+    public function testIsPrimaryEntityRequestForPrimaryEntityRequest()
     {
         $primaryEntity = new \stdClass();
-        $this->context->setData($primaryEntity);
+        $includedEntity = new \stdClass();
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($primaryEntity);
+        $this->context->setForm($form);
 
         self::assertTrue($this->context->isPrimaryEntityRequest());
 
         $includedEntities = new IncludedEntityCollection();
         $includedEntities->setPrimaryEntityId(\stdClass::class, 1);
         $includedEntities->setPrimaryEntity($primaryEntity, null);
-        $includedEntity = new \stdClass();
         $includedEntities->add($includedEntity, \stdClass::class, 2, new IncludedEntityData('0', 0));
         $this->context->setIncludedEntities($includedEntities);
         self::assertTrue($this->context->isPrimaryEntityRequest());
+    }
 
-        $this->context->setData($includedEntity);
+    public function testIsPrimaryEntityRequestForIncludedEntityRequest()
+    {
+        $primaryEntity = new \stdClass();
+        $includedEntity = new \stdClass();
+
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($includedEntity);
+        $this->context->setForm($form);
+
+        self::assertTrue($this->context->isPrimaryEntityRequest());
+
+        $includedEntities = new IncludedEntityCollection();
+        $includedEntities->setPrimaryEntityId(\stdClass::class, 1);
+        $includedEntities->setPrimaryEntity($primaryEntity, null);
+        $includedEntities->add($includedEntity, \stdClass::class, 2, new IncludedEntityData('0', 0));
+        $this->context->setIncludedEntities($includedEntities);
         self::assertFalse($this->context->isPrimaryEntityRequest());
+    }
+
+    public function testGetAllEntitiesWhenNoIncludedEntities()
+    {
+        $mainEntity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($mainEntity);
+        $this->context->setForm($form);
+
+        self::assertSame([$mainEntity], $this->context->getAllEntities());
+        self::assertSame([$mainEntity], $this->context->getAllEntities(true));
+    }
+
+    public function testGetAllEntitiesWhenNoIncludedEntitiesAndNoMainEntity()
+    {
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn(null);
+        $this->context->setForm($form);
+
+        self::assertSame([], $this->context->getAllEntities());
+        self::assertSame([], $this->context->getAllEntities(true));
+    }
+
+    public function testGetAllEntitiesWithIncludedEntitiesForPrimaryEntityRequest()
+    {
+        $primaryEntity = new \stdClass();
+        $includedEntity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($primaryEntity);
+        $this->context->setForm($form);
+
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->setPrimaryEntityId(\stdClass::class, 123);
+        $this->context->getIncludedEntities()
+            ->setPrimaryEntity($primaryEntity, null);
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$primaryEntity, $includedEntity], $this->context->getAllEntities());
+        self::assertSame([$primaryEntity], $this->context->getAllEntities(true));
+    }
+
+    public function testGetAllEntitiesWithIncludedEntitiesForIncludedEntityRequest()
+    {
+        $primaryEntity = new \stdClass();
+        $includedEntity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($includedEntity);
+        $this->context->setForm($form);
+
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->setPrimaryEntityId(\stdClass::class, 123);
+        $this->context->getIncludedEntities()
+            ->setPrimaryEntity($primaryEntity, null);
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$primaryEntity, $includedEntity], $this->context->getAllEntities());
+        self::assertSame([$includedEntity], $this->context->getAllEntities(true));
+    }
+
+    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForPrimaryEntityRequest()
+    {
+        $includedEntity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn(null);
+        $this->context->setForm($form);
+
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$includedEntity], $this->context->getAllEntities());
+        self::assertSame([], $this->context->getAllEntities(true));
+    }
+
+    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForIncludedEntityRequest()
+    {
+        $includedEntity = new \stdClass();
+        $form = $this->createMock(FormInterface::class);
+        $form->expects(self::any())
+            ->method('getData')
+            ->willReturn($includedEntity);
+        $this->context->setForm($form);
+
+        $this->context->setIncludedEntities(new IncludedEntityCollection());
+        $this->context->getIncludedEntities()
+            ->add($includedEntity, \stdClass::class, 1, $this->createMock(IncludedEntityData::class));
+        self::assertSame([$includedEntity], $this->context->getAllEntities());
+        self::assertSame([$includedEntity], $this->context->getAllEntities(true));
     }
 
     public function testEvent()

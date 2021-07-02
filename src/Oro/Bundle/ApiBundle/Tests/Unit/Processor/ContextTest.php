@@ -1316,12 +1316,6 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getCriteria());
     }
 
-    public function testGetAllEntities()
-    {
-        $this->expectException(\LogicException::class);
-        $this->context->getAllEntities();
-    }
-
     /**
      * @param array $data
      *
