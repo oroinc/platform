@@ -9,7 +9,7 @@ define(function(require) {
         events: {
             'click button[name$="[userEmailOrigin][check]"]': 'onClickConnect',
             'click button[name$="[userEmailOrigin][checkFolder]"]': 'onCheckFolder',
-            'click button.removeRow': 'onResetEmail'
+            'click button.delete': 'onResetEmail'
         },
 
         $vendorErrorMessage: null,

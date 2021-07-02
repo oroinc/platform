@@ -11,8 +11,8 @@ use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\ImapBundle\Manager\Oauth2ManagerInterface;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\Form\Type\ConfigurationTestType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -43,7 +43,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userConfigManager;
 
-    /** @var OAuth2ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $oauthManagerRegistry;
 
     /** @var User */
@@ -79,7 +79,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
 
         $oauthManager1 = $this->getOAuthManager('oauth1');
         $oauthManager2 = $this->getOAuthManager('oauth2');
-        $this->oauthManagerRegistry = $this->createMock(OAuth2ManagerRegistry::class);
+        $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
         $this->oauthManagerRegistry->expects(self::any())
             ->method('getManagers')
             ->willReturn([$oauthManager1, $oauthManager2]);
@@ -102,7 +102,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
                 if ('oauth2' === $type) {
                     return $oauthManager2;
                 }
-                throw new \InvalidArgumentException(sprintf('Manager for type %s does not exists', $type));
+                throw new \InvalidArgumentException(sprintf('The manager for %s" does not exist.', $type));
             });
 
         parent::setUp();
@@ -259,11 +259,11 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /**
      * @param string $type
      *
-     * @return Oauth2ManagerInterface
+     * @return OAuthManagerInterface
      */
-    private function getOAuthManager(string $type): Oauth2ManagerInterface
+    private function getOAuthManager(string $type): OAuthManagerInterface
     {
-        $oauthManager = $this->createMock(Oauth2ManagerInterface::class);
+        $oauthManager = $this->createMock(OAuthManagerInterface::class);
         $oauthManager->expects(self::any())
             ->method('getType')
             ->willReturn($type);

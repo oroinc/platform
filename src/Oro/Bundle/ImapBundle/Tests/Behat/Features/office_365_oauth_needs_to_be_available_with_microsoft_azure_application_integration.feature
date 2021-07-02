@@ -8,5 +8,5 @@ Feature: Office 365 OAuth needs to be available with Microsoft Azure Application
     Given I login as administrator
     And I go to System/ Configuration
     And I follow "System Configuration/Integrations/Microsoft Settings" on configuration sidebar
-    Then I should see "OAuth 2.0 for Office 365 emails sync"
-    And I should see "Enable"
+    Then I should see "Microsoft 365 Integrations"
+    And I should see "Enable Emails Sync"

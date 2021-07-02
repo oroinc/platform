@@ -4,7 +4,6 @@ dynamic-imports:
         - oroimap/js/app/components/check-config-settings
         - oroimap/js/app/components/check-connection-component
         - oroimap/js/app/components/google-sync-checkbox-component
-        - oroimap/js/app/components/microsoft-sync-checkbox-component
         - oroimap/js/app/components/imap-gmail-component
         - oroimap/js/app/components/imap-microsoft-component
-        - oroimap/js/app/components/popup
+        - oroimap/js/app/components/oauth-popup

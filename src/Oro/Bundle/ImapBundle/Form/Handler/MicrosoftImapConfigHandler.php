@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 
 /**
- * Microsoft Office 365 OAuth 2 related implementation of AbstractImapConfigHandler.
+ * Microsoft Office 365 OAuth related implementation of AbstractImapConfigHandler.
  * Handles refreshing tokens of email origin entities if Microsoft Azure API application
  * client ID/Secret/Tenant was modified
  */

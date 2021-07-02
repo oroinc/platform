@@ -5,9 +5,6 @@ oro.imap:
     system_configuration:
         groups:
             google_imap_settings.title: OAuth 2.0 for Gmail emails sync
-            microsoft_settings.title: Microsoft Settings
-            microsoft_integration_settings.title: Azure Active Directory Application Settings
-            microsoft_imap_settings.title: OAuth 2.0 for Office 365 emails sync
         fields:
             enable_google_imap:
                 label: Enable
@@ -16,8 +13,8 @@ oro.imap:
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Gmail OAuth 2.0, will become unavailable for synchronization.
             enable_microsoft_imap:
-                label: Enable
-                tooltip: 'Please make sure that Azure Application settings are available and configuration is saved.'
+                label: Enable Emails Sync
+                tooltip: Allows to enable and configure emails synchronization with Microsoft 365 for users. Please make sure that fields under the Azure Active Directory Application Settings are filled.
                 error.label: Error during Authorization
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Microsoft Azure App OAuth 2.0, will become unavailable for synchronization.

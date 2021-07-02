@@ -2,11 +2,10 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
-    const __ = require('orotranslation/js/translator');
 
     return {
         /**
-         * Opens popup window and returns the object
+         * Opens OAuth authorization popup window and returns the Window object that represents it.
          *
          * @param {String} url
          * @param {Object} config
@@ -25,13 +24,14 @@ define(function(require) {
 
             return window.open(
                 url,
-                __('oro.imap.connection.microsoft.oauth.popup.title'),
+                'oro-oauth-authorization',
                 'width=' + config.width + ', height=' + config.height + ', top=' + top + ', left=' + left
             );
         },
 
         /**
-         * Returns authorized promise
+         * Opens OAuth authorization popup window and returns a promise object
+         * that can be used to handle the authorization result.
          *
          * @param {String} url
          * @param {Object} config
@@ -53,7 +53,7 @@ define(function(require) {
         },
 
         /**
-         * Provides a promise of window closed
+         * Returns a promise object that can be used to handle closing of OAuth authorization window.
          *
          * @param {Window} win
          * @return {Promise}
@@ -75,7 +75,7 @@ define(function(require) {
         },
 
         /**
-         * Returns promise of auth callback loaded
+         * Returns a promise object that can be used to handle completion of OAuth authorization.
          *
          * @param {Window} win
          * @return {Promise}
@@ -94,7 +94,7 @@ define(function(require) {
                     }, 800);
                 } catch (err) {
                     // Cross origin interaction we want to catch
-                    // to get back when calback function is provided
+                    // to get back when callback function is provided
                 }
             }, 500);
 

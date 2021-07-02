@@ -1,12 +1,12 @@
 define(function(require) {
     'use strict';
 
-    const mediator = require('oroui/js/mediator');
-    const ImapMicrosoftView = require('oroimap/js/app/views/imap-microsoft-view');
-    const BaseImapComponent = require('oroimap/js/app/components/imap-component');
-    const routing = require('routing');
-    const popup = require('oroimap/js/app/components/popup');
     const $ = require('jquery');
+    const mediator = require('oroui/js/mediator');
+    const routing = require('routing');
+    const popup = require('oroimap/js/app/components/oauth-popup');
+    const BaseImapComponent = require('oroimap/js/app/components/imap-component');
+    const ImapMicrosoftView = require('oroimap/js/app/views/imap-microsoft-view');
 
     const ImapMicrosoftComponent = BaseImapComponent.extend({
 
@@ -30,14 +30,7 @@ define(function(require) {
         type: 'microsoft',
 
         /** @property {Object} */
-        popup: {
-            width: 500,
-            height: 600
-        },
-
-        /** @property {Object} */
         errorsMessages: {
-            emptyClientId: 'oro.imap.connection.microsoft.oauth.error.emptyClientId',
             access_deny: 'oro.imap.connection.microsoft.oauth.error.access_deny',
             request: 'oro.imap.connection.microsoft.oauth.error.request',
             closed_auth: 'oro.imap.connection.microsoft.oauth.error.closed_auth',
@@ -55,7 +48,6 @@ define(function(require) {
          * @inheritDoc
          */
         initialize: function(options) {
-            this.popup = options.popup || this.popup;
             ImapMicrosoftComponent.__super__.initialize.call(this, options);
         },
 
@@ -90,7 +82,7 @@ define(function(require) {
          */
         requestAuthCode: function(emailAddress) {
             const data = this.view.getData();
-            popup.whenAuthorized(this.buildLoginUrl(data), this.popup)
+            popup.whenAuthorized(this.buildLoginUrl(data))
                 .done(function() {
                     this.requestAccessToken();
                 }.bind(this))

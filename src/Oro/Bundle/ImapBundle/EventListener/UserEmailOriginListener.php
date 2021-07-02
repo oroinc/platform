@@ -11,7 +11,7 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -36,7 +36,7 @@ class UserEmailOriginListener
     protected $doctrine;
 
     /**
-     * @var OAuth2ManagerRegistry
+     * @var OAuthManagerRegistry
      */
     protected $oauthManagerRegistry;
 
@@ -44,13 +44,13 @@ class UserEmailOriginListener
      * @param SymmetricCrypterInterface $crypter
      * @param ImapConnectorFactory $connectorFactory
      * @param Registry $doctrine
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $crypter,
         ImapConnectorFactory $connectorFactory,
         Registry $doctrine,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->crypter = $crypter;
         $this->connectorFactory = $connectorFactory;

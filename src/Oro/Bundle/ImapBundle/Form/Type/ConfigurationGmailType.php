@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  * Defines email origin configuration form with predefined
  * Google Gmail IMAP/SMTP settings
  */
-class ConfigurationGmailType extends AbstractOauthAwareConfigurationType
+class ConfigurationGmailType extends AbstractOAuthAwareConfigurationType
 {
     const NAME = 'oro_imap_configuration_gmail';
 
