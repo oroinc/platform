@@ -24,14 +24,13 @@ class TemplateListener implements ServiceSubscriberInterface
 
     private ?Environment $twig = null;
 
-    private Inflector $inflector;
+    private ?Inflector $inflector = null;
 
-    private static ?TemplateNameParser $templateNameParser = null;
+    private ?TemplateNameParser $templateNameParser = null;
 
-    public function __construct(ContainerInterface $container, Inflector $inflector)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->inflector = $inflector;
     }
 
     public function onKernelView(ViewEvent $event): void
@@ -106,7 +105,7 @@ class TemplateListener implements ServiceSubscriberInterface
             return;
         }
 
-        $legacyController = $this->inflector->classify($controller);
+        $legacyController = $this->getInflector()->classify($controller);
         if ($legacyController === $controller) {
             return;
         }
@@ -139,7 +138,7 @@ class TemplateListener implements ServiceSubscriberInterface
     private function resolveActionName(string $name): string
     {
         return preg_match('/^(?<view>[^\/\.]+)(\.[a-z]+.[a-z]+)?$/', $name, $parsed)
-            ? str_replace($parsed['view'], $this->inflector->camelize($parsed['view']), $name)
+            ? str_replace($parsed['view'], $this->getInflector()->camelize($parsed['view']), $name)
             : $name;
     }
 
@@ -205,10 +204,22 @@ class TemplateListener implements ServiceSubscriberInterface
     private function getTwig(): Environment
     {
         if (!$this->twig) {
-            $this->twig = $this->container->get('twig');
+            $this->twig = $this->container->get(Environment::class);
         }
 
         return $this->twig;
+    }
+
+    /**
+     * @return Inflector
+     */
+    private function getInflector(): Inflector
+    {
+        if (!$this->inflector) {
+            $this->inflector = $this->container->get(Inflector::class);
+        }
+
+        return $this->inflector;
     }
 
     /**
@@ -216,11 +227,11 @@ class TemplateListener implements ServiceSubscriberInterface
      */
     private function getTemplateNameParser(): TemplateNameParser
     {
-        if (!static::$templateNameParser) {
-            static::$templateNameParser = new TemplateNameParser();
+        if (!$this->templateNameParser) {
+            $this->templateNameParser = $this->container->get(TemplateNameParser::class);
         }
 
-        return static::$templateNameParser;
+        return $this->templateNameParser;
     }
 
     /**
@@ -229,7 +240,9 @@ class TemplateListener implements ServiceSubscriberInterface
     public static function getSubscribedServices(): array
     {
         return [
-            'twig' => Environment::class,
+            Inflector::class,
+            Environment::class,
+            TemplateNameParser::class,
             'twig.loader.native_filesystem' => FilesystemLoader::class,
         ];
     }

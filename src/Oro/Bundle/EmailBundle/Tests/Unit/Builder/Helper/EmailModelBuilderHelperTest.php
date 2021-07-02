@@ -3,12 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder\Helper;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -23,29 +25,25 @@ use Twig\Environment;
  */
 class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 {
-    protected EmailModelBuilderHelper $helper;
+    private EmailModelBuilderHelper $helper;
 
-    protected EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject $entityRoutingHelper;
+    private EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject $entityRoutingHelper;
 
-    protected EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject $emailAddressHelper;
+    private EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject $entityNameResolver;
 
-    protected EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject $entityNameResolver;
+    private TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
 
-    protected TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject $tokenAccessor;
+    private EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject $emailAddressManager;
 
-    protected EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject $emailAddressManager;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    protected EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private EmailCacheManager|\PHPUnit\Framework\MockObject\MockObject $emailCacheManager;
 
-    protected EmailCacheManager|\PHPUnit\Framework\MockObject\MockObject $emailCacheManager;
-
-    protected Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
+    private Environment|\PHPUnit\Framework\MockObject\MockObject $twig;
 
     protected function setUp(): void
     {
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
-
-        $this->emailAddressHelper = new EmailAddressHelper();
 
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
 
@@ -63,7 +61,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->helper = new EmailModelBuilderHelper(
             $this->entityRoutingHelper,
-            $this->emailAddressHelper,
+            new EmailAddressHelper(),
             $this->entityNameResolver,
             $this->tokenAccessor,
             $this->emailAddressManager,
@@ -78,16 +76,16 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
     {
         $emailAddress = '"Admin" <someaddress@example.com>';
 
-        $this->entityRoutingHelper->expects($this->never())
+        $this->entityRoutingHelper->expects(self::never())
             ->method('getEntity');
 
-        $this->entityNameResolver->expects($this->never())
+        $this->entityNameResolver->expects(self::never())
             ->method('getName');
 
-        $this->emailAddressManager->expects($this->never())
+        $this->emailAddressManager->expects(self::never())
             ->method('getEmailAddressRepository');
 
-        $this->helper->preciseFullEmailAddress($emailAddress, null, null);
+        $this->helper->preciseFullEmailAddress($emailAddress);
     }
 
     public function testPreciseFullEmailAddressViaRoutingHelper(): void
@@ -100,21 +98,21 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $owner      = $this->createMock($ownerClass);
         $ownerName  = 'Admin';
 
-        $this->entityRoutingHelper->expects($this->once())
+        $this->entityRoutingHelper->expects(self::once())
             ->method('getEntity')
             ->with($ownerClass, $ownerId)
             ->willReturn($owner);
 
-        $this->entityNameResolver->expects($this->once())
+        $this->entityNameResolver->expects(self::once())
             ->method('getName')
             ->with($owner)
             ->willReturn($ownerName);
 
-        $this->emailAddressManager->expects($this->never())
+        $this->emailAddressManager->expects(self::never())
             ->method('getEmailAddressRepository');
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     public function testPreciseFullEmailAddressWithEmailOwnerAwareInterface(): void
@@ -130,21 +128,21 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
         $emailOwnerAwareStub = new EmailOwnerAwareStub($owner);
 
-        $this->entityRoutingHelper->expects($this->once())
+        $this->entityRoutingHelper->expects(self::once())
             ->method('getEntity')
             ->with(EmailOwnerAwareStub::class, $ownerId)
             ->willReturn($emailOwnerAwareStub);
 
-        $this->entityNameResolver->expects($this->once())
+        $this->entityNameResolver->expects(self::once())
             ->method('getName')
             ->with($owner)
             ->willReturn($ownerName);
 
-        $this->emailAddressManager->expects($this->never())
+        $this->emailAddressManager->expects(self::never())
             ->method('getEmailAddressRepository');
 
         $this->helper->preciseFullEmailAddress($emailAddress, EmailOwnerAwareStub::class, $ownerId);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     public function testPreciseFullEmailAddressViaRoutingHelperWithExcludeCurrentUser(): void
@@ -156,17 +154,17 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $ownerId    = 1;
         $owner      = $this->createMock($ownerClass);
 
-        $this->entityRoutingHelper->expects($this->once())
+        $this->entityRoutingHelper->expects(self::once())
             ->method('getEntity')
             ->with($ownerClass, $ownerId)
             ->willReturn($owner);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($owner);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     public function testPreciseFullEmailAddressViaAddressManager(): void
@@ -178,31 +176,29 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $ownerId    = null;
         $ownerName  = 'Admin';
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
 
         $otherOwner = $this->createMock(User::class);
 
         $emailAddressObj = new EmailAddress();
         $emailAddressObj->setOwner($otherOwner);
 
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findOneBy')
             ->willReturn($emailAddressObj);
 
-        $this->emailAddressManager->expects($this->once())
+        $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $this->entityNameResolver->expects($this->once())
+        $this->entityNameResolver->expects(self::once())
             ->method('getName')
             ->with($otherOwner)
             ->willReturn($ownerName);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     public function testPreciseFullEmailAddressViaAddressManagerWithExcludeCurrentUser(): void
@@ -213,30 +209,28 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $ownerClass = User::class;
         $ownerId    = null;
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $repo = $this->createMock(EntityRepository::class);
 
         $otherOwner = $this->createMock(User::class);
 
         $emailAddressObj = new EmailAddress();
         $emailAddressObj->setOwner($otherOwner);
 
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('findOneBy')
             ->willReturn($emailAddressObj);
 
-        $this->emailAddressManager->expects($this->once())
+        $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($otherOwner);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     /**
@@ -244,10 +238,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testPreciseFullEmailAddressWithProvider($expected, $emailAddress, $ownerClass, $ownerId): void
     {
-        $emailAddressRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailAddressRepository->expects($this->any())
+        $emailAddressRepository = $this->createMock(EntityRepository::class);
+        $emailAddressRepository->expects(self::any())
             ->method('findOneBy')
             ->willReturnCallback(
                 function ($args) {
@@ -258,28 +250,28 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
                     return $emailAddress;
                 }
             );
-        $this->emailAddressManager->expects($this->any())
+        $this->emailAddressManager->expects(self::any())
             ->method('getEmailAddressRepository')
             ->with($this->identicalTo($this->entityManager))
             ->willReturn($emailAddressRepository);
 
-        $this->entityNameResolver->expects($this->any())
+        $this->entityNameResolver->expects(self::any())
             ->method('getName')
-            ->with($this->isInstanceOf('Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser'))
+            ->with($this->isInstanceOf(TestUser::class))
             ->willReturnCallback(
                 function ($obj) {
                     return $obj->getFirstName() . ' ' . $obj->getLastName();
                 }
             );
         if ($ownerId) {
-            $this->entityRoutingHelper->expects($this->once())
+            $this->entityRoutingHelper->expects(self::once())
                 ->method('getEntity')
                 ->with($ownerClass, $ownerId)
                 ->willReturn(new TestUser($emailAddress, 'OwnerFirstName', 'OwnerLastName'));
         }
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
-        $this->assertEquals($expected, $emailAddress);
+        self::assertEquals($expected, $emailAddress);
     }
 
     public function preciseFullEmailAddressProvider(): array
@@ -294,13 +286,13 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
             [
                 '"FirstName LastName" <test@example.com>',
                 'test@example.com',
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
+                TestUser::class,
                 null
             ],
             [
                 '"OwnerFirstName OwnerLastName" <test@example.com>',
                 'test@example.com',
-                'Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser',
+                TestUser::class,
                 123
             ],
         ];
@@ -313,39 +305,36 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $ownerClass = User::class;
         $ownerId    = 2;
 
-        $this->entityRoutingHelper->expects($this->once())
+        $this->entityRoutingHelper->expects(self::once())
             ->method('getEntity')
             ->with($ownerClass, $ownerId)
             ->willReturn(null);
 
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repo->expects($this->once())
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())
             ->method('findOneBy')
             ->willReturn(null);
 
-        $this->emailAddressManager->expects($this->once())
+        $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
             ->with($this->entityManager)
             ->willReturn($repo);
 
-        $this->entityNameResolver->expects($this->never())
+        $this->entityNameResolver->expects(self::never())
             ->method('getName');
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
-        $this->assertEquals($emailAddress, $expected);
+        self::assertEquals($emailAddress, $expected);
     }
 
     public function testGetUserTokenIsNull(): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn(null);
 
         $result = $this->helper->getUser();
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
     /**
@@ -354,12 +343,12 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetUser($user): void
     {
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
         $result = $this->helper->getUser();
-        $this->assertSame($user, $result);
+        self::assertSame($user, $result);
     }
 
     public function getUserProvider(): array
@@ -373,13 +362,13 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
     {
         $className = 'Class';
 
-        $this->entityRoutingHelper->expects($this->once())
+        $this->entityRoutingHelper->expects(self::once())
             ->method('resolveEntityClass')
             ->with($className)
             ->willReturn($className);
 
         $result = $this->helper->decodeClassName($className);
-        $this->assertEquals($result, $className);
+        self::assertEquals($result, $className);
     }
 
     public function testBuildFullEmailAddress(): void
@@ -389,31 +378,30 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $format = 'format';
         $expected = '"format" <email>';
 
-        $user->expects($this->once())
+        $user->expects(self::once())
             ->method('getEmail')
             ->willReturn($email);
 
-        $this->entityNameResolver->expects($this->once())
+        $this->entityNameResolver->expects(self::once())
             ->method('getName')
             ->with($user)
             ->willReturn($format);
 
         $result = $this->helper->buildFullEmailAddress($user);
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function testGetEmailBodyWithException(): void
     {
-        $exception = $this->createMock('Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException');
         $emailEntity = new Email();
 
-        $this->emailCacheManager->expects($this->once())
+        $this->emailCacheManager->expects(self::once())
             ->method('ensureEmailBodyCached')
             ->with($emailEntity)
-            ->willThrowException($exception);
+            ->willThrowException(new LoadEmailBodyException());
 
         $result = $this->helper->getEmailBody($emailEntity, null);
-        $this->assertNull($result);
+        self::assertNull($result);
     }
 
     public function testGetEmailBody(): void
@@ -422,17 +410,17 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $templatePath = 'template_path';
         $body = 'body';
 
-        $this->emailCacheManager->expects($this->once())
+        $this->emailCacheManager->expects(self::once())
             ->method('ensureEmailBodyCached')
             ->with($emailEntity);
 
-        $this->twig->expects($this->once())
+        $this->twig->expects(self::once())
             ->method('render')
             ->with($templatePath, ['email' => $emailEntity])
             ->willReturn($body);
 
         $result = $this->helper->getEmailBody($emailEntity, $templatePath);
-        $this->assertEquals($body, $result);
+        self::assertEquals($body, $result);
     }
 
     /**
@@ -444,7 +432,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testPrependWith(string $prefix, string $subject, string $result): void
     {
-        $this->assertEquals($result, $this->helper->prependWith($prefix, $subject));
+        self::assertEquals($result, $this->helper->prependWith($prefix, $subject));
     }
 
     public function prependWithProvider(): array

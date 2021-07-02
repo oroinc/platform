@@ -37,8 +37,8 @@ $builder->add(
 $builder->addEventSubscriber(new AddressCollectionTypeSubscriber('addresses', $this->addressClass));
 ```
 
-3) Add OroAddressBundle:Include:fields.html.twig to the template to enable address form field types.
+3) Add @OroAddress/Include/fields.html.twig to the template to enable address form field types.
 
 ```php
-{% form_theme form with ['OroAddressBundle:Include:fields.html.twig']}
+{% form_theme form with ['@OroAddress/Include/fields.html.twig']}
 ```

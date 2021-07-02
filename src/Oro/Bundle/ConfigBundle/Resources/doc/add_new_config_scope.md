@@ -178,8 +178,8 @@ add new action to manipulate data:
 and the template:
  
 ```
-    {% extends 'OroConfigBundle::configPage.html.twig' %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% extends '@OroConfig/configPage.html.twig' %}
+    {% import '@OroUI/macros.html.twig' as UI %}
         
     {% set pageTitle = [
             'acme_test.some_label'|trans

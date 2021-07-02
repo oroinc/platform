@@ -39,7 +39,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'templating' => [
                 'default' => 'twig',
                 'twig' => [
-                    'enabled' => true,
                     'resources' => ['@OroLayout/Layout/div_layout.html.twig']
                 ]
             ],

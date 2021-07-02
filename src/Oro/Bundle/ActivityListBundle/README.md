@@ -29,7 +29,7 @@ The widget currently displayed in "Record activities" placeholder block on an en
 
 ## Add Widget into a Page
 
-Widget is usually rendered in the "view_content_data_activities" placeholder. However, if you need to extend it or use a view template different from 'OroUIBundle:actions:view.html.twig', you will have to define a placeholder in it. For example: 
+Widget is usually rendered in the "view_content_data_activities" placeholder. However, if you need to extend it or use a view template different from '@OroUI/actions/view.html.twig', you will have to define a placeholder in it. For example: 
 
 ```
   {%- set activitiesData -%}
@@ -90,7 +90,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
 */
 public function getTemplate()
 {
-   return 'OroCalendarBundle:CalendarEvent:js/activityItemTemplate.html.twig';
+   return '@OroCalendar/CalendarEvent/js/activityItemTemplate.html.twig';
 }
 ...
 

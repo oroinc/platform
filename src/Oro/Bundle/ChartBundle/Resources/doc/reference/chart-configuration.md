@@ -37,5 +37,5 @@ charts:
 
     data_transformer: oro_chart.data_transformer.example # Custom data transformer
 
-    template: OroChartBundle:Chart:line.html.twig
+    template: @OroChart/Chart/line.html.twig
 ```

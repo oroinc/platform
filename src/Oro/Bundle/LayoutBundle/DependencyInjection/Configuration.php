@@ -67,7 +67,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('default')->defaultValue('twig')->end()
                 ->arrayNode('twig')
-                    ->canBeDisabled()
+                    ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')

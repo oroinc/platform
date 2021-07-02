@@ -115,43 +115,6 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadWithDisabledTwigRenderer(): void
-    {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.environment', 'prod');
-        $container->setParameter('kernel.debug', false);
-
-        $extensionConfig = [
-            [
-                'templating' => [
-                    'twig' => false
-                ]
-            ]
-        ];
-
-        $extension = new OroLayoutExtension();
-        $extension->load($extensionConfig, $container);
-
-        // default renderer name
-        self::assertTrue(
-            $container->hasParameter('oro_layout.templating.default'),
-            'Failed asserting that default templating parameter is registered'
-        );
-        self::assertEquals(
-            'twig',
-            $container->getParameter('oro_layout.templating.default')
-        );
-        // twig renderer
-        self::assertFalse(
-            $container->hasParameter('oro_layout.twig.resources'),
-            'Failed asserting that TWIG resources parameter is not registered'
-        );
-        self::assertFalse(
-            $container->has('oro_layout.twig.extension.layout'),
-            'Failed asserting that TWIG extension service is not registered'
-        );
-    }
-
     public function testLoadWithActiveTheme(): void
     {
         $container = new ContainerBuilder();

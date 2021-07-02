@@ -100,8 +100,8 @@ To disable this behavior set `enableDefaultRendering` option to _false_ in the e
 Then you are able to manually render tags somewhere else in the entity view template.
 
 ``` twig
-{% import 'OroUIBundle::macros.html.twig' as ui %}
-{% import 'OroTagBundle::macros.html.twig' as Tag %}
+{% import '@OroUI/macros.html.twig' as ui %}
+{% import '@OroTag/macros.html.twig' as Tag %}
 ...
 {{ ui.renderHtmlProperty('oro.tag.entity_plural_label'|trans, Tag.renderView(entity)) }}
 ...

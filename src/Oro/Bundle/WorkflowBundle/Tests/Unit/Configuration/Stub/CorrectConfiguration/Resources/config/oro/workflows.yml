@@ -83,8 +83,8 @@ workflows:
                 form_type: custom_workflow_transition
                 display_type: page
                 destination_page: index
-                page_template: Workflow:Test:pageTemplate.html.twig
-                dialog_template: Workflow:Test:dialogTemplate.html.twig
+                page_template: '@OroWorkflow/Test/pageTemplate.html.twig'
+                dialog_template: '@OroWorkflow/Test/dialogTemplate.html.twig'
                 message_parameters:
                     test: param
                 init_entities:

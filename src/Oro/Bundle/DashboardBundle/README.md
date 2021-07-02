@@ -20,7 +20,7 @@ dashboards:
     # Configuration of dashboards
     dashboards:                                              # dashboard configuration section
         main:                                                # dashboard name
-            twig: OroDashboardBundle:Index:default.html.twig # dashboard template (used by default)
+            twig: '@OroDashboard/Index/default.html.twig' # dashboard template (used by default)
 ```
 To view all configuration options you can launch `config:dump-reference` command:
 ```bash
@@ -136,7 +136,7 @@ datagrids:
                 type: twig
                 label: ~
                 frontend_type: html
-                template: OroCallBundle:Datagrid:Column/direction.html.twig
+                template: '@OroCall/Datagrid/Column/direction.html.twig'
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
@@ -144,7 +144,7 @@ datagrids:
                 type: twig
                 label: orocrm.call.subject.label
                 frontend_type: html
-                template: OroCallBundle:Datagrid:Column/subject.html.twig
+                template: '@OroCall/Datagrid/Column/subject.html.twig'
             phone:
                 label: orocrm.call.phone_number.label
         sorters:
@@ -164,8 +164,8 @@ datagrids:
 Next you need to create a TWIG template renders your grid. This template should be located `Resources/views/Dashboard` directory in of your bundle. For example lets create `recentCalls.html.twig`:
 
 ```twig
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
  
 {% block content %}
     {{ dataGrid.renderGrid('dashboard-recent-calls-grid') }}
