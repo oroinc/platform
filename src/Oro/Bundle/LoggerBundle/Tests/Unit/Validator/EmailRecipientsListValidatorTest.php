@@ -14,24 +14,15 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class EmailRecipientsListValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var EmailRecipientsListValidator
-     */
+    /** @var EmailRecipientsListValidator */
     private $validator;
 
-    /**
-     * @var EmailRecipientsListConstraint
-     */
+    /** @var EmailRecipientsListConstraint */
     private $constraint;
 
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $context;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->validator = new EmailRecipientsListValidator();

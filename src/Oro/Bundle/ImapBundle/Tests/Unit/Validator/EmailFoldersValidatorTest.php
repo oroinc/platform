@@ -7,66 +7,53 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\EmailFoldersValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class EmailFoldersValidatorTest extends \PHPUnit\Framework\TestCase
+class EmailFoldersValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var EmailFolders */
-    protected $constraint;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
-    /** @var EmailFoldersValidator */
-    protected $validator;
-
-    protected function setUp(): void
+    protected function createValidator()
     {
-        $this->constraint = new EmailFolders();
-
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->validator = new EmailFoldersValidator();
-        $this->validator->initialize($this->context);
+        return new EmailFoldersValidator();
     }
 
     public function testUserEmailOriginValueWithFolderOnRootLevel()
     {
-        $this->assertViolationNotAdded();
-
         $folderSent = new EmailFolder();
         $folderSent->setType('index')->setSyncEnabled(true);
 
         $value = new UserEmailOrigin();
         $value->addFolder($folderSent);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new EmailFolders();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValueIsNotEmailOrigin()
     {
-        $this->assertViolationNotAdded();
+        $constraint = new EmailFolders();
+        $this->validator->validate(new \stdClass(), $constraint);
 
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValueWithFolders()
     {
-        $this->assertViolationNotAdded();
-
         $folderInbox = new EmailFolder();
         $folderInbox->setType('inbox')->setSyncEnabled(true);
 
         $value = new UserEmailOrigin();
         $value->addFolder($folderInbox);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new EmailFolders();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValueWithSubFolders()
     {
-        $this->assertViolationNotAdded();
-
         $subFolderInbox = new EmailFolder();
         $subFolderInbox->setType('subfolder')->setSyncEnabled(true);
 
@@ -76,13 +63,14 @@ class EmailFoldersValidatorTest extends \PHPUnit\Framework\TestCase
         $value = new UserEmailOrigin();
         $value->addFolder($folderInbox);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new EmailFolders();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValueWithSubFoldersNotSyncEnabled()
     {
-        $this->assertViolationAdded();
-
         $subFolderInbox = new EmailFolder();
         $subFolderInbox->setType('subfolder');
 
@@ -92,53 +80,51 @@ class EmailFoldersValidatorTest extends \PHPUnit\Framework\TestCase
         $value = new UserEmailOrigin();
         $value->addFolder($folderInbox);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new EmailFolders();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testEmptyCollectionValueWithViolation()
     {
-        $this->assertViolationAdded();
+        $constraint = new EmailFolders();
+        $this->validator->validate(new ArrayCollection([]), $constraint);
 
-        $this->validator->validate(new ArrayCollection([]), $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testUnsupportedCollectionValueWithViolation()
     {
-        $this->assertViolationAdded();
+        $constraint = new EmailFolders();
+        $this->validator->validate(new ArrayCollection([new \stdClass()]), $constraint);
 
-        $this->validator->validate(new ArrayCollection([new \stdClass()]), $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testNotEmptyCollectionValueWithViolation()
     {
-        $this->assertViolationAdded();
-
         $folderInbox = new EmailFolder();
         $folderInbox->setType('inbox');
 
-        $this->validator->validate(new ArrayCollection([$folderInbox]), $this->constraint);
+        $constraint = new EmailFolders();
+        $this->validator->validate(new ArrayCollection([$folderInbox]), $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testNotEmptyCollectionValue()
     {
-        $this->assertViolationNotAdded();
-
         $folderInbox = new EmailFolder();
         $folderInbox->setType('inbox')->setSyncEnabled(true);
 
-        $this->validator->validate(new ArrayCollection([$folderInbox]), $this->constraint);
-    }
+        $constraint = new EmailFolders();
+        $this->validator->validate(new ArrayCollection([$folderInbox]), $constraint);
 
-    private function assertViolationAdded()
-    {
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with('oro.imap.validator.configuration.folders_are_not_selected');
-    }
-
-    private function assertViolationNotAdded()
-    {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $this->assertNoViolation();
     }
 }

@@ -8,126 +8,103 @@ use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\EmailBundle\Validator\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class SmtpConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
+class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var SmtpConnectionConfiguration */
-    private $constraint;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
     /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $checker;
 
     /** @var SmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $smtpSettingsFactory;
 
-    /** @var SmtpConnectionConfigurationValidator */
-    private $validator;
-
     protected function setUp(): void
     {
-        $this->constraint = new SmtpConnectionConfiguration();
-
         $this->checker = $this->createMock(SmtpSettingsChecker::class);
         $this->smtpSettingsFactory = $this->createMock(SmtpSettingsFactory::class);
+        parent::setUp();
+    }
 
-        $this->validator = new SmtpConnectionConfigurationValidator($this->checker, $this->smtpSettingsFactory);
-
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->validator->initialize($this->context);
+    protected function createValidator()
+    {
+        return new SmtpConnectionConfigurationValidator($this->checker, $this->smtpSettingsFactory);
     }
 
     public function testValidateWithUnsupportedType()
     {
-        $this->assertViolationNotAdded();
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate(new \stdClass(), $constraint);
 
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidateSmtpNotConfigured()
     {
-        $this->assertViolationNotAdded();
-
         $value = $this->createUserEmailOrigin();
         $value->setSmtpHost('');
+
         $this->checker->expects($this->never())
             ->method('checkConnection');
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateFailedConnection()
     {
-        $this->assertViolationAdded();
-
         $value = $this->createUserEmailOrigin();
+
         $this->checker->expects($this->once())
             ->method('checkConnection')
             ->with($this->createSmtpSettingsByUserEmailOrigin($value))
             ->willReturn('Test error message');
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
     public function testValidateSuccessfullConnection()
     {
-        $this->assertViolationNotAdded();
-
         $value = $this->createUserEmailOrigin();
         $this->checker->expects($this->once())
             ->method('checkConnection')
             ->with($this->createSmtpSettingsByUserEmailOrigin($value))
             ->willReturn('');
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateArray()
     {
-        $this->assertViolationAdded();
-
         $value = ['key' => 'value'];
         $smtpSettings = new SmtpSettings();
+
         $this->smtpSettingsFactory->expects($this->once())
             ->method('create')
             ->with($value)
             ->willReturn($smtpSettings);
+
         $this->checker->expects($this->once())
             ->method('checkConnection')
             ->with($smtpSettings)
             ->willReturn('Test error message');
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new SmtpConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 
-    private function assertViolationAdded()
-    {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder);
-        $builder->expects($this->once())
-            ->method('addViolation');
-    }
-
-    private function assertViolationNotAdded()
-    {
-        $this->context->expects($this->never())
-            ->method('buildViolation')
-            ->with($this->constraint->message);
-    }
-
-    /**
-     * @param UserEmailOrigin $value
-     *
-     * @return SmtpSettings
-     */
-    private function createSmtpSettingsByUserEmailOrigin(UserEmailOrigin $value)
+    private function createSmtpSettingsByUserEmailOrigin(UserEmailOrigin $value): SmtpSettings
     {
         $smtpSettings = new SmtpSettings(
             $value->getSmtpHost(),
@@ -144,10 +121,7 @@ class SmtpConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCa
         return $smtpSettings;
     }
 
-    /**
-     * @return UserEmailOrigin
-     */
-    private function createUserEmailOrigin()
+    private function createUserEmailOrigin(): UserEmailOrigin
     {
         $value = new UserEmailOrigin();
         $value->setSmtpHost('smtp.host');

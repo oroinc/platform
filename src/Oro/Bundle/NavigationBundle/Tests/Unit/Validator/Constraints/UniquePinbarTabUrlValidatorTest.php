@@ -12,11 +12,9 @@ use Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrl;
 use Oro\Bundle\NavigationBundle\Validator\Constraints\UniquePinbarTabUrlValidator;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
+class UniquePinbarTabUrlValidatorTest extends ConstraintValidatorTestCase
 {
     private const URL = 'sample-url';
     private const URL_NORMALIZED = 'sample-url-normalized';
@@ -29,63 +27,61 @@ class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var PinbarTabUrlNormalizerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $pinbarTabUrlNormalizer;
 
-    /** @var Constraint|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraint;
-
-    /** @var UniquePinbarTabUrlValidator */
-    private $validator;
-
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->pinbarTabUrlNormalizer = $this->createMock(PinbarTabUrlNormalizerInterface::class);
+        parent::setUp();
+    }
 
-        $this->constraint = new UniquePinbarTabUrl(['pinbarTabClass' => self::PINBAR_TAB_CLASS_NAME]);
+    private function createNavigationItem(): NavigationItem
+    {
+        return new NavigationItem([
+            'url' => self::URL,
+            'type' => self::TYPE,
+            'user' => $this->createMock(AbstractUser::class),
+            'organization' => $this->createMock(OrganizationInterface::class),
+        ]);
+    }
 
-        $this->validator = new UniquePinbarTabUrlValidator($this->doctrineHelper, $this->pinbarTabUrlNormalizer);
+    protected function createValidator()
+    {
+        return new UniquePinbarTabUrlValidator($this->doctrineHelper, $this->pinbarTabUrlNormalizer);
     }
 
     public function testValidateWhenNotAbstractPinbarTab(): void
     {
-        $this->validator->initialize($context = $this->createMock(ExecutionContextInterface::class));
+        $constraint = new UniquePinbarTabUrl(['pinbarTabClass' => self::PINBAR_TAB_CLASS_NAME]);
+        $this->validator->validate(new \stdClass(), $constraint);
 
-        $context
-            ->expects(self::never())
-            ->method('buildViolation');
-
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenNoNavigationItem(): void
     {
-        $entity = new PinbarTabStub();
-
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('PinbarTab does not contain NavigationItem');
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new UniquePinbarTabUrl(['pinbarTabClass' => self::PINBAR_TAB_CLASS_NAME]);
+        $this->validator->validate(new PinbarTabStub(), $constraint);
     }
 
     public function testValidate(): void
     {
         $entity = new PinbarTabStub();
-
         $entity->setItem($navigationItem = $this->createNavigationItem());
 
-        $this->pinbarTabUrlNormalizer
-            ->expects(self::once())
+        $this->pinbarTabUrlNormalizer->expects(self::once())
             ->method('getNormalizedUrl')
             ->with(self::URL)
             ->willReturn(self::URL_NORMALIZED);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $pinbarTabRepository = $this->createMock(PinbarTabRepository::class);
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(self::PINBAR_TAB_CLASS_NAME)
-            ->willReturn($pinbarTabRepository = $this->createMock(PinbarTabRepository::class));
-
-        $pinbarTabRepository
-            ->expects(self::once())
+            ->willReturn($pinbarTabRepository);
+        $pinbarTabRepository->expects(self::once())
             ->method('countNavigationItems')
             ->with(
                 self::URL_NORMALIZED,
@@ -95,29 +91,28 @@ class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(0);
 
-        $this->validator->validate($entity, $this->constraint);
+        $constraint = new UniquePinbarTabUrl(['pinbarTabClass' => self::PINBAR_TAB_CLASS_NAME]);
+        $this->validator->validate($entity, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenAlreadyExists(): void
     {
         $entity = new PinbarTabStub();
-
         $entity->setItem($navigationItem = $this->createNavigationItem());
 
-        $this->pinbarTabUrlNormalizer
-            ->expects(self::once())
+        $this->pinbarTabUrlNormalizer->expects(self::once())
             ->method('getNormalizedUrl')
             ->with(self::URL)
             ->willReturn(self::URL_NORMALIZED);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $pinbarTabRepository = $this->createMock(PinbarTabRepository::class);
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(self::PINBAR_TAB_CLASS_NAME)
-            ->willReturn($pinbarTabRepository = $this->createMock(PinbarTabRepository::class));
-
-        $pinbarTabRepository
-            ->expects(self::once())
+            ->willReturn($pinbarTabRepository);
+        $pinbarTabRepository->expects(self::once())
             ->method('countNavigationItems')
             ->with(
                 self::URL_NORMALIZED,
@@ -127,33 +122,10 @@ class UniquePinbarTabUrlValidatorTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(1);
 
-        $this->validator->initialize($context = $this->createMock(ExecutionContextInterface::class));
+        $constraint = new UniquePinbarTabUrl(['pinbarTabClass' => self::PINBAR_TAB_CLASS_NAME]);
+        $this->validator->validate($entity, $constraint);
 
-        $this->constraint->message = 'sample-message';
-
-        $context
-            ->expects(self::once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder = $this->createMock(ConstraintViolationBuilderInterface::class));
-
-        $builder
-            ->expects(self::once())
-            ->method('addViolation');
-
-        $this->validator->validate($entity, $this->constraint);
-    }
-
-    /**
-     * @return NavigationItem
-     */
-    private function createNavigationItem(): NavigationItem
-    {
-        return new NavigationItem([
-            'url' => self::URL,
-            'type' => self::TYPE,
-            'user' => $this->createMock(AbstractUser::class),
-            'organization' => $this->createMock(OrganizationInterface::class),
-        ]);
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
     }
 }

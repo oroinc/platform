@@ -5,68 +5,39 @@ namespace Oro\Bundle\CurrencyBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Bundle\CurrencyBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class OptionalPriceValidatorTest extends \PHPUnit\Framework\TestCase
+class OptionalPriceValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var Constraints\OptionalPrice
-     */
-    protected $constraint;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface
-     */
-    protected $context;
-
-    /**
-     * @var Constraints\OptionalPriceValidator
-     */
-    protected $validator;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp(): void
+    protected function createValidator()
     {
-        $this->context      = $this->createMock(ExecutionContextInterface::class);
-        $this->constraint   = new Constraints\OptionalPrice();
-        $this->validator    = new Constraints\OptionalPriceValidator();
-        $this->validator->initialize($this->context);
+        return new Constraints\OptionalPriceValidator();
     }
 
     public function testConfiguration()
     {
-        $this->assertEquals([Constraint::CLASS_CONSTRAINT], $this->constraint->getTargets());
+        $constraint = new Constraints\OptionalPrice();
+        $this->assertEquals([Constraint::CLASS_CONSTRAINT], $constraint->getTargets());
     }
 
     /**
-     * @param boolean $isValid
-     * @param mixed $inputData
      * @dataProvider validateProvider
      */
-    public function testValidate($isValid, $inputData)
+    public function testValidate(bool $isValid, Price $inputData)
     {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($isValid ? $this->never() : $this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder);
-        $builder->expects($isValid ? $this->never() : $this->once())
-            ->method('atPath')
-            ->with('currency')
-            ->willReturnSelf();
-        $builder->expects($isValid ? $this->never() : $this->once())
-            ->method('addViolation');
+        $constraint = new Constraints\OptionalPrice();
+        $this->validator->validate($inputData, $constraint);
 
-        $this->validator->validate($inputData, $this->constraint);
+        if ($isValid) {
+            $this->assertNoViolation();
+        } else {
+            $this->buildViolation($constraint->message)
+                ->atPath('property.path.currency')
+                ->assertRaised();
+        }
     }
 
-    /**
-     * @return array
-     */
-    public function validateProvider()
+    public function validateProvider(): array
     {
         return [
             'empty data' => [
