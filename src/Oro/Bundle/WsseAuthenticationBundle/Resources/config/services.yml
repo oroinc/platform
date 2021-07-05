@@ -3,7 +3,7 @@ services:
         class:  Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\Provider\WsseAuthenticationProvider
         abstract: true
         arguments:
-            - '@security.user_checker'
+            - '<UserCheckerInterface $userChecker>'
             - '@oro_wsse_authentication.security.wsse_token_factory'
             - '<UserProviderInterface $userProvider>' # set in WsseSecurityListenerFactory
             - '<string $providerKey>' # set in WsseSecurityListenerFactory

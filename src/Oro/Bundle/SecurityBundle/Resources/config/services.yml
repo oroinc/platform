@@ -486,9 +486,9 @@ services:
     oro_security.authentication.provider.username_password_organization:
         class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
         arguments:
-            - null
-            - '@security.user_checker'
-            - null
+            - ~ # UserProviderInterface $userProvider
+            - ~ # UserCheckerInterface $userChecker
+            - ~ # string $providerKey
             - '@security.encoder_factory'
             - '%security.authentication.hide_user_not_found%'
         calls:
@@ -500,7 +500,7 @@ services:
     oro_security.authentication.provider.organization_rememberme:
         class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
         arguments:
-            - '@security.user_checker'
+            - ~ # UserCheckerInterface $userChecker
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.organization_rememberme']]
             - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
