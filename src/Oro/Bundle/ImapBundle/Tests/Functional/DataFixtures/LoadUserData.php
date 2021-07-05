@@ -46,7 +46,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setLastName('Towards')
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
 
         $userManager->updateUser($user);
@@ -59,7 +59,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(false);
 
         $userManager->updateUser($user2);

@@ -11,27 +11,25 @@ use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
+use Oro\Bundle\DigitalAssetBundle\Tests\Unit\Stub\DigitalAssetStub;
 use Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileMimeType;
 use Oro\Bundle\DigitalAssetBundle\Validator\Constraints\DigitalAssetSourceFileMimeTypeValidator;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\Testing\ReflectionUtil;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\TestCase
+class DigitalAssetSourceFileMimeTypeValidatorTest extends ConstraintValidatorTestCase
 {
-    use LoggerAwareTraitTestTrait;
-
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
     private const SAMPLE_ID = 1;
@@ -45,27 +43,28 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
     /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $urlGenerator;
 
-    /** @var DigitalAssetSourceFileMimeTypeValidator */
-    private $validator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExecutionContextInterface */
-    private $context;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(ConfigManager::class);
         $this->mimeTypeChecker = $this->createMock(MimeTypeChecker::class);
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
+        parent::setUp();
+    }
 
-        $this->validator = new DigitalAssetSourceFileMimeTypeValidator(
+    protected function createValidator()
+    {
+        $validator = new DigitalAssetSourceFileMimeTypeValidator(
             $this->entityConfigManager,
             $this->mimeTypeChecker,
             $this->urlGenerator
         );
+        $validator->setLogger($this->logger);
 
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->setUpLoggerMock($this->validator);
+        return $validator;
     }
 
     public function testValidateWhenNotDigitalAsset(): void
@@ -73,12 +72,14 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected instance of ' . DigitalAsset::class . ', got ' . \stdClass::class);
 
-        $this->validator->validate(new \stdClass, $this->createMock(Constraint::class));
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate(new \stdClass, $constraint);
     }
 
     public function testValidateWhenInvalidConstraint(): void
     {
         $constraint = $this->createMock(Constraint::class);
+
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'Expected instance of ' . DigitalAssetSourceFileMimeType::class . ', got ' . get_class($constraint)
@@ -89,65 +90,51 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
 
     public function testValidateWhenNoSourceFile(): void
     {
-        $this->assertNoViolations();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($this->createMock(DigitalAsset::class), $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $this->createMock(DigitalAsset::class),
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
-    }
-
-    private function assertNoViolations(): void
-    {
-        $this->context
-            ->expects($this->never())
-            ->method('buildViolation');
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenNoUploadedFile(): void
     {
         $digitalAsset = $this->createMock(DigitalAsset::class);
-        $digitalAsset
+        $digitalAsset->expects($this->any())
             ->method('getSourceFile')
-            ->willReturn($sourceFile = $this->createMock(File::class));
+            ->willReturn($this->createMock(File::class));
 
-        $this->assertNoViolations();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenImage(): void
     {
-        $digitalAsset = $this->createMock(DigitalAsset::class);
-        $digitalAsset
-            ->method('getSourceFile')
-            ->willReturn($sourceFile = $this->createMock(File::class));
-
-        $sourceFile
-            ->method('getFile')
-            ->willReturn($file = $this->createMock(ComponentFile::class));
-
-        $file
+        $file = $this->createMock(ComponentFile::class);
+        $file->expects($this->any())
             ->method('getMimeType')
             ->willReturn($imageMimeType = 'image/type');
 
-        $this->mimeTypeChecker
+        $sourceFile = $this->createMock(File::class);
+        $sourceFile->expects($this->any())
+            ->method('getFile')
+            ->willReturn($file);
+
+        $this->mimeTypeChecker->expects($this->any())
             ->method('isImageMimeType')
             ->with($imageMimeType)
             ->willReturn(true);
 
-        $this->assertNoViolations();
+        $digitalAsset = $this->createMock(DigitalAsset::class);
+        $digitalAsset->expects($this->any())
+            ->method('getSourceFile')
+            ->willReturn($sourceFile);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
+
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenPersistentCollection(): void
@@ -160,19 +147,16 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
         $childFiles->setInitialized(false);
         $childFiles->setOwner(new \stdClass, ['inversedBy' => 'sample-data']);
 
-        $entityManager
+        $entityManager->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($this->createMock(UnitOfWork::class));
 
         $digitalAsset = $this->mockDigitalAsset($childFiles, $this->createMock(ComponentFile::class));
 
-        $this->assertNoViolations();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $this->assertNoViolation();
 
         $this->assertTrue(ReflectionUtil::getPropertyValue($childFiles, 'initialized'));
     }
@@ -185,34 +169,27 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
      */
     private function mockDigitalAsset(Collection $childFiles, $uploadedFile): DigitalAsset
     {
-        $digitalAsset = $this->getMockBuilder(DigitalAsset::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
-            ->setMethods(['getSourceFile', 'getChildFiles'])
-            ->getMock();
-
-        $digitalAsset
-            ->method('getSourceFile')
-            ->willReturn($sourceFile = $this->createMock(File::class));
-
-        $sourceFile
+        $sourceFile = $this->createMock(File::class);
+        $sourceFile->expects($this->any())
             ->method('getFile')
             ->willReturn($uploadedFile);
 
-        $digitalAsset
-            ->method('getChildFiles')
-            ->willReturn($childFiles);
-
-        $uploadedFile
+        $uploadedFile->expects($this->any())
             ->method('getMimeType')
             ->willReturn($fileMimeType = 'file/type');
 
-        $this->mimeTypeChecker
+        $this->mimeTypeChecker->expects($this->any())
             ->method('isImageMimeType')
             ->with($fileMimeType)
             ->willReturn(false);
+
+        $digitalAsset = $this->createMock(DigitalAssetStub::class);
+        $digitalAsset->expects($this->any())
+            ->method('getSourceFile')
+            ->willReturn($sourceFile);
+        $digitalAsset->expects($this->any())
+            ->method('getChildFiles')
+            ->willReturn($childFiles);
 
         return $digitalAsset;
     }
@@ -223,15 +200,14 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
 
         $digitalAsset = $this->mockDigitalAsset($childFiles, $this->createMock(ComponentFile::class));
 
-        $this->assertNoViolations();
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with('File # does not have parent entity data');
 
-        $this->assertLoggerWarningMethodCalled();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenNoConfigFieldModel(): void
@@ -240,37 +216,27 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
 
         $digitalAsset = $this->mockDigitalAsset($childFiles, $this->createMock(ComponentFile::class));
 
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects($this->once())
             ->method('getConfigFieldModel')
             ->with(self::SAMPLE_CLASS, self::SAMPLE_FIELD)
             ->willReturn(null);
 
-        $this->assertNoViolations();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $this->assertNoViolation();
     }
 
-    /**
-     * @return Collection
-     */
     private function mockChildFiles(): Collection
     {
         $childFiles = new ArrayCollection([$childFile = $this->createMock(File::class)]);
-
-        $childFile
+        $childFile->expects($this->any())
             ->method('getParentEntityClass')
             ->willReturn(self::SAMPLE_CLASS);
-
-        $childFile
+        $childFile->expects($this->any())
             ->method('getParentEntityFieldName')
             ->willReturn(self::SAMPLE_FIELD);
-
-        $childFile
+        $childFile->expects($this->any())
             ->method('getParentEntityId')
             ->willReturn(self::SAMPLE_ID);
 
@@ -285,28 +251,20 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
 
         $this->mockFieldConfigModel('file');
 
-        $this->assertNoViolations();
+        $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->validator->initialize($this->context);
-        $this->validator->validate(
-            $digitalAsset,
-            $this->createMock(DigitalAssetSourceFileMimeType::class)
-        );
+        $this->assertNoViolation();
     }
 
-    /**
-     * @param string $type
-     */
     private function mockFieldConfigModel(string $type): void
     {
-        $this->entityConfigManager
-            ->expects($this->once())
+        $this->entityConfigManager->expects($this->once())
             ->method('getConfigFieldModel')
             ->with(self::SAMPLE_CLASS, self::SAMPLE_FIELD)
             ->willReturn($fieldConfigModel = $this->createMock(FieldConfigModel::class));
 
-        $fieldConfigModel
-            ->expects($this->once())
+        $fieldConfigModel->expects($this->once())
             ->method('getType')
             ->willReturn($type);
     }
@@ -315,146 +273,113 @@ class DigitalAssetSourceFileMimeTypeValidatorTest extends \PHPUnit\Framework\Tes
     {
         $childFiles = $this->mockChildFiles();
 
-        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile = $this->createMock(ComponentFile::class));
+        $uploadedFile = $this->createMock(ComponentFile::class);
+        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile);
 
         $this->mockFieldConfigModel('image');
 
-        $uploadedFile
-            ->expects($this->once())
+        $uploadedFile->expects($this->once())
             ->method('getFilename')
             ->willReturn($filename = 'sample-filename');
 
-        $this->entityConfigManager
+        $this->entityConfigManager->expects($this->any())
             ->method('getEntityMetadata')
             ->willReturn(null);
 
         $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->assertViolation(
-            $constraint->mimeTypeCannotBeNonImage,
-            [
+        $this->buildViolation($constraint->mimeTypeCannotBeNonImage)
+            ->setParameters([
                 '%file_name%' => $filename,
                 '%field_name%' => self::SAMPLE_FIELD,
                 '%entity_class%' => self::SAMPLE_CLASS,
                 '%entity_id%' => self::SAMPLE_ID,
-            ]
-        );
-
-        $this->validator->initialize($this->context);
-        $this->validator->validate($digitalAsset, $constraint);
-    }
-
-    /**
-     * @param string $message
-     * @param array $parameters
-     */
-    private function assertViolation(string $message, array $parameters): void
-    {
-        $this->context
-            ->expects($this->once())
-            ->method('buildViolation')
-            ->with($message, $parameters)
-            ->willReturn($violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class));
-
-        $violationBuilder
-            ->expects($this->once())
-            ->method('atPath')
-            ->with('sourceFile.file')
-            ->willReturnSelf();
-
-        $violationBuilder
-            ->expects($this->once())
-            ->method('addViolation');
+            ])
+            ->atPath('property.path.sourceFile.file')
+            ->assertRaised();
     }
 
     public function testValidateWhenEntityConfigHasNotRouteView(): void
     {
         $childFiles = $this->mockChildFiles();
 
-        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile = $this->createMock(UploadedFile::class));
+        $uploadedFile = $this->createMock(UploadedFile::class);
+        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile);
 
         $this->mockFieldConfigModel('image');
 
-        $uploadedFile
-            ->expects($this->once())
+        $uploadedFile->expects($this->once())
             ->method('getClientOriginalName')
             ->willReturn($filename = 'sample-filename');
 
-        $this->entityConfigManager
+        $this->entityConfigManager->expects($this->any())
             ->method('getEntityMetadata')
             ->willReturn($entityMetadata = $this->createMock(EntityMetadata::class));
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasRoute')
             ->with('view', true)
             ->willReturn(false);
 
         $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->assertViolation(
-            $constraint->mimeTypeCannotBeNonImage,
-            [
+        $this->buildViolation($constraint->mimeTypeCannotBeNonImage)
+            ->setParameters([
                 '%file_name%' => $filename,
                 '%field_name%' => self::SAMPLE_FIELD,
                 '%entity_class%' => self::SAMPLE_CLASS,
                 '%entity_id%' => self::SAMPLE_ID,
-            ]
-        );
-
-        $this->validator->initialize($this->context);
-        $this->validator->validate($digitalAsset, $constraint);
+            ])
+            ->atPath('property.path.sourceFile.file')
+            ->assertRaised();
     }
 
     public function testValidateWhenEntityConfigHasRouteView(): void
     {
         $childFiles = $this->mockChildFiles();
 
-        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile = $this->createMock(UploadedFile::class));
+        $uploadedFile = $this->createMock(UploadedFile::class);
+        $digitalAsset = $this->mockDigitalAsset($childFiles, $uploadedFile);
 
         $this->mockFieldConfigModel('image');
 
-        $uploadedFile
-            ->expects($this->once())
+        $uploadedFile->expects($this->once())
             ->method('getClientOriginalName')
             ->willReturn($filename = 'sample-filename');
 
-        $this->entityConfigManager
+        $this->entityConfigManager->expects($this->any())
             ->method('getEntityMetadata')
             ->willReturn($entityMetadata = $this->createMock(EntityMetadata::class));
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('hasRoute')
             ->with('view', true)
             ->willReturn(true);
 
-        $entityMetadata
-            ->expects($this->once())
+        $entityMetadata->expects($this->once())
             ->method('getRoute')
             ->with('view')
             ->willReturn($viewRoute = 'sample-route');
 
-        $this->urlGenerator
-            ->expects($this->once())
+        $this->urlGenerator->expects($this->once())
             ->method('generate')
             ->with($viewRoute, ['id' => self::SAMPLE_ID])
             ->willReturn($entityUrl = '/sample/url');
 
         $constraint = new DigitalAssetSourceFileMimeType();
+        $this->validator->validate($digitalAsset, $constraint);
 
-        $this->assertViolation(
-            $constraint->mimeTypeCannotBeNonImageInEntity,
-            [
+        $this->buildViolation($constraint->mimeTypeCannotBeNonImageInEntity)
+            ->setParameters([
                 '%entity_url%' => $entityUrl,
                 '%file_name%' => $filename,
                 '%field_name%' => self::SAMPLE_FIELD,
                 '%entity_class%' => self::SAMPLE_CLASS,
                 '%entity_id%' => self::SAMPLE_ID,
-            ]
-        );
-
-        $this->validator->initialize($this->context);
-        $this->validator->validate($digitalAsset, $constraint);
+            ])
+            ->atPath('property.path.sourceFile.file')
+            ->assertRaised();
     }
 }

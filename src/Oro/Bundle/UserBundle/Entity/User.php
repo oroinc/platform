@@ -509,7 +509,7 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username)
+    public function setUsername($username): self
     {
         parent::setUsername($username);
         $this->usernameLowercase = mb_strtolower($username);
@@ -1185,18 +1185,17 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getUserRoles(): array
     {
-        $roles = parent::getRoles();
+        $roles[] = parent::getUserRoles();
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {
-            $roles = array_merge($roles, $group->getRoles()->toArray());
+            $roles[] = $group->getRoles()->toArray();
         }
 
-        return array_unique($roles);
+        return array_unique(array_merge(...$roles));
     }
-
     /**
      * @param OrganizationInterface $organization
      *

@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * TODO: Remove this class after api for acl is ready
+ * Form handler for Role entity.
  */
 class RoleHandler
 {
@@ -94,7 +94,7 @@ class RoleHandler
     {
         /** @var $user User */
         foreach ($users as $user) {
-            $user->addRole($role);
+            $user->addUserRole($role);
             $this->manager->persist($user);
         }
     }
@@ -109,7 +109,7 @@ class RoleHandler
     {
         /** @var $user User */
         foreach ($users as $user) {
-            $user->removeRole($role);
+            $user->removeUserRole($role);
             $this->manager->persist($user);
         }
     }

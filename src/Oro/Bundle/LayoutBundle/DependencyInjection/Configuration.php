@@ -45,7 +45,13 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('enabled_themes')
+                    ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->info('List of enabled themes')
+                    ->defaultValue([])
+                ->end()
             ->end();
+
         $this->appendTemplatingNodes($rootNode);
         $this->appendThemingNodes($rootNode);
 

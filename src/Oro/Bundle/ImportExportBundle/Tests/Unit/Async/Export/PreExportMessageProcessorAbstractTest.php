@@ -6,6 +6,8 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export\Stub\PreExportMessageProcessorStub;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
@@ -15,7 +17,6 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,9 +43,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /** @var PreExportMessageProcessorStub */
     private $processor;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
@@ -68,14 +66,11 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $message = new Message();
 
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PreExportMessageProcessorStub::REJECT, $result);
+        self::assertEquals(PreExportMessageProcessorStub::REJECT, $result);
     }
 
-    /**
-     * @return array
-     */
     public function uniqueJobResultProvider(): array
     {
         return [
@@ -86,27 +81,24 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider uniqueJobResultProvider
-     * @param string $jobResult
-     * @param string $expectedResult
      */
-    public function testShouldReturnMessageStatusDependsOfJobResult($jobResult, $expectedResult): void
+    public function testShouldReturnMessageStatusDependsOfJobResult(bool $jobResult, string $expectedResult): void
     {
         $jobUniqueName = 'job_unique_name';
 
         $message = new Message();
         $message->setMessageId(123);
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturn($jobResult);
 
         $this->processor->setMessageBody(['message_body']);
         $this->processor->setJobUniqueName($jobUniqueName);
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public function testShouldThrowExceptionOnGetUserIfTokenIsNull(): void
@@ -122,39 +114,34 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects($this->never())
+        $this->jobRunner->expects(self::never())
             ->method('createDelayed');
 
-        $this->tokenStorage
-            ->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
 
-        $dependentJobContext = $this->createDependentJobContextMock();
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
 
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects($this->never())
+        $this->dependentJob->expects(self::never())
             ->method('saveDependentJob');
 
         $this->processor->setMessageBody($messageBody);
         $this->processor->setJobUniqueName($jobUniqueName);
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
     /**
@@ -164,11 +151,10 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     {
         $notObject = 'not_object';
         $notUserObject = new \stdClass();
-        $userWithoutRequiredMethods = $this->createUserMock();
-        $userWithoutGetEmailMethod = $this->createPartialMock(
-            UserInterface::class,
-            ['getId', 'getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials']
-        );
+        $userWithoutRequiredMethods = $this->createMock(UserInterface::class);
+        $userWithoutGetEmailMethod = $this->getMockBuilder(UserInterface::class)
+            ->onlyMethods(array_diff(get_class_methods(UserInterface::class), ['getEmail']))
+            ->getMock();
 
         return [
             [$notObject],
@@ -180,8 +166,6 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidUserTypeProvider
-     *
-     * @param mixed $user
      */
     public function testShouldThrowExceptionOnGetUserIfUserTypeInvalid($user): void
     {
@@ -196,45 +180,39 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects($this->never())
+        $this->jobRunner->expects(self::never())
             ->method('createDelayed');
 
-        $token = $this->createTokenMock();
-        $token
-            ->expects($this->once())
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects($this->once())
+        $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
 
-        $dependentJobContext = $this->createDependentJobContextMock();
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
 
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects($this->never())
+        $this->dependentJob->expects(self::never())
             ->method('saveDependentJob');
 
         $this->processor->setMessageBody($messageBody);
         $this->processor->setJobUniqueName($jobUniqueName);
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
     public function testShouldCreateDelayedJobAddDependentJobAndReturnACKOnEmptyExportResult(): void
@@ -252,68 +230,59 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with($jobUniqueName.'.chunk.1');
 
-        $user = $this->createUserStub();
-        $user
-            ->expects($this->once())
+        $user = $this->createMock(User::class);
+        $user->expects(self::once())
             ->method('getId')
             ->willReturn(self::USER_ID);
-        $user
-            ->expects($this->once())
+        $user->expects(self::once())
             ->method('getEmail');
 
-        $token = $this->createTokenMock();
-        $token
-            ->expects($this->any())
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::any())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects($this->any())
+        $this->tokenStorage->expects(self::any())
             ->method('getToken')
             ->willReturn($token);
 
-        $dependentJobContext = $this->createDependentJobContextMock();
-        $dependentJobContext
-            ->expects($this->once())
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
+        $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
                 Topics::POST_EXPORT,
                 $this->callback(function ($message) {
-                    $this->assertArrayHasKey('entity', $message);
-                    $this->assertEquals('Acme', $message['entity']);
+                    self::assertArrayHasKey('entity', $message);
+                    self::assertEquals('Acme', $message['entity']);
 
                     return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
                 })
             );
 
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('saveDependentJob')
             ->with($dependentJobContext);
 
         $this->processor->setMessageBody($messageBody);
         $this->processor->setJobUniqueName($jobUniqueName);
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
     public function testShouldCreateTwoDelayedJobsAddDependentJobAndReturnACKOnTwoExportResultChunks(): void
@@ -331,124 +300,66 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects(self::once())
             ->method('runUnique')
             ->with($message->getMessageId(), $jobUniqueName)
             ->willReturnCallback(function ($jobId, $name, $callback) use ($childJob) {
                 return $callback($this->jobRunner, $childJob);
             });
-        $this->jobRunner
-            ->expects($this->exactly(2))
+        $this->jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive(
                 [$jobUniqueName.'.chunk.1'],
                 [$jobUniqueName.'.chunk.2']
             );
 
-        $user = $this->createUserStub();
-        $user
-            ->expects($this->once())
+        $user = $this->createMock(User::class);
+        $user->expects(self::once())
             ->method('getId')
             ->willReturn(self::USER_ID);
 
-        $user
-            ->expects($this->once())
+        $user->expects(self::once())
             ->method('getEmail');
 
-        $token = $this->createTokenMock();
-        $token
-            ->expects($this->exactly(2))
+        $token = $this->createMock(TokenInterface::class);
+        $token->expects(self::exactly(2))
             ->method('getUser')
             ->willReturn($user);
 
-        $this->tokenStorage
-            ->expects($this->exactly(2))
+        $this->tokenStorage->expects(self::exactly(2))
             ->method('getToken')
             ->willReturn($token);
 
-        $dependentJobContext = $this->createDependentJobContextMock();
-        $dependentJobContext
-            ->expects($this->once())
+        $dependentJobContext = $this->createMock(DependentJobContext::class);
+        $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
                 Topics::POST_EXPORT,
-                $this->callback(function ($message) {
-                    $this->assertArrayHasKey('entity', $message);
-                    $this->assertEquals('Acme', $message['entity']);
+                self::callback(function ($message) {
+                    self::assertArrayHasKey('entity', $message);
+                    self::assertEquals('Acme', $message['entity']);
 
                     return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
                 })
             );
 
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
             ->with($job)
             ->willReturn($dependentJobContext);
-        $this->dependentJob
-            ->expects($this->once())
+        $this->dependentJob->expects(self::once())
             ->method('saveDependentJob')
             ->with($dependentJobContext);
 
         $this->processor->setMessageBody($messageBody);
         $this->processor->setJobUniqueName($jobUniqueName);
         $this->processor->setExportingEntityIds(range(1, 101));
-        $result = $this->processor->process($message, $this->createSessionMock());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PreExportMessageProcessorStub::ACK, $result);
+        self::assertEquals(PreExportMessageProcessorStub::ACK, $result);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
-     */
-    private function createDependentJobContextMock()
-    {
-        return $this->createMock(DependentJobContext::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TokenInterface
-     */
-    private function createTokenMock()
-    {
-        return $this->createMock(TokenInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
-     */
-    private function createUserMock()
-    {
-        return $this->createMock(UserInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|UserInterface
-     */
-    private function createUserStub()
-    {
-        return $this->getMockBuilder(UserInterface::class)
-            ->onlyMethods(['getRoles', 'getPassword', 'getSalt', 'getUsername', 'eraseCredentials'])
-            ->addMethods(['getId', 'getEmail'])
-            ->getMock();
-    }
-
-    /**
-     * @param int $id
-     * @param Job $rootJob
-     *
-     * @return Job
-     */
-    private function createJob($id, $rootJob = null)
+    private function createJob(int $id, Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);

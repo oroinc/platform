@@ -1,12 +1,12 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/app/views/base/view',
-    'routing',
-    'orolocale/js/formatter/datetime',
-    'autolinker'
-], function($, _, BaseView, routing, dateTimeFormatter, autolinker) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const BaseView = require('oroui/js/app/views/base/view');
+    const routing = require('routing');
+    const dateTimeFormatter = require('orolocale/js/formatter/datetime');
+    const autolinker = require('autolinker');
 
     const NoteView = BaseView.extend({
         options: {

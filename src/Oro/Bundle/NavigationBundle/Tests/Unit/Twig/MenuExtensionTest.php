@@ -22,19 +22,19 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     use TwigExtensionTestCaseTrait;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $helper;
+    private $helper;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $provider;
+    private $provider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $breadcrumbManager;
+    private $breadcrumbManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configurationProvider;
+    private $configurationProvider;
 
     /** @var MenuExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -60,21 +60,17 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testRenderBreadCrumbs()
     {
-        $environment = $this->getMockBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $environment = $this->createMock(Environment::class);
 
-        $template = $this->getMockBuilder(Template::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $template = $this->createMock(Template::class);
 
         $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
-            ->will($this->returnValue(['test-breadcrumb']));
+            ->willReturn(['test-breadcrumb']);
 
         $environment->expects($this->once())
             ->method('loadTemplate')
-            ->will($this->returnValue($template));
+            ->willReturn($template);
 
         $result = 'test';
         $template->expects($this->once())
@@ -96,13 +92,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testWrongBredcrumbs()
     {
-        $environment = $this->getMockBuilder(Environment::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $environment = $this->createMock(Environment::class);
 
         $this->breadcrumbManager->expects($this->once())
             ->method('getBreadcrumbs')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         $this->assertNull(
             self::callTwigFunction($this->extension, 'oro_breadcrumbs', [$environment, 'test_menu'])
@@ -126,13 +120,11 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('The menu has no child named "path"');
 
         $options = [];
-        $menuInstance = $this->getMockBuilder(ItemInterface::class)
-            ->setMethods(['getChild'])
-            ->getMockForAbstractClass();
+        $menuInstance = $this->createMock(ItemInterface::class);
         $menuInstance->expects($this->once())
             ->method('getChild')
             ->with('path')
-            ->will($this->returnValue(null));
+            ->willReturn(null);
 
         self::callTwigFunction($this->extension, 'oro_menu_get', [$menuInstance, ['path'], $options]);
     }
@@ -149,15 +141,13 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $options = [];
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder(ItemInterface::class)
-            ->setMethods(['getExtra'])
-            ->getMockForAbstractClass();
+        $menuInstance = $this->createMock(ItemInterface::class);
         $menuInstance->expects($this->once())
             ->method('getExtra')
             ->with('type');
         $menuInstance->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator()));
+            ->willReturn(new \ArrayIterator());
         $this->assertRender($menuInstance, $menuInstance, $options, $renderer);
     }
 
@@ -172,27 +162,24 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('type');
         $menuInstance->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator()));
+            ->willReturn(new \ArrayIterator());
         $this->assertRender($menu, $menuInstance, $options, $renderer);
     }
 
     /**
      * @dataProvider typeOptionsDataProvider
-     * @param array $options
      */
-    public function testRenderMenuInstanceWithExtra($options)
+    public function testRenderMenuInstanceWithExtra(array $options)
     {
         $renderer = 'test';
-        $menuInstance = $this->getMockBuilder(ItemInterface::class)
-            ->setMethods(['getExtra'])
-            ->getMockForAbstractClass();
+        $menuInstance = $this->createMock(ItemInterface::class);
         $menuInstance->expects($this->once())
             ->method('getExtra')
             ->with('type')
-            ->will($this->returnValue('type'));
+            ->willReturn('type');
         $menuInstance->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator()));
+            ->willReturn(new \ArrayIterator());
 
         $runtimeOptions = [
             'template' => 'test_runtime.tpl'
@@ -204,10 +191,7 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertRender($menuInstance, $menuInstance, $runtimeOptions, $renderer);
     }
 
-    /**
-     * @return array
-     */
-    public function typeOptionsDataProvider()
+    public function typeOptionsDataProvider(): array
     {
         return [
             'empty' => [
@@ -236,37 +220,26 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider menuItemsDataProvider
-     * @param array $items
-     * @param array $expected
      */
-    public function testFilterUnallowedItems($items, $expected)
+    public function testFilterNotAllowedItems(array $items, array $expected)
     {
-        $menu = $this->getMockBuilder(ItemInterface::class)
-            ->getMockForAbstractClass();
+        $menu = $this->createMock(ItemInterface::class);
 
         $menu->expects($this->atLeastOnce())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator($items)));
+            ->willReturn(new \ArrayIterator($items));
 
         $this->helper->expects($this->once())
             ->method('render')
-            ->will(
-                $this->returnCallback(
-                    function ($menu) use ($expected) {
-                        $result = $this->collectResultItemsData($menu);
-                        \PHPUnit\Framework\Assert::assertEquals($expected, $result);
-                    }
-                )
-            );
+            ->willReturnCallback(function ($menu) use ($expected) {
+                $result = $this->collectResultItemsData($menu);
+                \PHPUnit\Framework\Assert::assertEquals($expected, $result);
+            });
 
         self::callTwigFunction($this->extension, 'oro_menu_render', [$menu]);
     }
 
-    /**
-     * @param $item
-     * @return array
-     */
-    protected function collectResultItemsData($item)
+    private function collectResultItemsData(ItemInterface $item): array
     {
         $result = [];
         /** @var ItemInterface $sub */
@@ -285,9 +258,8 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     * @return array
      */
-    public function menuItemsDataProvider()
+    public function menuItemsDataProvider(): array
     {
         return [
             [
@@ -496,31 +468,23 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string $label
-     * @param bool   $isAllowed
-     * @param array  $children
-     * @param string $uri
-     * @param bool   $isDisplayed
-     *
-     * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getMenuItem($label, $isAllowed = true, $children = [], $uri = '', $isDisplayed = true)
-    {
-        /** @var MenuItem|\PHPUnit\Framework\MockObject\MockObject $menu */
+    private function getMenuItem(
+        string $label,
+        bool $isAllowed = true,
+        array $children = [],
+        string $uri = '',
+        bool $isDisplayed = true
+    ): MenuItem {
         $menu = $this->getMockBuilder(MenuItem::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'])
+            ->onlyMethods(['getLabel', 'getUri', 'hasChildren', 'getChildren', 'getIterator', 'count'])
             ->getMock();
-
         $menu->expects($this->any())
             ->method('getLabel')
-            ->will($this->returnValue($label));
-
+            ->willReturn($label);
         $menu->expects($this->any())
             ->method('getUri')
-            ->will($this->returnValue($uri));
-
+            ->willReturn($uri);
         $menu->setExtra('isAllowed', $isAllowed);
         $menu->setDisplay($isDisplayed);
 
@@ -528,23 +492,19 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
         $hasChildren = $childrenCount > 0;
         $menu->expects($this->any())
             ->method('hasChildren')
-            ->will($this->returnValue($hasChildren));
-
+            ->willReturn($hasChildren);
         $menu->expects($this->any())
             ->method('hasChildren')
-            ->will($this->returnValue($hasChildren));
-
+            ->willReturn($hasChildren);
         $menu->expects($this->any())
             ->method('getIterator')
-            ->will($this->returnValue(new \ArrayIterator($children)));
-
+            ->willReturn(new \ArrayIterator($children));
         $menu->expects($this->any())
             ->method('count')
-            ->will($this->returnValue($childrenCount));
-
+            ->willReturn($childrenCount);
         $menu->expects($this->any())
             ->method('getChildren')
-            ->will($this->returnValue($children));
+            ->willReturn($children);
 
         return $menu;
     }
@@ -555,12 +515,12 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
      * @param $options
      * @param $renderer
      */
-    protected function assertRender($menu, $menuInstance, $options, $renderer)
+    private function assertRender($menu, $menuInstance, $options, $renderer)
     {
         $this->helper->expects($this->once())
             ->method('render')
             ->with($menuInstance, $options, $renderer)
-            ->will($this->returnValue('MENU'));
+            ->willReturn('MENU');
 
         $this->assertEquals(
             'MENU',
@@ -569,25 +529,19 @@ class MenuExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $menu
-     * @param string $path
-     * @param array  $options
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * @return ItemInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    protected function assertGetMenuString($menu, $path, $options)
+    private function assertGetMenuString(string $menu, string $path, array $options)
     {
-        $menuInstance = $this->getMockBuilder(ItemInterface::class)
-            ->setMethods(['getChild', 'getExtra'])
-            ->getMockForAbstractClass();
+        $menuInstance = $this->createMock(ItemInterface::class);
         $menuInstance->expects($this->once())
             ->method('getChild')
             ->with($path)
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $this->provider->expects($this->once())
             ->method('get')
             ->with($menu, $options)
-            ->will($this->returnValue($menuInstance));
+            ->willReturn($menuInstance);
 
         return $menuInstance;
     }

@@ -12,7 +12,7 @@ Oro\Bundle\UserBundle\Entity\User:
     username (unique): <username()>
     organization: '@organization'
     organizations: ['@organization']
-    roles: ['@adminRole']
+    userRoles: ['@adminRole']
     owner: '@business_unit'
     businessUnits: ['@business_unit']
     email (unique): <email()>

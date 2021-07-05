@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\Extension\CustomizeFormDataExtension;
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Form\FormValidationHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\MapPrimaryField;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
@@ -104,7 +105,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 
         $this->formValidationHandler = new FormValidationHandler(
             $this->validator,
-            $this->customizationHandler,
+            new CustomizeFormDataEventDispatcher($this->customizationHandler),
             new PropertyAccessor()
         );
     }
@@ -161,7 +162,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         Entity\Account $data,
         array $submittedData,
         array $itemOptions = [],
-        $entryType = NameContainerType::class
+        string $entryType = NameContainerType::class
     ) {
         $formBuilder = $this->getFormBuilder($config);
         $formBuilder->add('enabledRole', null, array_merge(['mapped' => false], $itemOptions));

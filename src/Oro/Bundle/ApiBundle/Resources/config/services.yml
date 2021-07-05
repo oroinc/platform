@@ -136,6 +136,16 @@ services:
         arguments:
             - '@oro_entity_config.config_manager'
 
+    oro_api.save_data_handler:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+        arguments:
+            - '@oro_api.customize_form_data_event_dispatcher'
+            - '@oro_api.collect_form_errors'
+            - '@oro_api.subresource.collect_form_errors'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
+
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
         arguments:
@@ -1044,6 +1054,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactory
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.batch.flush_data_handler_factory, priority: -250 }
 

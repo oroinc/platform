@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
 use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Provider\AbstractProviderTest;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
@@ -13,12 +14,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserConfigurationFormProviderTest extends AbstractProviderTest
 {
-    const CONFIG_NAME = 'user_configuration';
+    protected const CONFIG_NAME = 'user_configuration';
 
     /**
      * {@inheritdoc}
      */
-    public function getParentCheckboxLabel()
+    public function getParentCheckboxLabel(): string
     {
         return 'oro.user.user_configuration.use_default';
     }
@@ -33,7 +34,7 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
         AuthorizationCheckerInterface $authorizationChecker,
         ChainSearchProvider $searchProvider,
         FormRegistryInterface $formRegistry
-    ) {
+    ): AbstractProvider {
         return new UserConfigurationFormProvider(
             $configBag,
             $translator,
@@ -45,13 +46,9 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
     }
 
     /**
-     * Return correct path to fileName
-     *
-     * @param string $fileName
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getFilePath($fileName)
+    protected function getFilePath(string $fileName): string
     {
         return __DIR__ . '/data/' . $fileName;
     }

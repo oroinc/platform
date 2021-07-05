@@ -85,7 +85,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     private function preparePostgreSql(ContainerBuilder $container)
     {
         $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL) {
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL && class_exists(\PDO::class)) {
             $doctrineConfig = $container->getExtensionConfig('doctrine');
             $doctrineConnectionOptions = [];
             foreach ($doctrineConfig as $config) {

@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
-use Symfony\Component\ErrorHandler\BufferingLogger;
+use Oro\Component\Testing\Logger\BufferingLogger;
 
 class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
 {

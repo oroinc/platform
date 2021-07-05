@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * * For "customize_loaded_data" processors that do not have "identifier_only" attribute,
  *   it is added with FALSE value. If such processor has this attribute and its value is NULL,
  *   the attribute is removed.
+ * * Makes the "event" attribute for "customize_form_data" processors mandatory to prevent potential logical errors.
  * * By performance reasons "customize_form_data" processors are grouped by event.
  *   The "event" attribute is removed.
  * * By performance reasons "identifier_fields_only" config extra for "get_config" processors
@@ -60,7 +61,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $groups = [];
         $config = DependencyInjectionUtil::getConfig($container);
@@ -73,11 +74,14 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         }
         $groups[self::CUSTOMIZE_LOADED_DATA_ACTION] = [self::ITEM_GROUP => 0, self::COLLECTION_GROUP => -1];
         $groups[self::CUSTOMIZE_FORM_DATA_ACTION] = [
-            CustomizeFormDataContext::EVENT_PRE_SUBMIT    => 0,
-            CustomizeFormDataContext::EVENT_SUBMIT        => -1,
-            CustomizeFormDataContext::EVENT_POST_SUBMIT   => -2,
-            CustomizeFormDataContext::EVENT_PRE_VALIDATE  => -3,
-            CustomizeFormDataContext::EVENT_POST_VALIDATE => -4
+            CustomizeFormDataContext::EVENT_PRE_SUBMIT      => 0,
+            CustomizeFormDataContext::EVENT_SUBMIT          => -1,
+            CustomizeFormDataContext::EVENT_POST_SUBMIT     => -2,
+            CustomizeFormDataContext::EVENT_PRE_VALIDATE    => -3,
+            CustomizeFormDataContext::EVENT_POST_VALIDATE   => -4,
+            CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA  => -5,
+            CustomizeFormDataContext::EVENT_POST_FLUSH_DATA => -6,
+            CustomizeFormDataContext::EVENT_POST_SAVE_DATA  => -7
         ];
         $processors = ProcessorsLoader::loadProcessors($container, DependencyInjectionUtil::PROCESSOR_TAG);
         $builder = new ProcessorBagConfigBuilder($groups, $processors);
@@ -202,13 +206,13 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
                 self::CUSTOMIZE_LOADED_DATA_ACTION,
                 self::COLLECTION_ATTRIBUTE
             );
-            $isCollectionProcessor = array_key_exists(self::COLLECTION_ATTRIBUTE, $item[1])
+            $isCollectionProcessor = \array_key_exists(self::COLLECTION_ATTRIBUTE, $item[1])
                 && $item[1][self::COLLECTION_ATTRIBUTE];
             unset($item[1][self::COLLECTION_ATTRIBUTE]);
             if ($isCollectionProcessor) {
                 $item[1][self::GROUP_ATTRIBUTE] = self::COLLECTION_GROUP;
                 // "identifier_only" attribute is not supported for collections
-                if (array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
+                if (\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
                     throw new LogicException(sprintf(
                         'The "%s" processor uses the "%s" tag attribute that is not supported'
                         . ' in case the "%s" tag attribute equals to true.',
@@ -221,7 +225,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             } else {
                 $item[1][self::GROUP_ATTRIBUTE] = self::ITEM_GROUP;
                 // normalize "identifier_only" attribute
-                if (!array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
+                if (!\array_key_exists(self::IDENTIFIER_ONLY_ATTRIBUTE, $item[1])) {
                     // add "identifier_only" attribute to the beginning of an attributes array,
                     // it will give a small performance gain at the runtime
                     $item[1] = [self::IDENTIFIER_ONLY_ATTRIBUTE => false] + $item[1];
@@ -285,12 +289,12 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
     {
         foreach ($processors as $key => $item) {
             $this->assertExtraAttribute($item[0], $item[1]);
-            if (array_key_exists(self::EXTRA_ATTRIBUTE, $item[1])) {
+            if (\array_key_exists(self::EXTRA_ATTRIBUTE, $item[1])) {
                 $identifierFieldsOnly = null;
-                if (is_array($item[1][self::EXTRA_ATTRIBUTE])) {
+                if (\is_array($item[1][self::EXTRA_ATTRIBUTE])) {
                     if (Matcher::OPERATOR_AND === key($item[1][self::EXTRA_ATTRIBUTE])) {
                         foreach (current($item[1][self::EXTRA_ATTRIBUTE]) as $k => $v) {
-                            if (is_array($v)) {
+                            if (\is_array($v)) {
                                 if (FilterIdentifierFieldsConfigExtra::NAME === current($v)) {
                                     $identifierFieldsOnly = false;
                                 }
@@ -380,7 +384,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         string $action,
         string $expectedAttributeName
     ): void {
-        if (array_key_exists(self::GROUP_ATTRIBUTE, $attributes)) {
+        if (\array_key_exists(self::GROUP_ATTRIBUTE, $attributes)) {
             throw new LogicException(sprintf(
                 'The "%s" processor uses the "%s" tag attribute that is not allowed'
                 . ' for the "%s" action. Use "%s" tag attribute instead.',
@@ -398,8 +402,8 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      */
     private function assertExtraAttribute(string $processorId, array $attributes): void
     {
-        if (array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
-            && is_array($attributes[self::EXTRA_ATTRIBUTE])
+        if (\array_key_exists(self::EXTRA_ATTRIBUTE, $attributes)
+            && \is_array($attributes[self::EXTRA_ATTRIBUTE])
             && Matcher::OPERATOR_OR === key($attributes[self::EXTRA_ATTRIBUTE])
         ) {
             throw new LogicException(sprintf(
@@ -423,7 +427,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
      */
     private function parseDataTypeAttribute(string $processorId, array $attributes, string $action): array
     {
-        if (!array_key_exists(self::DATA_TYPE_ATTRIBUTE, $attributes)) {
+        if (!\array_key_exists(self::DATA_TYPE_ATTRIBUTE, $attributes)) {
             throw new LogicException(sprintf(
                 'The "%s" processor for the "%s" action must have the "%s" tag attribute.',
                 $processorId,
@@ -453,8 +457,15 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         array $attributes,
         array $allEvents
     ): array {
-        if (!array_key_exists(self::EVENT_ATTRIBUTE, $attributes)) {
-            return $allEvents;
+        if (!\array_key_exists(self::EVENT_ATTRIBUTE, $attributes)) {
+            throw new LogicException(sprintf(
+                'The "%s" tag attribute is mandatory for the "%s" processor.'
+                . ' Use "%s: %s" when your processor should be executed for all events.',
+                self::EVENT_ATTRIBUTE,
+                $processorId,
+                self::EVENT_ATTRIBUTE,
+                implode(Matcher::OPERATOR_OR, $allEvents)
+            ));
         }
 
         $events = $this->parseAttributeWhenOnlyOrExpressionIsAllowed(
@@ -465,7 +476,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             'an event name or event names'
         );
         foreach ($events as $event) {
-            if (!in_array($event, $allEvents, true)) {
+            if (!\in_array($event, $allEvents, true)) {
                 throw new LogicException(sprintf(
                     'The "%s" processor has the "%s" tag attribute with a value that is not valid'
                     . ' for the "%s" action. The event "%s" is not supported. The supported events: %s.',
@@ -498,10 +509,10 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
         string $description
     ): array {
         $value = $attributes[$attributeName];
-        if (is_string($value)) {
+        if (\is_string($value)) {
             return [$value];
         }
-        if (!is_array($value) || key($value) !== Matcher::OPERATOR_OR) {
+        if (!\is_array($value) || key($value) !== Matcher::OPERATOR_OR) {
             throw $this->createInvalidAttributeWhenOnlyOrExpressionIsAllowedException(
                 $processorId,
                 $attributeName,
@@ -512,7 +523,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
 
         $items = reset($value);
         foreach ($items as $item) {
-            if (!is_string($item)) {
+            if (!\is_string($item)) {
                 throw $this->createInvalidAttributeWhenOnlyOrExpressionIsAllowedException(
                     $processorId,
                     $attributeName,

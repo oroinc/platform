@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LocaleBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\LocaleBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;

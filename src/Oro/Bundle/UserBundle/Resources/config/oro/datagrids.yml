@@ -341,7 +341,7 @@ datagrids:
             query:
                 join:
                     left:
-                        - { join: u.roles, alias: r }
+                        - { join: u.userRoles, alias: r }
                 where:
                     and:
                       - r.id = :role_id
@@ -399,7 +399,7 @@ datagrids:
                 select:
                     - >
                       (CASE WHEN (:role_id IS NOT NULL) THEN
-                        CASE WHEN (:role_id MEMBER OF u.roles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
+                        CASE WHEN (:role_id MEMBER OF u.userRoles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       ELSE
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)

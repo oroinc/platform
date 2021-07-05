@@ -1,5 +1,6 @@
 <?php
-namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Entity\Repository;
+
+namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Entity;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Async\Topics;

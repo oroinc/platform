@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CacheBundle\Tests\Unit\Action\Handler;
+namespace Oro\Bundle\CacheBundle\Tests\Unit\Command;
 
 use Oro\Bundle\CacheBundle\Action\DataStorage\InvalidateCacheDataStorage;
 use Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionHandlerInterface;

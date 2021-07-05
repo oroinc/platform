@@ -3,8 +3,8 @@
 namespace Oro\Bundle\MessageQueueBundle\EventListener;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -53,7 +53,7 @@ class LoginListener
 
         $token = $event->getAuthenticationToken();
         if ($token instanceof UsernamePasswordToken
-            && $token->getUser() instanceof AdvancedUserInterface
+            && $token->getUser() instanceof UserInterface
             && !$this->consumerHeartbeat->isAlive()
         ) {
             $event->getRequest()->getSession()->getFlashBag()->add(

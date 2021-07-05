@@ -43,7 +43,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
             ->method('fetch');
         $this->cache->expects(self::once())
             ->method('save')
-            ->with($enumClass, $expected);
+            ->with($enumClass, array_flip($expected));
 
         $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects(self::once())
@@ -70,7 +70,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with($enumClass)
-            ->willReturn($expected);
+            ->willReturn(array_flip($expected));
         $this->cache->expects(self::never())
             ->method('save');
 
@@ -95,7 +95,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
             ->method('fetch');
         $this->cache->expects(self::once())
             ->method('save')
-            ->with($enumClass, $expected);
+            ->with($enumClass, array_flip($expected));
 
         $repo = $this->createMock(EnumValueRepository::class);
         $repo->expects(self::once())
@@ -123,7 +123,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('fetch')
             ->with($enumClass)
-            ->willReturn($expected);
+            ->willReturn(array_flip($expected));
         $this->cache->expects(self::never())
             ->method('save');
 

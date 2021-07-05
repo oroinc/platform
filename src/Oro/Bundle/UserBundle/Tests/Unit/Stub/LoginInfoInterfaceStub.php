@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Stub;
 
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Oro\Bundle\UserBundle\Entity\LoginInfoInterface;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
 {
@@ -26,7 +26,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonExpired()
+    public function isAccountNonLocked(): bool
     {
         return false;
     }
@@ -34,23 +34,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isAccountNonLocked()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCredentialsNonExpired()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return true;
     }
@@ -94,7 +78,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username)
+    public function setUsername($username): self
     {
         $this->username = $username;
 
@@ -104,7 +88,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function setPassword($password)
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
 
@@ -122,7 +106,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function setPlainPassword($password)
+    public function setPlainPassword(?string $password): self
     {
         $this->plainPassword = $password;
 
@@ -133,6 +117,14 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
      * {@inheritdoc}
      */
     public function getRoles()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUserRoles(): array
     {
         return [];
     }
@@ -164,7 +156,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
@@ -172,7 +164,7 @@ class LoginInfoInterfaceStub implements UserInterface, LoginInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function addRole(Role $role)
+    public function addUserRole(Role $role): self
     {
         return $this;
     }

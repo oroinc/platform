@@ -7,17 +7,16 @@ use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 /**
  * Token represent user with organization context for usage by console commands.
  */
-class ConsoleToken extends AbstractToken implements OrganizationAwareTokenInterface
+class ConsoleToken extends AbstractToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
 {
-    use AuthenticatedTokenTrait;
-    use OrganizationAwareTokenTrait;
+    use RolesAndOrganizationAwareTokenTrait;
 
     /**
      * {@inheritdoc}
      */
     public function __construct(array $roles = [])
     {
-        parent::__construct($roles);
+        parent::__construct($this->initRoles($roles));
 
         $this->setAuthenticated(true);
     }

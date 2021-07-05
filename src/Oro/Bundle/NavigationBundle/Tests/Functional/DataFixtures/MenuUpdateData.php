@@ -136,6 +136,36 @@ class MenuUpdateData extends AbstractFixture implements DependentFixtureInterfac
             'divider' => false,
             'custom' => true,
         ],
+        'test_menu_item1_global' => [
+            'key' => 'test_menu_item1',
+            'parent_key' => null,
+            'default_title' => 'test_menu_item1',
+            'titles' => [],
+            'default_description' => 'test_menu_item1.description',
+            'descriptions' => [],
+            'uri' => '#test_menu_item1_upd',
+            'menu' => 'test_menu',
+            'scope' => LoadScopeData::DEFAULT_SCOPE,
+            'active' => false,
+            'priority' => 10,
+            'divider' => false,
+            'custom' => true,
+        ],
+        'test_menu_item1_user' => [
+            'key' => 'test_menu_item1',
+            'parent_key' => null,
+            'default_title' => 'test_menu_item1',
+            'titles' => [],
+            'default_description' => 'test_menu_item1.description',
+            'descriptions' => [],
+            'uri' => '#test_menu_item1',
+            'menu' => 'test_menu',
+            'scope' => LoadScopeUserData::SIMPLE_USER_SCOPE,
+            'active' => false,
+            'priority' => 10,
+            'divider' => false,
+            'custom' => true,
+        ]
     ];
 
     /**

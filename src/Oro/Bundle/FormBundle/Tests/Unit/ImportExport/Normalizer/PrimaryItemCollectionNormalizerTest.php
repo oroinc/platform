@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Serializer\Normalizer;
+namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\ImportExport\Serializer\Normalizer\PrimaryItemCollectionNormalizer;

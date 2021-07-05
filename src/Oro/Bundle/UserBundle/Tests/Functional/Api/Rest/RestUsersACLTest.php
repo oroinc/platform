@@ -25,7 +25,7 @@ class RestUsersACLTest extends WebTestCase
                 "plainPassword" => '1231231q',
                 "firstName" => "firstName",
                 "lastName" => "lastName",
-                "roles" => array("1")
+                "userRoles" => array("1")
             )
         );
 

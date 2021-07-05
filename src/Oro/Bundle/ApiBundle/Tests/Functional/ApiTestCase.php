@@ -9,10 +9,10 @@ use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestConfigRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
-use Symfony\Component\ErrorHandler\BufferingLogger;
+use Oro\Component\Testing\Logger\BufferingLogger;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Yaml\Yaml;
@@ -23,6 +23,8 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class ApiTestCase extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /** @var bool */
     private $isKernelRebootDisabled = false;
 
@@ -194,7 +196,7 @@ abstract class ApiTestCase extends WebTestCase
     {
         /** @var EntityManager|null $em */
         $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
-        if (!$em) {
+        if (null === $em) {
             return null;
         }
 
@@ -564,21 +566,6 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param string|null $scope The configuration scope (e.g.: global, organization, user, etc.)
-     *                           or NULL to get the configuration manager for the current scope
-     *
-     * @return ConfigManager
-     */
-    protected function getConfigManager(?string $scope = 'global'): ConfigManager
-    {
-        if (!$scope) {
-            return self::getContainer()->get('oro_config.manager');
-        }
-
-        return self::getContainer()->get('oro_config.' . $scope);
-    }
-
-    /**
      * Clears the default entity manager.
      */
     protected function clearEntityManager()
@@ -683,5 +670,28 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return $messages;
+    }
+
+    /**
+     * Removes all messages from the customize form data logger that is used for test purposes.
+     *
+     * @after
+     */
+    protected function clearCustomizeFormDataLogger()
+    {
+        $logger = $this->getCustomizeFormDataLogger();
+        if (null !== $logger) {
+            $logger->cleanLogs();
+        }
+    }
+
+    /**
+     * @return BufferingLogger|null
+     */
+    protected function getCustomizeFormDataLogger()
+    {
+        return null !== $this->client
+            ? $this->client->getContainer()->get('oro_api.tests.customize_form_data_logger')
+            : null;
     }
 }

@@ -40,6 +40,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
                 $authProviderId,
                 new ChildDefinition('oro_security.authentication.provider.organization_rememberme')
             )
+            ->replaceArgument(0, new Reference('security.user_checker.' . $id))
             ->addArgument($config['secret'])
             ->addArgument($id);
 

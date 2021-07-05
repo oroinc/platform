@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layput\DataProvider;
+namespace Oro\Bundle\TranslationBundle\Tests\Unit\Layout\DataProvider;
 
 use Oro\Bundle\TranslationBundle\Layout\DataProvider\TranslatorProvider;
 use Symfony\Component\Translation\Translator;

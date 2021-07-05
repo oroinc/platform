@@ -39,7 +39,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     private $tokenAccessor;
 
     /** @var PasswordFieldOptionsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $optionsProvider;
+    private $optionsProvider;
 
     protected function setUp(): void
     {
@@ -50,10 +50,8 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider addEntityFieldsDataProvider
-     * @param $permissions
-     * @param $isMyProfile
      */
-    public function testAddEntityFields($permissions, $isMyProfile)
+    public function testAddEntityFields(array $permissions, bool $isMyProfile)
     {
         $user = new User();
         $user->setId(1);
@@ -74,10 +72,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
 
         $formFactory = $this->createMock(FormFactory::class);
 
-        $builder = $this->getMockBuilder(FormBuilder::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['addEventSubscriber', 'add', 'getFormFactory', 'addEventListener'])
-            ->getMock();
+        $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->once())
             ->method('getFormFactory')
             ->willReturn($formFactory);
@@ -99,7 +94,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         ];
 
         if ($permissions[self::RULE_ROLE]) {
-            $formFields[] = ['roles', EntityType::class];
+            $formFields[] = ['userRoles', EntityType::class];
         }
 
         $attr = [];
@@ -140,10 +135,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         $type->buildForm($builder, []);
     }
 
-    /**
-     * @return array
-     */
-    public function addEntityFieldsDataProvider()
+    public function addEntityFieldsDataProvider(): array
     {
         return [
             'own profile with all permission' => [

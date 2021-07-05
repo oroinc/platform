@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Processor\Tests\Unit\Transition\Layout;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition\Layout;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Transition;

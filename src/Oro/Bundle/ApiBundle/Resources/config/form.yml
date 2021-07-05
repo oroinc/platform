@@ -49,6 +49,11 @@ services:
         arguments:
             - '@oro_api.customize_form_data.processor'
 
+    oro_api.customize_form_data_event_dispatcher:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher
+        arguments:
+            - '@oro_api.customize_form_data_handler'
+
     oro_api.form_property_accessor:
         class: Oro\Bundle\ApiBundle\Form\FormPropertyAccessor
         arguments:
@@ -66,7 +71,7 @@ services:
         class: Oro\Bundle\ApiBundle\Form\FormValidationHandler
         arguments:
             - '@validator'
-            - '@oro_api.customize_form_data_handler'
+            - '@oro_api.customize_form_data_event_dispatcher'
             - '@oro_api.form_property_accessor'
 
     oro_api.form.guesser.data_type:

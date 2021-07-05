@@ -1,73 +1,56 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Maintenance;
+namespace Oro\Bundle\PlatformBundle\Tests\Unit\Maintenance;
 
 use Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver;
+use Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory;
+use Oro\Bundle\PlatformBundle\Maintenance\MaintenanceEvent;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ModeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Mode
-     */
-    protected $mode;
+    /** @var Mode */
+    private $mode;
 
-    /**
-     * @var DatabaseDriver
-     */
-    protected $driver;
+    /** @var DatabaseDriver */
+    private $driver;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    /** @var EventDispatcherInterface */
+    private $dispatcher;
 
     protected function setUp(): void
     {
-        $factory = $this->getMockBuilder('Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->driver = $this->createMock(DatabaseDriver::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->driver = $this->getMockBuilder('Lexik\Bundle\MaintenanceBundle\Drivers\DatabaseDriver')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
-            ->setMethods(array('dispatch'))
-            ->getMockForAbstractClass();
-
-        $factory
-            ->expects($this->any())
+        $factory = $this->createMock(DriverFactory::class);
+        $factory->expects($this->any())
             ->method('getDriver')
-            ->will($this->returnValue($this->driver));
+            ->willReturn($this->driver);
 
-        $this->driver
-            ->expects($this->any())
+        $this->driver->expects($this->any())
             ->method('lock')
-            ->will($this->returnValue(true));
-
-        $this->driver
-            ->expects($this->any())
+            ->willReturn(true);
+        $this->driver->expects($this->any())
             ->method('unlock')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->mode = new Mode($factory, $this->dispatcher);
     }
 
     public function testModeIsOn()
     {
-        $this->driver
-            ->expects($this->once())
+        $this->driver->expects($this->once())
             ->method('decide')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->assertTrue($this->mode->isOn());
     }
 
     public function testModeOn()
     {
-        $this->dispatcher
-            ->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
 
@@ -76,8 +59,7 @@ class ModeTest extends \PHPUnit\Framework\TestCase
 
     public function testModeOff()
     {
-        $this->dispatcher
-            ->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
 

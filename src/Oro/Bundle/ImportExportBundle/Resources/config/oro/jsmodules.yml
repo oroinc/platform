@@ -1,5 +1,5 @@
 dynamic-imports:
-    oroimportexport:
+    commons:
         - oroimportexport/js/app/views/export-button-view
         - oroimportexport/js/app/views/export-configurable-template-widget-view
         - oroimportexport/js/app/views/export-configurable-widget-view

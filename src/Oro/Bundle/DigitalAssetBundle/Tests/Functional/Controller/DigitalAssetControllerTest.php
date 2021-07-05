@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CMSBundle\Tests\Functional\Controller;
+namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;

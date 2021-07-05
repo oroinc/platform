@@ -7,7 +7,7 @@ use Oro\Bundle\NavigationBundle\Configuration\Definition\MenuTreeBuilder;
 
 class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var MenuTreeBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $builder;
 
     /** @var MenuNodeDefinition */
@@ -16,10 +16,10 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->builder = $this->getMockBuilder(MenuTreeBuilder::class)
-            ->setMethods([
-                'node', 'children', 'scalarNode', 'end', 'menuNode', 'menuNodeHierarchy', 'defaultValue'
-            ])
+            ->onlyMethods(['node', 'scalarNode', 'end', 'menuNode'])
+            ->addMethods(['children', 'menuNodeHierarchy', 'defaultValue'])
             ->getMock();
+
         $this->definition = new MenuNodeDefinition('test');
         $this->definition->setBuilder($this->builder);
     }
@@ -39,32 +39,27 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     {
         $this->builder->expects($this->any())
             ->method('node')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $this->builder->expects($this->any())
             ->method('children')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $this->builder->expects($this->any())
             ->method('scalarNode')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $this->builder->expects($this->any())
             ->method('end')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $this->builder->expects($this->once())
             ->method('menuNode')
             ->with('children')
-            ->will($this->returnSelf());
-
+            ->willReturnSelf();
         $this->builder->expects($this->once())
             ->method('menuNodeHierarchy')
             ->with(9)
-            ->will($this->returnSelf());
+            ->willReturnSelf();
         $this->builder->expects($this->any())
             ->method('defaultValue')
-            ->will($this->returnSelf());
+            ->willReturnSelf();
 
         $this->definition->menuNodeHierarchy(10);
     }

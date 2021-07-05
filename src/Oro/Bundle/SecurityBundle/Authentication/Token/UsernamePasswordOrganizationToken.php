@@ -8,10 +8,11 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 /**
  * The authentication token that is used when an user uses a username and password to authentication.
  */
-class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements OrganizationAwareTokenInterface
+class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements
+    OrganizationAwareTokenInterface,
+    RolesAwareTokenInterface
 {
-    use AuthenticatedTokenTrait;
-    use OrganizationAwareTokenTrait;
+    use RolesAndOrganizationAwareTokenTrait;
 
     /**
      * @param string       $user
@@ -22,7 +23,7 @@ class UsernamePasswordOrganizationToken extends UsernamePasswordToken implements
      */
     public function __construct($user, $credentials, $providerKey, Organization $organization, array $roles = [])
     {
-        parent::__construct($user, $credentials, $providerKey, $roles);
+        parent::__construct($user, $credentials, $providerKey, $this->initRoles($roles));
         $this->setOrganization($organization);
     }
 }

@@ -1,4 +1,5 @@
 dynamic-imports:
-    oroconfig:
+    jstree:
         - oroconfig/js/app/views/configuration-tree-view
+    tinymce.min:
         - oroconfig/js/form/config-form

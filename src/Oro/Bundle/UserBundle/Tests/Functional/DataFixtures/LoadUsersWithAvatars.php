@@ -97,7 +97,7 @@ class LoadUsersWithAvatars extends AbstractFixture implements DependentFixtureIn
             ->setEmail(sprintf('%s@example.org', $username))
             ->setOrganization($organization)
             ->addOrganization($organization)
-            ->addRole($role)
+            ->addUserRole($role)
             ->setEnabled(true);
         $userManager->updateUser($user);
 

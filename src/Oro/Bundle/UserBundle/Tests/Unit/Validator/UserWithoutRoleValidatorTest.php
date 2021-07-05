@@ -7,51 +7,32 @@ use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\UserWithoutRole;
 use Oro\Bundle\UserBundle\Validator\UserWithoutRoleValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase
+class UserWithoutRoleValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var UserWithoutRoleValidator
-     */
-    protected $validator;
-
-    /**
-     * @var UserWithoutRole
-     */
-    protected $constraint;
-
-    /**
-     * @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $context;
-
-    protected function setUp(): void
+    protected function createValidator()
     {
-        $this->constraint = new UserWithoutRole();
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->validator = new UserWithoutRoleValidator();
-        $this->validator->initialize($this->context);
+        return new UserWithoutRoleValidator();
     }
 
     public function testEmptyUserCollection()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new UserWithoutRole();
+        $this->validator->validate(new ArrayCollection(), $constraint);
 
-        $this->validator->validate(new ArrayCollection(), $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testUserWithRole()
     {
         $user = new User();
-        $user->addRole(new Role());
+        $user->addUserRole(new Role());
 
-        $this->context->expects($this->never())
-            ->method('addViolation');
+        $constraint = new UserWithoutRole();
+        $this->validator->validate(new ArrayCollection([$user]), $constraint);
 
-        $this->validator->validate(new ArrayCollection([$user]), $this->constraint);
+        $this->assertNoViolation();
     }
 
     public function testUserWithoutRoles()
@@ -60,10 +41,11 @@ class UserWithoutRoleValidatorTest extends \PHPUnit\Framework\TestCase
             ->setFirstName('John')
             ->setLastName('Doe');
 
-        $this->context->expects($this->once())
-            ->method('addViolation')
-            ->with($this->constraint->message, ['{{ userName }}' => 'John Doe']);
+        $constraint = new UserWithoutRole();
+        $this->validator->validate(new ArrayCollection([$user]), $constraint);
 
-        $this->validator->validate(new ArrayCollection([$user]), $this->constraint);
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ userName }}', 'John Doe')
+            ->assertRaised();
     }
 }

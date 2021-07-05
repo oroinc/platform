@@ -7,10 +7,14 @@ use Oro\Bundle\UserBundle\Entity\Role;
 
 class RoleStub extends Role
 {
-    /**
-     * @var Organization
-     */
-    protected $organization;
+    protected ?Organization $organization = null;
+
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     /**
      * @param Organization $value

@@ -4,37 +4,30 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Reader;
 
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\Context;
-use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
 {
-    const MOCK_FILE_NAME = 'mock_file_for_initialize.xlsx';
+    private const MOCK_FILE_NAME = 'mock_file_for_initialize.xlsx';
 
-    /** @var ContextRegistry|MockObject */
+    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
+
+    /** @var ImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $importHelper;
 
     /** @var XlsxFileReader */
     private $reader;
 
-    /** @var ImportStrategyHelper|MockObject */
-    protected $importHelper;
-
-    /** {@inheritdoc} */
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->importHelper = $this->createMock(ImportStrategyHelper::class);
 
-        $this->reader = new class($this->contextRegistry) extends XlsxFileReader {
-            public function xisFirstLineIsHeader(): bool
-            {
-                return $this->firstLineIsHeader;
-            }
-        };
+        $this->reader = new XlsxFileReader($this->contextRegistry);
         $this->reader->setImportHelper($this->importHelper);
     }
 
@@ -46,33 +39,40 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
             'header' => ['one', 'two']
         ];
 
-        static::assertTrue($this->reader->xisFirstLineIsHeader());
-        static::assertEmpty($this->reader->getHeader());
+        self::assertTrue(ReflectionUtil::getPropertyValue($this->reader, 'firstLineIsHeader'));
+        self::assertEmpty($this->reader->getHeader());
 
         $context = new Context($options);
-        $this->reader->setStepExecution($this->getMockStepExecution($context));
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
+        $this->reader->setStepExecution($stepExecution);
 
-        static::assertEquals($options['firstLineIsHeader'], $this->reader->xisFirstLineIsHeader());
-        static::assertEquals($options['header'], $this->reader->getHeader());
+        self::assertEquals(
+            $options['firstLineIsHeader'],
+            ReflectionUtil::getPropertyValue($this->reader, 'firstLineIsHeader')
+        );
+        self::assertEquals(
+            $options['header'],
+            $this->reader->getHeader()
+        );
     }
 
     /**
      * @dataProvider excelDataProvider
-     *
-     * @param array $options
-     * @param $exceptedHeader
-     * @param array $expected
      */
-    public function testRead($options, $exceptedHeader, $expected)
+    public function testRead(array $options, ?array $exceptedHeader, array $expected)
     {
         $context = new Context($options);
-        $stepExecution = $this->getMockStepExecution($context);
-
+        $stepExecution = $this->createMock(StepExecution::class);
+        $this->contextRegistry->expects($this->any())
+            ->method('getByStepExecution')
+            ->with($stepExecution)
+            ->willReturn($context);
         $this->reader->setStepExecution($stepExecution);
         $this->reader->initializeByContext($context);
-
-        $stepExecution->expects($this->never())
-            ->method('addReaderWarning');
 
         $this->assertSame($exceptedHeader, $this->reader->getHeader());
 
@@ -88,8 +88,7 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $data);
     }
 
-    /** @return array */
-    public function excelDataProvider()
+    public function excelDataProvider(): array
     {
         return [
             'without headers' => [
@@ -147,24 +146,5 @@ class XlsxFileReaderTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-    }
-
-    /**
-     * @param ContextInterface $context
-     * @return MockObject|StepExecution
-     */
-    protected function getMockStepExecution($context)
-    {
-        $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->setMethods(['addReaderWarning', 'getByStepExecution'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextRegistry->expects($this->any())
-            ->method('getByStepExecution')
-            ->with($stepExecution)
-            ->willReturn($context);
-
-        return $stepExecution;
     }
 }

@@ -14,6 +14,9 @@ class ConfigurationTest extends TestCase
 
         $result = $processor->processConfiguration(new Configuration(), []);
 
+        $this->assertArrayHasKey('disable_babel', $result);
+        $this->assertTrue($result['disable_babel']);
+
         $this->assertArrayHasKey('build_timeout', $result);
         $this->assertNull($result['build_timeout']);
 
@@ -54,6 +57,7 @@ class ConfigurationTest extends TestCase
                     'npm_path' => 'npm',
                 ],
                 'expects' => [
+                    'disable_babel' => true,
                     'nodejs_path' => 'nodejs',
                     'npm_path' => 'npm',
                     'build_timeout' => null,
@@ -68,6 +72,7 @@ class ConfigurationTest extends TestCase
             ],
             [
                 'options' => [
+                    'disable_babel' => true,
                     'nodejs_path' => 'node',
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,
@@ -80,6 +85,7 @@ class ConfigurationTest extends TestCase
                     ],
                 ],
                 'expects' => [
+                    'disable_babel' => true,
                     'nodejs_path' => 'node',
                     'npm_path' => '/usr/local/bin/npm',
                     'build_timeout' => 300,

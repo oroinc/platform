@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ConsoleToken;
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Oro\Bundle\SecurityBundle\Provider\Console\ConsoleContextGlobalOptionsProvider;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -17,7 +18,6 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -55,7 +55,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     private function getUserRepository()
     {
         $repository = $this->createMock(UserRepository::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(User::class)
             ->willReturn($repository);
@@ -69,7 +69,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     private function getOrganizationRepository()
     {
         $repository = $this->createMock(OrganizationRepository::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Organization::class)
             ->willReturn($repository);
@@ -81,10 +81,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     {
         $inputDefinition = new InputDefinition();
         $application = $this->createMock(Application::class);
-        $application->expects($this->any())
+        $application->expects(self::any())
             ->method('getDefinition')
             ->willReturn($inputDefinition);
-        $application->expects($this->once())
+        $application->expects(self::once())
             ->method('getHelperSet')
             ->willReturn(new HelperSet());
 
@@ -94,14 +94,14 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $command->setDefinition($commandDefinition);
 
         $this->provider->addGlobalOptions($command);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'current-user',
                 'current-organization',
             ],
             array_keys($command->getApplication()->getDefinition()->getOptions())
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'current-user',
                 'current-organization',
@@ -114,7 +114,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
     {
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -130,7 +130,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -146,7 +146,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -155,7 +155,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($userId, null);
 
         $repository = $this->getUserRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($userId)
             ->willReturn(null);
@@ -170,7 +170,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -183,10 +183,10 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
-        $user->addRole($role);
+        $user->addUserRole($role);
         $user->addOrganization($organization);
         $repository = $this->getUserRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($userId)
             ->willReturn($user);
@@ -196,7 +196,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveAccessToMultipleOrgs()
@@ -204,7 +204,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -219,11 +219,11 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
-        $user->addRole($role);
+        $user->addUserRole($role);
         $user->addOrganization($organization1);
         $user->addOrganization($organization2);
         $repository = $this->getUserRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($userId)
             ->willReturn($user);
@@ -239,7 +239,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -253,11 +253,11 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
-        $user->addRole($role);
+        $user->addUserRole($role);
         $user->addOrganization($organization1);
         $user->addOrganization($organization2);
         $repository = $this->getUserRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($userId)
             ->willReturn($user);
@@ -267,7 +267,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $expectedToken->setOrganization($organization2);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenNoOrganizationAndUserHaveNoOrgs()
@@ -275,7 +275,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $userId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -286,9 +286,9 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
-        $user->addRole($role);
+        $user->addUserRole($role);
         $repository = $this->getUserRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($userId)
             ->willReturn($user);
@@ -304,7 +304,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $username = 'username';
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -317,9 +317,9 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         /** @var Role $role */
         $role = $this->createMock(Role::class);
         $user = new User();
-        $user->addRole($role);
+        $user->addUserRole($role);
         $user->addOrganization($organization);
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -329,7 +329,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 
     public function testResolveGlobalOptionsWhenUserIsStringAndOrganizationIsNotFound()
@@ -338,7 +338,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 777;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -347,13 +347,13 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($username, $organizationId);
 
         $user = new User();
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
 
         $organizationRepository = $this->getOrganizationRepository();
-        $organizationRepository->expects($this->once())
+        $organizationRepository->expects(self::once())
             ->method('find')
             ->with($organizationId)
             ->willReturn(null);
@@ -369,7 +369,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -378,7 +378,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($username, $organizationId);
 
         $user = new User();
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -387,7 +387,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organization->setEnabled(false);
         $organization->setName('testorg');
         $organizationRepository = $this->getOrganizationRepository();
-        $organizationRepository->expects($this->once())
+        $organizationRepository->expects(self::once())
             ->method('find')
             ->with($organizationId)
             ->willReturn($organization);
@@ -403,7 +403,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -415,14 +415,14 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organization->setEnabled(true);
         $organization->setName('testneworg');
         $organizationRepository = $this->getOrganizationRepository();
-        $organizationRepository->expects($this->once())
+        $organizationRepository->expects(self::once())
             ->method('find')
             ->with($organizationId)
             ->willReturn($organization);
 
         $user = new User();
         $user->setUsername('testnewusername');
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -442,7 +442,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organizationId = 555;
         /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject $input */
         $input = $this->createMock(InputInterface::class);
-        $input->expects($this->exactly(2))
+        $input->expects(self::exactly(2))
             ->method('getParameterOption')
             ->withConsecutive(
                 ['--' . 'current-user'],
@@ -454,7 +454,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $organization->setEnabled(true);
         $organization->setName('testneworg');
         $organizationRepository = $this->getOrganizationRepository();
-        $organizationRepository->expects($this->once())
+        $organizationRepository->expects(self::once())
             ->method('find')
             ->with($organizationId)
             ->willReturn($organization);
@@ -463,9 +463,9 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $role = $this->createMock(Role::class);
         $user = new User();
         $user->setUsername('testnewusername');
-        $user->addRole($role);
+        $user->addUserRole($role);
         $user->addOrganization($organization);
-        $this->userManager->expects($this->once())
+        $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
@@ -475,6 +475,6 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
         $expectedToken->setOrganization($organization);
 
         $this->provider->resolveGlobalOptions($input);
-        $this->assertEquals($expectedToken, $this->tokenStorage->getToken());
+        self::assertEquals($expectedToken, $this->tokenStorage->getToken());
     }
 }

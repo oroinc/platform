@@ -5,7 +5,7 @@ aliases:
 app-modules:
     - orosync/js/app/modules/content-manager-module
 dynamic-imports:
-    orosync:
+    commons:
         - orosync/js/app/components/ping-handler
         - orosync/js/app/components/tag-content
         - orosync/js/content-manager

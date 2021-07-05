@@ -20,9 +20,6 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     /** @var SendEmailTransportListener */
     private $listener;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->crypter = $this->createMock(SymmetricCrypterInterface::class);
@@ -48,10 +45,10 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->with($userEmailOrigin->getPassword())
             ->willReturn($decryptedPassword);
 
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
         $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
+            ->onlyMethods(['setHost', 'setPort', 'setEncryption'])
+            ->addMethods(['setUsername', 'setPassword', 'setAuthMode'])
             ->getMock();
         $streamOptions = ['ssl' => ['verify_peer' => false]];
         $smtpTransport->setStreamOptions($streamOptions);
@@ -147,10 +144,10 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
         $this->crypter->expects($this->never())
             ->method('decryptData');
 
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
         $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
+            ->onlyMethods(['setHost', 'setPort', 'setEncryption'])
+            ->addMethods(['setUsername', 'setPassword', 'setAuthMode'])
             ->getMock();
         $streamOptions = ['ssl' => ['verify_peer' => false]];
         $smtpTransport->setStreamOptions($streamOptions);
@@ -207,7 +204,6 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
     public function testSendWithOAuthSmtpConfiguredButOAuthAccessTokenIsNotSet()
     {
         $decryptedPassword = 'decrypted_pass1';
-        $oauthAuthMode = 'XOAUTH1';
 
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setAccountType('oauth1');
@@ -222,10 +218,10 @@ class SendEmailTransportListenerTest extends \PHPUnit\Framework\TestCase
             ->with($userEmailOrigin->getPassword())
             ->willReturn($decryptedPassword);
 
-        /** @var \Swift_Transport_EsmtpTransport|\PHPUnit\Framework\MockObject\MockObject $smtpTransport */
         $smtpTransport = $this->getMockBuilder(\Swift_Transport_EsmtpTransport::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setHost', 'setPort', 'setEncryption', 'setUsername', 'setPassword', 'setAuthMode'])
+            ->onlyMethods(['setHost', 'setPort', 'setEncryption'])
+            ->addMethods(['setUsername', 'setPassword', 'setAuthMode'])
             ->getMock();
         $streamOptions = ['ssl' => ['verify_peer' => false]];
         $smtpTransport->setStreamOptions($streamOptions);

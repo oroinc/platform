@@ -16,11 +16,11 @@ class AuthenticatedTokenTraitTest extends \PHPUnit\Framework\TestCase
         $role3 = new Role('ROLE_3');
 
         $user = new User();
-        $user->addRole($role1);
+        $user->addUserRole($role1);
 
         $updatedUser = new User();
         $updatedUser->setSalt($user->getSalt());
-        $updatedUser->setRoles([$role2, $role3]);
+        $updatedUser->setUserRoles([$role2, $role3]);
 
         $token = new UsernamePasswordOrganizationToken($user, 'password', 'main', new Organization(), [$role1]);
         self::assertEquals([$role1], $token->getRoles());

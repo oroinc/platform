@@ -424,7 +424,7 @@ class AclRoleHandler
 
         /** @var $user AbstractUser */
         foreach ($users as $user) {
-            $user->addRole($role);
+            $user->addUserRole($role);
             $manager->persist($user);
         }
     }
@@ -441,7 +441,7 @@ class AclRoleHandler
 
         /** @var $user AbstractUser */
         foreach ($users as $user) {
-            $user->removeRole($role);
+            $user->removeUserRole($role);
             $manager->persist($user);
         }
     }

@@ -1,10 +1,12 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Monolog;
+namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
 use Monolog\Handler\FingersCrossed\ActivationStrategyInterface;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
+use Oro\Bundle\LoggerBundle\Monolog\ConfigurableFingersCrossedHandler;
+use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Oro\Bundle\LoggerBundle\Test\MonologTestCaseTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +31,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
     protected function setUp(): void
     {
         $this->config = $this->createMock(LogLevelConfig::class);
-        $this->activationStrategy = $activationStrategy = $this->createMock(ActivationStrategyInterface::class);
+        $this->activationStrategy = $this->createMock(ActivationStrategyInterface::class);
         $this->testNestedHandler = new TestHandler();
         $this->handler = new ConfigurableFingersCrossedHandler($this->testNestedHandler, $this->activationStrategy);
         $this->handler->setLogLevelConfig($this->config);

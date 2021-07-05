@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Autocomplete;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\LocaleBundle\Autocomplete\EnabledLocalizationsSearchHandler;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
@@ -10,6 +11,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EnabledLocalizationsSearchHandlerTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /**
      * @var EnabledLocalizationsSearchHandler
      */
@@ -40,7 +43,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
         );
 
         // Check with scope identifier
-        self::getContainer()->get('oro_config.manager')->set(
+        self::getConfigManager('global')->set(
             Configuration::getConfigKeyByName(Configuration::ENABLED_LOCALIZATIONS),
             [
                 $this->getReference('en_CA')->getId(),
@@ -48,7 +51,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
             ],
             2
         );
-        self::getContainer()->get('oro_config.manager')->flush(2);
+        self::getConfigManager('global')->flush(2);
 
         $result = $this->searchHandler->search(';2', 1, 10, false);
         $this->assertSearchResult(
@@ -62,7 +65,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
 
     public function testSearchById(): void
     {
-        self::getContainer()->get('oro_config.manager')->flush(2);
+        self::getConfigManager('global')->flush(2);
 
         $idForSearch = $this->getReference('en_CA')->getId();
 
@@ -71,7 +74,7 @@ class EnabledLocalizationsSearchHandlerTest extends WebTestCase
 
     public function testSearchByIdNotExistingId(): void
     {
-        self::getContainer()->get('oro_config.manager')->flush(2);
+        self::getConfigManager('global')->flush(2);
 
         $this->assertSearchResult($this->searchHandler->search('77777;2', 1, 10, true), []);
     }

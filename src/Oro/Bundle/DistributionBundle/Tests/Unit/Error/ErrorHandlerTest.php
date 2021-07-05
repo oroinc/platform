@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DistributionBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\DistributionBundle\Tests\Unit\Error;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Psr\Log\LoggerInterface;

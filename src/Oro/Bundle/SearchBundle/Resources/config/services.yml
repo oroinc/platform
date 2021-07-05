@@ -410,3 +410,8 @@ services:
             - !php/const Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource::TYPE
         tags:
             - { name: oro_filter.provider.datagrid_filters }
+
+    oro_search.importexport.filtered_entity.search_entity_identity_reader:
+        class: Oro\Bundle\SearchBundle\Datagrid\FilteredEntityReader\SearchSourceFilteredEntityIdentityReader
+        tags:
+            - { name: oro_datagrid.filtered_entity_identity_reader}

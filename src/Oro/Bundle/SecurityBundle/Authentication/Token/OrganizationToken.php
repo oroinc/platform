@@ -3,16 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Authentication\Token;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Model\Role;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
-use Symfony\Component\Security\Core\Role\Role;
 
 /**
  * The organization aware authentication token.
  */
-class OrganizationToken extends AbstractToken implements OrganizationAwareTokenInterface
+class OrganizationToken extends AbstractToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
 {
-    use AuthenticatedTokenTrait;
-    use OrganizationAwareTokenTrait;
+    use RolesAndOrganizationAwareTokenTrait;
 
     /**
      * @param Organization    $organization
@@ -20,7 +19,7 @@ class OrganizationToken extends AbstractToken implements OrganizationAwareTokenI
      */
     public function __construct(Organization $organization, array $roles = [])
     {
-        parent::__construct($roles);
+        parent::__construct($this->initRoles($roles));
 
         $this->setOrganization($organization);
         $this->setAuthenticated(true);

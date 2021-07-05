@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Block\OptionResolver;
+namespace Oro\Component\Layout\Tests\Unit\Block\OptionsResolver;
 
 use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\Options;

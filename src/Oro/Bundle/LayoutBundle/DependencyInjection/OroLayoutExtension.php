@@ -40,6 +40,10 @@ class OroLayoutExtension extends Extension
             'oro_layout.templating.default',
             $config['templating']['default']
         );
+        $container->setParameter(
+            'oro_layout.enabled_themes',
+            $config['enabled_themes']
+        );
         $loader->load('twig_renderer.yml');
         $container->setParameter(
             'oro_layout.twig.resources',

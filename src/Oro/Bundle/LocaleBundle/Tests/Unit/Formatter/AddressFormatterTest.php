@@ -11,40 +11,19 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings
-     */
-    protected $localeSettings;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
+    private $localeSettings;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|NameFormatter
-     */
-    protected $nameFormatter;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|NameFormatter */
+    private $nameFormatter;
 
-    /**
-     * @var AddressFormatter
-     */
-    protected $addressFormatter;
+    /** @var AddressFormatter */
+    private $addressFormatter;
 
     protected function setUp(): void
     {
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(
-                [
-                    'getLocale',
-                    'getCountry',
-                    'getAddressFormats',
-                    'getLocaleByCountry',
-                    'isFormatAddressByAddressCountry'
-                ]
-            )
-            ->getMock();
-
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
-            ->disableOriginalConstructor()
-            ->setMethods(['format'])
-            ->getMock();
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->nameFormatter = $this->createMock(NameFormatter::class);
 
         $this->addressFormatter = new AddressFormatter(
             $this->localeSettings,
@@ -55,20 +34,14 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider formatDataProvider
-     * @param string $format
-     * @param string $regionCode
-     * @param string $expected
-     * @param bool $formatByCountry
-     * @param string $street2
-     * @param string|null $separator
      */
     public function testFormat(
-        $format,
-        $regionCode,
-        $expected,
-        $formatByCountry = false,
-        $street2 = 'apartment 10',
-        $separator = "\n"
+        string $format,
+        ?string $regionCode,
+        string $expected,
+        bool $formatByCountry = false,
+        string $street2 = 'apartment 10',
+        string $separator = "\n"
     ) {
         $address = new AddressStub($street2);
         $address->setRegionCode($regionCode);
@@ -109,10 +82,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->addressFormatter->format($address, null, $separator));
     }
 
-    /**
-     * @return array
-     */
-    public function formatDataProvider()
+    public function formatDataProvider(): array
     {
         return [
             'simple street' => [
@@ -169,12 +139,6 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getAddressPartsDataProvider
-     *
-     * @param string $format
-     * @param string|null $regionCode
-     * @param array
-     * @param bool $formatByCountry
-     * @param string $street2
      */
     public function testGetAddressParts(
         string $format,
@@ -188,32 +152,27 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         $locale = 'en';
         $country = 'CA';
 
-        $this->localeSettings
-            ->expects($this->once())
+        $this->localeSettings->expects($this->once())
             ->method('isFormatAddressByAddressCountry')
             ->willReturn($formatByCountry);
 
-        $this->localeSettings
-            ->expects($this->any())
+        $this->localeSettings->expects($this->any())
             ->method('getCountry')
             ->willReturn($country);
 
         if ($formatByCountry) {
-            $this->localeSettings
-                ->expects($this->once())
+            $this->localeSettings->expects($this->once())
                 ->method('getLocaleByCountry')
                 ->with($address->getCountryIso2())
                 ->willReturn($locale);
         } else {
-            $this->localeSettings
-                ->expects($this->once())
+            $this->localeSettings->expects($this->once())
                 ->method('getLocaleByCountry')
                 ->with($country)
                 ->willReturn($locale);
         }
 
-        $this->nameFormatter
-            ->expects($this->once())
+        $this->nameFormatter->expects($this->once())
             ->method('format')
             ->with($address, $locale)
             ->willReturn('Formatted User NAME');
@@ -222,8 +181,6 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array[]
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getAddressPartsDataProvider(): array
@@ -233,7 +190,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'format' => '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
                 'regionCode' => 'NY',
                 'expected' => [
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -247,7 +204,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                     '%postal_code%',
                 'regionCode' => 'NY',
                 'expected' => [
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street1%' => '1 Tests str.',
                     '%street2%' => 'apartment 10',
@@ -263,7 +220,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'regionCode' => 'NY',
                 'expected' => [
                     '%unknown_data_one%' => '',
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -279,7 +236,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'regionCode' => 'NY',
                 'expected' => [
                     '%unknown_data_one%' => '',
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -293,7 +250,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'format' => '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
                 'regionCode' => 'NY',
                 'expected' => [
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -307,7 +264,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'format' => '%name%\n%organization%\n%street%\n%CITY% %region_code% %COUNTRY% %postal_code%',
                 'regionCode' => null,
                 'expected' => [
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -321,7 +278,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
                 'format' => '%name%\n%organization%\n%street%\n%CITY% %region% %COUNTRY% %postal_code%',
                 'regionCode' => null,
                 'expected' => [
-                    '%name%' => "Formatted User NAME",
+                    '%name%' => 'Formatted User NAME',
                     '%organization%' => 'Company Ltd.',
                     '%street%' => '1 Tests str. apartment 10',
                     '%CITY%' => 'NEW YORK',
@@ -341,48 +298,40 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
 
         $this->localeSettings->expects($this->once())
             ->method('getCountry')
-            ->will($this->returnValue(LocaleConfiguration::DEFAULT_COUNTRY));
+            ->willReturn(LocaleConfiguration::DEFAULT_COUNTRY);
 
         $this->addressFormatter->getAddressFormat('CA');
     }
 
     /**
      * @dataProvider getAddressFormatDataProvider
-     *
-     * @param array $addressFormats
-     * @param string $localeOrRegion
-     * @param string $expectedFormat
-     * @param string $defaultCountry
      */
     public function testGetAddressFormat(
         array $addressFormats,
         $localeOrRegion,
-        $expectedFormat,
-        $defaultCountry = null
+        string $expectedFormat,
+        string $defaultCountry = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getAddressFormats')
-            ->will($this->returnValue($addressFormats));
+            ->willReturn($addressFormats);
 
         if (!$localeOrRegion) {
             $this->localeSettings->expects($this->once())
                 ->method('getLocale')
-                ->will($this->returnValue('en_US'));
+                ->willReturn('en_US');
         }
 
         if ($defaultCountry) {
             $this->localeSettings->expects($this->once())
                 ->method('getCountry')
-                ->will($this->returnValue($defaultCountry));
+                ->willReturn($defaultCountry);
         }
 
         $this->assertEquals($expectedFormat, $this->addressFormatter->getAddressFormat($localeOrRegion));
     }
 
-    /**
-     * @return array
-     */
-    public function getAddressFormatDataProvider()
+    public function getAddressFormatDataProvider(): array
     {
         return [
             'direct' => [

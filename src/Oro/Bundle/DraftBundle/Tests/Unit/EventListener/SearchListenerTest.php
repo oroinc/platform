@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\DraftBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\DraftBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\DraftBundle\EventListener\SearchListener;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;

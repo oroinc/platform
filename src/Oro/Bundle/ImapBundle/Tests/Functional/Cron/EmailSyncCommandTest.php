@@ -25,65 +25,51 @@ class EmailSyncCommandTest extends WebTestCase
 {
     use EmailFeatureTrait;
 
-    /** @var ImapConnectorFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $imapConnectorFactory;
-
-    /** @var ImapServicesFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $serviceFactory;
-
-    /** @var ImapServices|\PHPUnit\Framework\MockObject\MockObject */
-    protected $imapServices;
-
     /** @var Imap|\PHPUnit\Framework\MockObject\MockObject */
-    protected $imap;
+    private $imap;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $protocol;
-
-    /** @var SearchStringManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $searchStringManager;
+    private $protocol;
 
     protected function setUp(): void
     {
         $this->initClient();
 
-        $this->imapConnectorFactory = $this->createMock(ImapConnectorFactory::class);
-        $this->serviceFactory = $this->getMockBuilder(ImapServicesFactory::class)
-            ->setMethods(['createImapServices', 'getDefaultImapStorage'])
+        $serviceFactory = $this->getMockBuilder(ImapServicesFactory::class)
+            ->onlyMethods(['createImapServices', 'getDefaultImapStorage'])
             ->disableOriginalConstructor()
             ->getMock();
-        $this->imapServices = $this->getMockBuilder(ImapServices::class)
+        $imapServices = $this->getMockBuilder(ImapServices::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getStorage', 'getSearchStringManager'])
+            ->onlyMethods(['getStorage', 'getSearchStringManager'])
             ->getMock();
 
         $this->imap = new TestImap([]);
 
-        $this->searchStringManager = $this->createMock(SearchStringManagerInterface::class);
-
-        $this->imapServices->expects($this->any())
+        $imapServices->expects($this->any())
             ->method('getStorage')
-            ->will($this->returnValue($this->imap));
-        $this->imapServices->expects($this->any())
+            ->willReturn($this->imap);
+        $imapServices->expects($this->any())
             ->method('getSearchStringManager')
-            ->will($this->returnValue($this->searchStringManager));
+            ->willReturn($this->createMock(SearchStringManagerInterface::class));
 
-        $this->serviceFactory->expects($this->any())
+        $serviceFactory->expects($this->any())
             ->method('createImapServices')
-            ->will($this->returnValue($this->imapServices));
-        $this->serviceFactory->expects($this->any())
+            ->willReturn($imapServices);
+        $serviceFactory->expects($this->any())
             ->method('getDefaultImapStorage')
-            ->will($this->returnValue($this->imapServices));
+            ->willReturn($imapServices);
 
         $this->mockProtocol();
 
         $imapConfig = new ImapConfig();
-        $imapConnector = new ImapConnector($imapConfig, $this->serviceFactory);
-        $this->imapConnectorFactory->expects($this->any())
+        $imapConnector = new ImapConnector($imapConfig, $serviceFactory);
+        $imapConnectorFactory = $this->createMock(ImapConnectorFactory::class);
+        $imapConnectorFactory->expects($this->any())
             ->method('createImapConnector')
-            ->will($this->returnValue($imapConnector));
+            ->willReturn($imapConnector);
 
-        $this->getContainer()->set('oro_imap.connector.factory', $this->imapConnectorFactory);
+        $this->getContainer()->set('oro_imap.connector.factory', $imapConnectorFactory);
 
         $this->enableEmailFeature();
     }
@@ -116,22 +102,15 @@ class EmailSyncCommandTest extends WebTestCase
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
      * @dataProvider commandImapSyncProvider
-     * @param string $id
-     * @param array $params
-     * @param array $data
-     * @param int $assertCount
-     * @param array $expectedList
-     * @param array $expectedEmailData
-     * @param string $expectedEmailDataDbType
      */
     public function testImapSync(
-        $id,
+        string $id,
         array $params,
-        $data,
-        $assertCount,
-        $expectedList,
-        $expectedEmailData,
-        $expectedEmailDataDbType
+        array $data,
+        int $assertCount,
+        array $expectedList,
+        ?array $expectedEmailData,
+        string $expectedEmailDataDbType
     ) {
         if (!$this->isDbTypeIsValid($expectedEmailDataDbType)) {
             $this->markTestSkipped(sprintf('%s might be checked only with %s', $id, $expectedEmailDataDbType));
@@ -158,7 +137,7 @@ class EmailSyncCommandTest extends WebTestCase
         $listRepo = $this->getContainer()->get('doctrine')->getRepository('OroEmailBundle:Email');
         $list = $listRepo->findAll();
 
-        $this->assertEquals($assertCount, count($list));
+        $this->assertCount($assertCount, $list);
 
         if ($expectedEmailData) {
             /** @var Email $email */
@@ -166,7 +145,7 @@ class EmailSyncCommandTest extends WebTestCase
             $propertyAccessor = new PropertyAccessor();
             foreach ($expectedEmailData as $propertyPath => $expectedValue) {
                 if (strpos($propertyPath, '@') !== false) {
-                    list($propertyPath, $extension) = explode('@', $propertyPath);
+                    [$propertyPath, $extension] = explode('@', $propertyPath);
                     if ($extension && !extension_loaded($extension)) {
                         continue;
                     }
@@ -182,10 +161,7 @@ class EmailSyncCommandTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function commandImapSyncProvider()
+    public function commandImapSyncProvider(): array
     {
         $results = [];
         $path = __DIR__ . DIRECTORY_SEPARATOR . 'ImapResponses';
@@ -207,12 +183,7 @@ class EmailSyncCommandTest extends WebTestCase
         return $results;
     }
 
-    /**
-     * @param string $expectedEmailDataDbType
-     *
-     * @return bool
-     */
-    private function isDbTypeIsValid($expectedEmailDataDbType)
+    private function isDbTypeIsValid(string $expectedEmailDataDbType): bool
     {
         if ($expectedEmailDataDbType === '') {
             return true;
@@ -223,12 +194,7 @@ class EmailSyncCommandTest extends WebTestCase
         return $expectedEmailDataDbType === $platform;
     }
 
-    /**
-     * @param string $folder
-     *
-     * @return array
-     */
-    public static function getRequestsData($folder)
+    private function getRequestsData(string $folder): array
     {
         $parameters = [];
         $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
@@ -240,7 +206,7 @@ class EmailSyncCommandTest extends WebTestCase
         return $parameters;
     }
 
-    protected function mockProtocol()
+    private function mockProtocol(): void
     {
         $this->protocol = $this->createMock(ProtocolImap::class);
         $this->imap->setProtocol($this->protocol);

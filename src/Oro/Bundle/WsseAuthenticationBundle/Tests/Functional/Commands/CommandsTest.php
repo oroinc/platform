@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional;
+namespace Oro\Bundle\WsseAuthenticationBundle\Tests\Functional\Commands;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -118,7 +118,7 @@ class CommandsTest extends WebTestCase
                 'plainPassword' => '1231231q',
                 'firstName' => 'firstName',
                 'lastName' => 'lastName',
-                'roles' => ['3'],
+                'userRoles' => ['3'],
                 'owner' => '1',
             ],
         ];

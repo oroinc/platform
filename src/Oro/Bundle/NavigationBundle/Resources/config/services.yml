@@ -444,6 +444,7 @@ services:
             - 'menu_default_visibility'
         tags:
             - { name: kernel.event_listener, event: oro_menu.menu_update_change, method: onMenuUpdateScopeChange }
+            - { name: kernel.event_listener, event: oro_menu.menu_update_with_scope_change, method: onMenuUpdateWithScopeChange }
 
     oro_navigation.repository.menu_update:
         class: Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository

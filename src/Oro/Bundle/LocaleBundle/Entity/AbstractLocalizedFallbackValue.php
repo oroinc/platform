@@ -36,7 +36,7 @@ abstract class AbstractLocalizedFallbackValue
      * @ConfigField(
      *      defaultValues={
      *          "importexport"={
-     *              "excluded"=true
+     *              "excluded"=false
      *          }
      *      }
      * )

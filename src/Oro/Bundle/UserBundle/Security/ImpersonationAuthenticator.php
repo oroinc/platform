@@ -159,7 +159,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
             throw new BadUserOrganizationException("You don't have active organization assigned.");
         }
 
-        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getRoles());
+        return $this->tokenFactory->create($user, null, $providerKey, $organization, $user->getUserRoles());
     }
 
     /**

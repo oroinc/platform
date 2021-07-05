@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\EventListener;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class LocalizationChangeListenerTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -23,15 +25,13 @@ class LocalizationChangeListenerTest extends WebTestCase
         $localizationId2 = $this->getReference('german_localization')->getId();
         $userId = $this->getReference('user')->getId();
 
-        /** @var ConfigManager $globalConfigManager */
-        $globalConfigManager = $this->getContainer()->get('oro_config.global');
+        $globalConfigManager = self::getConfigManager('global');
 
         $globalConfigManager->set('oro_locale.enabled_localizations', [$localizationId1, $localizationId2]);
         $globalConfigManager->set('oro_locale.default_localization', $localizationId1);
         $globalConfigManager->flush();
 
-        /** @var ConfigManager $userConfigManager */
-        $userConfigManager = $this->getContainer()->get('oro_config.user');
+        $userConfigManager = self::getConfigManager('user');
         $userConfigManager->setScopeId($userId);
         $userConfigManager->set('oro_locale.default_localization', $localizationId2);
         $userConfigManager->flush();

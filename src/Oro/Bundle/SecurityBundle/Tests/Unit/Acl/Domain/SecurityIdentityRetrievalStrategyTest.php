@@ -6,78 +6,67 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityRetrievalStrategy;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
+use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Role\Role;
 
 class SecurityIdentityRetrievalStrategyTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SecurityIdentityRetrievalStrategy */
-    private $strategy;
+    private SecurityIdentityRetrievalStrategy $strategy;
 
     protected function setUp(): void
     {
         $this->strategy = new SecurityIdentityRetrievalStrategy();
     }
 
-    public function testGetSecurityIdentities()
+    public function testGetSecurityIdentities(): void
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createMock(AbstractToken::class);
         $user = new User();
         $user->setUsername('user1');
         $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-        $role = new Role('ROLE1');
+        $role = 'ROLE1';
         $token->expects(self::once())
-            ->method('getRoles')
+            ->method('getRoleNames')
             ->willReturn([$role]);
 
         $sids = $this->strategy->getSecurityIdentities($token);
         self::assertEquals(
             [
                 new UserSecurityIdentity($user->getUsername(), User::class),
-                new RoleSecurityIdentity($role->getRole())
+                new RoleSecurityIdentity($role)
             ],
             $sids
         );
     }
 
-    public function testGetSecurityIdentitiesForAnonymousToken()
+    public function testGetSecurityIdentitiesForAnonymousToken(): void
     {
         $token = $this->createMock(AnonymousToken::class);
-        $role = new Role('ROLE1');
+        $role = 'ROLE1';
         $token->expects(self::once())
-            ->method('getRoles')
+            ->method('getRoleNames')
             ->willReturn([$role]);
 
         $sids = $this->strategy->getSecurityIdentities($token);
-        self::assertEquals(
-            [
-                new RoleSecurityIdentity($role->getRole())
-            ],
-            $sids
-        );
+        self::assertEquals([new RoleSecurityIdentity($role)], $sids);
     }
 
-    public function testGetSecurityIdentitiesWhenUserSidCannotBeCreated()
+    public function testGetSecurityIdentitiesWhenUserSidCannotBeCreated(): void
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = $this->createMock(AbstractToken::class);
         $user = new User();
         $token->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-        $role = new Role('ROLE1');
+        $role = 'ROLE1';
         $token->expects(self::once())
-            ->method('getRoles')
+            ->method('getRoleNames')
             ->willReturn([$role]);
 
         $sids = $this->strategy->getSecurityIdentities($token);
-        self::assertEquals(
-            [
-                new RoleSecurityIdentity($role->getRole())
-            ],
-            $sids
-        );
+        self::assertEquals([new RoleSecurityIdentity($role)], $sids);
     }
 }

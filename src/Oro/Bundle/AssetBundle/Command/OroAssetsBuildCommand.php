@@ -52,25 +52,30 @@ class OroAssetsBuildCommand extends Command
     /** @var int|float|null */
     private $npmInstallTimeout;
 
+    private bool $disableBabel;
+
     /**
      * @param NodeProcessFactory $nodeProcessFactory
      * @param AssetConfigCache   $cache
      * @param string             $npmPath
      * @param int|float|null     $buildTimeout
      * @param int|float|null     $npmInstallTimeout
+     * @param bool               $disableBabel
      */
     public function __construct(
         NodeProcessFactory $nodeProcessFactory,
         AssetConfigCache $cache,
         string $npmPath,
         $buildTimeout,
-        $npmInstallTimeout
+        $npmInstallTimeout,
+        bool $disableBabel
     ) {
         $this->nodeProcessFactory = $nodeProcessFactory;
         $this->cache = $cache;
         $this->npmPath = $npmPath;
         $this->buildTimeout = $buildTimeout;
         $this->npmInstallTimeout = $npmInstallTimeout;
+        $this->disableBabel = $disableBabel;
 
         parent::__construct();
     }
@@ -295,7 +300,7 @@ HELP
         if ($input->getOption('skip-js')) {
             $command[] = 'skipJS';
         }
-        if (!$input->getOption('with-babel')) {
+        if ($this->disableBabel && !$input->getOption('with-babel')) {
             $command[] = 'skipBabel';
         }
         if ($input->getOption('skip-sourcemap')) {

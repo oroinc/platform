@@ -24,13 +24,10 @@ class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
     {
         $translator = $this->createMockTranslator();
 
-        $localeSettings = $this->getMockBuilder(LocaleSettings::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getTimezone'])
-            ->getMock();
+        $localeSettings = $this->createMock(LocaleSettings::class);
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue(date_default_timezone_get()));
+            ->willReturn(date_default_timezone_get());
 
         $subscriber = $this->getMockSubscriber(DateFilterSubscriber::class);
         $types = [
@@ -76,7 +73,6 @@ class DateTimeRangeFilterTypeTest extends AbstractTypeTestCase
             [
                 'defaultOptions' => [
                     'field_type' => DateTimeRangeType::class,
-                    'time_zone' => 'UTC',
                     'widget_options' => [
                         'showDatevariables' => true,
                         'showTime'          => true,

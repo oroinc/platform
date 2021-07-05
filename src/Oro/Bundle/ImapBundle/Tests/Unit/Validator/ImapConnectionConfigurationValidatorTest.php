@@ -1,105 +1,30 @@
 <?php
 
-namespace Oro\Bundle\ImapBundle\Tests\Unit\Validator\Constraints;
+namespace Oro\Bundle\ImapBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\ImapConnectionConfigurationValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class ImapConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
+class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ImapConnectionConfiguration */
-    private $constraint;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
     /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $checker;
 
-    /** @var ImapConnectionConfigurationValidator */
-    private $validator;
-
     protected function setUp(): void
     {
-        $this->constraint = new ImapConnectionConfiguration();
-
         $this->checker = $this->createMock(ImapSettingsChecker::class);
-        $this->validator = new ImapConnectionConfigurationValidator($this->checker);
-
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->validator->initialize($this->context);
+        parent::setUp();
     }
 
-    public function testValidateWithoutUserEmailOrigin()
+    protected function createValidator()
     {
-        $this->assertViolationNotAdded();
-
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        return new ImapConnectionConfigurationValidator($this->checker);
     }
 
-    public function testValidateImapNotConfigured()
-    {
-        $this->assertViolationNotAdded();
-
-        $value = $this->createUserEmailOrigin();
-        $value->setImapHost('');
-        $this->checker->expects($this->never())
-            ->method('checkConnection');
-
-        $this->validator->validate($value, $this->constraint);
-    }
-
-    public function testValidateFailedConnection()
-    {
-        $this->assertViolationAdded();
-
-        $value = $this->createUserEmailOrigin();
-        $this->checker->expects($this->once())
-            ->method('checkConnection')
-            ->with($value)
-            ->willReturn(false);
-
-        $this->validator->validate($value, $this->constraint);
-    }
-
-    public function testValidateSuccessfullConnection()
-    {
-        $this->assertViolationNotAdded();
-
-        $value = $this->createUserEmailOrigin();
-        $this->checker->expects($this->once())
-            ->method('checkConnection')
-            ->with($value)
-            ->willReturn(true);
-
-        $this->validator->validate($value, $this->constraint);
-    }
-
-    private function assertViolationAdded()
-    {
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->message)
-            ->willReturn($builder);
-        $builder->expects($this->once())
-            ->method('addViolation');
-    }
-
-    private function assertViolationNotAdded()
-    {
-        $this->context->expects($this->never())
-            ->method('buildViolation');
-    }
-
-    /**
-     * @return UserEmailOrigin
-     */
-    private function createUserEmailOrigin()
+    private function createUserEmailOrigin(): UserEmailOrigin
     {
         $value = new UserEmailOrigin();
         $value->setImapHost('imap.host');
@@ -109,5 +34,55 @@ class ImapConnectionConfigurationValidatorTest extends \PHPUnit\Framework\TestCa
         $value->setPassword('encrypted_password');
 
         return $value;
+    }
+
+    public function testValidateWithoutUserEmailOrigin()
+    {
+        $constraint = new ImapConnectionConfiguration();
+        $this->validator->validate(new \stdClass(), $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateImapNotConfigured()
+    {
+        $value = $this->createUserEmailOrigin();
+        $value->setImapHost('');
+        $this->checker->expects($this->never())
+            ->method('checkConnection');
+
+        $constraint = new ImapConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateFailedConnection()
+    {
+        $value = $this->createUserEmailOrigin();
+        $this->checker->expects($this->once())
+            ->method('checkConnection')
+            ->with($value)
+            ->willReturn(false);
+
+        $constraint = new ImapConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->assertRaised();
+    }
+
+    public function testValidateSuccessfullyConnection()
+    {
+        $value = $this->createUserEmailOrigin();
+        $this->checker->expects($this->once())
+            ->method('checkConnection')
+            ->with($value)
+            ->willReturn(true);
+
+        $constraint = new ImapConnectionConfiguration();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 }

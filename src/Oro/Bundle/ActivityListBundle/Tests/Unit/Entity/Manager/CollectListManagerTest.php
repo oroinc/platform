@@ -4,26 +4,30 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class CollectListManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $chainProvider;
+    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $chainProvider;
 
     /** @var CollectListManager */
-    protected $manager;
+    private $manager;
 
     protected function setUp(): void
     {
-        $this->chainProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->chainProvider = $this->createMock(ActivityListChainProvider::class);
+
         $this->manager = new CollectListManager($this->chainProvider);
     }
 
@@ -34,11 +38,9 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->chainProvider->expects($this->any())
             ->method('isSupportedEntity')
-            ->will($this->returnCallback(
-                function ($input) use ($correctEntity) {
-                    return $input === $correctEntity;
-                }
-            ));
+            ->willReturnCallback(function ($input) use ($correctEntity) {
+                return $input === $correctEntity;
+            });
         $this->assertTrue($this->manager->isSupportedEntity($correctEntity));
         $this->assertFalse($this->manager->isSupportedEntity($nonCorrectEntity));
     }
@@ -46,24 +48,24 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
     public function testProcessDeletedEntities()
     {
         $deleteData = [
-            ['class' => 'Acme\\TestBundle\\Entity\\TestEntity', 'id' => 10]
+            ['class' => 'Acme\TestBundle\Entity\TestEntity', 'id' => 10]
         ];
-        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
-            ->disableOriginalConstructor()->getMock();
-        $repo->expects($this->once())->method('deleteActivityListsByRelatedActivityData')
-            ->with('Acme\\TestBundle\\Entity\\TestEntity', 10);
+        $repo = $this->createMock(ActivityListRepository::class);
+        $repo->expects($this->once())
+            ->method('deleteActivityListsByRelatedActivityData')
+            ->with('Acme\TestBundle\Entity\TestEntity', 10);
 
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
-        $em->expects($this->once())->method('getRepository')->will($this->returnValue($repo));
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($repo);
 
         $this->manager->processDeletedEntities($deleteData, $em);
     }
 
     public function testProcessEmptyInsertEntities()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $this->assertFalse($this->manager->processInsertEntities([], $em));
     }
 
@@ -106,15 +108,13 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessEmptyUpdateEntities()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $this->assertFalse($this->manager->processUpdatedEntities([], $em));
     }
 
     public function testProcessUpdateEntities()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $testEntity = new \stdClass();
         $resultActivityList = new ActivityList();
         $this->chainProvider->expects($this->once())
@@ -124,16 +124,14 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->once())
             ->method('persist')
             ->with($resultActivityList);
-        $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()->getMock();
+        $uow = $this->createMock(UnitOfWork::class);
         $em->expects($this->once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
-        $metaData = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()->getMock();
+        $metaData = $this->createMock(ClassMetadata::class);
         $em->expects($this->once())
             ->method('getClassMetadata')
-            ->with('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
+            ->with(ActivityList::class)
             ->willReturn($metaData);
         $uow->expects($this->once())
             ->method('computeChangeSet')
@@ -143,24 +141,20 @@ class CollectListManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessFillOwners()
     {
-        $activityOwner = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityOwner')
-            ->setMethods(['isOwnerInCollection'])->disableOriginalConstructor()->getMock();
+        $activityOwner = $this->createMock(ActivityOwner::class);
         $activityOwner->expects($this->exactly(2))
             ->method('isOwnerInCollection')
             ->willReturn(false);
-        $activity = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
-            ->disableOriginalConstructor()->getMock();
+        $activity = $this->createMock(ActivityList::class);
         $activity->expects($this->once())
             ->method('getActivityOwners')
             ->willReturn(new ArrayCollection([$activityOwner]));
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
+        $em = $this->createMock(EntityManager::class);
         $testEntity = new \stdClass();
         $this->chainProvider->expects($this->once())
             ->method('getActivityListByEntity')
             ->willReturn($activity);
-        $emailProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
-            ->disableOriginalConstructor()->getMock();
+        $emailProvider = $this->createMock(EmailActivityListProvider::class);
         $emailProvider->expects($this->once())
             ->method('getActivityOwners')
             ->willReturn([$activityOwner]);

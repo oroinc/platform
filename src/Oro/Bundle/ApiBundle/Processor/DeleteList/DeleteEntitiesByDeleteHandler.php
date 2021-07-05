@@ -2,35 +2,31 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Deletes a list of entities by the delete handler.
  */
 class DeleteEntitiesByDeleteHandler implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private EntityDeleteHandlerRegistry $deleteHandlerRegistry;
+    private LoggerInterface $logger;
 
-    /** @var EntityDeleteHandlerRegistry */
-    private $deleteHandlerRegistry;
-
-    /**
-     * @param DoctrineHelper              $doctrineHelper
-     * @param EntityDeleteHandlerRegistry $deleteHandlerRegistry
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityDeleteHandlerRegistry $deleteHandlerRegistry
+        EntityDeleteHandlerRegistry $deleteHandlerRegistry,
+        LoggerInterface $logger
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->deleteHandlerRegistry = $deleteHandlerRegistry;
+        $this->logger = $logger;
     }
 
     /**
@@ -52,23 +48,19 @@ class DeleteEntitiesByDeleteHandler implements ProcessorInterface
         }
 
         $deleteHandler = $this->deleteHandlerRegistry->getHandler($entityClass);
-        $this->processDelete(
-            $context->getResult(),
-            $deleteHandler,
-            $this->doctrineHelper->getEntityManagerForClass($entityClass)
-        );
+        $this->processDelete($context->getResult(), $deleteHandler, $entityClass);
         $context->removeResult();
     }
 
     /**
      * @param mixed                        $data
      * @param EntityDeleteHandlerInterface $handler
-     * @param EntityManagerInterface       $em
+     * @param string                       $entityClass
      */
     private function processDelete(
         $data,
         EntityDeleteHandlerInterface $handler,
-        EntityManagerInterface $em
+        string $entityClass
     ): void {
         if (!\is_array($data) && !$data instanceof \Traversable) {
             throw new \RuntimeException(\sprintf(
@@ -77,16 +69,25 @@ class DeleteEntitiesByDeleteHandler implements ProcessorInterface
             ));
         }
 
-        $em->getConnection()->beginTransaction();
+        $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
+        $connection = $em->getConnection();
+        $connection->beginTransaction();
         try {
             $flushAllOptions = [];
             foreach ($data as $entity) {
                 $flushAllOptions[] = $handler->delete($entity, false);
             }
             $handler->flushAll($flushAllOptions);
-            $em->getConnection()->commit();
+            $connection->commit();
         } catch (\Throwable $e) {
-            $em->getConnection()->rollBack();
+            try {
+                $connection->rollBack();
+            } catch (\Throwable $rollbackException) {
+                $this->logger->error(
+                    'The database rollback operation failed in delete entities by delete handler API processor.',
+                    ['exception' => $rollbackException, 'entityClass' => $entityClass]
+                );
+            }
 
             throw $e;
         }
