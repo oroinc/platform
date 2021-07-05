@@ -46,7 +46,7 @@ define(function(require) {
             });
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keyup' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
+            this.$el.on('keydown' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
                 if (e.keyCode === 27) {
                     this._hideCriteria();
                 }

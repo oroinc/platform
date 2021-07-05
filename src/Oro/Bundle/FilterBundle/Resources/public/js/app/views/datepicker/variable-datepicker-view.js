@@ -12,6 +12,8 @@ define(function(require) {
     const localeSettings = require('orolocale/js/locale-settings');
     const layout = require('oroui/js/layout');
     const Popper = require('popper');
+    const {ESCAPE} = require('oroui/js/tools/keyboard-key-codes').default;
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
     require('orofilter/js/datevariables-widget');
     require('orofilter/js/itemizedpicker-widget');
 
@@ -408,8 +410,13 @@ define(function(require) {
             this.subview('tabs').updateTabsVisibility();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 this.subview('tabs').show('variables');
+                manageFocus.focusTabbable(this.$variables, this.$variables.find(`:contains(${value})`));
             }
             this.$calendar.datepicker('refresh');
+            manageFocus.focusTabbable(this.$calendar, this.$calendar.find('.ui-datepicker-calendar'));
+
+            this.$calendar.on('keydown.calendar', this.closeOnEspace.bind(this));
+            this.$dropdown.on('keydown.calendar', this.closeOnEspace.bind(this));
             this.trigger('open', this);
         },
 
@@ -418,7 +425,21 @@ define(function(require) {
          */
         close: function() {
             this.$dropdown.trigger('tohide');
+            this.$calendar.off('keydown.calendar');
+            this.$dropdown.off('keydown.calendar');
+            this.$frontDateField.focus();
             this.trigger('close', this);
+        },
+
+        /**
+         * Close dropdown on press Escape key
+         * @param event
+         */
+        closeOnEspace(event) {
+            if (event.keyCode === ESCAPE) {
+                event.stopPropagation();
+                this.close();
+            }
         }
     });
 

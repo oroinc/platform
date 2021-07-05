@@ -76,8 +76,7 @@ define(function(require, exports, module) {
          */
         events: {
             // Exclude from selection an auxiliary input inside of select2 component
-            'keyup input:not(.select2-focusser)': '_onReadCriteriaInputKey',
-            'keydown [type="text"]': '_preventEnterProcessing',
+            'keydown input:not(.select2-focusser)': '_onReadCriteriaInputKey',
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
@@ -133,6 +132,9 @@ define(function(require, exports, module) {
             if (e.which !== 13) {
                 return;
             }
+
+            e.stopPropagation();
+            e.preventDefault();
 
             if (!this._isValid()) {
                 return;
