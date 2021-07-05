@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Handler;
 
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -9,15 +10,13 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class BatchFlushDataHandlerFactory implements BatchFlushDataHandlerFactoryInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private FlushDataHandlerInterface $flushDataHandler;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, FlushDataHandlerInterface $flushDataHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->flushDataHandler = $flushDataHandler;
     }
 
     /**
@@ -26,7 +25,7 @@ class BatchFlushDataHandlerFactory implements BatchFlushDataHandlerFactoryInterf
     public function createHandler(string $entityClass): ?BatchFlushDataHandlerInterface
     {
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            return new BatchFlushDataHandler($entityClass, $this->doctrineHelper);
+            return new BatchFlushDataHandler($entityClass, $this->doctrineHelper, $this->flushDataHandler);
         }
 
         return null;

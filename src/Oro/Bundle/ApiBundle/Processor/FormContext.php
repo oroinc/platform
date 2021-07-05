@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormInterface;
  * An interface for form related execution contexts,
  * like contexts for such actions as "create", "update" and modify relationships.
  */
-interface FormContext extends ContextInterface
+interface FormContext extends ContextInterface, ChangeContextInterface
 {
     /**
      * Returns request data.

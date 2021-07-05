@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteEntitiesByDeleteHandler;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
+use Psr\Log\LoggerInterface;
 
 class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
 {
@@ -17,6 +18,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDeleteHandlerRegistry */
     private $deleteHandlerRegistry;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    private $logger;
 
     /** @var DeleteEntitiesByDeleteHandler */
     private $processor;
@@ -27,10 +31,12 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->deleteHandlerRegistry = $this->createMock(EntityDeleteHandlerRegistry::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->processor = new DeleteEntitiesByDeleteHandler(
             $this->doctrineHelper,
-            $this->deleteHandlerRegistry
+            $this->deleteHandlerRegistry,
+            $this->logger
         );
     }
 
@@ -38,6 +44,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
     {
         $this->deleteHandlerRegistry->expects(self::never())
             ->method('getHandler');
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         $this->processor->process($this->context);
     }
@@ -56,6 +65,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->method('getEntityManagerForClass');
         $this->deleteHandlerRegistry->expects(self::never())
             ->method('getHandler');
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);
@@ -81,11 +93,8 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->method('getManageableEntityClass')
             ->with($entityClass, $config)
             ->willReturn($entityClass);
-        $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrineHelper->expects(self::once())
-            ->method('getEntityManagerForClass')
-            ->with($entityClass)
-            ->willReturn($em);
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityManagerForClass');
 
         $this->deleteHandlerRegistry->expects(self::once())
             ->method('getHandler')
@@ -93,6 +102,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->willReturn($deleteHandler);
         $deleteHandler->expects(self::never())
             ->method('delete');
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($entity);
@@ -117,7 +129,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->with($entityClass)
             ->willReturn($em);
         $connection = $this->createMock(Connection::class);
-        $em->expects(self::exactly(2))
+        $em->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
         $connection->expects(self::once())
@@ -136,6 +148,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $deleteHandler->expects(self::once())
             ->method('flushAll')
             ->with([['entity' => $entity]]);
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);
@@ -165,7 +180,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->with($entityClass)
             ->willReturn($em);
         $connection = $this->createMock(Connection::class);
-        $em->expects(self::exactly(2))
+        $em->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
         $connection->expects(self::once())
@@ -186,6 +201,66 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->willThrowException($exception);
         $deleteHandler->expects(self::never())
             ->method('flushAll');
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult([$entity]);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWithExceptionFromDeleteHandlerAndRollbackFailed()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('test exception');
+
+        $entity = new \stdClass();
+        $entityClass = \get_class($entity);
+        $config = new EntityDefinitionConfig();
+        $deleteHandler = $this->createMock(EntityDeleteHandlerInterface::class);
+
+        $rollbackException = new \LogicException('rollback exception');
+        $this->doctrineHelper->expects(self::once())
+            ->method('getManageableEntityClass')
+            ->with($entityClass, $config)
+            ->willReturn($entityClass);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManagerForClass')
+            ->with($entityClass)
+            ->willReturn($em);
+        $connection = $this->createMock(Connection::class);
+        $em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $connection->expects(self::once())
+            ->method('beginTransaction');
+        $connection->expects(self::never())
+            ->method('commit');
+        $connection->expects(self::once())
+            ->method('rollBack')
+            ->willThrowException($rollbackException);
+
+        $exception = new \LogicException('test exception');
+        $this->deleteHandlerRegistry->expects(self::once())
+            ->method('getHandler')
+            ->with($entityClass)
+            ->willReturn($deleteHandler);
+        $deleteHandler->expects(self::once())
+            ->method('delete')
+            ->with($entity)
+            ->willThrowException($exception);
+        $deleteHandler->expects(self::never())
+            ->method('flushAll');
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'The database rollback operation failed in delete entities by delete handler API processor.',
+                ['exception' => $rollbackException, 'entityClass' => $entityClass]
+            );
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);
@@ -212,7 +287,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
             ->with($parentEntityClass)
             ->willReturn($em);
         $connection = $this->createMock(Connection::class);
-        $em->expects(self::exactly(2))
+        $em->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
         $connection->expects(self::once())
@@ -231,6 +306,9 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $deleteHandler->expects(self::once())
             ->method('flushAll')
             ->with([['entity' => $entity]]);
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         $this->context->setClassName($entityClass);
         $this->context->setResult([$entity]);

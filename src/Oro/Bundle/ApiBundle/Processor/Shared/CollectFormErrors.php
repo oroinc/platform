@@ -282,8 +282,6 @@ class CollectFormErrors implements ProcessorInterface
      */
     protected function getFieldErrorPropertyPath(FormError $error, FormInterface $field): ?string
     {
-        $result = null;
-
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
             $path = $this->getFieldErrorPropertyPathByConstraintViolation($field, $cause);

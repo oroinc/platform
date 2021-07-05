@@ -4,6 +4,17 @@ The current file describes significant changes in the code that may affect the u
 
 ## 5.0.0
 
+### Added
+
+#### ApiBundle
+* From now the `event` tag attribute for `customize_form_data` action API processor services is mandatory.
+  This was made to prevent potential logical errors.
+* `pre_flush_data`, `post_flush_data` and `post_save_data` events were added to the `customize_form_data` action.
+  The `pre_flush_data` and `post_flush_data` events are dispatched together with the `flush()` method of
+  the entity manager in the same database transaction.
+  The `post_save_data` event is dispatched after the database transaction is committed.
+  API processors for these events can be used to customize database update logic. 
+
 ### Removed
 
 #### ConfigBundle

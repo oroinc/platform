@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Form\FormUtil;
+use Oro\Bundle\ApiBundle\Processor\ChangeContextInterface;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormInterface;
@@ -12,7 +13,7 @@ use Symfony\Component\Form\FormInterface;
  * The execution context for processors for "customize_form_data" action.
  * Also {@see \Oro\Bundle\ApiBundle\Form\FormUtil} provides static methods that cam be helpful.
  */
-class CustomizeFormDataContext extends CustomizeDataContext
+class CustomizeFormDataContext extends CustomizeDataContext implements ChangeContextInterface
 {
     /**
      * This event is dispatched at the beginning of the Form::submit() method.
@@ -21,13 +22,14 @@ class CustomizeFormDataContext extends CustomizeDataContext
     public const EVENT_PRE_SUBMIT = 'pre_submit';
 
     /**
-     * This event is dispatched just before the Form::submit() method.
+     * This event is dispatched after the Form::submit() method has submitted and mapped the children,
+     * and after reverse transformation to normalized representation.
      * @see \Symfony\Component\Form\FormEvents::SUBMIT
      */
     public const EVENT_SUBMIT = 'submit';
 
     /**
-     * This event is dispatched after the Form::submit() method.
+     * This event is dispatched at the very end of the Form::submit().
      * @see \Symfony\Component\Form\FormEvents::POST_SUBMIT
      */
     public const EVENT_POST_SUBMIT = 'post_submit';
@@ -51,6 +53,28 @@ class CustomizeFormDataContext extends CustomizeDataContext
      * @see \Oro\Bundle\ApiBundle\Form\FormValidationHandler
      */
     public const EVENT_POST_VALIDATE = 'post_validate';
+
+    /**
+     * This event is dispatched after the database transaction is open but before data are flushed into the database.
+     * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+     */
+    public const EVENT_PRE_FLUSH_DATA = 'pre_flush_data';
+
+    /**
+     * This event is dispatched after data are successfully flushed into the database
+     * but before the database transaction is committed.
+     * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+     */
+    public const EVENT_POST_FLUSH_DATA = 'post_flush_data';
+
+    /**
+     * This event is dispatched after data are successfully flushed into the database,
+     * and the database transaction is committed.
+     * It can be used to perform some not crucial operations after data are saved into the database.
+     * It means that failure of these operations will not roll back data saved into the database.
+     * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+     */
+    public const EVENT_POST_SAVE_DATA = 'post_save_data';
 
     /** the form event name */
     private const EVENT = 'event';
@@ -83,7 +107,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @return string One of "pre_submit", "submit", "post_submit", "pre_validate" or "post_validate"
+     * @return string One of EVENT_* constants
      */
     public function getEvent(): string
     {
@@ -93,7 +117,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
     /**
      * Gets the form event name.
      *
-     * @param string $event One of "pre_submit", "submit", "post_submit", "pre_validate" or "post_validate"
+     * @param string $event One of EVENT_* constants
      */
     public function setEvent(string $event): void
     {
@@ -206,7 +230,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
      * Gets the data associated with the form event.
      * For "pre_submit" event it is the submitted data.
      * For "submit" event it is the norm data.
-     * For "post_submit", "pre_validate" and "post_validate" events it is the view data.
+     * For other events it is the view data.
      *
      * @return mixed
      */
@@ -246,6 +270,28 @@ class CustomizeFormDataContext extends CustomizeDataContext
     }
 
     /**
+     * Gets all entities, primary and included ones, that are processing by an action.
+     *
+     * @param bool $mainOnly Whether only main entity(ies) for this request
+     *                       or all, primary and included entities should be returned
+     *
+     * @return object[]
+     */
+    public function getAllEntities(bool $mainOnly = false): array
+    {
+        $includedEntities = $this->getIncludedEntities();
+        if ($mainOnly || null === $includedEntities) {
+            $entity = $this->getForm()->getData();
+
+            return null !== $entity ? [$entity] : [];
+        }
+
+        $entity = $includedEntities->getPrimaryEntity();
+
+        return array_merge(null !== $entity ? [$entity] : [], $includedEntities->getAll());
+    }
+
+    /**
      * Indicates whether the current action is executed for the primary entity or for an included entity.
      *
      * @return bool
@@ -256,7 +302,7 @@ class CustomizeFormDataContext extends CustomizeDataContext
 
         return
             null === $includedEntities
-            || $includedEntities->getPrimaryEntity() === $this->getData();
+            || $includedEntities->getPrimaryEntity() === $this->getForm()->getData();
     }
 
     /**

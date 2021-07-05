@@ -162,7 +162,6 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         $user = $this->getUser();
 
         self::assertTrue($user->isEnabled());
-        self::assertTrue($user->isAccountNonExpired());
         self::assertTrue($user->isAccountNonLocked());
 
         $user->setEnabled(false);
@@ -224,12 +223,6 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($serialized[3], $user->isEnabled());
         self::assertEquals($serialized[4], $user->getConfirmationToken());
         self::assertEquals($serialized[5], $user->getId());
-    }
-
-    public function testIsCredentialsNonExpired(): void
-    {
-        $user = $this->getUser();
-        self::assertTrue($user->isCredentialsNonExpired());
     }
 
     /**

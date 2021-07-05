@@ -248,7 +248,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username)
+    public function setUsername($username): self
     {
         $this->username = $username;
 
@@ -358,7 +358,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function setPassword($password)
+    public function setPassword(?string $password): self
     {
         $this->password = $password;
 
@@ -368,7 +368,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritDoc}
      */
-    public function getPlainPassword()
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
@@ -376,7 +376,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function setPlainPassword($password)
+    public function setPlainPassword(?string $password): self
     {
         $this->plainPassword = $password;
 
@@ -386,15 +386,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritDoc}
      */
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isAccountNonLocked()
+    public function isAccountNonLocked(): bool
     {
         return $this->isEnabled();
     }
@@ -402,7 +394,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritDoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->enabled;
     }
@@ -497,7 +489,7 @@ abstract class AbstractUser implements
     /**
      * {@inheritdoc}
      */
-    public function addUserRole(Role $role)
+    public function addUserRole(Role $role): self
     {
         if (!$this->hasRole($role)) {
             $this->userRoles->add($role);
@@ -543,14 +535,6 @@ abstract class AbstractUser implements
         }
 
         return (bool)$this->getUserRole($roleName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function isCredentialsNonExpired()
-    {
-        return true;
     }
 
     /**
@@ -711,15 +695,7 @@ abstract class AbstractUser implements
             return false;
         }
 
-        if ($this->isAccountNonExpired() !== $user->isAccountNonExpired()) {
-            return false;
-        }
-
         if ($this->isAccountNonLocked() !== $user->isAccountNonLocked()) {
-            return false;
-        }
-
-        if ($this->isCredentialsNonExpired() !== $user->isCredentialsNonExpired()) {
             return false;
         }
 

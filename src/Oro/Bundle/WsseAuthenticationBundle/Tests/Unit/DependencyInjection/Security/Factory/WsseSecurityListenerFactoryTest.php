@@ -16,12 +16,9 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPosition(): void
     {
-        $this->assertEquals('pre_auth', $this->getFactory()->getPosition());
+        self::assertEquals('pre_auth', $this->getFactory()->getPosition());
     }
 
-    /**
-     * @return WsseSecurityListenerFactory
-     */
     private function getFactory(): WsseSecurityListenerFactory
     {
         return new WsseSecurityListenerFactory();
@@ -29,7 +26,7 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function getKey(): void
     {
-        $this->assertEquals('wsse', $this->getFactory()->getKey());
+        self::assertEquals('wsse', $this->getFactory()->getKey());
     }
 
     public function testCreate(): void
@@ -70,10 +67,10 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
             'entry_point'
         );
 
-        $this->assertTrue($container->hasDefinition(self::ENCODER));
+        self::assertTrue($container->hasDefinition(self::ENCODER));
 
         $definition = $container->getDefinition(self::ENCODER);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'index_0' => $algorithm,
                 'index_1' => $encodeHashAsBase64,
@@ -82,14 +79,15 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
             $definition->getArguments()
         );
 
-        $this->assertTrue($container->hasDefinition(self::NONCE_CACHE));
+        self::assertTrue($container->hasDefinition(self::NONCE_CACHE));
 
-        $this->assertEquals(self::PROVIDER, $authProviderId);
-        $this->assertTrue($container->hasDefinition(self::PROVIDER));
+        self::assertEquals(self::PROVIDER, $authProviderId);
+        self::assertTrue($container->hasDefinition(self::PROVIDER));
 
         $definition = $container->getDefinition(self::PROVIDER);
-        $this->assertEquals(
+        self::assertEquals(
             [
+                'index_0' => new Reference('security.user_checker.foo'),
                 'index_2' => new Reference('user_provider'),
                 'index_3' => 'foo',
                 'index_4' => new Reference(self::ENCODER),
@@ -100,11 +98,11 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
             $definition->getArguments()
         );
 
-        $this->assertEquals(self::LISTENER, $listenerId);
-        $this->assertTrue($container->hasDefinition(self::LISTENER));
+        self::assertEquals(self::LISTENER, $listenerId);
+        self::assertTrue($container->hasDefinition(self::LISTENER));
 
         $definition = $container->getDefinition(self::LISTENER);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'index_3' => new Reference($entryPointId),
                 'index_4' => 'foo',
@@ -112,11 +110,11 @@ class WsseSecurityListenerFactoryTest extends \PHPUnit\Framework\TestCase
             $definition->getArguments()
         );
 
-        $this->assertEquals(self::ENTRY_POINT, $entryPointId);
-        $this->assertTrue($container->hasDefinition(self::ENTRY_POINT));
+        self::assertEquals(self::ENTRY_POINT, $entryPointId);
+        self::assertTrue($container->hasDefinition(self::ENTRY_POINT));
 
         $definition = $container->getDefinition(self::ENTRY_POINT);
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'index_1' => $realm,
                 'index_2' => $profile,

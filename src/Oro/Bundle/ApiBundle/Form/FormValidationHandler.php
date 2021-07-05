@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapper;
 use Symfony\Component\Form\FormEvent;
@@ -17,57 +17,38 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class FormValidationHandler
 {
-    /** @var ValidatorInterface */
-    protected $validator;
+    private ValidatorInterface $validator;
+    private CustomizeFormDataEventDispatcher $customizeFormDataEventDispatcher;
+    private PropertyAccessorInterface $propertyAccessor;
 
-    /** @var CustomizeFormDataHandler */
-    private $customizationHandler;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /**
-     * @param ValidatorInterface        $validator
-     * @param CustomizeFormDataHandler  $customizationHandler
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(
         ValidatorInterface $validator,
-        CustomizeFormDataHandler $customizationHandler,
+        CustomizeFormDataEventDispatcher $customizeFormDataEventDispatcher,
         PropertyAccessorInterface $propertyAccessor
     ) {
         $this->validator = $validator;
-        $this->customizationHandler = $customizationHandler;
+        $this->customizeFormDataEventDispatcher = $customizeFormDataEventDispatcher;
         $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
      * Dispatches "pre_validate" event for the given form.
      *
-     * @param FormInterface $form
-     *
-     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
     public function preValidate(FormInterface $form): void
     {
-        $this->assertSubmittedRootForm($form);
-
-        $this->dispatchPreValidateEventForChildren($form);
-        if ($this->hasApiEventContext($form)) {
-            $this->dispatchPreValidateEvent($this->createFormEvent($form));
-        }
+        $this->customizeFormDataEventDispatcher->dispatch(CustomizeFormDataContext::EVENT_PRE_VALIDATE, $form);
     }
 
     /**
      * Validates the given form.
      *
-     * @param FormInterface $form
-     *
-     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
     public function validate(FormInterface $form): void
     {
-        $this->assertSubmittedRootForm($form);
+        FormUtil::assertSubmittedRootForm($form);
 
         /**
          * Mark all children of the processing root form as submitted
@@ -88,117 +69,24 @@ class FormValidationHandler
         if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
             ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
-        $this->getValidationListener()->validateForm($this->createFormEvent($form));
+        $this->getValidationListener()->validateForm(new FormEvent($form, $form->getViewData()));
     }
 
     /**
      * Dispatches "post_validate" event for the given form.
      *
-     * @param FormInterface $form
-     *
-     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
      */
     public function postValidate(FormInterface $form): void
     {
-        $this->assertSubmittedRootForm($form);
-
-        $this->dispatchPostValidateEventForChildren($form);
-        if ($this->hasApiEventContext($form)) {
-            $this->dispatchPostValidateEvent($this->createFormEvent($form));
-        }
+        $this->customizeFormDataEventDispatcher->dispatch(CustomizeFormDataContext::EVENT_POST_VALIDATE, $form);
     }
 
-    /**
-     * @return ValidationListener
-     */
-    protected function getValidationListener(): ValidationListener
+    private function getValidationListener(): ValidationListener
     {
         return new ValidationListener(
             $this->validator,
             new ViolationMapper()
         );
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @throws \InvalidArgumentException if the given for is not root form or it is not submitted yet
-     */
-    private function assertSubmittedRootForm(FormInterface $form): void
-    {
-        if (!$form->isRoot()) {
-            throw new \InvalidArgumentException('The root form is expected.');
-        }
-        if (!$form->isSubmitted()) {
-            throw new \InvalidArgumentException('The submitted form is expected.');
-        }
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return FormEvent
-     */
-    private function createFormEvent(FormInterface $form): FormEvent
-    {
-        return new FormEvent($form, $form->getViewData());
-    }
-
-    /**
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
-    private function hasApiEventContext(FormInterface $form): bool
-    {
-        return $form->getConfig()->hasAttribute(CustomizeFormDataHandler::API_EVENT_CONTEXT);
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    private function dispatchPreValidateEvent(FormEvent $event): void
-    {
-        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_PRE_VALIDATE, $event);
-    }
-
-    /**
-     * @param FormInterface $form
-     */
-    private function dispatchPreValidateEventForChildren(FormInterface $form): void
-    {
-        /** @var FormInterface $child */
-        foreach ($form as $child) {
-            if ($child->count() > 0) {
-                $this->dispatchPreValidateEventForChildren($child);
-            }
-            if ($this->hasApiEventContext($child)) {
-                $this->dispatchPreValidateEvent($this->createFormEvent($child));
-            }
-        }
-    }
-
-    /**
-     * @param FormEvent $event
-     */
-    private function dispatchPostValidateEvent(FormEvent $event): void
-    {
-        $this->customizationHandler->handleFormEvent(CustomizeFormDataContext::EVENT_POST_VALIDATE, $event);
-    }
-
-    /**
-     * @param FormInterface $form
-     */
-    private function dispatchPostValidateEventForChildren(FormInterface $form): void
-    {
-        /** @var FormInterface $child */
-        foreach ($form as $child) {
-            if ($child->count() > 0) {
-                $this->dispatchPostValidateEventForChildren($child);
-            }
-            if ($this->hasApiEventContext($child)) {
-                $this->dispatchPostValidateEvent($this->createFormEvent($child));
-            }
-        }
     }
 }

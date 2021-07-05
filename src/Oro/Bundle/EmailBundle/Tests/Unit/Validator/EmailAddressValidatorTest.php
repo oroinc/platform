@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress;
 use Oro\Bundle\EmailBundle\Validator\EmailAddressValidator;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
@@ -12,13 +13,13 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var EmailAddress */
-    protected $constraint;
+    private $constraint;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
+    private $context;
 
     /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
+    private $emailAddressHelper;
 
     protected function setUp(): void
     {
@@ -32,7 +33,7 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
         $violationList = new ConstraintViolationList();
         $this->context->expects($this->once())
             ->method('getViolations')
-            ->will($this->returnValue($violationList));
+            ->willReturn($violationList);
         $this->context->expects($this->never())
             ->method('addViolation');
         $this->getValidator()->validate('testname <test@mail.com>', $this->constraint);
@@ -48,31 +49,25 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateWithErrors()
     {
         $violationList = new ConstraintViolationList();
-        $violation1 = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolation')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $violation1 = $this->createMock(ConstraintViolation::class);
         $violation1->expects($this->any())
             ->method('getPropertyPath')
-            ->will($this->returnValue('from'));
+            ->willReturn('from');
         $violationList->add($violation1);
-        $violation2 = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolation')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $violation2 = $this->createMock(ConstraintViolation::class);
         $violation2->expects($this->any())
             ->method('getPropertyPath')
-            ->will($this->returnValue('to'));
+            ->willReturn('to');
         $violationList->add($violation2);
-        $violation3 = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolation')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $violation3 = $this->createMock(ConstraintViolation::class);
         $violation3->expects($this->any())
             ->method('getPropertyPath')
-            ->will($this->returnValue('cc'));
+            ->willReturn('cc');
         $violationList->add($violation3);
 
         $this->context->expects($this->any())
             ->method('getViolations')
-            ->will($this->returnValue($violationList));
+            ->willReturn($violationList);
 
         $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->context->expects($this->any())
@@ -90,14 +85,11 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->context->expects($this->any())
             ->method('getPropertyPath')
-            ->will($this->returnValue('cc'));
+            ->willReturn('cc');
         $this->getValidator()->validate(['test wrong email 1', 'test wrong email 2'], $this->constraint);
     }
 
-    /**
-     * @return EmailAddressValidator
-     */
-    protected function getValidator()
+    private function getValidator(): EmailAddressValidator
     {
         $validator = new EmailAddressValidator($this->emailAddressHelper);
         $validator->initialize($this->context);

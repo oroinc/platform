@@ -12,12 +12,11 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\Constraints\EmailCaseInsensitiveOptionConstraint;
 use Oro\Bundle\UserBundle\Validator\EmailCaseInsensitiveOptionValidator;
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCase
+class EmailCaseInsensitiveOptionValidatorTest extends ConstraintValidatorTestCase
 {
     /** @var UserRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $userRepository;
@@ -28,22 +27,16 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
     /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridRouteHelper;
 
-    /** @var EmailCaseInsensitiveOptionValidator */
-    private $validator;
-
-    /** @var EmailCaseInsensitiveOptionConstraint */
-    private $constraint;
-
-    /** @var ConstraintViolationBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $violationBuilder;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $executionContext;
-
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
+        parent::setUp();
+    }
 
+    protected function createValidator()
+    {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $em = $this->createMock(EntityManagerInterface::class);
         $doctrine->expects($this->any())
@@ -55,22 +48,11 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
             ->with(User::class)
             ->willReturn($this->userRepository);
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->datagridRouteHelper = $this->createMock(DatagridRouteHelper::class);
-
-        $this->validator = new EmailCaseInsensitiveOptionValidator(
+        return new EmailCaseInsensitiveOptionValidator(
             $doctrine,
             $this->translator,
             $this->datagridRouteHelper
         );
-
-        $this->constraint = new EmailCaseInsensitiveOptionConstraint();
-
-        $this->violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->violationBuilder->expects($this->any())->method('setInvalidValue')->willReturnSelf();
-        $this->violationBuilder->expects($this->any())->method('addViolation')->willReturnSelf();
-
-        $this->executionContext = $this->createMock(ExecutionContextInterface::class);
     }
 
     public function testValidateExceptions()
@@ -80,19 +62,11 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
             sprintf('Expected argument of type "%s"', EmailCaseInsensitiveOptionConstraint::class)
         );
 
-        /** @var Constraint $constraint */
-        $constraint = $this->createMock(Constraint::class);
-
-        $this->validator->initialize($this->executionContext);
-        $this->validator->validate('', $constraint);
+        $this->validator->validate('', $this->createMock(Constraint::class));
     }
 
     /**
      * @dataProvider validateValidDataProvider
-     *
-     * @param bool $value
-     * @param bool $isCaseInsensitiveCollation
-     * @param array $emails
      */
     public function testValidateValid(bool $value, bool $isCaseInsensitiveCollation, array $emails)
     {
@@ -105,17 +79,13 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
             ->with(10)
             ->willReturn($emails);
 
-        $this->executionContext->expects($this->never())
-            ->method('buildViolation');
+        $constraint = new EmailCaseInsensitiveOptionConstraint();
+        $this->validator->validate($value, $constraint);
 
-        $this->validator->initialize($this->executionContext);
-        $this->validator->validate($value, $this->constraint);
+        $this->assertNoViolation();
     }
 
-    /**
-     * @return array
-     */
-    public function validateValidDataProvider()
+    public function validateValidDataProvider(): array
     {
         return [
             [
@@ -151,17 +121,18 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
         $this->translator->expects($this->never())
             ->method('trans');
 
-        $this->executionContext->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->collationMessage)
-            ->willReturn($this->violationBuilder);
+        $constraint = new EmailCaseInsensitiveOptionConstraint();
+        $this->validator->validate(false, $constraint);
 
-        $this->validator->initialize($this->executionContext);
-        $this->validator->validate(false, $this->constraint);
+        $this->buildViolation($constraint->collationMessage)
+            ->setInvalidValue(false)
+            ->assertRaised();
     }
 
     public function testValidateInvalidDuplicatedEmails()
     {
+        $constraint = new EmailCaseInsensitiveOptionConstraint();
+
         $this->userRepository->expects($this->never())
             ->method('isCaseInsensitiveCollation');
 
@@ -188,27 +159,17 @@ class EmailCaseInsensitiveOptionValidatorTest extends \PHPUnit\Framework\TestCas
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with($this->constraint->duplicatedEmailsClickHere, [], 'validators')
+            ->with($constraint->duplicatedEmailsClickHere, [], 'validators')
             ->willReturnArgument(0);
 
-        $this->executionContext->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->duplicatedEmailsMessage)
-            ->willReturn($this->violationBuilder);
+        $this->validator->validate(true, $constraint);
 
-        $this->violationBuilder->expects($this->once())
-            ->method('setParameters')
-            ->with(
-                [
-                    '%click_here%' => sprintf(
-                        '<a href="some/link/to/grid">%s</a>',
-                        $this->constraint->duplicatedEmailsClickHere
-                    )
-                ]
+        $this->buildViolation($constraint->duplicatedEmailsMessage)
+            ->setParameter(
+                '%click_here%',
+                sprintf('<a href="some/link/to/grid">%s</a>', $constraint->duplicatedEmailsClickHere)
             )
-            ->willReturnSelf();
-
-        $this->validator->initialize($this->executionContext);
-        $this->validator->validate(true, $this->constraint);
+            ->setInvalidValue(true)
+            ->assertRaised();
     }
 }

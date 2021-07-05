@@ -287,15 +287,6 @@ interface ContextInterface extends SharedDataAwareContextInterface
     public function setCriteria(Criteria $criteria = null);
 
     /**
-     * Gets all entities, primary and included ones, that are processing by an action.
-     *
-     * @param bool $primaryOnly Whether only primary entities or both primary and included entities should be returned
-     *
-     * @return object[]
-     */
-    public function getAllEntities(bool $primaryOnly = false): array;
-
-    /**
      * Whether any error occurred when processing an action.
      *
      * @return bool

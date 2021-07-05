@@ -73,6 +73,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Update\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: update, group: save_data, priority: -10 }
 
