@@ -128,6 +128,13 @@ define(function(require, exports, module) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
+            const {_keyDownTarget: keyDownTarget} = this;
+            delete this._keyDownTarget;
+
+            if (keyDownTarget && !keyDownTarget.isEqualNode(e.target)) {
+                return;
+            }
+
             this._onValueChanged();
 
             if (e.which !== 13) {
@@ -139,6 +146,11 @@ define(function(require, exports, module) {
             }
 
             this._applyValueAndHideCriteria();
+        },
+
+        _preventEnterProcessing(event) {
+            this._keyDownTarget = event.target;
+            TextFilter.__super__._preventEnterProcessing.call(this, event);
         },
 
         /**

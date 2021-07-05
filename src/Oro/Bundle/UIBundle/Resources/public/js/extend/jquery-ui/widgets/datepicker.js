@@ -6,7 +6,7 @@ import manageFocus from 'oroui/js/tools/manage-focus';
 import mask from 'oroui/js/dropdown-mask';
 
 const original = {
-    _connectDatepicker: $.datepicker.constructor.prototype._connectDatepicker,
+    _attachDatepicker: $.datepicker.constructor.prototype._attachDatepicker,
     _attachHandlers: $.datepicker.constructor.prototype._attachHandlers,
     _doKeyDown: $.datepicker.constructor.prototype._doKeyDown,
     _generateHTML: $.datepicker.constructor.prototype._generateHTML,
@@ -14,7 +14,8 @@ const original = {
     _hideDatepicker: $.datepicker.constructor.prototype._hideDatepicker,
     _attachments: $.datepicker.constructor.prototype._attachments,
     _updateDatepicker: $.datepicker.constructor.prototype._updateDatepicker,
-    _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
+    _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker,
+    _refreshDatepicker: $.datepicker.constructor.prototype._refreshDatepicker
 };
 
 const dropdownClassName = 'ui-datepicker-dialog-is-below';
@@ -101,18 +102,30 @@ function updatePos() {
 }
 
 $.extend($.datepicker.constructor.prototype, {
-    _connectDatepicker: function( target, inst ) {
-        original._connectDatepicker.call(this, target, inst);
-        inst.keepFocus = null;
+    _attachDatepicker(target, settings) {
+        original._attachDatepicker.call(this, target, settings);
+        const inst = this._getInst(target);
 
-        inst.dpDiv.off('keydown.prevent').on(
-            'keydown.prevent', event => manageFocus.preventTabOutOfContainer(event, inst.dpDiv)
-        );
+        inst.keepFocus = null;
+        if (!inst.inline) {
+            inst.dpDiv.off('keydown.prevent').on(
+                'keydown.prevent', event => manageFocus.preventTabOutOfContainer(event, inst.dpDiv)
+            );
+        }
 
         inst.dpDiv.off('keydown.datepicker').on('keydown.datepicker', this._onKeyboardNav.bind(this));
         inst.dpDiv.off('keyup.datepicker').on('keyup.datepicker', this._onKeyUpNav.bind(this));
 
         $.datepicker.uuid = this.uuid;
+    },
+
+    _refreshDatepicker(target) {
+        original._refreshDatepicker.call(this, target);
+
+        const inst = this._getInst(target);
+        if (inst.inline) {
+            $.datepicker._curInst = inst;
+        }
     },
 
     _attachHandlers(inst) {
@@ -203,6 +216,7 @@ $.extend($.datepicker.constructor.prototype, {
                 handled = $.ui.keyCode.ENTER;
                 break;
             case $.ui.keyCode.TAB:
+            case $.ui.keyCode.ESCAPE:
                 break;
             default:
                 event.target = target.get(0);
@@ -299,7 +313,7 @@ $.extend($.datepicker.constructor.prototype, {
             });
 
             $td.find('a').attr({
-                'id': `ui-datepicker-${month}-${date}`,
+                'id': `ui-datepicker-${month}-${date}-${this.uuid}`,
                 'aria-label': dayDate.format(this._defaults.weekDay),
                 'tabindex': '-1',
                 'aria-selected': $td.find('a').hasClass('ui-state-active')
@@ -373,6 +387,10 @@ $.extend($.datepicker.constructor.prototype, {
      * @private
      */
     _hideDatepicker(elem, ...rest) {
+        if ($.datepicker._curInst.inline) {
+            return;
+        }
+
         let input = elem;
         const dpDiv = $.datepicker._curInst.dpDiv;
 

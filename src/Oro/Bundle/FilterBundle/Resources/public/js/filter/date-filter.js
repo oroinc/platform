@@ -16,6 +16,13 @@ define(function(require, exports, module) {
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
     const localeSettings = require('orolocale/js/locale-settings');
     const layout = require('oroui/js/layout');
+    const {
+        ARROW_UP,
+        ARROW_DOWN,
+        ARROW_LEFT,
+        ARROW_RIGHT,
+        ESCAPE
+    } = require('oroui/js/tools/keyboard-key-codes').default;
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -182,8 +189,16 @@ define(function(require, exports, module) {
          */
         dayFormats: null,
 
-        events: {
-            'change select': 'onChangeFilterType'
+        events() {
+            const events = {
+                'change select': 'onChangeFilterType'
+            };
+
+            if (!this.isSimplePickerView()) {
+                events['focus [data-toggle="dropdown"]'] = 'onFocusDropdownTrigger';
+            }
+
+            return events;
         },
 
         /**
@@ -255,6 +270,27 @@ define(function(require, exports, module) {
         },
 
         /**
+         * Handle and navigate to dropdown when toggler in focus
+         * @param event
+         */
+        onFocusDropdownTrigger(event) {
+            const $target = $(event.target);
+            $target.one('keydown.onFocus', ({keyCode}) => {
+                switch (keyCode) {
+                    case ARROW_UP:
+                    case ARROW_DOWN:
+                    case ARROW_RIGHT:
+                    case ARROW_LEFT:
+                        $target.dropdown('show');
+                        break;
+                    case ESCAPE:
+                        this._hideCriteria();
+                        break;
+                }
+            });
+        },
+
+        /**
          * @inheritdoc
          */
         dispose: function() {
@@ -268,8 +304,15 @@ define(function(require, exports, module) {
         },
 
         _getPickerConstructor: function() {
-            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
-                ? DatePickerView : VariableDatePickerView;
+            return this.isSimplePickerView() ? DatePickerView : VariableDatePickerView;
+        },
+
+        /**
+         * Picker will be in dropdown
+         * @returns {*|boolean}
+         */
+        isSimplePickerView() {
+            return tools.isMobile() || !this.dateWidgetOptions.showDatevariables;
         },
 
         onChangeFilterType: function(e) {

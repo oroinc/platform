@@ -49,11 +49,7 @@ define(function(require) {
             const changeValueTypeEvent = `change ${this.criteriaValueSelectors.type}`;
 
             return {
-                // Exclude from selection an auxiliary input inside of select2 component
-                'keyup input:not(.select2-focusser)': '_onReadCriteriaInputKey',
                 [changeValueTypeEvent]: '_onValueChanged',
-                'keydown [type="text"]': '_preventEnterProcessing',
-                'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
                 'click .disable-filter': '_onClickDisableFilter',
                 'click .choice-value': '_onClickChoiceValue'
             };
