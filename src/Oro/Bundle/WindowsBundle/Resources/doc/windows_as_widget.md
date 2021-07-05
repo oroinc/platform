@@ -14,6 +14,6 @@ By default in Symfony2 template name will be guessed as TestBundle:Some:create.h
 
 In our case when _widgetContainer=dialog
 
-- TestBundle:Some:dialog.create.html.twig will be used if exists
-- TestBundle:Some:widget.create.html.twig will be used if exists
-- TestBundle:Some:create.html.twig will be used by default in case when no container specific or widget default templates found
+- @TestBundle/Some/dialog.create.html.twig will be used if exists
+- @TestBundle/Some/widget.create.html.twig will be used if exists
+- @TestBundle/Some/create.html.twig will be used by default in case when no container specific or widget default templates found
