@@ -53,7 +53,7 @@ class ConfigurationController extends AbstractController
 
     /**
      * @Route("/user/profile/{activeGroup}/{activeSubGroup}", name="oro_user_profile_configuration")
-     * @Template("OroUserBundle:Configuration:userConfig.html.twig")
+     * @Template("@OroUser/Configuration/userConfig.html.twig")
      * @AclAncestor("update_own_configuration")
      *
      * @param null $activeGroup

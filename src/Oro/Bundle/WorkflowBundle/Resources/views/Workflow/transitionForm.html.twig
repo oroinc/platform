@@ -1,6 +1,6 @@
 {% set entity = null %}
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as macros %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as macros %}
 
 {% set pageParams = transition.frontendOptions.page is defined ? transition.frontendOptions.page : null  %}
 {% if pageParams.title is defined %}
@@ -32,7 +32,7 @@
 {% set saveAndTransitButtonId = 'save-and-transit' %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if indexPath %}
         {{ UI.cancelButton(indexPath|url_decode) }}

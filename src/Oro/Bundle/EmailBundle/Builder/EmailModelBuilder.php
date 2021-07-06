@@ -171,7 +171,7 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Reply/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
@@ -217,7 +217,7 @@ class EmailModelBuilder
 
         $emailModel->setSubject($this->helper->prependWith('Re: ', $parentEmailEntity->getSubject()));
 
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Reply:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Reply/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         $emailModel->setContexts($this->activityListProvider->getTargetEntities($parentEmailEntity));
 
@@ -236,7 +236,7 @@ class EmailModelBuilder
         $emailModel->setParentEmailId($parentEmailEntity->getId());
 
         $emailModel->setSubject($this->helper->prependWith('Fwd: ', $parentEmailEntity->getSubject()));
-        $body = $this->helper->getEmailBody($parentEmailEntity, 'OroEmailBundle:Email/Forward:parentBody.html.twig');
+        $body = $this->helper->getEmailBody($parentEmailEntity, '@OroEmail/Email/Forward/parentBody.html.twig');
         $emailModel->setBodyFooter($body);
         // link attachments of forwarded email to current email instance
         $request = $this->request ?? $this->requestStack->getCurrentRequest();

@@ -7,10 +7,12 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration parameters recognized by LayoutBundle.
+ */
 class Configuration implements ConfigurationInterface
 {
-    private const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
-    private const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
+    private const DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';
 
     /**
      * {@inheritdoc}
@@ -70,37 +72,14 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('default')->defaultValue('twig')->end()
-                ->arrayNode('php')
-                    ->canBeDisabled()
-                    ->fixXmlConfig('resource')
-                    ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_PHP_RESOURCE)->end()
-                            ->example(['MyBundle:Layout/php'])
-                            ->validate()
-                                ->ifTrue(
-                                    function ($v) {
-                                        return !in_array(self::DEFAULT_LAYOUT_PHP_RESOURCE, $v);
-                                    }
-                                )
-                                ->then(
-                                    function ($v) {
-                                        return array_merge([self::DEFAULT_LAYOUT_PHP_RESOURCE], $v);
-                                    }
-                                )
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
                 ->arrayNode('twig')
-                    ->canBeDisabled()
+                    ->addDefaultsIfNotSet()
                     ->fixXmlConfig('resource')
                     ->children()
                         ->arrayNode('resources')
                             ->addDefaultChildrenIfNoneSet()
                             ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_TWIG_RESOURCE)->end()
-                            ->example(['MyBundle:Layout:blocks.html.twig'])
+                            ->example(['@My/Layout/blocks.html.twig'])
                             ->validate()
                                 ->ifTrue(
                                     function ($v) {

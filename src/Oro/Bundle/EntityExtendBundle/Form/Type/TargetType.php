@@ -16,6 +16,9 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for select entity which is suitable as target for relation.
+ */
 class TargetType extends AbstractType
 {
     /** @var ConfigManager */
@@ -68,8 +71,8 @@ class TargetType extends AbstractType
                 'configs' => array(
                     'allowClear'              => true,
                     'placeholder'             => 'oro.entity.form.choose_entity',
-                    'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
-                    'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
+                    'result_template_twig'    => '@OroEntity/Choice/entity/result.html.twig',
+                    'selection_template_twig' => '@OroEntity/Choice/entity/selection.html.twig',
                 )
             )
         );

@@ -31,7 +31,7 @@ class RoleController extends AbstractController
      *      permission="CREATE"
      * )
      * @Route("/create", name="oro_user_role_create")
-     * @Template("OroUserBundle:Role:update.html.twig")
+     * @Template("@OroUser/Role/update.html.twig")
      */
     public function createAction()
     {

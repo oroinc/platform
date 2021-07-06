@@ -4,7 +4,7 @@ layout:
             - 'root'
             - 'container'
         - '@setBlockTheme':
-            themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form_inline.html.twig'
+            themes: '@OroEmbeddedForm/layouts/embedded_default/form_inline.html.twig'
         - '@addTree':
             items:
                 form_css:

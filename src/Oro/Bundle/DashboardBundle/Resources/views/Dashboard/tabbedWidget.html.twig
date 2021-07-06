@@ -1,7 +1,7 @@
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
 
 {% block content %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div class="tab-container"
         {{ UI.renderPageComponentAttributes({
             module: 'oroui/js/app/components/tabs-component'
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: 'orodashboard/js/app/views/widget-tabs-view',

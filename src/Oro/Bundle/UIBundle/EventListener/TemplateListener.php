@@ -5,13 +5,12 @@ namespace Oro\Bundle\UIBundle\EventListener;
 use Doctrine\Inflector\Inflector;
 use Psr\Container\ContainerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
-use Symfony\Component\Templating\EngineInterface;
-use Symfony\Component\Templating\TemplateNameParserInterface;
+use Symfony\Component\Templating\TemplateNameParser;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 /**
@@ -23,14 +22,15 @@ class TemplateListener implements ServiceSubscriberInterface
 
     private ContainerInterface $container;
 
-    private ?EngineInterface $templating = null;
+    private ?Environment $twig = null;
 
-    private Inflector $inflector;
+    private ?Inflector $inflector = null;
 
-    public function __construct(ContainerInterface $container, Inflector $inflector)
+    private ?TemplateNameParser $templateNameParser = null;
+
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->inflector = $inflector;
     }
 
     public function onKernelView(ViewEvent $event): void
@@ -40,6 +40,13 @@ class TemplateListener implements ServiceSubscriberInterface
         if ($templateReference) {
             $this->resolveControllerDir($templateReference);
             $this->injectWidgetContainer($templateReference, $request);
+
+            if (!$this->getTwig()->getLoader()->exists((string) $templateReference)) {
+                $template = $request->attributes->get('_template');
+                if ($template instanceof Template) {
+                    $template->setTemplate((string) $templateReference);
+                }
+            }
         }
     }
 
@@ -65,14 +72,14 @@ class TemplateListener implements ServiceSubscriberInterface
             }
 
             if (is_string($templateReference)) {
-                $parsedTemplateReference = $this->container->get('templating.name_parser')->parse($templateReference);
+                $parsedTemplateReference = $this->getTemplateNameParser()->parse($templateReference);
                 $template->setTemplate($parsedTemplateReference);
                 return $parsedTemplateReference;
             }
         }
 
         if (is_string($template)) {
-            $parsedTemplateReference = $this->container->get('templating.name_parser')->parse($template);
+            $parsedTemplateReference = $this->getTemplateNameParser()->parse($template);
             $request->attributes->set('_template', $parsedTemplateReference);
             return $parsedTemplateReference;
         }
@@ -88,22 +95,17 @@ class TemplateListener implements ServiceSubscriberInterface
      */
     private function resolveControllerDir(TemplateReferenceInterface $templateReference): void
     {
-        if ($templateReference instanceof TemplateReference) {
-            $bundle = $templateReference->get('bundle');
-            $controller = $templateReference->get('controller');
-        } else {
-            $parts = $this->parseTemplateReference($templateReference);
-            if ($parts) {
-                $bundle = $parts['bundle'];
-                $controller = $parts['controller'];
-            }
+        $parts = $this->parseTemplateReference($templateReference);
+        if ($parts) {
+            $bundle = $parts['bundle'];
+            $controller = $parts['controller'];
         }
 
         if (!isset($bundle, $controller)) {
             return;
         }
 
-        $legacyController = $this->inflector->classify($controller);
+        $legacyController = $this->getInflector()->classify($controller);
         if ($legacyController === $controller) {
             return;
         }
@@ -117,17 +119,12 @@ class TemplateListener implements ServiceSubscriberInterface
             }
 
             if (file_exists($path . DIRECTORY_SEPARATOR . $legacyController)) {
-                if ($templateReference instanceof TemplateReference) {
-                    $templateReference->set('controller', $legacyController);
-                    $templateReference->set('name', $this->resolveActionName($templateReference->get('name')));
-                } else {
-                    $templateReference->set('name', sprintf(
-                        '@%s/%s/%s',
-                        $parts['bundle'],
-                        $legacyController,
-                        $this->resolveActionName($parts['name'])
-                    ));
-                }
+                $templateReference->set('name', sprintf(
+                    '@%s/%s/%s',
+                    $parts['bundle'],
+                    $legacyController,
+                    $this->resolveActionName($parts['name'])
+                ));
 
                 return;
             }
@@ -141,7 +138,7 @@ class TemplateListener implements ServiceSubscriberInterface
     private function resolveActionName(string $name): string
     {
         return preg_match('/^(?<view>[^\/\.]+)(\.[a-z]+.[a-z]+)?$/', $name, $parsed)
-            ? str_replace($parsed['view'], $this->inflector->camelize($parsed['view']), $name)
+            ? str_replace($parsed['view'], $this->getInflector()->camelize($parsed['view']), $name)
             : $name;
     }
 
@@ -172,29 +169,13 @@ class TemplateListener implements ServiceSubscriberInterface
      */
     private function processContainer(TemplateReferenceInterface $templateReference, string $container): bool
     {
-        if ($templateReference instanceof TemplateReference) {
-            $templateName = sprintf(
-                '%s:%s:%s.%s.%s',
-                $templateReference->get('bundle'),
-                $templateReference->get('controller'),
-                $container . '/' . $templateReference->get('name'),
-                $templateReference->get('format'),
-                $templateReference->get('engine')
-            );
+        $parts = $this->parseTemplateReference($templateReference);
+        if ($parts) {
+            $templateName = $parts['path'] . $container . '/' . $parts['name'];
 
-            if ($this->getTemplating()->exists($templateName)) {
-                $templateReference->set('name', $container . '/' . $templateReference->get('name'));
+            if ($this->getTwig()->getLoader()->exists($templateName)) {
+                $templateReference->set('name', $templateName);
                 return true;
-            }
-        } else {
-            $parts = $this->parseTemplateReference($templateReference);
-            if ($parts) {
-                $templateName = $parts['path'] . $container . '/' . $parts['name'];
-
-                if ($this->getTemplating()->exists($templateName)) {
-                    $templateReference->set('name', $templateName);
-                    return true;
-                }
             }
         }
 
@@ -218,15 +199,39 @@ class TemplateListener implements ServiceSubscriberInterface
     }
 
     /**
-     * @return EngineInterface
+     * @return Environment
      */
-    private function getTemplating(): EngineInterface
+    private function getTwig(): Environment
     {
-        if (!$this->templating) {
-            $this->templating = $this->container->get('templating');
+        if (!$this->twig) {
+            $this->twig = $this->container->get(Environment::class);
         }
 
-        return $this->templating;
+        return $this->twig;
+    }
+
+    /**
+     * @return Inflector
+     */
+    private function getInflector(): Inflector
+    {
+        if (!$this->inflector) {
+            $this->inflector = $this->container->get(Inflector::class);
+        }
+
+        return $this->inflector;
+    }
+
+    /**
+     * @return TemplateNameParser
+     */
+    private function getTemplateNameParser(): TemplateNameParser
+    {
+        if (!$this->templateNameParser) {
+            $this->templateNameParser = $this->container->get(TemplateNameParser::class);
+        }
+
+        return $this->templateNameParser;
     }
 
     /**
@@ -235,9 +240,10 @@ class TemplateListener implements ServiceSubscriberInterface
     public static function getSubscribedServices(): array
     {
         return [
-            'templating' => EngineInterface::class,
+            Inflector::class,
+            Environment::class,
+            TemplateNameParser::class,
             'twig.loader.native_filesystem' => FilesystemLoader::class,
-            'templating.name_parser' => TemplateNameParserInterface::class
         ];
     }
 }

@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set hasImportProcessor = importProcessor is defined and importProcessor is not empty %}
 {% set importAllowed = hasImportProcessor and is_granted('oro_importexport_import') %}

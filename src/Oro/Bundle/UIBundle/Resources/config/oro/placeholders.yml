@@ -44,28 +44,28 @@ placeholders:
 
     items:
         logo:
-            template: OroUIBundle:Default:logo.html.twig
+            template: '@@OroUI/Default/logo.html.twig'
         help:
-            template: OroUIBundle:Default:help.html.twig
+            template: '@@OroUI/Default/help.html.twig'
         user_dots_menu:
-            template: OroUIBundle:Default:user_dots_menu.html.twig
+            template: '@@OroUI/Default/user_dots_menu.html.twig'
         add_update_delete:
-            template: OroUIBundle:Form:buttons.html.twig
+            template: '@@OroUI/Form/buttons.html.twig'
         ui_js_modules_config:
-            template: OroUIBundle::js_modules_config.html.twig
+            template: '@@OroUI/js_modules_config.html.twig'
         ui_js_modules_config_public_path:
-            template: OroUIBundle::js_modules_config_public_path.html.twig
+            template: '@@OroUI/js_modules_config_public_path.html.twig'
         assets_js:
-            template: OroUIBundle:Assets:oro_js.html.twig
+            template: '@@OroUI/Assets/oro_js.html.twig'
         view_buttons:
-            template: OroUIBundle::buttons.html.twig
+            template: '@@OroUI/buttons.html.twig'
             applicable: "@oro_ui.widget_provider.view_actions->supports($entity$)"
             data: "@oro_ui.widget_provider.view_actions->getWidgets($entity$)"
         update_buttons:
-            template: OroUIBundle::buttons.html.twig
+            template: '@@OroUI/buttons.html.twig'
             applicable: "@oro_ui.widget_provider.update_actions->supports($entity$)"
             data: "@oro_ui.widget_provider.update_actions->getWidgets($entity$)"
         oro_ui_url_copy_action_button:
-            template: OroUIBundle::copy_button.html.twig
+            template: '@@OroUI/copy_button.html.twig'
         assets_css:
-            template: OroUIBundle:Assets:oro_css.html.twig
+            template: '@@OroUI/Assets/oro_css.html.twig'

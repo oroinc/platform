@@ -160,7 +160,7 @@ arguments and call KmpMenu renderer with the resulting options.
 {% block content %}
     <h1>Example menu</h1>
     {{ oro_menu_render('navbar') }}
-    {{ oro_menu_render('navbar', array('template' => 'SomeUserBundle:Menu:customdesign.html.twig')) }}
+    {{ oro_menu_render('navbar', array('template' => '@SomeUser/Menu/customdesign.html.twig')) }}
 {% endblock content %}
 ```
 
@@ -213,7 +213,7 @@ You can avoid usage of breadcrumb provider. For that you should create layout up
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'WebCatalogBundle:layouts:blank/oro_product_frontend_product_index/product_index.html.twig'
+            themes: '@OroWebCatalog/layouts/blank/oro_product_frontend_product_index/product_index.html.twig'
         - '@addTree':
             items:
                 category_breadcrumbs:

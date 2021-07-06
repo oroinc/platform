@@ -31,8 +31,8 @@ class OroIconTypeStub extends AbstractType
                 'placeholder' => '',
                 'configs' => [
                     'placeholder' => 'oro.form.choose_value',
-                    'result_template_twig' => 'OroFormBundle:Autocomplete:icon/result.html.twig',
-                    'selection_template_twig' => 'OroFormBundle:Autocomplete:icon/selection.html.twig',
+                    'result_template_twig' => '@OroForm/Autocomplete/icon/result.html.twig',
+                    'selection_template_twig' => '@OroForm/Autocomplete/icon/selection.html.twig',
                 ]
             ]
         );

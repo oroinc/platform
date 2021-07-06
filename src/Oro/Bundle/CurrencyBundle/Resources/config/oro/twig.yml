@@ -1,2 +1,2 @@
 bundles:
-    - OroCurrencyBundle:Form:fields.html.twig
+    - '@OroCurrency/Form/fields.html.twig'

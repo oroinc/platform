@@ -208,7 +208,7 @@ class BeforeMapObjectSearchListener
                     'entityName' => '@' . str_replace('\\', '_', $className) . '@'
                 ]
             ],
-            'search_template'       => 'OroEntityExtendBundle:Search:result.html.twig',
+            'search_template'       => '@OroEntityExtend/Search/result.html.twig',
             self::FIELDS_PATH       => [],
             'mode'                  => 'normal'
         ];

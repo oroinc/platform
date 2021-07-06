@@ -148,17 +148,17 @@ datagrids:
             applications:
                 label:         oro.workflow.workflowdefinition.applications.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/applications.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/applications.html.twig'
                 frontend_type: html
             exclusiveActiveGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_active_groups.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/exclusiveGroups.html.twig'
                 frontend_type: html
             exclusiveRecordGroups:
                 label:         oro.workflow.workflowdefinition.exclusive_record_groups.label
                 type:          twig
-                template:      OroWorkflowBundle:Datagrid:Column/exclusiveGroups.html.twig
+                template:      '@OroWorkflow/Datagrid/Column/exclusiveGroups.html.twig'
                 frontend_type: html
             createdAt:
                 label:         oro.ui.created_at

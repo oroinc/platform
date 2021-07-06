@@ -26,8 +26,8 @@ class OrganizationUserAclMultiSelectType extends UserMultiSelectType
                     'multiple'                => true,
                     'placeholder'             => 'oro.user.form.choose_user',
                     'allowClear'              => true,
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/selection.html.twig',
                 ]
             ]
         );

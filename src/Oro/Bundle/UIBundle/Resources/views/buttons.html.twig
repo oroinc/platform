@@ -1,4 +1,4 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% for groupName, group in data -%}
     {% if groupName is empty or group.widgets|length <= 2 -%}
         {% for widget in group.widgets -%}

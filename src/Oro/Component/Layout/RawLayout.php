@@ -478,11 +478,11 @@ class RawLayout
      * Example of returned data:
      *  [
      *      'root_item_id' => [
-     *          'MyBundle:Layout:my_theme.html.twig',
-     *          'AcmeBundle:Layout:some_theme.html.twig'
+     *          '@My/Layout/my_theme.html.twig',
+     *          '@Acme/Layout/some_theme.html.twig'
      *      ],
      *      'item_id1' => [
-     *          'MyBundle:Layout:custom_item.html.twig'
+     *          '@My/Layout/custom_item.html.twig'
      *      ]
      *  ]
      *
@@ -497,7 +497,7 @@ class RawLayout
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
      * @param string          $id     The id of the layout item to assign the theme(s) to
-     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes The theme(s). For example '@My/Layout/my_theme.html.twig'
      *
      * @return self
      */
@@ -522,8 +522,8 @@ class RawLayout
      *
      * Example of returned data:
      *  [
-     *      'MyBundle:Layout:div_form_layout.html.twig',
-     *      'AcmeBundle:Layout:div_form_layout.html.twig'
+     *      '@My/Layout/div_form_layout.html.twig',
+     *      '@Acme/Layout/div_form_layout.html.twig'
      *  ]
      *
      * @return array
@@ -536,7 +536,7 @@ class RawLayout
     /**
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
-     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes The theme(s). For example '@My/Layout/my_theme.html.twig'
      *
      * @return self
      */

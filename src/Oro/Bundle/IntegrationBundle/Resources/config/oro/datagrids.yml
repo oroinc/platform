@@ -18,7 +18,7 @@ datagrids:
             type:
                 label:          oro.integration.integration.type.label
                 type:           twig
-                template:       OroIntegrationBundle:Integration:Datagrid/type.html.twig
+                template:       '@OroIntegration/Integration/Datagrid/type.html.twig'
                 frontend_type:  html
                 context:
                     choices:  "@oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()"
@@ -120,7 +120,7 @@ datagrids:
             message:
                 label:          oro.integration.integration_status.message.label
                 type:           twig
-                template:       OroIntegrationBundle:Integration:Datagrid/message.html.twig
+                template:       '@OroIntegration/Integration/Datagrid/message.html.twig'
                 frontend_type:  html
             date:
                 label:         oro.ui.created_at

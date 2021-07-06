@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Provider;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\TwigTemplateProperty;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -94,7 +95,7 @@ class SystemAwareResolver implements ContainerAwareInterface
             return $val;
         }
 
-        if (is_scalar($val) && strpos($val, '%') !== false) {
+        if (strpos($val, '%') !== false) {
             $val = $this->resolveClassName($val);
         }
 
@@ -107,7 +108,8 @@ class SystemAwareResolver implements ContainerAwareInterface
         }
 
         if (is_scalar($val) && strpos($val, '@') !== false) {
-            $val = $this->resolveService($datagridName, $key, $val);
+            $val = $key === TwigTemplateProperty::TEMPLATE_KEY ?
+                $val : $this->resolveService($datagridName, $key, $val);
         }
 
         return $val;

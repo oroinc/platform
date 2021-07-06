@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages LayoutBundle service configuration
+ */
 class OroLayoutExtension extends Extension
 {
     public const ALIAS = 'oro_layout';
@@ -41,20 +44,11 @@ class OroLayoutExtension extends Extension
             'oro_layout.enabled_themes',
             $config['enabled_themes']
         );
-        if ($config['templating']['php']['enabled']) {
-            $loader->load('php_renderer.yml');
-            $container->setParameter(
-                'oro_layout.php.resources',
-                $config['templating']['php']['resources']
-            );
-        }
-        if ($config['templating']['twig']['enabled']) {
-            $loader->load('twig_renderer.yml');
-            $container->setParameter(
-                'oro_layout.twig.resources',
-                $config['templating']['twig']['resources']
-            );
-        }
+        $loader->load('twig_renderer.yml');
+        $container->setParameter(
+            'oro_layout.twig.resources',
+            $config['templating']['twig']['resources']
+        );
 
         $loader->load('theme_services.yml');
         if (isset($config['active_theme'])) {

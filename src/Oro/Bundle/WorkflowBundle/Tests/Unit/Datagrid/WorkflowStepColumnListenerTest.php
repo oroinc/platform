@@ -252,7 +252,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'label' => 'oro.workflow.workflowstep.grid.label',
                             'type' => 'twig',
                             'frontend_type' => 'html',
-                            'template' => 'OroWorkflowBundle:Datagrid:Column/workflowStep.html.twig'
+                            'template' => '@OroWorkflow/Datagrid/Column/workflowStep.html.twig'
                         ],
                     ],
                 ],
@@ -382,7 +382,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'label' => 'oro.workflow.workflowstep.grid.label',
                             'type' => 'twig',
                             'frontend_type' => 'html',
-                            'template' => 'OroWorkflowBundle:Datagrid:Column/workflowStep.html.twig'
+                            'template' => '@OroWorkflow/Datagrid/Column/workflowStep.html.twig'
                         ],
                     ],
                     'filters' => [
@@ -489,7 +489,7 @@ class WorkflowStepColumnListenerTest extends \PHPUnit\Framework\TestCase
                             'label' => 'oro.workflow.workflowstep.grid.label',
                             'type' => 'twig',
                             'frontend_type' => 'html',
-                            'template' => 'OroWorkflowBundle:Datagrid:Column/workflowStep.html.twig'
+                            'template' => '@OroWorkflow/Datagrid/Column/workflowStep.html.twig'
                         ],
                     ],
                     'filters' => [

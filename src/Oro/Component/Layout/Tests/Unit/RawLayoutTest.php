@@ -899,33 +899,33 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         // do test
         $this->rawLayout->setBlockTheme(
             'root',
-            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+            ['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig']
         );
         $this->rawLayout->setBlockTheme(
             'root',
-            'MyBundle:Layout:theme3.html.twig'
+            '@My/Layout/theme3.html.twig'
         );
         $this->rawLayout->setBlockTheme(
             'header',
-            'MyBundle:Layout:header_theme1.html.twig'
+            '@My/Layout/header_theme1.html.twig'
         );
         $this->rawLayout->setBlockTheme(
             'header',
-            ['MyBundle:Layout:header_theme2.html.twig', 'MyBundle:Layout:header_theme3.html.twig']
+            ['@My/Layout/header_theme2.html.twig', '@My/Layout/header_theme3.html.twig']
         );
 
         $blockThemes = $this->rawLayout->getBlockThemes();
         $this->assertSame(
             [
                 'root'   => [
-                    'MyBundle:Layout:theme1.html.twig',
-                    'MyBundle:Layout:theme2.html.twig',
-                    'MyBundle:Layout:theme3.html.twig'
+                    '@My/Layout/theme1.html.twig',
+                    '@My/Layout/theme2.html.twig',
+                    '@My/Layout/theme3.html.twig'
                 ],
                 'header' => [
-                    'MyBundle:Layout:header_theme1.html.twig',
-                    'MyBundle:Layout:header_theme2.html.twig',
-                    'MyBundle:Layout:header_theme3.html.twig'
+                    '@My/Layout/header_theme1.html.twig',
+                    '@My/Layout/header_theme2.html.twig',
+                    '@My/Layout/header_theme3.html.twig'
                 ]
             ],
             $blockThemes
@@ -937,7 +937,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Component\Layout\Exception\ItemNotFoundException::class);
         $this->expectExceptionMessage('The "unknown" item does not exist.');
 
-        $this->rawLayout->setBlockTheme('unknown', 'MyBundle:Layout:theme1.html.twig');
+        $this->rawLayout->setBlockTheme('unknown', '@My/Layout/theme1.html.twig');
     }
 
     /**
@@ -948,7 +948,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
 
-        $this->rawLayout->setBlockTheme($id, 'MyBundle:Layout:theme1.html.twig');
+        $this->rawLayout->setBlockTheme($id, '@My/Layout/theme1.html.twig');
     }
 
     /**
@@ -1010,18 +1010,18 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
 
         // do test
         $this->rawLayout->setFormTheme(
-            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+            ['@My/Layout/theme1.html.twig', '@My/Layout/theme2.html.twig']
         );
         $this->rawLayout->setFormTheme(
-            'MyBundle:Layout:theme3.html.twig'
+            '@My/Layout/theme3.html.twig'
         );
 
         $formThemes = $this->rawLayout->getFormThemes();
         $this->assertSame(
             [
-                'MyBundle:Layout:theme1.html.twig',
-                'MyBundle:Layout:theme2.html.twig',
-                'MyBundle:Layout:theme3.html.twig'
+                '@My/Layout/theme1.html.twig',
+                '@My/Layout/theme2.html.twig',
+                '@My/Layout/theme3.html.twig'
             ],
             $formThemes
         );

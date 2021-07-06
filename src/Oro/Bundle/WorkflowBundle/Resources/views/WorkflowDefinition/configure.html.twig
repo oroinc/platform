@@ -1,4 +1,4 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label|trans([], 'workflows')} }) %}
 
@@ -8,7 +8,7 @@
 {% endblock stats %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set html = UI.saveAndCloseButton({
         'route': 'oro_workflow_definition_view', 'params': {'name': entity.name}
@@ -19,7 +19,7 @@
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set breadcrumbs = {
         'entity': entity,

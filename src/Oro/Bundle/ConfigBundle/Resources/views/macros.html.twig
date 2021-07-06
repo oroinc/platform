@@ -60,7 +60,7 @@
 {% endmacro %}
 
 {% macro renderConfigurationScrollData(data) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% import _self as configMacros %}
 
     {% set content %}
@@ -86,14 +86,14 @@
         </div>
     {% endset %}
     <div class="system-configuration-container">
-        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+        {% embed "@OroUI/content_sidebar.html.twig" with {options: {
             scrollbar: '[data-role="jstree-container"]'
         }} %}
             {% block header %}
                 <div id="system-configuration-jstree-inline-actions"></div>
             {% endblock header %}
             {% block sidebar %}
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                {% import '@OroUI/macros.html.twig' as UI %}
                 {{ UI.renderJsTree({
                     'label': null,
                     'treeOptions': {
@@ -204,7 +204,7 @@
         block.tooltip     - fieldset tooltip (optional)
 #}
 {% macro renderFieldset(block) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
     <fieldset class="form-horizontal form-horizontal-large">
         {% if block.title is defined %}
         <h5 class="user-fieldset">

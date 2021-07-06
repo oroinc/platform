@@ -133,7 +133,7 @@
 
 {% block collection_render %}
     {% spaceless %}
-        {% from 'OroUIBundle::macros.html.twig' import collection_prototype as collection  %}
+        {% from '@OroUI/macros.html.twig' import collection_prototype as collection  %}
         <div class="row-oro">
             <div class="collection-fields-list" data-prototype="{{ collection(subform)|escape }}">
                 {% for field in subform.children %}

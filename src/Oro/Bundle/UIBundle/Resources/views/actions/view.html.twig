@@ -1,13 +1,13 @@
 {% extends bap.layout %}
-{% import 'OroSyncBundle:Include:contentTags.html.twig' as syncMacro %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroSync/Include/contentTags.html.twig' as syncMacro %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% block before_content_addition %}
     {% placeholder view_before_content_addition with {entity: entity} %}
 {% endblock before_content_addition %}
 
 {% block ownerLink %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if entity is not null %}
         {% set ownerLink -%}
@@ -20,7 +20,7 @@
 {% endblock ownerLink %}
 
 {% block content %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 <div class="layout-content"
         {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}

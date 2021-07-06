@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroEmailBundle::actions.html.twig' as EmailActions %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroEmail/actions.html.twig' as EmailActions %}
 
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name }}) %}
@@ -52,7 +52,7 @@
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 
 {% block navButtons %}
-    {% import 'OroEmailBundle::actions.html.twig' as EmailActions %}
+    {% import '@OroEmail/actions.html.twig' as EmailActions %}
 
     {% if is_granted('oro_email_email_create') %}
         <div class="btn-group">
@@ -76,7 +76,7 @@
         'oro.email.action.processing'|trans ~
         '&nbsp;<span class="loading-dots"></span>'
     %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="btn-group" {{ UI.renderPageComponentAttributes({
         view: 'oroemail/js/app/views/email-sync-view',
@@ -98,5 +98,5 @@
     {% set breadcrumbs = [{
         'label': 'oro.email.menu.user_emails'|trans
     }] %}
-    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+    {% include '@OroNavigation/Menu/breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}

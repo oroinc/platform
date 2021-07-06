@@ -1,4 +1,4 @@
-{% extends 'OroActivityListBundle:ActivityList/js:view.html.twig' %}
+{% extends '@OroActivityList/ActivityList/js/view.html.twig' %}
 
 {% block activityIcon %}
     <span class="{{ oro_entity_config_value(entityClass|default(), 'icon')|raw }}" aria-hidden="true"></span>
@@ -15,7 +15,7 @@
             {% for action in actions|default([]) %}
                 <li class="activity-action">{{ action|raw }}</li>
             {% endfor %}
-            {% include 'OroActivityListBundle:ActivityList/js:workflowTemplate.html.twig' %}
+            {% include '@OroActivityList/ActivityList/js/workflowTemplate.html.twig' %}
         </ul>
     </div>
 {% endblock %}

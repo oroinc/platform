@@ -1,7 +1,7 @@
 {% block oro_type_widget_datetime_range_widget %}
     {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : 1 %}
 
-    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
+    {% import '@OroDashboard/macros.html.twig' as UI %}
 
     {{ UI.renderDateWidgeView(form, valueType, 'datetime', 'orodashboard/js/app/views/widget-datetime-range-view') }}
 {% endblock %}
@@ -10,13 +10,13 @@
     {% set monthType = constant('Oro\\Bundle\\FilterBundle\\Form\\Type\\Filter\\AbstractDateFilterType::TYPE_THIS_MONTH') %}
     {% set valueType = (form.vars.value.type != '') ? form.vars.value.type : (form.vars.datetime_range_metadata.valueTypes ? monthType : 1) %}
 
-    {% import 'OroDashboardBundle::macros.html.twig' as UI %}
+    {% import '@OroDashboard/macros.html.twig' as UI %}
 
     {{ UI.renderDateWidgeView(form, valueType, 'date', 'orodashboard/js/app/views/widget-date-range-view') }}
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div class="widget-title-container" {{ UI.renderPageComponentAttributes({
         view: 'oroform/js/app/views/default-field-value-view',
@@ -35,7 +35,7 @@
 {% endblock oro_type_widget_title_widget %}
 
 {% block oro_type_widget_items_row %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set rowId = form.vars.id ~ 'Row' %}
 
     <div id="{{ rowId }}" class="control-group dashboard-widget-items">
@@ -77,7 +77,7 @@
         }) %}
     {% endif %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: 'orodashboard/js/items/view',
@@ -95,7 +95,7 @@
                 {{ form_widget(form.date) }}
             </div>
 
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
                 view: 'orodashboard/js/app/views/widget-date-compare-view',
@@ -133,9 +133,9 @@
                     {{ form_row(form.definition) }}
                     {% set metadata = oro_query_filter_metadata() %}
                     {% set column_chain_template_id = 'column-chain-template' %}
-                    {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+                    {% import '@OroQueryDesigner/macros.html.twig' as QD %}
                     {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
-                    {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
+                    {% import '@OroSegment/macros.html.twig' as segmentQD %}
                     {{ segmentQD.query_designer_condition_builder({
                         'id': name ~ '-condition-builder',
                         'disable_audit': true,

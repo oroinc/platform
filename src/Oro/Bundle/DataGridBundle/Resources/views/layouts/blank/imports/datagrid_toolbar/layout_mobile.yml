@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'OroDataGridBundle:layouts:blank/imports/datagrid_toolbar/layout_mobile.html.twig'
+            themes: '@OroDataGrid/layouts/blank/imports/datagrid_toolbar/layout_mobile.html.twig'
         - '@remove':
             id: __datagrid_toolbar_extra_actions
         - '@remove':

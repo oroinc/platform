@@ -11,9 +11,9 @@ use Twig\TokenParser\AbstractTokenParser;
  * Token Parser for the 'block_theme' tag
  * Examples:
  *  {% block_theme layout _self %}
- *  {% block_theme layout 'SomeBundle:Layout:blocks.html.twig' %}
- *  {% block_theme layout.some_block_id 'SomeBundle:Layout:blocks.html.twig' %}
- *  {% block_theme layout with ['SomeBundle:Layout:blocks.html.twig', 'AnotherBundle:Layout:blocks.html.twig'] %}
+ *  {% block_theme layout '@Some/Layout/blocks.html.twig' %}
+ *  {% block_theme layout.some_block_id '@Some/Layout/blocks.html.twig' %}
+ *  {% block_theme layout with ['@Some/Layout/blocks.html.twig', '@Another/Layout/blocks.html.twig'] %}
  */
 class BlockThemeTokenParser extends AbstractTokenParser
 {

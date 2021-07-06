@@ -1,6 +1,6 @@
 {% extends bap.layout %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 {% set buttonsPlaceholderData = {} %}
 {% if entity_class is defined %}
     {% set buttonsPlaceholderData = {'entity_class': entity_class} %}
@@ -69,7 +69,7 @@
             {{ dataGrid.renderGrid(gridName, params|default({}), renderParams) }}
 
             {# Only grids on index pages will be tagged #}
-            {% import 'OroUIBundle::macros.html.twig' as UI %}
+            {% import '@OroUI/macros.html.twig' as UI %}
 
             <div {{ UI.renderPageComponentAttributes({
                 module: 'orodatagrid/js/app/components/datagrid-allow-tracking-component',

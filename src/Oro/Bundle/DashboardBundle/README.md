@@ -14,13 +14,13 @@ dashboards:
             description: Text                                # description of widget
             acl:        acl_resource                         # acl resource of dashboard
             route:      oro_dashboard_itemized_widget        # widget route
-            route_parameters: { bundle: OroDashboardBundle, name: quickLaunchpad } # additional route parameters
+            route_parameters: { bundle: OroDashboard, name: quickLaunchpad } # additional route parameters
             isNew: true                                      # show or not "New" label next to the title
  
     # Configuration of dashboards
     dashboards:                                              # dashboard configuration section
         main:                                                # dashboard name
-            twig: OroDashboardBundle:Index:default.html.twig # dashboard template (used by default)
+            twig: '@OroDashboard/Index/default.html.twig' # dashboard template (used by default)
 ```
 To view all configuration options you can launch `config:dump-reference` command:
 ```bash
@@ -136,7 +136,7 @@ datagrids:
                 type: twig
                 label: ~
                 frontend_type: html
-                template: OroCallBundle:Datagrid:Column/direction.html.twig
+                template: '@OroCall/Datagrid/Column/direction.html.twig'
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
@@ -144,7 +144,7 @@ datagrids:
                 type: twig
                 label: orocrm.call.subject.label
                 frontend_type: html
-                template: OroCallBundle:Datagrid:Column/subject.html.twig
+                template: '@OroCall/Datagrid/Column/subject.html.twig'
             phone:
                 label: orocrm.call.phone_number.label
         sorters:
@@ -164,8 +164,8 @@ datagrids:
 Next you need to create a TWIG template renders your grid. This template should be located `Resources/views/Dashboard` directory in of your bundle. For example lets create `recentCalls.html.twig`:
 
 ```twig
-{% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroDashboard/Dashboard/widget.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
  
 {% block content %}
     {{ dataGrid.renderGrid('dashboard-recent-calls-grid') }}
@@ -190,7 +190,7 @@ dashboards:
         recent_calls:                               # register a widget
             label:      orocrm.dashboard.recent_calls.title
             route:      oro_dashboard_widget        # you can use existing controller to render your TWIG template
-            route_parameters: { bundle: OroCallBundle, name: recentCalls }   # just specify a bundle and a TWIG template name
+            route_parameters: { bundle: OroCall, name: recentCalls }   # just specify a bundle and a TWIG template name
             acl:        oro_call_view
 ```
  

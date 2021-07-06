@@ -10,7 +10,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
  */
 class OperationButton implements ButtonInterface
 {
-    const DEFAULT_TEMPLATE = 'OroActionBundle:Operation:button.html.twig';
+    const DEFAULT_TEMPLATE = '@OroAction/Operation/button.html.twig';
     const BUTTON_TEMPLATE_KEY = 'template';
 
     /**

@@ -99,7 +99,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         }
 
         if (is_string($val) && strpos($val, '@') !== false) {
-            $val = $this->resolveService($val);
+            $val = \str_starts_with($val, '@@') ? substr($val, 1) : $this->resolveService($val);
         }
 
         return $val;
@@ -130,7 +130,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         foreach ($items as $item) {
             $item = trim($item, ' ');
 
-            if ($this->startsWith($item, '$') && $this->endsWith($item, '$')) {
+            if (\str_starts_with($item, '$') && \str_ends_with($item, '$')) {
                 $name = substr($item, 1, -1);
                 $dot = strpos($name, '.');
                 $objectName = $dot ? substr($name, 0, $dot) : $name;
@@ -140,7 +140,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
                     $propertyPath = substr($name, $dot + 1);
                     $item = $this->getPropertyAccessor()->getValue($item, $propertyPath);
                 }
-            } elseif ($this->startsWith($item, '%') && $this->endsWith($item, '%')) {
+            } elseif (\str_starts_with($item, '%') && \str_ends_with($item, '%')) {
                 $name = substr($item, 1, -1);
                 $item = $this->getParameter($name);
             }
@@ -202,32 +202,6 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
             sprintf('%s::%s', $class, $method),
             $params
         );
-    }
-
-    /**
-     * Checks if a string starts with a given string.
-     *
-     * @param  string $haystack A string
-     * @param  string $needle   A string to check against
-     *
-     * @return bool TRUE if $haystack starts with $needle
-     */
-    protected function startsWith($haystack, $needle)
-    {
-        return strpos($haystack, $needle) === 0;
-    }
-
-    /**
-     * Checks if a string ends with a given string.
-     *
-     * @param  string $haystack A string
-     * @param  string $needle   A string to check against
-     *
-     * @return bool TRUE if $haystack ends with $needle
-     */
-    protected function endsWith($haystack, $needle)
-    {
-        return substr($haystack, -strlen($needle)) === $needle;
     }
 
     /**

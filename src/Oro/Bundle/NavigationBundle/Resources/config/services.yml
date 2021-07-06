@@ -322,7 +322,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
         arguments:
             - '@security.token_storage'
-            - '@templating'
+            - '@twig'
             - '%kernel.debug%'
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onResponse }

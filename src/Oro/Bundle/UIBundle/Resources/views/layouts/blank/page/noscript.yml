@@ -1,7 +1,7 @@
 layout:
   actions:
       - '@setBlockTheme':
-          themes: 'OroUIBundle:layouts:blank/page/noscript.html.twig'
+          themes: '@OroUI/layouts/blank/page/noscript.html.twig'
 
       - '@add':
           id: nosctipt

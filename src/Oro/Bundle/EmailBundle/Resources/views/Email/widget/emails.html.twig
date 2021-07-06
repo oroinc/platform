@@ -1,5 +1,5 @@
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% import 'OroEmailBundle::macros.html.twig' as email %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+{% import '@OroEmail/macros.html.twig' as email %}
 
 <div class="widget-content">
     {{ dataGrid.renderGrid('email-grid', datagridParameters) }}

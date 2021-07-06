@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'OroWorkflowBundle:layouts:default/imports/oro_workflow_transition_form/layout.html.twig'
+            themes: '@OroWorkflow/layouts/default/imports/oro_workflow_transition_form/layout.html.twig'
         - '@addTree':
             items:
                 transition_form_wrapper:

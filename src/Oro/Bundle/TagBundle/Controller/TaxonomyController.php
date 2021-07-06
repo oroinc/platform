@@ -49,7 +49,7 @@ class TaxonomyController extends AbstractController
      *      class="OroTagBundle:Taxonomy",
      *      permission="CREATE"
      * )
-     * @Template("OroTagBundle:Taxonomy:update.html.twig")
+     * @Template("@OroTag/Taxonomy/update.html.twig")
      */
     public function createAction()
     {

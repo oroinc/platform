@@ -40,7 +40,7 @@ datagrids:
                 label: oro.taxonomy.background_color.label
                 type: twig
                 frontend_type: html
-                template: OroTagBundle:Tag:Datagrid/Property/background_color.html.twig
+                template: '@OroTag/Tag/Datagrid/Property/background_color.html.twig'
             usage:
                 label: oro.tag.datagrid.usage_count
                 type: field
@@ -166,7 +166,7 @@ datagrids:
                 label: oro.taxonomy.background_color.label
                 type: twig
                 frontend_type: html
-                template: OroTagBundle:Tag:Datagrid/Property/background_color.html.twig
+                template: '@OroTag/Tag/Datagrid/Property/background_color.html.twig'
             usage:
                 label: oro.tag.datagrid.usage_count
                 type: field

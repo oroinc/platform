@@ -55,7 +55,7 @@ class FormListener
                 }
 
                 $ownerField = $event->getTwigEnvironment()
-                    ->render('OroOrganizationBundle::owner.html.twig', ['form'  => $form, 'label' => $label]);
+                    ->render('@OroOrganization/owner.html.twig', ['form'  => $form, 'label' => $label]);
                 array_unshift($data['dataBlocks'][$firstBlockId]['subblocks'][0]['data'], $ownerField);
             }
         }

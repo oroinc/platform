@@ -10,7 +10,7 @@
 #}
 {% macro sendEmailLink(email, entity, parameters) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{- UI.clientLink({
             'dataUrl': path(
                 'oro_email_email_create', {
@@ -46,7 +46,7 @@
 
 {% macro replyAllButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
         id: emailEntity.id
         } -%}
@@ -81,7 +81,7 @@
 
 {% macro replyButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
         } -%}
@@ -116,7 +116,7 @@
 
 {% macro forwardButton(emailEntity, parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {%- set routeParameters = {
             id: emailEntity.id
         } -%}
@@ -151,7 +151,7 @@
 
 {% macro createEmailButton(parameters = {}) -%}
     {% if is_granted('oro_email_email_create') %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path('oro_email_email_create', parameters),
             'label': 'oro.email.menu.compose'|trans,
@@ -179,7 +179,7 @@
 
 {% macro addMarkUnreadButton(emailEntity) -%}
     {% if is_granted('oro_email_email_user_edit', emailEntity) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(
                 'oro_email_mark_seen', {

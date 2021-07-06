@@ -1,7 +1,7 @@
 {% block oro_region_widget %}
     {# // check if block was not included yet #}
     {% if block('oro_region_updater_js') is not defined %}
-        {{ block('oro_region_updater_js', 'OroAddressBundle:Include:javascript.html.twig')|raw }}
+        {{ block('oro_region_updater_js', '@OroAddress/Include/javascript.html.twig')|raw }}
     {% endif %}
 
     {% if country_field is not defined or country_field is empty %}
@@ -24,7 +24,7 @@
     {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
     {% set regionView = regionView|default('oroaddress/js/region/view') %}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         view: regionView,
@@ -145,7 +145,7 @@
 
 {% macro oro_collection_validate_types_js(context) %}
     {% if context.form.vars.prototype.types is defined %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
 
         <div {{ UI.renderPageComponentAttributes({
             view: 'oroaddress/js/app/views/address-collection-view',

@@ -753,7 +753,7 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Formatter\NewHtmlFormatter
         parent: nelmio_api_doc.formatter.abstract_formatter
         calls:
-            - [setTemplatingEngine, ['@templating']]
+            - [setTwig, ['@twig']]
             - [setMotdTemplate, ['%nelmio_api_doc.motd.template%']]
             - [setApiName, ['%nelmio_api_doc.api_name%']]
             - [setEnableSandbox, ['%nelmio_api_doc.sandbox.enabled%']]

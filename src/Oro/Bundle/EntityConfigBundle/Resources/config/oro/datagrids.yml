@@ -95,7 +95,7 @@ datagrids:
                 label: oro.entity_config.field_config.type.label
                 frontend_type: html
                 type: twig
-                template: OroEntityConfigBundle:Config:fieldType.html.twig
+                template: '@OroEntityConfig/Config/fieldType.html.twig'
 
         actions:
             # @TODO check why those actions dont have ACL
@@ -150,7 +150,7 @@ datagrids:
                 label: oro.entity_config.attribute_family.entity_plural_label
                 frontend_type: html
                 type: twig
-                template: OroEntityConfigBundle:Datagrid:Column/attributeFamilies.html.twig
+                template: '@OroEntityConfig/Datagrid/Column/attributeFamilies.html.twig'
                 order: 99
             organization_applicable:
                 renderable: false
@@ -211,7 +211,7 @@ datagrids:
             diffs:
                 label: oro.entity_config.config_log.diffs.label
                 type: twig
-                template: OroEntityConfigBundle:Audit:data.html.twig
+                template: '@OroEntityConfig/Audit/data.html.twig'
                 frontend_type: html
                 context:
                     config_manager: '@oro_entity_config.config_manager'
@@ -360,7 +360,7 @@ datagrids:
                 label: oro.entity_config.attribute_group.attribute_relations.label
                 renderable: true
                 type: twig
-                template: 'OroEntityConfigBundle:Datagrid:Property/attributes.html.twig'
+                template: '@OroEntityConfig/Datagrid/Property/attributes.html.twig'
                 frontend_type: html
         properties:
             id: ~

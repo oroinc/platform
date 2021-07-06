@@ -637,18 +637,3 @@
         </div>
     </div>
 {% endmacro %}
-
-{#
-    Wrap text to tag
-    @deprecated since 2.3, no replacement because this macro was used
-        only in OroEmailBundle:Email:Datagrid/Property/contacts.html.twig,
-        now renderEmailAddressCell macro is used in this temmplate
-#}
-{% macro wrapTextToTag(text, isWrap, tag) %}
-    {% set tag = tag is not null ? tag : 'strong' %}
-    {% if isWrap == true %}
-        <{{ tag }}>{{ text }}</{{ tag }}>
-    {% else %}
-        {{ text }}
-    {% endif %}
-{% endmacro %}

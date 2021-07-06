@@ -111,7 +111,7 @@ datagrids:
                 label: oro.notification.emailnotification.entity_name.label
                 data_name: entityName
                 type: twig
-                template: OroEntityBundle:Datagrid:Property/entity.html.twig
+                template: '@OroEntity/Datagrid/Property/entity.html.twig'
                 frontend_type: html
                 context:
                     entity_provider: '@oro_entity.entity_provider'
@@ -130,14 +130,14 @@ datagrids:
             recipientUsersList:
                 label: oro.notification.datagrid.recipient.user
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientUsersList.html.twig
+                template: '@OroNotification/EmailNotification/Datagrid/Property/recipientUsersList.html.twig'
                 frontend_type: html
                 order: 60
 
             recipientGroupsList:
                 label: oro.notification.datagrid.recipient.group
                 type: twig
-                template: OroNotificationBundle:EmailNotification:Datagrid/Property/recipientGroupsList.html.twig
+                template: '@OroNotification/EmailNotification/Datagrid/Property/recipientGroupsList.html.twig'
                 choices: "@oro_notification.grid_helper->getRecipientGroupsChoices"
                 frontend_type: html
                 order: 70

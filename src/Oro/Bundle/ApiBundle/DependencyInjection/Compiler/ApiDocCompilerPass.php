@@ -39,6 +39,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const FILE_LOCATOR_SERVICE                      = 'file_locator';
     private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
     private const API_SOURCE_LISTENER_SERVICE               = 'oro_api.listener.api_source';
+    private const TWIG                                      = 'twig';
 
     /**
      * {@inheritdoc}
@@ -221,6 +222,11 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $defaultHtmlFormatterDef->addMethodCall(
             'setDocumentationProvider',
             [new Reference(self::DOCUMENTATION_PROVIDER_SERVICE)]
+        );
+        $defaultHtmlFormatterDef->removeMethodCall('setTemplatingEngine');
+        $defaultHtmlFormatterDef->addMethodCall(
+            'setTwig',
+            [new Reference(self::TWIG)]
         );
 
         // configure composite HTML formatter and set it as default one

@@ -10,8 +10,8 @@
 {% endblock %}
 
 {% block oro_segment_filter_builder_widget %}
-    {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
-    {% import 'OroQueryDesignerBundle::macros.html.twig' as QD %}
+    {% import '@OroSegment/macros.html.twig' as segmentQD %}
+    {% import '@OroQueryDesigner/macros.html.twig' as QD %}
 
     {% set segment = form.vars.value %}
     {% set id = form.vars.id %}

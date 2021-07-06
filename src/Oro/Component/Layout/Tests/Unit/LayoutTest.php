@@ -3,54 +3,54 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Exception\LogicException;
 use Oro\Component\Layout\Layout;
+use Oro\Component\Layout\LayoutRendererInterface;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Symfony\Component\Templating\TemplateReference;
 
 class LayoutTest extends LayoutTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $renderer;
+    protected LayoutRendererInterface|\PHPUnit\Framework\MockObject\MockObject $renderer;
 
-    /** @var LayoutRendererRegistry */
-    protected $rendererRegistry;
+    protected LayoutRendererRegistry $rendererRegistry;
 
     protected function setUp(): void
     {
-        $this->renderer         = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->renderer         = $this->createMock(LayoutRendererInterface::class);
         $this->rendererRegistry = new LayoutRendererRegistry();
         $this->rendererRegistry->addRenderer('test', $this->renderer);
         $this->rendererRegistry->setDefaultRenderer('test');
     }
 
-    public function testGetView()
+    public function testGetView(): void
     {
         $view = new BlockView();
 
         $layout = new Layout($view, $this->rendererRegistry);
 
-        $this->assertSame($view, $layout->getView());
+        self::assertSame($view, $layout->getView());
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $expected = 'some rendered string';
 
         $view = new BlockView();
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('renderBlock')
             ->with($this->identicalTo($view))
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $layout = new Layout($view, $this->rendererRegistry);
         $result = $layout->render();
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testRenderByUnknownRenderer()
+    public function testRenderByUnknownRenderer(): void
     {
-        $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The layout renderer named "unknown" was not found.');
 
         $view   = new BlockView();
@@ -58,51 +58,51 @@ class LayoutTest extends LayoutTestCase
         $layout->setRenderer('unknown')->render();
     }
 
-    public function testRenderByOtherRenderer()
+    public function testRenderByOtherRenderer(): void
     {
         $expected = 'some rendered string';
 
         $view = new BlockView();
 
-        $otherRenderer = $this->createMock('Oro\Component\Layout\LayoutRendererInterface');
+        $otherRenderer = $this->createMock(LayoutRendererInterface::class);
         $this->rendererRegistry->addRenderer('other', $otherRenderer);
 
-        $otherRenderer->expects($this->once())
+        $otherRenderer->expects(self::once())
             ->method('renderBlock')
             ->with($this->identicalTo($view))
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $layout = new Layout($view, $this->rendererRegistry);
         $result = $layout->setRenderer('other')->render();
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testRenderWithBlockTheme()
+    public function testRenderWithBlockTheme(): void
     {
         $expected = 'some rendered string';
-        $theme    = 'MyBungle::blocks.html.twig';
+        $theme    = '@My/blocks.html.twig';
 
         $view = new BlockView();
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('setBlockTheme')
             ->with($this->identicalTo($view), $theme);
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('renderBlock')
             ->with($this->identicalTo($view))
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setBlockTheme($theme);
         $result = $layout->render();
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testRenderWithBlockThemeForChild()
+    public function testRenderWithBlockThemeForChild(): void
     {
         $expected = 'some rendered string';
-        $theme    = 'MyBungle::blocks.html.twig';
+        $theme    = '@My/blocks.html.twig';
 
         $view = new BlockView();
 
@@ -110,35 +110,35 @@ class LayoutTest extends LayoutTestCase
         $view->children['child_id'] = $childView;
         $this->setLayoutBlocks(['root' => $view]);
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('setBlockTheme')
             ->with($this->identicalTo($childView), $theme);
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('renderBlock')
             ->with($this->identicalTo($view))
-            ->will($this->returnValue($expected));
+            ->willReturn($expected);
 
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setBlockTheme($theme, 'child_id');
         $result = $layout->render();
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
-    public function testSetFormTheme()
+    public function testSetFormTheme(): void
     {
-        $theme = 'MyBundle::forms.html.twig';
+        $theme = '@My/forms.html.twig';
         $view = new BlockView();
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('setFormTheme')
             ->with([$theme]);
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setFormTheme($theme);
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('renderBlock')
             ->with($this->identicalTo($view))
             ->willReturn('some_value');
-        $this->assertSame('some_value', $layout->render());
+        self::assertSame('some_value', $layout->render());
     }
 
     /**
@@ -146,28 +146,28 @@ class LayoutTest extends LayoutTestCase
      * @param $themes
      * @param $expected
      */
-    public function testRenderWithAbsoluteUrlBlockTheme($themes, $expected)
+    public function testRenderWithAbsoluteUrlBlockTheme($themes, $expected): void
     {
         $view = new BlockView();
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('setBlockTheme')
             ->with($this->identicalTo($view))
             ->willReturnCallback(function ($view, $themes) use ($expected) {
                 // Because assertEqual casted TemplateReference to string on compare - compare type manually
                 if (\is_array($expected)) {
                     foreach ($expected as $key => $value) {
-                        $this->assertSame(\gettype($value), \gettype($themes[$key]));
-                        $this->assertEquals($value, $themes[$key]);
+                        self::assertSame(\gettype($value), \gettype($themes[$key]));
+                        self::assertEquals($value, $themes[$key]);
                     }
                 } else {
-                    $this->assertSame(\gettype($expected), \gettype($themes));
-                    $this->assertEquals($expected, $themes);
+                    self::assertSame(\gettype($expected), \gettype($themes));
+                    self::assertEquals($expected, $themes);
                 }
             })
         ;
 
-        $this->renderer->expects($this->once())
+        $this->renderer->expects(self::once())
             ->method('renderBlock')
             ->with($view)
             ->willReturn('render result');
@@ -175,7 +175,7 @@ class LayoutTest extends LayoutTestCase
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setBlockTheme($themes);
         $result = $layout->render();
-        $this->assertEquals('render result', $result);
+        self::assertEquals('render result', $result);
     }
 
     public function renderWithAbsoluteUrlBlockThemeDataProvider(): array

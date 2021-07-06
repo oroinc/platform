@@ -1,4 +1,4 @@
-{% extends 'OroActionBundle:Operation:form.html.twig' %}
+{% extends '@OroAction/Operation/form.html.twig' %}
 
 {% block form_widget %}
     {% set translationCompleteness = context.stat.translationStatus|default(null) %}

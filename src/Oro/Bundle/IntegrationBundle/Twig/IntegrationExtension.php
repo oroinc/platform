@@ -19,7 +19,7 @@ use Twig\TwigFunction;
  */
 class IntegrationExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_THEME = 'OroIntegrationBundle:Form:fields.html.twig';
+    const DEFAULT_THEME = '@OroIntegration/Form/fields.html.twig';
 
     /** @var ContainerInterface */
     private $container;

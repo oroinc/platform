@@ -121,7 +121,7 @@ class Layout
     /**
      * Sets the theme(s) to be used for rendering a block and its children
      *
-     * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes  The theme(s). For example '@My/Layout/my_theme.html.twig'
      * @param string|null     $blockId The id of a block to assign the theme(s) to
      *
      * @return self
@@ -140,7 +140,7 @@ class Layout
     /**
      * Sets the theme(s) to be used for rendering forms
      *
-     * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|string[] $themes  The theme(s). For example '@My/Layout/my_theme.html.twig'
      *
      * @return self
      */

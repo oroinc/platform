@@ -81,7 +81,7 @@ class SegmentController extends AbstractController
 
     /**
      * @Route("/create", name="oro_segment_create")
-     * @Template("OroSegmentBundle:Segment:update.html.twig")
+     * @Template("@OroSegment/Segment/update.html.twig")
      * @Acl(
      *      id="oro_segment_create",
      *      type="entity",
@@ -117,7 +117,7 @@ class SegmentController extends AbstractController
 
     /**
      * @Route("/clone/{id}", name="oro_segment_clone", requirements={"id"="\d+"})
-     * @Template("OroSegmentBundle:Segment:update.html.twig")
+     * @Template("@OroSegment/Segment/update.html.twig")
      * @AclAncestor("oro_segment_create")
      *
      * @param Segment $entity

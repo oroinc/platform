@@ -22,7 +22,7 @@ class CommentController extends AbstractController
      *
      * @AclAncestor("oro_comment_view")
      *
-     * @Template("OroCommentBundle:Comment:form.html.twig")
+     * @Template("@OroComment/Comment/form.html.twig")
      */
     public function getFormAction()
     {

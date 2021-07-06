@@ -86,7 +86,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
                     'chartHighlightColor' => '#FF5E5E',
                 ],
                 'data_transformer' => 'some_service_id',
-                'template'         => 'FirstTestBundle:Chart:lineChart.html.twig',
+                'template'         => '@FirstTest/Chart/lineChart.html.twig',
                 'xaxis'            => [
                     'mode'    => 'normal',
                     'noTicks' => 5
@@ -94,7 +94,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'advanced_chart' => [
                 'label'            => 'Advanced Chart (overridden)',
-                'template'         => 'SecondTestBundle:Chart:advancedChart.html.twig',
+                'template'         => '@SecondTest/Chart/advancedChart.html.twig',
                 'data_schema'      => [],
                 'settings_schema'  => [],
                 'default_settings' => ['foo' => 'bar', 'chartColors' => 'testColor'],

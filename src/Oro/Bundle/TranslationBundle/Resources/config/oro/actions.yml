@@ -158,7 +158,7 @@ operations:
         label: oro.translation.action.install
         acl_resource: [TRANSLATE, $.data]
         frontend_options:
-            template: 'OroTranslationBundle:Operation:loadLanguage.html.twig'
+            template: '@OroTranslation/Operation/loadLanguage.html.twig'
             title_parameters:
                 '%%language%%': $.languageName
         button_options:

@@ -20,7 +20,7 @@ define(function(require) {
      * Sample:
      *
      * ```twig
-     * {% import 'OroUIBundle::macros.html.twig' as UI %}
+     * {% import '@OroUI/macros.html.twig' as UI %}
      * <div {{ UI.renderPageComponentAttributes({
      *    module: 'oroform/js/app/components/inline-editable-view-component',
      *    options: {

@@ -20,7 +20,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Templating\EngineInterface;
+use Twig\Environment;
 
 /**
  * Provides helper methods for building full email address and user email related methods.
@@ -50,8 +50,8 @@ class EmailModelBuilderHelper
     /** @var EmailCacheManager */
     protected $emailCacheManager;
 
-    /** @var EngineInterface */
-    protected $templating;
+    /** @var Environment */
+    protected $twig;
 
     /** @var MailboxManager */
     protected $mailboxManager;
@@ -64,7 +64,7 @@ class EmailModelBuilderHelper
      * @param EmailAddressManager    $emailAddressManager
      * @param EntityManager          $entityManager
      * @param EmailCacheManager      $emailCacheManager
-     * @param EngineInterface        $engineInterface
+     * @param Environment            $twig
      * @param MailboxManager         $mailboxManager
      */
     public function __construct(
@@ -75,7 +75,7 @@ class EmailModelBuilderHelper
         EmailAddressManager $emailAddressManager,
         EntityManager $entityManager,
         EmailCacheManager $emailCacheManager,
-        EngineInterface $engineInterface,
+        Environment $twig,
         MailboxManager $mailboxManager
     ) {
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -85,7 +85,7 @@ class EmailModelBuilderHelper
         $this->emailAddressManager= $emailAddressManager;
         $this->entityManager = $entityManager;
         $this->emailCacheManager = $emailCacheManager;
-        $this->templating = $engineInterface;
+        $this->twig = $twig;
         $this->mailboxManager = $mailboxManager;
     }
 
@@ -224,8 +224,7 @@ class EmailModelBuilderHelper
             return null;
         }
 
-        return $this->templating
-            ->render($templatePath, ['email' => $emailEntity]);
+        return $this->twig->render($templatePath, ['email' => $emailEntity]);
     }
 
     /**

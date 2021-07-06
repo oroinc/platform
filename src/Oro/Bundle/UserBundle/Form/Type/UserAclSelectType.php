@@ -5,6 +5,9 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for User ACL select.
+ */
 class UserAclSelectType extends AbstractType
 {
     /**
@@ -16,8 +19,8 @@ class UserAclSelectType extends AbstractType
             [
                 'configs'            => [
                     'placeholder'             => 'oro.user.form.choose_user',
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/selection.html.twig',
                     'component'               => 'acl-user-autocomplete',
                     'data_class_name'         => '',
                     'permission'              => 'CREATE',

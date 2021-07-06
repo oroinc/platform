@@ -1503,7 +1503,7 @@
 {%- endmacro -%}
 
 {%- macro renderJsTree(data, actions) -%}
-    {% embed "OroUIBundle::jstree.html.twig" with {
+    {% embed "@OroUI/jstree.html.twig" with {
         data: data,
         actions: actions
     } %}

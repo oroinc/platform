@@ -269,7 +269,7 @@ class EmailActivityListProvider implements
      */
     public function getTemplate()
     {
-        return 'OroEmailBundle:Email:js/activityItemTemplate.html.twig';
+        return '@OroEmail/Email/js/activityItemTemplate.html.twig';
     }
 
     /**
@@ -277,7 +277,7 @@ class EmailActivityListProvider implements
      */
     public function getGroupedTemplate(): string
     {
-        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.html.twig';
+        return '@OroEmail/Email/js/groupedActivityItemTemplate.html.twig';
     }
 
     /**

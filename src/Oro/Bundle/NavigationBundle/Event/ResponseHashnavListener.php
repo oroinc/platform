@@ -1,9 +1,9 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\Event;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Twig\Environment;
 
 /**
  * Updates response headers and check if full redirect is required when using hash navigation.
@@ -18,9 +18,9 @@ class ResponseHashnavListener
     protected $tokenStorage;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var bool
@@ -29,16 +29,16 @@ class ResponseHashnavListener
 
     /**
      * @param TokenStorageInterface $tokenStorage
-     * @param EngineInterface       $templating
+     * @param Environment           $twig
      * @param bool                  $isDebug
      */
     public function __construct(
         TokenStorageInterface $tokenStorage,
-        EngineInterface $templating,
+        Environment $twig,
         $isDebug = false
     ) {
         $this->tokenStorage = $tokenStorage;
-        $this->templating = $templating;
+        $this->twig = $twig;
         $this->isDebug = $isDebug;
     }
 
@@ -68,14 +68,16 @@ class ResponseHashnavListener
             if ($location) {
                 $response->headers->remove('location');
                 $response->setStatusCode(200);
-                $response = $this->templating->renderResponse(
-                    'OroNavigationBundle:HashNav:redirect.html.twig',
-                    array(
+
+                $template = $this->twig->render(
+                    '@OroNavigation/HashNav/redirect.html.twig',
+                    [
                         'full_redirect' => $isFullRedirect,
                         'location'      => $location,
-                    ),
-                    $response
+                    ]
                 );
+
+                $response->setContent($template);
             }
 
             // disable cache for ajax navigation pages and change content type to json

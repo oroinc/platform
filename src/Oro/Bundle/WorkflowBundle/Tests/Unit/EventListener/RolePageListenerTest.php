@@ -110,7 +110,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => false
@@ -162,7 +162,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => false
@@ -246,7 +246,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
         $twig->expects($this->once())
             ->method('render')
             ->with(
-                'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+                '@OroWorkflow/Datagrid/aclGrid.html.twig',
                 [
                     'entity'     => $entity,
                     'isReadonly' => true

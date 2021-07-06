@@ -1,9 +1,9 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as ui %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as ui %}
 {% oro_title_set({ params : {"%form.title%": entity.title} }) %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('oro_embedded_form_delete') %}
         {{ UI.deleteButton({
@@ -33,7 +33,7 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
 
     {% set id = 'embedded-form-get-code' %}
 

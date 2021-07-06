@@ -49,17 +49,17 @@ datagrids:
                 label: oro.translation.language.enabled.label
                 type: twig
                 frontend_type: html
-                template: OroTranslationBundle:Language:Datagrid/enabled.html.twig
+                template: '@OroTranslation/Language/Datagrid/enabled.html.twig'
             translationCompleteness:
                  label: oro.translation.language.translation_completeness.label
                  type: twig
                  frontend_type: html
-                 template: OroTranslationBundle:Language:Datagrid/translationCompleteness.html.twig
+                 template: '@OroTranslation/Language/Datagrid/translationCompleteness.html.twig'
             translationStatus:
                  label: oro.translation.language.translation_status.label
                  type: twig
                  frontend_type: html
-                 template: OroTranslationBundle:Language:Datagrid/translationStatus.html.twig
+                 template: '@OroTranslation/Language/Datagrid/translationStatus.html.twig'
             createdAt:
                 label: oro.ui.created_at
                 frontend_type: datetime
@@ -166,7 +166,7 @@ datagrids:
                 label: oro.translation.translation.english_translation.label
                 type: twig
                 frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/englishTranslation.html.twig
+                template: '@OroTranslation/Translation/Datagrid/englishTranslation.html.twig'
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
@@ -183,7 +183,7 @@ datagrids:
                 label: oro.translation.translation.current.label
                 type: twig
                 frontend_type: html
-                template: OroTranslationBundle:Translation:Datagrid/current.html.twig
+                template: '@OroTranslation/Translation/Datagrid/current.html.twig'
             key:
                 label: oro.translation.translation_key.key.label
             domain:

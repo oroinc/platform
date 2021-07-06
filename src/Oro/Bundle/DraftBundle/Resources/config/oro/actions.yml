@@ -62,7 +62,7 @@ operations:
                 attribute: $.draftableFields
             - '@render_template':
                 attribute: $.confirmationContent
-                template: OroDraftBundle:Draft:draftConfirmation.html.twig
+                template: '@OroDraft/Draft/draftConfirmation.html.twig'
                 params:
                     draftableFields: $.draftableFields
         actions:

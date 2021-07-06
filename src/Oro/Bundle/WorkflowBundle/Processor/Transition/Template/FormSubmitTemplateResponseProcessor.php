@@ -16,7 +16,7 @@ use Twig\Environment;
  */
 class FormSubmitTemplateResponseProcessor implements ProcessorInterface
 {
-    const WIDGET_TEMPLATE_TRANSITION_COMPLETE = 'OroWorkflowBundle:Widget:widget/transitionComplete.html.twig';
+    const WIDGET_TEMPLATE_TRANSITION_COMPLETE = '@OroWorkflow/Widget/widget/transitionComplete.html.twig';
 
     /** @var ViewHandlerInterface */
     private $viewHandler;

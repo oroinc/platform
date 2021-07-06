@@ -54,7 +54,7 @@ class LocalizationController extends AbstractController
 
     /**
      * @Route("/create", name="oro_locale_localization_create")
-     * @Template("OroLocaleBundle:Localization:update.html.twig")
+     * @Template("@OroLocale/Localization/update.html.twig")
      * @Acl(
      *     id="oro_locale_localization_create",
      *     type="entity",

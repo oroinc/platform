@@ -1,4 +1,4 @@
-{% import 'OroWorkflowBundle::macros.html.twig' as workflowMacros %}
+{% import '@OroWorkflow/macros.html.twig' as workflowMacros %}
 {% if workflows|length > 0 %}
     {% set collapseContainerId = 'entityWorkflow' ~ entityId %}
 <div class="widget-content workflow-widget-content">
@@ -72,7 +72,7 @@
                             {% if workflow.transitionsData|length != 0 %}
                                 <td class="workflow-controls">
                                     <div class="workflow-buttons-scroller">
-                                        {% include 'OroWorkflowBundle::Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId, 'originalUrl': originalUrl} %}
+                                        {% include '@OroWorkflow/Widget/widget/button.html.twig' with {'workflow': workflow, 'entity_id': entityId, 'originalUrl': originalUrl} %}
                                     </div>
                                 </td>
                             {% endif %}

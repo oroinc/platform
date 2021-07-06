@@ -34,7 +34,7 @@ class EmbeddedFormController extends AbstractController
 
     /**
      * @Route("create", name="oro_embedded_form_create")
-     * @Template("OroEmbeddedFormBundle:EmbeddedForm:update.html.twig")
+     * @Template("@OroEmbeddedForm/EmbeddedForm/update.html.twig")
      * @Acl(
      *      id="oro_embedded_form_create",
      *      type="entity",

@@ -1,5 +1,5 @@
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set dynamicField = oro_get_dynamic_field(entity, field) %}
 {% if dynamicField %}

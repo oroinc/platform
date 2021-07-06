@@ -224,7 +224,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('twig')
                                 ->info(
                                     'The name of TWIG template.'
-                                    . ' Default template is "OroDashboardBundle:Index:default.html.twig"'
+                                    . ' Default template is "@OroDashboard/Index/default.html.twig"'
                                 )
                                 ->cannotBeEmpty()
                             ->end()

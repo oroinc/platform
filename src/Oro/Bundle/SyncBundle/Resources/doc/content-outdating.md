@@ -23,7 +23,7 @@ your content will be tagged automatically, in cases when tags should be added dy
 
 **Example**
 ``` twig
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         module: 'orosync/js/app/components/tag-content',

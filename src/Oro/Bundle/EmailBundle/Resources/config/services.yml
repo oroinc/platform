@@ -94,7 +94,7 @@ services:
             - '@oro_email.email.address.manager'
             - '@doctrine.orm.entity_manager'
             - '@oro_email.email.cache.manager'
-            - '@templating'
+            - '@twig'
             - '@oro_email.mailbox.manager'
 
     oro_email.email.entity.builder:

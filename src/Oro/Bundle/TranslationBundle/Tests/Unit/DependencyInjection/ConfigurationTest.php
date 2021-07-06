@@ -34,7 +34,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'locales' => [],
             'default_required' => true,
             'manager_registry' => 'doctrine',
-            'templating' => 'OroTranslationBundle::default.html.twig'
+            'templating' => '@OroTranslation/default.html.twig'
         ];
 
         static::assertEquals(

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class ConfigGridController
+ * The controller for FieldConfigModel entity.
  *
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/field")
@@ -60,7 +60,7 @@ class ConfigFieldGridController extends AbstractController
 
     /**
      * @Route("/update/{id}", name="oro_entityextend_field_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template("OroEntityConfigBundle:Config:fieldUpdate.html.twig")
+     * @Template("@OroEntityConfig/Config/fieldUpdate.html.twig")
      * @param Request $request
      * @param EntityConfigModel $entity
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse|Response

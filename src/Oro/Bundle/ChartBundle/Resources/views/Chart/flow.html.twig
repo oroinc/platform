@@ -1,4 +1,4 @@
-{% import 'OroChartBundle::macros.html.twig' as chart %}
+{% import '@OroChart/macros.html.twig' as chart %}
 
 {% if data|length>0  %}
     {{ chart.renderChart(data, options, config, isMobileVersion()) }}

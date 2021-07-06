@@ -19,12 +19,12 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-        $this->container->expects($this->any())
+        $this->container = $this->createMock(ContainerInterface::class);
+        $this->container->expects(self::any())
             ->method('get')
-            ->will($this->returnValueMap([
+            ->willReturnMap([
                 ['oro_datagrid.some_class', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, new SomeClass(),]
-            ]));
+            ]);
         $this->resolver  = new SystemAwareResolver($this->container);
     }
 
@@ -35,24 +35,24 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      * @param array $gridDefinition
      * @param mixed $expect
      */
-    public function testResolveStatic($gridName, $gridDefinition, $expect)
+    public function testResolveStatic(string $gridName, array $gridDefinition, $expect): void
     {
         if ($gridName === 'test2') {
-            $this->container->expects($this->once())
+            $this->container->expects(self::once())
                 ->method('getParameter')
                 ->with('oro_datagrid.some.class')
-                ->will($this->returnValue('Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass'));
+                ->willReturn(SomeClass::class);
         }
 
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
-        $this->assertEquals($expect, $gridDefinition['filters']['entityName']['choices']);
+        self::assertEquals($expect, $gridDefinition['filters']['entityName']['choices']);
     }
 
     /**
      * @return array
      */
-    public function staticProvider()
+    public function staticProvider(): array
     {
         $classConstant = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\SomeClass::TEST';
 
@@ -75,26 +75,21 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
      * @dataProvider serviceProvider
      *
      * @param array $gridDefinition
-     * @param array $arguments
      */
-    public function testResolveServiceMethodCall($gridDefinition, array $arguments = [])
+    public function testResolveServiceMethodCall(array $gridDefinition): void
     {
         $gridName = 'test';
         $expected = 42;
 
-        if (!$arguments) {
-            $arguments = [$gridName, 'choices', $gridDefinition['filters']['entityName']];
-        }
-
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
-        $this->assertEquals($expected, $gridDefinition['filters']['entityName']['choices']);
+        self::assertEquals($expected, $gridDefinition['filters']['entityName']['choices']);
     }
 
     /**
      * @return array
      */
-    public function serviceProvider()
+    public function serviceProvider(): array
     {
         return [
             'service method call' => [
@@ -114,12 +109,11 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
                         ]
                     ]
                 ],
-                ['The', 'answer', 1]
             ]
         ];
     }
 
-    public function testResolveLazyServiceMethodCall()
+    public function testResolveLazyServiceMethodCall(): void
     {
         $gridDefinition = [
             'filters' => [
@@ -132,11 +126,11 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         $resolvedDefinition = $this->resolver->resolve('grid', $gridDefinition);
         $builder = $resolvedDefinition['filters']['entityName']['choices_builder'];
 
-        $this->assertTrue(is_callable($builder));
-        $this->assertEquals(42, call_user_func($builder));
+        self::assertIsCallable($builder);
+        self::assertEquals(42, $builder());
     }
 
-    public function testResolveService()
+    public function testResolveService(): void
     {
         $gridName = 'test';
         $gridDefinition = [
@@ -149,18 +143,18 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
-        $this->assertEquals(new SomeClass(), $gridDefinition['filters']['entityName']['choices_builder']);
+        self::assertEquals(new SomeClass(), $gridDefinition['filters']['entityName']['choices_builder']);
     }
 
     /**
      * Assert definition empty
      */
-    public function testResolveEmpty()
+    public function testResolveEmpty(): void
     {
         $definition     = [];
         $gridDefinition = $this->resolver->resolve('test', $definition);
 
-        $this->assertEmpty($gridDefinition);
+        self::assertEmpty($gridDefinition);
 
         $definition     = [
             'filters' => [
@@ -170,13 +164,13 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
             ]
         ];
         $gridDefinition = $this->resolver->resolve('test', $definition);
-        $this->assertEquals($definition, $gridDefinition);
+        self::assertEquals($definition, $gridDefinition);
     }
 
     /**
      * Assert definition escaped
      */
-    public function testResolveEscaped()
+    public function testResolveEscaped(): void
     {
         $gridName = 'test';
         $gridDefinition = [
@@ -188,6 +182,23 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         ];
         $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
 
-        $this->assertEquals('test@email.com', $gridDefinition['filters']['entityName']['choices_builder']);
+        self::assertEquals('test@email.com', $gridDefinition['filters']['entityName']['choices_builder']);
+    }
+
+    public function testResolveNamespacedTemplate(): void
+    {
+        $gridName = 'test';
+        $templateName = '@OroBar/index.html.twig';
+        $gridDefinition = [
+            'columns' => [
+                'columnName' => [
+                    'template' => $templateName
+                ]
+            ]
+        ];
+
+        $gridDefinition = $this->resolver->resolve($gridName, $gridDefinition);
+
+        self::assertEquals($templateName, $gridDefinition['columns']['columnName']['template']);
     }
 }

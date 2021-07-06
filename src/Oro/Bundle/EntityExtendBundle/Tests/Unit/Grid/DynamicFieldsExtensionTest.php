@@ -635,7 +635,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                             'type' => 'twig',
                             'renderable' => true,
                             'required' => false,
-                            'template' => 'OroEntityBundle:Datagrid:Property/entityFallbackValue.html.twig',
+                            'template' => '@OroEntity/Datagrid/Property/entityFallbackValue.html.twig',
                             'context' => [
                                 'fieldName' => 'testField',
                                 'entityClassName' => 'Test\Entity'

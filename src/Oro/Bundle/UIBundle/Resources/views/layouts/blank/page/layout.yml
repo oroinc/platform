@@ -1,7 +1,7 @@
 layout:
     actions:
         - '@setBlockTheme':
-            themes: 'OroUIBundle:layouts:blank/page/layout.html.twig'
+            themes: '@OroUI/layouts/blank/page/layout.html.twig'
         - '@addTree':
             items:
                 head:

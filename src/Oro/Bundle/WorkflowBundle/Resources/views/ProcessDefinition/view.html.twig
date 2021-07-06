@@ -1,9 +1,9 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% extends '@OroUI/actions/view.html.twig' %}
 
 {% oro_title_set({params : {"%process_definition.label%": entity.label} }) %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('oro_process_definition_update') %}
         {% set idButton = entity.name ~ '-process-deactivate-btn' %}
@@ -39,7 +39,7 @@
 {% endblock navButtons %}
 
 {% block breadcrumbs %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ parent() }}
     <span class="page-title__status">
@@ -67,7 +67,7 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {%- set processDefinitionInfo -%}
         {% set entityConfig = oro_entity_config(entity.relatedEntity) %}

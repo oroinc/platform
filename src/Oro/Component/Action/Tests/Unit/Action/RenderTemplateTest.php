@@ -54,7 +54,7 @@ class RenderTemplateTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute(): void
     {
-        $template = 'AcmeBundle:template.html.twig';
+        $template = '@AcmeTest/template.html.twig';
         $html = '<h1>Test: 1, 2</h1>';
 
         $context = new ActionData([

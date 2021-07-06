@@ -22,7 +22,7 @@
     	    ->setDataMapping(array('label' => 'firstName', 'value' => 'fee'))
             ->getView();
 
-		return $this->render('ExampleBundle:Example:example.html.twig', array('chartView' => $view));
+		return $this->render('@Example/Example/example.html.twig', array('chartView' => $view));
 	}
 
 ```

@@ -1,5 +1,5 @@
-{% extends 'OroConfigBundle::configPage.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroConfig/configPage.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set fullname = entity|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
