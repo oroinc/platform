@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
-use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
@@ -40,7 +39,7 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
         $event = new MigrationDataFixturesEvent($this->em, $fixturesType, $this->logger);
         $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_PRE_LOAD);
 
-        $executor = new ORMExecutor($this->em);
+        $executor = new DataFixturesORMExecutor($this->em);
         if (null !== $this->logger) {
             $executor->setLogger($this->logger);
         }
