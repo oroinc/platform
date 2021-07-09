@@ -263,6 +263,8 @@ define(function(require) {
                 .click(function(e) {
                     e.stopImmediatePropagation();
                 });
+            this.$calendar.on(`keydown${this.eventNamespace()}`, this.closeOnEscape.bind(this));
+            this.$dropdown.on(`keydown${this.eventNamespace()}`, this.closeOnEscape.bind(this));
         },
 
         /**
@@ -310,8 +312,9 @@ define(function(require) {
          * Destroys picker widget
          */
         destroyPickerWidget: function() {
+            this.$calendar.off(this.eventNamespace());
+            this.$dropdown.off(this.eventNamespace());
             this.$calendar.datepicker('destroy');
-            this.$calendar.off();
             this.$variables.dateVariables('destroy');
             this.removeSubview('tabs');
             this.$frontDateField.unwrap();
@@ -414,9 +417,6 @@ define(function(require) {
             }
             this.$calendar.datepicker('refresh');
             manageFocus.focusTabbable(this.$calendar, this.$calendar.find('.ui-datepicker-calendar'));
-
-            this.$calendar.on('keydown.calendar', this.closeOnEspace.bind(this));
-            this.$dropdown.on('keydown.calendar', this.closeOnEspace.bind(this));
             this.trigger('open', this);
         },
 
@@ -425,8 +425,6 @@ define(function(require) {
          */
         close: function() {
             this.$dropdown.trigger('tohide');
-            this.$calendar.off('keydown.calendar');
-            this.$dropdown.off('keydown.calendar');
             this.$frontDateField.focus();
             this.trigger('close', this);
         },
@@ -435,8 +433,9 @@ define(function(require) {
          * Close dropdown on press Escape key
          * @param event
          */
-        closeOnEspace(event) {
-            if (event.keyCode === ESCAPE) {
+        closeOnEscape(event) {
+            // Prevent close dropdown if calendar is open
+            if (event.keyCode === ESCAPE && this.$calendar.is(':visible')) {
                 event.stopPropagation();
                 this.close();
             }

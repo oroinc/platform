@@ -95,11 +95,11 @@ define(function(require, exports, module) {
         buttonActiveClass: 'open-filter',
 
         /**
-         * Criteria trigger active class
+         * Criteria trigger expand class
          *
          * @property {String}
          */
-        criteriaSelectorActiveClass: filterSettings.criteriaSelectorActiveClass,
+        buttonExpandClass: filterSettings.buttonExpandClass,
 
         /**
          * Element enclosing a criteria dropdown
@@ -538,7 +538,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _setButtonPressed: function(element, status) {
-            this._setCriteriaSelectorPressed(status);
+            this._setButtonExpanded(status);
 
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
@@ -553,9 +553,9 @@ define(function(require, exports, module) {
          * @param {Boolean} state
          * @protected
          */
-        _setCriteriaSelectorPressed: function(state) {
+        _setButtonExpanded: function(state) {
             this.$('.filter-criteria-selector')
-                .toggleClass(this.criteriaSelectorActiveClass, state).attr('aria-expanded', state);
+                .toggleClass(this.buttonExpandClass, state).attr('aria-expanded', state);
         },
 
         /**
@@ -592,11 +592,11 @@ define(function(require, exports, module) {
          *
          * @return {string|undefined}
          */
-        getExtraCriteriaClass() {
+        getCriteriaExtraClass() {
             if (_.isObject(filterSettings) && _.isObject(filterSettings.appearance)) {
                 const mode = filterSettings.appearance[this.renderMode];
 
-                return mode && typeof mode.criteriaClass == 'string'
+                return mode && typeof mode.criteriaClass === 'string'
                     ? mode.criteriaClass
                     : void 0;
             }
@@ -605,11 +605,9 @@ define(function(require, exports, module) {
         },
 
         /**
-         * Get properties related to filter criteria
-         *
          * @return {Object}
          */
-        getCriteriaProperties() {
+        getTemplateDataProps() {
             return {
                 inputFieldAriaLabel: __('oro.filter.input_field.aria_label', {label: this.label}),
                 choiceAriaLabel: __('oro.filter.select_field.aria_label', {label: this.label}),
@@ -617,6 +615,15 @@ define(function(require, exports, module) {
                     label: `${__('oro.filter.by')} ${this.label}`}
                 )
             };
+        },
+
+        /**
+         * Detect is filter has dropdown mode
+         * If renderMode is empty equals `dropdown-mode`
+         * @returns {boolean}
+         */
+        isDropdownRenderMode() {
+            return this.renderMode === 'dropdown-mode';
         }
     }));
 

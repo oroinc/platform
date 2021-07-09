@@ -2,18 +2,19 @@
 
 .ui-timepicker-wrapper {
     z-index: z('dropdown') + 1;
-}
 
-.ui-timepicker-list {
-    height: 158px;
+    max-height: 158px;
+
     overflow-y: auto;
 
     border: $ui-timepicker-list-border;
     box-shadow: $ui-timepicker-list-box-shadow;
-    border-radius: 4px;
+    border-radius: $base-ui-element-border-radius;
 
     background: $ui-timepicker-list-background;
+}
 
+.ui-timepicker-list {
     li {
         padding: 4px 9px;
 
@@ -23,6 +24,7 @@
 
         cursor: pointer;
 
+        &.ui-timepicker-selected,
         &:hover {
             background: $ui-timepicker-list-item-hover-background;
             color: $ui-timepicker-list-item-hover-color;

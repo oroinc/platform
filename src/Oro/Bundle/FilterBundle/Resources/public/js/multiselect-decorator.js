@@ -214,7 +214,6 @@ define(function(require, exports, module) {
          * Action performed on dropdown open
          */
         onOpenDropdown: function() {
-            this.getWidget().find('input[type="search"]').focus();
             this.getWidgetTrigger().addClass('pressed');
         },
 

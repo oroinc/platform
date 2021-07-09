@@ -195,7 +195,7 @@ define(function(require, exports, module) {
             };
 
             if (!this.isSimplePickerView()) {
-                events['focus [data-toggle="dropdown"]'] = 'onFocusDropdownTrigger';
+                events['keydown [data-toggle="dropdown"]'] = 'onKeyDownDropdownTrigger';
             }
 
             return events;
@@ -273,23 +273,21 @@ define(function(require, exports, module) {
          * Handle and navigate to dropdown when toggler in focus
          * @param event
          */
-        onFocusDropdownTrigger(event) {
+        onKeyDownDropdownTrigger(event) {
             const $target = $(event.target);
-            $target.off('keydown.onFocus').on('keydown.onFocus', ({keyCode}) => {
-                switch (keyCode) {
-                    case ARROW_UP:
-                    case ARROW_DOWN:
-                    case ARROW_RIGHT:
-                    case ARROW_LEFT:
-                        $target.dropdown('show');
-                        $target.off('keydown.onFocus');
-                        break;
-                    case ESCAPE:
-                        this._hideCriteria();
-                        $target.off('keydown.onFocus');
-                        break;
-                }
-            });
+            switch (event.keyCode) {
+                case ARROW_UP:
+                case ARROW_DOWN:
+                case ARROW_RIGHT:
+                case ARROW_LEFT:
+                    event.preventDefault();
+                    $target.dropdown('show');
+                    break;
+                case ESCAPE:
+                    event.preventDefault();
+                    this._hideCriteria();
+                    break;
+            }
         },
 
         /**
@@ -405,7 +403,7 @@ define(function(require, exports, module) {
                     parts: this._getParts(),
                     popoverContent: __('oro.filter.date.info'),
                     renderMode: this.renderMode,
-                    ...this.getCriteriaProperties()
+                    ...this.getTemplateDataProps()
                 })
             );
 
@@ -450,7 +448,7 @@ define(function(require, exports, module) {
                         selectedChoiceLabel: selectedPartLabel,
                         selectedChoiceTooltip: this._getPartTooltip(value.part),
                         renderMode: this.renderMode,
-                        ...this.getCriteriaProperties()
+                        ...this.getTemplateDataProps()
                     })
                 );
             }
@@ -463,7 +461,7 @@ define(function(require, exports, module) {
                     selectedChoiceLabel: selectedChoiceLabel,
                     popoverContent: __('oro.filter.date.info'),
                     renderMode: this.renderMode,
-                    ...this.getCriteriaProperties()
+                    ...this.getTemplateDataProps()
                 })
             );
 
@@ -508,7 +506,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _getPickerConfigurationOptions: function(optionsToMerge, parameters= {}) {
-            const {startDateFieldAriaLabel, endDateFieldAriaLabel} = this.getCriteriaProperties();
+            const {startDateFieldAriaLabel, endDateFieldAriaLabel} = this.getTemplateDataProps();
             const labelsMap = {
                 start: startDateFieldAriaLabel,
                 end: endDateFieldAriaLabel
@@ -780,13 +778,6 @@ define(function(require, exports, module) {
             };
         },
 
-        /**
-         * @inheritdoc
-         */
-        _focusCriteria: function() {
-            this.$(this.criteriaSelector).focus();
-        },
-
         _getSelectedChoiceLabel: function(property, value) {
             let selectedChoiceLabel = '';
             if (!_.isEmpty(this[property])) {
@@ -823,8 +814,21 @@ define(function(require, exports, module) {
             );
         },
 
-        getCriteriaProperties() {
-            const data = DateFilter.__super__.getCriteriaProperties.call(this);
+        /**
+         * @return {jQuery}
+         */
+        getCriteriaValueFieldToFocus() {
+            const startView = this.subviewsByName['start'];
+
+            if (!startView.nativeMode) {
+                return this.$(`${this.criteriaSelector} .datepicker-input`).filter(':visible').first();
+            } else {
+                return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value.start}`);
+            }
+        },
+
+        getTemplateDataProps() {
+            const data = DateFilter.__super__.getTemplateDataProps.call(this);
 
             return {
                 ...data,

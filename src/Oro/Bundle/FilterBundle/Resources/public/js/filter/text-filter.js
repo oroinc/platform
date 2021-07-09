@@ -9,11 +9,15 @@ define(function(require, exports, module) {
     const EmptyFilter = require('oro/filter/empty-filter');
     const tools = require('oroui/js/tools');
     const mediator = require('oroui/js/mediator');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
 
     let config = require('module-config').default(module.id);
     config = _.extend({
         notAlignCriteria: tools.isMobile()
     }, config);
+
+    require('jquery-ui/tabbable');
 
     /**
      * Text grid filter.
@@ -78,6 +82,9 @@ define(function(require, exports, module) {
             // Exclude from selection an auxiliary input inside of select2 component
             'keydown input:not(.select2-focusser)': '_onReadCriteriaInputKey',
             'click .filter-update': '_onClickUpdateCriteria',
+            'keydown .filter-update': '_onKeydownUpdateCriteria',
+            'keydown .filter-criteria-selector': 'onKeyDownCriteriaSelector',
+            'keydown .filter-criteria': 'onKeyDownCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
@@ -133,7 +140,6 @@ define(function(require, exports, module) {
                 return;
             }
 
-            e.stopPropagation();
             e.preventDefault();
 
             if (!this._isValid()) {
@@ -157,6 +163,18 @@ define(function(require, exports, module) {
 
             this.trigger('updateCriteriaClick', this);
             this._applyValueAndHideCriteria();
+        },
+
+        /**
+         * Handle keydown on criteria update button
+         *
+         * @param {Event} e
+         * @private
+         */
+        _onKeydownUpdateCriteria(e) {
+            if (e.keyCode === KEYBOARD_CODES.ENTER || e.keyCode === KEYBOARD_CODES.SPACE) {
+                this._onClickUpdateCriteria(e);
+            }
         },
 
         /**
@@ -310,10 +328,10 @@ define(function(require, exports, module) {
                 .removeAttr('aria-hidden')
                 .addClass('criteria-visible');
             this._alignCriteria();
-            if (this.autoClose !== false) {
-                this._focusCriteria();
-            }
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            if (this.autoClose !== false) {
+                this._focusCriteriaValue();
+            }
             this.trigger('showCriteria', this);
             setTimeout(() => {
                 this.popupCriteriaShowed = true;
@@ -378,15 +396,6 @@ define(function(require, exports, module) {
         },
 
         /**
-         * Focus filter criteria input
-         *
-         * @protected
-         */
-        _focusCriteria: function() {
-            this.$(this.criteriaSelector + ' input[type=text]').not('[data-skip-focus]').focus().select();
-        },
-
-        /**
          * @inheritdoc
          */
         _writeDOMValue: function(value) {
@@ -417,6 +426,62 @@ define(function(require, exports, module) {
             }
 
             return '"' + value.value + '"';
+        },
+
+        onKeyDownCriteria(e) {
+            if (
+                e.keyCode === KEYBOARD_CODES.ENTER &&
+                !this.getCriteria().is(':visible')
+            ) {
+                this.focusCriteriaToggler();
+            } else if (
+                e.keyCode === KEYBOARD_CODES.ENTER &&
+                this.$(this.criteriaSelector).is(':animated')
+            ) {
+                this.$(this.criteriaSelector).done(() => {
+                    if (
+                        !this.getCriteria().is(':visible') &&
+                        document.activeElement.isSameNode(e.target)
+                    ) {
+                        this.focusCriteriaToggler();
+                    }
+                });
+            } else if (this.isDropdownRenderMode()) {
+                manageFocus.preventTabOutOfContainer(e, e.currentTarget);
+            }
+        },
+
+        onKeyDownCriteriaSelector(e) {
+            this.trigger('keydownOnToggle', e, this);
+        },
+
+        _focusCriteriaValue() {
+            this.getCriteriaValueFieldToFocus().focus().select();
+        },
+
+        /**
+         * @return {jQuery}
+         */
+        getCriteriaValueFieldToFocus() {
+            if (this.criteriaValueSelectors === void 0) {
+                return $();
+            } else if (typeof this.criteriaValueSelectors.value === 'string') {
+                return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value}`);
+            }
+
+            return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value.start}`);
+        },
+
+        getCriteriaSelector() {
+            return this.$('.filter-criteria-selector');
+        },
+
+        getCriteria() {
+            return this.$(this.criteriaSelector);
+        },
+
+        focusCriteriaToggler() {
+            this.getCriteriaSelector().trigger('focus');
         }
     });
 

@@ -146,7 +146,7 @@ define(function(require) {
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value,
                 renderMode: this.renderMode,
-                ...this.getCriteriaProperties()
+                ...this.getTemplateDataProps()
             };
         },
 

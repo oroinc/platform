@@ -1,3 +1,3 @@
 export default {
-    criteriaSelectorActiveClass: 'active'
+    buttonExpandClass: 'active'
 };

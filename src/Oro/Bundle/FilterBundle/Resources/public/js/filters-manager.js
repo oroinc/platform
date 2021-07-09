@@ -60,7 +60,7 @@ define(function(require, exports, module) {
          *  Is used in template for render additional html
          * @property {String} 'collapse-mode' | 'toggle-mode'
          */
-        renderMode: '',
+        renderMode: 'dropdown-mode',
 
         /**
          * Add filter button hint
@@ -231,6 +231,13 @@ define(function(require, exports, module) {
                 this.subview('filters-state', filtersStateView);
                 this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
+
+                    const visibleFilters = Object.values(this.filters)
+                        .filter(filter => filter.visible && filter.enabled);
+
+                    if (visibleFilters.length && $.contains(filtersStateView.el, document.activeElement)) {
+                        visibleFilters[0].getCriteriaSelector().trigger('focus');
+                    }
                 });
             }
 

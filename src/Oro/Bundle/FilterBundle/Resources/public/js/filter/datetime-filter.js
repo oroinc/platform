@@ -9,6 +9,7 @@ define(function(require, exports, module) {
     const VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     const DateFilter = require('oro/filter/date-filter');
     const tools = require('oroui/js/tools');
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
     let config = require('module-config').default(module.id);
 
     config = _.extend({
@@ -54,7 +55,8 @@ define(function(require, exports, module) {
 
         events: {
             // timepicker triggers this event on mousedown and hides picker's dropdown
-            'hideTimepicker input': '_preventClickOutsideCriteria'
+            'hideTimepicker input': '_onHideTimepicker',
+            'showTimepicker input': '_onShowTimepicker'
         },
 
         /**
@@ -98,8 +100,39 @@ define(function(require, exports, module) {
          *
          * @protected
          */
-        _preventClickOutsideCriteria: function() {
+        _preventClickOutsideCriteria() {
             this._justPickedTime = true;
+        },
+
+        _onHideTimepicker() {
+            this._preventClickOutsideCriteria();
+            this._preventCloseCriteria = true;
+        },
+
+        _onShowTimepicker() {
+            this._preventCloseCriteria = false;
+        },
+
+        onKeyDownTimepickerInput(e) {
+            /*
+                1. Prevent first press by ESC;
+                2. ESC and SPACE close timepicker so need to set opposite value;
+             */
+            if (
+                e.keyCode === KEYBOARD_CODES.ESCAPE ||
+                e.keyCode === KEYBOARD_CODES.ENTER
+            ) {
+                this._preventCloseCriteria = !this._preventCloseCriteria;
+            }
+
+            const startView = this.subviewsByName['start'];
+            if (
+                e.keyCode === KEYBOARD_CODES.ESCAPE &&
+                !startView.nativeMode &&
+                this._preventCloseCriteria
+            ) {
+                e.stopPropagation();
+            }
         },
 
         /**
@@ -108,7 +141,7 @@ define(function(require, exports, module) {
         _getPickerConfigurationOptions: function(optionsToMerge, parameters) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, optionsToMerge, parameters);
 
-            const {startTimeFieldAriaLabel, endTimeFieldAriaLabel} = this.getCriteriaProperties();
+            const {startTimeFieldAriaLabel, endTimeFieldAriaLabel} = this.getTemplateDataProps();
             const labelsMap = {
                 start: startTimeFieldAriaLabel,
                 end: endTimeFieldAriaLabel
@@ -188,6 +221,8 @@ define(function(require, exports, module) {
             const value = this._readDOMValue();
             this._updateDateTimePickerSubView('start', value);
             this._updateDateTimePickerSubView('end', value);
+            this.$el.find('.timepicker-input')
+                .bindFirst(`keydown${this.eventNamespace()}`, this.onKeyDownTimepickerInput.bind(this));
         },
 
         _updateDateTimePickerSubView: function(subViewName, viewValue) {
@@ -207,8 +242,8 @@ define(function(require, exports, module) {
             }
         },
 
-        getCriteriaProperties() {
-            const data = DatetimeFilter.__super__.getCriteriaProperties.call(this);
+        getTemplateDataProps() {
+            const data = DatetimeFilter.__super__.getTemplateDataProps.call(this);
 
             return {
                 ...data,
@@ -219,6 +254,18 @@ define(function(require, exports, module) {
                     label: this.label
                 })
             };
+        },
+
+        /**
+         * @inheritdoc
+         */
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            this.$el.find('.timepicker-input').off(this.eventNamespace());
+            DatetimeFilter.__super__.dispose.call(this);
         }
     });
 
