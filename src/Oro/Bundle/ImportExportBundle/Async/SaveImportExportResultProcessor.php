@@ -71,23 +71,12 @@ class SaveImportExportResultProcessor implements MessageProcessorInterface, Topi
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = JSON::decode($message->getBody());
+
         try {
             $options = $this->configureOption($body);
-        } catch (MissingOptionsException $e) {
+        } catch (MissingOptionsException | UndefinedOptionsException | InvalidOptionsException $e) {
             $this->logger->critical(
                 sprintf('Error occurred during save result: %s', $e->getMessage()),
-                ['exception' => $e]
-            );
-            return self::REJECT;
-        } catch (UndefinedOptionsException $e) {
-            $this->logger->critical(
-                sprintf('Error occurred during save result: %s', $e->getMessage()),
-                ['exception' => $e]
-            );
-            return self::REJECT;
-        } catch (InvalidOptionsException $e) {
-            $this->logger->critical(
-                sprintf('Not enough required parameters: %s', $e->getMessage()),
                 ['exception' => $e]
             );
             return self::REJECT;

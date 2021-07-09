@@ -17,7 +17,7 @@ use Oro\Bundle\ImapBundle\Exception\SocketTimeoutException;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
@@ -37,7 +37,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /** @var SyncCredentialsIssueManager */
@@ -49,7 +49,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
      * @param ImapConnectorFactory $connectorFactory
      * @param SymmetricCrypterInterface $encryptor
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         ManagerRegistry $doctrine,
@@ -57,7 +57,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
 
@@ -99,7 +99,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      */
     protected function getEmailOriginClass()
     {
-        return 'OroImapBundle:UserEmailOrigin';
+        return UserEmailOrigin::class;
     }
 
     /**

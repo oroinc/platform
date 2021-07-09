@@ -5,6 +5,8 @@ services:
     Oro\Bundle\InstallerBundle\Command\CheckRequirementsCommand:
         arguments:
             - '%kernel.project_dir%'
+        calls:
+            - ['setProvidersIterator', [!tagged_iterator oro.requirements_provider]]
         tags:
             - { name: console.command }
 

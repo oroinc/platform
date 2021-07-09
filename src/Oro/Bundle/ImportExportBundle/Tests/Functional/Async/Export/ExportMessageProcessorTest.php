@@ -115,14 +115,6 @@ class ExportMessageProcessorTest extends WebTestCase
     }
 
     /**
-     * @return object
-     */
-    private function getConfigManager()
-    {
-        return $this->getContainer()->get('oro_config.user');
-    }
-
-    /**
      * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
      */
     private function createExportHandlerMock()

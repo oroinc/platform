@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Grid;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\SegmentBundle\Tests\Functional\DataFixtures\LoadOrganizationsWithUsersData;
@@ -14,6 +15,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class SegmentWithConditionsGroupTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     /**
      * @var bool
      */
@@ -31,14 +34,14 @@ class SegmentWithConditionsGroupTest extends WebTestCase
             LoadOrganizationsWithUsersData::class,
             LoadSegmentWithToManyFiltersData::class
         ]);
-        $this->configManager = $this->getContainer()->get('oro_config.manager');
+        $this->configManager = self::getConfigManager(null);
         $this->groupingEnabled = $this->configManager
             ->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
     }
 
     protected function tearDown(): void
     {
-        $this->configManager
+        self::getConfigManager('global')
             ->set('oro_query_designer.conditions_group_merge_same_entity_conditions', $this->groupingEnabled);
     }
 
@@ -65,7 +68,8 @@ class SegmentWithConditionsGroupTest extends WebTestCase
 
     public function testSegmentWithGroupedFiltersGroupingDisabled()
     {
-        $this->configManager->set('oro_query_designer.conditions_group_merge_same_entity_conditions', false);
+        self::getConfigManager('global')
+            ->set('oro_query_designer.conditions_group_merge_same_entity_conditions', false);
 
         $this->assertSegmentResults(
             $this->getReference(LoadSegmentWithToManyFiltersData::SEGMENT_FILTER_GROUP),

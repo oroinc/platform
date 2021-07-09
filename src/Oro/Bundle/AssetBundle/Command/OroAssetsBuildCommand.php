@@ -52,6 +52,8 @@ class OroAssetsBuildCommand extends Command
     /** @var int|float|null */
     private $npmInstallTimeout;
 
+    private bool $disableBabel;
+
     /**
      * @param NodeProcessFactory $nodeProcessFactory
      * @param AssetConfigCache   $cache
@@ -73,6 +75,11 @@ class OroAssetsBuildCommand extends Command
         $this->npmInstallTimeout = $npmInstallTimeout;
 
         parent::__construct();
+    }
+
+    public function setDisableBabel(bool $disableBabel): void
+    {
+        $this->disableBabel = $disableBabel;
     }
 
     /**
@@ -294,7 +301,7 @@ HELP
         if ($input->getOption('skip-js')) {
             $command[] = '--env.skipJS';
         }
-        if ($input->getOption('skip-babel')) {
+        if ($this->disableBabel || $input->getOption('skip-babel')) {
             $command[] = '--env.skipBabel';
         }
         if ($input->getOption('skip-sourcemap')) {

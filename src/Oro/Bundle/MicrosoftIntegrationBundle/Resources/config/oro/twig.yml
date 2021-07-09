@@ -1,0 +1,2 @@
+bundles:
+    - OroMicrosoftIntegrationBundle:Form:fields.html.twig

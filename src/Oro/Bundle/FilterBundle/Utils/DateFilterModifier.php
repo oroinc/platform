@@ -20,7 +20,7 @@ class DateFilterModifier
     protected $dateCompiler;
 
     /** @var null|string  */
-    protected $timeZone;
+    protected $timeZone = null;
 
     /** @var array */
     protected static $partFormatsMap = [
@@ -70,7 +70,7 @@ class DateFilterModifier
         // change value type depending on date part
         if (array_key_exists($data['part'], static::$partFormatsMap)) {
             $format = static::$partFormatsMap[$data['part']];
-            $data   = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
+            $data = $this->mapValues($valueKeys, $data, $this->getDatePartAccessorClosure($format));
         } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
             $data = $this->mapValues($valueKeys, $data, $this->getQuarterMapValuesClosure());
         } elseif ($compile) {
@@ -116,7 +116,7 @@ class DateFilterModifier
             ? $data['value']['start']
             : $data['value']['end'];
         if ($date && !$date instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($date, true, $this->getTimeZone());
+            $result = $this->dateCompiler->compile($date, true);
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -126,6 +126,7 @@ class DateFilterModifier
                     case DateModifierInterface::VAR_SOY:
                         $data['type'] = $this->convertEqualToBetweenType($isEqualType);
                         if ($isEqualType) {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 day');
                         } else {
                             $data['value']['start'] = $data['value']['end'];
@@ -138,8 +139,10 @@ class DateFilterModifier
                             $data['value']['start'] = $data['value']['end'];
                         }
                         if (ExpressionResult::TYPE_DATE === $result->getSourceType()) {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 day');
                         } else {
+                            $data['value']['start'] = $this->dateFormat($result->getValue());
                             $data['value']['end'] = $this->modifyDate($result->getValue(), '1 minute');
                         }
                         break;
@@ -195,7 +198,7 @@ class DateFilterModifier
     {
         $endDate = $data['value']['end'];
         if ($endDate && !$endDate instanceof \DateTime) {
-            $result = $this->dateCompiler->compile($endDate, true, $this->getTimeZone());
+            $result = $this->dateCompiler->compile($endDate, true);
             if ($result instanceof ExpressionResult) {
                 switch ($result->getVariableType()) {
                     case DateModifierInterface::VAR_TODAY:
@@ -233,7 +236,7 @@ class DateFilterModifier
         if (isset($data['part'])) {
             foreach ($data['value'] as $field) {
                 if ($field && !$field instanceof \DateTime) {
-                    $result = $this->dateCompiler->compile($field, true, $this->getTimeZone());
+                    $result = $this->dateCompiler->compile($field, true);
 
                     switch ($result->getVariableType()) {
                         case DateModifierInterface::VAR_THIS_DAY_W_Y:
@@ -256,20 +259,32 @@ class DateFilterModifier
 
     /**
      * @param \DateTime $date
-     * @param string    $modify
+     * @param string $modify
      *
      * @return string
      */
     protected function modifyDate(\DateTime $date, $modify)
     {
-        return (clone $date)->modify($modify)->format('Y-m-d H:i');
+        $date = (clone $date)->modify($modify);
+
+        return $this->dateFormat($date);
+    }
+
+    /**
+     * @param \DateTime $date
+     *
+     * @return string
+     */
+    protected function dateFormat(\DateTime $date): string
+    {
+        return $date->format('Y-m-d H:i');
     }
 
     /**
      * Call callback for each of given value, used instead of array_map to walk safely through array
      *
-     * @param array    $keys
-     * @param array    $data
+     * @param array $keys
+     * @param array $data
      * @param \Closure $callback
      *
      * @return array
@@ -305,7 +320,7 @@ class DateFilterModifier
                     // returns values from 0 to 365.
                     // @see http://php.net/manual/en/function.date.php
                     if ('z' === $part) {
-                        $result ++;
+                        $result++;
                     }
                     return $result;
                     break;
@@ -321,7 +336,7 @@ class DateFilterModifier
     protected function getCompileClosure()
     {
         return function ($data) {
-            return $this->dateCompiler->compile($data, false, $this->getTimeZone());
+            return $this->dateCompiler->compile($data, false);
         };
     }
 
@@ -331,13 +346,12 @@ class DateFilterModifier
     protected function getQuarterMapValuesClosure()
     {
         return function ($data) {
-            $quarter = null;
             switch (true) {
                 case is_numeric($data):
                     $quarter = (int)$data;
                     break;
                 case ($data instanceof \DateTime):
-                    $month   = (int)$data->format('m');
+                    $month = (int)$data->format('m');
                     $quarter = ceil($month / 3);
                     break;
                 default:
@@ -355,7 +369,7 @@ class DateFilterModifier
     {
         return function ($data) {
             if ($data instanceof \DateTime) {
-                return (clone $data)->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:00\Z');
+                return (clone $data)->format('Y-m-d H:i:00\Z');
             }
             if (is_numeric($data)) {
                 return sprintf('2015-%02d-01 00:00:00\Z', $data);

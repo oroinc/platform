@@ -5,11 +5,15 @@ namespace Oro\Bundle\NavigationBundle\Tests\Functional\Entity\Repository;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Tests\Functional\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 
+/**
+ * @dbIsolationPerTest
+ */
 class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
@@ -139,6 +143,29 @@ class MenuUpdateRepositoryTest extends WebTestCase
                 ]
             ],
         ];
+    }
+
+    public function testUpdateDependentMenuUpdateUri()
+    {
+        /** @var MenuUpdate $globalMenuUpdate */
+        $globalMenuUpdate = $this->getReference('test_menu_item1_global');
+        /** @var MenuUpdate $userMenuUpdate */
+        $userMenuUpdate = $this->getReference('test_menu_item1_user');
+        $this->repository->updateDependentMenuUpdates($globalMenuUpdate);
+
+        $this->assertEquals($globalMenuUpdate->getUri(), $userMenuUpdate->getUri());
+    }
+
+    public function testGetDependentMenuUpdateScopes()
+    {
+        /** @var MenuUpdate $globalMenuUpdate */
+        $globalMenuUpdate = $this->getReference('test_menu_item1_global');
+        $scopes = $this->repository->getDependentMenuUpdateScopes($globalMenuUpdate);
+        $this->assertCount(1, $scopes);
+        /** @var Scope $expectedScope */
+        $expectedScope = $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE);
+
+        $this->assertEquals($expectedScope->getId(), $scopes[0]->getId());
     }
 
     /**

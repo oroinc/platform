@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Form\Type;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
@@ -13,6 +14,8 @@ use Symfony\Component\DomCrawler\Form;
 
 class UserTypeTest extends WebTestCase
 {
+    use ConfigManagerAwareTestTrait;
+
     const NAME_PREFIX = 'NamePrefix';
     const MIDDLE_NAME = 'MiddleName';
     const NAME_SUFFIX = 'NameSuffix';
@@ -76,7 +79,7 @@ class UserTypeTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $configManager = $this->getContainer()->get('oro_config.user');
+        $configManager = self::getConfigManager('global');
         $configManager->set('oro_user.send_password_in_invitation_email', $sendPassword);
         $configManager->flush();
 
@@ -158,7 +161,7 @@ class UserTypeTest extends WebTestCase
         $this->assertNotNull($user);
         $this->assertEquals($email, key($message->getTo()));
 
-        $configManager = $this->getContainer()->get('oro_config.manager');
+        $configManager = self::getConfigManager(null);
 
         $this->assertEquals(
             $configManager->get('oro_notification.email_notification_sender_email'),

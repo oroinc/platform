@@ -8,7 +8,7 @@ use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
@@ -37,18 +37,18 @@ class MailboxType extends AbstractType
     /** @var SymmetricCrypterInterface */
     protected $encryptor;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /**
      * @param MailboxProcessStorage $storage
      * @param SymmetricCrypterInterface $encryptor
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         MailboxProcessStorage $storage,
         SymmetricCrypterInterface $encryptor,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->storage = $storage;
         $this->encryptor = $encryptor;

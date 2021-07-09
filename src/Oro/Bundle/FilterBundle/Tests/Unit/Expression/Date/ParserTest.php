@@ -10,17 +10,19 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 class ParserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Parser */
-    protected $parser;
+    private $parser;
+
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
     protected function setUp(): void
     {
-        $localeSettingsMock = $this->createMock(LocaleSettings::class);
-        $localeSettingsMock
+        $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $this->localeSettings
             ->expects($this->any())
             ->method('getTimeZone')
             ->willReturn('UTC');
-
-        $this->parser = new Parser($localeSettingsMock);
+        $this->parser = new Parser($this->localeSettings);
     }
 
     protected function tearDown(): void
@@ -32,17 +34,16 @@ class ParserTest extends \PHPUnit\Framework\TestCase
      * @dataProvider parseProvider
      *
      * @param array $tokens
-     * @param string $timeZone
      * @param mixed $expectedResult
      * @param null|string $expectedException
      */
-    public function testParse($tokens, $timeZone, $expectedResult, $expectedException = null)
+    public function testParse($tokens, $expectedResult, $expectedException = null)
     {
         if (null !== $expectedException) {
             $this->expectException($expectedException);
         }
 
-        $result = $this->parser->parse($tokens, false, $timeZone);
+        $result = $this->parser->parse($tokens);
         $this->assertEquals($expectedResult, $result);
     }
 
@@ -52,20 +53,11 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     public function parseProvider()
     {
         return [
-            'Non system configuration time zone' => [
-                [
-                    new Token(Token::TYPE_DATE, '2001-01-01'),
-                    new Token(Token::TYPE_TIME, '23:00:00'),
-                ],
-                'time zone' => 'America/Jamaica',
-                Carbon::parse('2001-01-01 23:00:00', 'America/Jamaica')
-            ],
             'should merge date and time' => [
                 [
                     new Token(Token::TYPE_DATE, '2001-01-01'),
                     new Token(Token::TYPE_TIME, '23:00:00'),
                 ],
-                'time zone' => null,
                 Carbon::parse('2001-01-01 23:00:00', 'UTC')
             ],
             'should merge date and time reverse mode' => [
@@ -73,10 +65,9 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_TIME, '23:00:00'),
                     new Token(Token::TYPE_DATE, '2001-01-01'),
                 ],
-                'time zone' => null,
                 Carbon::parse('2001-01-01 23:00:00', 'UTC')
             ],
-            'should process parentheses'                     => [
+            'should process parentheses' => [
                 [
                     new Token(Token::TYPE_PUNCTUATION, '('),
                     new Token(Token::TYPE_INTEGER, 2),
@@ -86,10 +77,9 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_OPERATOR, '-'),
                     new Token(Token::TYPE_INTEGER, 1),
                 ],
-                'time zone' => null,
                 4
             ],
-            'should check parentheses syntax'                => [
+            'should check parentheses syntax' => [
                 [
                     new Token(Token::TYPE_PUNCTUATION, '('),
                     new Token(Token::TYPE_INTEGER, 2),
@@ -98,7 +88,6 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_OPERATOR, '-'),
                     new Token(Token::TYPE_INTEGER, 1),
                 ],
-                'time zone' => null,
                 null,
                 '\LogicException'
             ],
@@ -107,17 +96,15 @@ class ParserTest extends \PHPUnit\Framework\TestCase
                     new Token(Token::TYPE_INTEGER, 2),
                     new Token(Token::TYPE_PUNCTUATION, ')'),
                 ],
-                'time zone' => null,
                 null,
                 '\LogicException'
             ],
-            'one variable are allowed per expression'        => [
+            'one variable are allowed per expression' => [
                 [
                     new Token(Token::TYPE_VARIABLE, 2),
                     new Token(Token::TYPE_OPERATOR, '+'),
                     new Token(Token::TYPE_VARIABLE, 3),
                 ],
-                'time zone' => null,
                 null,
                 'Oro\Bundle\FilterBundle\Expression\Exception\SyntaxException'
             ]

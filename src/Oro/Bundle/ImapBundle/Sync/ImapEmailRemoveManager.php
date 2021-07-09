@@ -46,9 +46,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
         $this->em->transactional(function () use ($imapFolder, $folder, $manager) {
             $existingUids = $manager->getEmailUIDs();
 
-            $staleImapEmailsQb = $this
-                ->em
-                ->getRepository('OroImapBundle:ImapEmail')
+            $staleImapEmailsQb = $this->em->getRepository(ImapEmail::class)
                 ->createQueryBuilder('ie');
             $staleImapEmailsQb
                 ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
@@ -81,7 +79,7 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
                 $email = $imapEmail->getEmail();
                 $email->getEmailUsers()
                     ->forAll(function ($key, EmailUser $emailUser) use ($folder, $imapEmail) {
-                        $existsEmails = $this->em->getRepository('OroImapBundle:ImapEmail')
+                        $existsEmails = $this->em->getRepository(ImapEmail::class)
                             ->findBy(['email' => $imapEmail->getEmail()]);
 
                         $emailUser->removeFolder($folder);
@@ -106,9 +104,9 @@ class ImapEmailRemoveManager implements LoggerAwareInterface
         $this->logger->info('Removing empty outdated folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
-        $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
+        $repo = $this->em->getRepository(ImapEmailFolder::class);
         $imapFolders = $repo->getEmptyOutdatedFoldersByOrigin($origin);
-        $folders     = new ArrayCollection();
+        $folders = new ArrayCollection();
 
         /** @var ImapEmailFolder $imapFolder */
         foreach ($imapFolders as $imapFolder) {

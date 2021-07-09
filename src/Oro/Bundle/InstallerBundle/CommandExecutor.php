@@ -141,9 +141,11 @@ class CommandExecutor extends AbstractCommandExecutor
             $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
+            $originalVerbosity = $this->output->getVerbosity();
             try {
                 $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
             } finally {
+                $this->output->setVerbosity($originalVerbosity);
                 $this->application->setAutoExit(true);
             }
         }
@@ -188,6 +190,50 @@ class CommandExecutor extends AbstractCommandExecutor
     public function getLastCommandExitCode()
     {
         return $this->lastCommandExitCode;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function prepareParameters($command, array $params): array
+    {
+        $params = parent::prepareParameters($command, $params);
+
+        if (!$this->hasVerbosityParameter($params)) {
+            switch ($this->output->getVerbosity()) {
+                case OutputInterface::VERBOSITY_DEBUG:
+                    $params['-vvv'] = true;
+                    break;
+                case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                    $params['-vv'] = true;
+                    break;
+                case OutputInterface::VERBOSITY_VERBOSE:
+                    $params['-v'] = true;
+                    break;
+                case OutputInterface::VERBOSITY_QUIET:
+                    $params['-q'] = true;
+                    break;
+            }
+        }
+
+        return $params;
+    }
+
+    private function hasVerbosityParameter(array $params): bool
+    {
+        foreach ($params as $name => $value) {
+            if ('-v' === $name
+                || '-vv' === $name
+                || '-vvv' === $name
+                || '--verbose' === $name
+                || '-q' === $name
+                || '--quiet' === $name
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

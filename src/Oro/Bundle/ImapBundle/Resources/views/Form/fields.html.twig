@@ -100,11 +100,13 @@
                     <div class="control-label wrap">
                         {{ 'oro.imap.configuration.reset_email.label'|trans }}
                     </div>
-                    <div class="controls oro-item-collection">
-                        <div style="margin-top: 6px">
-                            <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
-                            <button title="{{ 'oro.imap.configuration.disconnect.label'|trans }}" class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
-                        </div>
+                    <div class="controls html-content oro-item-collection">
+                        <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
+                        <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                                title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+                        >
+                            <span class="fa-close" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
             {% endif %}
@@ -197,11 +199,13 @@
                     <div class="control-label wrap">
                         {{ 'oro.imap.configuration.reset_email.label'|trans }}
                     </div>
-                    <div class="controls oro-item-collection">
-                        <div style="margin-top: 6px">
-                            <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
-                            <button title="{{ 'oro.imap.configuration.disconnect.label'|trans }}" class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
-                        </div>
+                    <div class="controls html-content oro-item-collection">
+                        <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
+                        <button data-role="remove" class="btn btn-icon btn-square-lighter delete" type="button"
+                                title="{{ 'oro.imap.configuration.disconnect.label'|trans }}"
+                        >
+                            <span class="fa-close" aria-hidden="true"></span>
+                        </button>
                     </div>
                 </div>
             {% endif %}
@@ -229,32 +233,6 @@
             {% endif %}
 
             {{- form_rest(form) -}}
-        </div>
-    </div>
-{% endblock %}
-
-{% block oro_config_microsoft_imap_sync_checkbox_widget %}
-    {% set options = {
-        errorMessage: '.default-alert',
-        successMessage: '.alert-success',
-        vendorErrorMessage: '.vendor-alert',
-        googleWarningMessage: '.alert-warning',
-        routeAccessToken: 'oro_imap_microsoft_access_token'
-    } %}
-    <div data-page-component-module="oroimap/js/app/components/microsoft-sync-checkbox-component"
-         data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
-        {{ block('checkbox_widget') }}
-        <div class="alert vendor-connection-status alert-warning" role="alert" style="display: none">
-            {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
-        </div>
-        <div class="vendor-alert vendor-connection-status alert alert-error" role="alert" style="display: none">
-
-        </div>
-        <div class="default-alert vendor-connection-status alert alert-error" role="alert" style="display: none">
-            {{ 'oro.imap.system_configuration.fields.enable_google_imap.error.label'|trans }}
-        </div>
-        <div class="alert vendor-connection-status alert-success" role="alert" style="display: none">
-            {{ 'oro.imap.system_configuration.fields.enable_google_imap.success.label'|trans }}
         </div>
     </div>
 {% endblock %}

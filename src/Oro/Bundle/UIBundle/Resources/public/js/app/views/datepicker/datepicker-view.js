@@ -247,6 +247,7 @@ define(function(require) {
                 return;
             }
             this.$frontDateField.val(this.getFrontendFormattedDate());
+            this.checkEmpty();
         },
 
         /**

@@ -1,0 +1,16 @@
+ignored_queries:
+    mysql:
+        - 'ALTER TABLE oro_email_origin DROP ews_server, DROP ews_user_email'
+        - 'ALTER TABLE test_api_composite_id DROP FOREIGN KEY FK_5D378FD111BF52E488B6035E'
+        - 'DROP INDEX IDX_5D378FD188B6035E11BF52E4 ON test_api_composite_id'
+        - 'ALTER TABLE test_api_composite_id ADD CONSTRAINT FK_5D378FD111BF52E488B6035E FOREIGN KEY (parent_key1, parent_key2) REFERENCES test_api_composite_id (key1, key2)'
+        - 'ALTER TABLE test_api_composite_id_children DROP FOREIGN KEY FK_DBE4B623996DC7A2649618'
+        - 'ALTER TABLE test_api_composite_id_children DROP FOREIGN KEY FK_DBE4B62311BF52E488B6035E'
+        - 'DROP INDEX IDX_DBE4B623649618996DC7A2 ON test_api_composite_id_children'
+        - 'DROP INDEX IDX_DBE4B62388B6035E11BF52E4 ON test_api_composite_id_children'
+        - 'ALTER TABLE test_api_composite_id_children ADD CONSTRAINT FK_DBE4B623996DC7A2649618 FOREIGN KEY (child_key1, child_key2) REFERENCES test_api_composite_id (key1, key2)'
+        - 'ALTER TABLE test_api_composite_id_children ADD CONSTRAINT FK_DBE4B62311BF52E488B6035E FOREIGN KEY (parent_key1, parent_key2) REFERENCES test_api_composite_id (key1, key2)'
+        - "ALTER TABLE oro_message_queue_job CHANGE data data JSON DEFAULT NULL COMMENT '(DC2Type:json_array)'"
+    postgresql:
+        - 'ALTER TABLE oro_email_origin DROP ews_server'
+        - 'ALTER TABLE oro_email_origin DROP ews_user_email'

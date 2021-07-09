@@ -86,6 +86,12 @@ class DebugCommand extends AbstractDebugCommand implements ContainerAwareInterfa
                 InputOption::VALUE_NONE,
                 'Show a list of all processors without descriptions'
             )
+            ->addOption(
+                'no-docs',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not show descriptions of API processors'
+            )
             ->setDescription('Displays registered API actions and processors.')
             ->setHelp(
                 <<<'HELP'
@@ -96,10 +102,12 @@ The <info>%command.name%</info> command display a list of available API actions.
 To see the processors registered for a given action, specify the action name as an argument:
 
   <info>php %command.full_name% <action></info>
+  <info>php %command.full_name% --no-docs <action></info>
 
 The list of the processors can be limited to some group specified as the second argument:
 
   <info>php %command.full_name% <action> <group></info>
+  <info>php %command.full_name% --no-docs <action> <group></info>
 
 The <info>--attribute</info> option can be used to show the processors that will be executed
 only when the context has a given attribute with the specified value.
@@ -167,7 +175,13 @@ HELP
         if ($group) {
             $attributes[] = sprintf('group:%s', $group);
         }
-        $this->dumpProcessors($output, $action, $this->getRequestType($input), $attributes);
+        $this->dumpProcessors(
+            $output,
+            $action,
+            $this->getRequestType($input),
+            $attributes,
+            $input->getOption('no-docs')
+        );
     }
 
     private function dumpActions(OutputInterface $output): void
@@ -333,12 +347,14 @@ HELP
      * @param string          $action
      * @param RequestType     $requestType
      * @param string[]        $attributes
+     * @param bool            $noDocs
      */
     private function dumpProcessors(
         OutputInterface $output,
         string $action,
         RequestType $requestType,
-        array $attributes
+        array $attributes,
+        bool $noDocs
     ) {
         $output->writeln('The processors are displayed in the order they are executed.');
 
@@ -383,9 +399,11 @@ HELP
                 PHP_EOL,
                 get_class($processor)
             );
-            $processorDescription = $this->getClassDocComment(get_class($processor));
-            if (!empty($processorDescription)) {
-                $processorColumn .= PHP_EOL . $processorDescription;
+            if (!$noDocs) {
+                $processorDescription = $this->getClassDocComment(get_class($processor));
+                if (!empty($processorDescription)) {
+                    $processorColumn .= PHP_EOL . $processorDescription;
+                }
             }
 
             $attributesColumn = $this->formatProcessorAttributes($processors->getProcessorAttributes(), $action);
@@ -401,6 +419,9 @@ HELP
         $reflection = new \ReflectionClass($className);
 
         $comment = $reflection->getDocComment();
+        if (false === $comment) {
+            return '';
+        }
 
         $comment = preg_replace('/^\s+\* @[\w0-9]+.*/msi', '', $comment);
         $comment = strtr($comment, ['/**' => '', '*/' => '']);

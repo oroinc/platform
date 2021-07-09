@@ -274,13 +274,13 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
     {
         $entity = $this->getScopedEntity();
         $entityId = $this->getEntityId($entity);
-        $this->assertEquals($entityId, $this->manager->getScopeIdFromEntity($entity));
+        $this->assertSame($entityId, $this->manager->getScopeIdFromEntity($entity));
     }
 
     public function testGetScopeIdFromUnsupportedEntity()
     {
         $entity = new \stdClass();
-        $this->assertEquals($this->manager->getScopeId(), $this->manager->getScopeIdFromEntity($entity));
+        $this->assertNull($this->manager->getScopeIdFromEntity($entity));
     }
 
     public function testSetScopeIdFromEntity()
@@ -298,16 +298,17 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
 
     public function testSetScopeIdFromUnsupportedEntity()
     {
-        $entity = new \stdClass();
+        $this->manager->setScopeIdFromEntity($this->getScopedEntity());
         $oldScopeId = $this->manager->getScopeId();
         $this->dispatcher->expects($this->exactly(0))
             ->method('dispatch')
             ->with(static::anything(), ConfigManagerScopeIdUpdateEvent::EVENT_NAME);
 
+        $entity = new \stdClass();
         $this->manager->setScopeIdFromEntity($entity);
-        $this->assertEquals($oldScopeId, $this->manager->getScopeId());
-    }
 
+        $this->assertSame($oldScopeId, $this->manager->getScopeId());
+    }
 
     /**
      * @param Config $config

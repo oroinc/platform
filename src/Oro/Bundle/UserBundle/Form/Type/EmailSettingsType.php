@@ -4,7 +4,7 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\ImapBundle\Form\Type\ChoiceAccountType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,16 +19,16 @@ class EmailSettingsType extends AbstractType
     /** UserImapConfigSubscriber */
     protected $subscriber;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     protected $oauthManagerRegistry;
 
     /**
      * @param UserImapConfigSubscriber $subscriber
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
+     * @param OAuthManagerRegistry $oauthManagerRegistry
      */
     public function __construct(
         UserImapConfigSubscriber $subscriber,
-        OAuth2ManagerRegistry    $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->subscriber = $subscriber;
         $this->oauthManagerRegistry = $oauthManagerRegistry;

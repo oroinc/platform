@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\ImapBundle\Manager\OAuth2ManagerRegistry;
+use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
@@ -15,16 +15,16 @@ class SendEmailTransportListener
     /** @var SymmetricCrypterInterface */
     private $crypter;
 
-    /** @var OAuth2ManagerRegistry */
+    /** @var OAuthManagerRegistry */
     private $oauthManagerRegistry;
 
     /**
      * @param SymmetricCrypterInterface $crypter
-     * @param OAuth2ManagerRegistry     $oauthManagerRegistry
+     * @param OAuthManagerRegistry     $oauthManagerRegistry
      */
     public function __construct(
         SymmetricCrypterInterface $crypter,
-        OAuth2ManagerRegistry $oauthManagerRegistry
+        OAuthManagerRegistry $oauthManagerRegistry
     ) {
         $this->crypter = $crypter;
         $this->oauthManagerRegistry = $oauthManagerRegistry;

@@ -191,7 +191,7 @@ services:
         arguments:
             - '@oro_email.mailbox.process_storage'
             - '@oro_security.encoder.default'
-            - '@oro_imap.manager_registry.registry'
+            - '@oro_imap.oauth_manager_registry'
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 

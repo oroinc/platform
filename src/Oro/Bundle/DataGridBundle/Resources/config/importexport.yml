@@ -27,6 +27,17 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_importexport.reader.entity'
             - '@event_dispatcher'
+        calls:
+            - [setEntityIdentityReaders, [ !tagged_iterator oro_datagrid.filtered_entity_identity_reader ]]
+            - [setLogger, ['@logger']]
+
+    oro_datagrid.importexport.filtered_entity.orm_entity_identity_reader:
+        class: Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader\OrmFilteredEntityIdentityReader
+        arguments:
+            - '@event_dispatcher'
+            - '@oro_security.acl_helper'
+        tags:
+            - { name: oro_datagrid.filtered_entity_identity_reader}
 
     oro_datagrid.importexport.export_connector:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector

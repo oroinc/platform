@@ -6,7 +6,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 
 /**
- * Google OAuth 2 related implementation of AbstractImapConfigHandler.
+ * Google OAuth related implementation of AbstractImapConfigHandler.
  * Handles refreshing tokens of email origin entities if Google API application
  * client ID/Secret was modified
  */

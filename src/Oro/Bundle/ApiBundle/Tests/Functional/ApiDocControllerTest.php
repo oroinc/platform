@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGenerator;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,14 +16,6 @@ class ApiDocControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-    }
-
-    /**
-     * @return ConfigManager
-     */
-    private function getConfigManager(): ConfigManager
-    {
-        return self::getContainer()->get('oro_config.global');
     }
 
     /**

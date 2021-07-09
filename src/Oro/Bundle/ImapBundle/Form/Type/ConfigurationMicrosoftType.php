@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  * Defines email origin configuration form with predefined
  * Microsoft Office 365 IMAP/SMTP settings
  */
-class ConfigurationMicrosoftType extends AbstractOauthAwareConfigurationType
+class ConfigurationMicrosoftType extends AbstractOAuthAwareConfigurationType
 {
     const NAME = 'oro_imap_configuration_microsoft';
 
