@@ -255,7 +255,7 @@ define(function(require) {
                 choices: this.choices,
                 name: this.name,
                 renderMode: this.renderMode,
-                ...this.getCriteriaProperties()
+                ...this.getTemplateDataProps()
             }));
 
             this._appendFilter($filter);
@@ -283,6 +283,9 @@ define(function(require) {
             this._criteriaRenderd = true;
 
             this._alignCriteria();
+            if (this.autoClose !== false) {
+                this._focusCriteriaValue();
+            }
         },
 
         /**
@@ -567,6 +570,19 @@ define(function(require) {
             }
 
             DictionaryFilter.__super__._applyValueAndHideCriteria.call(this);
+        },
+
+        /**
+         * @return {jQuery}
+         */
+        getCriteriaValueFieldToFocus() {
+            const $el = DictionaryFilter.__super__.getCriteriaValueFieldToFocus.call(this);
+
+            if ($el.data('select2')) {
+                return $el.data('select2').search;
+            }
+
+            return $el;
         }
     });
 

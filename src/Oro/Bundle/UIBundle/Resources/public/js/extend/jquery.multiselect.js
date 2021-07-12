@@ -12,7 +12,8 @@ define(function(require) {
     $.widget('orofilter.multiselect', $.ech.multiselect, {
         options: _.extend({}, $.ech.multiselect.prototype.options, {
             outerTrigger: null,
-            refreshNotOpened: true
+            refreshNotOpened: true,
+            preventTabOutOfContainer: true
         }),
 
         _create(...args) {
@@ -106,7 +107,9 @@ define(function(require) {
                 }
             });
             this.menu.on(`keydown${this._namespaceID}`, e => {
-                manageFocus.preventTabOutOfContainer(e, this.menu);
+                if (this.options.preventTabOutOfContainer) {
+                    manageFocus.preventTabOutOfContainer(e, this.menu);
+                }
 
                 if (e.which === KEY_CODES.ESCAPE) {
                     this.close();
@@ -142,6 +145,12 @@ define(function(require) {
             }
             this.button.attr('aria-expanded', true);
             this.$outerTrigger.attr('aria-expanded', true);
+
+            // Remove outdated styles
+            this.labels.filter(':not(.ui-state-disabled)').eq(0).trigger('mouseover').find('input').trigger('blur');
+            // Remove outdated class
+            this.menu.find('.ui-state-hover').removeClass('ui-state-hover');
+            manageFocus.focusTabbable(this.menu);
         },
 
         close() {
@@ -178,9 +187,22 @@ define(function(require) {
 
         refresh(init) {
             if (this.hasBeenOpened || this.options.refreshNotOpened) {
+                let $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
                 const scrollTop = this.menu.find('.ui-multiselect-checkboxes').scrollTop();
+                let {activeElement} = document;
+                if (!$checkboxesContainer[0].contains(activeElement)) {
+                    activeElement = null;
+                }
+
                 this._super(init);
-                this.menu.find('.ui-multiselect-checkboxes').scrollTop(scrollTop);
+
+                // updated checkbox container
+                $checkboxesContainer = this.menu.find('.ui-multiselect-checkboxes');
+                if (activeElement) {
+                    // move focus back to last active checkbox
+                    $checkboxesContainer.find(`#${activeElement.id}`).focus();
+                }
+                $checkboxesContainer.scrollTop(scrollTop);
             }
             this.menu.find('.ui-multiselect-checkboxes').attr({
                 'aria-label': this.options.listAriaLabel ? this.options.listAriaLabel : null

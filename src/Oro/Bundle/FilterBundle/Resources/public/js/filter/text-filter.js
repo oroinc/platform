@@ -9,11 +9,15 @@ define(function(require, exports, module) {
     const EmptyFilter = require('oro/filter/empty-filter');
     const tools = require('oroui/js/tools');
     const mediator = require('oroui/js/mediator');
+    const manageFocus = require('oroui/js/tools/manage-focus').default;
+    const KEYBOARD_CODES = require('oroui/js/tools/keyboard-key-codes').default;
 
     let config = require('module-config').default(module.id);
     config = _.extend({
         notAlignCriteria: tools.isMobile()
     }, config);
+
+    require('jquery-ui/tabbable');
 
     /**
      * Text grid filter.
@@ -76,9 +80,11 @@ define(function(require, exports, module) {
          */
         events: {
             // Exclude from selection an auxiliary input inside of select2 component
-            'keyup input:not(.select2-focusser)': '_onReadCriteriaInputKey',
-            'keydown [type="text"]': '_preventEnterProcessing',
+            'keydown input:not(.select2-focusser)': '_onReadCriteriaInputKey',
             'click .filter-update': '_onClickUpdateCriteria',
+            'keydown .filter-update': '_onKeydownUpdateCriteria',
+            'keydown .filter-criteria-selector': 'onKeyDownCriteriaSelector',
+            'keydown .filter-criteria': 'onKeyDownCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
             'click .disable-filter': '_onClickDisableFilter',
@@ -128,18 +134,13 @@ define(function(require, exports, module) {
          * @protected
          */
         _onReadCriteriaInputKey: function(e) {
-            const {_keyDownTarget: keyDownTarget} = this;
-            delete this._keyDownTarget;
-
-            if (keyDownTarget && !keyDownTarget.isEqualNode(e.target)) {
-                return;
-            }
-
             this._onValueChanged();
 
             if (e.which !== 13) {
                 return;
             }
+
+            e.preventDefault();
 
             if (!this._isValid()) {
                 return;
@@ -148,9 +149,16 @@ define(function(require, exports, module) {
             this._applyValueAndHideCriteria();
         },
 
-        _preventEnterProcessing(event) {
-            this._keyDownTarget = event.target;
-            TextFilter.__super__._preventEnterProcessing.call(this, event);
+        /**
+         * Handle keydown on criteria update button
+         *
+         * @param {Event} e
+         * @private
+         */
+        _onKeydownUpdateCriteria(e) {
+            if (e.keyCode === KEYBOARD_CODES.ENTER || e.keyCode === KEYBOARD_CODES.SPACE) {
+                this._onClickUpdateCriteria(e);
+            }
         },
 
         /**
@@ -317,13 +325,12 @@ define(function(require, exports, module) {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
             this.$(this.criteriaSelector)
                 .removeClass('criteria-hidden')
-                .removeAttr('aria-hidden')
                 .addClass('criteria-visible');
             this._alignCriteria();
-            if (this.autoClose !== false) {
-                this._focusCriteria();
-            }
             this._setButtonPressed(this.$(this.criteriaSelector), true);
+            if (this.autoClose !== false) {
+                this._focusCriteriaValue();
+            }
             this.trigger('showCriteria', this);
             setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
@@ -376,24 +383,14 @@ define(function(require, exports, module) {
         _hideCriteria: function() {
             this.$(this.criteriaSelector)
                 .removeClass('criteria-visible')
-                .addClass('criteria-hidden')
-                .attr('aria-hidden', true);
+                .addClass('criteria-hidden');
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             this.trigger('hideCriteria', this);
-            setTimeout(_.bind(function() {
+            setTimeout(() => {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
                 }
-            }, this), 100);
-        },
-
-        /**
-         * Focus filter criteria input
-         *
-         * @protected
-         */
-        _focusCriteria: function() {
-            this.$(this.criteriaSelector + ' input[type=text]').not('[data-skip-focus]').focus().select();
+            }, 100);
         },
 
         /**
@@ -427,6 +424,62 @@ define(function(require, exports, module) {
             }
 
             return '"' + value.value + '"';
+        },
+
+        onKeyDownCriteria(e) {
+            if (
+                e.keyCode === KEYBOARD_CODES.ENTER &&
+                !this.getCriteria().is(':visible')
+            ) {
+                this.focusCriteriaToggler();
+            } else if (
+                e.keyCode === KEYBOARD_CODES.ENTER &&
+                this.$(this.criteriaSelector).is(':animated')
+            ) {
+                this.$(this.criteriaSelector).done(() => {
+                    if (
+                        !this.getCriteria().is(':visible') &&
+                        document.activeElement.isSameNode(e.target)
+                    ) {
+                        this.focusCriteriaToggler();
+                    }
+                });
+            } else if (this.isDropdownRenderMode()) {
+                manageFocus.preventTabOutOfContainer(e, e.currentTarget);
+            }
+        },
+
+        onKeyDownCriteriaSelector(e) {
+            this.trigger('keydownOnToggle', e, this);
+        },
+
+        _focusCriteriaValue() {
+            this.getCriteriaValueFieldToFocus().focus().select();
+        },
+
+        /**
+         * @return {jQuery}
+         */
+        getCriteriaValueFieldToFocus() {
+            if (this.criteriaValueSelectors === void 0) {
+                return $();
+            } else if (typeof this.criteriaValueSelectors.value === 'string') {
+                return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value}`);
+            }
+
+            return this.$(`${this.criteriaSelector} ${this.criteriaValueSelectors.value.start}`);
+        },
+
+        getCriteriaSelector() {
+            return this.$('.filter-criteria-selector');
+        },
+
+        getCriteria() {
+            return this.$(this.criteriaSelector);
+        },
+
+        focusCriteriaToggler() {
+            this.getCriteriaSelector().trigger('focus');
         }
     });
 

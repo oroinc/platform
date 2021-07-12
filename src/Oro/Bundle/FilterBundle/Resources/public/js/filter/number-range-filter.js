@@ -108,7 +108,7 @@ define(function(require) {
 
             const type = this.$(this.criteriaValueSelectors.type).val();
             const filterEnd = this.$('.filter-separator, .filter-end');
-            const {inputFieldAriaLabel, rangeStartFieldAriaLabel} = this.getCriteriaProperties();
+            const {inputFieldAriaLabel, rangeStartFieldAriaLabel} = this.getTemplateDataProps();
 
             if (this.isApplicable(type)) {
                 this.$(this.criteriaValueSelectors.value).attr('aria-label', rangeStartFieldAriaLabel);
@@ -328,8 +328,8 @@ define(function(require) {
             }
         },
 
-        getCriteriaProperties() {
-            const data = NumberRangeFilter.__super__.getCriteriaProperties.call(this);
+        getTemplateDataProps() {
+            const data = NumberRangeFilter.__super__.getTemplateDataProps.call(this);
 
             return {
                 ...data,

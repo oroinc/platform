@@ -94,11 +94,11 @@ define(function(require, exports, module) {
         buttonActiveClass: 'open-filter',
 
         /**
-         * Criteria trigger active class
+         * Criteria trigger expand class
          *
          * @property {String}
          */
-        criteriaSelectorActiveClass: 'active',
+        buttonExpandClass: 'active',
 
         /**
          * Element enclosing a criteria dropdown
@@ -537,7 +537,7 @@ define(function(require, exports, module) {
          * @protected
          */
         _setButtonPressed: function(element, status) {
-            this._setCriteriaSelectorPressed(status);
+            this._setButtonExpanded(status);
 
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
@@ -552,9 +552,9 @@ define(function(require, exports, module) {
          * @param {Boolean} state
          * @protected
          */
-        _setCriteriaSelectorPressed: function(state) {
+        _setButtonExpanded: function(state) {
             this.$('.filter-criteria-selector')
-                .toggleClass(this.criteriaSelectorActiveClass, state).attr('aria-expanded', state);
+                .toggleClass(this.buttonExpandClass, state).attr('aria-expanded', state);
         },
 
         /**
@@ -591,7 +591,7 @@ define(function(require, exports, module) {
          *
          * @return {Object}
          */
-        getCriteriaProperties() {
+        getTemplateDataProps() {
             return {
                 criteriaLabel: this.label,
                 criteriaLongLabel: `${__('oro.filter.by')} ${this.label}`,
@@ -601,6 +601,15 @@ define(function(require, exports, module) {
                     label: `${__('oro.filter.by')} ${this.label}`}
                 )
             };
+        },
+
+        /**
+         * Detect is filter has dropdown mode
+         * If renderMode is empty equals `dropdown-mode`
+         * @returns {boolean}
+         */
+        isDropdownRenderMode() {
+            return this.renderMode === 'dropdown-mode';
         }
     }));
 

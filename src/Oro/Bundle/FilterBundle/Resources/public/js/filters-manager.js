@@ -60,7 +60,7 @@ define(function(require, exports, module) {
          *  Is used in template for render additional html
          * @property {String} 'collapse-mode' | 'toggle-mode'
          */
-        renderMode: '',
+        renderMode: 'dropdown-mode',
 
         /**
          * Add filter button hint
@@ -231,6 +231,17 @@ define(function(require, exports, module) {
                 this.subview('filters-state', filtersStateView);
                 this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
+
+                    const filter = Object.values(this.filters)
+                        .find(filter => {
+                            return filter.visible &&
+                                filter.enabled &&
+                                filter.getCriteriaSelector().attr('tabindex') !== '-1';
+                        });
+
+                    if (filter && $.contains(filtersStateView.el, document.activeElement)) {
+                        filter.getCriteriaSelector().trigger('focus');
+                    }
                 });
             }
 

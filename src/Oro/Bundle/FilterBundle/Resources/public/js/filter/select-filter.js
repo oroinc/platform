@@ -65,6 +65,13 @@ define(function(require, exports, module) {
         buttonSelector: '.filter-criteria-selector',
 
         /**
+         * Selector to criteria popup container
+         *
+         * @property {string}
+         */
+        criteriaSelector: '.filter-criteria',
+
+        /**
          * Selector for select input element
          *
          * @property
@@ -131,6 +138,7 @@ define(function(require, exports, module) {
          */
         events: {
             'keydown select': '_preventEnterProcessing',
+            'keydown .filter-criteria-selector': 'onKeyDownCriteriaSelector',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
             'change select': '_onSelectChange',
@@ -212,7 +220,7 @@ define(function(require, exports, module) {
                 selected: _.extend({}, this.emptyValue, this.value),
                 isEmpty: this.isEmpty(),
                 renderMode: this.renderMode,
-                ...this.getCriteriaProperties()
+                ...this.getTemplateDataProps()
             };
         },
 
@@ -275,7 +283,7 @@ define(function(require, exports, module) {
          */
         _initializeSelectWidget: function() {
             const position = this._getSelectWidgetPosition();
-            const {selectOptionsListAriaLabel} = this.getCriteriaProperties();
+            const {selectOptionsListAriaLabel} = this.getTemplateDataProps();
 
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
@@ -318,7 +326,8 @@ define(function(require, exports, module) {
                     }, this),
                     appendTo: this._appendToContainer(),
                     refreshNotOpened: this.templateTheme !== '',
-                    listAriaLabel: selectOptionsListAriaLabel
+                    listAriaLabel: selectOptionsListAriaLabel,
+                    preventTabOutOfContainer: this.isDropdownRenderMode()
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch,
                 filterLabel: this.label
@@ -329,6 +338,18 @@ define(function(require, exports, module) {
                     this._onClickFilterArea(e);
                 }
             }, this));
+        },
+
+        _showCriteria() {
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('open');
+            }
+        },
+
+        _hideCriteria() {
+            if (this.selectWidget) {
+                this.selectWidget.multiselect('close');
+            }
         },
 
         /**
@@ -415,6 +436,14 @@ define(function(require, exports, module) {
             const filterWidth = this.$(this.containerSelector).width();
             const requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
+        },
+
+        onKeyDownCriteriaSelector(e) {
+            this.trigger('keydownOnToggle', e, this);
+        },
+
+        focusCriteriaToggler() {
+            this.getCriteriaSelector().trigger('focus');
         },
 
         /**
@@ -504,8 +533,16 @@ define(function(require, exports, module) {
             );
         },
 
-        getCriteriaProperties() {
-            const data = SelectFilter.__super__.getCriteriaProperties.call(this);
+        getCriteriaSelector() {
+            return this.$('.filter-criteria-selector');
+        },
+
+        getCriteria() {
+            return this.$(this.criteriaSelector);
+        },
+
+        getTemplateDataProps() {
+            const data = SelectFilter.__super__.getTemplateDataProps.call(this);
 
             return {
                 ...data,
