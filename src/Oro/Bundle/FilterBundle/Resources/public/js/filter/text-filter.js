@@ -325,7 +325,6 @@ define(function(require, exports, module) {
             $(document).trigger('clearMenus'); // hides all opened dropdown menus
             this.$(this.criteriaSelector)
                 .removeClass('criteria-hidden')
-                .removeAttr('aria-hidden')
                 .addClass('criteria-visible');
             this._alignCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -384,8 +383,7 @@ define(function(require, exports, module) {
         _hideCriteria: function() {
             this.$(this.criteriaSelector)
                 .removeClass('criteria-visible')
-                .addClass('criteria-hidden')
-                .attr('aria-hidden', true);
+                .addClass('criteria-hidden');
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             this.trigger('hideCriteria', this);
             setTimeout(() => {

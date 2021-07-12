@@ -232,11 +232,15 @@ define(function(require, exports, module) {
                 this.listenTo(filtersStateView, 'clicked', function() {
                     this.setViewMode(FiltersManager.MANAGE_VIEW_MODE);
 
-                    const visibleFilters = Object.values(this.filters)
-                        .filter(filter => filter.visible && filter.enabled);
+                    const filter = Object.values(this.filters)
+                        .find(filter => {
+                            return filter.visible &&
+                                   filter.enabled &&
+                                   filter.getCriteriaSelector().attr('tabindex') !== '-1';
+                        });
 
-                    if (visibleFilters.length && $.contains(filtersStateView.el, document.activeElement)) {
-                        visibleFilters[0].getCriteriaSelector().trigger('focus');
+                    if (filter && $.contains(filtersStateView.el, document.activeElement)) {
+                        filter.getCriteriaSelector().trigger('focus');
                     }
                 });
             }
