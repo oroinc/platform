@@ -6,4 +6,4 @@ placeholders:
 
     items:
         field_condition:
-            template: OroSegmentBundle:Segment:field_condition.html.twig
+            template: '@@OroSegment/Segment/field_condition.html.twig'

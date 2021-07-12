@@ -50,7 +50,7 @@ class WsseAuthenticationProvider implements AuthenticationProviderInterface
     private $dateFormat;
 
     /**
-     * @param UserCheckerInterface $userChecker A UserChecketerInterface instance
+     * @param UserCheckerInterface $userChecker A UserCheckerInterface instance
      * @param WsseTokenFactoryInterface $wsseTokenFactory
      * @param UserProviderInterface $userProvider An UserProviderInterface instance
      * @param string $providerKey The provider key

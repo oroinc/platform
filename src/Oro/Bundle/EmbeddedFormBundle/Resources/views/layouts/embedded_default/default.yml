@@ -41,6 +41,6 @@ layout:
                         form_css: ~
                     content: ~
         - '@setBlockTheme':
-            themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form.html.twig'
+            themes: '@OroEmbeddedForm/layouts/embedded_default/form.html.twig'
 
     conditions: 'context["embedded_form_inline"]==false'

@@ -509,7 +509,7 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username)
+    public function setUsername($username): self
     {
         parent::setUsername($username);
         $this->usernameLowercase = mb_strtolower($username);

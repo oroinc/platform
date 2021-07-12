@@ -3,6 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SaveParentEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -12,6 +15,9 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FlushDataHandlerInterface */
+    private $flushDataHandler;
+
     /** @var SaveParentEntity */
     private $processor;
 
@@ -20,14 +26,18 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->flushDataHandler = $this->createMock(FlushDataHandlerInterface::class);
 
-        $this->processor = new SaveParentEntity($this->doctrineHelper);
+        $this->processor = new SaveParentEntity($this->doctrineHelper, $this->flushDataHandler);
     }
 
     public function testProcessWhenParentEntityAlreadySaved()
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
+
+        $this->flushDataHandler->expects(self::never())
+            ->method('flushData');
 
         $this->context->setProcessed(SaveParentEntity::OPERATION_NAME);
         $this->context->setParentEntity(new \stdClass());
@@ -39,6 +49,9 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
+        $this->flushDataHandler->expects(self::never())
+            ->method('flushData');
+
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
@@ -47,6 +60,9 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
+
+        $this->flushDataHandler->expects(self::never())
+            ->method('flushData');
 
         $this->context->setParentEntity(null);
         $this->processor->process($this->context);
@@ -61,6 +77,9 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->method('getEntityManager')
             ->with(self::identicalTo($entity), false)
             ->willReturn(null);
+
+        $this->flushDataHandler->expects(self::never())
+            ->method('flushData');
 
         $this->context->setParentEntity($entity);
         $this->processor->process($this->context);
@@ -78,9 +97,13 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
             ->with(self::identicalTo($entity), false)
             ->willReturn($em);
 
-        $em->expects(self::once())
-            ->method('flush')
-            ->with(null);
+        $this->flushDataHandler->expects(self::once())
+            ->method('flushData')
+            ->with(self::identicalTo($em), self::isInstanceOf(FlushDataHandlerContext::class))
+            ->willReturnCallback(function (EntityManagerInterface $em, FlushDataHandlerContext $context) {
+                self::assertSame($this->context, $context->getEntityContexts()[0]);
+                self::assertSame($this->context->getSharedData(), $context->getSharedData());
+            });
 
         $this->context->setParentEntity($entity);
         $this->processor->process($this->context);

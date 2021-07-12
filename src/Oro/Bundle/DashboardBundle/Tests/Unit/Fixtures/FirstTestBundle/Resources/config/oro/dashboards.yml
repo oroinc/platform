@@ -22,4 +22,4 @@ dashboards:
                     position:   100
     dashboards:
         main:
-            twig: OroDashboardBundle:Index:default.html.twig
+            twig: '@OroDashboard/Index/default.html.twig'

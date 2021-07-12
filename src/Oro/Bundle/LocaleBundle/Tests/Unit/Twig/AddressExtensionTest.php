@@ -89,7 +89,7 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
         $environment
             ->expects($this->once())
             ->method('loadTemplate')
-            ->with('OroLocaleBundle:Twig:address.html.twig')
+            ->with('@OroLocale/Twig/address.html.twig')
             ->willReturn($template);
 
         $template

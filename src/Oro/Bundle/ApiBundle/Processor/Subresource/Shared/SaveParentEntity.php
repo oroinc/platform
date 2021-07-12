@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
+use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeRelationshipContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -14,15 +16,13 @@ class SaveParentEntity implements ProcessorInterface
 {
     public const OPERATION_NAME = 'save_parent_entity';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private FlushDataHandlerInterface $flushDataHandler;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, FlushDataHandlerInterface $flushDataHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->flushDataHandler = $flushDataHandler;
     }
 
     /**
@@ -44,12 +44,15 @@ class SaveParentEntity implements ProcessorInterface
         }
 
         $em = $this->doctrineHelper->getEntityManager($parentEntity, false);
-        if (!$em) {
+        if (null === $em) {
             // only manageable entities are supported
             return;
         }
 
-        $em->flush();
+        $this->flushDataHandler->flushData(
+            $em,
+            new FlushDataHandlerContext([$context], $context->getSharedData())
+        );
 
         $context->setProcessed(self::OPERATION_NAME);
     }

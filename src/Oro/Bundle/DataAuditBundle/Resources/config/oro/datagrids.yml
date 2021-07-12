@@ -26,7 +26,7 @@ datagrids:
             action:
                 label: oro.dataaudit.datagrid.action
                 type: twig
-                template: OroDataAuditBundle:Datagrid:Property/action.html.twig
+                template: '@OroDataAudit/Datagrid/Property/action.html.twig'
                 frontend_type: html
             version:
                 label: oro.dataaudit.datagrid.version
@@ -41,7 +41,7 @@ datagrids:
             data:
                 label: oro.dataaudit.datagrid.data
                 type: twig
-                template: OroDataAuditBundle:Datagrid:Property/data.html.twig
+                template: '@OroDataAudit/Datagrid/Property/data.html.twig'
                 frontend_type: html
             author:
                 label: oro.dataaudit.datagrid.author
@@ -142,13 +142,13 @@ datagrids:
             old:
                 label: oro.dataaudit.datagrid.old_values
                 type: twig
-                template: OroDataAuditBundle:Datagrid:Property/old.html.twig
+                template: '@OroDataAudit/Datagrid/Property/old.html.twig'
                 frontend_type: html
                 data_name: data
             new:
                 label: oro.dataaudit.datagrid.new_values
                 type: twig
-                template: OroDataAuditBundle:Datagrid:Property/new.html.twig
+                template: '@OroDataAudit/Datagrid/Property/new.html.twig'
                 frontend_type: html
                 data_name: data
         properties: ~

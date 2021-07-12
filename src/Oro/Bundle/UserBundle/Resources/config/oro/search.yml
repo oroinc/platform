@@ -6,7 +6,7 @@ search:
             name:                       oro_user_view
             parameters:
                 id:                     id
-        search_template:                OroUserBundle:Search:result.html.twig
+        search_template:                '@OroUser/Search/result.html.twig'
         fields:
             -
                 name:                   id
@@ -67,7 +67,7 @@ search:
     Oro\Bundle\UserBundle\Entity\Role:
         alias:                          oro_access_role
         title_fields:                   [label]
-        search_template:                OroUserBundle:Role:Search\result.html.twig
+        search_template:                '@OroUser/Role/Search/result.html.twig'
         route:
             name:                       oro_user_role_index
         fields:

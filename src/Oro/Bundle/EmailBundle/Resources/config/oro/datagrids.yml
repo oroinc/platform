@@ -26,7 +26,7 @@ datagrids:
                 label: oro.email.autoresponserule.status.label
                 type: twig
                 frontend_type: html
-                template: OroEmailBundle:AutoResponseRule:Datagrid/Property/active.html.twig
+                template: '@OroEmail/AutoResponseRule/Datagrid/Property/active.html.twig'
         properties:
             id: ~
             update_link:
@@ -148,33 +148,33 @@ datagrids:
                 label: oro.email.mailbox.entity_label
                 type: twig
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/mailbox.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/mailbox.html.twig'
                 renderable: false
             contacts:
                 data_name: ~
                 type: twig
                 label: oro.email.contact.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/contacts.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/contacts.html.twig'
             subject:
                 data_name: subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/subject.html.twig'
             attachments:
                 data_name: has_attachments
                 type: twig
                 label:
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/attachments.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/attachments.html.twig'
                 manageable: false
             receivedAt:
                 data_name: receivedAt
                 type: twig
                 label: oro.email.date.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/date.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/date.html.twig'
         properties:
             id: ~
         sorters:
@@ -403,18 +403,18 @@ datagrids:
                 type: twig
                 label: oro.email.received_at.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/date_long.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/date_long.html.twig'
             fromEmailAddress:
                 type: twig
                 label: oro.email.from_name.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/from.html.twig'
             subject:
                 data_name: subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/subject.html.twig'
         sorters:
             columns:
                 fromEmailAddress: { data_name: fromEmailAddress }
@@ -443,13 +443,13 @@ datagrids:
                 type: twig
                 label: oro.email.recipients.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/recipients.html.twig'
             subject:
                 data_name: subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/subject.html.twig'
         sorters:
             columns:
                 sentAt:  { data_name: e.sentAt }
@@ -471,19 +471,19 @@ datagrids:
                 type: twig
                 label: oro.email.received_at.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/date_long.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/date_long.html.twig'
             fromEmailAddress:
                 type: twig
                 label: oro.email.from_name.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/from.html.twig'
                 cellClassName: 'direction-ltr'
             subject:
                 data_name: subject
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+                template: '@OroEmail/Email/Datagrid/Property/subject.html.twig'
         sorters:
             columns:
                 fromEmailAddress: { data_name: fromEmailAddress }
@@ -516,7 +516,7 @@ datagrids:
             entityName:
                 label:          oro.email.emailtemplate.entity_name.label
                 type:           twig
-                template:       OroEntityBundle:Datagrid:Property/entity.html.twig
+                template:       '@OroEntity/Datagrid/Property/entity.html.twig'
                 frontend_type:  html
                 context:
                     entity_provider: "@oro_entity.entity_provider"
@@ -623,19 +623,19 @@ datagrids:
                 type: twig
                 frontend_type: html
                 data_name: origin
-                template: OroEmailBundle:Mailbox:Datagrid/Property/origin.html.twig
+                template: '@OroEmail/Mailbox/Datagrid/Property/origin.html.twig'
             smtp:
                 label: oro.imap.configuration.use_smtp.label
                 type: twig
                 frontend_type: html
                 data_name: origin
-                template: OroEmailBundle:Mailbox:Datagrid/Property/originSmtp.html.twig
+                template: '@OroEmail/Mailbox/Datagrid/Property/originSmtp.html.twig'
             processing:
                 data_name: processSettings
                 type: twig
                 label: oro.email.mailbox.process.label
                 frontend_type: html
-                template: OroEmailBundle:Mailbox:Datagrid/Property/processSettings.html.twig
+                template: '@OroEmail/Mailbox/Datagrid/Property/processSettings.html.twig'
         properties:
             id: ~
             update_link:

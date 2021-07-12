@@ -5,7 +5,7 @@
 {% if fallbackType == 'boolean' %}
     {{ fallbackValue ? 'Yes'|trans : 'No'|trans }}
 {% elseif fallbackType == 'array' %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {{ UI.renderList(fallbackValue) }}
 {% else %}
     {{ fallbackValue|default('') }}

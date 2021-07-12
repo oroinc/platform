@@ -16,14 +16,14 @@
         }) %}
         {{ block("container_widget") }}
     {% endif %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
     {{ dataGrid.renderGrid(grid_full_name, grid_parameters, grid_render_parameters) }}
 {% endblock %}
 
 {% block taggable_datagrid_widget %}
     {{ block_widget(block) }}
 
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         module: 'orodatagrid/js/app/components/datagrid-allow-tracking-component',

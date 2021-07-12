@@ -170,6 +170,7 @@ class WsseSecurityListenerFactory implements SecurityFactoryInterface
 
         $container
             ->setDefinition($providerId, new ChildDefinition(self::AUTHENTICATION_PROVIDER))
+            ->replaceArgument(0, new Reference('security.user_checker.' . $id))
             ->replaceArgument(2, new Reference($userProviderId))
             ->replaceArgument(3, $id)
             ->replaceArgument(4, new Reference($encoderId))

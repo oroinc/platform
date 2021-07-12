@@ -30,7 +30,7 @@ class NoteController extends AbstractController
      * )
      *
      * @AclAncestor("oro_note_view")
-     * @Template("OroNoteBundle:Note:notes.html.twig")
+     * @Template("@OroNote/Note/notes.html.twig")
      */
     public function widgetAction($entityClass, $entityId)
     {
@@ -75,7 +75,7 @@ class NoteController extends AbstractController
      *     requirements={"id"="\d+", "renderContexts"="\d+"},
      *     defaults={"renderContexts"=true}
      * )
-     * @Template("OroNoteBundle:Note/widget:info.html.twig")
+     * @Template("@OroNote/Note/widget/info.html.twig")
      * @AclAncestor("oro_note_view")
      * @param Request $request
      * @param Note $entity
@@ -116,7 +116,7 @@ class NoteController extends AbstractController
     /**
      * @Route("/create", name="oro_note_create")
      *
-     * @Template("OroNoteBundle:Note:update.html.twig")
+     * @Template("@OroNote/Note/update.html.twig")
      * @AclAncestor("oro_note_create")
      * @param Request $request
      * @return array

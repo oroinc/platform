@@ -3,8 +3,8 @@
     * entity       - user entity Oro\Bundle\UserBundle\Entity\User or null
     * indexer_item - indexer item Oro\Bundle\SearchBundle\Query\Result\Item
 #}
-{% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroSearch/Search/searchResultItem.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set showImage = true %}
 

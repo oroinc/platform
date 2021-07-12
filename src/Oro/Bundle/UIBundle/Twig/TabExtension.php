@@ -21,7 +21,7 @@ use Twig\TwigFunction;
  */
 class TabExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const TEMPLATE = 'OroUIBundle::tab_panel.html.twig';
+    const TEMPLATE = '@OroUI/tab_panel.html.twig';
     const DEFAULT_WIDGET_TYPE = 'block';
 
     /** @var ContainerInterface */

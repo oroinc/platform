@@ -65,7 +65,7 @@
     @param bool    reloadRequired - is page reload required after run
 #}
 {% macro runButton(entity, reloadRequired = false) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% if entity.id and is_granted('EDIT', entity)
         and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
     %}
@@ -79,23 +79,6 @@
                 'page-component-options': {'reloadRequired': reloadRequired}|json_encode,
             }
         }) }}
-    {% endif %}
-{% endmacro %}
-
-{#
-    Renders save and refresh button
-
-    @param Segment entity
-
-    @deprecated Since 1.10, use macros saveActionButton in OroUIBUndle::macros.html.twig
-#}
-{% macro saveAndRefreshButton(entity) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-
-    {% if entity.id and is_granted('EDIT', entity)
-        and entity.type.name == constant('Oro\\Bundle\\SegmentBundle\\Entity\\SegmentType::TYPE_STATIC')
-    %}
-        {{ UI.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': 'Save and refresh', 'action': 'save_and_refresh'}) }}
     {% endif %}
 {% endmacro %}
 

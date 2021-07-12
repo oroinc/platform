@@ -16,7 +16,7 @@ class PlaceholderExtensionTest extends \PHPUnit\Framework\TestCase
 
     const PLACEHOLDER_NAME = 'placeholder_name';
     const INVALID_PLACEHOLDER_NAME = 'invalid_placeholder_name';
-    const TEMPLATE_NAME = 'FooBarBundle:Test:test.html.twig';
+    const TEMPLATE_NAME = '@FooBar/Test/test.html.twig';
     const ACTION_NAME = 'Foo\Bundle\BarBundle\Controller\TestController::testAction';
     const DELIMITER = '<br/>';
 

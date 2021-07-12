@@ -1,6 +1,6 @@
 {% macro renderDynamicFields(entity, entity_class = null, ignoredFields = {}) %}
     {% import _self as entityConfigMacros %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields if fieldName not in ignoredFields %}
@@ -20,7 +20,7 @@
 {% endmacro %}
 
 {% macro renderDynamicField(entity, field) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
     {% import _self as entityConfigMacros %}
 
     {% set dynamicField = oro_get_dynamic_field(entity, field) %}
@@ -61,7 +61,7 @@
 {% endmacro %}
 
 {% macro renderFormatted(entity, entity_class, field_name, item) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set value = item.value %}
     {% set type  = item.type %}
 
@@ -99,7 +99,7 @@
 {% endmacro %}
 
 {% macro renderField(value) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
 
     {% if value.template is defined %}
         {{ include(value.template, { data: value}) }}
@@ -113,7 +113,7 @@
 {% endmacro %}
 
 {% macro displayLayoutActions(actions) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% for button in actions %}
         {% set componentData = {} %}
         {% if  button.page_component_module is defined %}

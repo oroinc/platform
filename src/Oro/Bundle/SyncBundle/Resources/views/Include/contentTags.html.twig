@@ -1,5 +1,5 @@
 {% macro syncContentTags(data, includeCollectionTag = false) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
         module: 'orosync/js/app/components/tag-content',

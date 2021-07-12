@@ -114,7 +114,7 @@ services:
         arguments:
             - '@oro_message_queue.message_producer'
         tags:
-            - { name: data_collector, template: 'OroMessageQueueBundle:Collector:message_queue.html.twig', id: message_queue }
+            - { name: data_collector, template: '@OroMessageQueue/Collector/message_queue.html.twig', id: message_queue }
 
     oro_message_queue.client.buffered_message_producer:
         class: Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer

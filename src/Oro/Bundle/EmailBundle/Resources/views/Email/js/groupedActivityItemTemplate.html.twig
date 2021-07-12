@@ -1,6 +1,6 @@
-{% extends 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI%}
-{% import 'OroEmailBundle::actions.html.twig' as EA %}
+{% extends '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI%}
+{% import '@OroEmail/actions.html.twig' as EA %}
 
 {% set entityClass = 'Oro\\Bundle\\EmailBundle\\Entity\\Email' %}
 {% set entityName = oro_entity_config_value(entityClass, 'label')|trans %}
@@ -40,7 +40,7 @@
 {% endblock %}
 
 {% block activityActions %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set action %}
         {% if is_granted('oro_email_email_user_edit') %}

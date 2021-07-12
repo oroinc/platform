@@ -21,6 +21,7 @@ class OrganizationHttpBasicFactory extends HttpBasicFactory
                 new ChildDefinition('oro_security.authentication.provider.username_password_organization')
             )
             ->replaceArgument(0, new Reference($userProvider))
+            ->replaceArgument(1, new Reference('security.user_checker.' . $id))
             ->replaceArgument(2, $id);
 
         // entry point

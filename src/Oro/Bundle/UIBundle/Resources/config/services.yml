@@ -47,15 +47,17 @@ services:
         calls:
             - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
 
+    oro_ui.templating.template_name_parser:
+        class: Symfony\Component\Templating\TemplateNameParser
+
     oro_ui.view.listener:
         class: Oro\Bundle\UIBundle\EventListener\TemplateListener
         arguments:
             - '@Psr\Container\ContainerInterface'
-            - '@Doctrine\Inflector\Inflector'
         tags:
-            - { name: container.service_subscriber, id: 'templating' }
+            - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: 'twig.loader.native_filesystem' }
-            - { name: container.service_subscriber, id: 'templating.name_parser' }
+            - { name: container.service_subscriber, id: 'oro_ui.templating.template_name_parser', key: Symfony\Component\Templating\TemplateNameParser }
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
     oro_ui.view.content_provider.listener:

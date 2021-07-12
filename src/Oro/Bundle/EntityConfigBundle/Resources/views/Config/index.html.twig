@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set gridName = 'entityconfig-grid' %}
 {% set pageTitle = 'oro.entity_config.menu.entities_list.label'|trans %}
@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('oro_entityconfig_manage') %}
         {% for button in buttonConfig %}

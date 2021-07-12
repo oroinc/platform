@@ -1,7 +1,7 @@
 search:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer:
         alias: test_entity
-        search_template: OroSearchBundle:Test:searchResult.html.twig
+        search_template: '@OroSearch/Test/searchResult.html.twig'
         fields:
             -
                 name: products

@@ -6,4 +6,4 @@ placeholders:
 
     items:
         oro_imap_sync_origin_credential_notifications_topic:
-            template: OroImapBundle::credentialsTopicSubscribe.html.twig
+            template: '@@OroImap/credentialsTopicSubscribe.html.twig'

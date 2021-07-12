@@ -16,7 +16,7 @@
 {% endblock %}
 
 {% block body_widget %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' body ' ~ (isMobileVersion() ? 'mobile' : 'desktop') ~ '-version'
     }) %}

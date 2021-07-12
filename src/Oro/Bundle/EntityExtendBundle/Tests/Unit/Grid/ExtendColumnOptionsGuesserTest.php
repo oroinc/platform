@@ -153,7 +153,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             [
                 'frontend_type' => Property::TYPE_HTML,
                 'type'          => 'twig',
-                'template'      => 'OroEntityExtendBundle:Datagrid:Property/enum.html.twig',
+                'template'      => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
                 'context'       => [
                     'entity_class' => $config->get('target_entity')
                 ]
@@ -238,7 +238,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
                 'frontend_type' => Property::TYPE_HTML,
                 'export_type'   => 'list',
                 'type'          => 'twig',
-                'template'      => 'OroEntityExtendBundle:Datagrid:Property/multiEnum.html.twig',
+                'template'      => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
                 'context'       => [
                     'entity_class' => 'Test\EnumValue'
                 ]

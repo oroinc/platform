@@ -22,7 +22,7 @@
             </div>
         {% endset %}
 
-        {% include 'WebProfilerBundle:Profiler:toolbar_item.html.twig' with { link: profiler_url, status: status|default('') } %}
+        {% include '@WebProfiler/Profiler/toolbar_item.html.twig' with { link: profiler_url, status: status|default('') } %}
     {% endif %}
 {% endblock %}
 

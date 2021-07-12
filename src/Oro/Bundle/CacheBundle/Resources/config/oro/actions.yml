@@ -5,7 +5,7 @@ operations:
         button_options:
             icon: fa-clock-o
         frontend_options:
-            template: OroCacheBundle:Action:invalidate.html.twig
+            template: '@OroCache/Action/invalidate.html.twig'
             title: oro.cache.invalidate.label
             options:
                 width: 505

@@ -124,7 +124,7 @@ class BaseTwigRendererEngineTest extends RendererEngineTest
      */
     protected function createTheme($blockName)
     {
-        $theme = $this->createMock('\Twig_Template');
+        $theme = $this->createMock(Template::class);
         $theme->expects($this->any())
             ->method('getBlocks')
             ->willReturn([$blockName => [$theme, $blockName]]);

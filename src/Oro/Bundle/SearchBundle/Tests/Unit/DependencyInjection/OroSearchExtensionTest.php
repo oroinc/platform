@@ -41,7 +41,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getParameter('oro_search.log_queries')
         );
         self::assertEquals(
-            'OroSearchBundle:Datagrid:itemContainer.html.twig',
+            '@OroSearch/Datagrid/itemContainer.html.twig',
             $container->getParameter('oro_search.twig.item_container_template')
         );
     }
@@ -72,7 +72,7 @@ class OroSearchExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getParameter('oro_search.log_queries')
         );
         self::assertEquals(
-            'OroSearchBundle:Datagrid:itemContainer.html.twig',
+            '@OroSearch/Datagrid/itemContainer.html.twig',
             $container->getParameter('oro_search.twig.item_container_template')
         );
     }

@@ -14,6 +14,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Twig\Error\Error;
 
 /**
  * Provides compiled email template information ready to be sent via email.
@@ -84,7 +85,7 @@ class EmailTemplateContentProvider
             $emailTemplateModel
                 ->setSubject($subject)
                 ->setContent($content);
-        } catch (\Twig_Error $exception) {
+        } catch (Error $exception) {
             $this->logger->error(
                 sprintf(
                     'Rendering of email template "%s" failed. %s',

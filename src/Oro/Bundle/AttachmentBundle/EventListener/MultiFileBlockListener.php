@@ -45,7 +45,7 @@ class MultiFileBlockListener
             $event->setFieldVisibility(false);
         } elseif ($this->isFileOrImageField($event->getFieldConfigId()->getFieldType())) {
             $event->setFieldViewValue([
-                'template' => 'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                'template' => '@OroAttachment/Twig/dynamicField.html.twig',
                 'fieldConfigId' => $event->getFieldConfigId(),
                 'entity' => $event->getEntity(),
                 'value' => $event->getFieldValue(),
@@ -90,7 +90,7 @@ class MultiFileBlockListener
             );
 
             $html = $event->getTwigEnvironment()->render(
-                'OroAttachmentBundle:Twig:dynamicField.html.twig',
+                '@OroAttachment/Twig/dynamicField.html.twig',
                 [
                     'data' => [
                         'entity' => $event->getEntity(),

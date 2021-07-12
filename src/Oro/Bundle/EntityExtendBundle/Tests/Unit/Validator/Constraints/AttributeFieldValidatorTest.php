@@ -10,31 +10,26 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeField;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\AttributeFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
+class AttributeFieldValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $validationHelper;
 
-    /**
-     * @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeConfigProvider;
-
-    /**
-     * @var AttributeFieldValidator
-     */
-    private $validator;
 
     protected function setUp(): void
     {
         $this->validationHelper = $this->createMock(FieldNameValidationHelper::class);
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->validator = new AttributeFieldValidator(
+        parent::setUp();
+    }
+
+    protected function createValidator()
+    {
+        return new AttributeFieldValidator(
             $this->validationHelper,
             $this->attributeConfigProvider
         );
@@ -47,8 +42,7 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
             'Only Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel is supported, stdClass is given'
         );
         $constraint = new AttributeField();
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $this->validator->initialize($context);
+
         $this->validator->validate(new \stdClass(), $constraint);
     }
 
@@ -68,13 +62,9 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ->with($className, true)
             ->willReturn([]);
 
-        /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->never())
-            ->method('buildViolation');
-
-        $this->validator->initialize($context);
         $this->validator->validate($fieldConfigModel, new AttributeField());
+
+        $this->assertNoViolation();
     }
 
     public function testValidateWhenIsAttribute()
@@ -97,13 +87,9 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
                 new Config(new FieldConfigId('attribute', $className, $fieldName), ['is_attribute' => true]),
             ]);
 
-        /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->never())
-            ->method('buildViolation');
-
-        $this->validator->initialize($context);
         $this->validator->validate($fieldConfigModel, new AttributeField());
+
+        $this->assertNoViolation();
     }
 
     public function testValidate()
@@ -127,21 +113,11 @@ class AttributeFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $constraint = new AttributeField();
-        $builder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $builder->expects($this->once())
-            ->method('atPath')
-            ->with('fieldName')
-            ->willReturnSelf();
-        $builder->expects($this->once())
-            ->method('addViolation');
-        /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject $context */
-        $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects($this->once())
-            ->method('buildViolation')
-            ->with($constraint->message, ['{{ field }}' => $fieldName])
-            ->willReturn($builder);
-
-        $this->validator->initialize($context);
         $this->validator->validate($fieldConfigModel, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('{{ field }}', $fieldName)
+            ->atPath('property.path.fieldName')
+            ->assertRaised();
     }
 }

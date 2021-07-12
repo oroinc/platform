@@ -196,7 +196,7 @@ abstract class ApiTestCase extends WebTestCase
     {
         /** @var EntityManager|null $em */
         $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
-        if (!$em) {
+        if (null === $em) {
             return null;
         }
 
@@ -670,5 +670,28 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return $messages;
+    }
+
+    /**
+     * Removes all messages from the customize form data logger that is used for test purposes.
+     *
+     * @after
+     */
+    protected function clearCustomizeFormDataLogger()
+    {
+        $logger = $this->getCustomizeFormDataLogger();
+        if (null !== $logger) {
+            $logger->cleanLogs();
+        }
+    }
+
+    /**
+     * @return BufferingLogger|null
+     */
+    protected function getCustomizeFormDataLogger()
+    {
+        return null !== $this->client
+            ? $this->client->getContainer()->get('oro_api.tests.customize_form_data_logger')
+            : null;
     }
 }

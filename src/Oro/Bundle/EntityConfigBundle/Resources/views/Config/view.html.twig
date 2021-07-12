@@ -1,7 +1,7 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
+{% import '@OroEntityConfig/macros.html.twig' as entityConfig %}
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
 {% if is_granted('oro_entityconfig_manage') %}
@@ -12,11 +12,11 @@
 {% endif %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if is_granted('oro_entityconfig_manage') %}
         {% if extend_config.is('is_extend') %}
-            {% include 'OroImportExportBundle:ImportExport:buttons_from_configuration.html.twig' with {
+            {% include '@OroImportExport/ImportExport/buttons_from_configuration.html.twig' with {
                 'alias': 'oro_field_config_model',
                 'options': {'entity_id': entity.id}
             } %}
@@ -39,7 +39,7 @@
 {% endblock pageHeader %}
 
 {% block stats %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.created|oro_format_datetime }}</li>
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updated|oro_format_datetime }}</li>

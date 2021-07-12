@@ -1,6 +1,6 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig'] %}
 {% set formAction = app.request.uri %}
 {% set entityId = entity.id %}
 {% set reloadLink -%}
@@ -15,7 +15,7 @@
 {% endif %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if entity.isDivider == false %}
         {% set html = UI.saveAndStayButton({
@@ -115,7 +115,7 @@
 {% endblock navButtons %}
 
 {% block content_data %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% set id = 'menu-update-edit' %}
 
@@ -148,7 +148,7 @@
                 'dataBlocks': dataBlocks,
             } %}
 
-            {{ block('content_data', 'OroUIBundle:actions:update.html.twig') }}
+            {{ block('content_data', '@OroUI/actions/update.html.twig') }}
         {% endblock content_column %}
     {% endset %}
 
@@ -166,11 +166,11 @@
     } %}
 
     <div class="sidebar-container">
-        {% embed "OroUIBundle::content_sidebar.html.twig" with {options: {
+        {% embed "@OroUI/content_sidebar.html.twig" with {options: {
             fixSidebarHeight: false
         }} %}
             {% block sidebar %}
-                {% import 'OroUIBundle::macros.html.twig' as UI %}
+                {% import '@OroUI/macros.html.twig' as UI %}
                 {{ UI.renderJsTree(
                     {
                         'label': 'oro.navigation.menu.menu_list_default.label'|trans,

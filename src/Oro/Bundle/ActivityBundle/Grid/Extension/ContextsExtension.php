@@ -49,7 +49,7 @@ class ContextsExtension extends AbstractExtension
     const GRID_COLUMNS_PATH = '[columns]';
     const DEFAULT_COLUMN_NAME = 'contexts';
     const DEFAULT_COLUMN_LABEL = 'oro.activity.contexts.column.label';
-    const DEFAULT_TEMPLATE = 'OroActivityBundle:Grid:Column/contexts.html.twig';
+    const DEFAULT_TEMPLATE = '@OroActivity/Grid/Column/contexts.html.twig';
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;

@@ -5,6 +5,9 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Form type for User select.
+ */
 class UserSelectType extends AbstractType
 {
     /**
@@ -17,8 +20,8 @@ class UserSelectType extends AbstractType
                 'autocomplete_alias' => 'users',
                 'configs'            => [
                     'placeholder'             => 'oro.user.form.choose_user',
-                    'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                    'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig'
+                    'result_template_twig'    => '@OroUser/User/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/selection.html.twig'
                 ]
             ]
         );

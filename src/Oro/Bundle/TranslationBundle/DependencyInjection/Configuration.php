@@ -51,7 +51,7 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->booleanNode('default_required')->defaultTrue()->end()
                 ->scalarNode('manager_registry')->defaultValue('doctrine')->end()
-                ->scalarNode('templating')->defaultValue('OroTranslationBundle::default.html.twig')->end()
+                ->scalarNode('templating')->defaultValue('@OroTranslation/default.html.twig')->end()
             ->end();
 
         SettingsBuilder::append($rootNode, ['installed_translation_meta' => ['type' => 'array']]);

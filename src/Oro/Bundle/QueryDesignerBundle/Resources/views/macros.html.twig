@@ -43,7 +43,7 @@
 {% endmacro %}
 
 {% macro query_designer_column_list(attr, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% import _self as queryDesignerMacros %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
@@ -75,7 +75,7 @@
 {% endmacro %}
 
 {% macro query_designer_grouping_list(attr) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <div class="grid-container query-designer-grid-container query-designer-columns-grid-container">
@@ -153,7 +153,7 @@
 {% endmacro %}
 
 {% macro query_designer_column_form(form, attr, params, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({
         'class': (attr.class|default('') ~ ' query-designer-form')|trim
     }) %}
@@ -223,7 +223,7 @@
 {% endmacro %}
 
 {% macro query_designer_grouping_form(form, attr, params) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form query-designer-form')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <div class="query-designer-row">
@@ -259,7 +259,7 @@
 {% endmacro %}
 
 {% macro query_designer_date_grouping_form(form, params) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' query-designer-grouping-form clearfix')|trim}) %}
     <div{{ UI.attributes(attr) }} {{ UI.renderPageComponentAttributes({
         module: 'oroui/js/app/components/view-component',

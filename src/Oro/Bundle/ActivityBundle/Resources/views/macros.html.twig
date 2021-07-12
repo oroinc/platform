@@ -63,7 +63,7 @@
 {% endmacro %}
 
 {% macro activity_context_link(hideText) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <a href="#" role="button" title="{{ 'oro.activity.contexts.placeholder'|trans|raw }}"
        class="dropdown-item"
        data-url="<%= routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
@@ -93,7 +93,7 @@
 {# Button for add context on the activity list item view page #}
 {% macro addContextButton(entity, parameters) -%}
     {% if is_granted('EDIT', entity) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {% import '@OroUI/macros.html.twig' as UI %}
         {{ UI.clientButton({
             'dataUrl': path(
             'oro_activity_context', {

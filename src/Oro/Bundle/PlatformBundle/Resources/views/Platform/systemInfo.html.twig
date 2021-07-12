@@ -1,9 +1,9 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% extends '@OroUI/actions/view.html.twig' %}
 
 {% set entity = null %}
 
 {% block pageHeader %}
-    {% include 'OroUIBundle::page_title_block.html.twig' with { title: 'oro.platform.system_info'|trans } %}
+    {% include '@OroUI/page_title_block.html.twig' with { title: 'oro.platform.system_info'|trans } %}
 {% endblock %}
 
 {% block navButtons %}{% endblock navButtons %}
@@ -86,7 +86,7 @@
 {% endmacro %}
 
 {% macro deploymentVariables(variables) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
     <div class="widget-content">
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">

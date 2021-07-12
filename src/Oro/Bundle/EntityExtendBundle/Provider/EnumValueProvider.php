@@ -30,17 +30,31 @@ class EnumValueProvider
     }
 
     /**
+     * Get only unique enum translations values.
+     *
+     * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
+     *
+     * @return array [enum value id => enum value name, ...]
+     */
+    public function getEnumChoices(string $enumClass): array
+    {
+        $nonUniqueEnumTranslations = $this->getEnumChoicesWithNonUniqueTranslation($enumClass);
+
+        return array_flip($nonUniqueEnumTranslations);
+    }
+
+    /**
      * @param string $enumClass {@see \Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper::buildEnumValueClassName}
      *
      * @return array [enum value name => enum value id, ...]
      */
-    public function getEnumChoices(string $enumClass): array
+    public function getEnumChoicesWithNonUniqueTranslation(string $enumClass): array
     {
         if (!$this->enumTranslationCache->contains($enumClass)) {
             $result = [];
             $values = $this->getEnumValueRepository($enumClass)->getValues();
             foreach ($values as $enum) {
-                $result[$enum->getName()] = $enum->getId();
+                $result[$enum->getId()] = $enum->getName();
             }
             $this->enumTranslationCache->save($enumClass, $result);
         } else {

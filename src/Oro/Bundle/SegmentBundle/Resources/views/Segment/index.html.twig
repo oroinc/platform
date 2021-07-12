@@ -1,10 +1,10 @@
-{% extends 'OroUIBundle:actions:index.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroUI/actions/index.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 {% set gridName = 'oro_segments-grid' %}
 {% set pageTitle = 'oro.segment.entity_plural_label'|trans %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if isDesktopVersion() and is_granted('oro_segment_create') %}
         {{ UI.addButton({

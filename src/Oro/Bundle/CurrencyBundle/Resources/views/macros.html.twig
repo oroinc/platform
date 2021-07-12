@@ -7,7 +7,7 @@
         fieldName - the name of field on wich Field ACL should be checked
 #}
 {% macro convert_to_base_currency(multicurrency, title = null, entity = null, fieldName = null) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
     {% set value = oro_multicurrency_rate_converter(multicurrency) %}
     {% if value|length %}
         <div class="base-currency-wrapper base-currency-wrapper--convert">

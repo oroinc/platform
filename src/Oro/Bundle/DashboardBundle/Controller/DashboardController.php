@@ -113,7 +113,7 @@ class DashboardController extends AbstractController
 
     /**
      * @Route("/configure/{id}", name="oro_dashboard_configure", requirements={"id"="\d+"}, methods={"GET", "POST"})
-     * @Template("OroDashboardBundle:Dashboard:dialog/configure.html.twig")
+     * @Template("@OroDashboard/Dashboard/dialog/configure.html.twig")
      *
      * @param Request $request
      * @param Widget $widget
@@ -173,7 +173,7 @@ class DashboardController extends AbstractController
      *      class="OroDashboardBundle:Dashboard",
      *      permission="CREATE"
      * )
-     * @Template("OroDashboardBundle:Dashboard:update.html.twig")
+     * @Template("@OroDashboard/Dashboard/update.html.twig")
      * @param Request $request
      * @return array|RedirectResponse
      */
@@ -230,7 +230,7 @@ class DashboardController extends AbstractController
     public function widgetAction($widget, $bundle, $name)
     {
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }
@@ -260,7 +260,7 @@ class DashboardController extends AbstractController
         );
 
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $params
         );
     }
@@ -290,7 +290,7 @@ class DashboardController extends AbstractController
         );
 
         return $this->render(
-            sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
+            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
             $params
         );
     }
@@ -304,7 +304,7 @@ class DashboardController extends AbstractController
     public function quickLaunchpadAction()
     {
         return $this->render(
-            'OroDashboardBundle:Index:quickLaunchpad.html.twig',
+            '@OroDashboard/Index/quickLaunchpad.html.twig',
             [
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
             ]
@@ -338,7 +338,7 @@ class DashboardController extends AbstractController
      *      name="oro_dashboard_grid",
      *      requirements={"gridName"="[\w\:-]+"}
      * )
-     * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
+     * @Template("@OroDashboard/Dashboard/grid.html.twig")
      *
      * @param string  $widget
      * @param string  $gridName

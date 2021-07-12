@@ -24,7 +24,7 @@ class GroupController extends AbstractController
      * Create group form
      *
      * @Route("/create", name="oro_user_group_create")
-     * @Template("OroUserBundle:Group:update.html.twig")
+     * @Template("@OroUser/Group/update.html.twig")
      * @Acl(
      *      id="oro_user_group_create",
      *      type="entity",

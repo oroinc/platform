@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% set gridName = 'tag-results-grid' %}
 {% oro_title_set({ params: { '%tag.name%': tag.name } }) %}

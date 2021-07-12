@@ -2,7 +2,7 @@ operations:
     CRUD_ACTION:
         label: CRUD_ACTION
         button_options:
-            template: OroActionBundle:Operation:crud-button.html.twig
+            template: '@OroAction/Operation/crud-button.html.twig'
         preconditions:
             '@and':
                 - '@not_blank': $.data

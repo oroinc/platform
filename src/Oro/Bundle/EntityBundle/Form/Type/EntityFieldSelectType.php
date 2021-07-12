@@ -10,6 +10,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Form type for entity select.
+ */
 class EntityFieldSelectType extends AbstractType
 {
     const NAME = 'oro_entity_field_select';
@@ -55,8 +58,8 @@ class EntityFieldSelectType extends AbstractType
 
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
-            'result_template_twig'    => 'OroEntityBundle:Select:entity_field/result.html.twig',
-            'selection_template_twig' => 'OroEntityBundle:Select:entity_field/selection%s.html.twig',
+            'result_template_twig'    => '@OroEntity/Select/entity_field/result.html.twig',
+            'selection_template_twig' => '@OroEntity/Select/entity_field/selection%s.html.twig',
             'component'               => 'entity-field-select'
         ];
 

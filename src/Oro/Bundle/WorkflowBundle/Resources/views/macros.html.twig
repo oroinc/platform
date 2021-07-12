@@ -1,5 +1,5 @@
 {% macro renderTransitionButton(workflow, transition, workflowItem, transitionData, onlyLink, noIcon, noIconText, aClass) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+    {% import '@OroUI/macros.html.twig' as ui %}
 
     {% if transition.displayType == 'dialog' and transition.hasForm() %}
         {% if transitionData['dialog-url'] is not defined or not transitionData['dialog-url'] %}

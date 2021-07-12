@@ -48,7 +48,7 @@ class ButtonStub implements ButtonInterface
      */
     public function getTemplate()
     {
-        return '@OroActionBundle/Tests/Functional/Stub/button.html.twig';
+        return '@OroActionStub/button.html.twig';
     }
 
     /**

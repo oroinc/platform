@@ -15,7 +15,6 @@ use Symfony\Component\DependencyInjection\Reference;
 class ConfigurationPass implements CompilerPassInterface
 {
     private const LAYOUT_FACTORY_BUILDER_SERVICE = 'oro_layout.layout_factory_builder';
-    private const PHP_RENDERER_SERVICE = 'oro_layout.php.layout_renderer';
     private const TWIG_RENDERER_SERVICE = 'oro_layout.twig.layout_renderer';
     private const LAYOUT_EXTENSION_SERVICE = 'oro_layout.extension';
     private const BLOCK_TYPE_TAG_NAME = 'layout.block_type';
@@ -52,12 +51,6 @@ class ConfigurationPass implements CompilerPassInterface
     private function registerRenderers(ContainerBuilder $container)
     {
         $factoryBuilderDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
-        if ($container->hasDefinition(self::PHP_RENDERER_SERVICE)) {
-            $factoryBuilderDef->addMethodCall(
-                'addRenderer',
-                ['php', new Reference(self::PHP_RENDERER_SERVICE)]
-            );
-        }
         if ($container->hasDefinition(self::TWIG_RENDERER_SERVICE)) {
             $factoryBuilderDef->addMethodCall(
                 'addRenderer',

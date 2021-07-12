@@ -23,7 +23,7 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
 {
     const MENU_NAME = 'oro_menu';
 
-    const BREADCRUMBS_TEMPLATE = 'OroNavigationBundle:Menu:breadcrumbs.html.twig';
+    const BREADCRUMBS_TEMPLATE = '@OroNavigation/Menu/breadcrumbs.html.twig';
 
     /** @var ContainerInterface */
     protected $container;

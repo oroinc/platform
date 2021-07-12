@@ -51,7 +51,7 @@ class TagController extends AbstractController
      *      class="OroTagBundle:Tag",
      *      permission="CREATE"
      * )
-     * @Template("OroTagBundle:Tag:update.html.twig")
+     * @Template("@OroTag/Tag/update.html.twig")
      */
     public function createAction()
     {

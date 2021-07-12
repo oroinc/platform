@@ -119,8 +119,8 @@ return [
                 'form_type' => 'custom_workflow_transition',
                 'display_type' => 'page',
                 'destination_page' => 'name',
-                'page_template' => 'Workflow:Test:pageTemplate.html.twig',
-                'dialog_template' => 'Workflow:Test:dialogTemplate.html.twig',
+                'page_template' => '@OroWorkflow/Test/pageTemplate.html.twig',
+                'dialog_template' => '@OroWorkflow/Test/dialogTemplate.html.twig',
                 'form_options' => [
                     'attribute_fields' => [
                         'first_attribute' => [

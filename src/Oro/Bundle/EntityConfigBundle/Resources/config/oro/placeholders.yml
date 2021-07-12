@@ -11,10 +11,10 @@ placeholders:
     items:
         oro_entity_config_attributes_import_view:
             applicable: "@oro_entity_config.placeholder.attributes_import_filter->isApplicableEntity($entity$)"
-            template: OroEntityConfigBundle:Attribute:attributes_import_sync.html.twig
+            template: '@@OroEntityConfig/Attribute/attributes_import_sync.html.twig'
             data: "@oro_entity_config.placeholder.attributes_import_filter->getTopicByEntity($entity$)"
 
         oro_entity_config_attributes_import_index:
             applicable: "@oro_entity_config.placeholder.attributes_import_filter->isApplicableAlias($entityAlias$)"
-            template: OroEntityConfigBundle:Attribute:attributes_import_sync.html.twig
+            template: '@@OroEntityConfig/Attribute/attributes_import_sync.html.twig'
             data: "@oro_entity_config.placeholder.attributes_import_filter->getTopicByAlias($entityAlias$)"

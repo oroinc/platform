@@ -17,6 +17,9 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+/**
+ * Defines the configuration parameters recognized by WorkflowBundle.
+ */
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
     const NODE_STEPS = 'steps';
@@ -39,7 +42,7 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
     const DEFAULT_TRANSITION_DISPLAY_TYPE = 'dialog';
     const DEFAULT_ENTITY_ATTRIBUTE = 'entity';
     const DEFAULT_INIT_CONTEXT_ATTRIBUTE = 'init_context';
-    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = 'OroWorkflowBundle:actions:update.html.twig';
+    const DEFAULT_FORM_CONFIGURATION_TEMPLATE = '@OroWorkflow/actions/update.html.twig';
     const DEFAULT_FORM_CONFIGURATION_HANDLER = 'default';
 
     const NODE_FORM_OPTIONS_CONFIGURATION = 'configuration';

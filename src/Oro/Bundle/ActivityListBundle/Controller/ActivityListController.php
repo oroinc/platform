@@ -19,7 +19,7 @@ class ActivityListController extends AbstractController
 {
     /**
      * @Route("/view/widget/{entityClass}/{entityId}", name="oro_activity_list_widget_activities")
-     * @Template("OroActivityListBundle:ActivityList:activities.html.twig")
+     * @Template("@OroActivityList/ActivityList/activities.html.twig")
      *
      * @param string $entityClass The entity class which activities should be rendered
      * @param int    $entityId    The entity object id which activities should be rendered

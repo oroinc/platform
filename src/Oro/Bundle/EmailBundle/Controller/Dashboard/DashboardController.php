@@ -39,7 +39,7 @@ class DashboardController extends AbstractController
         $loggedUserId = $loggedUser->getId();
         $renderMethod = ($contentType === 'tab') ? 'render' : 'renderView';
         $activeTabContent = $this->$renderMethod(
-            'OroEmailBundle:Dashboard:recentEmailsGrid.html.twig',
+            '@OroEmail/Dashboard/recentEmailsGrid.html.twig',
             [
                 'loggedUserId' => $loggedUserId,
                 'gridName' => sprintf('dashboard-recent-emails-%s-grid', $activeTab)
@@ -69,7 +69,7 @@ class DashboardController extends AbstractController
             );
 
             return $this->render(
-                'OroEmailBundle:Dashboard:recentEmails.html.twig',
+                '@OroEmail/Dashboard/recentEmails.html.twig',
                 $params
             );
         }

@@ -10,7 +10,7 @@ services:
         arguments:
             - '@oro_api.profiler.logger'
         tags:
-            - { name: data_collector, template: OroApiBundle:Collector:api.html.twig, id: data_api }
+            - { name: data_collector, template: '@OroApi/Collector/api.html.twig', id: data_api }
 
     oro_api.profiler.processor_registry:
         class: Oro\Component\ChainProcessor\Debug\TraceableProcessorRegistry

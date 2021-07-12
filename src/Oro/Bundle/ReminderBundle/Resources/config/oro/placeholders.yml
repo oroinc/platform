@@ -16,10 +16,10 @@ placeholders:
 
     items:
         oro_reminder_subscribe_script:
-            template: OroReminderBundle:Reminder:subscribeScript.html.twig
+            template: '@@OroReminder/Reminder/subscribeScript.html.twig'
 
         oro_reminder_show_script:
-            template: OroReminderBundle:Reminder:showScript.html.twig
+            template: '@@OroReminder/Reminder/showScript.html.twig'
 
         default_template:
-            template: OroReminderBundle:Reminder:reminderDefault.html.twig
+            template: '@@OroReminder/Reminder/reminderDefault.html.twig'

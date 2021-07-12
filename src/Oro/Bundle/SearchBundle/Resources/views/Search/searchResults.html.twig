@@ -1,5 +1,5 @@
 {% extends bap.layout %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% oro_title_set({ params: { '%keyword%': searchString|default('oro.search.result.empty'|trans) } }) %}
 {% set gridName = 'search-grid' %}

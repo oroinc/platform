@@ -45,7 +45,7 @@ class StatusController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             if (!$result) {
                 return $this->render(
-                    'OroUserBundle:Status:statusForm.html.twig',
+                    '@OroUser/Status/statusForm.html.twig',
                     [
                          'form' => $this->get('oro_user.form.status')->createView(),
                     ]

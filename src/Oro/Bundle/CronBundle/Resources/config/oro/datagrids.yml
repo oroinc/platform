@@ -12,13 +12,13 @@ datagrids:
                 label: oro.cron.schedule.command.label
                 cellClassName: 'direction-ltr'
                 type: twig
-                template: OroCronBundle:Schedule:Datagrid/command.html.twig
+                template: '@OroCron/Schedule/Datagrid/command.html.twig'
                 frontend_type: html
             definition:
                 label: oro.cron.schedule.definition.label
                 cellClassName: 'direction-ltr'
                 type: twig
-                template: OroCronBundle:Schedule:Datagrid/definition.html.twig
+                template: '@OroCron/Schedule/Datagrid/definition.html.twig'
                 frontend_type: html
         sorters:
             columns:

@@ -24,7 +24,7 @@ use Twig\TwigFunction;
  */
 class FormExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    const DEFAULT_TEMPLATE = 'OroFormBundle:Form:fields.html.twig';
+    const DEFAULT_TEMPLATE = '@OroForm/Form/fields.html.twig';
     const BLOCK_NAME       = 'oro_form_js_validation';
 
     /**

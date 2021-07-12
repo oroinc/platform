@@ -3,10 +3,10 @@
 namespace Oro\Bundle\TranslationBundle\Controller;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Templating\TemplateReferenceInterface;
+use Twig\Environment;
 
 /**
  * Used when JSON file with js translations not generated and application make direct request to get this file.
@@ -19,9 +19,9 @@ class Controller
     protected $translator;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var string|TemplateReferenceInterface
@@ -35,15 +35,15 @@ class Controller
 
     /**
      * @param Translator $translator
-     * @param EngineInterface $templating
+     * @param Environment $twig
      * @param string|TemplateReferenceInterface $template a template name or a TemplateReferenceInterface instance
      * @param array $options array('domains' => array(), 'debug' => true|false)
      * @throws \InvalidArgumentException
      */
-    public function __construct(Translator $translator, EngineInterface $templating, $template, $options)
+    public function __construct(Translator $translator, Environment $twig, $template, $options)
     {
         $this->translator = $translator;
-        $this->templating = $templating;
+        $this->twig = $twig;
         if (empty($template) || !($template instanceof TemplateReferenceInterface || is_string($template))) {
             throw new \InvalidArgumentException('Please provide valid twig template as third argument');
         }
@@ -93,6 +93,6 @@ class Controller
             $result['translations'][$locale][$domain] = $translations;
         }
 
-        return $this->templating->render($this->template, ['json' => $result]);
+        return $this->twig->render($this->template, ['json' => $result]);
     }
 }

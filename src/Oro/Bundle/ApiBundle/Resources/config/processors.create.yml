@@ -89,10 +89,18 @@ services:
     # save_data
     #
 
+    oro_api.create.persist_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Create\PersistEntity
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -8 }
+
     oro_api.create.save_entity:
         class: Oro\Bundle\ApiBundle\Processor\Create\SaveEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
 

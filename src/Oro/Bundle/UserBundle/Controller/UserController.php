@@ -55,7 +55,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/profile/view", name="oro_user_profile_view")
-     * @Template("OroUserBundle:User:view.html.twig")
+     * @Template("@OroUser/User/view.html.twig")
      */
     public function viewProfileAction()
     {
@@ -66,7 +66,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/profile/edit", name="oro_user_profile_update")
-     * @Template("OroUserBundle:User/Profile:update.html.twig")
+     * @Template("@OroUser/User/Profile/update.html.twig")
      * @AclAncestor("update_own_profile")
      */
     public function updateProfileAction()
@@ -109,7 +109,7 @@ class UserController extends AbstractController
         }
 
         return $this->render(
-            'OroUserBundle:User/widget:apiKeyGen.html.twig',
+            '@OroUser/User/widget/apiKeyGen.html.twig',
             ['form' => $form->createView(), 'user' => $user]
         );
     }
@@ -118,7 +118,7 @@ class UserController extends AbstractController
      * Create user form
      *
      * @Route("/create", name="oro_user_create")
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("@OroUser/User/update.html.twig")
      * @Acl(
      *      id="oro_user_user_create",
      *      type="entity",
@@ -137,7 +137,7 @@ class UserController extends AbstractController
      * Edit user form
      *
      * @Route("/update/{id}", name="oro_user_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("@OroUser/User/update.html.twig")
      * @Acl(
      *      id="oro_user_user_update",
      *      type="entity",

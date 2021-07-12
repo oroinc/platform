@@ -7,4 +7,4 @@ placeholders:
 
     items:
        window_bundle_js:
-            template: OroWindowsBundle:Include:javascript.html.twig
+            template: '@@OroWindows/Include/javascript.html.twig'

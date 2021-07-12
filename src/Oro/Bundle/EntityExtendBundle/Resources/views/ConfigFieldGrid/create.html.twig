@@ -1,5 +1,5 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
+{% form_theme form with '@OroForm/Form/fields.html.twig' %}
 
 {% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
@@ -8,7 +8,7 @@
 {% endif %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ UI.cancelButton(path('oro_entityconfig_view', {'id':entity_id})) }}
     {{ UI.saveActionButton({

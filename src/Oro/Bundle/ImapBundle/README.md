@@ -180,12 +180,12 @@ class ExampleConfigurationType extends AbstractOauthAwareConfigurationType
   
   ```
   bundles:
-      - ExampleVendorImapBundle:Form:fields.html.twig
+      - '@ExampleVendorImap/Form/fields.html.twig'
   ```
   2. Create fields definitions file with custom definition of previously defined form field
   
   ```
-  {# ExampleVendorImapBundle:Form:fields.html.twig #}
+  {# '@ExampleVendorImap/Form/fields.html.twig' #}
   
   {% block example_imap_configuration_type_widget %}
       {% set data = form.parent.parent.vars.value %}

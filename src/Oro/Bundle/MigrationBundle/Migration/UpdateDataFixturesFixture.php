@@ -70,7 +70,7 @@ class UpdateDataFixturesFixture extends AbstractFixture
                 } catch (\Exception $e) {
                     throw new \RuntimeException(
                         sprintf(
-                            'Exception during persisting the fixture %s with version %s.',
+                            'Exception during persisting the fixture "%s" with version "%s".',
                             $dataFixture->getClassName(),
                             $dataFixture->getVersion()
                         ),

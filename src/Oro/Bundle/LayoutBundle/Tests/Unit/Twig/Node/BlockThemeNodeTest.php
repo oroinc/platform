@@ -26,7 +26,7 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
         );
         $resources = new Node(
             [
-                new ConstantExpression('SomeBundle:Layout:blocks.html.twig', 0)
+                new ConstantExpression('@Some/Layout/blocks.html.twig', 0)
             ]
         );
 
@@ -36,7 +36,7 @@ class BlockThemeNodeTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             sprintf(
-                self::SET_THEME_CALL . '(%s, "SomeBundle:Layout:blocks.html.twig");',
+                self::SET_THEME_CALL . '(%s, "@Some/Layout/blocks.html.twig");',
                 $this->getVariableGetter('layout')
             ),
             trim($compiler->compile($node)->getSource())

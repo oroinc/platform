@@ -147,7 +147,7 @@ services:
         arguments:
             - '@twig'
             - '@oro_entity_config.provider.entity'
-            - OroTagBundle:Search:searchResultItem.html.twig
+            - '@@OroTag/Search/searchResultItem.html.twig'
         calls:
             - [setMappingProvider,  ['@oro_search.provider.search_mapping']]
         tags:

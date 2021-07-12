@@ -18,45 +18,37 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Twig\Error\Error;
 
 class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
+    private EmailTemplateRepository|\PHPUnit\Framework\MockObject\MockObject $repository;
 
-    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRenderer;
+    private EmailRenderer|\PHPUnit\Framework\MockObject\MockObject $emailRenderer;
 
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EmailTemplateContentProvider */
-    private $provider;
+    private EmailTemplateContentProvider $provider;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EmailTemplateRepository::class);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine */
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->with(EmailTemplate::class)
             ->willReturn($this->repository);
 
         $this->emailRenderer = $this->createMock(EmailRenderer::class);
-        $this->propertyAccessor = new PropertyAccessor();
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->provider = new EmailTemplateContentProvider(
             $doctrine,
             $this->emailRenderer,
-            $this->propertyAccessor,
+            new PropertyAccessor(),
             $this->logger
         );
     }
@@ -71,13 +63,12 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $localization = new Localization();
         $templateParams = ['any-key' => 'any-val'];
 
-        $exception = new NoResultException;
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findWithLocalizations')
             ->with($criteria)
             ->willThrowException($exception);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 $this->isType('string'),
@@ -113,13 +104,13 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $templateParams = ['any-key' => 'any-val'];
 
         $emailTemplate = new EmailTemplate();
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findWithLocalizations')
             ->with($criteria)
             ->willReturn($emailTemplate);
 
-        $exception = new \Twig_Error('Some error');
-        $this->emailRenderer->expects($this->once())
+        $exception = new Error('Some error');
+        $this->emailRenderer->expects(self::once())
             ->method('compileMessage')
             ->with(
                 $this->isInstanceOf(EmailTemplateModel::class),
@@ -166,12 +157,12 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
                 ->setContentFallback(true)
         );
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('findWithLocalizations')
             ->with($criteria)
             ->willReturn($emailTemplate);
 
-        $this->emailRenderer->expects($this->once())
+        $this->emailRenderer->expects(self::once())
             ->method('compileMessage')
             ->with(
                 $this->equalTo(
@@ -188,7 +179,7 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $model = $this->provider->getTemplateContent($criteria, $localizationChildrenB, $templateParams);
-        $this->assertEquals(
+        self::assertEquals(
             (new EmailTemplateModel())
                 ->setType(EmailTemplateModel::CONTENT_TYPE_HTML)
                 ->setSubject('Compiled subject')

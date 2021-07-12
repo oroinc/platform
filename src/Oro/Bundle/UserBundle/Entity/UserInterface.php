@@ -3,52 +3,76 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Oro\Bundle\SecurityBundle\Model\Role;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 /**
  * Represents the interface that all user classes must implement.
  */
-interface UserInterface extends AdvancedUserInterface
+interface UserInterface extends SymfonyUserInterface
 {
     /**
      * @param string $username New username
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setUsername($username);
+    public function setUsername($username): self;
 
     /**
-     * @param string $password New encoded password
+     * @param string|null $password New encoded password
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setPassword($password);
+    public function setPassword(?string $password): self;
 
     /**
      * Get plain user password.
      *
-     * @return string
+     * @return string|null
      */
-    public function getPlainPassword();
+    public function getPlainPassword(): ?string;
 
     /**
-     * @param string $password New password as plain string
+     * @param string|null $password New password as plain string
      *
-     * @return UserInterface
+     * @return self
      */
-    public function setPlainPassword($password);
+    public function setPlainPassword(?string $password): self;
 
     /**
      * Adds a Role to the Collection.
      *
      * @param Role $role
      *
-     * @return UserInterface
+     * @return self
      */
-    public function addUserRole(Role $role);
+    public function addUserRole(Role $role): self;
 
     /**
      * @return Role[]
      */
     public function getUserRoles(): array;
+
+    /**
+     * Checks whether the user is locked.
+     *
+     * If this method returns false, the authentication system
+     * will throw a LockedException and prevent login.
+     *
+     * @return bool true if the user is not locked, false otherwise
+     *
+     * @see LockedException
+     */
+    public function isAccountNonLocked(): bool;
+
+    /**
+     * Checks whether the user is enabled.
+     *
+     * If this method returns false, the authentication system
+     * will throw a DisabledException and prevent login.
+     *
+     * @return bool true if the user is enabled, false otherwise
+     *
+     * @see DisabledException
+     */
+    public function isEnabled(): bool;
 }

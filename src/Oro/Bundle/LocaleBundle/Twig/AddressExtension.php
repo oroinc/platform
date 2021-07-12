@@ -17,7 +17,7 @@ use Twig\TwigFilter;
  */
 class AddressExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private const ADDRESS_TEMPLATE = 'OroLocaleBundle:Twig:address.html.twig';
+    private const ADDRESS_TEMPLATE = '@OroLocale/Twig/address.html.twig';
 
     /** @var ContainerInterface */
     protected $container;

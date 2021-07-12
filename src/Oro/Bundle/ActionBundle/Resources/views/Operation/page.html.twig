@@ -1,4 +1,4 @@
-{% extends 'OroUIBundle:actions:update.html.twig' %}
+{% extends '@OroUI/actions/update.html.twig' %}
 
 {% set formAction = app.request.uri  %}
 {% set entity = context.data %}
@@ -33,12 +33,12 @@
 
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: operation.definition.label|trans } %}
+        {% include '@OroUI/page_title_block.html.twig' with { title: operation.definition.label|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ UI.cancelButton(fromUrl|default(indexUrl)) }}
 

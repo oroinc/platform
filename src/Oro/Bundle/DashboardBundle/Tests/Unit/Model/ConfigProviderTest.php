@@ -38,9 +38,9 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->expectedDashboardConfigs = [
-            'main'                  => ['twig' => 'OroDashboardBundle:Index:default.html.twig'],
-            'alternative_dashboard' => ['twig' => 'OroDashboardBundle:Index:default.html.twig'],
-            'empty_board'           => ['twig' => 'OroDashboardBundle:Index:default.html.twig']
+            'main'                  => ['twig' => '@OroDashboard/Index/default.html.twig'],
+            'alternative_dashboard' => ['twig' => '@OroDashboard/Index/default.html.twig'],
+            'empty_board'           => ['twig' => '@OroDashboard/Index/default.html.twig']
         ];
 
         $this->expectedWidgetConfigs = [

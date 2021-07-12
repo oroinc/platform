@@ -4,6 +4,8 @@ namespace Oro\Bundle\AssetBundle\Twig;
 
 use Oro\Bundle\AssetBundle\Webpack\WebpackServer;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Provide twig helpers for Webpack HMR
@@ -16,7 +18,7 @@ class WebpackExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new \Twig_SimpleFunction('webpack_hmr_enabled', [WebpackServer::class, 'isRunning']),
+            new TwigFunction('webpack_hmr_enabled', [WebpackServer::class, 'isRunning']),
         ];
     }
 
@@ -26,7 +28,7 @@ class WebpackExtension extends AbstractExtension
     public function getFilters()
     {
         return [
-            new \Twig_SimpleFilter('webpack_asset', [WebpackServer::class, 'getServerUrl']),
+            new TwigFilter('webpack_asset', [WebpackServer::class, 'getServerUrl']),
         ];
     }
 }

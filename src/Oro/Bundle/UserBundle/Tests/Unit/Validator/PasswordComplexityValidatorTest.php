@@ -6,77 +6,64 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Provider\PasswordComplexityConfigProvider;
 use Oro\Bundle\UserBundle\Validator\Constraints\PasswordComplexity;
 use Oro\Bundle\UserBundle\Validator\PasswordComplexityValidator;
-use Symfony\Component\Validator\Context\ExecutionContext;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
+class PasswordComplexityValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ConstraintViolationBuilderInterface */
-    protected $violationBuilder;
-
-    /** @var PasswordComplexity */
-    protected $constraint;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     protected function setUp(): void
     {
-        $this->violationBuilder = $this->getMockBuilder(ConstraintViolationBuilderInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->violationBuilder->method('setInvalidValue')->willReturnSelf();
-        $this->violationBuilder->method('setParameters')->willReturnSelf();
-        $this->violationBuilder->method('addViolation')->willReturnSelf();
+        $this->configManager = $this->createMock(ConfigManager::class);
+        parent::setUp();
+    }
 
-        $this->constraint = new PasswordComplexity([]);
+    protected function createValidator()
+    {
+        return new PasswordComplexityValidator(new PasswordComplexityConfigProvider($this->configManager));
     }
 
     /**
      * @dataProvider validateInvalidDataProvider
-     *
-     * @param array $configMap System config
-     * @param string $value    Testing password
-     * @param string $message  Expected message param
      */
-    public function testValidateInvalid(array $configMap, $value, $message)
+    public function testValidateInvalid(array $configMap, string $value, string $message)
     {
-        $validator = new PasswordComplexityValidator($this->getConfigProvider($configMap));
-        $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->willReturnMap($configMap);
 
-        $context->expects($this->once())
-            ->method('buildViolation')
-            ->with($message)
-            ->willReturn($this->violationBuilder);
+        $constraint = new PasswordComplexity();
+        $this->validator->validate($value, $constraint);
 
-        /** @var ExecutionContext $context */
-        $validator->initialize($context);
-        $validator->validate($value, $this->constraint);
+        $this->buildViolation($message)
+            ->setParameter(
+                '{{ length }}',
+                $this->configManager->get(PasswordComplexityConfigProvider::CONFIG_MIN_LENGTH)
+            )
+            ->setInvalidValue($value)
+            ->assertRaised();
     }
 
     /**
      * @dataProvider validateValidDataProvider
-     *
-     * @param array $configMap System config
-     * @param string $value    Testing password
      */
-    public function testValidateValid(array $configMap, $value)
+    public function testValidateValid(array $configMap, string $value)
     {
-        $validator = new PasswordComplexityValidator($this->getConfigProvider($configMap));
-        $context = $this->getMockBuilder(ExecutionContextInterface::class)->disableOriginalConstructor()->getMock();
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->willReturnMap($configMap);
 
-        $context->expects($this->never())
-            ->method('buildViolation');
+        $constraint = new PasswordComplexity();
+        $this->validator->validate($value, $constraint);
 
-        /** @var ExecutionContext $context */
-        $validator->initialize($context);
-        $validator->validate($value, $this->constraint);
+        $this->assertNoViolation();
     }
 
     /**
      * Different rules enabled, invalid value provided
-     *
-     * @return array
      */
-    public function validateInvalidDataProvider()
+    public function validateInvalidDataProvider(): array
     {
         return [
             'min length' => [
@@ -176,10 +163,7 @@ class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function validateValidDataProvider()
+    public function validateValidDataProvider(): array
     {
         return [
             'all rules disabled' => [
@@ -223,29 +207,5 @@ class PasswordComplexityValidatorTest extends \PHPUnit\Framework\TestCase
                 'value' => 'paSsw0rd!',
             ],
         ];
-    }
-
-    /**
-     * @param array $configMap
-     *
-     * @return PasswordComplexityConfigProvider
-     */
-    protected function getConfigProvider(array $configMap)
-    {
-        $configManager = $this->getMockBuilder(ConfigManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManager->method('get')->willReturnMap($configMap);
-
-        /** @var ConfigManager $configManager */
-        $configProvider = new PasswordComplexityConfigProvider($configManager);
-
-        /** @var PasswordComplexityConfigProvider $configManager */
-        return $configProvider;
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->violationBuilder, $this->constraint);
     }
 }

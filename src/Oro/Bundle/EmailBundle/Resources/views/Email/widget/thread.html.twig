@@ -25,7 +25,7 @@
             {% else %}
                 {# email collapsed also can be evaluated for other conditions here #}
                 {% set emailCollapsed = not loop.last %}
-                {% include 'OroEmailBundle:Email/Thread:emailItem.html.twig' %}
+                {% include '@OroEmail/Email/Thread/emailItem.html.twig' %}
             {% endif %}
         {% endfor %}
     </div>

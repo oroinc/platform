@@ -1150,6 +1150,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SaveParentEntity
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_api.save_data_handler'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: save_data, priority: -10 }
             - { name: oro.api.processor, action: add_subresource, group: save_data, priority: -10 }

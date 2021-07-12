@@ -1,15 +1,15 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
 {% oro_title_set({ params: { '%name%': entity.name, '%id%': entity.id } }) %}
 
 {% block breadcrumbs %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ parent() }}
 
     <span class="page-title__status">
-        {% include 'OroMessageQueueBundle:Job/Datagrid:status.html.twig' with {'record': {'rootEntity': entity}} %}
+        {% include '@OroMessageQueue/Job/Datagrid/status.html.twig' with {'record': {'rootEntity': entity}} %}
 
         {% if entity.unique %}
             {{ UI.badge('oro.message_queue_job.header.unique'|trans, 'info') }}
@@ -37,7 +37,7 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
     {% set gridName  = 'oro_message_queue_child_jobs' %}
     {% set params  = {'root_job_id': entity.id} %}

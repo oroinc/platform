@@ -4,8 +4,8 @@
     * form         - Oro\Bundle\EmailBundle\Form\type\EmailType
     * saved        - bool
 #}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEmailBundle:Form:fields.html.twig'] %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% form_theme form with ['@OroForm/Form/fields.html.twig', '@OroEmail/Form/fields.html.twig'] %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% block page_container %}
     {% if saved %}

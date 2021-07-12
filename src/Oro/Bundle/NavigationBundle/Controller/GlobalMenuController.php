@@ -42,7 +42,7 @@ class GlobalMenuController extends AbstractMenuController
 
     /**
      * @Route("/{menuName}/create/{parentKey}", name="oro_navigation_global_menu_create")
-     * @Template("OroNavigationBundle:GlobalMenu:update.html.twig")
+     * @Template("@OroNavigation/GlobalMenu/update.html.twig")
      *
      * @param string $menuName
      * @param string|null $parentKey

@@ -116,7 +116,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
                     [
                         'type' => 'twig',
                         'frontend_type' => Property::TYPE_HTML,
-                        'template' => 'OroEntityBundle:Datagrid:Property/entityFallbackValue.html.twig',
+                        'template' => '@OroEntity/Datagrid/Property/entityFallbackValue.html.twig',
                         'context' => [
                             'fieldName' => $field->getFieldName(),
                             'entityClassName' => $entityClassName

@@ -2,15 +2,15 @@ navigation:
     menu_config:
         templates:
             application_menu:
-                template: 'OroUIBundle:Menu:application_menu.html.twig'
+                template: '@@OroUI/Menu/application_menu.html.twig'
                 current_class: 'active'
                 ancestor_class: 'active'
 
             dots_menu:
-                template: 'OroUIBundle:Menu:dots_menu.html.twig'
+                template: '@@OroUI/Menu/dots_menu.html.twig'
 
             shortcuts:
-                template: 'OroUIBundle:Menu:shortcuts.html.twig'
+                template: '@@OroUI/Menu/shortcuts.html.twig'
 
         tree:
             application_menu:

@@ -67,7 +67,7 @@ operations:
                         method: createView
         frontend_options:
             show_dialog: false
-            template: 'OroWorkflowBundle:WorkflowDefinition:clone.html.twig'
+            template: '@OroWorkflow/WorkflowDefinition/clone.html.twig'
         attributes:
             entity:
                 label: ' '

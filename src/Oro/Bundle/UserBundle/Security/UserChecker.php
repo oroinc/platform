@@ -9,30 +9,24 @@ use Oro\Bundle\UserBundle\Exception\EmptyOwnerException;
 use Oro\Bundle\UserBundle\Exception\OrganizationException;
 use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 
 /**
  * Checks User state during authentication.
  */
-class UserChecker extends BaseUserChecker
+class UserChecker extends AbstractUserChecker
 {
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    protected TokenStorageInterface $tokenStorage;
 
-    /**
-     * @param TokenStorageInterface $tokenStorage
-     */
-    public function __construct(
-        TokenStorageInterface $tokenStorage
-    ) {
+    public function __construct(TokenStorageInterface $tokenStorage)
+    {
         $this->tokenStorage = $tokenStorage;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function checkPostAuth(UserInterface $user)
+    public function checkPostAuth(SymfonyUserInterface $user): void
     {
         parent::checkPostAuth($user);
 
@@ -55,7 +49,7 @@ class UserChecker extends BaseUserChecker
     /**
      * {@inheritdoc}
      */
-    public function checkPreAuth(UserInterface $user)
+    public function checkPreAuth(SymfonyUserInterface $user): void
     {
         parent::checkPreAuth($user);
 
@@ -82,12 +76,7 @@ class UserChecker extends BaseUserChecker
         }
     }
 
-    /**
-     * @param User $user
-     *
-     * @return bool
-     */
-    protected function hasOrganization(User $user)
+    protected function hasOrganization(User $user): bool
     {
         return $user->getOrganizations(true)->count() > 0;
     }

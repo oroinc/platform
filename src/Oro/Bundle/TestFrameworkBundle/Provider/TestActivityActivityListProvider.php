@@ -92,7 +92,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
      */
     public function getTemplate()
     {
-        return 'OroActivityListBundle:ActivityList/js:activityItemTemplate.html.twig';
+        return '@OroActivityList/ActivityList/js/activityItemTemplate.html.twig';
     }
 
     /**

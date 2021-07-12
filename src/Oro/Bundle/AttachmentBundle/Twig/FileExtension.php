@@ -37,8 +37,8 @@ use Twig\TwigFunction;
 class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private const DEFAULT_THUMB_SIZE = 16;
-    private const FILES_TEMPLATE = 'OroAttachmentBundle:Twig:file.html.twig';
-    private const IMAGES_TEMPLATE = 'OroAttachmentBundle:Twig:image.html.twig';
+    private const FILES_TEMPLATE = '@OroAttachment/Twig/file.html.twig';
+    private const IMAGES_TEMPLATE = '@OroAttachment/Twig/image.html.twig';
 
     /** @var ContainerInterface */
     private $container;

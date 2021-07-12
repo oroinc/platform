@@ -6,36 +6,23 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin;
 use Oro\Bundle\EmailBundle\Validator\MailboxOriginValidator;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
+class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var MailboxOrigin */
-    protected $constraint;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $context;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
-
-    /** @var MailboxOriginValidator */
-    protected $validator;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     protected function setUp(): void
     {
-        $this->constraint = new MailboxOrigin();
+        $this->translator = $this->createMock(Translator::class);
+        parent::setUp();
+    }
 
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->validator = new MailboxOriginValidator(
-            $this->translator
-        );
-        $this->validator->initialize($this->context);
+    protected function createValidator()
+    {
+        return new MailboxOriginValidator($this->translator);
     }
 
     /**
@@ -43,8 +30,6 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValueWithFolderSentOnRootLevel()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
         $this->translator->expects($this->never())
             ->method('trans');
 
@@ -54,7 +39,10 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
         $value = new UserEmailOrigin();
         $value->addFolder($folderSent);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new MailboxOrigin();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -62,14 +50,15 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValueIsNotEmailOrigin()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
         $this->translator->expects($this->never())
             ->method('trans');
 
         $value = new EmailFolder();
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new MailboxOrigin();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -77,8 +66,6 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValueWithFolderSentInFolderInbox()
     {
-        $this->context->expects($this->never())
-            ->method('addViolation');
         $this->translator->expects($this->never())
             ->method('trans');
 
@@ -92,7 +79,10 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
         $value = new UserEmailOrigin();
         $value->addFolder($folderInbox);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new MailboxOrigin();
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
     }
 
     /**
@@ -100,19 +90,17 @@ class MailboxOriginValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public function testValueWithoutFolderSent()
     {
-        $this->context->expects($this->once())
-            ->method('addViolation');
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('oro.imap.configuration.connect_and_retrieve_folders')
-            ->will($this->returnArgument(0));
-
         $folderInbox = new EmailFolder();
         $folderInbox->setType('inbox');
 
         $value = new UserEmailOrigin();
         $value->addFolder($folderInbox);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new MailboxOrigin();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->setParameter('%button%', null)
+            ->assertRaised();
     }
 }

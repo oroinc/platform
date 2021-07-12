@@ -139,7 +139,7 @@ class RolePageListener
     protected function getRenderedGridHtml(Environment $twigEnvironment, Role $entity, $readOnly)
     {
         return $twigEnvironment->render(
-            'OroWorkflowBundle:Datagrid:aclGrid.html.twig',
+            '@OroWorkflow/Datagrid/aclGrid.html.twig',
             [
                 'entity'     => $entity,
                 'isReadonly' => $readOnly

@@ -1,5 +1,5 @@
-{% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends '@OroDashboard/Dashboard/tabbedWidget.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
 
 {% set unreadMailCount %}
     <div class="email-mail-count-circle" {{ UI.renderPageComponentAttributes({

@@ -1,12 +1,12 @@
-{% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+{% extends '@OroUI/actions/view.html.twig' %}
+{% import '@OroUI/macros.html.twig' as UI %}
+{% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 {% oro_title_set({params : {"%report.name%": entity.name, "%report.group%": reportGroup|trans} }) %}
 {% set pageTitle = entity.name %}
 {% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import '@OroUI/macros.html.twig' as UI %}
 
     {% if isDesktopVersion() and is_granted('EDIT', entity) %}
         {{ UI.editButton({
@@ -51,7 +51,7 @@
 {% endblock %}
 
 {% block content_data %}
-    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% import '@OroDataGrid/macros.html.twig' as dataGrid %}
 
     {% if gridName is defined %}
         {% if chartView is defined %}
