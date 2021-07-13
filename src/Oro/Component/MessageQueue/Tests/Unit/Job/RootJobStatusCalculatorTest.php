@@ -2,6 +2,8 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -9,6 +11,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
+use Oro\Component\MessageQueue\Job\Topics;
 use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
@@ -29,45 +32,42 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var RootJobStatusCalculator */
     private $rootJobStatusCalculator;
 
+    /** @var Registry */
+    private $registry;
+
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManagerInterface::class);
-        $this->jobStatusChecker = $this->createMock(JobStatusChecker::class);
+        $this->jobStatusChecker = new JobStatusChecker();
         $this->statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
+        $this->registry = $this->createMock(Registry::class);
 
         $this->rootJobStatusCalculator = new RootJobStatusCalculator(
             $this->jobManager,
             $this->jobStatusChecker,
             $this->statusCalculatorResolver,
-            $this->messageProducer
+            $this->messageProducer,
+            $this->registry
         );
+
+        $this->jobManager
+            ->expects($this->any())
+            ->method('saveJobWithLock')
+            ->willReturnCallback(fn (Job $job, callable $callback) => $callback($job));
     }
 
     /**
-     * @dataProvider jobDataProvider
+     * @dataProvider testJobStoppedBeforeCalculateProvider
      *
-     * @param Job $passedJob
-     * @param Job $expectedJob
-     * @return void
+     * @param Job $job
      */
-    public function testCalculateJobStoppedBeforeCalculate(Job $passedJob, Job $expectedJob): void
+    public function testJobStoppedBeforeCalculate(Job $job): void
     {
-        $dateTime = new \DateTime('-1 hour');
-        $expectedJob->setLastActiveAt($dateTime);
-        $this->jobStatusChecker
-            ->expects($this->once())
-            ->method('isJobStopped')
-            ->with($expectedJob)
-            ->willReturn(true);
-
-        $this->jobManager
-            ->expects($this->never())
-            ->method('saveJobWithLock');
-
+        $this->assertObjectManaged();
         $this->statusCalculatorResolver
             ->expects($this->never())
             ->method('getCalculatorForRootJob');
@@ -76,208 +76,164 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
             ->expects($this->never())
             ->method('send');
 
-        $this->rootJobStatusCalculator->calculate($passedJob);
-
-        $this->assertEquals($dateTime, $expectedJob->getLastActiveAt());
-        $this->assertNull($expectedJob->getStoppedAt());
+        $this->rootJobStatusCalculator->calculate($job);
+        $this->assertNull($job->getLastActiveAt());
     }
 
-    /**
-     * @dataProvider jobDataProvider
-     *
-     * @param Job $passedJob
-     * @param Job $expectedJob
-     * @return void
-     */
-    public function testCalculateJobStoppedBeforeSave(Job $passedJob, Job $expectedJob): void
+    public function testJobStoppedBeforeCalculateProvider(): \Generator
     {
-        $dateTime = new \DateTime('-1 hour');
-        $expectedJob->setLastActiveAt($dateTime);
-        $this->jobStatusChecker
-            ->expects($this->exactly(2))
-            ->method('isJobStopped')
-            ->withConsecutive(
-                [$expectedJob],
-                [$expectedJob]
-            )
-            ->willReturnOnConsecutiveCalls(
-                false,
-                true
-            );
-
-        $this->jobManager
-            ->expects($this->once())
-            ->method('saveJobWithLock')
-            ->willReturnCallback(static function (Job $expectedJob, $callback) {
-                $callback($expectedJob);
-            });
-
-        $this->statusCalculatorResolver
-            ->expects($this->never())
-            ->method('getCalculatorForRootJob');
-
-        $this->messageProducer
-            ->expects($this->never())
-            ->method('send');
-
-        $this->rootJobStatusCalculator->calculate($passedJob);
-
-        $this->assertEquals($dateTime, $expectedJob->getLastActiveAt());
-        $this->assertNull($expectedJob->getStoppedAt());
+        yield Job::STATUS_SUCCESS => [$this->getJob('job', Job::STATUS_SUCCESS)];
+        yield Job::STATUS_FAILED => [$this->getJob('job', Job::STATUS_FAILED)];
+        yield Job::STATUS_CANCELLED => [$this->getJob('job', Job::STATUS_CANCELLED)];
+        yield Job::STATUS_STALE => [$this->getJob('job', Job::STATUS_STALE)];
     }
 
-    /**
-     * @dataProvider jobDataProvider
-     *
-     * @param Job $passedJob
-     * @param Job $expectedJob
-     * @return void
-     */
-    public function testCalculateChangeJobStatusOnly(Job $passedJob, Job $expectedJob): void
+    public function testChangeJobStatus(): void
     {
-        $dateTime = new \DateTime('-1 hour');
-        $expectedJob->setLastActiveAt($dateTime);
-        $expectedJob->setJobProgress(0.5);
-        $this->jobStatusChecker
-            ->expects($this->exactly(4))
-            ->method('isJobStopped')
-            ->withConsecutive(
-                [$expectedJob],
-                [$expectedJob],
-                [$expectedJob],
-                [$expectedJob]
-            )
-            ->willReturnOnConsecutiveCalls(
-                false,
-                false,
-                false,
-                false
-            );
-
-        $this->jobManager
-            ->expects($this->once())
-            ->method('saveJobWithLock')
-            ->willReturnCallback(static function (Job $expectedJob, $callback) {
-                $callback($expectedJob);
-            });
+        $this->assertObjectManaged();
+        $job = $this->getJob();
 
         $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
-        $statusAndProgressCalculator->expects($this->once())
+        $statusAndProgressCalculator
+            ->expects($this->once())
             ->method('calculateRootJobStatus')
-            ->willReturn('oro.message_queue_job.status.running');
-        $statusAndProgressCalculator->expects($this->once())
-            ->method('calculateRootJobProgress')
-            ->willReturn(0.5);
-        $statusAndProgressCalculator->expects($this->once())
+            ->willReturn(Job::STATUS_RUNNING);
+        $statusAndProgressCalculator
+            ->expects($this->once())
             ->method('clean');
 
         $this->statusCalculatorResolver
             ->expects($this->once())
             ->method('getCalculatorForRootJob')
-            ->with($expectedJob)
+            ->with($job)
             ->willReturn($statusAndProgressCalculator);
 
         $this->messageProducer
             ->expects($this->never())
             ->method('send');
 
-        $this->rootJobStatusCalculator->calculate($passedJob);
+        $this->rootJobStatusCalculator->calculate($job);
 
-        $this->assertGreaterThan($dateTime, $expectedJob->getLastActiveAt());
-        $this->assertNull($expectedJob->getStoppedAt());
-        $this->assertEquals(0.5, $expectedJob->getJobProgress());
-        $this->assertEquals('oro.message_queue_job.status.running', $expectedJob->getStatus());
+        $this->assertNotNull($job->getLastActiveAt());
+        $this->assertNull($job->getStoppedAt());
+        $this->assertEquals(Job::STATUS_RUNNING, $job->getStatus());
     }
 
-    /**
-     * @dataProvider jobDataProvider
-     *
-     * @param Job $passedJob
-     * @param Job $expectedJob
-     * @return void
-     */
-    public function testCalculateChangeJobStatusAndStop(Job $passedJob, Job $expectedJob): void
+    public function testChangeJobStatusAndStop(): void
     {
-        $dateTime = new \DateTime('-1 hour');
-        $expectedJob->setId(75);
-        $expectedJob->setLastActiveAt($dateTime);
-        $expectedJob->setJobProgress(0.5);
-        $this->jobStatusChecker
-            ->expects($this->exactly(4))
-            ->method('isJobStopped')
-            ->withConsecutive(
-                [$expectedJob],
-                [$expectedJob],
-                [$expectedJob],
-                [$expectedJob]
-            )
-            ->willReturnOnConsecutiveCalls(
-                false,
-                false,
-                true,
-                true
-            );
-
-        $this->jobManager
-            ->expects($this->once())
-            ->method('saveJobWithLock')
-            ->willReturnCallback(static function (Job $expectedJob, $callback) {
-                $callback($expectedJob);
-            });
+        $this->assertObjectManaged();
+        $job = $this->getJob('job', Job::STATUS_RUNNING, 1);
 
         $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
-        $statusAndProgressCalculator->expects($this->once())
+        $statusAndProgressCalculator
+            ->expects($this->once())
             ->method('calculateRootJobStatus')
-            ->willReturn('oro.message_queue_job.status.success');
-        $statusAndProgressCalculator->expects($this->once())
+            ->willReturn(Job::STATUS_SUCCESS);
+        $statusAndProgressCalculator
+            ->expects($this->once())
             ->method('calculateRootJobProgress')
             ->willReturn(1);
-        $statusAndProgressCalculator->expects($this->once())
+        $statusAndProgressCalculator
+            ->expects($this->once())
             ->method('clean');
 
         $this->statusCalculatorResolver
             ->expects($this->once())
             ->method('getCalculatorForRootJob')
-            ->with($expectedJob)
+            ->with($job)
             ->willReturn($statusAndProgressCalculator);
 
         $this->messageProducer
             ->expects($this->once())
             ->method('send')
-            ->with(
-                'oro.message_queue.job.root_job_stopped',
-                new Message(['jobId' => 75], MessagePriority::HIGH)
-            );
+            ->with(Topics::ROOT_JOB_STOPPED, new Message(['jobId' => 1], MessagePriority::HIGH));
 
-        $this->rootJobStatusCalculator->calculate($passedJob);
+        $this->rootJobStatusCalculator->calculate($job);
 
-        $this->assertGreaterThan($dateTime, $expectedJob->getLastActiveAt());
-        $this->assertGreaterThan($dateTime, $expectedJob->getStoppedAt());
-        $this->assertEquals(1, $expectedJob->getJobProgress());
-        $this->assertEquals('oro.message_queue_job.status.success', $expectedJob->getStatus());
+        $this->assertNotNull($job->getLastActiveAt());
+        $this->assertNotNull($job->getStoppedAt());
+        $this->assertEquals(1, $job->getJobProgress());
+        $this->assertEquals(Job::STATUS_SUCCESS, $job->getStatus());
     }
 
-    /**
-     * @return array
-     */
-    public function jobDataProvider(): array
+    public function testCalculateChildJobsWithStop(): void
     {
-        $rootJob = new Job();
-        $rootJob->setName('root.job');
-        $childJob = new Job();
-        $childJob->setName('child.job');
-        $childJob->setRootJob($rootJob);
-        $rootJob->addChildJob($childJob);
+        $this->assertObjectManaged();
 
-        return [
-            'with child job' => [
-                'passedJob' => $childJob,
-                'expectedJob' => $rootJob,
-            ],
-            'with root job' => [
-                'passedJob' => $rootJob,
-                'expectedJob' => $rootJob,
-            ]
-        ];
+        $rootJob = $this->getJob(name: 'Root Job', id: 1);
+        $child1 = $this->getJob(name: 'Child Job 1', rootJob: $rootJob);
+        $child2 = $this->getJob(name: 'Child Job 2', rootJob: $rootJob);
+        $rootJob->setChildJobs([$child1, $child2]);
+
+        $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
+        $statusAndProgressCalculator
+            ->expects($this->once())
+            ->method('calculateRootJobStatus')
+            ->willReturn(Job::STATUS_SUCCESS);
+        $statusAndProgressCalculator
+            ->expects($this->once())
+            ->method('calculateRootJobProgress')
+            ->willReturn(1);
+        $statusAndProgressCalculator
+            ->expects($this->once())
+            ->method('clean');
+
+        $this->statusCalculatorResolver
+            ->expects($this->once())
+            ->method('getCalculatorForRootJob')
+            ->with($rootJob)
+            ->willReturn($statusAndProgressCalculator);
+
+        $this->messageProducer
+            ->expects($this->once())
+            ->method('send')
+            ->with(Topics::ROOT_JOB_STOPPED, new Message(['jobId' => 1], MessagePriority::HIGH));
+
+        // Because all consumers wait until at least one consumer updates the status of the 'job'
+        // and unlocks the record, we can simulate parallel processors due to the loop.
+        foreach ($rootJob->getChildJobs() as $childJob) {
+            $this->rootJobStatusCalculator->calculate($childJob);
+        }
+
+        $this->assertNotNull($rootJob->getLastActiveAt());
+        $this->assertNotNull($rootJob->getStoppedAt());
+        $this->assertEquals(1, $rootJob->getJobProgress());
+        $this->assertEquals(Job::STATUS_SUCCESS, $rootJob->getStatus());
+    }
+
+    private function assertObjectManaged(): void
+    {
+        $manager = $this->createMock(EntityManager::class);
+        $manager
+            ->expects($this->any())
+            ->method('contains')
+            ->willReturn(true);
+        $manager
+            ->expects($this->any())
+            ->method('refresh');
+
+        $this->registry
+            ->expects($this->any())
+            ->method('getManager')
+            ->willReturn($manager);
+    }
+
+    private function getJob(
+        string $name = 'Job',
+        ?string $status = Job::STATUS_NEW,
+        ?int $id = null,
+        ?Job $rootJob = null
+    ): Job {
+        $job = new Job();
+        $job->setName($name);
+        $job->setStatus($status);
+        if ($id) {
+            $job->setId($id);
+        }
+        if ($rootJob) {
+            $job->setRootJob($rootJob);
+        }
+
+        return $job;
     }
 }

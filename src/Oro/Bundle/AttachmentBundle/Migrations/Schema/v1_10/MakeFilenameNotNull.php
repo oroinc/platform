@@ -21,6 +21,11 @@ class MakeFilenameNotNull implements Migration
 
         // filename column is already NOT NULL, do nothing
         if (!$table->getColumn('filename')->getNotnull()) {
+            $queries->addPreQuery(new ParametrizedSqlMigrationQuery(<<<SQL
+                 DELETE FROM oro_attachment 
+                 WHERE file_id IN (SELECT id FROM oro_attachment_file WHERE filename IS NULL)
+            SQL));
+
             $queries->addPreQuery(new ParametrizedSqlMigrationQuery(
                 'DELETE FROM oro_attachment_file WHERE filename IS NULL'
             ));
