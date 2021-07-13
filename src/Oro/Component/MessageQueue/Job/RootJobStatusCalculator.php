@@ -2,6 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Job;
 
+use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -26,6 +27,9 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
     /** @var MessageProducerInterface */
     private $messageProducer;
 
+    /** @var Registry  */
+    private $registry;
+
     /**
      * @param JobManagerInterface $jobManager
      * @param JobStatusChecker $jobStatusChecker
@@ -44,18 +48,21 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         $this->messageProducer = $messageProducer;
     }
 
+    public function setRegistry(Registry $registry): void
+    {
+        $this->registry = $registry;
+    }
+
     /**
      * @param Job $job
+     *
      * @return void
      */
     public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);
-        if ($this->jobStatusChecker->isJobStopped($rootJob)) {
-            return;
-        }
-
         $this->jobManager->saveJobWithLock($rootJob, function (Job $rootJob) {
+            $rootJob = $this->refreshJob($rootJob);
             if (!$this->jobStatusChecker->isJobStopped($rootJob)) {
                 $this->updateRootJob($rootJob);
             }
@@ -98,5 +105,15 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
     private function getRootJob(Job $job): Job
     {
         return $job->isRoot() ? $job : $job->getRootJob();
+    }
+
+    private function refreshJob(Job $job): Job
+    {
+        $em = $this->registry->getManager();
+        if ($em->contains($job)) {
+            $em->refresh($job);
+        }
+
+        return $job;
     }
 }

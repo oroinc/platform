@@ -49,6 +49,8 @@ services:
             - '@oro_message_queue.checker.job_status_checker'
             - '@oro_message_queue.status_calculator.status_calculator_resolver'
             - '@oro_message_queue.client.message_producer'
+        calls:
+            - [ 'setRegistry', ['@doctrine'] ]
 
     oro_message_queue.checker.job_status_checker:
         class: 'Oro\Component\MessageQueue\Checker\JobStatusChecker'
