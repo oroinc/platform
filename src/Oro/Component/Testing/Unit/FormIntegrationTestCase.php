@@ -103,6 +103,10 @@ class FormIntegrationTestCase extends BaseTestCase
     {
         $formName = $form->getName();
         $value = var_export($expectedValue, true);
+        $this->assertTrue(
+            $form->getConfig()->hasOption($optionName),
+            "Failed asserting that {$optionName} option of {$formName} not exists."
+        );
         $this->assertEquals(
             $expectedValue,
             $form->getConfig()->getOption($optionName),
