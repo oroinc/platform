@@ -84,7 +84,7 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
     /**
      * Sets alias for the current browser tab
      *
-     * Example: And I set alias "tab1"f or the current browser tab
+     * Example: And I set alias "tab1" for the current browser tab
      * @When /^(?:|I )set alias "(?P<alias>[^"]+)" for (?:|the )current browser tab$/
      *
      * @param string $alias

@@ -650,7 +650,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^I should see that option "([^"]*)" is selected in "([^"]*)" select$/
+     * @Then /^(?:|I )should see that option "([^"]*)" is selected in "([^"]*)" select$/
      * @param string $label
      * @param string $field
      */
@@ -679,7 +679,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @Then /^I should not see any selected option in "([^"]*)" select$/
+     * @Then /^(?:|I )should not see any selected option in "([^"]*)" select$/
      * @param string $field
      */
     public function iShouldNotSeeAnySelectedOption(string $field)
