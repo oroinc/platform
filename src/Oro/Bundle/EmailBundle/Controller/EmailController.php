@@ -700,7 +700,7 @@ class EmailController extends AbstractController
     {
         try {
             $this->get(EmailSynchronizationManager::class)->syncOrigins(
-                $this->get(EmailSynchronizationManager::class)->getEmailOrigins(
+                $this->get(EmailGridHelper::class)->getEmailOrigins(
                     $this->get(TokenAccessorInterface::class)->getUserId()
                 ),
                 true

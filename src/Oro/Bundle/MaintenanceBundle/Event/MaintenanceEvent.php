@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Maintenance;
+namespace Oro\Bundle\MaintenanceBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 

@@ -9,7 +9,7 @@ use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
-use Oro\Bundle\PlatformBundle\Maintenance\Mode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

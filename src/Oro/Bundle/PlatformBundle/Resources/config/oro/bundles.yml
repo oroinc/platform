@@ -16,5 +16,4 @@ bundles:
     - { name: Nelmio\SecurityBundle\NelmioSecurityBundle, priority: -50 }
     - { name: Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle, priority: -175 }
     - { name: Liip\ImagineBundle\LiipImagineBundle, priority: -165 }
-    - { name: Lexik\Bundle\MaintenanceBundle\LexikMaintenanceBundle, priority: -145 }
     - { name: Oro\Bundle\PlatformBundle\OroPlatformBundle, priority: -200 }

@@ -1,29 +1,20 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Maintenance;
+namespace Oro\Bundle\MaintenanceBundle\Maintenance;
 
-use Lexik\Bundle\MaintenanceBundle\Drivers\DriverFactory;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\MaintenanceBundle\Drivers\DriverFactory;
+use Oro\Bundle\MaintenanceBundle\Event\MaintenanceEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class represents Maintenance Mode
  */
 class Mode
 {
-    /**
-     * @var DriverFactory
-     */
-    protected $factory;
+    private DriverFactory $factory;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
-    /**
-     * @param DriverFactory            $factory
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(DriverFactory $factory, EventDispatcherInterface $dispatcher)
     {
         $this->factory    = $factory;
@@ -31,10 +22,11 @@ class Mode
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Lexik\Bundle\MaintenanceBundle\Drivers.AbstractDriver::createLock()
+     * @return bool
+     *
+     * @see \Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver::createLock()
      */
-    public function on()
+    public function on(): bool
     {
         $result = $this->factory->getDriver()->lock();
 
@@ -46,10 +38,11 @@ class Mode
     }
 
     /**
-     * (non-PHPdoc)
-     * @see Lexik\Bundle\MaintenanceBundle\Drivers.AbstractDriver::createUnlock()
+     * @return bool
+     *
+     * @see \Oro\Bundle\MaintenanceBundle\Drivers\AbstractDriver::createUnlock()
      */
-    public function off()
+    public function off(): bool
     {
         $result = $this->factory->getDriver()->unlock();
 
@@ -65,7 +58,7 @@ class Mode
      *
      * @return bool
      */
-    public function isOn()
+    public function isOn(): bool
     {
         return $this->factory->getDriver()->decide();
     }
@@ -73,7 +66,7 @@ class Mode
     /**
      * Turn on maintenance mode and register shutdown function to turn it off
      */
-    public function activate()
+    public function activate(): void
     {
         $this->on();
 

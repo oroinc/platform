@@ -1,60 +1,14 @@
 # OroPlatformBundle
 
-OroPlatformBundle provides adjustments to the Symfony framework that enable you to configure the application settings in bundles' YAML configuration files, switch the application to the maintenance mode, and define the global command options, etc.
+OroPlatformBundle provides adjustments to the Symfony framework that enable you to configure the application settings in bundles' YAML configuration files, and define the global command options, etc.
 
 
 ## Table of Contents
- - [Maintenance mode](#maintenance-mode)
  - [Lazy services](#lazy-services)
  - [Add application configuration settings from any bundle](#add-application-configuration-settings-from-any-bundle)
  - [Optional Doctrine listeners](#optional-doctrine-listeners)
  - [Lazy Doctrine listeners](#lazy-doctrine-listeners)
  - [Global options for console commands](#global-options-for-console-commands)
-
-
-## Maintenance mode
-To use maintenance mode functionality bundle provides `oro_platform.maintenance` service.
-
-``` php
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use Symfony\Component\Routing\Annotation\Route;
-
-class AcmeController extends AbstractController
-{
-    public function indexAction()
-    {
-        // check if maintenance mode is on
-        if ($this->get('oro_platform.maintenance')->isOn()) {
-            // ...
-        }
-
-        // ...
-    }
-
-    /**
-     * @Route("/maintenance/{mode}", name="acme_maintenance", requirements={"mode"="on|off"})
-     */
-    public function maintenanceAction($mode = 'on')
-    {
-        // switch maintenance mode on/off
-        if ('on' == $mode) {
-            $this->get('oro_platform.maintenance')->on();
-        } else {
-            $this->get('oro_platform.maintenance')->off();
-        }
-
-        // ...
-    }
-}
-```
-
-In maintenance mode all cron jobs disabled for execution.
-
-Other documentation could be found [here](https://github.com/lexik/LexikMaintenanceBundle/blob/master/Resources/doc/index.md).
-
-**Note**: Ensure that you have read bundle documentation to understand how the installed OroHealthCheckBundle affects
-the default behavior of the maintenance mode.
 
 ## Lazy services
 

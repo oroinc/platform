@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
 
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\EntityExtendBundle\Event\UpdateSchemaEvent;
-use Oro\Bundle\PlatformBundle\Maintenance\Mode as MaintenanceMode;
+use Oro\Bundle\MaintenanceBundle\Maintenance\Mode as MaintenanceMode;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
