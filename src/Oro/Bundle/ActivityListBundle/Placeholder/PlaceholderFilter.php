@@ -31,12 +31,6 @@ class PlaceholderFilter
     /** @var array[] */
     protected $applicableCache = [];
 
-    /**
-     * @param ActivityListChainProvider $activityListChainProvider
-     * @param ManagerRegistry           $doctrine
-     * @param DoctrineHelper            $doctrineHelper
-     * @param ConfigManager             $configManager
-     */
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
         ManagerRegistry $doctrine,
@@ -91,9 +85,6 @@ class PlaceholderFilter
         return $result;
     }
 
-    /**
-     * @param BeforeGroupingChainWidgetEvent $event
-     */
     public function isAllowedButton(BeforeGroupingChainWidgetEvent $event)
     {
         $entity   = $event->getEntity();

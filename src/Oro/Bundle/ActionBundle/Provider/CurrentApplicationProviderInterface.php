@@ -16,8 +16,5 @@ interface CurrentApplicationProviderInterface
      */
     public function isApplicationsValid(array $applications): bool;
 
-    /**
-     * @return string|null
-     */
     public function getCurrentApplication(): ?string;
 }

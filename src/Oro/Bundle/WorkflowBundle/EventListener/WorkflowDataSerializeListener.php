@@ -35,10 +35,6 @@ class WorkflowDataSerializeListener
     /** @var ServiceLink */
     private $serializerLink;
 
-    /**
-     * @param ServiceLink $serializerLink
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ServiceLink $serializerLink, DoctrineHelper $doctrineHelper)
     {
         $this->serializerLink = $serializerLink;
@@ -47,8 +43,6 @@ class WorkflowDataSerializeListener
 
     /**
      * Before flush serializes all WorkflowItem's data
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -68,9 +62,6 @@ class WorkflowDataSerializeListener
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args)
     {
         if ($this->scheduledEntities) {
@@ -83,9 +74,6 @@ class WorkflowDataSerializeListener
 
     /**
      * After WorkflowItem loaded, deserialize WorkflowItem
-     *
-     * @param WorkflowItem       $entity
-     * @param LifecycleEventArgs $args
      */
     public function postLoad(WorkflowItem $entity, LifecycleEventArgs $args)
     {
@@ -94,8 +82,6 @@ class WorkflowDataSerializeListener
 
     /**
      * Serialize data of WorkflowItem
-     *
-     * @param WorkflowItem $workflowItem
      */
     protected function serialize(WorkflowItem $workflowItem)
     {
@@ -112,8 +98,6 @@ class WorkflowDataSerializeListener
 
     /**
      * Deserialize data of WorkflowItem
-     *
-     * @param WorkflowItem $workflowItem
      */
     protected function deserialize(WorkflowItem $workflowItem)
     {

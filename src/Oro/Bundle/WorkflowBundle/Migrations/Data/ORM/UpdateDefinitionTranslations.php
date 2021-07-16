@@ -62,10 +62,6 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         return array_keys($workflowConfiguration);
     }
 
-    /**
-     * @param TranslationProcessor $processor
-     * @param WorkflowDefinition $definition
-     */
     protected function processConfiguration(TranslationProcessor $processor, WorkflowDefinition $definition)
     {
         $sourceConfiguration = array_merge(
@@ -89,10 +85,6 @@ class UpdateDefinitionTranslations extends AbstractFixture implements ContainerA
         $definition->setConfiguration($preparedConfiguration);
     }
 
-    /**
-     * @param WorkflowDefinition $definition
-     * @param array $stepsConfiguration
-     */
     protected function setWorkflowdefinitionSteps(WorkflowDefinition $definition, array $stepsConfiguration)
     {
         foreach ($stepsConfiguration as $name => $stepConfiguration) {

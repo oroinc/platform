@@ -27,11 +27,6 @@ class ExportExtension extends AbstractExtension
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param TranslatorInterface           $translator
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     */
     public function __construct(
         TranslatorInterface $translator,
         AuthorizationCheckerInterface $authorizationChecker,

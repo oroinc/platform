@@ -20,7 +20,7 @@ class AttributeFileType extends ConfigurableType
 
         $resolver->setDefault('visible', function (Options $options, $previousValue) {
             $expression = 'data["file_applications"].isValidForField(className, fieldName)';
-            
+
             return $previousValue ? $previousValue . ' && ' . $expression : '=' . $expression;
         });
     }

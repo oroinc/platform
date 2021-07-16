@@ -18,10 +18,6 @@ class TagVirtualRelationProvider implements VirtualRelationProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param TaggableHelper $taggableHelper
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(TaggableHelper $taggableHelper, DoctrineHelper $doctrineHelper)
     {
         $this->taggableHelper = $taggableHelper;

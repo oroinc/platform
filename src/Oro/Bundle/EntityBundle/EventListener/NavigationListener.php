@@ -26,12 +26,6 @@ class NavigationListener
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param ConfigManager                 $configManager
-     * @param TranslatorInterface           $translator
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -44,9 +38,6 @@ class NavigationListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param ConfigureMenuEvent $event
-     */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
         $children = [];

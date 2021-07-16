@@ -19,10 +19,6 @@ class EntityIdAccessor
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param ObjectPropertyAccessorInterface $propertyAccessor
-     * @param EntityIdTransformerRegistry     $entityIdTransformerRegistry
-     */
     public function __construct(
         ObjectPropertyAccessorInterface $propertyAccessor,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -104,11 +100,6 @@ class EntityIdAccessor
         return $result;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

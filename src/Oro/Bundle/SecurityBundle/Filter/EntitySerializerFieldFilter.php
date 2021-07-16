@@ -29,12 +29,6 @@ class EntitySerializerFieldFilter implements FieldFilterInterface
     /** @var ConfigInterface[] */
     private $securityConfigs = [];
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ConfigManager                 $configManager
-     * @param DoctrineHelper                $doctrineHelper
-     * @param bool                          $isIdFieldProtected
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ConfigManager $configManager,
@@ -72,22 +66,11 @@ class EntitySerializerFieldFilter implements FieldFilterInterface
         return !$securityConfig->get('show_restricted_fields', false, true);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $field
-     *
-     * @return bool
-     */
     private function isIdentifierField(string $entityClass, string $field): bool
     {
         return $this->doctrineHelper->getEntityIdFieldName($entityClass) === $field;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ConfigInterface|null
-     */
     private function getSecurityConfig(string $entityClass): ?ConfigInterface
     {
         if (\array_key_exists($entityClass, $this->securityConfigs)) {

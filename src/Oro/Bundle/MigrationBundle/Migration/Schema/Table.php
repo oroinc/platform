@@ -35,8 +35,6 @@ class Table extends BaseTable
 
     /**
      * Constructor
-     *
-     * @param array $args
      */
     public function __construct(array $args)
     {

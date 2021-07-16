@@ -58,12 +58,6 @@ class OwnerDeletionManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $entityClassName
-     * @param array  $values
-     *
-     * @return Config
-     */
     private function getEntityConfig(string $entityClassName, array $values): Config
     {
         $entityConfigId = new EntityConfigId('entity', $entityClassName);

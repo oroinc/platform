@@ -25,11 +25,6 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
     /** @var AssociationBuilder */
     protected $associationBuilder;
 
-    /**
-     * @param ActivityListChainProvider $listProvider
-     * @param ConfigManager             $configManager
-     * @param AssociationBuilder        $associationBuilder
-     */
     public function __construct(
         ActivityListChainProvider $listProvider,
         ConfigManager $configManager,

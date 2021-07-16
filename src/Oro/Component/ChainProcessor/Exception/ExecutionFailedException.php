@@ -16,12 +16,6 @@ class ExecutionFailedException extends \RuntimeException
     /** @var string|null */
     private $group;
 
-    /**
-     * @param string          $processorId
-     * @param string|null     $action
-     * @param string|null     $group
-     * @param \Exception|null $previous
-     */
     public function __construct(
         string $processorId,
         string $action = null,
@@ -40,25 +34,16 @@ class ExecutionFailedException extends \RuntimeException
         parent::__construct($message, 0, $previous);
     }
 
-    /**
-     * @return string
-     */
     public function getProcessorId(): string
     {
         return $this->processorId;
     }
 
-    /**
-     * @return string|null
-     */
     public function getAction(): ?string
     {
         return $this->action;
     }
 
-    /**
-     * @return string|null
-     */
     public function getGroup(): ?string
     {
         return $this->group;

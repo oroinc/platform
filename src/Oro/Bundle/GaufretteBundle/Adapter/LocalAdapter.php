@@ -11,9 +11,6 @@ use Gaufrette\Adapter\Local as BaseAdapter;
  */
 class LocalAdapter extends BaseAdapter implements ListKeysAware
 {
-    /**
-     * @return string
-     */
     public function getDirectory(): string
     {
         return $this->directory;
@@ -60,11 +57,6 @@ class LocalAdapter extends BaseAdapter implements ListKeysAware
         return ['keys' => $files, 'dirs' => $dirs];
     }
 
-    /**
-     * @param string $prefix
-     *
-     * @return string
-     */
     private function getRootDirectoryForListKeys(string $prefix): string
     {
         $lastSeparatorPos = strrpos($prefix, '/');

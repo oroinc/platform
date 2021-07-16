@@ -93,9 +93,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Finds and processes subselects in given expression.
-     *
-     * @param AST\Node                $conditionalExpression
-     * @param AccessRuleWalkerContext $context
      */
     private function findAndProcessSubselects(AST\Node $conditionalExpression, AccessRuleWalkerContext $context): void
     {
@@ -124,10 +121,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
         }
     }
 
-    /**
-     * @param AST\Node                $AST
-     * @param AccessRuleWalkerContext $context
-     */
     private function processSelect(AST\Node $AST, AccessRuleWalkerContext $context): void
     {
         $fromClause = $AST instanceof AST\SelectStatement ? $AST->fromClause : $AST->subselectFromClause;
@@ -216,10 +209,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Creates the context for subselects.
-     *
-     * @param AccessRuleWalkerContext $context
-     *
-     * @return AccessRuleWalkerContext
      */
     private function getSubselectContext(AccessRuleWalkerContext $context): AccessRuleWalkerContext
     {
@@ -232,14 +221,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Creates new criteria, process access rules with new criteria and returns it.
-     *
-     * @param string                  $entityClass
-     * @param AccessRuleWalkerContext $context
-     * @param string                  $alias
-     * @param bool                    $isRoot
-     * @param array                   $options
-     *
-     * @return Criteria
      */
     private function getEntityAccessRulesCriteria(
         string $entityClass,
@@ -303,8 +284,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Collects existing array query components to array of objects.
-     *
-     * @return QueryComponentCollection
      */
     private function collectQueryComponents(): QueryComponentCollection
     {
@@ -322,8 +301,6 @@ class AccessRuleWalker extends TreeWalkerAdapter
 
     /**
      * Adds new query components to existing query components.
-     *
-     * @param QueryComponentCollection $queryComponents
      */
     private function applyNewQueryComponents(QueryComponentCollection $queryComponents): void
     {

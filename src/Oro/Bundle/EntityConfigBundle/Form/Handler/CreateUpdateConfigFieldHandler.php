@@ -29,12 +29,6 @@ class CreateUpdateConfigFieldHandler
     /** @var ConfigHelper */
     protected $configHelper;
 
-    /**
-     * @param ConfigHelperHandler $configHelperHandler
-     * @param ConfigManager $configManager
-     * @param ConfigHelper $configHelper
-     * @param FieldSessionStorage $sessionStorage
-     */
     public function __construct(
         ConfigHelperHandler $configHelperHandler,
         ConfigManager $configManager,
@@ -149,13 +143,6 @@ class CreateUpdateConfigFieldHandler
         );
     }
 
-    /**
-     * @param string $entityClassName
-     * @param string $fieldName
-     * @param string $fieldType
-     * @param array $fieldOptions
-     * @return FieldConfigModel
-     */
     protected function createAndUpdateFieldModel(
         string $entityClassName,
         string $fieldName,

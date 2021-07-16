@@ -803,11 +803,6 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    /**
-     * @param string $expectedQuery
-     * @param Query $dqlQuery
-     * @param array $contextOptions
-     */
     private function assertResultQueryEquals(string $expectedQuery, Query $dqlQuery, array $contextOptions = []): void
     {
         $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);

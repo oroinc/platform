@@ -21,9 +21,6 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
         $this->position = 0;
     }
 
-    /**
-     * @param SearchQueryExprInterface $item
-     */
     public function add(SearchQueryExprInterface $item)
     {
         $this->items[] = $item;

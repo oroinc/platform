@@ -77,9 +77,6 @@ class OperationRegistryTest extends WebTestCase
         return $config['operations'] ?? [];
     }
 
-    /**
-     * @param array $operations
-     */
     private function setOperationsConfig(array $operations)
     {
         $config = $this->configProvider->getConfiguration();

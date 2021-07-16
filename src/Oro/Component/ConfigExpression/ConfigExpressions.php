@@ -81,9 +81,6 @@ class ConfigExpressions
         return $this->assembler;
     }
 
-    /**
-     * @param AssemblerInterface $assembler
-     */
     public function setAssembler(AssemblerInterface $assembler)
     {
         $this->assembler = $assembler;
@@ -102,9 +99,6 @@ class ConfigExpressions
         return $this->factory;
     }
 
-    /**
-     * @param ExpressionFactoryInterface $factory
-     */
     public function setFactory(ExpressionFactoryInterface $factory)
     {
         $this->factory = $factory;
@@ -122,9 +116,6 @@ class ConfigExpressions
         return $this->contextAccessor;
     }
 
-    /**
-     * @param ContextAccessorInterface $contextAccessor
-     */
     public function setContextAccessor(ContextAccessorInterface $contextAccessor)
     {
         $this->contextAccessor = $contextAccessor;
@@ -132,8 +123,6 @@ class ConfigExpressions
 
     /**
      * Registers new extension.
-     *
-     * @param ExtensionInterface $extension
      */
     public function addExtension(ExtensionInterface $extension)
     {

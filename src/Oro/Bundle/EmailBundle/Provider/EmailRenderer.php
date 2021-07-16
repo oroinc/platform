@@ -55,10 +55,6 @@ class EmailRenderer extends TemplateRenderer
     /**
      * Compiles the given email template for the preview purposes.
      *
-     * @param EmailTemplateInterface $template
-     *
-     * @return string
-     *
      * @throws \Twig\Error\Error if the given template cannot be compiled
      */
     public function compilePreview(EmailTemplateInterface $template): string

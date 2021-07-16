@@ -44,8 +44,6 @@ class CumulativeResource implements ResourceInterface, \Serializable, SelfChecki
 
     /**
      * Gets the unique name of a configuration resource.
-     *
-     * @return string
      */
     public function getResource(): string
     {

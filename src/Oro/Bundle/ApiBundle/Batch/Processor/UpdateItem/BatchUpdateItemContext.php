@@ -42,8 +42,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets FQCN of an entity.
-     *
-     * @return string|null
      */
     public function getClassName(): ?string
     {
@@ -52,8 +50,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets FQCN of an entity.
-     *
-     * @param string|null $className
      */
     public function setClassName(string $className = null): void
     {
@@ -86,8 +82,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the summary statistics of this batch operation.
-     *
-     * @return BatchSummary|null
      */
     public function getSummary(): ?BatchSummary
     {
@@ -96,8 +90,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the summary statistics of this batch operation.
-     *
-     * @param BatchSummary|null $summary
      */
     public function setSummary(?BatchSummary $summary): void
     {
@@ -127,8 +119,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the request data.
-     *
-     * @return array|null
      */
     public function getRequestData(): ?array
     {
@@ -137,8 +127,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the request data.
-     *
-     * @param array|null $requestData
      */
     public function setRequestData(array $requestData = null): void
     {
@@ -147,8 +135,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the name of the target action.
-     *
-     * @return string|null
      */
     public function getTargetAction(): ?string
     {
@@ -157,8 +143,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the name of the target action.
-     *
-     * @param string|null $action
      */
     public function setTargetAction(string $action = null): void
     {
@@ -171,8 +155,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the processor responsible to process the request data.
-     *
-     * @return ActionProcessorInterface|null
      */
     public function getTargetProcessor(): ?ActionProcessorInterface
     {
@@ -181,8 +163,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the processor responsible to process the request data.
-     *
-     * @param ActionProcessorInterface|null $processor
      */
     public function setTargetProcessor(ActionProcessorInterface $processor = null): void
     {
@@ -191,8 +171,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the context which should be used when processing the request data.
-     *
-     * @return Context|null
      */
     public function getTargetContext(): ?Context
     {
@@ -201,8 +179,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the context which should be used when processing the request data.
-     *
-     * @param Context|null $context
      */
     public function setTargetContext(Context $context = null): void
     {
@@ -213,8 +189,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
      * Gets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @return ParameterBagInterface
      */
     public function getSharedData(): ParameterBagInterface
     {
@@ -225,8 +199,6 @@ class BatchUpdateItemContext extends ByStepNormalizeResultContext
      * Sets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @param ParameterBagInterface $sharedData
      */
     public function setSharedData(ParameterBagInterface $sharedData): void
     {

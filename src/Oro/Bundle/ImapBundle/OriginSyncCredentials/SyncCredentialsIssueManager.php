@@ -23,10 +23,6 @@ class SyncCredentialsIssueManager
     /** @var NotificationSenderInterface[] */
     private $userNotificationSenders = [];
 
-    /**
-     * @param WrongCredentialsOriginsDriverInterface $credentialsDriver
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         WrongCredentialsOriginsDriverInterface $credentialsDriver,
         AuthorizationCheckerInterface $authorizationChecker
@@ -37,8 +33,6 @@ class SyncCredentialsIssueManager
 
     /**
      * Adds the notification channel.
-     *
-     * @param NotificationSenderInterface $notificationSender
      */
     public function addNotificationSender(NotificationSenderInterface $notificationSender)
     {
@@ -47,8 +41,6 @@ class SyncCredentialsIssueManager
 
     /**
      * Adds the notification channel.
-     *
-     * @param NotificationSenderInterface $notificationSender
      */
     public function addUserNotificationSender(NotificationSenderInterface $notificationSender)
     {
@@ -57,8 +49,6 @@ class SyncCredentialsIssueManager
 
     /**
      * Stores information about wrong credential sync email box.
-     *
-     * @param UserEmailOrigin $emailOrigin
      */
     public function addInvalidOrigin(UserEmailOrigin $emailOrigin)
     {
@@ -95,8 +85,6 @@ class SyncCredentialsIssueManager
     /**
      * Sends the messages to the notification channels about the given user's wrong credential sync email boxes
      * and deletes the information about wrong boxes from the storage to avoid notification duplications.
-     *
-     * @param User $user
      */
     public function processInvalidOriginsForUser(User $user)
     {
@@ -108,8 +96,6 @@ class SyncCredentialsIssueManager
 
     /**
      * Removes the origin information. This method should be called after success sync of the email origin.
-     *
-     * @param UserEmailOrigin $emailOrigin
      */
     public function removeOriginFromTheFailed(UserEmailOrigin $emailOrigin)
     {
@@ -118,8 +104,6 @@ class SyncCredentialsIssueManager
 
     /**
      * Sends the messages to user notification channels
-     *
-     * @param array $invalidOrigins
      */
     private function processUserOrigins(array $invalidOrigins)
     {

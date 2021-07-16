@@ -18,7 +18,6 @@ class CreateNoteActionTest extends WebTestCase
 
     /**
      * @dataProvider argumentTypes
-     * @param array $arguments
      */
     public function testCreateAction(array $arguments)
     {

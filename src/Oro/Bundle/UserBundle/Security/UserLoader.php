@@ -19,10 +19,6 @@ class UserLoader implements UserLoaderInterface
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param ConfigManager   $configManager
-     */
     public function __construct(ManagerRegistry $doctrine, ConfigManager $configManager)
     {
         $this->doctrine = $doctrine;
@@ -69,9 +65,6 @@ class UserLoader implements UserLoaderInterface
         );
     }
 
-    /**
-     * @return UserRepository
-     */
     private function getRepository(): UserRepository
     {
         return $this->doctrine

@@ -25,7 +25,6 @@ class WorkflowRestrictionIdentityTest extends \PHPUnit\Framework\TestCase
         unset($this->identity);
     }
 
-
     public function testGetId()
     {
         $this->assertNull($this->identity->getId());

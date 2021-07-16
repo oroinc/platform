@@ -46,10 +46,6 @@ final class DataType
 
     /**
      * Checks whether the field represents an array.
-     *
-     * @param string|null $dataType
-     *
-     * @return bool
      */
     public static function isArray(?string $dataType): bool
     {
@@ -63,10 +59,6 @@ final class DataType
 
     /**
      * Checks whether the field represents a nested object.
-     *
-     * @param string|null $dataType
-     *
-     * @return bool
      */
     public static function isNestedObject(?string $dataType): bool
     {
@@ -75,10 +67,6 @@ final class DataType
 
     /**
      * Checks whether the field represents a nested association.
-     *
-     * @param string|null $dataType
-     *
-     * @return bool
      */
     public static function isNestedAssociation(?string $dataType): bool
     {
@@ -99,10 +87,6 @@ final class DataType
      * Also "nestedObject" data-type, that is used to group several fields in one object,
      * is classified as an association that should be represented as a field because the behaviour
      * of it is the same.
-     *
-     * @param string|null $dataType
-     *
-     * @return bool
      */
     public static function isAssociationAsField(?string $dataType): bool
     {
@@ -117,10 +101,6 @@ final class DataType
     /**
      * Checks whether the given data-type represents a multi-target association.
      * @link https://doc.oroinc.com/backend/entities/extend-entities/multi-target-associations
-     *
-     * @param string|null $dataType
-     *
-     * @return bool
      */
     public static function isExtendedAssociation(?string $dataType): bool
     {

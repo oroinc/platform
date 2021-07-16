@@ -44,11 +44,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
      */
     private $options;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param FlashBag $flashBag
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         FlashBag $flashBag,
@@ -103,9 +98,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         $this->options = $resolver->resolve($options);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     private function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('events');
@@ -131,9 +123,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
         return $this->optionsResolver;
     }
 
-    /**
-     * @param ExtendableConditionEvent $event
-     */
     protected function processErrors(ExtendableConditionEvent $event)
     {
         $errors = [];

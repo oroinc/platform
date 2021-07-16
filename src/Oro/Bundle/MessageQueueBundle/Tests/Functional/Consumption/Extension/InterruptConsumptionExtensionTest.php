@@ -72,9 +72,6 @@ class InterruptConsumptionExtensionTest extends WebTestCase
         $this->assertInterruptionMessage('Consuming interrupted, reason: The cache has changed.');
     }
 
-    /**
-     * @param string $expectedMessage
-     */
     private function assertInterruptionMessage(string $expectedMessage): void
     {
         $this->assertTrue($this->logger->hasRecord($expectedMessage, 'warning'));

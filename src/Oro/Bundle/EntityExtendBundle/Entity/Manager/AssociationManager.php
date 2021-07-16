@@ -38,13 +38,6 @@ class AssociationManager
     /** @var FeatureChecker */
     protected $featureChecker;
 
-    /**
-     * @param ConfigManager      $configManager
-     * @param ServiceLink        $aclHelperLink
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param FeatureChecker     $featureChecker
-     */
     public function __construct(
         ConfigManager $configManager,
         ServiceLink $aclHelperLink,

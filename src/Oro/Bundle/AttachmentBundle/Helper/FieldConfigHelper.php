@@ -14,28 +14,16 @@ class FieldConfigHelper
     const MULTI_FILE_TYPE = 'multiFile';
     const MULTI_IMAGE_TYPE = 'multiImage';
 
-    /**
-     * @param ConfigIdInterface $fieldConfigId
-     * @return bool
-     */
     public static function isImageField(ConfigIdInterface $fieldConfigId): bool
     {
         return in_array($fieldConfigId->getFieldType(), [self::IMAGE_TYPE, self::MULTI_IMAGE_TYPE], true);
     }
 
-    /**
-     * @param ConfigIdInterface $fieldConfigId
-     * @return bool
-     */
     public static function isFileField(ConfigIdInterface $fieldConfigId): bool
     {
         return in_array($fieldConfigId->getFieldType(), [self::FILE_TYPE, self::MULTI_FILE_TYPE], true);
     }
 
-    /**
-     * @param ConfigIdInterface $fieldConfigId
-     * @return bool
-     */
     public static function isMultiField(ConfigIdInterface $fieldConfigId): bool
     {
         return in_array($fieldConfigId->getFieldType(), [self::MULTI_FILE_TYPE, self::MULTI_IMAGE_TYPE], true);

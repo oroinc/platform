@@ -11,10 +11,6 @@ final class QueryDefinitionUtil
 {
     /**
      * Returns the JSON representation of the given query definition.
-     *
-     * @param array $definition
-     *
-     * @return string
      */
     public static function encodeDefinition(array $definition): string
     {
@@ -23,10 +19,6 @@ final class QueryDefinitionUtil
 
     /**
      * Decodes the JSON representation of the given query definition.
-     *
-     * @param string|null $encodedDefinition
-     *
-     * @return array
      *
      * @throw InvalidConfigurationException if the JSON representation is not valid
      */
@@ -51,10 +43,6 @@ final class QueryDefinitionUtil
      * Decodes the JSON representation of the given query definition.
      * Unlike {@see decodeDefinition()}, this method returns empty array if the given encoded definition
      * contains an invalid JSON representation or it is NULL.
-     *
-     * @param string|null $encodedDefinition
-     *
-     * @return array
      */
     public static function safeDecodeDefinition(?string $encodedDefinition): array
     {
@@ -71,10 +59,6 @@ final class QueryDefinitionUtil
 
     /**
      * Returns a string that unique identify the given column.
-     *
-     * @param array $column
-     *
-     * @return string
      */
     public static function buildColumnIdentifier(array $column): string
     {

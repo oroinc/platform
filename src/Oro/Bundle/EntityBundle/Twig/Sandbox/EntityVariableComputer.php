@@ -22,11 +22,6 @@ class EntityVariableComputer
     /** @var EntityDataAccessor */
     private $entityDataAccessor;
 
-    /**
-     * @param ConfigProvider            $configProvider
-     * @param VariableProcessorRegistry $variableProcessors
-     * @param EntityDataAccessor        $entityDataAccessor
-     */
     public function __construct(
         ConfigProvider $configProvider,
         VariableProcessorRegistry $variableProcessors,

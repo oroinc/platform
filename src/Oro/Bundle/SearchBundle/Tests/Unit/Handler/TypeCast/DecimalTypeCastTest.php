@@ -27,9 +27,6 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
         $this->assertIsFloat($this->handler->castValue($value));
     }
 
-    /**
-     * @return array
-     */
     public function validTypesDataProvider(): array
     {
         return [
@@ -46,8 +43,6 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidTypesDataProvider
-     *
-     * @param $value
      */
     public function testCastValueWithUnsupportedValue($value): void
     {
@@ -56,9 +51,6 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
         $this->handler->castValue($value);
     }
 
-    /**
-     * @return array
-     */
     public function invalidTypesDataProvider(): array
     {
         return [

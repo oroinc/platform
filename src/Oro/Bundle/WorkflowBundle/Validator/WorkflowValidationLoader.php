@@ -19,9 +19,6 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
     /** @var ContainerInterface */
     private $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -57,11 +54,6 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
         return true;
     }
 
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
     private function isWorkflowEntityConstraintRequired(string $className): bool
     {
         return
@@ -69,25 +61,16 @@ class WorkflowValidationLoader extends AbstractLoader implements ServiceSubscrib
             || $this->getRestrictionManager()->hasEntityClassRestrictions($className, false);
     }
 
-    /**
-     * @return DatabaseChecker
-     */
     private function getDatabaseChecker(): DatabaseChecker
     {
         return $this->container->get('oro_workflow.database_checker');
     }
 
-    /**
-     * @return WorkflowPermissionRegistry
-     */
     private function getPermissionRegistry(): WorkflowPermissionRegistry
     {
         return $this->container->get('oro_workflow.permission_registry');
     }
 
-    /**
-     * @return RestrictionManager
-     */
     private function getRestrictionManager(): RestrictionManager
     {
         return $this->container->get('oro_workflow.restriction.manager');

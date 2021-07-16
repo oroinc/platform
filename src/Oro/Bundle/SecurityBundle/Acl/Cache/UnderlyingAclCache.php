@@ -44,15 +44,13 @@ class UnderlyingAclCache
 
     /**
      * Caches underlying OID
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function cacheUnderlying(ObjectIdentityInterface $oid)
     {
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
-        
+
         if (!array_key_exists($type, $this->entityBatches)) {
             $this->entityBatches[$type] = [];
         }
@@ -91,7 +89,7 @@ class UnderlyingAclCache
         $batchNumber = $this->getBatchNumber($oid);
         $batchKey = $this->getBatchCacheKey($oid);
         $type = $oid->getType();
-        
+
         // check if batches info loaded and load it
         if (!array_key_exists($type, $this->entityBatches)) {
             $batch = $this->cache->fetch($type);
@@ -123,8 +121,6 @@ class UnderlyingAclCache
 
     /**
      * Removes OID info from the cache
-     *
-     * @param ObjectIdentityInterface $oid
      */
     public function evictFromCache(ObjectIdentityInterface $oid)
     {

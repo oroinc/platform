@@ -13,13 +13,7 @@ interface LoginAttemptsHandlerInterface
     const SUCCESSFUL_LOGIN_MESSAGE = 'Successful login';
     const UNSUCCESSFUL_LOGIN_MESSAGE = 'Unsuccessful login';
 
-    /**
-     * @param AuthenticationFailureEvent $event
-     */
     public function onAuthenticationFailure(AuthenticationFailureEvent $event);
 
-    /**
-     * @param  InteractiveLoginEvent $event
-     */
     public function onInteractiveLogin(InteractiveLoginEvent $event);
 }

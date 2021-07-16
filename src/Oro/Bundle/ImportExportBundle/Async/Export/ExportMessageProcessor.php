@@ -21,17 +21,11 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     protected $doctrineHelper;
 
-    /**
-     * @param ExportHandler $exportHandler
-     */
     public function setExportHandler(ExportHandler $exportHandler)
     {
         $this->exportHandler = $exportHandler;
     }
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function setDoctrineHelper(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

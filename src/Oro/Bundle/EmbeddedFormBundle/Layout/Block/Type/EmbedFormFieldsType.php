@@ -31,9 +31,6 @@ class EmbedFormFieldsType extends AbstractFormType
     /** @var FormLayoutBuilderInterface */
     protected $formLayoutBuilder;
 
-    /**
-     * @param FormLayoutBuilderInterface $formLayoutBuilder
-     */
     public function __construct(FormLayoutBuilderInterface $formLayoutBuilder)
     {
         $this->formLayoutBuilder = $formLayoutBuilder;
@@ -84,7 +81,6 @@ class EmbedFormFieldsType extends AbstractFormType
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
         $this->formLayoutBuilder->build($formAccessor, $builder, $options);
     }
-
 
     /**
      * {@inheritdoc}

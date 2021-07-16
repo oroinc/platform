@@ -58,7 +58,6 @@ class RegionRepository extends EntityRepository implements IdentityAwareTranslat
         return array_column($result, 'combinedCode');
     }
 
-
     /**
      * {@inheritdoc}
      */

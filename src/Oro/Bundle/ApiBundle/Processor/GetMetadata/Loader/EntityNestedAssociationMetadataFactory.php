@@ -19,10 +19,6 @@ class EntityNestedAssociationMetadataFactory
     /** @var EntityMetadataFactory */
     protected $entityMetadataFactory;
 
-    /**
-     * @param NestedAssociationMetadataHelper $nestedAssociationMetadataHelper
-     * @param EntityMetadataFactory           $entityMetadataFactory
-     */
     public function __construct(
         NestedAssociationMetadataHelper $nestedAssociationMetadataHelper,
         EntityMetadataFactory $entityMetadataFactory

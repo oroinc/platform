@@ -290,17 +290,11 @@ class ResetController extends AbstractController
         return $responseData;
     }
 
-    /**
-     * @return EntityRoutingHelper
-     */
     protected function getEntityRoutingHelper(): EntityRoutingHelper
     {
         return $this->get(EntityRoutingHelper::class);
     }
 
-    /**
-     * @return UserManager
-     */
     protected function getUserManager(): UserManager
     {
         return $this->get(UserManager::class);

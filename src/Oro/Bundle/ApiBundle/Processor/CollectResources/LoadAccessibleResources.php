@@ -15,9 +15,6 @@ class LoadAccessibleResources implements ProcessorInterface
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
-    /**
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     */
     public function __construct(EntityOverrideProviderRegistry $entityOverrideProviderRegistry)
     {
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;

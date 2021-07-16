@@ -102,9 +102,6 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function onKernelRequestDataProvider(): array
     {
         return [
@@ -188,10 +185,6 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $listener->onConsoleCommand($event);
     }
 
-    /**
-     * @param Request $request
-     * @return RequestEvent
-     */
     private function createRequestEvent(Request $request): RequestEvent
     {
         $event = $this->createMock(RequestEvent::class);

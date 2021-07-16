@@ -15,9 +15,6 @@ class SelectedItemsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider notEmptyDataProvider
-     *
-     * @param array $values
-     * @param bool $inset
      */
     public function testIsEmptyWhenNotEmpty(array $values, bool $inset)
     {

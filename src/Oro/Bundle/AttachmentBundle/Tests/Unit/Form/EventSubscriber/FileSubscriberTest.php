@@ -59,11 +59,6 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($formEvent);
     }
 
-    /**
-     * @param File|null $data
-     *
-     * @return FormEvent
-     */
     private function mockFormEvent(?File $data): FormEvent
     {
         $formEvent = $this->createMock(FormEvent::class);

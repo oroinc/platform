@@ -21,11 +21,6 @@ class CreateNoteAction extends AbstractAction
     /** @var array|null */
     protected $options;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param ActivityManager $activityManager
-     * @param ContextAccessor $contextAccessor
-     */
     public function __construct(
         ManagerRegistry $registry,
         ActivityManager $activityManager,
@@ -95,9 +90,6 @@ class CreateNoteAction extends AbstractAction
         }
     }
 
-    /**
-     * @return ObjectManager
-     */
     private function getEntityManager(): ObjectManager
     {
         return $this->registry->getManagerForClass(Note::class);

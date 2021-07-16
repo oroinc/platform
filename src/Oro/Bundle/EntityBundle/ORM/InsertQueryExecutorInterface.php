@@ -12,12 +12,6 @@ use Doctrine\ORM\QueryBuilder;
 interface InsertQueryExecutorInterface
 {
     /**
-     * @param string       $className
-     * @param array        $fields
-     * @param QueryBuilder $selectQueryBuilder
-     *
-     * @return int
-     *
      * @throws QueryException
      * @throws DBALException
      */

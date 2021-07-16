@@ -42,11 +42,6 @@ class ResourcesProvider implements ResetInterface
     /** @var array [request cache key => [entity class, ...], ...] */
     private $resourcesWithoutIdentifier = [];
 
-    /**
-     * @param ActionProcessorInterface         $processor
-     * @param ResourcesCache                   $resourcesCache
-     * @param ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader
-     */
     public function __construct(
         ActionProcessorInterface $processor,
         ResourcesCache $resourcesCache,
@@ -265,11 +260,6 @@ class ResourcesProvider implements ResetInterface
         $this->resourcesWithoutIdentifier = [];
     }
 
-    /**
-     * @param string $cacheKey
-     *
-     * @return bool
-     */
     private function hasResourcesInMemoryCache(string $cacheKey): bool
     {
         return \array_key_exists($cacheKey, $this->resources);
@@ -427,15 +417,6 @@ class ResourcesProvider implements ResetInterface
         return $resources;
     }
 
-    /**
-     * @param ApiResource $resource
-     * @param array       $actionsConfig
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return bool
-     */
     private function isExcludeUpdateList(
         ApiResource $resource,
         array $actionsConfig,
@@ -524,12 +505,6 @@ class ResourcesProvider implements ResetInterface
         return $resourcesWithoutId;
     }
 
-    /**
-     * @param string      $version
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     private function getCacheKey(string $version, RequestType $requestType): string
     {
         return $version . (string)$requestType;

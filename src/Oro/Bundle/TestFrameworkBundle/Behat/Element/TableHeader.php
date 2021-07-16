@@ -71,7 +71,6 @@ class TableHeader extends Element
 
     /**
      * Total columns number, NOT including action & mass action columns
-     * @return int
      */
     public function getColumnsCount(): int
     {

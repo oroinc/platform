@@ -60,9 +60,6 @@ class EntityStub
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
     public function getNewCollection(): ArrayCollection
     {
         return $this->newCollection;
@@ -78,9 +75,6 @@ class EntityStub
         return $this;
     }
 
-    /**
-     * @return PersistentCollection
-     */
     public function getDirtyPersistentCollection(): PersistentCollection
     {
         return $this->dirtyPersistentCollection;
@@ -96,9 +90,6 @@ class EntityStub
         return $this;
     }
 
-    /**
-     * @return PersistentCollection
-     */
     public function getInitializedPersistentCollection(): PersistentCollection
     {
         return $this->initializedPersistentCollection;

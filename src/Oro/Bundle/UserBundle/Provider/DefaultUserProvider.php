@@ -15,10 +15,6 @@ class DefaultUserProvider
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
     {
         $this->configManager = $configManager;

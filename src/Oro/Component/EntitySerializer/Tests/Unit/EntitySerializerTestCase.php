@@ -123,9 +123,6 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
-    /**
-     * @param array $array
-     */
     protected function sortByKeyRecursive(array &$array)
     {
         ksort($array);

@@ -90,8 +90,6 @@ class Manufacturer
 
     /**
      * Remove products
-     *
-     * @param Product $product
      */
     public function removeProduct(Product $product)
     {

@@ -67,8 +67,6 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
 
     /**
      * Removes a meta property.
-     *
-     * @param string $name
      */
     public function removeMetaProperty(string $name): void
     {
@@ -107,9 +105,6 @@ class MetaPropertiesConfigExtra implements ConfigExtraInterface
         return 'meta_properties:' . implode(',', array_keys($this->metaProperties));
     }
 
-    /**
-     * @param string $name
-     */
     private function assertMetaPropertyExists(string $name): void
     {
         if (!\array_key_exists($name, $this->metaProperties)) {

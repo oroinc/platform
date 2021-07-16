@@ -77,10 +77,6 @@ class ActionsConfigLoader extends AbstractConfigLoader
         return $action;
     }
 
-    /**
-     * @param ActionConfig $action
-     * @param array        $statusCodes
-     */
     protected function loadStatusCodes(ActionConfig $action, array $statusCodes)
     {
         if (!empty($statusCodes)) {
@@ -91,10 +87,6 @@ class ActionsConfigLoader extends AbstractConfigLoader
         }
     }
 
-    /**
-     * @param ActionConfig $action
-     * @param array|null   $fields
-     */
     protected function loadFields(ActionConfig $action, array $fields = null)
     {
         if (!empty($fields)) {

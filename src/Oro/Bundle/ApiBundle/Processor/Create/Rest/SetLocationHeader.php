@@ -32,12 +32,6 @@ class SetLocationHeader implements ProcessorInterface
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
 
-    /**
-     * @param RestRoutesRegistry          $routesRegistry
-     * @param UrlGeneratorInterface       $urlGenerator
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         UrlGeneratorInterface $urlGenerator,
@@ -91,11 +85,6 @@ class SetLocationHeader implements ProcessorInterface
         $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $location);
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);

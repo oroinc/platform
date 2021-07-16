@@ -29,9 +29,6 @@ class FeatureCSChecker implements HealthCheckerInterface
         ];
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function checkFeatureName(BeforeFeatureTested $event)
     {
         $featureTitle = $event->getFeature()->getTitle();
@@ -70,9 +67,6 @@ class FeatureCSChecker implements HealthCheckerInterface
         return 'cs';
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function checkFeatureDescription(BeforeFeatureTested $event)
     {
         if (!$event->getFeature()->getDescription()) {

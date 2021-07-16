@@ -37,15 +37,8 @@ abstract class AbstractDescriptor implements DescriptorInterface
         }
     }
 
-    /**
-     * @param array $options
-     */
     abstract protected function describeDefaults(array $options): void;
 
-    /**
-     * @param BlockTypeInterface $blockType
-     * @param array              $options
-     */
     abstract protected function describeBlockType(BlockTypeInterface $blockType, array $options = []): void;
 
     /**

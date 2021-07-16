@@ -25,9 +25,6 @@ class TestRouteOptionsResolver implements RouteOptionsResolverInterface
         $this->addTestRoutes($routes);
     }
 
-    /**
-     * @param RouteCollectionAccessor $routes
-     */
     private function addTestRoutes(RouteCollectionAccessor $routes)
     {
         $routes->append(

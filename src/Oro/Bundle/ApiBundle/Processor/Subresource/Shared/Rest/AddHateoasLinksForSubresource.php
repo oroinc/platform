@@ -27,11 +27,6 @@ class AddHateoasLinksForSubresource implements ProcessorInterface
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
-    /**
-     * @param RestRoutesRegistry    $routesRegistry
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param SubresourcesProvider  $subresourcesProvider
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         UrlGeneratorInterface $urlGenerator,

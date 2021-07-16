@@ -32,10 +32,6 @@ class RelatedEntityStateHelper
      */
     private $collectionSnapshotItems = [];
 
-    /**
-     * @param FieldHelper $fieldHelper
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         FieldHelper $fieldHelper,
         DoctrineHelper $doctrineHelper

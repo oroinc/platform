@@ -18,9 +18,6 @@ class FieldConfigGridListener extends AbstractConfigGridListener
      */
     protected $parameters;
 
-    /**
-     * @param BuildAfter $event
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $datagrid = $event->getDatagrid();
@@ -32,9 +29,6 @@ class FieldConfigGridListener extends AbstractConfigGridListener
         }
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         // false flag used to place dynamic columns to the end of grid

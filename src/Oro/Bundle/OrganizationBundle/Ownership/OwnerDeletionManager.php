@@ -31,13 +31,6 @@ class OwnerDeletionManager
     /** @var ObjectIdAccessor */
     private $objectIdAccessor;
 
-    /**
-     * @param ContainerInterface                 $checkerContainer
-     * @param ConfigProvider                     $ownershipProvider
-     * @param OwnershipMetadataProviderInterface $ownershipMetadata
-     * @param DoctrineHelper                     $doctrineHelper
-     * @param ObjectIdAccessor                   $objectIdAccessor
-     */
     public function __construct(
         ContainerInterface $checkerContainer,
         ConfigProvider $ownershipProvider,
@@ -104,10 +97,6 @@ class OwnerDeletionManager
 
     /**
      * Checks if there is at least one entity in the given organization.
-     *
-     * @param Organization $organization
-     *
-     * @return bool
      */
     private function hasOrganizationAssignments(Organization $organization): bool
     {
@@ -143,14 +132,6 @@ class OwnerDeletionManager
         return false;
     }
 
-    /**
-     * @param int                    $organizationId
-     * @param string                 $entityClass
-     * @param string                 $organizationFieldName
-     * @param EntityManagerInterface $em
-     *
-     * @return bool
-     */
     private function hasAssignmentsForOrganization(
         int $organizationId,
         string $entityClass,
@@ -170,11 +151,6 @@ class OwnerDeletionManager
         return !empty($findResult);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return OwnerAssignmentCheckerInterface
-     */
     private function getAssignmentChecker(string $entityClass): OwnerAssignmentCheckerInterface
     {
         if ($this->checkerContainer->has($entityClass)) {

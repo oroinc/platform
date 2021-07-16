@@ -65,14 +65,6 @@ class EntityFallbackResolver
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param ContainerInterface $fallbackProviders
-     * @param ConfigProvider $entityConfigProvider
-     * @param SystemConfigurationFormProvider $formProvider
-     * @param ConfigManager $configManager
-     * @param ConfigBag $configBag
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(
         ContainerInterface $fallbackProviders,
         ConfigProvider $entityConfigProvider,

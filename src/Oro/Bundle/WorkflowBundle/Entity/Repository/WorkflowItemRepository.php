@@ -142,9 +142,6 @@ class WorkflowItemRepository extends EntityRepository
         }
     }
 
-    /**
-     * @param array $workflowItemIds
-     */
     protected function clearWorkflowItems(array $workflowItemIds)
     {
         if (empty($workflowItemIds)) {

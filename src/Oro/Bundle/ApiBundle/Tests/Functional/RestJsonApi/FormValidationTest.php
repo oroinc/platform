@@ -54,11 +54,6 @@ class FormValidationTest extends RestJsonApiTestCase
         });
     }
 
-    /**
-     * @param array                      $error
-     * @param string                     $entityClass
-     * @param OwnershipMetadataInterface $ownershipMetadata
-     */
     private function assertOwnershipErrors(
         array $error,
         string $entityClass,
@@ -77,11 +72,6 @@ class FormValidationTest extends RestJsonApiTestCase
         $this->assertOwnershipError($error, $metadata, $ownershipMetadata->getOrganizationFieldName());
     }
 
-    /**
-     * @param array          $error
-     * @param EntityMetadata $metadata
-     * @param string|null    $fieldName
-     */
     private function assertOwnershipError(array $error, EntityMetadata $metadata, ?string $fieldName)
     {
         if (!$fieldName) {

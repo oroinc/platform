@@ -19,10 +19,6 @@ class TestConfigBag implements ConfigBagInterface
     /** @var bool */
     private $hasChanges = false;
 
-    /**
-     * @param ConfigBagInterface $configBag
-     * @param EntityConfigMerger $entityConfigMerger
-     */
     public function __construct(
         ConfigBagInterface $configBag,
         EntityConfigMerger $entityConfigMerger

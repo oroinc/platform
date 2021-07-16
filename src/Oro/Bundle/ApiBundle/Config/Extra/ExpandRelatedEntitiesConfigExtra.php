@@ -47,10 +47,6 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
 
     /**
      * Checks if it is requested to expand an entity by the given path.
-     *
-     * @param string $path
-     *
-     * @return bool
      */
     public function isExpandRequested(string $path): bool
     {
@@ -93,9 +89,6 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
         return 'expand:' . implode(',', $this->expandedEntities);
     }
 
-    /**
-     * @return array
-     */
     private function buildMap(): array
     {
         $map = [];

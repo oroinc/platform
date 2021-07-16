@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  */
 class Status
 {
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id")

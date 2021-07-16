@@ -45,9 +45,6 @@ class ConfigurationPass implements CompilerPassInterface
         $this->servicesForServiceLocator = [];
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function registerRenderers(ContainerBuilder $container)
     {
         $factoryBuilderDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
@@ -59,9 +56,6 @@ class ConfigurationPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function registerThemeConfigExtensions(ContainerBuilder $container)
     {
         $themeConfigurationDef = $container->getDefinition(self::THEME_CONFIG_SERVICE);
@@ -72,8 +66,6 @@ class ConfigurationPass implements CompilerPassInterface
 
     /**
      * Registers block types, block type extensions and layout updates
-     *
-     * @param ContainerBuilder $container
      */
     private function configureLayoutExtension(ContainerBuilder $container)
     {
@@ -225,9 +217,6 @@ class ConfigurationPass implements CompilerPassInterface
         return $dataProviders;
     }
 
-    /**
-     * @param string $serviceId
-     */
     private function addServiceToServiceLocator(string $serviceId): void
     {
         $this->servicesForServiceLocator[$serviceId] = new Reference($serviceId);

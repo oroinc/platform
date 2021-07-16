@@ -34,8 +34,6 @@ class UpdateExtendConfigPostUpMigrationListener
 
     /**
      * POST UP event handler
-     *
-     * @param PostMigrationEvent $event
      */
     public function onPostUp(PostMigrationEvent $event)
     {

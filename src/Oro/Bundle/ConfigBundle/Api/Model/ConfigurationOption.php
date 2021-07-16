@@ -104,9 +104,6 @@ class ConfigurationOption
         return $this->createdAt;
     }
 
-    /**
-     * @param \DateTime|null $createdAt
-     */
     public function setCreatedAt(\DateTime $createdAt = null)
     {
         $this->createdAt = $createdAt;
@@ -120,9 +117,6 @@ class ConfigurationOption
         return $this->updatedAt;
     }
 
-    /**
-     * @param \DateTime|null $updatedAt
-     */
     public function setUpdatedAt(\DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;

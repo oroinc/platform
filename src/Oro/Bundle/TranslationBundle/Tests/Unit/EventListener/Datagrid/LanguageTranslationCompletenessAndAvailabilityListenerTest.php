@@ -46,7 +46,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
         $expectedRecords = [];
         $languageMetrics = [];
 
-
         // Install available:
 
         $originalRecords[] = new ResultRecord([
@@ -62,7 +61,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'installedBuildDate' => null,
             'translationStatus' => 'install_available',
         ]);
-
 
         // Update available:
 
@@ -80,7 +78,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationStatus' => 'update_available',
         ]);
 
-
         // Up-to-date:
 
         $originalRecords[] = new ResultRecord([
@@ -97,7 +94,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationStatus' => 'up_to_date',
         ]);
 
-
         // No available translations:
 
         $originalRecords[] = new ResultRecord([
@@ -113,7 +109,6 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'installedBuildDate' => null,
             'translationStatus' => 'not_available',
         ]);
-
 
         $this->translationMetricsProvider->method('getForLanguage')->willReturnMap($languageMetrics);
         $event = new OrmResultAfter($this->createMock(DatagridInterface::class), $originalRecords);

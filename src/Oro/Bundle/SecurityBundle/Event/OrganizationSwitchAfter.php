@@ -16,10 +16,6 @@ class OrganizationSwitchAfter extends Event
     /** @var Organization */
     protected $organization;
 
-    /**
-     * @param User         $user
-     * @param Organization $organization
-     */
     public function __construct(User $user, Organization $organization)
     {
         $this->user         = $user;

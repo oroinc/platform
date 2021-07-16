@@ -60,9 +60,6 @@ class TestEntity
         return $this->userOwner;
     }
 
-    /**
-     * @param User $userOwner
-     */
     public function setUserOwner(User $userOwner): void
     {
         $this->userOwner = $userOwner;
@@ -76,9 +73,6 @@ class TestEntity
         return $this->businessUnitOwner;
     }
 
-    /**
-     * @param BusinessUnit $businessUnitOwner
-     */
     public function setBusinessUnitOwner(BusinessUnit $businessUnitOwner): void
     {
         $this->businessUnitOwner = $businessUnitOwner;

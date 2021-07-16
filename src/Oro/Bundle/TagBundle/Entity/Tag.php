@@ -245,9 +245,6 @@ class Tag extends ExtendTag
         return $this->tagging;
     }
 
-    /**
-     * @param Tagging $tagging
-     */
     public function addTagging(Tagging $tagging)
     {
         if (!$this->tagging->contains($tagging)) {
@@ -326,7 +323,6 @@ class Tag extends ExtendTag
     {
         return $this->organization;
     }
-
 
     /**
      * @return Taxonomy

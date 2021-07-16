@@ -12,19 +12,11 @@ class TypeCastingHandlerRegistry
      */
     private $handlers;
 
-    /**
-     * @param \Traversable $handlers
-     */
     public function __construct(\Traversable $handlers)
     {
         $this->handlers = iterator_to_array($handlers);
     }
 
-    /**
-     * @param string $type
-     *
-     * @return TypeCastingHandlerInterface
-     */
     public function get(string $type): TypeCastingHandlerInterface
     {
         if (!array_key_exists($type, $this->handlers)) {

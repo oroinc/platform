@@ -14,13 +14,6 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var SimpleFilterFactory */
     private $filterFactory;
 
-    /**
-     * @param array $filters
-     * @param array $filterFactories
-     * @param array $factories
-     *
-     * @return SimpleFilterFactory
-     */
     private function getFilterFactory(
         array $filters = [],
         array $filterFactories = [],

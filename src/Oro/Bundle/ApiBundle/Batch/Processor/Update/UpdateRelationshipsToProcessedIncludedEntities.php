@@ -64,10 +64,6 @@ class UpdateRelationshipsToProcessedIncludedEntities implements ProcessorInterfa
         $context->setProcessed(self::OPERATION_NAME);
     }
 
-    /**
-     * @param array        $item
-     * @param IncludedData $includedData
-     */
     private function updateRelationships(array &$item, IncludedData $includedData): void
     {
         $includeAccessor = $includedData->getIncludeAccessor();

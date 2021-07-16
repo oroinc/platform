@@ -41,9 +41,6 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     /** @var RouterInterface|null */
     private $router;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

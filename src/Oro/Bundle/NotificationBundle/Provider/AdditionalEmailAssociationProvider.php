@@ -23,11 +23,6 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param ManagerRegistry     $doctrine
-     * @param ConfigProvider      $entityConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         ConfigProvider $entityConfigProvider,
@@ -74,11 +69,6 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
             ->getFieldValue($entity, $associationName);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ClassMetadata|null
-     */
     private function getEntityMetadata(string $entityClass): ?ClassMetadata
     {
         $em = $this->doctrine->getManagerForClass($entityClass);
@@ -89,12 +79,6 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
         return $em->getClassMetadata($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return string
-     */
     private function getFieldLabel(string $entityClass, string $fieldName): string
     {
         if (!$this->entityConfigProvider->hasConfig($entityClass, $fieldName)) {
@@ -106,11 +90,6 @@ class AdditionalEmailAssociationProvider implements AdditionalEmailAssociationPr
         );
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return string
-     */
     private function prettifyFieldName(string $fieldName): string
     {
         $fieldLabel = ucfirst($fieldName);

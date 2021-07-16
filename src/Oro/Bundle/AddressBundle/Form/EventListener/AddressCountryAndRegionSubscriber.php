@@ -24,9 +24,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
     /**
      * Constructor.
-     *
-     * @param ObjectManager $om
-     * @param FormFactoryInterface $factory
      */
     public function __construct(ObjectManager $om, FormFactoryInterface $factory)
     {
@@ -47,8 +44,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
     /**
      * Removes or adds a region field based on the country set.
-     *
-     * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
@@ -97,8 +92,6 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
     /**
      * Removes or adds a region field based on the country set on submitted form.
-     *
-     * @param FormEvent $event
      */
     public function preSubmit(FormEvent $event)
     {

@@ -11,8 +11,6 @@ abstract class MappingConfigurationProviderAbstract extends PhpArrayConfigProvid
 {
     /**
      * Gets website search mapping configuration.
-     *
-     * @return array
      */
     abstract public function getConfiguration(): array;
 }

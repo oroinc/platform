@@ -19,11 +19,6 @@ class OriginFolderFilterProvider
     /** @var MailboxNameHelper */
     private $mailboxNameHelper;
 
-    /**
-     * @param ManagerRegistry        $doctrine
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param MailboxNameHelper      $mailboxNameHelper
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         TokenAccessorInterface $tokenAccessor,

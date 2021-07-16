@@ -85,9 +85,6 @@ class Account
         return $this->roles;
     }
 
-    /**
-     * @param Role $role
-     */
     public function addRole(Role $role)
     {
         if (!$this->roles->contains($role)) {
@@ -95,9 +92,6 @@ class Account
         }
     }
 
-    /**
-     * @param Role $role
-     */
     public function removeRole(Role $role)
     {
         if ($this->roles->contains($role)) {
@@ -113,9 +107,6 @@ class Account
         return $this->contacts;
     }
 
-    /**
-     * @param Contact $contact
-     */
     public function addContact(Contact $contact)
     {
         if (!$this->getContacts()->contains($contact)) {
@@ -124,17 +115,11 @@ class Account
         }
     }
 
-    /**
-     * @param Collection $contacts
-     */
     public function setContacts(Collection $contacts)
     {
         $this->contacts = $contacts;
     }
 
-    /**
-     * @param Contact $contact
-     */
     public function removeContact(Contact $contact)
     {
         if ($this->getContacts()->contains($contact)) {

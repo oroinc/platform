@@ -226,10 +226,6 @@ class EntityFieldFallbackValueTypeTest extends FormIntegrationTestCase
         self::assertNull($submittedFallbackValue->getOwnValue());
     }
 
-    /**
-     * @param $form
-     * @return FormInterface
-     */
     private function getChildForm($form): FormInterface
     {
         return $form->get('valueWithFallback');

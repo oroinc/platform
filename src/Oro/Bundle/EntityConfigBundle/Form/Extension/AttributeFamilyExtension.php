@@ -23,9 +23,6 @@ class AttributeFamilyExtension extends AbstractTypeExtension
      */
     protected $attributeConfigProvider;
 
-    /**
-     * @param ConfigProvider $attributeConfigProvider
-     */
     public function __construct(ConfigProvider $attributeConfigProvider)
     {
         $this->attributeConfigProvider = $attributeConfigProvider;
@@ -43,9 +40,6 @@ class AttributeFamilyExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSetData(FormEvent $event)
     {
         $class = $event->getForm()->getConfig()->getOptions()['data_class'];

@@ -37,37 +37,26 @@ abstract class AbstractDatabaseRequirementsProvider extends AbstractRequirements
 
     /**
      * Database platform name from $connection->getDatabasePlatform()->getName()
-     *
-     * @return string
      */
     abstract protected function getTargetPlatformName(): string;
 
     /**
      * Platform name for messages
-     *
-     * @return string
      */
     abstract protected function getTargetPlatformLabel(): string;
 
     /**
      * Required platform version
-     *
-     * @return string
      */
     abstract protected function getRequiredPlatformVersion(): string;
 
     /**
      * An array of required privileges
-     *
-     * @return array
      */
     abstract protected function getRequiredPrivileges(): array;
 
     /**
      * An array of granted privileges
-     *
-     * @param Connection $connection
-     * @return array
      */
     abstract protected function getGrantedPrivileges(Connection $connection): array;
 

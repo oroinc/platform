@@ -20,9 +20,6 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $input
-     * @param $result
-     *
      * @dataProvider isApplicableProvider
      */
     public function testIsApplicable($input, $result)
@@ -36,9 +33,6 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $input
-     * @param $result
-     *
      * @dataProvider processConfigsProvider
      */
     public function testProcessConfigs($input, $result)

@@ -19,9 +19,6 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         $this->loadFixtures([LoadOperationFilesData::class]);
     }
 
-    /**
-     * @param array $operationIds
-     */
     private function updateModificationDateForTestOperations(array $operationIds): void
     {
         $modificationDate = date_sub(

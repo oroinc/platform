@@ -27,11 +27,6 @@ class BusinessUnitManager
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param EntityManager          $em
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param AclHelper              $aclHelper
-     */
     public function __construct(
         EntityManager $em,
         TokenAccessorInterface $tokenAccessor,

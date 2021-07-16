@@ -57,15 +57,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      */
     protected $batchSize;
 
-    /**
-     * @param JobRunner $jobRunner
-     * @param MessageProducerInterface $producer
-     * @param TokenStorageInterface $tokenStorage
-     * @param DependentJobService $dependentJob
-     * @param LoggerInterface $logger
-     * @param ExportHandler $exportHandler
-     * @param $sizeOfBatch
-     */
     public function __construct(
         JobRunner $jobRunner,
         MessageProducerInterface $producer,
@@ -104,9 +95,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * @return int
-     */
     protected function getBatchSize(): int
     {
         return $this->batchSize;
@@ -138,7 +126,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
                     $this->getDelayedJobCallback($body, $batchData)
                 );
             }
-
 
             return true;
         };
@@ -178,10 +165,6 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
         return array_chunk($ids, $this->getBatchSize());
     }
 
-    /**
-     * @param Job   $rootJob
-     * @param array $body
-     */
     protected function addDependentJob(Job $rootJob, array $body)
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);

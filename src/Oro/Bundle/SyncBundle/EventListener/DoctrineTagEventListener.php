@@ -65,8 +65,6 @@ class DoctrineTagEventListener implements OptionalListenerInterface
     /**
      * Collect changes that were done
      * Generates tags and store in protected variable
-     *
-     * @param OnFlushEventArgs $event
      */
     public function onFlush(OnFlushEventArgs $event)
     {
@@ -95,8 +93,6 @@ class DoctrineTagEventListener implements OptionalListenerInterface
 
     /**
      * Send collected tags to publisher
-     *
-     * @param PostFlushEventArgs $event
      */
     public function postFlush(PostFlushEventArgs $event)
     {

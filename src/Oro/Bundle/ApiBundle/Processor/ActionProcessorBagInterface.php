@@ -8,8 +8,6 @@ interface ActionProcessorBagInterface
 {
     /**
      * Registers a processor in the bag.
-     *
-     * @param ActionProcessorInterface $processor
      */
     public function addProcessor(ActionProcessorInterface $processor);
 

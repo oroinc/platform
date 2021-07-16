@@ -12,9 +12,6 @@ class MailboxSaved extends Event
     /** @var Mailbox */
     protected $mailbox;
 
-    /**
-     * @param Mailbox $mailbox
-     */
     public function __construct(Mailbox $mailbox)
     {
         $this->mailbox = $mailbox;

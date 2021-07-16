@@ -25,10 +25,6 @@ class UserPreferredLocalizationProvider extends AbstractPreferredLocalizationPro
      */
     private $localizationManager;
 
-    /**
-     * @param ConfigManager $userConfigManager
-     * @param LocalizationManager $localizationManager
-     */
     public function __construct(ConfigManager $userConfigManager, LocalizationManager $localizationManager)
     {
         $this->userConfigManager = $userConfigManager;

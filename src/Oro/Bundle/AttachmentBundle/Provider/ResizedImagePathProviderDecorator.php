@@ -18,10 +18,6 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
     /** @var int */
     private $prefixLength;
 
-    /**
-     * @param ResizedImagePathProviderInterface $resizedImagePathProvider
-     * @param string                            $prefix
-     */
     public function __construct(ResizedImagePathProviderInterface $resizedImagePathProvider, string $prefix)
     {
         $this->resizedImagePathProvider = $resizedImagePathProvider;
@@ -49,11 +45,6 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
         );
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private function removePrefix(string $path): string
     {
         $path = '/' . ltrim($path, '/');

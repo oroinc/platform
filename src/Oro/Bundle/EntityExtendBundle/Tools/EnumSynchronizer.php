@@ -37,12 +37,6 @@ class EnumSynchronizer
     /** @var ConfigTranslationHelper */
     protected $translationHelper;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param ManagerRegistry $doctrine
-     * @param TranslatorInterface $translator
-     * @param ConfigTranslationHelper $translationHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
@@ -401,10 +395,6 @@ class EnumSynchronizer
         return null;
     }
 
-    /**
-     * @param array $values
-     * @param array $options
-     */
     protected function fillOptionIds(array $values, array &$options)
     {
         $ids = array_map(function (AbstractEnumValue $value) {

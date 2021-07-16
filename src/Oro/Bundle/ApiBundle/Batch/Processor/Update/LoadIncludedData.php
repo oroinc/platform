@@ -21,10 +21,6 @@ class LoadIncludedData implements ProcessorInterface
     /** @var IncludeMapManager */
     private $includeMapManager;
 
-    /**
-     * @param IncludeAccessorRegistry $includeAccessorRegistry
-     * @param IncludeMapManager       $includeMapManager
-     */
     public function __construct(
         IncludeAccessorRegistry $includeAccessorRegistry,
         IncludeMapManager $includeMapManager

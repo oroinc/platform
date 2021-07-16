@@ -28,11 +28,6 @@ abstract class AbstractImapConfigHandler
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param ManagerRegistry              $doctrine
-     * @param OAuth2ManagerRegistry        $oauthManagerRegistry
-     * @param LoggerInterface              $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         OAuth2ManagerRegistry $oauthManagerRegistry,
@@ -43,10 +38,6 @@ abstract class AbstractImapConfigHandler
         $this->logger = $logger;
     }
 
-    /**
-     * @param ConfigManager   $manager
-     * @param ConfigChangeSet $changeSet
-     */
     public function handle(ConfigManager $manager, ConfigChangeSet $changeSet)
     {
         if ($this->imapOauth2Manager->isOAuthEnabled()) {
@@ -56,9 +47,6 @@ abstract class AbstractImapConfigHandler
         }
     }
 
-    /**
-     * @param bool $force
-     */
     protected function refreshTokens(bool $force): void
     {
         $em = $this->getEntityManager();
@@ -127,16 +115,11 @@ abstract class AbstractImapConfigHandler
 
     /**
      * Returns manager type name
-     *
-     * @return string
      */
     abstract protected function getManagerType(): string;
 
     /**
      * Returns true if refresh token action needs to be forced
-     *
-     * @param ConfigChangeSet $changeSet
-     * @return bool
      */
     abstract protected function isForceRefreshRequired(ConfigChangeSet $changeSet): bool;
 }

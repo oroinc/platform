@@ -10,9 +10,6 @@ class ResourceIterator implements \Iterator
     /** @var \RecursiveIteratorIterator */
     protected $iterator;
 
-    /**
-     * @param array $resources
-     */
     public function __construct(array $resources)
     {
         $this->iterator = new \RecursiveIteratorIterator(

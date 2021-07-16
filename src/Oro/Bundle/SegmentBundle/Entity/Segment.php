@@ -203,8 +203,6 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
 
     /**
      * Get name in lowercase
-     *
-     * @return string|null
      */
     public function getNameLowercase(): ?string
     {

@@ -83,11 +83,6 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
         }
     }
 
-    /**
-     * @param SubresourceContext $context
-     *
-     * @return bool
-     */
     private function isGrantedForClass(SubresourceContext $context): bool
     {
         $isGranted = true;

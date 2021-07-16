@@ -44,10 +44,6 @@ class FeatureContext extends OroFeatureContext implements KernelAwareContext, Fi
         $em->flush();
     }
 
-    /**
-     * @param \DateTime $startDate
-     * @param \DateTime $endDate
-     */
     protected function fillDatesFrom(\DateTime $startDate, \DateTime $endDate)
     {
         $registry = $this->getContainer()->get('doctrine');

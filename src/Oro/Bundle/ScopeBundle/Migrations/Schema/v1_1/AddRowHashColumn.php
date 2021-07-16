@@ -32,7 +32,6 @@ class AddRowHashColumn implements Migration, OrderedMigrationInterface
     }
 
     /**
-     * @param Table $table
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     protected function addRowHashComment(Table $table): void

@@ -192,7 +192,6 @@ HELP
         $io->table($headers, $rows);
     }
 
-
     private function getRepository(): LanguageRepository
     {
         if (!$this->languageRepository) {

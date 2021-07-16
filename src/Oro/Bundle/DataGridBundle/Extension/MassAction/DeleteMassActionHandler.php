@@ -35,13 +35,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /** @var string */
     protected $responseMessage = 'oro.grid.mass_action.delete.success_message';
 
-    /**
-     * @param ManagerRegistry               $registry
-     * @param TranslatorInterface           $translator
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param MassDeleteLimiter             $limiter
-     * @param RequestStack                  $requestStack
-     */
     public function __construct(
         ManagerRegistry $registry,
         TranslatorInterface $translator,
@@ -77,8 +70,6 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
     /**
      * Finish processed batch
-     *
-     * @param EntityManager $manager
      */
     protected function finishBatch(EntityManager $manager)
     {

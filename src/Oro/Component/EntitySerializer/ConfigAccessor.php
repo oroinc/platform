@@ -7,12 +7,6 @@ namespace Oro\Component\EntitySerializer;
  */
 class ConfigAccessor
 {
-    /**
-     * @param string           $fieldName
-     * @param FieldConfig|null $fieldConfig
-     *
-     * @return string
-     */
     public function getPropertyPath(string $fieldName, FieldConfig $fieldConfig = null): string
     {
         if (null === $fieldConfig) {
@@ -22,12 +16,6 @@ class ConfigAccessor
         return $fieldConfig->getPropertyPath($fieldName);
     }
 
-    /**
-     * @param EntityConfig $config
-     * @param string       $fieldName
-     *
-     * @return EntityConfig
-     */
     public function getTargetEntity(EntityConfig $config, string $fieldName): EntityConfig
     {
         $fieldConfig = $config->getField($fieldName);
@@ -44,12 +32,6 @@ class ConfigAccessor
         return $targetConfig;
     }
 
-    /**
-     * @param EntityConfig $config
-     * @param string       $fieldName
-     *
-     * @return AssociationQuery|null
-     */
     public function getAssociationQuery(EntityConfig $config, string $fieldName): ?AssociationQuery
     {
         $fieldConfig = $config->getField($fieldName);

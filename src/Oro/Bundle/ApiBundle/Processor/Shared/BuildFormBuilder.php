@@ -29,11 +29,6 @@ class BuildFormBuilder implements ProcessorInterface
     /** @var bool */
     private $enableFullValidation;
 
-    /**
-     * @param FormHelper     $formHelper
-     * @param DoctrineHelper $doctrineHelper
-     * @param bool           $enableFullValidation
-     */
     public function __construct(
         FormHelper $formHelper,
         DoctrineHelper $doctrineHelper,

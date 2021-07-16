@@ -16,9 +16,6 @@ class PersistIncludedEntities implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -47,9 +44,6 @@ class PersistIncludedEntities implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormContext $context
-     */
     private function persistIncludedEntities(FormContext $context): void
     {
         $additionalEntities = $context->getAdditionalEntities();

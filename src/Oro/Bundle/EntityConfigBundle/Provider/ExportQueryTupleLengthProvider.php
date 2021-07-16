@@ -16,9 +16,6 @@ class ExportQueryTupleLengthProvider
     /** @var array */
     private $tupleLengthByClassName;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
@@ -34,11 +31,6 @@ class ExportQueryTupleLengthProvider
      * for doctrine to parse it. For example, for Product entity with ~500 enum attributes (which results in ~2661
      * columns in export query), the difference is ~100 times - 0.5sec when parsing a doctrine query and 0.005sec when
      * manually summing possible columns in this method.
-     *
-     * @param string $className
-     * @param bool $forceRecalculate
-     *
-     * @return int
      */
     public function getTupleLength(string $className, bool $forceRecalculate = true): int
     {

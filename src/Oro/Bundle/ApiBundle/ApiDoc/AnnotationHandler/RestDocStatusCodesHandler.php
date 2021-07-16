@@ -10,10 +10,6 @@ use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
  */
 class RestDocStatusCodesHandler
 {
-    /**
-     * @param ApiDoc            $annotation
-     * @param StatusCodesConfig $statusCodes
-     */
     public function handle(ApiDoc $annotation, StatusCodesConfig $statusCodes)
     {
         $codes = $statusCodes->getCodes();

@@ -42,12 +42,6 @@ class FixtureLoader
      */
     protected $entitySupplement;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param EntityClassResolver $entityClassResolver
-     * @param EntitySupplement $entitySupplement
-     * @param AliceLoader $aliceLoader
-     */
     public function __construct(
         KernelInterface $kernel,
         EntityClassResolver $entityClassResolver,
@@ -187,9 +181,6 @@ class FixtureLoader
         return $this->entityClassResolver->getEntityClass($entityName);
     }
 
-    /**
-     * @param array $objects
-     */
     public function persist(array $objects)
     {
         $em = $this->getEntityManager();

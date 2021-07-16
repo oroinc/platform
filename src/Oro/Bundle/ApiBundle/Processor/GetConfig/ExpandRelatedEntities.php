@@ -37,12 +37,6 @@ class ExpandRelatedEntities implements ProcessorInterface
     /** @var CompleteCustomDataTypeHelper */
     private $customDataTypeHelper;
 
-    /**
-     * @param DoctrineHelper                 $doctrineHelper
-     * @param ConfigProvider                 $configProvider
-     * @param EntityOverrideProviderRegistry $entityOverrideProviderRegistry
-     * @param CompleteCustomDataTypeHelper   $customDataTypeHelper
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigProvider $configProvider,
@@ -297,13 +291,6 @@ class ExpandRelatedEntities implements ProcessorInterface
         return $definition->getField($fieldName)->getPropertyPath($fieldName);
     }
 
-    /**
-     * @param ClassMetadata                   $parentMetadata
-     * @param string                          $associationName
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string
-     */
     private function getAssociationTargetClass(
         ClassMetadata $parentMetadata,
         string $associationName,
@@ -319,12 +306,6 @@ class ExpandRelatedEntities implements ProcessorInterface
         return $this->resolveEntityClass($entityClass, $entityOverrideProvider);
     }
 
-    /**
-     * @param string                          $entityClass
-     * @param EntityOverrideProviderInterface $entityOverrideProvider
-     *
-     * @return string
-     */
     private function resolveEntityClass(
         string $entityClass,
         EntityOverrideProviderInterface $entityOverrideProvider

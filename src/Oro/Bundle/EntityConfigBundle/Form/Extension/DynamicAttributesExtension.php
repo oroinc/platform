@@ -27,7 +27,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 class DynamicAttributesExtension extends AbstractTypeExtension implements ServiceSubscriberInterface
 {
     use FormExtendedTypeTrait;
-    
+
     /** @var ConfigManager */
     private $configManager;
 
@@ -40,11 +40,6 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
     /** @var array */
     private $fields = [];
 
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param ContainerInterface $container
-     */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,
@@ -131,9 +126,6 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         }
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSetData(FormEvent $event)
     {
         $data = $event->getData();
@@ -147,9 +139,6 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         $this->addAttributes($form, $dataClass, $data->getAttributeFamily());
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function onPreSubmit(FormEvent $event)
     {
         $data = $event->getData();
@@ -202,7 +191,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         if (empty($options['data_class'])) {
             return false;
         }
-        
+
         if (empty($options['enable_attributes'])) {
             return false;
         }
@@ -236,25 +225,16 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
         }
     }
 
-    /**
-     * @return AttributeManager
-     */
     private function getAttributeManager(): AttributeManager
     {
         return $this->container->get('oro_entity_config.manager.attribute_manager');
     }
 
-    /**
-     * @return AttributeConfigHelper
-     */
     private function getAttributeConfigHelper(): AttributeConfigHelper
     {
         return $this->container->get('oro_entity_config.config.attributes_config_helper');
     }
 
-    /**
-     * @return DynamicFieldsHelper
-     */
     private function getDynamicFieldsHelper(): DynamicFieldsHelper
     {
         return $this->container->get('oro_entity_extend.form.extension.dynamic_fields_helper');

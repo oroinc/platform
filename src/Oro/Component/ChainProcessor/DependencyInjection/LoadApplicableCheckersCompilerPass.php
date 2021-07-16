@@ -45,10 +45,6 @@ class LoadApplicableCheckersCompilerPass implements CompilerPassInterface
         );
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition       $processorBagServiceDef
-     */
     protected function registerApplicableCheckers(ContainerBuilder $container, Definition $processorBagServiceDef)
     {
         $taggedServices = $container->findTaggedServiceIds($this->applicableCheckerTagName);

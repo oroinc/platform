@@ -169,9 +169,6 @@ class FormAction implements \ArrayAccess, ContextItemInterface
         throw new \BadMethodCallException('Not supported');
     }
 
-    /**
-     * @param array $data
-     */
     protected function __construct(array $data)
     {
         $this->data = $data;

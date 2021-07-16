@@ -26,9 +26,6 @@ abstract class AbstractDuplicatorExtension implements DuplicatorExtensionInterfa
         return $this;
     }
 
-    /**
-     * @return \ArrayAccess
-     */
     public function getContext(): \ArrayAccess
     {
         return $this->context;

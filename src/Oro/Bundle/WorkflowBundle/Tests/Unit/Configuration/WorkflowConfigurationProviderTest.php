@@ -33,10 +33,6 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
     }
 
-    /**
-     * @param array $bundles
-     * @return WorkflowConfigurationProvider
-     */
     protected function buildProvider(array $bundles): WorkflowConfigurationProvider
     {
         $finderFactory = new ConfigFinderFactory($bundles);
@@ -316,10 +312,6 @@ TEXT;
         $this->assertEquals($expected, $configuration);
     }
 
-    /**
-     * @param string $bundleName
-     * @return array
-     */
     protected function getExpectedWokflowConfiguration(string $bundleName): array
     {
         $fileName = __DIR__ . '/Stub/' . $bundleName . '/Resources/config/oro/workflows.php';

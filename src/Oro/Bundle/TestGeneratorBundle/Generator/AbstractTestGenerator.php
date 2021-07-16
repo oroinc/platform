@@ -42,10 +42,6 @@ abstract class AbstractTestGenerator
 
     const PACKAGE_FOLDER_NAME = 'package';
 
-    /**
-     * @param Environment $twig
-     * @param KernelInterface $kernelInterface
-     */
     public function __construct(
         Environment $twig,
         KernelInterface $kernelInterface

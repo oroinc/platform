@@ -29,9 +29,6 @@ abstract class AssociationFilter extends ComparisonFilter implements
         $this->requestType = $requestType;
     }
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function setValueNormalizer(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -45,9 +42,6 @@ abstract class AssociationFilter extends ComparisonFilter implements
         return 'type';
     }
 
-    /**
-     * @return RequestType
-     */
     protected function getRequestType(): RequestType
     {
         return $this->requestType;
@@ -94,11 +88,6 @@ abstract class AssociationFilter extends ComparisonFilter implements
         return $result;
     }
 
-    /**
-     * @param string $entityType
-     *
-     * @return string
-     */
     protected function getEntityClass(string $entityType): string
     {
         return $this->valueNormalizer->normalizeValue(
@@ -108,10 +97,6 @@ abstract class AssociationFilter extends ComparisonFilter implements
         );
     }
 
-    /**
-     * @param string $field
-     * @param string $path
-     */
     protected function assertFilterValuePath(string $field, string $path): void
     {
         if (0 !== \strpos($path, $field . '.')) {

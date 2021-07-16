@@ -21,9 +21,6 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @param array $request
-     * @param array $response
-     *
      * @dataProvider advancedSearchDataProvider
      */
     public function testAdvancedSearch(array $request, array $response)
@@ -56,9 +53,6 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @param array $request
-     * @param array $response
-     *
      * @dataProvider advancedSearchBadRequestDataProvider
      */
     public function testAdvancedSearchBadRequest(array $request, array $response)

@@ -43,14 +43,6 @@ class ObjectNormalizer
     /** @var DataNormalizer */
     private $dataNormalizer;
 
-    /**
-     * @param ObjectNormalizerRegistry $normalizerRegistry
-     * @param DoctrineHelper           $doctrineHelper
-     * @param SerializationHelper      $serializationHelper
-     * @param DataAccessorInterface    $dataAccessor
-     * @param ConfigNormalizer         $configNormalizer
-     * @param DataNormalizer           $dataNormalizer
-     */
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
@@ -110,11 +102,6 @@ class ObjectNormalizer
         return $normalizedObjects;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     *
-     * @return EntityDefinitionConfig
-     */
     private function getNormalizedConfig(EntityDefinitionConfig $config): EntityDefinitionConfig
     {
         $normalizedConfig = clone $config;
@@ -398,10 +385,6 @@ class ObjectNormalizer
 
     /**
      * Checks whether the given property path represents a metadata property
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
      */
     private function isMetadataProperty(string $propertyPath): bool
     {
@@ -428,11 +411,6 @@ class ObjectNormalizer
         return null;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string|null
-     */
     private function getEntityDiscriminator(string $entityClass): ?string
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
@@ -445,13 +423,6 @@ class ObjectNormalizer
         return $map[$entityClass];
     }
 
-    /**
-     * @param array                       $items
-     * @param EntityDefinitionConfig|null $config
-     * @param array                       $context
-     *
-     * @return array
-     */
     private function postSerializeCollection(array $items, ?EntityDefinitionConfig $config, array $context): array
     {
         if (null === $config) {

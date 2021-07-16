@@ -26,13 +26,6 @@ class SendEmail extends AbstractSendEmail
      */
     private $emailOriginHelper;
 
-    /**
-     * @param ContextAccessor    $contextAccessor
-     * @param Processor          $emailProcessor
-     * @param EmailAddressHelper $emailAddressHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param EmailOriginHelper  $emailOriginHelper
-     */
     public function __construct(
         ContextAccessor $contextAccessor,
         Processor $emailProcessor,

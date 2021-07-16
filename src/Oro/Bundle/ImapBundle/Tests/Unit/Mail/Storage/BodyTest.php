@@ -143,11 +143,6 @@ class BodyTest extends TestCase
         );
     }
 
-    /**
-     * @param MockObject                               $obj
-     * @param                                          $iterationResult1
-     * @param                                          $iterationResult2
-     */
     private function mockIterator(MockObject $obj, $iterationResult1, $iterationResult2)
     {
         $obj->expects($this->exactly(3))
@@ -161,13 +156,6 @@ class BodyTest extends TestCase
             ->will($this->onConsecutiveCalls(true, true, true));
     }
 
-    /**
-     * @param MockObject $obj
-     * @param            $contentValue
-     * @param            $contentType
-     * @param            $contentTransferEncoding
-     * @param            $contentEncoding
-     */
     private function preparePartMock(
         MockObject $obj,
         $contentValue,

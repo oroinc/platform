@@ -714,10 +714,6 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($ownerTree);
     }
 
-    /**
-     * @param User $user
-     * @param Organization $organization
-     */
     private function configureTokenAccessor(User $user, Organization $organization): void
     {
         $this->tokenAccessor->expects($this->any())
@@ -737,9 +733,6 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($organization);
     }
 
-    /**
-     * @param bool $isEntityNew
-     */
     private function configureDoctrineHelper(bool $isEntityNew): void
     {
         $this->doctrineHelper->expects($this->once())

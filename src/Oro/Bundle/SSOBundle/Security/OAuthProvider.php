@@ -35,12 +35,6 @@ class OAuthProvider extends HWIOAuthProvider
     /** @var OrganizationGuesserInterface */
     private $organizationGuesser;
 
-    /**
-     * @param OAuthAwareUserProviderInterface $userProvider
-     * @param ResourceOwnerMap                $resourceOwnerMap
-     * @param UserCheckerInterface            $userChecker
-     * @param TokenStorageInterface           $tokenStorage
-     */
     public function __construct(
         OAuthAwareUserProviderInterface $userProvider,
         ResourceOwnerMap $resourceOwnerMap,
@@ -53,17 +47,11 @@ class OAuthProvider extends HWIOAuthProvider
         $this->userChecker = $userChecker;
     }
 
-    /**
-     * @param OAuthTokenFactoryInterface $tokenFactory
-     */
     public function setTokenFactory(OAuthTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;
     }
 
-    /**
-     * @param OrganizationGuesserInterface $organizationGuesser
-     */
     public function setOrganizationGuesser(OrganizationGuesserInterface $organizationGuesser): void
     {
         $this->organizationGuesser = $organizationGuesser;
@@ -107,12 +95,6 @@ class OAuthProvider extends HWIOAuthProvider
         return $token;
     }
 
-    /**
-     * @param AbstractUser   $user
-     * @param TokenInterface $token
-     *
-     * @return Organization
-     */
     private function guessOrganization(AbstractUser $user, TokenInterface $token): Organization
     {
         $organization = $this->organizationGuesser->guess($user, $token);

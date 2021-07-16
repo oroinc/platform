@@ -174,7 +174,6 @@ abstract class TaggedServicesCompilerPassCase extends \PHPUnit\Framework\TestCas
             ->willReturnOnConsecutiveCalls(...$returnedResult);
     }
 
-
     /**
      * @param string|array $param
      * @return array

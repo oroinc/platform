@@ -18,9 +18,6 @@ class GridFilterChoiceTree extends GridFilterStringItem
 
     /**
      * Check that the item exists/not exists in grid filter options
-     *
-     * @param string $value
-     * @param bool $isShouldSee
      */
     public function checkValue(string $value, bool $isShouldSee): void
     {

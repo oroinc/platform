@@ -18,17 +18,12 @@ class TicketController extends AbstractController
      *
      * @Route("/sync/ticket", name="oro_sync_ticket", methods={"POST"})
      * @CsrfProtection()
-     *
-     * @return JsonResponse
      */
     public function syncTicketAction(): JsonResponse
     {
         return new JsonResponse(['ticket' => $this->get(TicketProvider::class)->generateTicket($this->getUser())]);
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedServices(): array
     {
         return array_merge(

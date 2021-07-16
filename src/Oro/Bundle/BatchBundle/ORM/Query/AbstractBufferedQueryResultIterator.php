@@ -161,9 +161,6 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this->query;
     }
 
-    /**
-     * @param Query $query
-     */
     abstract protected function initializeQuery(Query $query);
 
     /**

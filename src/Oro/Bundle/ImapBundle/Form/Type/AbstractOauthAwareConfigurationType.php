@@ -47,13 +47,6 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
     /** @var OAuth2ManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface    $translator
-     * @param ConfigManager          $userConfigManager
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param RequestStack           $requestStack
-     * @param OAuth2ManagerRegistry  $oauthManagerRegistry
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $userConfigManager,
@@ -138,9 +131,6 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
         ]);
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addOwnerOrganizationEventListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -166,7 +156,6 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addNewOriginCreateEventListener(FormBuilderInterface $builder)
@@ -203,9 +192,6 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     protected function addPrepopulateRefreshTokenEventListener(FormBuilderInterface $builder)
     {
         $builder->addEventListener(
@@ -238,8 +224,6 @@ abstract class AbstractOauthAwareConfigurationType extends AbstractType
 
     /**
      * Returns account type for UserEmailOrigin entity
-     *
-     * @return string
      */
     abstract protected function getAccountType(): string;
 }

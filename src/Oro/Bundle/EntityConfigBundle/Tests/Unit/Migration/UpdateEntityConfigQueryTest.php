@@ -46,9 +46,6 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testGetDescription($key, $value)
@@ -85,9 +82,6 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testUpdateCascadeValue($key, $value)
@@ -116,9 +110,6 @@ class UpdateEntityConfigQueryTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $key
-     * @param $value
-     *
      * @dataProvider getConfiguration
      */
     public function testNoRelationAlert($key, $value)

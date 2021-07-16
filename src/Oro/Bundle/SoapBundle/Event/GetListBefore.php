@@ -37,9 +37,6 @@ class GetListBefore extends Event
         return $this->criteria;
     }
 
-    /**
-     * @param Criteria $criteria
-     */
     public function setCriteria(Criteria $criteria)
     {
         $this->criteria = $criteria;

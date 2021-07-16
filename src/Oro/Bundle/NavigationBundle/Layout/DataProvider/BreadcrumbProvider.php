@@ -11,9 +11,6 @@ class BreadcrumbProvider
      */
     private $breadcrumbManager;
 
-    /**
-     * @param BreadcrumbManagerInterface $breadcrumbManager
-     */
     public function __construct(
         BreadcrumbManagerInterface $breadcrumbManager
     ) {

@@ -9,8 +9,6 @@ interface TransactionWatcherAwareInterface
 {
     /**
      * Sets the transaction watcher.
-     *
-     * @param TransactionWatcherInterface|null $transactionWatcher
      */
     public function setTransactionWatcher(TransactionWatcherInterface $transactionWatcher = null);
 }

@@ -8,7 +8,7 @@ interface IncludeHandlerInterface
     const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
     const HEADER_UNKNOWN     = 'X-Include-Unknown';
     const DELIMITER          = ';';
-    
+
     /**
      * Is handler object supports "include request"
      *

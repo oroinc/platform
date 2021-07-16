@@ -38,10 +38,6 @@ class ErrorCompleterRegistry
      * Creates a new instance of ErrorCompleterInterface
      * responsible to build a document for the specific request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return ErrorCompleterInterface
-     *
      * @throws \LogicException if an error completer does not exist for the given request type
      */
     public function getErrorCompleter(RequestType $requestType): ErrorCompleterInterface

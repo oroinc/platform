@@ -18,17 +18,11 @@ class LoginSubscriber
      */
     protected $userManager;
 
-    /**
-     * @param BaseUserManager $userManager
-     */
     public function __construct(BaseUserManager $userManager)
     {
         $this->userManager = $userManager;
     }
 
-    /**
-     * @param InteractiveLoginEvent $event
-     */
     public function onLogin(InteractiveLoginEvent $event)
     {
         /** @var UserInterface $user */

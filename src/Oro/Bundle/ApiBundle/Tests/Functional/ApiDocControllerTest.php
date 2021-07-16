@@ -18,11 +18,6 @@ class ApiDocControllerTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @param string|null $view
-     *
-     * @return Response
-     */
     private function sendApiDocRequest(string $view = null): Response
     {
         $parameters = [];
@@ -37,13 +32,6 @@ class ApiDocControllerTest extends WebTestCase
         return $this->client->getResponse();
     }
 
-    /**
-     * @param string $view
-     * @param string $method
-     * @param string $resource
-     *
-     * @return Response
-     */
     private function sendApiDocResourceRequest(string $view, string $method, string $resource): Response
     {
         $resourceId = '/api/' . $resource;
@@ -62,9 +50,6 @@ class ApiDocControllerTest extends WebTestCase
         return $this->client->getResponse();
     }
 
-    /**
-     * @return string|null
-     */
     private function getBackendPrefix(): ?string
     {
         $container = self::getContainer();

@@ -33,8 +33,6 @@ class PlaceholderConfiguration implements ConfigurationInterface
 
     /**
      * Builds the configuration tree for placeholders
-     *
-     * @param NodeBuilder $builder
      */
     protected function appendPlaceholders(NodeBuilder $builder)
     {
@@ -84,8 +82,6 @@ class PlaceholderConfiguration implements ConfigurationInterface
 
     /**
      * Builds the configuration tree for placeholder items
-     *
-     * @param NodeBuilder $builder
      */
     protected function appendItems(NodeBuilder $builder)
     {

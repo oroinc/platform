@@ -54,12 +54,6 @@ class ThemeProvider
         return $this->getTheme($themeName)->getImagePlaceholders();
     }
 
-    /**
-     * @param string $themeName
-     * @param string $sectionName
-     *
-     * @return string|null
-     */
     public function getStylesOutput(string $themeName, string $sectionName = 'styles'): ?string
     {
         $outputPath = $this->getOutputPath($themeName, $sectionName);
@@ -89,12 +83,6 @@ class ThemeProvider
         return $this->themes[$themeName];
     }
 
-    /**
-     * @param string $themeName
-     * @param string $sectionName
-     *
-     * @return string|null
-     */
     private function getOutputPath(string $themeName, string $sectionName): ?string
     {
         $theme = $this->getTheme($themeName);

@@ -32,9 +32,6 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
-     *
      * @dataProvider assembleProvider
      */
     public function testCreateOperation(array $configuration, array $expected)

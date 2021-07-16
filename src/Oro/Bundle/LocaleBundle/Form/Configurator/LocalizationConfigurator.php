@@ -21,17 +21,11 @@ class LocalizationConfigurator
     /** @var ConfigHandler */
     private $configHandler;
 
-    /**
-     * @param ConfigHandler $configHandler
-     */
     public function __construct(ConfigHandler $configHandler)
     {
         $this->configHandler = $configHandler;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     */
     public function buildForm(FormBuilderInterface $builder): void
     {
         $builder->addEventListener(
@@ -56,10 +50,6 @@ class LocalizationConfigurator
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param ConfigManager $configManager
-     */
     private function setEnabledLocalizations(FormInterface $form, ConfigManager $configManager): void
     {
         $form = $form->get(Config::getFieldKeyByName(Config::DEFAULT_LOCALIZATION));
@@ -75,9 +65,6 @@ class LocalizationConfigurator
         $form->add('value', LocalizationSelectionType::class, $options);
     }
 
-    /**
-     * @param FormInterface $form
-     */
     private function hideUseParentScopeCheckbox(FormInterface $form): void
     {
         $options = $form->get('use_parent_scope_value')

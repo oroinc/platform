@@ -26,11 +26,6 @@ class NumberFilterTest extends WebTestCase
         $this->filter = self::getContainer()->get('oro_filter.number_filter');
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
     private function createQueryBuilder(string $alias): QueryBuilder
     {
         $doctrine = self::getContainer()->get('doctrine');

@@ -50,9 +50,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
             );
     }
 
-    /**
-     * @return string
-     */
     public static function func1(): string
     {
         self::assertEmpty(func_get_args());
@@ -78,9 +75,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
         return 'static_func2 + ' . ((null === $val1) ? 'NULL' : $val1) . ' + ' . ((null === $val2) ? 'NULL' : $val2);
     }
 
-    /**
-     * @return array
-     */
     public static function otherFunc(): array
     {
         return ['static', 'func'];
@@ -88,8 +82,6 @@ class SystemAwareResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveProvider
-     * @param $config
-     * @param $expected
      */
     public function testResolve($config, $expected): void
     {

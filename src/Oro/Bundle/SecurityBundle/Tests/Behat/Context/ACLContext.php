@@ -104,7 +104,6 @@ class ACLContext extends OroFeatureContext implements
         $this->getMink()->setDefaultSessionName('first_session');
     }
 
-
     /**
      * @Given /^(?P<user>(administrator|user)) has following permissions$/
      */
@@ -246,7 +245,6 @@ class ACLContext extends OroFeatureContext implements
      *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
      *
      * @Then /^the role has following active permissions:$/
-     * @param TableNode $table
      */
     public function iSeeFollowingPermissions(TableNode $table)
     {
@@ -274,8 +272,6 @@ class ACLContext extends OroFeatureContext implements
      *            | Language | View | Create | Edit | Assign | Translate |
      *
      * @Then /^the role has not following permissions:$/
-     *
-     * @param TableNode $table
      */
     public function iDontSeeFollowingPermissions(TableNode $table)
     {
@@ -376,10 +372,6 @@ class ACLContext extends OroFeatureContext implements
     /**
      * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for field "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
      * @Then /^the permission "(?P<permission>(?:[^"]|\\")*)" for transition "(?P<fieldName>(?:[^"]|\\")*)" is set to "(?P<accessLevel>(?:[^"]|\\")*)"$/
-     *
-     * @param string $fieldName
-     * @param string $permission
-     * @param string $accessLevel
      */
     //@codingStandardsIgnoreEnd
     public function permissionIsSetTo(string $fieldName, string $permission, string $accessLevel): void
@@ -407,9 +399,6 @@ class ACLContext extends OroFeatureContext implements
     /**
      * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" transition$/
      * @When /^(?:|I )open "(?P<permission>(?:[^"]|\\")*)" permission dropdown for "(?P<fieldName>(?:[^"]|\\")*)" field$/
-     *
-     * @param string $permission
-     * @param string $fieldName
      */
     //@codingStandardsIgnoreEnd
     public function iOpenPermissionDropdown(string $permission, string $fieldName): void
@@ -434,8 +423,6 @@ class ACLContext extends OroFeatureContext implements
 
     /**
      * @Then /^(?:|I )should see next items in permissions dropdown:$/
-     *
-     * @param TableNode $table
      */
     public function iShouldSeeItemsInPermissionsDropdown(TableNode $table)
     {
@@ -458,8 +445,6 @@ class ACLContext extends OroFeatureContext implements
 
     /**
      * @Then /^(?:|I )choose "(?P<option>[^"]*)" in permissions dropdown$/
-     *
-     * @param string $option
      */
     public function iSelectOptionInPermissionsDropdown(string $option): void
     {
@@ -487,7 +472,6 @@ class ACLContext extends OroFeatureContext implements
      *       | Account name  | View:Business Unit | Create:Global | Edit:None |
      *
      * @Then /^(?:|I )select following field permissions:$/
-     * @param TableNode $table
      */
     public function iSelectFollowingFieldPermissions(TableNode $table)
     {

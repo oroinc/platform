@@ -13,9 +13,6 @@ class FileAccessControlChecker
     /** @var AttachmentEntityConfigProviderInterface */
     private $attachmentEntityConfigProvider;
 
-    /**
-     * @param AttachmentEntityConfigProviderInterface $configManager
-     */
     public function __construct(AttachmentEntityConfigProviderInterface $configManager)
     {
         $this->attachmentEntityConfigProvider = $configManager;

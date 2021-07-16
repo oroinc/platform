@@ -17,9 +17,6 @@ class MigrationQueryExecutor
      */
     protected $logger;
 
-    /**
-     * @param Connection $connection
-     */
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -27,8 +24,6 @@ class MigrationQueryExecutor
 
     /**
      * Sets a logger
-     *
-     * @param LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {

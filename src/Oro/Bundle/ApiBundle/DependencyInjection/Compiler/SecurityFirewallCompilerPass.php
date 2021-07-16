@@ -50,10 +50,6 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
 
     /**
      * Checks whether a firewall is stateless and have context parameter
-     *
-     * @param array $firewallConfig
-     *
-     * @return bool
      */
     private function isStatelessFirewallWithContext(array $firewallConfig): bool
     {
@@ -64,11 +60,6 @@ class SecurityFirewallCompilerPass implements CompilerPassInterface
             && $firewallConfig['context'];
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $firewallName
-     * @param array            $firewallConfig
-     */
     private function configureStatelessFirewallWithContext(
         ContainerBuilder $container,
         string $firewallName,

@@ -59,9 +59,6 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $entity->isUpdatedAtSet());
     }
 
-    /**
-     * @return array
-     */
     public function isUpdatedAtSetDataProvider(): array
     {
         return [
@@ -160,14 +157,6 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test_title_string2', $entity->getDefaultTitle());
     }
 
-    /**
-     * @param string $value
-     * @param bool $default
-     * @param Localization|null $localization
-     * @param string $fallbackValue
-     *
-     * @return LocalizedFallbackValue
-     */
     protected function createLocalizedValue(
         string $value,
         bool $default = false,
@@ -203,19 +192,12 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getChildrenIdsDataProvider
-     *
-     * @param Localization $localization
-     * @param bool $withOwnId
-     * @param array $expected
      */
     public function testGetChildrenIds(Localization $localization, bool $withOwnId, array $expected): void
     {
         self::assertEquals($expected, $localization->getChildrenIds($withOwnId));
     }
 
-    /**
-     * @return \Generator
-     */
     public function getChildrenIdsDataProvider(): \Generator
     {
         $localization = $this->getEntity(

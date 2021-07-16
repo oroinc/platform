@@ -22,9 +22,6 @@ class OroEmailBundle extends Bundle
     private const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
     private const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         // register email address proxy class loader
@@ -74,8 +71,6 @@ class OroEmailBundle extends Bundle
 
     /**
      * Add a compiler pass handles ORM mappings of email address proxy
-     *
-     * @param ContainerBuilder $container
      */
     private function addDoctrineOrmMappingsPass(ContainerBuilder $container)
     {

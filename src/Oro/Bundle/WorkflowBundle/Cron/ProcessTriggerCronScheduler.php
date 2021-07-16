@@ -11,8 +11,6 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
 {
     /**
-     * @param ProcessTrigger $trigger
-     *
      * @throws \InvalidArgumentException
      */
     public function add(ProcessTrigger $trigger)
@@ -31,7 +29,6 @@ class ProcessTriggerCronScheduler extends AbstractTriggerCronScheduler
     }
 
     /**
-     * @param ProcessTrigger $trigger
      * @throws \InvalidArgumentException
      */
     public function removeSchedule(ProcessTrigger $trigger)

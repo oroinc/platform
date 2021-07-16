@@ -23,10 +23,6 @@ class EmailConfigurationConfigurator
     /** @var ValidatorInterface */
     private $validator;
 
-    /**
-     * @param SymmetricCrypterInterface $encryptor
-     * @param ValidatorInterface $validator
-     */
     public function __construct(SymmetricCrypterInterface $encryptor, ValidatorInterface $validator)
     {
         $this->encryptor = $encryptor;
@@ -63,8 +59,6 @@ class EmailConfigurationConfigurator
 
     /**
      * Validate the form with SmtpConnectionConfiguration constraint
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {

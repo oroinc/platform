@@ -30,11 +30,6 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
      */
     private $logger;
 
-    /**
-     * @param Registry $doctrine
-     * @param EmailFlagManager $emailFlagManager
-     * @param LoggerInterface $logger
-     */
     public function __construct(Registry $doctrine, EmailFlagManager $emailFlagManager, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;

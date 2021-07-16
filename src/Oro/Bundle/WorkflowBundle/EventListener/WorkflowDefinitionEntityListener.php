@@ -21,10 +21,6 @@ class WorkflowDefinitionEntityListener
     /** @var ClearableCache */
     private $cache;
 
-    /**
-     * @param ClearableCache $cache
-     * @param WorkflowRegistry $workflowRegistry
-     */
     public function __construct(ClearableCache $cache, WorkflowRegistry $workflowRegistry)
     {
         $this->cache = $cache;
@@ -32,7 +28,6 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param WorkflowDefinition $definition
      * @throws WorkflowActivationException
      */
     public function prePersist(WorkflowDefinition $definition)
@@ -53,8 +48,6 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     * @param PreUpdateEventArgs $event
      * @throws WorkflowActivationException
      */
     public function preUpdate(WorkflowDefinition $definition, PreUpdateEventArgs $event)
@@ -80,8 +73,6 @@ class WorkflowDefinitionEntityListener
     }
 
     /**
-     * @param WorkflowDefinition $definition
-     *
      * @throws WorkflowRemoveException
      */
     public function preRemove(WorkflowDefinition $definition)

@@ -27,12 +27,6 @@ class ComputePercent100RoundType implements ProcessorInterface
     }
 
     /**
-     * @param array                  $data
-     * @param EntityDefinitionConfig $config
-     * @param string                 $entityClass
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function processCustomTypes(array $data, EntityDefinitionConfig $config, string $entityClass): array

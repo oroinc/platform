@@ -38,10 +38,6 @@ class DocumentBuilderFactory
      * Creates a new instance of DocumentBuilderInterface
      * responsible to build a document for the specific request type.
      *
-     * @param RequestType $requestType
-     *
-     * @return DocumentBuilderInterface
-     *
      * @throws \LogicException if a document builder cannot be created for the given request type
      */
     public function createDocumentBuilder(RequestType $requestType): DocumentBuilderInterface

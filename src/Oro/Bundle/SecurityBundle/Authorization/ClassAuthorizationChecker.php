@@ -24,12 +24,6 @@ class ClassAuthorizationChecker
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ServiceLink                   $objectIdentityFactoryLink
-     * @param ServiceLink                   $annotationProviderLink
-     * @param LoggerInterface               $logger
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ServiceLink $objectIdentityFactoryLink,

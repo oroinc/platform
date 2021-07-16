@@ -17,19 +17,11 @@ class ResourceDocParserProvider
     /** @var ResourceDocParserRegistry */
     private $resourceDocParserRegistry;
 
-    /**
-     * @param ResourceDocParserRegistry $resourceDocParserRegistry
-     */
     public function __construct(ResourceDocParserRegistry $resourceDocParserRegistry)
     {
         $this->resourceDocParserRegistry = $resourceDocParserRegistry;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return ResourceDocParserInterface
-     */
     public function getResourceDocParser(RequestType $requestType): ResourceDocParserInterface
     {
         $cacheKey = (string)$requestType;

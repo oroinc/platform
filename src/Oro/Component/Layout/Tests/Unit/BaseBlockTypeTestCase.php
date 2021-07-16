@@ -35,9 +35,6 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $this->layoutFactory = $layoutFactoryBuilder->getLayoutFactory();
     }
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $layoutFactoryBuilder->addRenderer(

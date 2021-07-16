@@ -28,9 +28,6 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
     /** @var string[] */
     private $parameterNames = [];
 
-    /**
-     * @param QueryBuilder $qb
-     */
     public function __construct(QueryBuilder $qb)
     {
         $this->qb = $qb;

@@ -23,19 +23,12 @@ class InstallCommandDeploymentTypeListener
      */
     private $deploymentType;
 
-    /**
-     * @param $projectDir
-     * @param $deploymentType
-     */
     public function __construct($projectDir, $deploymentType)
     {
         $this->projectDir = $projectDir;
         $this->deploymentType = $deploymentType;
     }
 
-    /**
-     * @param InstallerEvent $event
-     */
     public function afterDatabasePreparation(InstallerEvent $event)
     {
         if (!$this->deploymentType) {

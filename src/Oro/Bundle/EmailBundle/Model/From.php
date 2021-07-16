@@ -12,17 +12,11 @@ class From
      */
     private $params;
 
-    /**
-     * @param array $params
-     */
     private function __construct(array $params)
     {
         $this->params = $params;
     }
 
-    /**
-     * @param \Swift_Message $message
-     */
     public function populate(\Swift_Message $message): void
     {
         $message->setFrom(...$this->params);
@@ -30,7 +24,6 @@ class From
 
     /**
      * Returns array representation.
-     * @return array
      */
     public function toArray(): array
     {

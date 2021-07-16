@@ -17,19 +17,12 @@ class StatusGridHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TypesRegistry       $typesRegistry
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TypesRegistry $typesRegistry, TranslatorInterface $translator)
     {
         $this->typesRegistry = $typesRegistry;
         $this->translator    = $translator;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function statusGridBuildBefore(BuildBefore $event)
     {
         $params = $event->getDatagrid()->getParameters();
@@ -49,8 +42,6 @@ class StatusGridHelper
 
     /**
      * Binds integration ID to query
-     *
-     * @param BuildAfter $event
      */
     public function statusGridBuildAfter(BuildAfter $event)
     {

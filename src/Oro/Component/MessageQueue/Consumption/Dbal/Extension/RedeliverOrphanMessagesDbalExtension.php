@@ -105,9 +105,6 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->pidFileManager->removePidFile($context->getMessageConsumer()->getConsumerId());
     }
 
-    /**
-     * @param Context $context
-     */
     private function saveProcessPid(Context $context)
     {
         /** @var DbalMessageConsumer $consumer */
@@ -116,9 +113,6 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
         $this->pidFileManager->createPidFile($consumer->getConsumerId());
     }
 
-    /**
-     * @param Context $context
-     */
     private function redeliverOrphanMessages(Context $context)
     {
         // find orphan consumerIds

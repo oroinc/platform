@@ -36,10 +36,6 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
         $this->loadTranslator($manager, $this->container->get('oro_user.manager'));
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param UserManager $userManager
-     */
     public function loadTranslator(ObjectManager $manager, UserManager $userManager)
     {
         $role = $manager->getRepository('OroUserBundle:Role')

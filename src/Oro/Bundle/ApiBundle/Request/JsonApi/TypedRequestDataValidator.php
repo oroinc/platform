@@ -153,13 +153,6 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         $this->validateAttributesAndRelationships($data, $pointer);
     }
 
-    /**
-     * @param array  $data
-     * @param string $primaryResourceClass
-     * @param string $pointer
-     *
-     * @return bool
-     */
     protected function validatePrimaryDataObjectType(
         array $data,
         string $primaryResourceClass,
@@ -207,10 +200,6 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
         return true;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $message
-     */
     protected function addConflictError(string $pointer, string $message): void
     {
         $this->addErrorObject(

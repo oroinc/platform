@@ -24,8 +24,6 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isCoveredByAclWhenNotEnoughDataProvider
-     *
-     * @param File $file
      */
     public function testIsCoveredByAclWhenNotEnoughData(File $file): void
     {
@@ -36,9 +34,6 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->checker->isCoveredByAcl($file));
     }
 
-    /**
-     * @return array
-     */
     public function isCoveredByAclWhenNotEnoughDataProvider(): array
     {
         return [

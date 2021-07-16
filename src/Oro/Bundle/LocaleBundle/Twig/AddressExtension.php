@@ -22,9 +22,6 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
     /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
@@ -73,12 +70,6 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
     /**
      * Formats address using twig template.
      * Wraps each address part into a tag.
-     *
-     * @param Environment $environment
-     * @param AddressInterface $address
-     * @param string|null $country
-     * @param string $newLineSeparator
-     * @return string
      */
     public function formatAddressHtml(
         Environment $environment,

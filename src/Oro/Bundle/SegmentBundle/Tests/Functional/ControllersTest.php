@@ -30,7 +30,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param array $report
      * @dataProvider segmentsDataProvider
      */
     public function testCreate(array $report)
@@ -86,8 +85,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param array $report
-     * @param array $reportResult
      * @depends testView
      * @dataProvider segmentsDataProvider
      */
@@ -189,7 +186,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param array $report
      * @depends testView
      * @dataProvider segmentsDataProvider
      */

@@ -21,12 +21,6 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         $this->processor = new UpdateRelationshipsToProcessedIncludedEntities();
     }
 
-    /**
-     * @param array $items
-     * @param array $processedItems
-     *
-     * @return IncludedData
-     */
     private function getIncludedData(array $items, array $processedItems): IncludedData
     {
         $itemKeyBuilder = new ItemKeyBuilder();

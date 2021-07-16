@@ -34,9 +34,6 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
      */
     protected $translationLocales;
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $this->translator = $this->container->get('translator');
@@ -136,8 +133,6 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
 
     /**
      * Load entities to DB
-     *
-     * @param ObjectManager $manager
      */
     abstract protected function loadEntities(ObjectManager $manager);
 }

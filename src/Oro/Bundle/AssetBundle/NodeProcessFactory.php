@@ -14,9 +14,6 @@ class NodeProcessFactory
      */
     private $jsEngine;
 
-    /**
-     * @param string $jsEnginePath
-     */
     public function __construct(string $jsEnginePath)
     {
         $this->jsEngine = $jsEnginePath;

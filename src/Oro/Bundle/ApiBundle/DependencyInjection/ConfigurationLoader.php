@@ -42,17 +42,11 @@ class ConfigurationLoader
     /** @var ContainerBuilder */
     private $container;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;
     }
 
-    /**
-     * @param array $config
-     */
     public function load(array $config)
     {
         if ($this->container->getParameter('kernel.debug')) {
@@ -110,11 +104,6 @@ class ConfigurationLoader
         }
     }
 
-    /**
-     * @param array $config
-     *
-     * @return string
-     */
     private function getRequestTypeExpression(array $config): string
     {
         $requestTypes = [];
@@ -392,13 +381,6 @@ class ConfigurationLoader
         return $entityOverrideProviderServiceId;
     }
 
-    /**
-     * @param string $configKey
-     * @param string $configCacheServiceId
-     * @param string $entityAliasResolverServiceId
-     *
-     * @return string
-     */
     private function configureExclusionProvider(
         string $configKey,
         string $configCacheServiceId,
@@ -452,11 +434,6 @@ class ConfigurationLoader
         return $items;
     }
 
-    /**
-     * @param string $aspect
-     *
-     * @return int
-     */
     private function getRequestTypeAspectRank(string $aspect): int
     {
         $rank = 8;

@@ -660,9 +660,6 @@ class QueryBuilderUtilTest extends OrmTestCase
         $this->assertEquals('a0_.Field0', QueryBuilderUtil::getField('a0_', $invalid));
     }
 
-    /**
-     * @return array
-     */
     public function invalidDataProvider(): array
     {
         return [

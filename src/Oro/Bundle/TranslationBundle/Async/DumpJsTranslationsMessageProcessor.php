@@ -21,9 +21,6 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param JsTranslationDumper $dumper
-     */
     public function __construct(JsTranslationDumper $dumper, LoggerInterface $logger)
     {
         $this->dumper = $dumper;

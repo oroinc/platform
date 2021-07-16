@@ -60,11 +60,6 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getCurrencySymbolByCurrencyDataProvider
-     *
-     * @param string $viewType
-     * @param array $currencyList
-     * @param string $currencyCode
-     * @param string $expectedSymbol
      */
     public function testGetCurrencySymbolByCurrency(
         string $viewType,
@@ -85,9 +80,6 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedSymbol, $this->localeSettings->getCurrencySymbolByCurrency($currencyCode));
     }
 
-    /**
-     * @return array
-     */
     public function getCurrencySymbolByCurrencyDataProvider(): array
     {
         return [

@@ -151,7 +151,6 @@ class Organization extends ExtendOrganization implements
         $this->users         = new ArrayCollection();
     }
 
-
     /**
      * Get id
      *

@@ -27,11 +27,6 @@ class ConfigurationTestType extends AbstractType
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
 
-    /**
-     * @param TranslatorInterface    $translator
-     * @param ConfigManager          $userConfigManager
-     * @param TokenAccessorInterface $tokenAccessor
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $userConfigManager,

@@ -203,13 +203,6 @@ class EmailTemplateManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * We have to use callback instead of constructing \Swift_Message object, as it has auto generated inner fields
      * which make it impossible to compare objects directly.
-     *
-     * @param string $subject
-     * @param string $body
-     * @param string $contentType
-     * @param array $from
-     * @param array|null $to
-     * @return \PHPUnit\Framework\Constraint\Callback
      */
     private function assertMessageCallback(
         string $subject,

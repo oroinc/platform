@@ -15,9 +15,6 @@ class AddMasterRequestRouteListener
     /** @var array */
     protected $masterRequestRoute;
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();

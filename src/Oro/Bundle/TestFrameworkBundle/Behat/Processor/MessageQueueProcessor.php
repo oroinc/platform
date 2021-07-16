@@ -32,9 +32,6 @@ class MessageQueueProcessor implements MessageQueueProcessorInterface
     /** @var int */
     private $retries = 0;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;

@@ -35,12 +35,6 @@ class EntityProvider
 
     /**
      * Constructor
-     *
-     * @param ConfigProvider      $entityConfigProvider
-     * @param ConfigProvider      $extendConfigProvider
-     * @param EntityClassResolver $entityClassResolver
-     * @param TranslatorInterface $translator
-     * @param FeatureChecker      $featureChecker
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -58,8 +52,6 @@ class EntityProvider
 
     /**
      * Sets exclusion provider
-     *
-     * @param ExclusionProviderInterface $exclusionProvider
      */
     public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
     {

@@ -26,11 +26,6 @@ class DictionaryFilterTest extends WebTestCase
         $this->filter = self::getContainer()->get('oro_filter.dictionary_filter');
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
     private function createQueryBuilder(string $alias): QueryBuilder
     {
         $doctrine = self::getContainer()->get('doctrine');

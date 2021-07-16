@@ -54,12 +54,6 @@ trait SpecialFieldsConsistencyTestTrait
         }
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $excludedActions
-     *
-     * @return string|null
-     */
     private function checkSpecialFieldsConsistencyForEntity(string $entityClass, array $excludedActions): ?string
     {
         $errors = [];
@@ -94,13 +88,6 @@ trait SpecialFieldsConsistencyTestTrait
         return $result;
     }
 
-    /**
-     * @param array          $errorMessages
-     * @param EntityMetadata $metadata
-     * @param string         $fieldName
-     * @param string         $dataType
-     * @param string         $expectedFieldName
-     */
     private function checkFieldName(
         array &$errorMessages,
         EntityMetadata $metadata,

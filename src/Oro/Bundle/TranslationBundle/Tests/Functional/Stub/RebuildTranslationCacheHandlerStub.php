@@ -13,17 +13,11 @@ class RebuildTranslationCacheHandlerStub implements RebuildTranslationCacheHandl
     /** @var callable|null */
     private $rebuildCacheCallback;
 
-    /**
-     * @param RebuildTranslationCacheHandlerInterface $handler
-     */
     public function __construct(RebuildTranslationCacheHandlerInterface $handler)
     {
         $this->handler = $handler;
     }
 
-    /**
-     * @param callable|null $rebuildCache
-     */
     public function setRebuildCache(?callable $rebuildCache): void
     {
         $this->rebuildCacheCallback = $rebuildCache;

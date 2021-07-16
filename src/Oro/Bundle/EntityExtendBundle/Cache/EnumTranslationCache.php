@@ -15,18 +15,13 @@ class EnumTranslationCache
      * @var Cache
      */
     protected $cache;
-    
+
     /** @var LocalizationHelper */
     private $localizationHelper;
 
     /** @var LocaleSettings */
     private $localeSettings;
 
-    /**
-     * @param Cache $cache
-     * @param LocalizationHelper $localizationHelper
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(
         Cache $cache,
         LocalizationHelper $localizationHelper,
@@ -39,10 +34,6 @@ class EnumTranslationCache
 
     /**
      * Check that cache contains values
-     *
-     * @param string $enumValueEntityClass
-     *
-     * @return bool
      */
     public function contains(string $enumValueEntityClass): bool
     {
@@ -87,8 +78,6 @@ class EnumTranslationCache
 
     /**
      * Invalidate a cache by class of the enum value entity
-     *
-     * @param string $enumValueEntityClass
      */
     public function invalidate(string $enumValueEntityClass)
     {
@@ -98,20 +87,11 @@ class EnumTranslationCache
         }
     }
 
-    /**
-     * @param string $enumValueEntityClass
-     * @param string|null $locale
-     *
-     * @return string
-     */
     private function getKey(string $enumValueEntityClass, string $locale = null): string
     {
         return sprintf('%s|%s', $enumValueEntityClass, $locale ?? $this->getLocaleKey());
     }
 
-    /**
-     * @return string
-     */
     private function getLocaleKey(): string
     {
         return $this->localizationHelper->getCurrentLocalization()

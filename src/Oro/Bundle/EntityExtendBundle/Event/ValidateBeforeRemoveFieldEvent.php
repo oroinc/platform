@@ -15,9 +15,6 @@ class ValidateBeforeRemoveFieldEvent extends Event
     /** @var array */
     protected $validationMessages = [];
 
-    /**
-     * @param FieldConfigModel $fieldConfig
-     */
     public function __construct(FieldConfigModel $fieldConfig)
     {
         $this->fieldConfig = $fieldConfig;

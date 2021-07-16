@@ -16,17 +16,11 @@ class MassNotificationListener
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param NotificationSentEvent $event
-     */
     public function logMassNotification(NotificationSentEvent $event)
     {
         $spoolItem = $event->getSpoolItem();

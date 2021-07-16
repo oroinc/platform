@@ -32,10 +32,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->datagridParametersHelper->getFromParameters($this->datagridParameters, $parameterName));
     }
 
-    /**
-     * @param string $parameterName
-     * @param bool $exists
-     */
     private function mockParameterExists(string $parameterName, bool $exists): void
     {
         $this->datagridParameters
@@ -74,10 +70,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider minifiedParametersDataProvider
-     *
-     * @param array $minifiedParameters
-     * @param string $parameterName
-     * @param string|null $expectedParameterValue
      */
     public function testGetFromMinifiedParameters(
         array $minifiedParameters,
@@ -98,9 +90,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function minifiedParametersDataProvider(): array
     {
         return [
@@ -119,10 +108,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterParametersDataProvider
-     *
-     * @param string $filterName
-     * @param array $originalParameters
-     * @param array $expectedParameters
      */
     public function testResetFilter(string $filterName, array $originalParameters, array $expectedParameters): void
     {
@@ -132,9 +117,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(new ParameterBag($expectedParameters), $parameters);
     }
 
-    /**
-     * @return array
-     */
     public function filterParametersDataProvider(): array
     {
         return [
@@ -192,9 +174,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resetFiltersDataProvider
-     *
-     * @param array $originalParameters
-     * @param array $expectedParameters
      */
     public function testResetFilters(array $originalParameters, array $expectedParameters): void
     {
@@ -204,9 +183,6 @@ class DatagridParametersHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(new ParameterBag($expectedParameters), $parameters);
     }
 
-    /**
-     * @return array
-     */
     public function resetFiltersDataProvider(): array
     {
         return [

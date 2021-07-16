@@ -16,9 +16,6 @@ class SecurityProvider
      */
     protected $securityProvider;
 
-    /**
-     * @param SearchSecurityProvider $securityProvider
-     */
     public function __construct(SearchSecurityProvider $securityProvider)
     {
         $this->securityProvider = $securityProvider;

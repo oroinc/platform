@@ -25,10 +25,6 @@ class DatabasePersister
     /** @var TranslationManager */
     private $translationManager;
 
-    /**
-     * @param Registry $registry
-     * @param TranslationManager $translationManager
-     */
     public function __construct(Registry $registry, TranslationManager $translationManager)
     {
         $this->registry = $registry;
@@ -133,7 +129,6 @@ class DatabasePersister
     {
         return $this->getEntityManager($class)->getRepository($class);
     }
-
 
     /**
      * Loads translation keys to DB if needed

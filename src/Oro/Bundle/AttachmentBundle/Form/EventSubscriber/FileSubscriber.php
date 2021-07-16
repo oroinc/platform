@@ -21,9 +21,6 @@ class FileSubscriber implements EventSubscriberInterface
     /** @var ConfigFileValidator */
     protected $validator;
 
-    /**
-     * @param ConfigFileValidator $validator
-     */
     public function __construct(ConfigFileValidator $validator)
     {
         $this->validator = $validator;
@@ -41,8 +38,6 @@ class FileSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger attachment entity update
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {

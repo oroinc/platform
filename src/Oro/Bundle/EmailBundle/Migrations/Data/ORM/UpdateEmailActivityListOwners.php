@@ -45,8 +45,6 @@ class UpdateEmailActivityListOwners extends AbstractFixture implements Container
 
     /**
      * Update ActivityList Owner
-     *
-     * @param ObjectManager $manager
      */
     public function updateActivityListOwner(ObjectManager $manager)
     {

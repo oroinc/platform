@@ -5,7 +5,7 @@ services:
     Oro\Bundle\CronBundle\Command\CronCommand:
         arguments:
             - '@doctrine'
-            - '@oro_platform.maintenance'
+            - '@oro_maintenance.maintenance'
             - '@oro_cron.helper.cron'
             - '@oro_cron.async.command_runner'
             - '@logger'

@@ -18,11 +18,6 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/update_list_for_entity.yml']);
     }
 
-    /**
-     * @param string $name
-     *
-     * @return int
-     */
     private function getEmployeeId(string $name): int
     {
         /** @var TestEmployee|null $employee */

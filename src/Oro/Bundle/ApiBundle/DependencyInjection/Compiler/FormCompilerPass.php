@@ -132,9 +132,6 @@ class FormCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function decorateFormTypeFactory(ContainerBuilder $container)
     {
         $container
@@ -147,10 +144,6 @@ class FormCompilerPass implements CompilerPassInterface
             ->setDecoratedService(self::FORM_TYPE_FACTORY_SERVICE_ID);
     }
 
-    /**
-     * @param Definition       $formRegistryDef
-     * @param ContainerBuilder $container
-     */
     private function assertExistingFormRegistry(Definition $formRegistryDef, ContainerBuilder $container)
     {
         $formRegistryClass = $formRegistryDef->getClass();

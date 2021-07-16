@@ -40,13 +40,6 @@ class ActivityListIdProvider
     /** @var AclHelper */
     private $aclHelper;
 
-    /**
-     * @param ConfigManager                    $config
-     * @param ActivityListChainProvider        $chainProvider
-     * @param ActivityListFilterHelper         $activityListFilterHelper
-     * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
-     * @param AclHelper                        $aclHelper
-     */
     public function __construct(
         ConfigManager $config,
         ActivityListChainProvider $chainProvider,

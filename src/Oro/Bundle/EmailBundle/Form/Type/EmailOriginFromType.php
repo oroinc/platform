@@ -40,14 +40,6 @@ class EmailOriginFromType extends AbstractType
     /** @var EmailOriginHelper */
     protected $emailOriginHelper;
 
-    /**
-     * @param TokenAccessorInterface  $tokenAccessor
-     * @param RelatedEmailsProvider   $relatedEmailsProvider
-     * @param EmailModelBuilderHelper $helper
-     * @param MailboxManager          $mailboxManager
-     * @param ManagerRegistry         $registry
-     * @param EmailOriginHelper       $emailOriginHelper
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,

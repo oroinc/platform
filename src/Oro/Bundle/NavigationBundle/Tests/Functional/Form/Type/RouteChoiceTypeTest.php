@@ -28,9 +28,6 @@ class RouteChoiceTypeTest extends WebTestCase
 
     /**
      * @dataProvider createViewDataProvider
-     *
-     * @param array $options
-     * @param array $expectedChoices
      */
     public function testCreateView(array $options, array $expectedChoices)
     {

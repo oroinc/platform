@@ -13,17 +13,11 @@ class ConfigManagerArrayCacheClearListener
     /** @var CacheProvider */
     private $arrayCache;
 
-    /**
-     * @param CacheProvider $cacheProvider
-     */
     public function __construct(CacheProvider $cacheProvider)
     {
         $this->arrayCache = $cacheProvider;
     }
 
-    /**
-     * @param ConfigManagerScopeIdUpdateEvent $event
-     */
     public function onScopeIdChange(ConfigManagerScopeIdUpdateEvent $event): void
     {
         $this->arrayCache->flushAll();

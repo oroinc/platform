@@ -9,9 +9,6 @@ class AliceFixtureIdentifierResolver implements FixtureIdentifierResolverInterfa
     /** @var KernelInterface */
     private $kernel;
 
-    /**
-     * @param KernelInterface $kernel
-     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;

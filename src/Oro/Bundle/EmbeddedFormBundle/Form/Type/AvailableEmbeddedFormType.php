@@ -14,9 +14,6 @@ class AvailableEmbeddedFormType extends AbstractType
      */
     protected $manager;
 
-    /**
-     * @param EmbeddedFormManager $manager
-     */
     public function __construct(EmbeddedFormManager $manager)
     {
         $this->manager = $manager;

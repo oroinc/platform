@@ -256,11 +256,6 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         return $userEmailOrigin;
     }
 
-    /**
-     * @param string $type
-     *
-     * @return Oauth2ManagerInterface
-     */
     private function getOAuthManager(string $type): Oauth2ManagerInterface
     {
         $oauthManager = $this->createMock(Oauth2ManagerInterface::class);

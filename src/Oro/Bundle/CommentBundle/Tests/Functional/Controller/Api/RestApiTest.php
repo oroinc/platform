@@ -122,7 +122,6 @@ class RestApiTest extends WebTestCase
         return $result;
     }
 
-
     /**
      * @depends testPost
      *

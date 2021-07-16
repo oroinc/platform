@@ -25,11 +25,6 @@ abstract class RolePrivilegeAbstractProvider
     /** @var AclRoleHandler */
     protected $aclRoleHandler;
 
-    /**
-     * @param TranslatorInterface           $translator
-     * @param RolePrivilegeCategoryProvider $categoryProvider
-     * @param AclRoleHandler                $aclRoleHandler
-     */
     public function __construct(
         TranslatorInterface $translator,
         RolePrivilegeCategoryProvider $categoryProvider,
@@ -58,7 +53,7 @@ abstract class RolePrivilegeAbstractProvider
 
         return self::DEFAULT_ACTION_CATEGORY;
     }
-    
+
     /**
      * @param AbstractRole $role
      * @param string       $type

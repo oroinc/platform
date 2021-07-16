@@ -13,9 +13,6 @@ abstract class AbstractAssembler
      */
     protected $configurationPasses = array();
 
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
     public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
     {
         $this->configurationPasses[] = $configurationPass;
@@ -83,8 +80,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param array $options
-     * @param array $requiredOptions
      * @throws AssemblerException
      */
     protected function assertOptions(array $options, array $requiredOptions)
@@ -111,9 +106,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     * @param array $optionNames
-     *
      * @throws AssemblerException If parameter is invalid
      */
     protected function assertParameterHasOptions(ParameterInterface $parameter, array $optionNames)
@@ -133,9 +125,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     * @param array $optionNames
-     *
      * @throws AssemblerException
      */
     protected function assertParameterHasNoOptions(ParameterInterface $parameter, array $optionNames)
@@ -155,8 +144,6 @@ abstract class AbstractAssembler
     }
 
     /**
-     * @param ParameterInterface $parameter
-     *
      * @throws AssemblerException
      */
     protected function assertParameterHasClassOption(ParameterInterface $parameter)

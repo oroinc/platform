@@ -295,8 +295,6 @@ class AclManager extends AbstractAclManager
 
     /**
      * Deletes an ACL for the given ObjectIdentity.
-     *
-     * @param OID $oid
      */
     public function deleteAcl(OID $oid)
     {
@@ -445,8 +443,6 @@ class AclManager extends AbstractAclManager
      * otherwise, class-based ACEs are deleted.
      * If the given object identity represents a "root" ACL the object-based ACEs are deleted.
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     public function deleteAllPermissions(SID $sid, OID $oid)
@@ -772,8 +768,6 @@ class AclManager extends AbstractAclManager
     /**
      * Deletes all class-based ACEs for the given security identity
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     protected function deleteAllClassPermissions(SID $sid, OID $oid)
@@ -784,8 +778,6 @@ class AclManager extends AbstractAclManager
     /**
      * Deletes all object-based ACEs for the given security identity
      *
-     * @param SID $sid
-     * @param OID $oid
      * @throws InvalidAclMaskException
      */
     protected function deleteAllObjectPermissions(SID $sid, OID $oid)

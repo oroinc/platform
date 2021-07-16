@@ -24,10 +24,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
     /** @var DatagridConfiguration[] */
     private $configuration = [];
 
-    /**
-     * @param SegmentDatagridConfigurationBuilder $builder
-     * @param ManagerRegistry                     $doctrine
-     */
     public function __construct(
         SegmentDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine
@@ -68,10 +64,6 @@ class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAw
 
     /**
      * Checks whether a segment grid ready for displaying.
-     *
-     * @param string $gridName
-     *
-     * @return bool
      */
     public function isConfigurationValid(string $gridName): bool
     {

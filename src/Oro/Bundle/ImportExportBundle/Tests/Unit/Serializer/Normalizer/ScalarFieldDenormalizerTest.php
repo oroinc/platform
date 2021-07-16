@@ -36,8 +36,6 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function supportsDenormalizationProvider(): array
     {
@@ -181,8 +179,6 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
     public function denormalizeProvider(): array
     {

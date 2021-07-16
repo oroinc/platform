@@ -16,27 +16,17 @@ class ExportPreGetIds extends Event
     /** @var array */
     private $options;
 
-    /**
-     * @param QueryBuilder $qb
-     * @param array $options
-     */
     public function __construct(QueryBuilder $qb, array $options)
     {
         $this->qb = $qb;
         $this->options = $options;
     }
 
-    /**
-     * @return QueryBuilder
-     */
     public function getQueryBuilder(): QueryBuilder
     {
         return $this->qb;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;

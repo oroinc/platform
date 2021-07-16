@@ -20,9 +20,6 @@ class MultipleEntityType extends AbstractType
     /** @var RouterInterface */
     protected $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;

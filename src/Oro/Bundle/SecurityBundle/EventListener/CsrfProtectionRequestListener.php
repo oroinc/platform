@@ -26,8 +26,6 @@ class CsrfProtectionRequestListener
     /**
      * Implements double submit cookie CSRF check.
      *
-     * @param ControllerEvent $event
-     *
      * @throws AccessDeniedHttpException when route is protected against CSRF attacks and security check failed
      */
     public function onKernelController(ControllerEvent $event): void
@@ -69,8 +67,6 @@ class CsrfProtectionRequestListener
 
     /**
      * Regenerates CSRF cookie on each response.
-     *
-     * @param ResponseEvent $event
      */
     public function onKernelResponse(ResponseEvent $event): void
     {

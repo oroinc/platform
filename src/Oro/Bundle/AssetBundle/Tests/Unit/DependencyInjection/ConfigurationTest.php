@@ -32,9 +32,6 @@ class ConfigurationTest extends TestCase
 
     /**
      * @dataProvider dataProviderConfigTree
-     *
-     * @param array $options
-     * @param array $expects
      */
     public function testConfigTree(array $options, array $expects): void
     {
@@ -45,9 +42,6 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($expects, $result);
     }
 
-    /**
-     * @return array
-     */
     public function dataProviderConfigTree(): array
     {
         return [

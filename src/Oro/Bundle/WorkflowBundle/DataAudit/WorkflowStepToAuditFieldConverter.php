@@ -22,10 +22,6 @@ class WorkflowStepToAuditFieldConverter implements ChangeSetToAuditFieldsConvert
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param ChangeSetToAuditFieldsConverterInterface $innerConverter
-     * @param DoctrineHelper                           $doctrineHelper
-     */
     public function __construct(
         ChangeSetToAuditFieldsConverterInterface $innerConverter,
         DoctrineHelper $doctrineHelper

@@ -25,9 +25,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private const TEMPLATES           = 'templates';
     private const CHILDREN            = 'children';
 
-    /**
-     * @return array
-     */
     public function getMenuTree(): array
     {
         $config = $this->doGetConfig();
@@ -40,9 +37,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $menuConfig[self::TREE];
     }
 
-    /**
-     * @return array
-     */
     public function getMenuItems(): array
     {
         $config = $this->doGetConfig();
@@ -55,9 +49,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $menuConfig[self::ITEMS];
     }
 
-    /**
-     * @return array
-     */
     public function getMenuTemplates(): array
     {
         $config = $this->doGetConfig();
@@ -70,9 +61,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $menuConfig[self::TEMPLATES];
     }
 
-    /**
-     * @return array
-     */
     public function getNavigationElements(): array
     {
         $config = $this->doGetConfig();
@@ -83,11 +71,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $config[self::NAVIGATION_ELEMENTS];
     }
 
-    /**
-     * @param string $route
-     *
-     * @return string|null
-     */
     public function getTitle(string $route): ?string
     {
         $config = $this->doGetConfig();
@@ -141,11 +124,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $processedConfig;
     }
 
-    /**
-     * @param array $tree
-     *
-     * @return array
-     */
     private function getReorganizedTree(array $tree): array
     {
         $newTree = $tree;
@@ -158,12 +136,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $newTree;
     }
 
-    /**
-     * @param array  $tree
-     * @param array  $treePart
-     * @param string $childName
-     * @param array  $childData
-     */
     private function reorganizeTree(array &$tree, array &$treePart, string $childName, array &$childData): void
     {
         $data = $childData;
@@ -184,12 +156,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         }
     }
 
-    /**
-     * @param array  $tree
-     * @param string $childName
-     *
-     * @return array|null
-     */
     private function getChildAndRemove(array &$tree, string $childName): ?array
     {
         if (!\array_key_exists(self::CHILDREN, $tree)) {
@@ -213,11 +179,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return null;
     }
 
-    /**
-     * @param array $treeItem
-     *
-     * @return string
-     */
     private function getMergeStrategy(array $treeItem): string
     {
         $mergeStrategy = \array_key_exists('merge_strategy', $treeItem)
@@ -233,9 +194,6 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $mergeStrategy;
     }
 
-    /**
-     * @param array $config
-     */
     private function normalizeOptionNames(array &$config): void
     {
         $normalizeMap = [

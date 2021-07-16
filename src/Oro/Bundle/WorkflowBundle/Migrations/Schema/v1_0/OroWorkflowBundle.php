@@ -33,8 +33,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate table oro_workflow_definition
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowDefinitionTable(Schema $schema)
     {
@@ -56,8 +54,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate table oro_workflow_item
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowItemTable(Schema $schema)
     {
@@ -80,8 +76,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate table oro_workflow_step
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowStepTable(Schema $schema)
     {
@@ -100,8 +94,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate table oro_workflow_transition_log
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowTransitionLogTable(Schema $schema)
     {
@@ -122,8 +114,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate table oro_workflow_entity_acl
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowEntityAclTable(Schema $schema)
     {
@@ -171,8 +161,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_workflow_definition
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowDefinitionForeignKeys(Schema $schema)
     {
@@ -189,8 +177,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_workflow_item
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowItemForeignKeys(Schema $schema)
     {
@@ -213,8 +199,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_workflow_step
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowStepForeignKeys(Schema $schema)
     {
@@ -231,8 +215,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_workflow_transition_log
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowTransitionLogForeignKeys(Schema $schema)
     {
@@ -261,8 +243,6 @@ class OroWorkflowBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_workflow_entity_acl
-     *
-     * @param Schema $schema
      */
     public static function oroWorkflowEntityAclForeignKeys(Schema $schema)
     {

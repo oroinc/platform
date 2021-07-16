@@ -8,9 +8,6 @@ use Oro\Bundle\UserBundle\Entity\Role;
 
 abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
 {
-    /**
-     * @return PhpArrayConfigCacheModifier
-     */
     private static function getConfigurationModifier(): PhpArrayConfigCacheModifier
     {
         return new PhpArrayConfigCacheModifier(
@@ -52,9 +49,6 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
 
     /**
      * @dataProvider configurablePermissionEntitiesProvider
-     *
-     * @param array $config
-     * @param \Closure $assertGridData
      */
     public function testConfigurableEntities(array $config, \Closure $assertGridData)
     {

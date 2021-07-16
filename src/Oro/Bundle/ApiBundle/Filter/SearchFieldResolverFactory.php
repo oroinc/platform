@@ -12,9 +12,6 @@ class SearchFieldResolverFactory
     /** @var AbstractSearchMappingProvider */
     private $searchMappingProvider;
 
-    /**
-     * @param AbstractSearchMappingProvider $searchMappingProvider
-     */
     public function __construct(AbstractSearchMappingProvider $searchMappingProvider)
     {
         $this->searchMappingProvider = $searchMappingProvider;
@@ -36,11 +33,6 @@ class SearchFieldResolverFactory
         );
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
     protected function getSearchFieldMappings(string $entityClass): array
     {
         $mapping = $this->searchMappingProvider->getEntityConfig($entityClass);

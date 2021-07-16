@@ -33,10 +33,6 @@ class SortersConfigLoader extends AbstractConfigLoader
         return $sorters;
     }
 
-    /**
-     * @param SortersConfig $sorters
-     * @param array|null    $fields
-     */
     protected function loadFields(SortersConfig $sorters, array $fields = null)
     {
         if (!empty($fields)) {

@@ -32,9 +32,6 @@ class ImapEmailIterator implements \Iterator, \Countable
 
     /**
      * Constructor
-     *
-     * @param ImapMessageIterator $iterator
-     * @param ImapEmailManager    $manager
      */
     public function __construct(ImapMessageIterator $iterator, ImapEmailManager $manager)
     {
@@ -69,9 +66,6 @@ class ImapEmailIterator implements \Iterator, \Countable
         $this->iterator->setBatchSize($batchSize);
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->iterator->setLogger($logger);

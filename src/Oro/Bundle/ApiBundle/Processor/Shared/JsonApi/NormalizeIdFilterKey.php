@@ -20,9 +20,6 @@ class NormalizeIdFilterKey implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -52,11 +49,6 @@ class NormalizeIdFilterKey implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return string|null
-     */
     private function getIdentifierFieldName(Context $context): ?string
     {
         $idFieldName = null;

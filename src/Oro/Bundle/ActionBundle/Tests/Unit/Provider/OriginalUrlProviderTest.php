@@ -96,7 +96,6 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     *
      * @param string $requestUri
      * @return Request
      */

@@ -17,9 +17,6 @@ class SyncScheduler
      */
     private $producer;
 
-    /**
-     * @param MessageProducerInterface $producer
-     */
     public function __construct(MessageProducerInterface $producer)
     {
         $this->producer = $producer;

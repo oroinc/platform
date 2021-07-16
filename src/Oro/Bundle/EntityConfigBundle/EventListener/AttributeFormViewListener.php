@@ -21,17 +21,11 @@ class AttributeFormViewListener
      */
     private $attributeManager;
 
-    /**
-     * @param AttributeManager $attributeManager
-     */
     public function __construct(AttributeManager $attributeManager)
     {
         $this->attributeManager = $attributeManager;
     }
 
-    /**
-     * @param BeforeListRenderEvent $event
-     */
     public function onEdit(BeforeListRenderEvent $event)
     {
         $entity = $event->getEntity();
@@ -52,10 +46,6 @@ class AttributeFormViewListener
         $this->removeEmptyGroupBlocks($scrollData, $groupsData);
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param array $groups
-     */
     private function removeEmptyGroupBlocks(ScrollData $scrollData, array $groups)
     {
         $data = $scrollData->getData();
@@ -82,10 +72,6 @@ class AttributeFormViewListener
         }
     }
 
-    /**
-     * @param ScrollData $scrollData
-     * @param array $groups
-     */
     protected function addNotEmptyGroupBlocks(ScrollData $scrollData, array $groups)
     {
         foreach ($groups as $group) {
@@ -133,9 +119,6 @@ class AttributeFormViewListener
         return $twig->render('@OroEntityConfig/Attribute/row.html.twig', ['child' => $attributeView]);
     }
 
-    /**
-     * @param BeforeListRenderEvent $event
-     */
     public function onViewList(BeforeListRenderEvent $event)
     {
         $entity = $event->getEntity();

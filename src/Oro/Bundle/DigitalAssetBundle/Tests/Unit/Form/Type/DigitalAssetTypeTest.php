@@ -74,10 +74,6 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param DigitalAsset $defaultData
-     * @param array $submittedData
-     * @param DigitalAsset $expectedData
      */
     public function testSubmit(DigitalAsset $defaultData, array $submittedData, DigitalAsset $expectedData): void
     {
@@ -96,9 +92,6 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
         $this->assertInstanceOf(\DateTime::class, $form->getData()->getSourceFile()->getUpdatedAt());
     }
 
-    /**
-     * @return array
-     */
     public function submitDataProvider(): array
     {
         $sourceFile = new File();

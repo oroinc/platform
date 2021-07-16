@@ -37,8 +37,6 @@ class CacheConfigurationPass implements CompilerPassInterface
 
     /**
      * Makes sure abstract service for data cache exists
-     *
-     * @param ContainerBuilder $container
      */
     private function ensureAbstractDataCacheExists(ContainerBuilder $container): void
     {
@@ -50,8 +48,6 @@ class CacheConfigurationPass implements CompilerPassInterface
 
     /**
      * Configures data cache manager
-     *
-     * @param ContainerBuilder $container
      */
     private function configureDataCacheManagerAndStaticConfigCache(ContainerBuilder $container): void
     {
@@ -76,10 +72,6 @@ class CacheConfigurationPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $providerServiceId
-     */
     private function registerStaticConfigWarmer(ContainerBuilder $container, string $providerServiceId): void
     {
         $warmerServiceId = $providerServiceId . '.warmer';
@@ -93,12 +85,6 @@ class CacheConfigurationPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $cacheDefinitionId
-     *
-     * @return Definition
-     */
     private function getCacheProvider(ContainerBuilder $container, string $cacheDefinitionId): Definition
     {
         if ($container->hasDefinition($cacheDefinitionId)) {
@@ -120,9 +106,6 @@ class CacheConfigurationPass implements CompilerPassInterface
         return $cacheDefinition;
     }
 
-    /**
-     * @return Definition
-     */
     private function getFilesystemCache(): Definition
     {
         $cacheDefinition = new Definition(
@@ -134,11 +117,6 @@ class CacheConfigurationPass implements CompilerPassInterface
         return $cacheDefinition;
     }
 
-    /**
-     * @param Definition $cacheProvider
-     *
-     * @return Definition
-     */
     public static function getMemoryCacheChain(Definition $cacheProvider): Definition
     {
         $definition = new Definition(MemoryCacheChain::class, [$cacheProvider]);

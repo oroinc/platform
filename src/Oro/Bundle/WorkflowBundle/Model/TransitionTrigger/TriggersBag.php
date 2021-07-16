@@ -29,9 +29,6 @@ class TriggersBag
         }
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     protected function addTrigger(BaseTransitionTrigger $trigger)
     {
         $this->triggers[] = $trigger;

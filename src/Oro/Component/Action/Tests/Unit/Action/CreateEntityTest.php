@@ -49,7 +49,6 @@ class CreateEntityTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $options
      * @dataProvider executeDataProvider
      */
     public function testExecute(array $options)

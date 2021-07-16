@@ -20,9 +20,6 @@ interface ButtonInterface
      */
     public function getLabel();
 
-    /**
-     * @return string|null
-     */
     public function getAriaLabel(): ?string;
 
     /**

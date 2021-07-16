@@ -18,9 +18,6 @@ class ValidateEntityTypeSupported implements ProcessorInterface
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
-    /**
-     * @param ValueNormalizer $valueNormalizer
-     */
     public function __construct(ValueNormalizer $valueNormalizer)
     {
         $this->valueNormalizer = $valueNormalizer;
@@ -58,12 +55,6 @@ class ValidateEntityTypeSupported implements ProcessorInterface
         }
     }
 
-    /**
-     * @param string      $entityClass
-     * @param RequestType $requestType
-     *
-     * @return string
-     */
     private function getEntityType(string $entityClass, RequestType $requestType): string
     {
         $entityType = ValueNormalizerUtil::convertToEntityType(

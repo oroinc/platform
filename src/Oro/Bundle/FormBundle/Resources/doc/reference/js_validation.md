@@ -170,4 +170,4 @@ This attribute is checked in each validation cycle, so developer can add/remove 
  1. supports only group of checkboxes with same name (like `user[role][]`)
  2. can't be supported on client side
  3. alias for `required` validator (standard jQuery.validate)
- 4. supports only integer type
+ 4. supports only `numeric`, `integer` and `float` types

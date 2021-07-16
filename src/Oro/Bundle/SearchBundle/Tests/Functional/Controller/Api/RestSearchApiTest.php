@@ -25,9 +25,6 @@ class RestSearchApiTest extends SearchBundleWebTestCase
     }
 
     /**
-     * @param array $request
-     * @param array $response
-     *
      * @dataProvider searchDataProvider
      */
     public function testSearch(array $request, array $response)
@@ -79,10 +76,6 @@ class RestSearchApiTest extends SearchBundleWebTestCase
         );
     }
 
-    /**
-     * @param array $items
-     * @param array $result
-     */
     protected function assertResultHasItems(array $items, array $result)
     {
         foreach ($items as $item) {

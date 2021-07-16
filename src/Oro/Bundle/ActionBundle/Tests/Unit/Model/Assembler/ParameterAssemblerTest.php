@@ -21,9 +21,6 @@ class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $configuration
-     * @param array $expected
-     *
      * @dataProvider assembleProvider
      */
     public function testAssemble(array $configuration, array $expected)

@@ -71,9 +71,6 @@ class OrganizationBasicAuthenticationListener
         $this->ignoreFailure = false;
     }
 
-    /**
-     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
-     */
     public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
     {
         $this->tokenFactory = $tokenFactory;

@@ -19,10 +19,6 @@ class SubresourcesConfigExtension extends AbstractConfigExtension
     /** @var FilterOperatorRegistry */
     private $filterOperatorRegistry;
 
-    /**
-     * @param ActionProcessorBagInterface $actionProcessorBag
-     * @param FilterOperatorRegistry      $filterOperatorRegistry
-     */
     public function __construct(
         ActionProcessorBagInterface $actionProcessorBag,
         FilterOperatorRegistry $filterOperatorRegistry

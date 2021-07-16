@@ -12,10 +12,6 @@ interface MediaCacheManagerRegistryInterface
 {
     /**
      * Returns public or protected media cache manager for the given file.
-     *
-     * @param File $file
-     *
-     * @return GaufretteFileManager
      */
     public function getManagerForFile(File $file): GaufretteFileManager;
 }

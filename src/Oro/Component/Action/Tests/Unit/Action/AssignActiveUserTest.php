@@ -46,8 +46,6 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
      * @dataProvider optionsDataProvider
      */
     public function testInitialize(array $inputOptions, array $expectedOptions)
@@ -136,7 +134,6 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputOptions
      * @dataProvider optionsDataProvider
      */
     public function testExecute(array $inputOptions)

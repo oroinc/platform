@@ -71,8 +71,6 @@ class DateTimeExtension extends AbstractTypeExtension
 
     /**
      * Wraps DateTimeToLocalizedStringTransformer with RemoveMillisecondsFromDateTimeTransformer view transformer.
-     *
-     * @param FormBuilderInterface $builder
      */
     private function wrapLocalizedStringWithRemoveMillisecondsTransformer(FormBuilderInterface $builder)
     {

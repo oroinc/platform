@@ -38,12 +38,6 @@ class FixturesChecker implements HealthCheckerInterface
      */
     protected $errors = [];
 
-    /**
-     * @param FixtureLoader $fixtureLoader
-     * @param AliceLoader $aliceLoader
-     * @param DoctrineIsolator $doctrineIsolator
-     * @param KernelInterface $kernel
-     */
     public function __construct(
         FixtureLoader $fixtureLoader,
         AliceLoader $aliceLoader,
@@ -66,9 +60,6 @@ class FixturesChecker implements HealthCheckerInterface
         ];
     }
 
-    /**
-     * @param BeforeFeatureTested $event
-     */
     public function checkFixtures(BeforeFeatureTested $event)
     {
         $this->kernel->boot();

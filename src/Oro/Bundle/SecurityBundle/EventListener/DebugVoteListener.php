@@ -20,10 +20,6 @@ class DebugVoteListener extends VoteListener
     /** @var bool|null */
     private $isEnabled;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param VoteListener $innerListener
-     */
     public function __construct(ConfigManager $configManager, VoteListener $innerListener)
     {
         $this->configManager = $configManager;
@@ -40,17 +36,11 @@ class DebugVoteListener extends VoteListener
         }
     }
 
-    /**
-     * @return array
-     */
     public static function getSubscribedEvents(): array
     {
         return parent::getSubscribedEvents();
     }
 
-    /**
-     * @return bool
-     */
     private function isEnabled(): bool
     {
         if ($this->isEnabled === null) {

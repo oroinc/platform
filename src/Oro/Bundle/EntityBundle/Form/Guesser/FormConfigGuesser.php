@@ -15,11 +15,6 @@ class FormConfigGuesser extends AbstractFormGuesser
     /** @var ConfigProvider */
     protected $formConfigProvider;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     * @param ConfigProvider  $entityConfigProvider
-     * @param ConfigProvider  $formConfigProvider
-     */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ConfigProvider $entityConfigProvider,

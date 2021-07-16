@@ -18,10 +18,6 @@ class DefaultOwnerHelper
     /** @var OwnershipMetadataProviderInterface */
     protected $ownershipMetadataProvider;
 
-    /**
-     * @param ManagerRegistry                    $registry
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(
         ManagerRegistry $registry,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider

@@ -14,18 +14,9 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\DTO\SelectedItems;
  */
 interface IterableResultFactoryInterface
 {
-    /**
-     * @param DatasourceInterface $dataSource
-     * @return bool
-     */
     public function isApplicable(DatasourceInterface $dataSource): bool;
 
     /**
-     * @param DatasourceInterface $dataSource
-     * @param ActionConfiguration $actionConfiguration
-     * @param DatagridConfiguration $gridConfiguration
-     * @param SelectedItems $selectedItems
-     * @return IterableResultInterface
      * @throws LogicException
      */
     public function createIterableResult(

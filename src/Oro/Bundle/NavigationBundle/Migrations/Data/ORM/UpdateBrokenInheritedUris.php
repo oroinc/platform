@@ -73,9 +73,6 @@ class UpdateBrokenInheritedUris extends AbstractFixture implements ContainerAwar
         return new BufferedIdentityQueryResultIterator($qb);
     }
 
-    /**
-     * @param array $menusByScopes
-     */
     protected function clearCaches(array $menusByScopes): void
     {
         $eventDispatcher = $this->container->get(EventDispatcherInterface::class);

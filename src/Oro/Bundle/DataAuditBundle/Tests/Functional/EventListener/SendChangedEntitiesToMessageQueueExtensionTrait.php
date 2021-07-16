@@ -15,49 +15,30 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 {
     use MessageQueueExtension;
 
-    /**
-     * @param int $expected
-     * @param Message $message
-     */
     public function assertEntitiesInsertedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_inserted']));
         $this->assertCount($expected, $message->getBody()['entities_inserted']);
     }
 
-    /**
-     * @param int $expected
-     * @param Message $message
-     */
     public function assertEntitiesUpdatedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_updated']));
         $this->assertCount($expected, $message->getBody()['entities_updated']);
     }
 
-    /**
-     * @param int $expected
-     * @param Message $message
-     */
     public function assertEntitiesDeletedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['entities_deleted']));
         $this->assertCount($expected, $message->getBody()['entities_deleted']);
     }
 
-    /**
-     * @param int $expected
-     * @param Message $message
-     */
     public function assertCollectionsUpdatedInMessageCount(int $expected, Message $message): void
     {
         $this->assertTrue(isset($message->getBody()['collections_updated']));
         $this->assertCount($expected, $message->getBody()['collections_updated']);
     }
 
-    /**
-     * @return TestAuditDataOwner
-     */
     protected function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
@@ -87,9 +68,6 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $ownerProxy;
     }
 
-    /**
-     * @return TestAuditDataChild
-     */
     protected function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
@@ -102,9 +80,6 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $child;
     }
 
-    /**
-     * @return Message
-     */
     protected function getFirstEntitiesChangedMessage(): Message
     {
         $messages = self::getSentMessages();

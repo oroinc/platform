@@ -19,9 +19,6 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
      */
     private $configModified = false;
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     */
     public function __construct(WorkflowDefinition $workflowDefinition)
     {
         $this->workflowDefinition = $workflowDefinition;
@@ -80,9 +77,6 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
         }
     }
 
-    /**
-     * @param $field
-     */
     private function getUpdatedValue(&$field)
     {
         if ($this->hasChanges()) {

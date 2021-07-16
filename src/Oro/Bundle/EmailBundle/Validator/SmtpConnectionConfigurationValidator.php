@@ -19,10 +19,6 @@ class SmtpConnectionConfigurationValidator extends ConstraintValidator
     /** @var SmtpSettingsFactory */
     private $smtpSettingsFactory;
 
-    /**
-     * @param SmtpSettingsChecker $checker
-     * @param SmtpSettingsFactory $smtpSettingsFactory
-     */
     public function __construct(SmtpSettingsChecker $checker, SmtpSettingsFactory $smtpSettingsFactory)
     {
         $this->checker = $checker;

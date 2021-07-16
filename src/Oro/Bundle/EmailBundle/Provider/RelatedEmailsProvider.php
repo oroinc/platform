@@ -36,13 +36,6 @@ class RelatedEmailsProvider
     /** @var EmailAttributeProvider */
     private $emailAttributeProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailRecipientsHelper $emailRecipientsHelper
-     * @param EntityFieldProvider $entityFieldProvider
-     * @param EmailAttributeProvider $emailAttributeProvider
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,

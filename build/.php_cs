@@ -1,5 +1,9 @@
 <?php
 
+include_once __DIR__.'/Oro/PhpCsFixer/Fixer/Phpdoc/NoSuperfluousPhpdocTagsFixer.php';
+
+use Oro\PhpCsFixer\Fixer\Phpdoc\NoSuperfluousPhpdocTagsFixer;
+
 $finder = PhpCsFixer\Finder::create()
     ->in([__DIR__.'/../..'])
     ->notPath('doctrine-extensions')
@@ -10,6 +14,7 @@ $finder = PhpCsFixer\Finder::create()
 
 // https://github.com/mlocati/php-cs-fixer-configurator
 return PhpCsFixer\Config::create()
+    ->registerCustomFixers([new NoSuperfluousPhpdocTagsFixer()])
     ->setRules(
         [
             // generic PSRs
@@ -22,6 +27,18 @@ return PhpCsFixer\Config::create()
             'ordered_imports' => true,
             'no_unused_imports' => true,
             'no_extra_consecutive_blank_lines' => ['use'],
+            'Oro/no_superfluous_phpdoc_tags' => [
+                'allow_mixed' => true
+            ],
+            'no_empty_phpdoc' => true,
+            'phpdoc_trim_consecutive_blank_line_separation' => true,
+            'phpdoc_trim' => true,
+            'no_extra_blank_lines' => [
+                'extra',
+            ],
+            'no_blank_lines_after_class_opening' => true,
+            'no_leading_import_slash' => true,
+            'no_whitespace_in_blank_line' => true,
             'php_unit_namespaced' => ['target' => '6.0'],
             'php_unit_expectation' => true,
 

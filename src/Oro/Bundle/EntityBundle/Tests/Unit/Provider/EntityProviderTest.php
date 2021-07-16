@@ -271,7 +271,6 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfigs')
             ->willReturn([$entityConfig1, $entityConfig2, $entityConfig3]);
 
-
         $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->willReturnCallback(function ($param) {

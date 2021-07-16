@@ -34,7 +34,6 @@ class DropEmailUserColumn implements Migration, OrderedMigrationInterface
     /**
      * Add origin to EmailUser
      *
-     * @param Schema $schema
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function updateOroEmailUserTable(Schema $schema)

@@ -56,17 +56,6 @@ class EmailModelBuilderHelper
     /** @var MailboxManager */
     protected $mailboxManager;
 
-    /**
-     * @param EntityRoutingHelper    $entityRoutingHelper
-     * @param EmailAddressHelper     $emailAddressHelper
-     * @param EntityNameResolver     $entityNameResolver
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param EmailAddressManager    $emailAddressManager
-     * @param EntityManager          $entityManager
-     * @param EmailCacheManager      $emailCacheManager
-     * @param Environment            $twig
-     * @param MailboxManager         $mailboxManager
-     */
     public function __construct(
         EntityRoutingHelper $entityRoutingHelper,
         EmailAddressHelper $emailAddressHelper,
@@ -179,9 +168,6 @@ class EmailModelBuilderHelper
         return $this->tokenAccessor->getOrganization();
     }
 
-    /**
-     * @param EmailEntity $emailEntity
-     */
     public function ensureEmailBodyCached(EmailEntity $emailEntity)
     {
         $this->emailCacheManager->ensureEmailBodyCached($emailEntity);

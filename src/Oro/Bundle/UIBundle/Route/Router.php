@@ -27,11 +27,6 @@ class Router
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @param RequestStack                  $requestStack
-     * @param SymfonyRouter                 $router
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         RequestStack $requestStack,
         SymfonyRouter $router,

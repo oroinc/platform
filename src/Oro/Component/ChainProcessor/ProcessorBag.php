@@ -28,13 +28,6 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ChainApplicableChecker */
     protected $processorApplicableChecker;
 
-    /**
-     * @param ProcessorBagConfigProviderInterface             $configProvider
-     * @param ProcessorRegistryInterface                      $processorRegistry
-     * @param bool                                            $debug
-     * @param ProcessorApplicableCheckerFactoryInterface|null $applicableCheckerFactory
-     * @param ProcessorIteratorFactoryInterface|null          $processorIteratorFactory
-     */
     public function __construct(
         ProcessorBagConfigProviderInterface $configProvider,
         ProcessorRegistryInterface $processorRegistry,
@@ -87,11 +80,6 @@ class ProcessorBag implements ProcessorBagInterface
         return $this->configProvider->getGroups($action);
     }
 
-    /**
-     * @param ContextInterface $context
-     *
-     * @return ProcessorIterator
-     */
     protected function createProcessorIterator(ContextInterface $context): ProcessorIterator
     {
         return $this->processorIteratorFactory->createProcessorIterator(
@@ -133,8 +121,6 @@ class ProcessorBag implements ProcessorBagInterface
 
     /**
      * Initializes the given applicable checker
-     *
-     * @param ChainApplicableChecker $applicableChecker
      */
     protected function initializeApplicableChecker(ChainApplicableChecker $applicableChecker): void
     {

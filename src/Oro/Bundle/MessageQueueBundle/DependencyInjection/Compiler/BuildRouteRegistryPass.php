@@ -49,7 +49,7 @@ class BuildRouteRegistryPass implements CompilerPassInterface
                 $destinationName = empty($params['destinationName']) ?
                     Config::DEFAULT_QUEUE_NAME :
                     $params['destinationName'];
-                
+
                 $configs[$topicName][] = [$processorName, $destinationName];
             } else {
                 throw new \LogicException(sprintf(

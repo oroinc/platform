@@ -20,10 +20,6 @@ class WidgetSortByConverter extends ConfigValueConverterAbstract
         'DESC' => 'oro.dashboard.widget.sort_by.order.desc.label',
     ];
 
-    /**
-     * @param ConfigProvider $entityConfigProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigProvider $entityConfigProvider, TranslatorInterface $translator)
     {
         $this->entityConfigProvider = $entityConfigProvider;

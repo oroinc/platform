@@ -24,10 +24,6 @@ abstract class AbstractSmtpSettingsProvider implements SmtpSettingsAwareInterfac
 
     /**
      * SmtpSettingsProvider constructor.
-     *
-     * @param ConfigManager      $configManager
-     * @param GlobalScopeManager $globalScopeManager
-     * @param SymmetricCrypterInterface $encryptor
      */
     public function __construct(
         ConfigManager $configManager,

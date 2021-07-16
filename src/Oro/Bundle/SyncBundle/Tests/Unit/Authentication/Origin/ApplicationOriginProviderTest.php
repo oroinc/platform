@@ -26,9 +26,6 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getOriginsDataProvider
-     *
-     * @param null|string $origin
-     * @param array $expectedOrigins
      */
     public function testGetOrigins(?string $origin, array $expectedOrigins): void
     {
@@ -47,9 +44,6 @@ class ApplicationOriginProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedOrigins, $this->applicationOriginProvider->getOrigins());
     }
 
-    /**
-     * @return array
-     */
     public function getOriginsDataProvider(): array
     {
         return [

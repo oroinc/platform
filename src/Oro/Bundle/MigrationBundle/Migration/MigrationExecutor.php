@@ -40,10 +40,6 @@ class MigrationExecutor
      */
     protected $extensionManager;
 
-    /**
-     * @param MigrationQueryExecutor $queryExecutor
-     * @param OroDataCacheManager $cacheManager
-     */
     public function __construct(MigrationQueryExecutor $queryExecutor, OroDataCacheManager $cacheManager)
     {
         $this->queryExecutor = $queryExecutor;
@@ -52,8 +48,6 @@ class MigrationExecutor
 
     /**
      * Sets a logger
-     *
-     * @param LoggerInterface $logger
      */
     public function setLogger(LoggerInterface $logger)
     {
@@ -72,8 +66,6 @@ class MigrationExecutor
 
     /**
      * Sets extension manager
-     *
-     * @param MigrationExtensionManager $extensionManager
      */
     public function setExtensionManager(MigrationExtensionManager $extensionManager)
     {
@@ -194,8 +186,6 @@ class MigrationExecutor
 
     /**
      * Sets extensions for the given migration
-     *
-     * @param Migration $migration
      */
     protected function setExtensions(Migration $migration)
     {
@@ -206,9 +196,6 @@ class MigrationExecutor
 
     /**
      * Validates the given tables from SchemaDiff
-     *
-     * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
      *
      * @throws InvalidNameException if invalid table or column name is detected
      */
@@ -269,10 +256,6 @@ class MigrationExecutor
     {
     }
 
-    /**
-     * @param SchemaDiff $schemaDiff
-     * @param Migration  $migration
-     */
     protected function checkIndexes(SchemaDiff $schemaDiff, Migration $migration)
     {
         foreach ($schemaDiff->newTables as $table) {
@@ -293,10 +276,6 @@ class MigrationExecutor
     }
 
     /**
-     * @param Table     $table
-     * @param Index     $index
-     * @param Migration $migration
-     *
      * @throws InvalidNameException
      */
     protected function checkIndex(Table $table, Index $index, Migration $migration)

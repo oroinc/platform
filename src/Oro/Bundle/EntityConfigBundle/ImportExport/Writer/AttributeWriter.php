@@ -15,9 +15,6 @@ class AttributeWriter extends EntityFieldWriter
      */
     protected $serializedFieldProvider;
 
-    /**
-     * @param SerializedFieldProvider $serializedFieldProvider
-     */
     public function setSerializedFieldProvider(SerializedFieldProvider $serializedFieldProvider)
     {
         $this->serializedFieldProvider = $serializedFieldProvider;
@@ -34,9 +31,6 @@ class AttributeWriter extends EntityFieldWriter
         $this->setAttributeData($fieldConfigModel);
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     */
     protected function setAttributeData(FieldConfigModel $fieldConfigModel)
     {
         $extendProvider = $this->configManager->getProvider('extend');

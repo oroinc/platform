@@ -27,9 +27,6 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveDataProvider
-     * @param ActionData $data
-     * @param array $parameters
-     * @param ActionData $expected
      */
     public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
     {
@@ -105,10 +102,6 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveViolationsTypeProvider
-     * @param ActionData $data
-     * @param array $parameters
-     * @param array $exception
-     * @param array $expectedErrors
      */
     public function testResolveViolationType(
         ActionData $data,

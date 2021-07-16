@@ -12,9 +12,6 @@ class UniversalCacheKeyGenerator
     /** @var ObjectCacheKeyGenerator */
     private $objectCacheKeyGenerator;
 
-    /**
-     * @param ObjectCacheKeyGenerator $objectCacheKeyGenerator
-     */
     public function __construct(ObjectCacheKeyGenerator $objectCacheKeyGenerator)
     {
         $this->objectCacheKeyGenerator = $objectCacheKeyGenerator;
@@ -44,12 +41,6 @@ class UniversalCacheKeyGenerator
         return sha1($cacheKey);
     }
 
-    /**
-     * @param array $arguments
-     * @param string $scope
-     *
-     * @return string
-     */
     private function getCacheKey(array $arguments, string $scope = ''): string
     {
         $cacheKey = [];

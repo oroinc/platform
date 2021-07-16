@@ -52,13 +52,6 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
      */
     private $websocketAuthenticationProvider;
 
-    /**
-     * @param ClientManipulatorInterface $decoratedClientManipulator
-     * @param ClientStorageInterface $clientStorage
-     * @param UserProvider $userProvider
-     * @param TicketProviderInterface $ticketProvider
-     * @param WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider
-     */
     public function __construct(
         ClientManipulatorInterface $decoratedClientManipulator,
         ClientStorageInterface $clientStorage,
@@ -142,11 +135,6 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
         return $this->getClient($connection)->getUser();
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     *
-     * @return bool
-     */
     private function renewClientByConnection(ConnectionInterface $connection): bool
     {
         if (empty($connection->WAMP->username)) {
@@ -167,12 +155,6 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
         }
     }
 
-    /**
-     * @param ConnectionInterface $connection
-     * @param UserInterface|null $user
-     *
-     * @return bool
-     */
     private function addUserToClientStorage(ConnectionInterface $connection, ?UserInterface $user = null): bool
     {
         if (!isset($connection->httpRequest)) {
@@ -199,11 +181,6 @@ class ClientManipulator implements ClientManipulatorInterface, LoggerAwareInterf
         return false;
     }
 
-    /**
-     * @param RequestInterface $request
-     * @param UserInterface|null $user
-     * @return RequestInterface
-     */
     private function getRequestWithNewTicket(RequestInterface $request, ?UserInterface $user = null): RequestInterface
     {
         $ticket = base64_encode($this->ticketProvider->generateTicket($user));

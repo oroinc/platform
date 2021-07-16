@@ -68,9 +68,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($user, $token->getUser());
     }
 
-    /**
-     * @return User
-     */
     public function getUser(): User
     {
         $organization = new Organization();
@@ -94,13 +91,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider wrongUserProvider
-     *
-     * @param User $user
-     * @param string $secret
-     * @param string $exceptionType
-     * @param string $exceptionString
-     * @param bool $isEnabledUser
-     * @param bool $isLockedUserAuthStatus
      */
     public function testAuthenticateOnWrongData(
         User $user,
@@ -133,9 +123,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->authenticate($token);
     }
 
-    /**
-     * @return array
-     */
     public function wrongUserProvider(): array
     {
         $organization1 = new Organization();
@@ -276,12 +263,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->provider->supports($token));
     }
 
-    /**
-     * @param User $user
-     * @param string $secret
-     *
-     * @return Token
-     */
     private function prepareTestInstance(User $user, string $secret): Token
     {
         $this->userProvider
@@ -311,9 +292,6 @@ class WsseAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         return $token;
     }
 
-    /**
-     * @return string
-     */
     private function getNonce(): string
     {
         return base64_encode(uniqid(self::TEST_NONCE, true));

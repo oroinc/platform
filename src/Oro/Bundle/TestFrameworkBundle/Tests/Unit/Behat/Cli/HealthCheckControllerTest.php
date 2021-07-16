@@ -39,8 +39,6 @@ class HealthCheckControllerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterCheckersProvider
-     * @param $parameter
-     * @param array $expectedCheckers
      */
     public function testFilterCheckers($parameter, array $expectedCheckers)
     {

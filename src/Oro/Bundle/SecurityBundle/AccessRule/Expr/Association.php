@@ -12,17 +12,11 @@ class Association implements ExpressionInterface
     /** @var string */
     private $associationName;
 
-    /**
-     * @param string $associationName
-     */
     public function __construct(string $associationName)
     {
         $this->associationName = $associationName;
     }
 
-    /**
-     * @return string
-     */
     public function getAssociationName(): string
     {
         return $this->associationName;

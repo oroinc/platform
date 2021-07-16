@@ -22,9 +22,6 @@ class ThemeConfiguration implements ConfigurationInterface
     /** @var ThemeConfigurationExtensionInterface[] */
     private $extensions = [];
 
-    /**
-     * @param ThemeConfigurationExtensionInterface $extension
-     */
     public function addExtension(ThemeConfigurationExtensionInterface $extension)
     {
         $this->extensions[] = $extension;
@@ -113,9 +110,6 @@ class ThemeConfiguration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    /**
-     * @param NodeBuilder $configNode
-     */
     private function appendConfigNodes(NodeBuilder $configNode)
     {
         $this->appendAssets($configNode);
@@ -126,9 +120,6 @@ class ThemeConfiguration implements ConfigurationInterface
         }
     }
 
-    /**
-     * @param NodeBuilder $configNode
-     */
     private function appendAssets(NodeBuilder $configNode)
     {
         $configNode->arrayNode('assets')
@@ -155,9 +146,6 @@ class ThemeConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $configNode
-     */
     private function appendImages(NodeBuilder $configNode)
     {
         $widthHeightValidator = function ($value) {
@@ -212,9 +200,6 @@ class ThemeConfiguration implements ConfigurationInterface
             ->end();
     }
 
-    /**
-     * @param NodeBuilder $configNode
-     */
     private function appendPageTemplates(NodeBuilder $configNode)
     {
         $configNode->arrayNode('page_templates')

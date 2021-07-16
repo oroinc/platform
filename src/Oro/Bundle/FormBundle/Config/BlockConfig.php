@@ -41,9 +41,6 @@ class BlockConfig implements FormConfigInterface
      */
     protected $subBlocks = array();
 
-    /**
-     * @param $code
-     */
     public function __construct($code)
     {
         $this->code = $code;

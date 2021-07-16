@@ -20,10 +20,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     /** @var ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /**
-     * @param ErrorTitleOverrideProvider      $errorTitleOverrideProvider
-     * @param ExceptionTextExtractorInterface $exceptionTextExtractor
-     */
     public function __construct(
         ErrorTitleOverrideProvider $errorTitleOverrideProvider,
         ExceptionTextExtractorInterface $exceptionTextExtractor
@@ -32,9 +28,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         $this->exceptionTextExtractor = $exceptionTextExtractor;
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeStatusCode(Error $error): void
     {
         if (null === $error->getStatusCode() && null !== $error->getInnerException()) {
@@ -45,9 +38,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeCode(Error $error): void
     {
         if (null === $error->getCode() && null !== $error->getInnerException()) {
@@ -59,7 +49,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
     }
 
     /**
-     * @param Error $error
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function completeTitle(Error $error): void
@@ -88,9 +77,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     */
     protected function completeDetail(Error $error): void
     {
         if (null === $error->getDetail()) {
@@ -105,11 +91,6 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
         }
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return bool
-     */
     protected function isConfigFilterConstraintViolation(Error $error): bool
     {
         if (null === $error->getInnerException()) {

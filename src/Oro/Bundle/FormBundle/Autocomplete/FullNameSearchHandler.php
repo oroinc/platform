@@ -11,9 +11,6 @@ class FullNameSearchHandler extends SearchHandler
      */
     protected $entityNameResolver;
 
-    /**
-     * @param EntityNameResolver $entityNameResolver
-     */
     public function setEntityNameResolver(EntityNameResolver $entityNameResolver)
     {
         $this->entityNameResolver = $entityNameResolver;

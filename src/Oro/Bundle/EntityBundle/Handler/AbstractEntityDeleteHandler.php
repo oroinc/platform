@@ -24,30 +24,20 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
     /** @var EntityDeleteAccessDeniedExceptionFactory */
     private $accessDeniedExceptionFactory;
 
-    /**
-     * @param EntityDeleteHandlerExtensionRegistry $extensionRegistry
-     */
     public function setExtensionRegistry(EntityDeleteHandlerExtensionRegistry $extensionRegistry): void
     {
         $this->extensionRegistry = $extensionRegistry;
     }
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
     public function setDoctrine(ManagerRegistry $doctrine): void
     {
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param EntityDeleteAccessDeniedExceptionFactory $factory
-     */
     public function setAccessDeniedExceptionFactory(EntityDeleteAccessDeniedExceptionFactory $factory): void
     {
         $this->accessDeniedExceptionFactory = $factory;
     }
-
 
     /**
      * {@inheritdoc}
@@ -144,11 +134,6 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         $this->getHandlerExtension($entity)->postFlush($entity, $options);
     }
 
-    /**
-     * @param string $reason
-     *
-     * @return AccessDeniedException
-     */
     final protected function createAccessDeniedException(string $reason = 'access denied'): AccessDeniedException
     {
         return $this->accessDeniedExceptionFactory->createAccessDeniedException($reason);
@@ -168,11 +153,6 @@ abstract class AbstractEntityDeleteHandler implements EntityDeleteHandlerInterfa
         return $this->doctrine->getManagerForClass($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return ObjectRepository
-     */
     final protected function getEntityRepository(string $entityClass): ObjectRepository
     {
         $entityClass = ClassUtils::getRealClass($entityClass);

@@ -129,9 +129,6 @@ class OperationDefinition
         return $this->enabled;
     }
 
-    /**
-     * @return bool
-     */
     public function isPageReload(): bool
     {
         return $this->pageReload;

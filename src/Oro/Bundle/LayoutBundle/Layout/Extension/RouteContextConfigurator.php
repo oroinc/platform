@@ -15,9 +15,6 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
     /** @var RequestStack */
     protected $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;

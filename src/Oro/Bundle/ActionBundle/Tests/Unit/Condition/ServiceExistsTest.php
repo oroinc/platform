@@ -82,8 +82,6 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-
-
     /**
      * @dataProvider dataProvider
      * @param bool $hasService

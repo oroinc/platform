@@ -18,9 +18,6 @@ class ChainConfigCacheState implements ConfigCacheStateInterface
         $this->states = $states;
     }
 
-    /**
-     * @param ConfigCacheStateInterface $state
-     */
     public function addConfigCacheState(ConfigCacheStateInterface $state): void
     {
         $this->states[] = $state;

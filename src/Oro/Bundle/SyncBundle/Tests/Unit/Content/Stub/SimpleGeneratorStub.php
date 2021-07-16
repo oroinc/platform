@@ -9,9 +9,6 @@ class SimpleGeneratorStub implements TagGeneratorInterface
     /** @var string */
     protected $suffix;
 
-    /**
-     * @param $suffix
-     */
     public function __construct($suffix)
     {
         $this->suffix = $suffix;

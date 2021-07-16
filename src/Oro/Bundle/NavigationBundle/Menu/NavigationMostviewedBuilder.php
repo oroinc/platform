@@ -16,11 +16,6 @@ class NavigationMostviewedBuilder extends NavigationItemBuilder
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param NavigationItemsProviderInterface $navigationItemsProvider
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         NavigationItemsProviderInterface $navigationItemsProvider,

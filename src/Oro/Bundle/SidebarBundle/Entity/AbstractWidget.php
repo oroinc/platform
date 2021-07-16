@@ -89,7 +89,7 @@ class AbstractWidget
     public function setPosition($position)
     {
         $this->position = $position;
-    
+
         return $this;
     }
 
@@ -112,7 +112,7 @@ class AbstractWidget
     public function setSettings($settings)
     {
         $this->settings = $settings;
-    
+
         return $this;
     }
 

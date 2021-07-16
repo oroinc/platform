@@ -27,12 +27,6 @@ class BusinessUnitGridListener
     /** @var OwnerTreeProvider */
     protected $treeProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoterInterface|null                 $aclVoter
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -45,9 +39,6 @@ class BusinessUnitGridListener
         $this->treeProvider = $treeProvider;
     }
 
-    /**
-     * @param BuildBefore $event
-     */
     public function onBuildBefore(BuildBefore $event)
     {
         $config = $event->getConfig();

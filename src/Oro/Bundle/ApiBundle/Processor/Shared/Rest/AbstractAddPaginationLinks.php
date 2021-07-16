@@ -32,11 +32,6 @@ abstract class AbstractAddPaginationLinks implements ProcessorInterface
     /** @var UrlGeneratorInterface */
     private $urlGenerator;
 
-    /**
-     * @param RestRoutesRegistry    $routesRegistry
-     * @param FilterNamesRegistry   $filterNamesRegistry
-     * @param UrlGeneratorInterface $urlGenerator
-     */
     public function __construct(
         RestRoutesRegistry $routesRegistry,
         FilterNamesRegistry $filterNamesRegistry,
@@ -47,32 +42,16 @@ abstract class AbstractAddPaginationLinks implements ProcessorInterface
         $this->urlGenerator = $urlGenerator;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return RestRoutes
-     */
     protected function getRoutes(RequestType $requestType): RestRoutes
     {
         return $this->routesRegistry->getRoutes($requestType);
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return FilterNames
-     */
     protected function getFilterNames(RequestType $requestType): FilterNames
     {
         return $this->filterNamesRegistry->getFilterNames($requestType);
     }
 
-    /**
-     * @param string $routeName
-     * @param array  $defaultParams
-     *
-     * @return RouteLinkMetadata
-     */
     protected function getRouteLinkMetadata(string $routeName, array $defaultParams = []): RouteLinkMetadata
     {
         return new RouteLinkMetadata(
@@ -83,12 +62,6 @@ abstract class AbstractAddPaginationLinks implements ProcessorInterface
         );
     }
 
-    /**
-     * @param DocumentBuilderInterface     $documentBuilder
-     * @param LinkMetadataInterface        $baseLink
-     * @param string                       $pageNumberFilterName
-     * @param QueryStringAccessorInterface $queryStringAccessor
-     */
     protected function addLinks(
         DocumentBuilderInterface $documentBuilder,
         LinkMetadataInterface $baseLink,

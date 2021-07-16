@@ -20,9 +20,6 @@ class ResourcesCache
     /** @var ResourcesCacheAccessor */
     private $cache;
 
-    /**
-     * @param ResourcesCacheAccessor $cache
-     */
     public function __construct(ResourcesCacheAccessor $cache)
     {
         $this->cache = $cache;
@@ -201,12 +198,6 @@ class ResourcesCache
         $this->cache->clear();
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $cachedData
-     *
-     * @return ApiResource
-     */
     private function unserializeApiResource(string $entityClass, array $cachedData): ApiResource
     {
         $resource = new ApiResource($entityClass);
@@ -215,11 +206,6 @@ class ResourcesCache
         return $resource;
     }
 
-    /**
-     * @param ApiResource $resource
-     *
-     * @return array
-     */
     private function serializeApiResource(ApiResource $resource): array
     {
         return [
@@ -227,12 +213,6 @@ class ResourcesCache
         ];
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $cachedData
-     *
-     * @return ApiResourceSubresources
-     */
     private function unserializeApiResourceSubresources(
         string $entityClass,
         array $cachedData
@@ -249,11 +229,6 @@ class ResourcesCache
         return $resource;
     }
 
-    /**
-     * @param ApiResourceSubresources $entitySubresources
-     *
-     * @return array
-     */
     private function serializeApiResourceSubresources(ApiResourceSubresources $entitySubresources): array
     {
         $serializedSubresources = [];

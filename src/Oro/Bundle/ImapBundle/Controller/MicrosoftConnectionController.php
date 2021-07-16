@@ -53,9 +53,6 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
     /**
      * Stores response in session for further calls
      * from component
-     *
-     * @param Response $response
-     * @return Response
      */
     private function storeResponse(Response $response): Response
     {
@@ -102,10 +99,6 @@ class MicrosoftConnectionController extends AbstractVendorConnectionController
         return new JsonResponse($response);
     }
 
-    /**
-     * @param array $originalResponse
-     * @return array
-     */
     private function appendProfileData(array $originalResponse): array
     {
         /** @var Oauth2ManagerInterface $manager */

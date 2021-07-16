@@ -39,10 +39,6 @@ class CompleteSorters extends CompleteSection
         $this->completeSortersForAssociations($section, $metadata, $definition);
     }
 
-    /**
-     * @param EntityConfigInterface  $sorters
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeSortersForIdentifierFields(
         EntityConfigInterface $sorters,
         EntityDefinitionConfig $definition
@@ -55,11 +51,6 @@ class CompleteSorters extends CompleteSection
         }
     }
 
-    /**
-     * @param EntityConfigInterface  $sorters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeSortersForFields(
         EntityConfigInterface $sorters,
         ClassMetadata $metadata,
@@ -74,11 +65,6 @@ class CompleteSorters extends CompleteSection
         }
     }
 
-    /**
-     * @param EntityConfigInterface  $sorters
-     * @param ClassMetadata          $metadata
-     * @param EntityDefinitionConfig $definition
-     */
     protected function completeSortersForAssociations(
         EntityConfigInterface $sorters,
         ClassMetadata $metadata,

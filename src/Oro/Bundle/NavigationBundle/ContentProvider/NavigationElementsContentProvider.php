@@ -17,10 +17,6 @@ class NavigationElementsContentProvider implements ContentProviderInterface
     /** @var RequestStack */
     private $requestStack;
 
-    /**
-     * @param ConfigurationProvider $configurationProvider
-     * @param RequestStack          $requestStack
-     */
     public function __construct(ConfigurationProvider $configurationProvider, RequestStack $requestStack)
     {
         $this->configurationProvider = $configurationProvider;

@@ -41,8 +41,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_email_notif table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationEmailNotifTable(Schema $schema)
     {
@@ -59,8 +57,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_email_spool table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationEmailSpoolTable(Schema $schema)
     {
@@ -75,8 +71,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_mass_notif table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationMassNotifTable(Schema $schema)
     {
@@ -94,8 +88,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_recip_group table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationRecipGroupTable(Schema $schema)
     {
@@ -109,8 +101,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_recip_list table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationRecipListTable(Schema $schema)
     {
@@ -138,8 +128,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Create oro_notification_recip_user table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationRecipUserTable(Schema $schema)
     {
@@ -153,8 +141,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Add oro_notification_email_notif foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNotificationEmailNotifForeignKeys(Schema $schema)
     {
@@ -175,8 +161,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Add oro_notification_recip_group foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNotificationRecipGroupForeignKeys(Schema $schema)
     {
@@ -197,8 +181,6 @@ class OroNotificationBundleInstaller implements Installation
 
     /**
      * Add oro_notification_recip_user foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroNotificationRecipUserForeignKeys(Schema $schema)
     {

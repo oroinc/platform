@@ -13,8 +13,6 @@ trait ApiFeatureTrait
 
     /**
      * Enables API feature.
-     *
-     * @param string $featureName
      */
     protected function enableApiFeature(string $featureName = 'oro_api.web_api'): void
     {
@@ -25,8 +23,6 @@ trait ApiFeatureTrait
 
     /**
      * Disables API feature.
-     *
-     * @param string $featureName
      */
     protected function disableApiFeature(string $featureName = 'oro_api.web_api'): void
     {

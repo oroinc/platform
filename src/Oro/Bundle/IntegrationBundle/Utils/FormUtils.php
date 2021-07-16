@@ -14,9 +14,6 @@ class FormUtils
     /** @var TypesRegistry */
     protected $registry;
 
-    /**
-     * @param TypesRegistry $registry
-     */
     public function __construct(TypesRegistry $registry)
     {
         $this->registry = $registry;

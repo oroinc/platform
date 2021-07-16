@@ -22,9 +22,6 @@ class RecognizeAssociationType implements ProcessorInterface
     /** @var SubresourcesProvider */
     private $subresourcesProvider;
 
-    /**
-     * @param SubresourcesProvider $subresourcesProvider
-     */
     public function __construct(SubresourcesProvider $subresourcesProvider)
     {
         $this->subresourcesProvider = $subresourcesProvider;
@@ -56,10 +53,6 @@ class RecognizeAssociationType implements ProcessorInterface
         }
     }
 
-    /**
-     * @param SubresourceContext $context
-     * @param string             $associationName
-     */
     private function setAssociationType(SubresourceContext $context, string $associationName): void
     {
         $subresource = $this->subresourcesProvider->getSubresource(

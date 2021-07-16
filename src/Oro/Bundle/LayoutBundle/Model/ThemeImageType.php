@@ -83,9 +83,6 @@ class ThemeImageType
         }
     }
 
-    /**
-     * @param ThemeImageTypeDimension $dimension
-     */
     private function addDimension(ThemeImageTypeDimension $dimension)
     {
         $this->dimensions[$dimension->getName()] = $dimension;

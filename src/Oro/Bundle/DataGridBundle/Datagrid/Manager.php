@@ -34,11 +34,6 @@ class Manager implements ManagerInterface
 
     /**
      * Constructor
-     *
-     * @param ConfigurationProviderInterface $configurationProvider
-     * @param Builder                        $builder
-     * @param RequestParameterBagFactory     $parametersFactory
-     * @param NameStrategyInterface          $nameStrategy
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,

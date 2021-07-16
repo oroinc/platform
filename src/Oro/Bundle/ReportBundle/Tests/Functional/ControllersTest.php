@@ -55,9 +55,6 @@ class ControllersTest extends WebTestCase
     /**
      * @depends testCreate
      * @dataProvider reportDataProvider
-     *
-     * @param array $report
-     * @param array $reportResult
      */
     public function testView(array $report, array $reportResult)
     {
@@ -80,8 +77,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param array $report
-     * @param array $reportResult
      * @depends testView
      * @dataProvider reportDataProvider
      */
@@ -146,7 +141,6 @@ class ControllersTest extends WebTestCase
     }
 
     /**
-     * @param array $report
      * @depends testView
      * @dataProvider reportDataProvider
      */
@@ -302,9 +296,6 @@ class ControllersTest extends WebTestCase
         }
     }
 
-    /**
-     * @param Crawler $crawler
-     */
     private function assertReportSaved(Crawler $crawler)
     {
         $response = $this->client->getResponse();

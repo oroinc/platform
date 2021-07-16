@@ -15,10 +15,6 @@ class SimpleProcessorRegistry implements ProcessorRegistryInterface
     /** @var ProcessorRegistryInterface */
     private $parentRegistry;
 
-    /**
-     * @param array                      $processors
-     * @param ProcessorRegistryInterface $parentRegistry
-     */
     public function __construct(array $processors, ProcessorRegistryInterface $parentRegistry)
     {
         $this->processors = $processors;

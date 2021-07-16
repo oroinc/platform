@@ -65,9 +65,6 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         return $this->getContainer()->get('security.token_storage');
     }
 
-    /**
-     * @param array $expectedChanges
-     */
     protected static function assertSentChanges(array $expectedChanges)
     {
         /** @var Message $message */

@@ -45,14 +45,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
      */
     private $messageProducer;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ProcessHandler $handler
-     * @param ProcessLogger $logger
-     * @param EventTriggerCache $triggerCache
-     * @param ProcessSchedulePolicy $schedulePolicy
-     * @param MessageProducerInterface $messageProducer
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ProcessHandler $handler,
@@ -109,7 +101,6 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
     }
 
     /**
-     * @param ObjectManager $manager
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function process(ObjectManager $manager)

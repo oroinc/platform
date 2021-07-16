@@ -17,9 +17,6 @@ class ValidateParentActionAvailability implements ProcessorInterface
     /** @var ResourcesProvider */
     private $resourcesProvider;
 
-    /**
-     * @param ResourcesProvider $resourcesProvider
-     */
     public function __construct(ResourcesProvider $resourcesProvider)
     {
         $this->resourcesProvider = $resourcesProvider;

@@ -32,11 +32,6 @@ final class QueryStringUtil
 
     /**
      * Adds URL-encoded query string to URL.
-     *
-     * @param string $url
-     * @param string $queryString
-     *
-     * @return string
      */
     public static function addQueryString(string $url, string $queryString): string
     {
@@ -51,12 +46,6 @@ final class QueryStringUtil
      * Adds a parameter to URL-encoded query string.
      * If the query string already contains a parameter with the given name
      * its value will be overridden with the new value.
-     *
-     * @param string $queryString
-     * @param string $name
-     * @param string $value
-     *
-     * @return string
      */
     public static function addParameter(string $queryString, string $name, string $value): string
     {
@@ -70,11 +59,6 @@ final class QueryStringUtil
 
     /**
      * Removes a parameter from URL-encoded query string.
-     *
-     * @param string $queryString
-     * @param string $name
-     *
-     * @return string
      */
     public static function removeParameter(string $queryString, string $name): string
     {
@@ -92,11 +76,6 @@ final class QueryStringUtil
         return self::httpBuildQuery(self::unsetParameterByPath($params, $path));
     }
 
-    /**
-     * @param array $params
-     *
-     * @return string
-     */
     private static function httpBuildQuery(array $params): string
     {
         return http_build_query($params, '', '&', PHP_QUERY_RFC3986);

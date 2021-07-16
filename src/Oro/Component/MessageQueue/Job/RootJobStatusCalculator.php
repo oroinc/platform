@@ -35,11 +35,6 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         $this->registry = $registry;
     }
 
-    /**
-     * @param Job $job
-     *
-     * @return void
-     */
     public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);

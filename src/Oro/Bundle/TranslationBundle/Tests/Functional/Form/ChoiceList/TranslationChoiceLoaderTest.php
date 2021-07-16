@@ -102,9 +102,6 @@ class TranslationChoiceLoaderTest extends WebTestCase
         );
     }
 
-    /**
-     * @return QueryBuilder
-     */
     private function createQueryBuilder(): QueryBuilder
     {
         return $this->getManagerRegistry()
@@ -113,9 +110,6 @@ class TranslationChoiceLoaderTest extends WebTestCase
             ->createQueryBuilder('a');
     }
 
-    /**
-     * @return \Doctrine\Bundle\DoctrineBundle\Registry
-     */
     private function getManagerRegistry(): Registry
     {
         return self::getContainer()->get('doctrine');

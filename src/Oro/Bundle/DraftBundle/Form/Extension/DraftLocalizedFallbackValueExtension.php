@@ -23,9 +23,6 @@ class DraftLocalizedFallbackValueExtension extends AbstractTypeExtension
      */
     private $draftHelper;
 
-    /**
-     * @param DraftHelper $draftHelper
-     */
     public function __construct(DraftHelper $draftHelper)
     {
         $this->draftHelper = $draftHelper;
@@ -39,9 +36,6 @@ class DraftLocalizedFallbackValueExtension extends AbstractTypeExtension
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function preSubmit(FormEvent $event): void
     {
         if ($this->draftHelper->isSaveAsDraftAction()) {
@@ -53,11 +47,6 @@ class DraftLocalizedFallbackValueExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return bool
-     */
     private function checkRootEntityIsDraftable(FormInterface $form): bool
     {
         if ($form->getParent()) {

@@ -25,10 +25,6 @@ class LocalizationSelectionType extends AbstractType
     /** @var LocalizationChoicesProvider */
     private $localizationChoicesProvider;
 
-    /**
-     * @param LocalizationManager $localizationManager
-     * @param LocalizationChoicesProvider $localizationChoicesProvider
-     */
     public function __construct(
         LocalizationManager $localizationManager,
         LocalizationChoicesProvider $localizationChoicesProvider
@@ -93,11 +89,6 @@ class LocalizationSelectionType extends AbstractType
         return OroChoiceType::class;
     }
 
-    /**
-     * @param null|array $enabledLocalization
-     *
-     * @return array
-     */
     private function getLocalizationChoices(?array $enabledLocalization): array
     {
         $availableLocalizations = $this->localizationChoicesProvider->getLocalizationChoices();

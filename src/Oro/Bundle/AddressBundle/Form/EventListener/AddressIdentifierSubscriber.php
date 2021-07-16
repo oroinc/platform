@@ -24,8 +24,6 @@ class AddressIdentifierSubscriber implements EventSubscriberInterface
 
     /**
      * Setting address ID to ID field of the form
-     *
-     * @param FormEvent $event
      */
     public function postSetData(FormEvent $event)
     {

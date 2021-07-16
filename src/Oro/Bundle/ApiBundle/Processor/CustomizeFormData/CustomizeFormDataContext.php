@@ -96,8 +96,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Checks if the context is already initialized.
-     *
-     * @return bool
      */
     public function isInitialized(): bool
     {
@@ -152,8 +150,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Gets a form object related to a customizing entity.
-     *
-     * @return FormInterface
      */
     public function getForm(): FormInterface
     {
@@ -218,8 +214,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Sets a form object related to a customizing entity.
-     *
-     * @param FormInterface $form
      */
     public function setForm(FormInterface $form): void
     {
@@ -251,8 +245,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Returns a collection contains additional entities included into the request.
-     *
-     * @return IncludedEntityCollection|null
      */
     public function getIncludedEntities(): ?IncludedEntityCollection
     {
@@ -261,8 +253,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Sets a collection contains additional entities included into the request.
-     *
-     * @param IncludedEntityCollection $includedEntities
      */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities): void
     {
@@ -293,8 +283,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Indicates whether the current action is executed for the primary entity or for an included entity.
-     *
-     * @return bool
      */
     public function isPrimaryEntityRequest(): bool
     {
@@ -353,8 +341,6 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
 
     /**
      * Sets a service that can be used to convert an entity object to a model object and vise versa.
-     *
-     * @param EntityMapper|null $entityMapper
      */
     public function setEntityMapper(EntityMapper $entityMapper = null)
     {

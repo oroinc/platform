@@ -52,10 +52,6 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformProvider
-     *
-     * @param       $expected
-     * @param       $entity
-     * @param array $transformerOptions
      */
     public function testReverseTransform($expected, $entity, array $transformerOptions = [])
     {

@@ -49,14 +49,6 @@ class FieldsDescriptionHelper
     /** @var ConfigProvider */
     private $ownershipConfigProvider;
 
-    /**
-     * @param EntityDescriptionProvider   $entityDocProvider
-     * @param TranslatorInterface         $translator
-     * @param ResourceDocParserProvider   $resourceDocParserProvider
-     * @param DescriptionProcessor        $descriptionProcessor
-     * @param IdentifierDescriptionHelper $identifierDescriptionHelper
-     * @param ConfigProvider              $ownershipConfigProvider
-     */
     public function __construct(
         EntityDescriptionProvider $entityDocProvider,
         TranslatorInterface $translator,
@@ -74,13 +66,6 @@ class FieldsDescriptionHelper
     }
 
     /**
-     * @param EntityDefinitionConfig $definition
-     * @param RequestType            $requestType
-     * @param string                 $entityClass
-     * @param bool                   $isInherit
-     * @param string                 $targetAction
-     * @param string|null            $fieldPrefix
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -179,12 +164,6 @@ class FieldsDescriptionHelper
         return $definition->findFieldNameByPropertyPath(reset($identifierFieldNames));
     }
 
-    /**
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     *
-     * @return string
-     */
     private function resolveFieldName(string $fieldName, EntityDefinitionFieldConfig $field): string
     {
         $propertyPath = $field->getPropertyPath();
@@ -195,10 +174,6 @@ class FieldsDescriptionHelper
         return $fieldName;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $targetAction
-     */
     private function setDescriptionForCreatedAtField(EntityDefinitionConfig $definition, string $targetAction): void
     {
         FieldDescriptionUtil::updateFieldDescription(
@@ -209,10 +184,6 @@ class FieldsDescriptionHelper
         FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'createdAt', $targetAction);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $targetAction
-     */
     private function setDescriptionForUpdatedAtField(EntityDefinitionConfig $definition, string $targetAction): void
     {
         FieldDescriptionUtil::updateFieldDescription(
@@ -223,10 +194,6 @@ class FieldsDescriptionHelper
         FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'updatedAt', $targetAction);
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     */
     private function setDescriptionsForOwnershipFields(EntityDefinitionConfig $definition, string $entityClass): void
     {
         if (!$this->ownershipConfigProvider->hasConfig($entityClass)) {
@@ -249,12 +216,6 @@ class FieldsDescriptionHelper
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ConfigInterface        $entityConfig
-     * @param string                 $configKey
-     * @param string                 $description
-     */
     private function updateOwnershipFieldDescription(
         EntityDefinitionConfig $definition,
         ConfigInterface $entityConfig,
@@ -273,9 +234,6 @@ class FieldsDescriptionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     */
     private function setDescriptionsForEnumFields(EntityDefinitionConfig $definition): void
     {
         FieldDescriptionUtil::updateFieldDescription(
@@ -296,15 +254,6 @@ class FieldsDescriptionHelper
     }
 
     /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param RequestType                 $requestType
-     * @param string                      $entityClass
-     * @param string                      $targetAction
-     * @param string                      $fieldName
-     * @param string|null                 $fieldPrefix
-     * @param string|null                 $fieldDescriptionReplacement
-     *
-     * @return string|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getDescriptionOfField(
@@ -355,14 +304,6 @@ class FieldsDescriptionHelper
         return $description;
     }
 
-    /**
-     * @param string                      $entityClass
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $fieldName
-     * @param string|null                 $fieldPrefix
-     *
-     * @return string|null
-     */
     private function getFieldDescription(
         string $entityClass,
         EntityDefinitionFieldConfig $field,
@@ -377,11 +318,6 @@ class FieldsDescriptionHelper
         return $this->entityDocProvider->getFieldDocumentation($entityClass, $propertyPath);
     }
 
-    /**
-     * @param Label $label
-     *
-     * @return string|null
-     */
     private function trans(Label $label): ?string
     {
         return $label->trans($this->translator) ?: null;

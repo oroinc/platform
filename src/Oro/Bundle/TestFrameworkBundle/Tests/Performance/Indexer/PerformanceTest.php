@@ -27,7 +27,6 @@ class PerformanceTest extends WebTestCase
         $schemaTool->dropDatabase();
         $schemaTool->createSchema($classes);
 
-
         list($msec, $sec) = explode(" ", microtime());
         $stop=$sec + $msec;
         echo "\nDropping and creating schema time is " . round($stop - $start, 4) . " sec\n";

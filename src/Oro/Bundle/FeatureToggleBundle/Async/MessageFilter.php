@@ -16,9 +16,6 @@ class MessageFilter implements MessageFilterInterface
      */
     private $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(
         FeatureChecker $featureChecker
     ) {

@@ -9,9 +9,6 @@ class CountryProvider
     /** @var CountryRepository */
     protected $repository;
 
-    /**
-     * @param CountryRepository $repository
-     */
     public function __construct(CountryRepository $repository)
     {
         $this->repository = $repository;

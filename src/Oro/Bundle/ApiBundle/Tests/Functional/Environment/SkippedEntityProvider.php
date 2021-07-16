@@ -10,9 +10,6 @@ class SkippedEntityProvider implements SkippedEntityProviderInterface
     /** @var array [entity class => [action, ...]] */
     private $skippedEntities = [];
 
-    /**
-     * @param SkippedEntityProviderInterface $innerProvider
-     */
     public function __construct(SkippedEntityProviderInterface $innerProvider)
     {
         $this->innerProvider = $innerProvider;

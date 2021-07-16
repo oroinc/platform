@@ -19,8 +19,6 @@ class OroReportBundle implements Migration
 
     /**
      * Create oro_order_shipping_tracking table
-     *
-     * @param Schema $schema
      */
     protected function createOroCalendarDateTable(Schema $schema)
     {

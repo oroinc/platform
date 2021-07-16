@@ -11,10 +11,6 @@ interface ProtocolValidatorInterface
 {
     /**
      * Checks whether it is allowed to download a file by the given protocol.
-     *
-     * @param string $protocol
-     *
-     * @return bool
      */
     public function isSupportedProtocol(string $protocol): bool;
 }

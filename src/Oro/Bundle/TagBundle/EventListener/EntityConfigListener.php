@@ -19,8 +19,6 @@ class EntityConfigListener
 
     /**
      * Deletes tags relations for $className in cases when "tagging" option has been disabled for it.
-     *
-     * @param PostFlushConfigEvent $event
      */
     public function postFlush(PostFlushConfigEvent $event)
     {

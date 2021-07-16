@@ -27,9 +27,6 @@ abstract class RegisterFilters implements ProcessorInterface
     /** @var FilterFactoryInterface */
     private $filterFactory;
 
-    /**
-     * @param FilterFactoryInterface $filterFactory
-     */
     public function __construct(FilterFactoryInterface $filterFactory)
     {
         $this->filterFactory = $filterFactory;
@@ -100,11 +97,6 @@ abstract class RegisterFilters implements ProcessorInterface
         return $filter;
     }
 
-    /**
-     * @param FilterFieldConfig $filterConfig
-     *
-     * @return array
-     */
     private function getFilterOptions(FilterFieldConfig $filterConfig): array
     {
         $filterOptions = $filterConfig->getOptions();
@@ -115,10 +107,6 @@ abstract class RegisterFilters implements ProcessorInterface
         return $filterOptions;
     }
 
-    /**
-     * @param StandaloneFilter  $filter
-     * @param FilterFieldConfig $filterConfig
-     */
     private function initializeFilterOptions(StandaloneFilter $filter, FilterFieldConfig $filterConfig): void
     {
         if ($filterConfig->hasArrayAllowed()) {

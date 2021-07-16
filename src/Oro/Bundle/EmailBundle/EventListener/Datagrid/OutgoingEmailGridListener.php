@@ -11,17 +11,11 @@ class OutgoingEmailGridListener
     /** @var EmailGridResultHelper */
     protected $resultHelper;
 
-    /**
-     * @param EmailGridResultHelper $resultHelper
-     */
     public function __construct(EmailGridResultHelper $resultHelper)
     {
         $this->resultHelper = $resultHelper;
     }
 
-    /**
-     * @param OrmResultAfter $event
-     */
     public function onResultAfter(OrmResultAfter $event)
     {
         /** @var ResultRecord[] $records */

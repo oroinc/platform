@@ -10,8 +10,6 @@ class LoadReportTypes extends AbstractFixture
 {
     /**
      * Load available report types
-     *
-     * @param ObjectManager $manager
      */
     public function load(ObjectManager $manager)
     {

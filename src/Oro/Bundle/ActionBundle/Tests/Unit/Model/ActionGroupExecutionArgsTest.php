@@ -25,8 +25,6 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param $expected
-     * @param array $parameters
      * @dataProvider provideParameters
      */
     public function testAddParameters($expected, array $parameters)

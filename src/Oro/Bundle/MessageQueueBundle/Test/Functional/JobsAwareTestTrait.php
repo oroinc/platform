@@ -14,33 +14,21 @@ use Oro\Component\MessageQueue\Job\JobRunner;
  */
 trait JobsAwareTestTrait
 {
-    /**
-     * @return JobManager
-     */
     protected function getJobManager(): JobManager
     {
         return $this->getContainer()->get('oro_message_queue.job.manager');
     }
 
-    /**
-     * @return JobRunner
-     */
     protected function getJobRunner(): JobRunner
     {
         return $this->getContainer()->get('oro_message_queue.job.runner');
     }
 
-    /**
-     * @return JobProcessor
-     */
     protected function getJobProcessor(): JobProcessor
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
     }
 
-    /**
-     * @return Job|null
-     */
     protected function createUniqueJob(): ?Job
     {
         $ownerId = $this->getUniqid();
@@ -56,10 +44,6 @@ trait JobsAwareTestTrait
         return $childJob;
     }
 
-    /**
-     * @param Job|null $rootJob
-     * @return Job
-     */
     protected function createDelayedJob(Job $rootJob = null): Job
     {
         if (!$rootJob) {
@@ -69,10 +53,6 @@ trait JobsAwareTestTrait
         return $this->getJobProcessor()->findOrCreateChildJob($this->getUniqid(), $rootJob);
     }
 
-    /**
-     * @param int $jobId
-     * @return array
-     */
     protected function getDependentJobsByJobId(int $jobId): array
     {
         $job = $this->getJobProcessor()->findJobById($jobId);
@@ -81,9 +61,6 @@ trait JobsAwareTestTrait
         return $rootJob->getData()['dependentJobs'] ?? [];
     }
 
-    /**
-     * @return string
-     */
     protected function getUniqid(): string
     {
         return uniqid(microtime(true), true);

@@ -62,9 +62,6 @@ class RemoveInvalidEntityConfigQuery implements MigrationQuery, ConnectionAwareI
         }
     }
 
-    /**
-     * @param array $row
-     */
     protected function processRow(array $row)
     {
         $convertedData = Type::getType(Types::ARRAY)

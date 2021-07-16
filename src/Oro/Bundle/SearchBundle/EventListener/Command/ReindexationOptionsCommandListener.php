@@ -19,9 +19,6 @@ class ReindexationOptionsCommandListener
     public const SKIP_REINDEXATION_OPTION_NAME     = 'skip-search-reindexation';
     public const SCHEDULE_REINDEXATION_OPTION_NAME = 'schedule-search-reindexation';
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
@@ -36,12 +33,6 @@ class ReindexationOptionsCommandListener
         }
     }
 
-    /**
-     * @param Command        $helpCommand
-     * @param InputInterface $input
-     *
-     * @return bool
-     */
     private function isHelpForPlatformUpdateCommand(Command $helpCommand, InputInterface $input): bool
     {
         $commandProperty = ReflectionUtil::getProperty(new \ReflectionClass($helpCommand), 'command');
@@ -56,9 +47,6 @@ class ReindexationOptionsCommandListener
         return false !== $input->getParameterOption(PlatformUpdateCommand::getDefaultName());
     }
 
-    /**
-     * @param Command $command
-     */
     private function addReindexationOptions(Command $command): void
     {
         $this->addOption($command, new InputOption(
@@ -75,9 +63,6 @@ class ReindexationOptionsCommandListener
         ));
     }
 
-    /**
-     * @param Command $command
-     */
     private function addOption(Command $command, InputOption $option): void
     {
         $command->getApplication()->getDefinition()->addOption($option);

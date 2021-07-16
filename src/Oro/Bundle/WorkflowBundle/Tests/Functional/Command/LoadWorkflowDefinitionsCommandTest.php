@@ -29,11 +29,6 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $expectedMessages
-     * @param array $expectedDefinitions
-     * @param array $expectedEventTriggers
-     * @param array $expectedCronTriggers
      */
     public function testExecute(
         array $expectedMessages,
@@ -112,7 +107,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     /**
      * @dataProvider invalidExecuteDataProvider
      *
-     * @param $expectedMessages $messages
+     * @param $expectedMessages
      * @param string $configDirectory
      */
     public function testExecuteErrors(array $expectedMessages, $configDirectory)
@@ -155,9 +150,6 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param array $messages
-     */
     protected function assertCommandExecuted(array $messages)
     {
         $result = $this->runCommand(self::NAME);

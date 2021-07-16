@@ -52,7 +52,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ->willReturn([self::FIELD_NAME]);
     }
 
-
     /** {@inheritdoc} */
     protected function getExtension()
     {
@@ -342,11 +341,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $this->assertEquals($initialConfig, $config->toArray());
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return array
-     */
     private function getExpectedConfig(DatagridConfiguration $config): array
     {
         $expectedConfig = [
@@ -387,10 +381,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return $this->mergeWithInitialConfig($config, $expectedConfig);
     }
 
-    /**
-     * @param Config $attributeFieldConfig
-     * @param array $familiesIdsByAttributesIds
-     */
     private function mockAttributeInFamilies(Config $attributeFieldConfig, array $familiesIdsByAttributesIds): void
     {
         /** @var FieldConfigId $fieldConfigId */
@@ -416,12 +406,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ->willReturn($familiesIdsByAttributesIds);
     }
 
-    /**
-     * @param string $fieldType
-     * @param bool $isAttribute
-     *
-     * @return Config
-     */
     private function mockAttributeFieldConfig(string $fieldType, bool $isAttribute): Config
     {
         $attributeFieldConfig = new Config(
@@ -489,8 +473,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function buildExpressionDataProvider(): array
@@ -660,12 +642,6 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     * @param array $expectedConfig
-     *
-     * @return array
-     */
     private function mergeWithInitialConfig(DatagridConfiguration $config, array $expectedConfig): array
     {
         $initialConfig = $config->toArray();

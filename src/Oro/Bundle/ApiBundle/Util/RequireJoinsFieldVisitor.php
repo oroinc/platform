@@ -19,9 +19,6 @@ class RequireJoinsFieldVisitor extends ExpressionVisitor
     /** @var array */
     private $fields = [];
 
-    /**
-     * @param RequireJoinsDecisionMakerInterface $decisionMaker
-     */
     public function __construct(RequireJoinsDecisionMakerInterface $decisionMaker)
     {
         $this->decisionMaker = $decisionMaker;
@@ -76,11 +73,6 @@ class RequireJoinsFieldVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * @param Comparison $comparison
-     *
-     * @return bool
-     */
     private function isJoinRequired(Comparison $comparison): bool
     {
         return $this->decisionMaker->isJoinRequired(

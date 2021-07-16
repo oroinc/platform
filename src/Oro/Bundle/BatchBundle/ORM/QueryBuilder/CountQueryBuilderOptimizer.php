@@ -28,9 +28,6 @@ class CountQueryBuilderOptimizer
     /** @var QueryOptimizationContext */
     protected $context;
 
-    /**
-     * @param QueryBuilderTools|null $qbTools
-     */
     public function __construct(QueryBuilderTools $qbTools = null)
     {
         if (!$qbTools) {
@@ -41,17 +38,12 @@ class CountQueryBuilderOptimizer
 
     /**
      * Sets an event dispatcher
-     *
-     * @param EventDispatcherInterface $eventDispatcher
      */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param RelationHelper $relationHelper
-     */
     public function setRelationHelper(RelationHelper $relationHelper)
     {
         $this->relationHelper = $relationHelper;

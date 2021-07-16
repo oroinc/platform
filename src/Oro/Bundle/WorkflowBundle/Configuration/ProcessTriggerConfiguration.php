@@ -109,7 +109,6 @@ class ProcessTriggerConfiguration implements ConfigurationInterface
         return $nodeDefinition;
     }
 
-
     /**
      * {@inheritDoc}
      */

@@ -68,10 +68,6 @@ class RegionRepositoryTest extends WebTestCase
         $this->assertContains($dk85->getCombinedCode(), $result);
     }
 
-    /**
-     * @param Region $expected
-     * @param array $regions
-     */
     private function assertRegionExists(Region $expected, array $regions)
     {
         $this->assertGreaterThanOrEqual(1, count($regions));

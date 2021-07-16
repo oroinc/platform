@@ -17,11 +17,6 @@ class FirstPageLinkMetadata extends LinkMetadataDecorator
     /** @var QueryStringAccessorInterface|null */
     private $queryStringAccessor;
 
-    /**
-     * @param LinkMetadataInterface             $link
-     * @param string                            $pageNumberFilterName
-     * @param QueryStringAccessorInterface|null $queryStringAccessor
-     */
     public function __construct(
         LinkMetadataInterface $link,
         string $pageNumberFilterName,

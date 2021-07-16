@@ -218,11 +218,6 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         return [null, null];
     }
 
-    /**
-     * @param FieldConfigId $fieldId
-     * @param ClassMetadata $metadata
-     * @param array $data
-     */
     private function addTargetClassData(FieldConfigId $fieldId, ClassMetadata $metadata, array &$data)
     {
         $fieldName = $fieldId->getFieldName();
@@ -231,10 +226,6 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
     }
 
-    /**
-     * @param FieldConfigId $fieldId
-     * @param array $data
-     */
     private function addFormatterData(FieldConfigId $fieldId, array &$data)
     {
         $formatter = $this->formatterManager->guessFormatter($fieldId->getFieldType());

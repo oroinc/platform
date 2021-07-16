@@ -17,17 +17,11 @@ class FieldAccessor extends BaseFieldAccessor
     /** @var RequestType|null */
     private $requestType;
 
-    /**
-     * @param MandatoryFieldProviderRegistry $mandatoryFieldProvider
-     */
     public function setMandatoryFieldProvider(MandatoryFieldProviderRegistry $mandatoryFieldProvider): void
     {
         $this->mandatoryFieldProvider = $mandatoryFieldProvider;
     }
 
-    /**
-     * @param RequestType|null $requestType
-     */
     public function setRequestType(RequestType $requestType = null): void
     {
         $this->requestType = $requestType;

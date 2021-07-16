@@ -30,10 +30,6 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
     /** @var string|null */
     private $connectionName;
 
-    /**
-     * @param string      $transactionWatcherTag
-     * @param string|null $connectionName
-     */
     public function __construct(string $transactionWatcherTag, string $connectionName = null)
     {
         $this->transactionWatcherTag = $transactionWatcherTag;
@@ -93,10 +89,6 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
 
     /**
      * Gets the root directory where the connection proxy should be stored.
-     *
-     * @param string $cacheDir
-     *
-     * @return string
      */
     public static function getConnectionProxyRootDir(string $cacheDir): string
     {
@@ -130,10 +122,6 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
-     *
-     * @return string
-     *
      * @throws \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the Doctrine DBAL
      * layer is not configured as expected
      */
@@ -148,11 +136,6 @@ class AddTransactionWatcherCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param string           $connectionName
-     *
-     * @return Definition
-     *
      * @throws \InvalidArgumentException if the given connection is not configured
      * @throws \Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException if the Doctrine DBAL
      * layer is not configured as expected
@@ -301,9 +284,6 @@ PHP
     }
 
     /**
-     * @param string $file
-     * @param string $content
-     *
      * @throws \RuntimeException if the proxy file cannot be written
      */
     private function writeProxyFile(string $file, string $content)
@@ -318,11 +298,6 @@ PHP
         @chmod($file, 0666 & ~umask());
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return string
-     */
     private function getProxyDir(ContainerBuilder $container): string
     {
         return
@@ -332,8 +307,6 @@ PHP
     }
 
     /**
-     * @param string $proxyDir
-     *
      * @throws \RuntimeException if the proxy directory cannot be created
      */
     private function ensureProxyDirExists(string $proxyDir)

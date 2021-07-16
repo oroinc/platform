@@ -17,9 +17,6 @@ class EmailTypeTemplateAccessibilityCheckerExtension extends AbstractTypeExtensi
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
         $this->authorizationChecker = $authorizationChecker;

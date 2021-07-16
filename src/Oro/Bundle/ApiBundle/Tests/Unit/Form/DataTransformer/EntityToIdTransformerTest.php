@@ -375,7 +375,6 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformWhenIdIsNotAcceptableDataProvider
      * @param mixed $id
-     *
      */
     public function testReverseTransformWhenIdIsNotAcceptable($id)
     {
@@ -390,9 +389,6 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    /**
-     * @return array
-     */
     public function reverseTransformWhenIdIsNotAcceptableDataProvider(): array
     {
         return [

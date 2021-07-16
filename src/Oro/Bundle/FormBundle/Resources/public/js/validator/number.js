@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const localeSettings = require('orolocale/js/locale-settings');
 
@@ -25,13 +24,13 @@ define(function(require) {
      */
     function between(number, min, max) {
         let result = true;
-        if (!_.isUndefined(min) && min === max) {
+        if (min !== void 0 && min === max) {
             result = number === parseInt(min, 10) || 0;
         } else {
-            if (!_.isUndefined(min) && min !== null) {
+            if (min !== void 0 && min !== null) {
                 result = number >= parseInt(min, 10) || -1;
             }
-            if (result === true && !_.isUndefined(max) && max !== null) {
+            if (result === true && max !== void 0 && max !== null) {
                 result = number <= parseInt(max, 10) || 1;
             }
         }
@@ -56,8 +55,8 @@ define(function(require) {
         function(param, element, value, placeholders) {
             let message;
             let number;
-            param = _.extend({}, defaultParam, param);
-            value = _.isUndefined(value) ? this.elementValue(element) : value;
+            param = Object.assign({}, defaultParam, param);
+            value = value === void 0 ? this.elementValue(element) : value;
             value = toNumber(value);
             if (isNaN(value)) {
                 return __(param.notNumberMessage);
@@ -78,11 +77,11 @@ define(function(require) {
                     default:
                         return '';
                 }
-                if (_.isUndefined(placeholders)) {
+                if (placeholders === void 0) {
                     placeholders = {};
                 }
                 placeholders.limit = number;
-                if (_.isUndefined(placeholders.value)) {
+                if (placeholders.value === void 0) {
                     placeholders.value = value;
                 }
                 return __(message, placeholders, number);

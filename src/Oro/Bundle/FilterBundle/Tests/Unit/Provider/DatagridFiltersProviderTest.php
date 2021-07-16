@@ -14,7 +14,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FilterFactory|\PHPUnit\Framework\MockObject\MockObject */
     private FilterFactory $filterFactory;
 
-    /** @var DatagridFiltersProvider */
     private DatagridFiltersProvider $provider;
 
     protected function setUp(): void
@@ -25,8 +24,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getDatagridFiltersWhenNoFiltersDataProvider
-     *
-     * @param array $gridConfigParams
      */
     public function testGetDatagridFiltersWhenNoFilters(array $gridConfigParams): void
     {
@@ -38,9 +35,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEmpty($this->provider->getDatagridFilters($gridConfig));
     }
 
-    /**
-     * @return array
-     */
     public function getDatagridFiltersWhenNoFiltersDataProvider(): array
     {
         return [
@@ -117,11 +111,6 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $this->provider->getDatagridFilters($gridConfig));
     }
 
-    /**
-     * @param string $datasourceType
-     * @param array $gridConfig
-     * @return DatagridConfiguration
-     */
     private function getGridConfig(string $datasourceType, array $gridConfig = []): DatagridConfiguration
     {
         $configuration = DatagridConfiguration::createNamed('sample_grid', $gridConfig);

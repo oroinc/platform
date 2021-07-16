@@ -15,9 +15,6 @@ class RemoveMillisecondsFromDateTimeTransformer implements DataTransformerInterf
     /** @var DataTransformerInterface */
     private $innerTransformer;
 
-    /**
-     * @param DataTransformerInterface $innerTransformer
-     */
     public function __construct(DataTransformerInterface $innerTransformer)
     {
         $this->innerTransformer = $innerTransformer;

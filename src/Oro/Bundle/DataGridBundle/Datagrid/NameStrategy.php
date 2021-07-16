@@ -15,9 +15,6 @@ class NameStrategy implements NameStrategyInterface
     /** @var RequestStack */
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -64,7 +61,6 @@ class NameStrategy implements NameStrategyInterface
 
         return $result;
     }
-
 
     /**
      * {@inheritdoc}

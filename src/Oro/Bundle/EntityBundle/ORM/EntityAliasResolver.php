@@ -36,11 +36,6 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
     /** @var EntityAliasStorage|null */
     private $storage;
 
-    /**
-     * @param EntityAliasLoader $loader
-     * @param Cache             $cache
-     * @param LoggerInterface   $logger
-     */
     public function __construct(EntityAliasLoader $loader, Cache $cache, LoggerInterface $logger)
     {
         $this->loader = $loader;
@@ -50,8 +45,6 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
 
     /**
      * Sets an object that should be used to check if entity alias cache is fresh or should be rebuilt.
-     *
-     * @param ConfigCacheStateInterface $configCacheState
      */
     public function setConfigCacheState(ConfigCacheStateInterface $configCacheState): void
     {
@@ -221,9 +214,6 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         }
     }
 
-    /**
-     * @return EntityAliasStorage|null
-     */
     private function fetchAliasesFromCache(): ?EntityAliasStorage
     {
         $storage = null;
@@ -238,9 +228,6 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         return $storage;
     }
 
-    /**
-     * @param EntityAliasStorage $storage
-     */
     private function saveAliasesToCache(EntityAliasStorage $storage): void
     {
         $timestamp = null === $this->configCacheState

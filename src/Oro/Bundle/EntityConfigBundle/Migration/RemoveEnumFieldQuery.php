@@ -119,9 +119,6 @@ class RemoveEnumFieldQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param $sql
-     * @param array $parameters
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])

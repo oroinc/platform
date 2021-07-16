@@ -180,7 +180,6 @@ class ExportHandler extends AbstractHandler
         return $fileName;
     }
 
-
     /**
      * Handles export action
      *

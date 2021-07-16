@@ -38,10 +38,6 @@ class NormalizeFilterValues implements ProcessorInterface
     /** @var Context */
     private $context;
 
-    /**
-     * @param ValueNormalizer             $valueNormalizer
-     * @param EntityIdTransformerRegistry $entityIdTransformerRegistry
-     */
     public function __construct(
         ValueNormalizer $valueNormalizer,
         EntityIdTransformerRegistry $entityIdTransformerRegistry
@@ -282,22 +278,11 @@ class NormalizeFilterValues implements ProcessorInterface
             : 0;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return EntityIdTransformerInterface
-     */
     private function getEntityIdTransformer(RequestType $requestType): EntityIdTransformerInterface
     {
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    /**
-     * @param string      $filterKey
-     * @param FilterValue $filterValue
-     *
-     * @return Error
-     */
     private function createFilterError(string $filterKey, FilterValue $filterValue): Error
     {
         return Error::createValidationError(Constraint::FILTER)

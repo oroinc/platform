@@ -9,9 +9,6 @@ class ContainerStub extends Container
 {
     private $parameters;
 
-    /**
-     * @param array $parameters
-     */
     public function __construct(array $parameters = [])
     {
         parent::__construct();

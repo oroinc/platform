@@ -37,10 +37,6 @@ class AclAccessRule implements AccessRuleInterface
     /** @var OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
 
-    /**
-     * @param AclConditionDataBuilderInterface $builder
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     */
     public function __construct(
         AclConditionDataBuilderInterface $builder,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider

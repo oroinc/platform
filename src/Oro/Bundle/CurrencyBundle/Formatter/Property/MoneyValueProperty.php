@@ -15,8 +15,6 @@ class MoneyValueProperty extends AbstractProperty
 
     /**
      * MoneyValueProperty constructor.
-     *
-     * @param MoneyValueTypeFormatter         $formatter
      */
     public function __construct(MoneyValueTypeFormatter $formatter, LoggerInterface $logger)
     {

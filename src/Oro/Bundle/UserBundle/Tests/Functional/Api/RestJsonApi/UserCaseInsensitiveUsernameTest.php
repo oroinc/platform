@@ -43,9 +43,6 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
         $this->assertRequestSuccess($data);
     }
 
-    /**
-     * @return array
-     */
     private function getData(): array
     {
         return [
@@ -61,11 +58,6 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
         ];
     }
 
-    /**
-     * @param array $data
-     *
-     * @return User
-     */
     private function assertRequestSuccess(array $data): User
     {
         $attributes = $data['data']['attributes'];
@@ -80,18 +72,11 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
         return $user;
     }
 
-    /**
-     * @return UserRepository
-     */
     private function getUserRepository(): UserRepository
     {
         return $this->getEntityManager()->getRepository(User::class);
     }
 
-    /**
-     * @param string $email
-     * @return User|null
-     */
     private function findUser(string $email): ?User
     {
         return $this->getUserRepository()->findOneBy(['email' => $email]);

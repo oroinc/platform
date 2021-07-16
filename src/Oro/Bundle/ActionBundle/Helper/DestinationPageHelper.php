@@ -22,11 +22,6 @@ class DestinationPageHelper
 
     const PARAM_ORIGINAL_URL = 'originalUrl';
 
-    /**
-     * @param RequestStack $requestStack
-     * @param EntityConfigHelper $entityConfigHelper
-     * @param RouterInterface $router
-     */
     public function __construct(
         RequestStack $requestStack,
         EntityConfigHelper $entityConfigHelper,

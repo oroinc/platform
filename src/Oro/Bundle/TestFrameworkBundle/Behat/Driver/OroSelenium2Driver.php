@@ -379,8 +379,6 @@ JS;
      * Deselects all options of a multiple select
      *
      * Note: this implementation does not trigger a change event after deselecting the elements.
-     *
-     * @param Element $element
      */
     private function deselectAllOptions(Element $element)
     {
@@ -443,9 +441,6 @@ JS;
         $this->executeJsOnXpath($xpath, $script);
     }
 
-    /**
-     * @param NodeElement $element
-     */
     public function switchToIFrameByElement(NodeElement $element)
     {
         $id = $element->getAttribute('id');

@@ -25,17 +25,11 @@ class AttributeTextType extends AbstractType
     /** @var string */
     protected $defaultVisible = '=value !== null';
 
-    /**
-     * @param AttributeConfigurationProviderInterface $attributeConfigurationProvider
-     */
     public function __construct(AttributeConfigurationProviderInterface $attributeConfigurationProvider)
     {
         $this->attributeConfigurationProvider = $attributeConfigurationProvider;
     }
 
-    /**
-     * @param string $defaultVisible
-     */
     public function setDefaultVisible(string $defaultVisible): void
     {
         $this->defaultVisible = $defaultVisible;

@@ -16,17 +16,11 @@ class EntityVirtualStructureOptionsListener
     /** @var VirtualFieldProviderInterface */
     private $virtualFieldProvider;
 
-    /**
-     * @param VirtualFieldProviderInterface $virtualFieldProvider
-     */
     public function __construct(VirtualFieldProviderInterface $virtualFieldProvider)
     {
         $this->virtualFieldProvider = $virtualFieldProvider;
     }
 
-    /**
-     * @param EntityStructureOptionsEvent $event
-     */
     public function onOptionsRequest(EntityStructureOptionsEvent $event)
     {
         $data = $event->getData();

@@ -21,10 +21,6 @@ class SearchResultBefore extends Event implements GridEventInterface
      */
     protected $query;
 
-    /**
-     * @param DatagridInterface    $datagrid
-     * @param SearchQueryInterface $query
-     */
     public function __construct(DatagridInterface $datagrid, SearchQueryInterface $query)
     {
         $this->datagrid = $datagrid;

@@ -15,9 +15,6 @@ class LocaleDataConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/locale_data.yml';
 
-    /**
-     * @return array
-     */
     public function getConfiguration(): array
     {
         return $this->doGetConfig();

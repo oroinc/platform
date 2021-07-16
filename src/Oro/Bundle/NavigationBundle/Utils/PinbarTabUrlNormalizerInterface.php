@@ -7,10 +7,5 @@ namespace Oro\Bundle\NavigationBundle\Utils;
  */
 interface PinbarTabUrlNormalizerInterface
 {
-    /**
-     * @param string $url
-     *
-     * @return string
-     */
     public function getNormalizedUrl(string $url): string;
 }

@@ -34,9 +34,6 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         return false;
     }
 
-    /**
-     * @return OwnerTreeInterface
-     */
     public function getTree(): OwnerTreeInterface
     {
         foreach ($this->providers as $provider) {

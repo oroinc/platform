@@ -19,17 +19,11 @@ class InvalidateCacheListener
     /** @var bool */
     private $needToRemoveRulesCache = false;
 
-    /**
-     * @param NotificationManager $notificationManager
-     */
     public function __construct(NotificationManager $notificationManager)
     {
         $this->notificationManager = $notificationManager;
     }
 
-    /**
-     * @param OnFlushEventArgs $args
-     */
     public function onFlush(OnFlushEventArgs $args)
     {
         if (!$this->needToRemoveRulesCache && $this->isRulesCacheDirty($args->getEntityManager()->getUnitOfWork())) {
@@ -45,11 +39,6 @@ class InvalidateCacheListener
         }
     }
 
-    /**
-     * @param UnitOfWork $uow
-     *
-     * @return bool
-     */
     private function isRulesCacheDirty(UnitOfWork $uow): bool
     {
         if ($this->hasEmailNotificationEntity($uow->getScheduledEntityInsertions())) {
@@ -72,11 +61,6 @@ class InvalidateCacheListener
         return false;
     }
 
-    /**
-     * @param array $entities
-     *
-     * @return bool
-     */
     private function hasEmailNotificationEntity(array $entities): bool
     {
         foreach ($entities as $entity) {

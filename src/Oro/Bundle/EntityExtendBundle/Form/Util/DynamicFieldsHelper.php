@@ -120,11 +120,6 @@ class DynamicFieldsHelper
             );
     }
 
-    /**
-     * @param FormView        $view
-     * @param FormInterface   $form
-     * @param ConfigInterface $extendConfig
-     */
     public function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
         $data = $form->getData();

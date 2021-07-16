@@ -24,10 +24,6 @@ class BuildFormBuilder implements ProcessorInterface
     /** @var bool */
     protected $enableFullValidation;
 
-    /**
-     * @param FormHelper $formHelper
-     * @param bool       $enableFullValidation
-     */
     public function __construct(FormHelper $formHelper, bool $enableFullValidation = false)
     {
         $this->formHelper = $formHelper;
@@ -63,11 +59,6 @@ class BuildFormBuilder implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface|null
-     */
     protected function getFormBuilder(ChangeSubresourceContext $context): ?FormBuilderInterface
     {
         if (null === $context->getConfig()) {
@@ -83,11 +74,6 @@ class BuildFormBuilder implements ProcessorInterface
         return $formBuilder;
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return FormBuilderInterface
-     */
     protected function createFormBuilder(ChangeSubresourceContext $context): FormBuilderInterface
     {
         $formBuilder = $this->formHelper->createFormBuilder(
@@ -99,10 +85,6 @@ class BuildFormBuilder implements ProcessorInterface
         return $formBuilder;
     }
 
-    /**
-     * @param FormBuilderInterface     $formBuilder
-     * @param ChangeSubresourceContext $context
-     */
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
         $entryFormOptions = $this->getEntryFormOptions($context);
@@ -116,11 +98,6 @@ class BuildFormBuilder implements ProcessorInterface
         );
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return array
-     */
     protected function getFormOptions(ChangeSubresourceContext $context): array
     {
         $formOptions = [];
@@ -133,11 +110,6 @@ class BuildFormBuilder implements ProcessorInterface
         return $formOptions;
     }
 
-    /**
-     * @param ChangeSubresourceContext $context
-     *
-     * @return array
-     */
     protected function getEntryFormOptions(ChangeSubresourceContext $context): array
     {
         $config = $context->getConfig();

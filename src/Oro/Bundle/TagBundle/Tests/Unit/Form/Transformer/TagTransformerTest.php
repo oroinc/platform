@@ -31,8 +31,6 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueReverseTransformProvider
-     * @param $value
-     * @param $tags
      */
     public function testReverseTransform($value, $tags)
     {
@@ -58,9 +56,6 @@ class TagTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider valueTransformProvider
-     *
-     * @param $expected
-     * @param $value
      */
     public function testTransform($expected, $value)
     {

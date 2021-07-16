@@ -130,9 +130,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         $this->multipleAttemptsEnabled = $multipleAttemptsEnabled;
     }
 
-    /**
-     * @param array $sleepBetweenAttempt
-     */
     public function setSleepBetweenAttempt(array $sleepBetweenAttempt)
     {
         $this->sleepBetweenAttempt = $sleepBetweenAttempt;
@@ -186,8 +183,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 
     /**
      * Get last request headers as array
-     *
-     * @return null|int
      */
     protected function getLastResponseStatusCode(): ?int
     {

@@ -19,13 +19,6 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
     /** @var ManagerRegistry */
     private $doctrine;
 
-    /**
-     * @param FormFactoryInterface     $factory
-     * @param FilterUtility            $util
-     * @param RouterInterface          $router
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param ManagerRegistry          $doctrine
-     */
     public function __construct(
         FormFactoryInterface $factory,
         FilterUtility $util,

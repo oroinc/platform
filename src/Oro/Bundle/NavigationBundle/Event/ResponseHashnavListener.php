@@ -45,7 +45,6 @@ class ResponseHashnavListener
     /**
      * Checking request and response and decide whether we need a redirect
      *
-     * @param ResponseEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function onResponse(ResponseEvent $event): void

@@ -13,10 +13,6 @@ class DatagridExportReader extends AbstractReader
      */
     protected $gridDataReader;
 
-    /**
-     * @param ContextRegistry         $contextRegistry
-     * @param DatagridExportConnector $gridDataReader
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         DatagridExportConnector $gridDataReader

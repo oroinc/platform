@@ -27,7 +27,6 @@ class PriceTypeTest extends FormIntegrationTestCase
         $localeSettings = $this->createMock(LocaleSettings::class);
         $currencyNameHelper = $this->createMock(CurrencyNameHelper::class);
 
-
         return [
             new PreloadedExtension(
                 [

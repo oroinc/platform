@@ -23,9 +23,6 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $this->treeListener = $this->createMock(TreeListener::class);
     }
 
-    /**
-     * @param array $config
-     */
     private function expectGetConfiguration(array $config)
     {
         $this->treeListener->expects(self::any())

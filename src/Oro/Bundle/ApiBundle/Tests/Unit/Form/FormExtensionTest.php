@@ -21,13 +21,6 @@ class FormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $types
-     * @param array $typeExtensions
-     * @param array $guessers
-     *
-     * @return FormExtension
-     */
     private function getExtension(array $types, array $typeExtensions, array $guessers): FormExtension
     {
         return new FormExtension($this->container, $types, $typeExtensions, $guessers);

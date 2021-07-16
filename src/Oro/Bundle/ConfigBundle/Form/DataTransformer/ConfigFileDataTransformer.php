@@ -28,19 +28,12 @@ class ConfigFileDataTransformer implements DataTransformerInterface
      */
     private $validator;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ValidatorInterface $validator
-     */
     public function __construct(DoctrineHelper $doctrineHelper, ValidatorInterface $validator)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->validator = $validator;
     }
 
-    /**
-     * @param array $fileConstraints
-     */
     public function setFileConstraints(array $fileConstraints)
     {
         $this->fileConstraints = $fileConstraints;

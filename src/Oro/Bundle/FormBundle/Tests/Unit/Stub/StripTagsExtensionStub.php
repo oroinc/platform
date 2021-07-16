@@ -10,9 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class StripTagsExtensionStub extends StripTagsExtension
 {
-    /**
-     * @param TestCase $testCase
-     */
     public function __construct(TestCase $testCase)
     {
         /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject $htmlTagHelper */

@@ -34,8 +34,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigTable(Schema $schema)
     {
@@ -53,8 +51,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config_field
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigFieldTable(Schema $schema)
     {
@@ -74,8 +70,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config_log
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigLogTable(Schema $schema)
     {
@@ -91,8 +85,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config_log_diff
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigLogDiffTable(Schema $schema)
     {
@@ -111,8 +103,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config_optionset
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigOptionsetTable(Schema $schema)
     {
@@ -149,8 +139,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate table oro_entity_config_value
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigValueTable(Schema $schema)
     {
@@ -171,8 +159,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_entity_config_log_diff
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigLogDiffForeignKeys(Schema $schema)
     {
@@ -189,8 +175,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_entity_config_optionset
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigOptionsetForeignKeys(Schema $schema)
     {
@@ -232,8 +216,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_entity_config_value
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigValueForeignKeys(Schema $schema)
     {
@@ -256,8 +238,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_entity_config_field
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigFieldForeignKeys(Schema $schema)
     {
@@ -274,8 +254,6 @@ class OroEntityConfigBundle implements Migration
 
     /**
      * Generate foreign keys for table oro_entity_config_log
-     *
-     * @param Schema $schema
      */
     public static function oroEntityConfigLogForeignKeys(Schema $schema)
     {

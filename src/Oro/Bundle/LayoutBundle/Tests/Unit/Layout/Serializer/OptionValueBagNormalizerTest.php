@@ -40,7 +40,6 @@ class OptionValueBagNormalizerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param OptionValueBag $bag
      * @dataProvider optionsDataProvider
      */
     public function testNormalizeDenormalize(OptionValueBag $bag)

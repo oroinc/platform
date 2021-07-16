@@ -19,9 +19,6 @@ class AddAssociationValidators implements ProcessorInterface
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -43,10 +40,6 @@ class AddAssociationValidators implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     */
     private function addValidatorsForEntityAssociations(EntityDefinitionConfig $definition, string $entityClass): void
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
@@ -70,10 +63,6 @@ class AddAssociationValidators implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     */
     private function addValidatorsForObjectAssociations(EntityDefinitionConfig $definition, string $entityClass): void
     {
         $fields = $definition->getFields();
@@ -95,13 +84,6 @@ class AddAssociationValidators implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $entityClass
-     * @param string                      $fieldName
-     *
-     * @return bool
-     */
     private function isHasAdderAndRemoverConstraintExist(
         EntityDefinitionFieldConfig $field,
         string $entityClass,

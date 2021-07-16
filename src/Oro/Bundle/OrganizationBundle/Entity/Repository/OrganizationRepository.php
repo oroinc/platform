@@ -224,8 +224,6 @@ class OrganizationRepository extends EntityRepository
     }
 
     /**
-     * @return int
-     *
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getEnabledOrganizationCount(): int

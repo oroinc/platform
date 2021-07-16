@@ -14,9 +14,6 @@ class ContainerBuilderAdapter implements ResourcesContainerInterface
     /** @var ContainerBuilder */
     private $container;
 
-    /**
-     * @param ContainerBuilder $container
-     */
     public function __construct(ContainerBuilder $container)
     {
         $this->container = $container;

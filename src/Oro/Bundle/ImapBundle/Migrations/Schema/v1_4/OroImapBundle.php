@@ -20,8 +20,6 @@ class OroImapBundle implements Migration
     /**
      * Adds Access Token fields to the oro_email_origin table
      *
-     * @param Schema $schema
-     *
      * @throws SchemaException
      */
     public static function addAccessTokenFieldsToOroEmailOriginTable(Schema $schema)

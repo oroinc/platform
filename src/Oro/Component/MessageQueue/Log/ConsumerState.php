@@ -75,8 +75,6 @@ class ConsumerState
 
     /**
      * Sets a consumption extension that is executed at the moment.
-     *
-     * @param ExtensionInterface|null $extension
      */
     public function setExtension(ExtensionInterface $extension = null)
     {
@@ -95,8 +93,6 @@ class ConsumerState
 
     /**
      * Sets a message processor that is executed at the moment.
-     *
-     * @param MessageProcessorInterface|null $messageProcessor
      */
     public function setMessageProcessor(MessageProcessorInterface $messageProcessor = null)
     {
@@ -115,8 +111,6 @@ class ConsumerState
 
     /**
      * Sets a message that is processed at the moment.
-     *
-     * @param MessageInterface|null $message
      */
     public function setMessage(MessageInterface $message = null)
     {

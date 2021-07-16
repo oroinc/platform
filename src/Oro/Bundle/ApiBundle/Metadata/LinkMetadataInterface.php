@@ -31,35 +31,21 @@ interface LinkMetadataInterface extends ToArrayInterface
 
     /**
      * Checks whether metadata of the given meta property exists.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return bool
      */
     public function hasMetaProperty(string $metaPropertyName): bool;
 
     /**
      * Gets metadata of a meta property.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return MetaAttributeMetadata|null
      */
     public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata;
 
     /**
      * Adds metadata of a meta property.
-     *
-     * @param MetaAttributeMetadata $metaProperty
-     *
-     * @return MetaAttributeMetadata
      */
     public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata;
 
     /**
      * Removes metadata of a meta property.
-     *
-     * @param string $metaPropertyName
      */
     public function removeMetaProperty(string $metaPropertyName): void;
 }

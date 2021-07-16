@@ -117,11 +117,6 @@ class LocalizationChangeListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onConfigUpdate($event);
     }
 
-    /**
-     * @param int $recordId
-     * @param int $value
-     * @return ConfigValue
-     */
     private function getConfigValue(int $recordId, int $value): ConfigValue
     {
         $config = new Config();

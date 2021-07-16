@@ -24,10 +24,6 @@ class TemplateEmailMessageSender
      */
     private $doctrineHelper;
 
-    /**
-     * @param EmailTemplateManager $emailTemplateManager
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(EmailTemplateManager $emailTemplateManager, DoctrineHelper $doctrineHelper)
     {
         $this->emailTemplateManager = $emailTemplateManager;
@@ -35,9 +31,6 @@ class TemplateEmailMessageSender
     }
 
     /**
-     * @param array $message
-     * @param array $failedRecipients
-     * @return int
      * @throws \LogicException
      */
     public function sendTranslatedMessage(array $message, array &$failedRecipients = []): int
@@ -56,10 +49,6 @@ class TemplateEmailMessageSender
             );
     }
 
-    /**
-     * @param array $message
-     * @return bool
-     */
     public function isTranslatable(array $message): bool
     {
         if (!isset($message['template'], $message['sender'], $message['body']) || !is_array($message['body'])) {
@@ -69,10 +58,6 @@ class TemplateEmailMessageSender
         return null !== $this->getRecipient($message);
     }
 
-    /**
-     * @param array $message
-     * @return null|EmailHolderInterface
-     */
     private function getRecipient(array $message): ?EmailHolderInterface
     {
         if (isset($message['recipientUserId'])) {

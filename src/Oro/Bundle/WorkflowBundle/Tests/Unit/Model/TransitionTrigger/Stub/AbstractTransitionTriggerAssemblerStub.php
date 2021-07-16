@@ -29,9 +29,6 @@ class AbstractTransitionTriggerAssemblerStub extends AbstractTransitionTriggerAs
         return $this->canAssemble;
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     */
     protected function verifyTrigger(BaseTransitionTrigger $trigger)
     {
         //void

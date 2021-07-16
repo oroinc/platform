@@ -20,10 +20,6 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
 
     /**
      * @dataProvider prepareDataProvider
-     *
-     * @param array $source
-     * @param string|null $fileName
-     * @param array $expectedSource
      */
     public function testPrepare(array $source, ?string $fileName, array $expectedSource): void
     {
@@ -36,9 +32,6 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
         self::assertEquals($expectedSource, $data->getSource());
     }
 
-    /**
-     * @return array
-     */
     public function prepareDataProvider(): array
     {
         $namespacedThemeName = '@OroLayout/Tests/Unit/Layout/Extension/Generator/data/sub/update.html.twig';

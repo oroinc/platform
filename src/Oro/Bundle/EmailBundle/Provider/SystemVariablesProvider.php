@@ -25,11 +25,6 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
     /** @var DateTimeFormatterInterface */
     private $dateTimeFormatter;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param ConfigManager $configManager
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     */
     public function __construct(
         TranslatorInterface $translator,
         ConfigManager $configManager,
@@ -71,10 +66,6 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
         return $result;
     }
 
-    /**
-     * @param array $result
-     * @param bool  $addValue
-     */
     private function addApplicationUrl(array &$result, bool $addValue): void
     {
         if ($addValue) {
@@ -88,10 +79,6 @@ class SystemVariablesProvider implements SystemVariablesProviderInterface
         $result['appURL'] = $val;
     }
 
-    /**
-     * @param array $result
-     * @param bool  $addValue
-     */
     private function addCurrentDateAndTime(array &$result, bool $addValue): void
     {
         if ($addValue) {

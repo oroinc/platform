@@ -71,10 +71,6 @@ class FieldsTransformer
         return $data;
     }
 
-    /**
-     * @param Collection $collection
-     * @return array
-     */
     public function getCollectionData(Collection $collection): array
     {
         return $this->getData($collection->toArray());

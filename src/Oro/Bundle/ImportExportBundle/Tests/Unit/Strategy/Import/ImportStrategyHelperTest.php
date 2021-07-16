@@ -239,9 +239,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string|null $path
-     * @param string $error
-     * @param string $expectedMessage
      * @dataProvider validateDataProvider
      */
     public function testValidateEntity(?string $path, string $error, string $expectedMessage): void
@@ -265,9 +262,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(array($expectedMessage), $this->helper->validateEntity($entity));
     }
 
-    /**
-     * @return array
-     */
     public function validateDataProvider(): array
     {
         return [
@@ -286,7 +280,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider prefixDataProvider
-     * @param string|null $prefix
      */
     public function testAddValidationErrors(?string $prefix): void
     {
@@ -312,9 +305,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->addValidationErrors($validationErrors, $context, $prefix);
     }
 
-    /**
-     * @return array
-     */
     public function prefixDataProvider(): array
     {
         return [
@@ -335,7 +325,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider trueFalseDataProvider
-     * @param bool $isGranted
      */
     public function testIsGrantedObject(bool $isGranted): void
     {
@@ -349,7 +338,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider trueFalseDataProvider
-     * @param bool $isGranted
      */
     public function testIsGrantedObjectProperty(bool $isGranted): void
     {
@@ -362,9 +350,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
     }
 
-    /**
-     * @return array
-     */
     public function trueFalseDataProvider(): array
     {
         return [
@@ -398,9 +383,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object));
     }
 
-    /**
-     * @return array
-     */
     public function isGrantedWhenUsingCacheDataProvider(): array
     {
         $object = new \stdClass();
@@ -477,9 +459,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($isGranted, $this->helper->isGranted($attributes, $object, $property));
     }
 
-    /**
-     * @return array
-     */
     public function isGrantedForPropertyWhenUsingCacheDataProvider(): array
     {
         $object = new \stdClass();
@@ -718,11 +697,6 @@ class ImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $fieldNames
-     *
-     * @return array
-     */
     private function convertFieldNamesToFieldConfigs(array $fieldNames): array
     {
         return array_map(function ($fieldName) {

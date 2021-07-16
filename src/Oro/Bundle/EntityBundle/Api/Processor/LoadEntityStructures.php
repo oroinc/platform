@@ -15,9 +15,6 @@ class LoadEntityStructures implements ProcessorInterface
     /** @var EntityStructureDataProvider */
     private $entityStructureProvider;
 
-    /**
-     * @param EntityStructureDataProvider $entityStructureProvider
-     */
     public function __construct(EntityStructureDataProvider $entityStructureProvider)
     {
         $this->entityStructureProvider = $entityStructureProvider;

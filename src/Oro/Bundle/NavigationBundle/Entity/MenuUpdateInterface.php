@@ -205,8 +205,6 @@ interface MenuUpdateInterface
 
     /**
      * Get array of link attributes
-     *
-     * @return array
      */
     public function getLinkAttributes(): array;
 

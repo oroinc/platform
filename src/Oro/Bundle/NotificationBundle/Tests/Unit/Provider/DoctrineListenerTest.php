@@ -53,8 +53,6 @@ class DoctrineListenerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider eventData
-     * @param $methodName
-     * @param $eventName
      */
     public function testEventDispatchers($methodName, $eventName)
     {

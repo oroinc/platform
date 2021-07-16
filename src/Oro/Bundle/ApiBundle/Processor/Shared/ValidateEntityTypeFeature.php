@@ -18,9 +18,6 @@ class ValidateEntityTypeFeature implements ProcessorInterface
     /** @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

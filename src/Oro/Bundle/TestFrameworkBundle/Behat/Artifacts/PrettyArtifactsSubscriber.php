@@ -34,10 +34,6 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
      */
     protected $mink;
 
-    /**
-     * @param NodeEventListeningFormatter $formatter
-     * @param Mink $mink
-     */
     public function __construct(NodeEventListeningFormatter $formatter, Mink $mink)
     {
         $this->printer = $formatter->getOutputPrinter();
@@ -57,9 +53,6 @@ class PrettyArtifactsSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ArtifactsHandlerInterface $artifactsHandler
-     */
     public function addArtifactHandler(ArtifactsHandlerInterface $artifactsHandler)
     {
         $this->artifactsHandlers[] = $artifactsHandler;

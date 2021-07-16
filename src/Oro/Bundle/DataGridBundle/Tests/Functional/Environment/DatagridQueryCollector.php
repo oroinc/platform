@@ -20,9 +20,6 @@ class DatagridQueryCollector implements QueryExecutorInterface
     /** @var string[] */
     private $datagridNames = [];
 
-    /**
-     * @param QueryExecutorInterface $queryExecutor
-     */
     public function __construct(QueryExecutorInterface $queryExecutor)
     {
         $this->queryExecutor = $queryExecutor;
@@ -30,8 +27,6 @@ class DatagridQueryCollector implements QueryExecutorInterface
 
     /**
      * Enables collecting of executed queries for the given datagrid.
-     *
-     * @param string $datagridName
      */
     public function enable(string $datagridName): void
     {

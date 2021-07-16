@@ -58,9 +58,6 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function supportsDataProvider(): array
     {
         $tokenWithoutNonce = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
@@ -236,25 +233,16 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedToken, $actualToken);
     }
 
-    /**
-     * @return string
-     */
     private function getDate(): string
     {
         return date('c');
     }
 
-    /**
-     * @return string
-     */
     private function getDateInFuture(): string
     {
         return (new \DateTime('now +1 day'))->format('c');
     }
 
-    /**
-     * @return string
-     */
     private function getDateInPast(): string
     {
         return (new \DateTime('now -301 seconds'))->format('c');

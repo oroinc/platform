@@ -322,7 +322,6 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getVirtualColumnOption('column_join_id', 'unknown');
     }
 
-
     public function testVirtualRelationJoins()
     {
         self::assertFalse($this->context->hasVirtualRelationJoins());

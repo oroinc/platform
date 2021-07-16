@@ -22,10 +22,6 @@ class CreateAsyncOperation implements ProcessorInterface
     /** @var AuthorizationCheckerInterface */
     private $authorizationChecker;
 
-    /**
-     * @param DoctrineHelper                $doctrineHelper
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AuthorizationCheckerInterface $authorizationChecker
@@ -68,9 +64,6 @@ class CreateAsyncOperation implements ProcessorInterface
         $context->setOperationId($operation->getId());
     }
 
-    /**
-     * @return bool
-     */
     private function isCreationOfAsyncOperationGranted(): bool
     {
         $oid = ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, AsyncOperation::class);

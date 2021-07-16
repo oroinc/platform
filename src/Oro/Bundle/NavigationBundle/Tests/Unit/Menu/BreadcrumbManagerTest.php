@@ -80,7 +80,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->setExtra('routes', []);
         $item2->addChild($item);
 
-
         $this->provider->expects($this->once())
             ->method('get')
             ->willReturn($item1);
@@ -121,7 +120,6 @@ class BreadcrumbManagerTest extends \PHPUnit\Framework\TestCase
         $item1->addChild($item2);
         $item1->setExtra('routes', []);
         $item2->addChild($item);
-
 
         $this->provider->expects($this->once())
             ->method('get')

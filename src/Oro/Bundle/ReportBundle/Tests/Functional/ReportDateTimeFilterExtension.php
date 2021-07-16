@@ -8,12 +8,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Functional;
 trait ReportDateTimeFilterExtension
 {
     /**
-     * @param string $modify
-     * @param string $formattedTime
-     * @param string $timeZone
-     *
      * @throws \Exception
-     * @return \DateTime
      */
     public function dateTimeWithModify(
         string $modify = '+0 seconds',
@@ -35,13 +30,7 @@ trait ReportDateTimeFilterExtension
     }
 
     /**
-     * @param string $modify
-     * @param string $formattedTime
-     * @param string $timeZone
-     * @param string $format
-     *
      * @throws \Exception
-     * @return string
      */
     public function dateTimeWithModifyAsString(
         string $modify = '+0 day',
@@ -52,11 +41,6 @@ trait ReportDateTimeFilterExtension
         return $this->dateTimeWithModify($modify, $formattedTime, $timeZone)->format($format);
     }
 
-    /**
-     * @param string $timeZone
-     *
-     * @return \DateTimeZone
-     */
     private function getTimeZone(string $timeZone = 'UTC'): \DateTimeZone
     {
         $identifiers = array_values(timezone_identifiers_list());

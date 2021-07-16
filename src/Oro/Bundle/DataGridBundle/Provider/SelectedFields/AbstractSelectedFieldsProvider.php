@@ -15,9 +15,6 @@ abstract class AbstractSelectedFieldsProvider implements SelectedFieldsProviderI
     /** @var DatagridStateProviderInterface */
     protected $datagridStateProvider;
 
-    /**
-     * @param DatagridStateProviderInterface $datagridStateProvider
-     */
     public function __construct(DatagridStateProviderInterface $datagridStateProvider)
     {
         $this->datagridStateProvider = $datagridStateProvider;

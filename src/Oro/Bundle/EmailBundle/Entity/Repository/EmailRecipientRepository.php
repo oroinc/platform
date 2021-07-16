@@ -11,13 +11,6 @@ use Doctrine\ORM\QueryBuilder;
  */
 class EmailRecipientRepository extends EntityRepository
 {
-    /**
-     * @param array $senderEmails
-     * @param array $excludedEmails
-     * @param string|null $query
-     *
-     * @return QueryBuilder
-     */
     public function getEmailsUsedInLast30DaysQb(
         array $senderEmails = [],
         array $excludedEmails = [],

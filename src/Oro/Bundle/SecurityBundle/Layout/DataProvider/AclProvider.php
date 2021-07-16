@@ -21,10 +21,6 @@ class AclProvider
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param ManagerRegistry               $doctrine
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ManagerRegistry $doctrine

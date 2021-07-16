@@ -15,9 +15,6 @@ class Configuration implements ConfigurationInterface
     /** @var array */
     protected $types;
 
-    /**
-     * @param $types
-     */
     public function __construct($types)
     {
         $this->types = $types;

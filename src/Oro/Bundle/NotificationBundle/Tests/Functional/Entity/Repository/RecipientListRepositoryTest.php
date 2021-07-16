@@ -214,10 +214,6 @@ class RecipientListRepositoryTest extends WebTestCase
         $this->assertRecipients($expectedEmails, array_values($this->repository->getRecipients($recipientList)));
     }
 
-    /**
-     * @param array $expectedRecipients
-     * @param array $actualRecipients
-     */
     private function assertRecipients(array $expectedRecipients, array $actualRecipients): void
     {
         self::assertCount(\count($expectedRecipients), $actualRecipients);
@@ -226,10 +222,6 @@ class RecipientListRepositoryTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array $expectedEmails
-     * @param array $actualEmails
-     */
     private function assertEmails(array $expectedEmails, array $actualEmails): void
     {
         self::assertCount(\count($expectedEmails), $actualEmails);

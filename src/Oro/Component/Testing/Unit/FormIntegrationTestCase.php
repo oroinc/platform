@@ -75,24 +75,17 @@ class FormIntegrationTestCase extends BaseTestCase
         return $validator;
     }
 
-    /**
-     * @param FormInterface $form
-     */
     protected function assertFormIsValid(FormInterface $form)
     {
         $formName = $form->getName();
         $this->assertTrue($form->isValid(), "{$formName} form should be valid.");
     }
 
-    /**
-     * @param FormInterface $form
-     */
     protected function assertFormIsNotValid(FormInterface $form)
     {
         $formName = $form->getName();
         $this->assertFalse($form->isValid(), "{$formName} form shouldn't be valid.");
     }
-
 
     /**
      * @param mixed         $expectedValue
@@ -114,10 +107,6 @@ class FormIntegrationTestCase extends BaseTestCase
         );
     }
 
-    /**
-     * @param               $expectedFieldName
-     * @param FormInterface $form
-     */
     protected function assertFormContainsField($expectedFieldName, FormInterface $form)
     {
         $formName = $form->getName();
@@ -127,10 +116,6 @@ class FormIntegrationTestCase extends BaseTestCase
         );
     }
 
-    /**
-     * @param               $expectedFieldName
-     * @param FormInterface $form
-     */
     protected function assertFormNotContainsField($expectedFieldName, FormInterface $form)
     {
         $formName = $form->getName();
@@ -140,9 +125,6 @@ class FormIntegrationTestCase extends BaseTestCase
         );
     }
 
-    /**
-     * @param ClassMetadata $meta
-     */
     protected function loadMetadata(ClassMetadata $meta)
     {
         if (false !== ($configFile = $this->getConfigFile($meta->name))) {
@@ -223,10 +205,6 @@ class FormIntegrationTestCase extends BaseTestCase
         return $path;
     }
 
-    /**
-     * @param \DateTime $expected
-     * @param \DateTime $actual
-     */
     public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));

@@ -15,7 +15,7 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
      * @var ArrayCollection|AccessLevelOwnershipDecisionMakerInterface[]
      */
     protected $ownershipDecisionMakers;
-    
+
     /**
      * @param AccessLevelOwnershipDecisionMakerInterface[] $ownershipDecisionMakers
      */
@@ -23,11 +23,9 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
     {
         $this->ownershipDecisionMakers = new ArrayCollection($ownershipDecisionMakers);
     }
-    
+
     /**
      * Adds all decision makers marked by tag: oro_security.owner.ownership_decision_maker
-     *
-     * @param AccessLevelOwnershipDecisionMakerInterface $ownershipDecisionMakers
      */
     public function addOwnershipDecisionMaker(AccessLevelOwnershipDecisionMakerInterface $ownershipDecisionMakers)
     {
@@ -35,7 +33,7 @@ class ChainEntityOwnershipDecisionMaker implements AccessLevelOwnershipDecisionM
             $this->ownershipDecisionMakers->add($ownershipDecisionMakers);
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */

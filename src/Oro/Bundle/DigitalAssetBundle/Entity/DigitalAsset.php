@@ -132,9 +132,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
         $this->titles = new ArrayCollection();
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
@@ -148,11 +145,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
         return $this->titles;
     }
 
-    /**
-     * @param LocalizedFallbackValue $title
-     *
-     * @return self
-     */
     public function addTitle(LocalizedFallbackValue $title): self
     {
         if (!$this->titles->contains($title)) {
@@ -162,11 +154,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
         return $this;
     }
 
-    /**
-     * @param LocalizedFallbackValue $title
-     *
-     * @return self
-     */
     public function removeTitle(LocalizedFallbackValue $title): self
     {
         if ($this->titles->contains($title)) {
@@ -176,11 +163,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
         return $this;
     }
 
-    /**
-     * @param File $file
-     *
-     * @return self
-     */
     public function setSourceFile(File $file): self
     {
         $this->sourceFile = $file;
@@ -188,9 +170,6 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
         return $this;
     }
 
-    /**
-     * @return File|null
-     */
     public function getSourceFile(): ?File
     {
         return $this->sourceFile;

@@ -66,25 +66,16 @@ class CsvMimeTypeGuesser extends FileinfoMimeTypeGuesser
         return null;
     }
 
-    /**
-     * @param string $delimiter
-     */
     public function setDelimiter(string $delimiter)
     {
         $this->delimiter = $delimiter;
     }
 
-    /**
-     * @param string $enclosure
-     */
     public function setEnclosure(string $enclosure)
     {
         $this->enclosure = $enclosure;
     }
 
-    /**
-     * @param string $escape
-     */
     public function setEscape(string $escape)
     {
         $this->escape = $escape;

@@ -78,9 +78,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getTemplateByEntityNameDataProvider
-     * @param bool $includeNonEntity
-     * @param bool $includeSystemTemplates
-     * @param array $expectedReferences
      */
     public function testGetTemplateByEntityName(
         bool $includeNonEntity,
@@ -103,9 +100,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEquals($this->getReferencesIds($expectedReferences), $this->getEntitiesIds($actualResult));
     }
 
-    /**
-     * @return array
-     */
     public function getTemplateByEntityNameDataProvider(): array
     {
         return [
@@ -138,12 +132,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider getEntityTemplatesDataProvider
-     *
-     * @param bool $includeNonEntity
-     * @param bool $includeSystemTemplates
-     * @param bool $visibleOnly
-     * @param array $excludeTemplates
-     * @param array $expectedReferences
      */
     public function testGetEntityTemplatesQueryBuilder(
         bool $includeNonEntity,
@@ -174,9 +162,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertEquals($this->getReferencesIds($expectedReferences), $this->getEntitiesIds($actualResult));
     }
 
-    /**
-     * @return array
-     */
     public function getEntityTemplatesDataProvider(): array
     {
         return [
@@ -395,10 +380,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
         self::assertTrue($expectedResult);
     }
 
-    /**
-     * @param array $entities
-     * @return array
-     */
     private function getEntitiesIds(array $entities): array
     {
         return array_map(function ($entity) {
@@ -406,10 +387,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
         }, $entities);
     }
 
-    /**
-     * @param array $references
-     * @return array
-     */
     private function getReferencesIds(array $references): array
     {
         return array_map(function ($reference) {
@@ -417,18 +394,11 @@ class EmailTemplateRepositoryTest extends WebTestCase
         }, $references);
     }
 
-    /**
-     * @param string $name
-     * @return EmailTemplate
-     */
     private function getMainEmailTemplateByName(string $name): EmailTemplate
     {
         return $this->getRepository()->findOneBy(['name' => $name]);
     }
 
-    /**
-     * @return EmailTemplateRepository
-     */
     private function getRepository(): EmailTemplateRepository
     {
         return self::getContainer()->get('doctrine')

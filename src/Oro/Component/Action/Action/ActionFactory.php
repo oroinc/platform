@@ -20,10 +20,6 @@ class ActionFactory implements ActionFactoryInterface
      */
     protected $types;
 
-    /**
-     * @param ContainerInterface $container
-     * @param array $types
-     */
     public function __construct(ContainerInterface $container, array $types = [])
     {
         $this->container = $container;

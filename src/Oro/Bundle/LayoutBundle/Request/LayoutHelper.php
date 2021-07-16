@@ -13,19 +13,11 @@ class LayoutHelper
     /** @var RequestStack */
     private $requestStack;
 
-    /**
-     * @param RequestStack $requestStack
-     */
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @param Request|null $request
-     *
-     * @return bool
-     */
     public function isLayoutRequest(Request $request = null): bool
     {
         if (null === $request) {
@@ -35,11 +27,6 @@ class LayoutHelper
         return null !== $request && null !== $request->attributes->get('_layout');
     }
 
-    /**
-     * @param Request|null $request
-     *
-     * @return bool
-     */
     public function isTemplateRequest(Request $request = null): bool
     {
         return !$this->isLayoutRequest($request);

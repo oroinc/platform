@@ -238,8 +238,6 @@ class RecipientList
     /**
      * Custom validation constraint
      * Not valid if no one recipient specified
-     *
-     * @param ExecutionContextInterface $context
      */
     public function isValid(ExecutionContextInterface $context)
     {
@@ -265,9 +263,6 @@ class RecipientList
         return $this->entityEmails;
     }
 
-    /**
-     * @param array $entityEmails
-     */
     public function setEntityEmails(array $entityEmails)
     {
         $this->entityEmails = $entityEmails;

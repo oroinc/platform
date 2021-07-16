@@ -48,11 +48,6 @@ class TwigServiceLocatorPass implements CompilerPassInterface
             ->replaceArgument(0, $services);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param Definition $definition
-     * @param array $ids
-     */
     private function getSubscribedServices(ContainerBuilder $container, Definition $definition, array &$ids): void
     {
         $class = $definition->getClass();

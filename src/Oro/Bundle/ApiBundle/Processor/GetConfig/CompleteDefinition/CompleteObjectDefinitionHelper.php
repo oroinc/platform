@@ -17,18 +17,11 @@ class CompleteObjectDefinitionHelper
     /** @var CompleteAssociationHelper */
     private $associationHelper;
 
-    /**
-     * @param CompleteAssociationHelper $associationHelper
-     */
     public function __construct(CompleteAssociationHelper $associationHelper)
     {
         $this->associationHelper = $associationHelper;
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param ConfigContext          $context
-     */
     public function completeDefinition(EntityDefinitionConfig $definition, ConfigContext $context)
     {
         if ($context->hasExtra(FilterIdentifierFieldsConfigExtra::NAME)) {
@@ -38,9 +31,6 @@ class CompleteObjectDefinitionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     */
     private function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition)
     {
         $idFieldNames = $definition->getIdentifierFieldNames();

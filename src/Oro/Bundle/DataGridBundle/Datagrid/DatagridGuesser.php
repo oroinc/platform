@@ -139,9 +139,6 @@ class DatagridGuesser
         }
     }
 
-    /**
-     * @return ColumnOptionsGuesserInterface
-     */
     private function getColumnOptionsGuesser(): ColumnOptionsGuesserInterface
     {
         if (null === $this->columnOptionsGuesser) {

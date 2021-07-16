@@ -1,6 +1,8 @@
-define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/datetime'
-], function(_, __, datetimeFormatter) {
+define(function(require) {
     'use strict';
+
+    const __ = require('orotranslation/js/translator');
+    const datetimeFormatter = require('orolocale/js/formatter/datetime');
 
     const defaultParam = {
         message: 'This value is not a valid time.'
@@ -20,7 +22,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
         function(param, element) {
             const value = String(this.elementValue(element));
             const placeholders = {};
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             placeholders.value = value;
             return __(param.message, placeholders);
         }

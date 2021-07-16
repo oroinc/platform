@@ -31,9 +31,6 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadEmailFolders(ObjectManager $manager)
     {
         $data = [
@@ -65,9 +62,6 @@ class LoadImapEmailFolderData extends AbstractFixture implements DependentFixtur
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     private function loadImapEmailFolders(ObjectManager $manager)
     {
         $data = [

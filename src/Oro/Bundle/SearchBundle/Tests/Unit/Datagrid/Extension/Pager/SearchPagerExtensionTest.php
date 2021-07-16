@@ -161,9 +161,6 @@ class SearchPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectPage, $pagerParameters['_page'] ?? null);
     }
 
-    /**
-     * @return array
-     */
     public function datagridPagerParamsDataProvider(): array
     {
         return [

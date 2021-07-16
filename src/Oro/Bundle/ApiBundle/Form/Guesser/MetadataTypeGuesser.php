@@ -46,10 +46,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     /** @var IncludedEntityCollection|null */
     private $includedEntities;
 
-    /**
-     * @param DataTypeGuesser $dataTypeGuesser
-     * @param DoctrineHelper  $doctrineHelper
-     */
     public function __construct(DataTypeGuesser $dataTypeGuesser, DoctrineHelper $doctrineHelper)
     {
         $this->dataTypeGuesser = $dataTypeGuesser;
@@ -64,9 +60,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         return $this->metadataAccessor;
     }
 
-    /**
-     * @param MetadataAccessorInterface|null $metadataAccessor
-     */
     public function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
     {
         $this->metadataAccessor = $metadataAccessor;
@@ -80,9 +73,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         return $this->configAccessor;
     }
 
-    /**
-     * @param ConfigAccessorInterface|null $configAccessor
-     */
     public function setConfigAccessor(ConfigAccessorInterface $configAccessor = null)
     {
         $this->configAccessor = $configAccessor;
@@ -96,9 +86,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         return $this->entityMapper;
     }
 
-    /**
-     * @param EntityMapper|null $entityMapper
-     */
     public function setEntityMapper(EntityMapper $entityMapper = null)
     {
         $this->entityMapper = $entityMapper;
@@ -112,9 +99,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         return $this->includedEntities;
     }
 
-    /**
-     * @param IncludedEntityCollection|null $includedEntities
-     */
     public function setIncludedEntities(IncludedEntityCollection $includedEntities = null)
     {
         $this->includedEntities = $includedEntities;
@@ -417,12 +401,6 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         );
     }
 
-    /**
-     * @param array $formOptions
-     * @param array $configuredFormOptions
-     *
-     * @return array
-     */
     private function mergeCollectionFormOptions(array $formOptions, array $configuredFormOptions): array
     {
         if (\array_key_exists('entry_options', $configuredFormOptions)) {

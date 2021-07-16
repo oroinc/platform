@@ -20,7 +20,6 @@ interface ActivityListProviderInterface
      *                            It means that an association with the target entity should exist
      *                            and should not be marked as deleted.
      *
-     *
      * @return bool
      */
     public function isApplicableTarget($entityClass, $accessible = true);

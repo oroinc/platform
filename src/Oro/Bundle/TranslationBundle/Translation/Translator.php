@@ -107,41 +107,26 @@ class Translator extends BaseTranslator
         $this->logger = new NullLogger();
     }
 
-    /**
-     * @param TranslationStrategyProvider $strategyProvider
-     */
     public function setStrategyProvider(TranslationStrategyProvider $strategyProvider)
     {
         $this->strategyProvider = $strategyProvider;
     }
 
-    /**
-     * @param TranslationDomainProvider $translationDomainProvider
-     */
     public function setTranslationDomainProvider(TranslationDomainProvider $translationDomainProvider)
     {
         $this->translationDomainProvider = $translationDomainProvider;
     }
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
-    /**
-     * @param $installed
-     */
     public function setInstalled($installed)
     {
         $this->installed = $installed;
@@ -412,8 +397,6 @@ class Translator extends BaseTranslator
 
     /**
      * Sets a cache of dynamic translation metadata
-     *
-     * @param DynamicTranslationMetadataCache $cache
      */
     public function setDatabaseMetadataCache(DynamicTranslationMetadataCache $cache)
     {
@@ -422,8 +405,6 @@ class Translator extends BaseTranslator
 
     /**
      * Sets a cache of loaded translation resources
-     *
-     * @param Cache $cache
      */
     public function setResourceCache(Cache $cache)
     {
@@ -533,10 +514,6 @@ class Translator extends BaseTranslator
         }
     }
 
-    /**
-     * @param string $locale
-     * @return string
-     */
     private function getCatalogueCachePath(string $locale): string
     {
         return $this->options['cache_dir'] .'/catalogue.' .$locale .'.' .strtr(

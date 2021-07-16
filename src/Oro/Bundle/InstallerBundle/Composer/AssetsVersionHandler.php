@@ -12,9 +12,6 @@ class AssetsVersionHandler
     /** @var IOInterface */
     protected $io;
 
-    /**
-     * @param IOInterface $io
-     */
     public function __construct(IOInterface $io)
     {
         $this->io = $io;

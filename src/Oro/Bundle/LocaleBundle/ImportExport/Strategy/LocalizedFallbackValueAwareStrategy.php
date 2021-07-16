@@ -40,11 +40,6 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         return parent::processEntity($entity, $isFullData, $isPersistNew, $itemData, $searchContext, $entityIsRelation);
     }
 
-    /**
-     * @param object $entity
-     *
-     * @return bool
-     */
     private function isLocalizedFallbackValueEntity(object $entity): bool
     {
         return is_a($entity, $this->localizedFallbackValueClass, true);

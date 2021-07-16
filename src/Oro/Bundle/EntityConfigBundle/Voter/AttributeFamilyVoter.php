@@ -19,10 +19,6 @@ class AttributeFamilyVoter extends AbstractEntityVoter
     /** @var AttributeFamilyManager */
     private $familyManager;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param AttributeFamilyManager $familyManager
-     */
     public function __construct(DoctrineHelper $doctrineHelper, AttributeFamilyManager $familyManager)
     {
         parent::__construct($doctrineHelper);

@@ -206,9 +206,6 @@ class AttributeGuesserTest extends \PHPUnit\Framework\TestCase
         return $attribute;
     }
 
-    /**
-     * @param array $metadataArray
-     */
     protected function setEntityMetadata(array $metadataArray)
     {
         $valueMap = [];

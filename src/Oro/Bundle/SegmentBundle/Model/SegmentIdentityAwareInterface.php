@@ -10,8 +10,6 @@ interface SegmentIdentityAwareInterface
 {
     /**
      * Gets the identifier of a segment entity.
-     *
-     * @return int|null
      */
     public function getSegmentId(): ?int;
 }

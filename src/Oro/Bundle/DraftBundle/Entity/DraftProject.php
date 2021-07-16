@@ -52,19 +52,11 @@ class DraftProject extends ExtendDraftProject implements DatesAwareInterface, Or
      */
     protected $title;
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param string $title
-     *
-     * @return DraftProject
-     */
     public function setTitle(string $title): DraftProject
     {
         $this->title = $title;
@@ -72,9 +64,6 @@ class DraftProject extends ExtendDraftProject implements DatesAwareInterface, Or
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTitle(): ?string
     {
         return $this->title;

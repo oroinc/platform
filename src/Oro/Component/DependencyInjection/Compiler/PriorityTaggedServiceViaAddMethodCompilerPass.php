@@ -31,12 +31,6 @@ class PriorityTaggedServiceViaAddMethodCompilerPass implements CompilerPassInter
     /** @var bool */
     private $isServiceOptional;
 
-    /**
-     * @param string $serviceId
-     * @param string $tagName
-     * @param string $addMethodName
-     * @param bool   $isServiceOptional
-     */
     public function __construct(
         string $serviceId,
         string $tagName,

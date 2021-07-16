@@ -7,9 +7,6 @@ namespace Oro\Bundle\AttachmentBundle\Exception;
  */
 class ProcessorsException extends \RuntimeException
 {
-    /**
-     * @param string $name
-     */
     public function __construct(string $name)
     {
         $message = sprintf('The %s library not found or not executable.', $name);

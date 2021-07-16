@@ -185,11 +185,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         );
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     protected function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
@@ -246,11 +241,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $result[self::META][$name] = $value;
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     protected function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $idFieldNames = $metadata->getIdentifierFieldNames();
@@ -265,12 +255,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     */
     protected function addRelationships(
         array &$result,
         array $data,
@@ -331,10 +315,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param array      $result
-     * @param array|null $meta
-     */
     protected function addAssociationMeta(array &$result, ?array $meta): void
     {
         if (!empty($meta)) {
@@ -364,11 +344,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         return $item;
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     protected function addAttributesAsMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
@@ -380,12 +355,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     */
     protected function addRelationshipsAsMeta(
         array &$result,
         array $data,
@@ -509,12 +478,6 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
         $this->result[self::INCLUDED][] = $object;
     }
 
-    /**
-     * @param string $entityType
-     * @param string $entityId
-     *
-     * @return array
-     */
     protected function getResourceIdObject(string $entityType, string $entityId): array
     {
         return [

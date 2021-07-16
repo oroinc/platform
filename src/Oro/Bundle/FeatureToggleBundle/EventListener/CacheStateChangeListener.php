@@ -13,17 +13,11 @@ class CacheStateChangeListener
     /** @var CacheState */
     protected $cacheState;
 
-    /**
-     * @param CacheState $cacheState
-     */
     public function __construct(CacheState $cacheState)
     {
         $this->cacheState = $cacheState;
     }
 
-    /**
-     * @param FeaturesChange $event
-     */
     public function onFeaturesChange(FeaturesChange $event)
     {
         $this->cacheState->renewChangeDate();

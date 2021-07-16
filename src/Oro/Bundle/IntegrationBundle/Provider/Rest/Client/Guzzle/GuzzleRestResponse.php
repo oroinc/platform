@@ -21,10 +21,6 @@ class GuzzleRestResponse implements RestResponseInterface
      */
     protected $requestUrl;
 
-    /**
-     * @param ResponseInterface $response
-     * @param string|null       $requestUrl
-     */
     public function __construct(ResponseInterface $response, string $requestUrl = null)
     {
         $this->response = $response;

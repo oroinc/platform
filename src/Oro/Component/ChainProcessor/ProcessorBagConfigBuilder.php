@@ -103,10 +103,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
 
     /**
      * Registers a processing group.
-     *
-     * @param string $group
-     * @param string $action
-     * @param int    $priority
      */
     public function addGroup(string $group, string $action, int $priority = 0): void
     {
@@ -133,12 +129,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
 
     /**
      * Registers a processor.
-     *
-     * @param string      $processorId
-     * @param array       $attributes
-     * @param string|null $action
-     * @param string|null $group
-     * @param int         $priority
      */
     public function addProcessor(
         string $processorId,
@@ -234,13 +224,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
         }
     }
 
-    /**
-     * @param string $action
-     * @param array  $actionData
-     * @param array  $groups
-     *
-     * @return array
-     */
     private function getSortedProcessors(string $action, array $actionData, array $groups): array
     {
         $processors = [];
@@ -289,11 +272,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
 
     /**
      * Calculates an internal priority of a processor based on its priority and a priority of its group.
-     *
-     * @param int      $processorPriority
-     * @param int|null $groupPriority
-     *
-     * @return int
      */
     private static function calculatePriority(int $processorPriority, int $groupPriority = null): int
     {
@@ -321,12 +299,6 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
         return self::getIntervalPriority($processorPriority, $groupPriority);
     }
 
-    /**
-     * @param int      $processorPriority
-     * @param int|null $groupPriority
-     *
-     * @return int
-     */
     private static function getIntervalPriority(int $processorPriority, ?int $groupPriority): int
     {
         return (($groupPriority ?? 0) * 511) + $processorPriority - 1;

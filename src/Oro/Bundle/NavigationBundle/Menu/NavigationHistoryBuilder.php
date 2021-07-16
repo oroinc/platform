@@ -23,13 +23,6 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param TokenAccessorInterface $tokenAccessor
-     * @param NavigationItemsProviderInterface $navigationItemsProvider
-     * @param Matcher $matcher
-     * @param MenuManipulator $menuManipulator
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         NavigationItemsProviderInterface $navigationItemsProvider,

@@ -8,11 +8,6 @@ use Oro\Bundle\ApiBundle\Request\Version;
 
 class ConfigBagTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param int $numberOfGetConfigCalls
-     *
-     * @return ConfigBag
-     */
     public function getConfigBag(int $numberOfGetConfigCalls = 1): ConfigBag
     {
         $configFile = 'api.yml';

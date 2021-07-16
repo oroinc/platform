@@ -7,8 +7,6 @@ use Oro\Bundle\EntityExtendBundle\Validator\Constraints\Decimal;
 class DecimalTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param $options
-     *
      * @dataProvider constructorProvider
      */
     public function testConstructor($options, $expetedPrecision, $expectedScale)

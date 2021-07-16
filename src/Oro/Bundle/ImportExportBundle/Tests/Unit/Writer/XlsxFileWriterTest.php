@@ -195,18 +195,11 @@ class XlsxFileWriterTest extends \PHPUnit\Framework\TestCase
         return $stepExecution;
     }
 
-    /**
-     * @return string
-     */
     private function getFilePath(): string
     {
         return $this->getTempDir('XlsxFileWriterTest', null) . DIRECTORY_SEPARATOR . 'new_file.xlsx';
     }
 
-    /**
-     * @param string $expectedPath
-     * @param string $actualPath
-     */
     private function assertXlsx(string $expectedPath, string $actualPath): void
     {
         $exceptedReader = ReaderFactory::createFromType(Type::XLSX);

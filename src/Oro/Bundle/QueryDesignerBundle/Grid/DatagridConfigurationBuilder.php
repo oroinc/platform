@@ -30,13 +30,6 @@ class DatagridConfigurationBuilder
     protected $gridName;
 
     /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param DatagridGuesser                  $datagridGuesser
-     * @param EntityNameResolver               $entityNameResolver
-     *
      * @throws InvalidConfigurationException
      */
     public function __construct(
@@ -59,9 +52,6 @@ class DatagridConfigurationBuilder
         );
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     */
     public function setSource(AbstractQueryDesigner $source)
     {
         $this->source = $source;

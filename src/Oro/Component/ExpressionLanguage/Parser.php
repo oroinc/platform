@@ -49,9 +49,6 @@ class Parser
      */
     private $methods;
 
-    /**
-     * @param array $functions
-     */
     public function __construct(array $functions)
     {
         $this->functions = $functions;

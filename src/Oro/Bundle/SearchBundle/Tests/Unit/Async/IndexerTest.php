@@ -56,7 +56,6 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $indexer->getClassesForReindex();
     }
 
-
     public function testSaveShouldReturnFalseIfEntityIsNull()
     {
         $doctrineHelper = $this->createDoctrineHelperMock();
@@ -208,7 +207,6 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             ->with($this->identicalTo($entities[0]))
             ->will($this->returnValue('entity-name'))
         ;
-
 
         $indexer = new Indexer(
             self::getMessageProducer(),

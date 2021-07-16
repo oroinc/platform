@@ -32,9 +32,6 @@ class PinbarTabRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider countNavigationItemsDataProvider
-     *
-     * @param string $url
-     * @param int $expectedCount
      */
     public function testCountNavigationItems(string $url, int $expectedCount): void
     {
@@ -47,9 +44,6 @@ class PinbarTabRepositoryTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function countNavigationItemsDataProvider(): array
     {
         return [
@@ -75,9 +69,6 @@ class PinbarTabRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider countPinbarTabDuplicatedTitlesDataProvider
-     *
-     * @param string $titleShort
-     * @param int $expectedCount
      */
     public function testCountPinbarTabDuplicatedTitles(string $titleShort, int $expectedCount): void
     {
@@ -90,9 +81,6 @@ class PinbarTabRepositoryTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function countPinbarTabDuplicatedTitlesDataProvider(): array
     {
         return [

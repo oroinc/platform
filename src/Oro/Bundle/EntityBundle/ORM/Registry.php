@@ -113,9 +113,6 @@ class Registry extends BaseRegistry
         throw ORMException::unknownEntityNamespace($alias);
     }
 
-    /**
-     * @param OrmConfiguration $configuration
-     */
     protected function initializeEntityManagerConfiguration(OrmConfiguration $configuration)
     {
         $configuration->setAttribute('DefaultQueryCacheLifetime', $this->defaultQueryCacheLifetime);

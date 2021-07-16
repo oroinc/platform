@@ -23,9 +23,6 @@ class MemoryCacheChain extends CacheProvider
     /** @var CacheProvider[] */
     private $caches = [];
 
-    /**
-     * @param CacheProvider|null $cache
-     */
     public function __construct(CacheProvider $cache = null)
     {
         if (PHP_SAPI !== 'cli') {

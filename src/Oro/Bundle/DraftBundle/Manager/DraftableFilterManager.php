@@ -16,17 +16,11 @@ class DraftableFilterManager
      */
     private $managerRegistry;
 
-    /**
-     * @param ManagerRegistry $managerRegistry
-     */
     public function __construct(ManagerRegistry $managerRegistry)
     {
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * @param string $className
-     */
     public function disable(string $className): void
     {
         /** @var EntityManager $em */
@@ -37,9 +31,6 @@ class DraftableFilterManager
         }
     }
 
-    /**
-     * @param string $className
-     */
     public function enable(string $className): void
     {
         /** @var EntityManager $em */

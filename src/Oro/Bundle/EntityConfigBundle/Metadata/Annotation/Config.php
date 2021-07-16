@@ -30,9 +30,6 @@ class Config
     /** @var array */
     public $routes = [];
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         if (isset($data['mode'])) {
@@ -81,9 +78,6 @@ class Config
         $this->collectRoutes($data);
     }
 
-    /**
-     * @param array $data
-     */
     protected function collectRoutes(array $data)
     {
         foreach ($data as $name => $value) {

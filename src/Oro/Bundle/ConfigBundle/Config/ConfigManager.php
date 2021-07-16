@@ -59,9 +59,6 @@ class ConfigManager
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @param CacheProvider|null $arrayCache
-     */
     public function setArrayCache(?CacheProvider $arrayCache): void
     {
         $this->arrayCache = $arrayCache;

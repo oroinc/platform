@@ -23,11 +23,6 @@ class MessageProducer implements MessageProducerInterface
     /** @var DestinationMetaRegistry */
     private $destinationMetaRegistry;
 
-    /**
-     * @param DriverInterface $driver
-     * @param RecipientListRouterInterface $router
-     * @param DestinationMetaRegistry $destinationMetaRegistry
-     */
     public function __construct(
         DriverInterface $driver,
         RecipientListRouterInterface $router,
@@ -96,11 +91,6 @@ class MessageProducer implements MessageProducerInterface
         return $message;
     }
 
-    /**
-     * @param Message $message
-     *
-     * @return string
-     */
     private function getContentType(Message $message): string
     {
         $body = $message->getBody();
@@ -116,11 +106,6 @@ class MessageProducer implements MessageProducerInterface
         return $contentType ?: 'text/plain';
     }
 
-    /**
-     * @param Message $message
-     *
-     * @return string
-     */
     private function getBody(Message $message): string
     {
         $body = $message->getBody();

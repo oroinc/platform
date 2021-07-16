@@ -29,10 +29,6 @@ class ChoiceAccountType extends AbstractType
     /** @var OAuth2ManagerRegistry */
     protected $oauthManagerRegistry;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param OAuth2ManagerRegistry $oauthManagerRegistry
-     */
     public function __construct(
         TranslatorInterface $translator,
         OAuth2ManagerRegistry  $oauthManagerRegistry
@@ -109,9 +105,6 @@ class ChoiceAccountType extends AbstractType
         };
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function preSubmit(FormEvent $formEvent)
     {
         $form = $formEvent->getForm();
@@ -150,9 +143,6 @@ class ChoiceAccountType extends AbstractType
         }
     }
 
-    /**
-     * @param FormEvent $formEvent
-     */
     public function preSetData(FormEvent $formEvent)
     {
         $accountTypeModel = $formEvent->getData();
@@ -190,8 +180,6 @@ class ChoiceAccountType extends AbstractType
 
     /**
      * Update form if accountType is changed
-     *
-     * @param FormBuilderInterface $builder
      */
     protected function initEvents(FormBuilderInterface $builder)
     {
@@ -199,10 +187,6 @@ class ChoiceAccountType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param AccountTypeModel $accountTypeModel
-     */
     protected function updateForm(FormInterface $form, AccountTypeModel $accountTypeModel)
     {
         if ($accountTypeModel instanceof AccountTypeModel) {
@@ -213,10 +197,6 @@ class ChoiceAccountType extends AbstractType
         }
     }
 
-    /**
-     * @param AccountTypeModel $accountTypeModel
-     * @return string|null
-     */
     protected function solveUserEmailOriginType(AccountTypeModel $accountTypeModel): ?string
     {
         switch (true) {

@@ -14,9 +14,6 @@ class WidgetSortByType extends AbstractType
     /** @var EntityFieldProvider */
     protected $fieldProvider;
 
-    /**
-     * @param EntityFieldProvider $fieldProvider
-     */
     public function __construct(EntityFieldProvider $fieldProvider)
     {
         $this->fieldProvider = $fieldProvider;

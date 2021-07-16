@@ -29,12 +29,6 @@ class BusinessUnitHandler
     /** @var OwnerTreeProviderInterface */
     private $ownerTreeProvider;
 
-    /**
-     * @param FormInterface $form
-     * @param RequestStack $requestStack
-     * @param ObjectManager $manager
-     * @param OwnerTreeProviderInterface $ownerTreeProvider
-     */
     public function __construct(
         FormInterface $form,
         RequestStack $requestStack,

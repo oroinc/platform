@@ -91,7 +91,6 @@ class ReportControllerTest extends WebTestCase
 
     /**
      * @depends testCreate
-     * @return int
      */
     public function testUpdate(): int
     {
@@ -126,8 +125,6 @@ class ReportControllerTest extends WebTestCase
 
     /**
      * @depends testUpdate
-     * @param int $id
-     * @return string
      */
     public function testClone(int $id): string
     {
@@ -170,7 +167,6 @@ class ReportControllerTest extends WebTestCase
 
     /**
      * @depends testClone
-     * @param string $name
      */
     public function testIndexAfterClone(string $name): void
     {

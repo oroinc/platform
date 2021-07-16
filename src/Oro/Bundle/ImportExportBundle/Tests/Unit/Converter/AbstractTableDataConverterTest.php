@@ -65,8 +65,6 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $importedRecord
-     * @param array $result
      * @dataProvider convertToExportDataProvider
      */
     public function testConvertToExportFormat(array $importedRecord, array $result)

@@ -17,10 +17,6 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecorator implements ImagineBinaryF
      */
     private $unsupportedMimeTypes;
 
-    /**
-     * @param ImagineBinaryFilterInterface $decoratedFilter
-     * @param array                        $unsupportedMimeTypes
-     */
     public function __construct(ImagineBinaryFilterInterface $decoratedFilter, array $unsupportedMimeTypes)
     {
         $this->decoratedFilter = $decoratedFilter;

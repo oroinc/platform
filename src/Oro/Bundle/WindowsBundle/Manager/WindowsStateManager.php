@@ -27,12 +27,6 @@ class WindowsStateManager
     /** @var string */
     private $className;
 
-    /**
-     * @param TokenStorageInterface      $tokenStorage
-     * @param ManagerRegistry            $doctrine
-     * @param WindowsStateRequestManager $requestStateManager
-     * @param string                     $className
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         ManagerRegistry $doctrine,

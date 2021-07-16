@@ -25,7 +25,6 @@ interface ParameterBinderInterface
      *  $queryParameterBinder->bindParameters($datagrid, ['email'], false);
      * </code>
      *
-     *
      * @param DatagridInterface $datagrid
      * @param array $datasourceToDatagridParameters
      * @param bool $append

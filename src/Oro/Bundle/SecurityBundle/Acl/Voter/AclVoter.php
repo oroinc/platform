@@ -56,17 +56,12 @@ class AclVoter extends BaseAclVoter implements AclVoterInterface
 
     /**
      * Sets the ACL extension selector
-     *
-     * @param AclExtensionSelector $selector
      */
     public function setAclExtensionSelector(AclExtensionSelector $selector)
     {
         $this->extensionSelector = $selector;
     }
 
-    /**
-     * @param AclGroupProviderInterface $provider
-     */
     public function setAclGroupProvider(AclGroupProviderInterface $provider)
     {
         $this->groupProvider = $provider;
@@ -74,8 +69,6 @@ class AclVoter extends BaseAclVoter implements AclVoterInterface
 
     /**
      * Adds an observer is used to inform a caller about IsGranted operation details
-     *
-     * @param OneShotIsGrantedObserver $observer
      */
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {

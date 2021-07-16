@@ -10,9 +10,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 trait OrganizationTrait
 {
-    /**
-     * @return Organization
-     */
     public function getOrganization(): Organization
     {
         $organizationRepository = $this->getContainer()->get('doctrine')

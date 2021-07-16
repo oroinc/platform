@@ -43,8 +43,6 @@ abstract class AbstractProcessor implements ProcessorInterface
     /**
      * Adds to the context a regular expression that can be used to validate a value
      * of a data-type this processor works with.
-     *
-     * @param NormalizeValueContext $context
      */
     protected function processRequirement(NormalizeValueContext $context)
     {
@@ -96,8 +94,6 @@ abstract class AbstractProcessor implements ProcessorInterface
 
     /**
      * Does a value normalization (conversion to a concrete data-type) if needed.
-     *
-     * @param NormalizeValueContext $context
      */
     protected function processNormalization(NormalizeValueContext $context)
     {

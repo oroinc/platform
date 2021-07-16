@@ -12,9 +12,6 @@ class OnButtonsMatched extends Event
     /** @var ButtonsCollection */
     protected $buttons;
 
-    /**
-     * @param ButtonsCollection $buttons
-     */
     public function __construct(ButtonsCollection $buttons)
     {
         $this->buttons = $buttons;

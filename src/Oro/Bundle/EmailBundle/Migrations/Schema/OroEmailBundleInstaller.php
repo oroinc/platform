@@ -63,8 +63,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create many-to-many relation table
-     *
-     * @param Schema $schema
      */
     public static function createOroEmailToFolderRelationTable(Schema $schema)
     {
@@ -78,8 +76,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Generate table oro_email_address
-     *
-     * @param Schema $schema
      */
     public static function createOroEmailAddressTable(Schema $schema)
     {
@@ -96,8 +92,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_attachment table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailAttachmentTable(Schema $schema)
     {
@@ -113,8 +107,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_recipient table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailRecipientTable(Schema $schema)
     {
@@ -130,8 +122,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_template table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailTemplateTable(Schema $schema)
     {
@@ -156,8 +146,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_attachment_content table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailAttachmentContentTable(Schema $schema)
     {
@@ -172,8 +160,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_origin table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailOriginTable(Schema $schema)
     {
@@ -194,8 +180,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_folder table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailFolderTable(Schema $schema)
     {
@@ -217,8 +201,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_user table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailUserTable(Schema $schema)
     {
@@ -238,8 +220,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_thread table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailThreadTable(Schema $schema)
     {
@@ -252,8 +232,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_body table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailBodyTable(Schema $schema)
     {
@@ -270,8 +248,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_mailbox table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailMailboxTable(Schema $schema)
     {
@@ -293,8 +269,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_mailbox_process table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailMailboxProcessTable(Schema $schema)
     {
@@ -306,8 +280,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailTable(Schema $schema)
     {
@@ -339,8 +311,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_auto_response_rule table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailAutoResponseRuleTable(Schema $schema)
     {
@@ -357,8 +327,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create oro_email_template_localized table
-     *
-     * @param Schema $schema
      */
     protected function createOroEmailTemplateLocalizedTable(Schema $schema)
     {
@@ -375,8 +343,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Create many-to-many relation table
-     *
-     * @param Schema $schema
      */
     public static function addOroEmailToFolderRelationForeignKeys(Schema $schema)
     {
@@ -397,8 +363,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_address foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailAddressForeignKeys(Schema $schema)
     {
@@ -413,8 +377,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_attachment foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailAttachmentForeignKeys(Schema $schema)
     {
@@ -435,8 +397,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_recipient foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailRecipientForeignKeys(Schema $schema)
     {
@@ -457,8 +417,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_template foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailTemplateForeignKeys(Schema $schema)
     {
@@ -473,8 +431,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_attachment_content foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailAttachmentContentForeignKeys(Schema $schema)
     {
@@ -489,8 +445,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_folder foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailFolderForeignKeys(Schema $schema)
     {
@@ -511,8 +465,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_user foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailUserForeignKeys(Schema $schema)
     {
@@ -540,8 +492,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_thread foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailThreadForeignKeys(Schema $schema)
     {
@@ -556,8 +506,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_mailbox foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailMailboxForeignKeys(Schema $schema)
     {
@@ -584,8 +532,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailForeignKeys(Schema $schema)
     {
@@ -612,8 +558,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_auto_response_rule foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailAutoResponseRuleForeignKeys(Schema $schema)
     {
@@ -634,8 +578,6 @@ class OroEmailBundleInstaller implements Installation
 
     /**
      * Add oro_email_template_localized foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroEmailTemplateLocalizedForeignKeys(Schema $schema)
     {

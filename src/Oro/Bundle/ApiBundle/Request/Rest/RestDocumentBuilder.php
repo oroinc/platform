@@ -154,11 +154,6 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         return $entityClass;
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     protected function addMeta(array &$result, array $data, EntityMetadata $metadata): void
     {
         $properties = $metadata->getMetaProperties();
@@ -215,11 +210,6 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         // not supported
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param EntityMetadata $metadata
-     */
     protected function addAttributes(array &$result, array $data, EntityMetadata $metadata): void
     {
         $fields = $metadata->getFields();
@@ -231,12 +221,6 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
         }
     }
 
-    /**
-     * @param array          $result
-     * @param array          $data
-     * @param RequestType    $requestType
-     * @param EntityMetadata $metadata
-     */
     protected function addRelationships(
         array &$result,
         array $data,

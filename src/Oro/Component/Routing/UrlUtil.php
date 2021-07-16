@@ -103,10 +103,6 @@ class UrlUtil
      * Concatenates the given paths and adds a slash character between paths if one is not already present.
      * If any of a path is an empty string, the method concatenates the remaining paths.
      * If all paths are empty strings, the result is an empty string as well.
-     *
-     * @param string ...$paths
-     *
-     * @return string
      */
     public static function join(string ...$paths): string
     {
@@ -118,12 +114,6 @@ class UrlUtil
         return $result;
     }
 
-    /**
-     * @param string $path1
-     * @param string $path2
-     *
-     * @return string
-     */
     private static function joinTwoPaths(string $path1, string $path2): string
     {
         if (!$path1) {
@@ -149,42 +139,21 @@ class UrlUtil
         return $path1 . self::SLASH . $path2;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
     private static function startsWithSlash(string $value): bool
     {
         return strpos($value, self::SLASH) === 0;
     }
 
-    /**
-     * @param string $value
-     *
-     * @return bool
-     */
     private static function endsWithSlash(string $value): bool
     {
         return substr($value, -1) === self::SLASH;
     }
 
-    /**
-     * @param string $haystack
-     * @param string $needle
-     *
-     * @return bool
-     */
     private static function startsWith(string $haystack, string $needle): bool
     {
         return strpos($haystack, $needle) === 0;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return string
-     */
     private static function normalizePath(string $path): string
     {
         if (!$path || self::startsWithSlash($path)) {

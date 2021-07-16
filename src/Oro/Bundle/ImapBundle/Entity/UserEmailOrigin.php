@@ -312,8 +312,6 @@ class UserEmailOrigin extends EmailOrigin
 
     /**
      * Returns type.
-     *
-     * @return string|null
      */
     public function getAccountType(): ?string
     {
@@ -322,9 +320,6 @@ class UserEmailOrigin extends EmailOrigin
 
     /**
      * Sets type
-     *
-     * @param string $accountType
-     * @return UserEmailOrigin
      */
     public function setAccountType(string $accountType): UserEmailOrigin
     {

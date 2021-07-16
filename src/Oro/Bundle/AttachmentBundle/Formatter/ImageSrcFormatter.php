@@ -17,9 +17,6 @@ class ImageSrcFormatter implements FormatterInterface
     /** @var AttachmentManager */
     private $manager;
 
-    /**
-     * @param AttachmentManager $manager
-     */
     public function __construct(AttachmentManager $manager)
     {
         $this->manager = $manager;

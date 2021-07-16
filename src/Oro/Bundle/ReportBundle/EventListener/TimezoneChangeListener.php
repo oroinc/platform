@@ -13,17 +13,11 @@ class TimezoneChangeListener
     /** @var CalendarDateManager */
     private $calendarDateManager;
 
-    /**
-     * @param CalendarDateManager $calendarDateManager
-     */
     public function __construct(CalendarDateManager $calendarDateManager)
     {
         $this->calendarDateManager = $calendarDateManager;
     }
 
-    /**
-     * @param ConfigUpdateEvent $event
-     */
     public function onConfigUpdate(ConfigUpdateEvent $event)
     {
         if (!$event->isChanged('oro_locale.timezone')) {

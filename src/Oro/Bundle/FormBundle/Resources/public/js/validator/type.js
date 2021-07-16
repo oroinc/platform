@@ -1,7 +1,6 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const numberFormatter = require('orolocale/js/formatter/number');
     const defaultParam = {
@@ -30,7 +29,7 @@ define(function(require) {
             return this.optional(element) || result;
         },
         function(param) {
-            param = _.extend({}, defaultParam, param);
+            param = Object.assign({}, defaultParam, param);
             return __(param.message, {type: param.type});
         }
     ];

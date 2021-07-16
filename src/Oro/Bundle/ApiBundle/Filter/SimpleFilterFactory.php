@@ -80,12 +80,6 @@ class SimpleFilterFactory implements FilterFactoryInterface
         return $filter;
     }
 
-    /**
-     * @param string $filterType
-     * @param string $dataType
-     *
-     * @return StandaloneFilter
-     */
     private function instantiateFilter(string $filterType, string $dataType): StandaloneFilter
     {
         if (isset($this->factories[$filterType])) {
@@ -108,11 +102,6 @@ class SimpleFilterFactory implements FilterFactoryInterface
         return $filter;
     }
 
-    /**
-     * @param string $filterType
-     *
-     * @return array
-     */
     private function getFilterParameters(string $filterType): array
     {
         if (isset($this->factories[$filterType])) {

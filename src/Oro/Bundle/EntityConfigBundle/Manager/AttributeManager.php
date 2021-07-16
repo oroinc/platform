@@ -56,11 +56,6 @@ class AttributeManager
     /** @var AttributeFamily[] */
     private $familiesByAttributeId = [];
 
-    /**
-     * @param ConfigManager $configManager
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigTranslationHelper $configTranslationHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         DoctrineHelper $doctrineHelper,

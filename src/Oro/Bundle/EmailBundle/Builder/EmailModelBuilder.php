@@ -78,17 +78,6 @@ class EmailModelBuilder
      */
     private $fileConstraintsProvider;
 
-    /**
-     * @param EmailModelBuilderHelper $emailModelBuilderHelper
-     * @param EntityManager $entityManager
-     * @param ConfigManager $configManager
-     * @param EmailActivityListProvider $activityListProvider
-     * @param EmailAttachmentProvider $emailAttachmentProvider
-     * @param Factory $factory
-     * @param RequestStack $requestStack
-     * @param HtmlTagHelper $htmlTagHelper
-     * @param FileConstraintsProvider $fileConstraintsProvider
-     */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         EntityManager $entityManager,
@@ -204,7 +193,6 @@ class EmailModelBuilder
                 $ccList[] = $toEmail;
             }
 
-
             $emailModel->setTo($toList);
             $emailModel->setCc($ccList);
             $emailModel->setFrom($fromAddress->getEmail());
@@ -255,10 +243,6 @@ class EmailModelBuilder
         $this->request = $request;
     }
 
-    /**
-     * @param EmailModel $emailModel
-     * @param EmailEntity $parentEmailEntity
-     */
     protected function initReplyFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $user = $this->helper->getUser();
@@ -287,10 +271,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     * @param EmailEntity $parentEmailEntity
-     */
     protected function initReplyAllFrom(EmailModel $emailModel, EmailEntity $parentEmailEntity)
     {
         $userEmails = $this->helper->getUser()->getEmails();
@@ -317,9 +297,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyRequest(EmailModel $emailModel)
     {
         $this->applyEntityData($emailModel);
@@ -328,9 +305,6 @@ class EmailModelBuilder
         $this->applyRecipients($emailModel);
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyEntityData(EmailModel $emailModel)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
@@ -355,9 +329,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyFrom(EmailModel $emailModel)
     {
         if (!$emailModel->getFrom()) {
@@ -377,9 +348,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applyRecipients(EmailModel $emailModel)
     {
         $emailModel->setTo(
@@ -413,9 +381,6 @@ class EmailModelBuilder
         return $address ? [$address] : [];
     }
 
-    /**
-     * @param EmailModel $model
-     */
     protected function applySubject(EmailModel $model)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
@@ -426,10 +391,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     * @param EmailEntity $emailEntity
-     */
     protected function applyEntityDataFromEmail(EmailModel $emailModel, EmailEntity $emailEntity)
     {
         $entities = $emailEntity->getActivityTargets();
@@ -443,9 +404,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function applySignature(EmailModel $emailModel)
     {
         $signature = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature'));
@@ -454,10 +412,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     * @param EmailEntity $emailEntity
-     */
     protected function applyAttachments(EmailModel $emailModel, EmailEntity $emailEntity)
     {
         try {
@@ -476,9 +430,6 @@ class EmailModelBuilder
         }
     }
 
-    /**
-     * @param EmailModel $emailModel
-     */
     protected function initAvailableAttachments(EmailModel $emailModel)
     {
         $attachments = [];
@@ -530,10 +481,6 @@ class EmailModelBuilder
         );
     }
 
-    /**
-     * @param array $attachments
-     * @return array
-     */
     private function filterAttachmentsByEmailMaxFileSize(array $attachments): array
     {
         $maxFileSize = (float)$this->fileConstraintsProvider->getMaxSizeByConfigPath('oro_email.attachment_max_size');
@@ -549,10 +496,6 @@ class EmailModelBuilder
         );
     }
 
-    /**
-     * @param array $attachments
-     * @return array
-     */
     private function filterAttachmentsByMimeTypes(array $attachments): array
     {
         $mimeTypes = $this->fileConstraintsProvider->getMimeTypes();

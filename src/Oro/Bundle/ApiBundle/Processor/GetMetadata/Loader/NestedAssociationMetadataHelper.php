@@ -22,10 +22,6 @@ class NestedAssociationMetadataHelper
     /** @var ObjectMetadataFactory */
     private $objectMetadataFactory;
 
-    /**
-     * @param MetadataHelper        $metadataHelper
-     * @param ObjectMetadataFactory $objectMetadataFactory
-     */
     public function __construct(
         MetadataHelper $metadataHelper,
         ObjectMetadataFactory $objectMetadataFactory

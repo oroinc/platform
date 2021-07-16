@@ -20,11 +20,6 @@ class QueryModifier
     /** @var ConfigAccessor */
     private $configAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param FieldAccessor  $fieldAccessor
-     * @param ConfigAccessor $configAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FieldAccessor $fieldAccessor,
@@ -35,10 +30,6 @@ class QueryModifier
         $this->configAccessor = $configAccessor;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param EntityConfig $config
-     */
     public function updateQuery(QueryBuilder $qb, EntityConfig $config): void
     {
         $rootAlias = $this->doctrineHelper->getRootAlias($qb);
@@ -89,14 +80,6 @@ class QueryModifier
     }
 
     /**
-     * @param QueryBuilder $qb
-     * @param string       $rootAlias
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     * @param bool         $isForcePartialLoadEnabled
-     * @param bool         $needToDisableForcePartialLoadHint
-     * @param array        $innerJoinAssociationMap
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -169,15 +152,6 @@ class QueryModifier
         }
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $rootAlias
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     * @param int          $aliasCounter
-     *
-     * @return int
-     */
     private function updateJoinQueryPartForNestedAssociations(
         QueryBuilder $qb,
         string $rootAlias,
@@ -240,14 +214,6 @@ class QueryModifier
         return $associationMap;
     }
 
-    /**
-     * @param string       $entityClass
-     * @param EntityConfig $config
-     * @param string       $parentAssociationName
-     * @param array        $innerJoinAssociationMap
-     *
-     * @return bool
-     */
     private function hasLeftJoinSingleValuedAssociations(
         string $entityClass,
         EntityConfig $config,
@@ -270,13 +236,6 @@ class QueryModifier
         return false;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $rootAlias
-     * @param string       $joinExpr
-     *
-     * @return Expr\Join|null
-     */
     private function getExistingJoin(QueryBuilder $qb, string $rootAlias, string $joinExpr): ?Expr\Join
     {
         $joinParts = $qb->getDQLPart('join');
@@ -292,9 +251,6 @@ class QueryModifier
         return null;
     }
 
-    /**
-     * @param Expr\Join $join
-     */
     private function ensureInnerJoin(Expr\Join $join): void
     {
         if (Expr\Join::INNER_JOIN === $join->getJoinType()) {

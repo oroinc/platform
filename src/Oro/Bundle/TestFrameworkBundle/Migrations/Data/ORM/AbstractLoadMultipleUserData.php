@@ -40,9 +40,6 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
         $this->loadUsers($manager);
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     protected function loadRoles(ObjectManager $manager)
     {
         /* @var AclManager $aclManager */
@@ -68,9 +65,6 @@ abstract class AbstractLoadMultipleUserData extends AbstractFixture implements C
         }
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     protected function loadUsers(ObjectManager $manager)
     {
         /* @var UserManager $userManager */

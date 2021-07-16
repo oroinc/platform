@@ -80,9 +80,6 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
         }
     }
 
-    /**
-     * @param ObjectManager $om
-     */
     protected function loadEmailsDemo(ObjectManager $om)
     {
         $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
@@ -126,7 +123,6 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
                 false,
                 true
             );
-
 
             $emailUser->getEmail()->setEmailBody($emailBody);
             $emailUser->getEmail()->setMessageId(sprintf('<id+&?= %s@%s>', $index, 'bap.migration.generated'));

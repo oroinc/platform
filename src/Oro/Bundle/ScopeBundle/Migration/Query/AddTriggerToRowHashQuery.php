@@ -27,8 +27,6 @@ class AddTriggerToRowHashQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function addTriggers(LoggerInterface $logger, bool $dryRun): void
@@ -41,8 +39,6 @@ class AddTriggerToRowHashQuery extends AbstractScopeQuery
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param bool            $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function executePgSqlTriggerQuery(LoggerInterface $logger, bool $dryRun): void
@@ -77,8 +73,6 @@ TRIGGER;
     }
 
     /**
-     * @param LoggerInterface $logger
-     * @param bool $dryRun
      * @throws \Doctrine\DBAL\DBALException
      */
     protected function executeMySqlTriggerQuery(LoggerInterface $logger, bool $dryRun): void

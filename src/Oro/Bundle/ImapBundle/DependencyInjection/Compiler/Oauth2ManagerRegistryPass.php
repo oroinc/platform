@@ -32,10 +32,6 @@ class Oauth2ManagerRegistryPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param Definition $registryDefinition
-     * @param array $taggedServices
-     */
     private function doProcess(Definition $registryDefinition, array $taggedServices): void
     {
         foreach (array_keys($taggedServices) as $loaderServiceId) {

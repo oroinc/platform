@@ -19,10 +19,6 @@ class TypeValidationLoader extends AbstractFieldConfigBasedValidationLoader
     /** @var ConfigProvider */
     private $extendConfigProvider;
 
-    /**
-     * @param ConfigProvider $extendConfigProvider
-     * @param ConfigProvider $fieldConfigProvider
-     */
     public function __construct(ConfigProvider $extendConfigProvider, ConfigProvider $fieldConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
@@ -49,11 +45,6 @@ class TypeValidationLoader extends AbstractFieldConfigBasedValidationLoader
 
     /**
      * Check if field applicable to add constraint
-     *
-     * @param ClassMetadata $metadata
-     * @param ConfigInterface $fieldConfig
-     *
-     * @return bool
      */
     private function isApplicable(ClassMetadata $metadata, ConfigInterface $fieldConfig): bool
     {

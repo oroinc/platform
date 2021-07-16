@@ -10,11 +10,6 @@ class PhpArrayConfigProviderStub extends PhpArrayConfigProvider
     /** @var callable */
     private $loadConfigCallback;
 
-    /**
-     * @param string   $cacheFile
-     * @param bool     $debug
-     * @param callable $loadConfigCallback
-     */
     public function __construct(string $cacheFile, bool $debug, callable $loadConfigCallback)
     {
         parent::__construct($cacheFile, $debug);

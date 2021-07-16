@@ -15,9 +15,6 @@ class NameFormatConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/name_format.yml';
 
-    /**
-     * @return array
-     */
     public function getConfiguration(): array
     {
         return $this->doGetConfig();

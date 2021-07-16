@@ -80,10 +80,6 @@ class OAuth2ManagerRegistryTest extends TestCase
     }
 
     /**
-     * @param array $availability
-     * @param bool $expected
-     * @param null|string $type
-     *
      * @dataProvider getEnabledAssertionsData
      */
     public function testIsOauthImapEnabled(array $availability, bool $expected, ?string $type): void
@@ -100,9 +96,6 @@ class OAuth2ManagerRegistryTest extends TestCase
         $this->assertEquals($expected, $this->registry->isOauthImapEnabled($type));
     }
 
-    /**
-     * @return array
-     */
     public function getEnabledAssertionsData(): array
     {
         return [

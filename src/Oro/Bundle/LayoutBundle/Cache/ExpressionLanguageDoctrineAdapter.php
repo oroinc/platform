@@ -19,11 +19,6 @@ class ExpressionLanguageDoctrineAdapter extends AbstractAdapter
         doSave as traitDoSave;
     }
 
-    /**
-     * @param CacheProvider $provider
-     * @param string $namespace
-     * @param int $defaultLifetime
-     */
     public function __construct(CacheProvider $provider, string $namespace = '', int $defaultLifetime = 0)
     {
         parent::__construct('', $defaultLifetime);
@@ -78,10 +73,6 @@ class ExpressionLanguageDoctrineAdapter extends AbstractAdapter
         return $this->traitDoSave($updatedValues, $lifetime);
     }
 
-    /**
-     * @param string $id
-     * @return string
-     */
     private function hashId(string $id): string
     {
         return base_convert(md5($id), 16, 36) . base_convert(sha1($id), 16, 36);

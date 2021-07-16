@@ -22,7 +22,6 @@ trait EmailFeatureTrait
         $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')->resetCache();
     }
 
-
     public function disableEmailFeature(): void
     {
         $configManager = self::getConfigManager('global');

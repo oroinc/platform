@@ -18,8 +18,6 @@ interface MetadataExtraInterface
 
     /**
      * Makes modifications of the MetadataContext necessary to get required additional metadata.
-     *
-     * @param MetadataContext $context
      */
     public function configureContext(MetadataContext $context);
 

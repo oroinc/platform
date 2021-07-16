@@ -20,11 +20,6 @@ class ApiEventListener
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @param RequestAuthorizationChecker $requestAuthorizationChecker
-     * @param AclHelper                   $aclHelper
-     * @param RequestStack                $requestStack
-     */
     public function __construct(
         RequestAuthorizationChecker $requestAuthorizationChecker,
         AclHelper $aclHelper,
@@ -37,8 +32,6 @@ class ApiEventListener
 
     /**
      * Check access to current object after entity was selected
-     *
-     * @param FindAfter $event
      */
     public function onFindAfter(FindAfter $event)
     {

@@ -15,29 +15,16 @@ class FormHandlerRegistry
     /** @var ContainerInterface */
     private $handlers;
 
-    /**
-     * @param ContainerInterface $handlers
-     */
     public function __construct(ContainerInterface $handlers)
     {
         $this->handlers = $handlers;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return bool
-     */
     public function has(string $alias): bool
     {
         return $this->handlers->has($alias);
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return FormHandlerInterface
-     */
     public function get(string $alias): FormHandlerInterface
     {
         if (!$this->handlers->has($alias)) {

@@ -19,11 +19,6 @@ class LocaleConfigurationProvider
     /** @var LocaleDataConfigurationProvider */
     private $localeDataConfigProvider;
 
-    /**
-     * @param NameFormatConfigurationProvider    $nameFormatConfigProvider
-     * @param AddressFormatConfigurationProvider $addressFormatConfigProvider
-     * @param LocaleDataConfigurationProvider    $localeDataConfigProvider
-     */
     public function __construct(
         NameFormatConfigurationProvider $nameFormatConfigProvider,
         AddressFormatConfigurationProvider $addressFormatConfigProvider,
@@ -36,8 +31,6 @@ class LocaleConfigurationProvider
 
     /**
      * Gets name formats configuration.
-     *
-     * @return array
      */
     public function getNameFormats(): array
     {
@@ -46,8 +39,6 @@ class LocaleConfigurationProvider
 
     /**
      * Gets address formats configuration.
-     *
-     * @return array
      */
     public function getAddressFormats(): array
     {
@@ -56,8 +47,6 @@ class LocaleConfigurationProvider
 
     /**
      * Gets locale data configuration.
-     *
-     * @return array
      */
     public function getLocaleData(): array
     {

@@ -39,12 +39,6 @@ class LocalizedValueRenderListener
      */
     protected $numberFormatter;
 
-    /**
-     * @param AddressFormatter $addressFormatter
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     * @param EntityNameResolver $entityNameResolver
-     * @param NumberFormatter $numberFormatter
-     */
     public function __construct(
         AddressFormatter $addressFormatter,
         DateTimeFormatterInterface $dateTimeFormatter,
@@ -58,7 +52,6 @@ class LocalizedValueRenderListener
     }
 
     /**
-     * @param ValueRenderEvent $fieldValueEvent
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function beforeValueRender(ValueRenderEvent $fieldValueEvent)

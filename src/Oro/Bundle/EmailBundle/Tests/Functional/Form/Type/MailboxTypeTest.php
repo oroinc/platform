@@ -67,11 +67,6 @@ class MailboxTypeTest extends WebTestCase
             ->getRepository(Mailbox::class);
     }
 
-    /**
-     * @param Collection $data
-     * @param string $className
-     * @param array $expected
-     */
     private function assertEntityFieldContains(Collection $data, string $className, array $expected)
     {
         $expectedIds = array_map(

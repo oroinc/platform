@@ -84,17 +84,11 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
         return $this->children;
     }
 
-    /**
-     * @param TestCustomIdentifier $item
-     */
     public function addChild(TestCustomIdentifier $item)
     {
         $this->children->add($item);
     }
 
-    /**
-     * @param TestCustomIdentifier $item
-     */
     public function removeChild(TestCustomIdentifier $item)
     {
         $this->children->removeElement($item);

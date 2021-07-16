@@ -36,7 +36,7 @@ class ScopeTransformer implements DataTransformerInterface
         if (null === $value) {
             return null;
         }
-        
+
         $accessor = PropertyAccess::createPropertyAccessor();
 
         $result = [];

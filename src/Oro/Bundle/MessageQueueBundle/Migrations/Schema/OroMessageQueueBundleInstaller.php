@@ -48,9 +48,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $this->initializeCacheState($queries);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createDbalQueueTable(Schema $schema)
     {
         $queueSchema = new DbalSchema(
@@ -61,9 +58,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $queueSchema->addToSchema($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createUniqueJobTable(Schema $schema)
     {
         $uniqueJobSchema = new UniqueJobSchema(
@@ -74,10 +68,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
         $uniqueJobSchema->addToSchema($schema);
     }
 
-    /**
-     * @param Schema $schema
-     * @param QueryBag $queries
-     */
     private function createJobTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('oro_message_queue_job');
@@ -114,8 +104,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
 
     /**
      * Adds the oro_message_queue_state table structure.
-     *
-     * @param Schema $schema
      */
     private function createStateTable(Schema $schema)
     {
@@ -127,8 +115,6 @@ class OroMessageQueueBundleInstaller implements Installation, ContainerAwareInte
 
     /**
      * Adds the initial cache state data to oro_message_queue_state table.
-     *
-     * @param QueryBag $queries
      */
     private function initializeCacheState(QueryBag $queries)
     {

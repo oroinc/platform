@@ -17,13 +17,9 @@ interface MessageConsumerInterface
      * @return MessageInterface|null
      */
     public function receive($timeout = 0): ?MessageInterface;
-    
+
     /**
      * Tell the MQ broker that the message was processed successfully
-     *
-     * @param MessageInterface $message
-     *
-     * @return void
      */
     public function acknowledge(MessageInterface $message): void;
 

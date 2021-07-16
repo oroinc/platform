@@ -20,9 +20,6 @@ class ConfigurationMergerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mergeConfigurationDataProvider
-     *
-     * @param array $rawConfig
-     * @param array $expected
      */
     public function testMergeConfiguration(array $rawConfig, array $expected)
     {

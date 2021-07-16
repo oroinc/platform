@@ -15,9 +15,6 @@ class AttributeFileTypeTest extends BlockTypeTestCase
 {
     private const NAME = 'attribute_file';
 
-    /**
-     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
-     */
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $attributeConfigurationProvider = $this->createMock(AttributeConfigurationProvider::class);

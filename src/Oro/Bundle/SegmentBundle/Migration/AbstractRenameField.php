@@ -62,15 +62,11 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
 
     /**
      * Name of the field which should be changed.
-     *
-     * @return string
      */
     abstract protected function getOldFieldName(): string;
 
     /**
      * New name for the field.
-     *
-     * @return string
      */
     abstract protected function getNewFieldName(): string;
 

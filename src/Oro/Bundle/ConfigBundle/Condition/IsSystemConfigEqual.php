@@ -28,9 +28,6 @@ class IsSystemConfigEqual extends AbstractCondition implements ContextAccessorAw
     /** @var mixed */
     protected $value;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

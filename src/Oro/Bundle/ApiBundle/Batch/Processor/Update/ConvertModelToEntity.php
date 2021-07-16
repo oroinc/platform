@@ -35,9 +35,6 @@ class ConvertModelToEntity implements ProcessorInterface
         }
     }
 
-    /**
-     * @param FormContext $context
-     */
     private function convertModelToEntity(FormContext $context): void
     {
         $model = $context->getResult();

@@ -21,9 +21,6 @@ abstract class ChannelActionEvent extends Event
      */
     private $channel;
 
-    /**
-     * @param Channel $channel
-     */
     public function __construct(Channel $channel)
     {
         $this->channel = $channel;

@@ -14,9 +14,6 @@ class ContextParentConfigAccessor implements ConfigAccessorInterface
     /** @var SubresourceContext */
     protected $context;
 
-    /**
-     * @param SubresourceContext $context
-     */
     public function __construct(SubresourceContext $context)
     {
         $this->context = $context;

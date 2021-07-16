@@ -10,9 +10,6 @@ class PlatformResultSetMapping extends ResultSetMapping
     /** @var AbstractPlatform */
     protected $platform;
 
-    /**
-     * @param AbstractPlatform $platform
-     */
     public function __construct(AbstractPlatform $platform)
     {
         $this->platform = $platform;

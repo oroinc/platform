@@ -16,9 +16,6 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
     /** @var UnidirectionalAssociationHandler */
     private $handler;
 
-    /**
-     * @param UnidirectionalAssociationHandler $handler
-     */
     public function __construct(UnidirectionalAssociationHandler $handler)
     {
         $this->handler = $handler;

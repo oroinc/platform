@@ -7,9 +7,6 @@ use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 
 class ReplaceEmbeddedAttachmentsListener
 {
-    /**
-     * @param EmailBodyLoaded $event
-     */
     public function replace(EmailBodyLoaded $event)
     {
         $emailBody    = $event->getEmail()->getEmailBody();

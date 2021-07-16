@@ -55,7 +55,6 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider repositoryExceptionDataProvider
-     * @param \Throwable $exception
      */
     public function testGetTemplateContentRepositoryException(\Throwable $exception): void
     {
@@ -82,9 +81,6 @@ class EmailTemplateContentProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider->getTemplateContent($criteria, $localization, $templateParams);
     }
 
-    /**
-     * @return array
-     */
     public function repositoryExceptionDataProvider(): array
     {
         return [

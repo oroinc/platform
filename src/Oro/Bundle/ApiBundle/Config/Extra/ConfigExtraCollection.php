@@ -12,8 +12,6 @@ class ConfigExtraCollection
 
     /**
      * Indicates whether the collection is empty.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {
@@ -52,10 +50,6 @@ class ConfigExtraCollection
 
     /**
      * Checks whether some configuration data is requested.
-     *
-     * @param string $extraName
-     *
-     * @return bool
      */
     public function hasConfigExtra(string $extraName): bool
     {
@@ -70,10 +64,6 @@ class ConfigExtraCollection
 
     /**
      * Gets a request for configuration data by its name.
-     *
-     * @param string $extraName
-     *
-     * @return ConfigExtraInterface|null
      */
     public function getConfigExtra(string $extraName): ?ConfigExtraInterface
     {
@@ -88,8 +78,6 @@ class ConfigExtraCollection
 
     /**
      * Adds a request for some configuration data.
-     *
-     * @param ConfigExtraInterface $extra
      *
      * @throws \InvalidArgumentException if a config extra with the same name already exists
      */
@@ -106,8 +94,6 @@ class ConfigExtraCollection
 
     /**
      * Removes a request for some configuration data.
-     *
-     * @param string $extraName
      */
     public function removeConfigExtra(string $extraName): void
     {
@@ -139,10 +125,6 @@ class ConfigExtraCollection
 
     /**
      * Checks whether some configuration data is requested.
-     *
-     * @param string $sectionName
-     *
-     * @return bool
      */
     public function hasConfigSection(string $sectionName): bool
     {

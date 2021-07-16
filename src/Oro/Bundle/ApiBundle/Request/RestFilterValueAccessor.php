@@ -234,11 +234,6 @@ class RestFilterValueAccessor extends FilterValueAccessor
         }
     }
 
-    /**
-     * @param array $value
-     *
-     * @return bool
-     */
     private function isValueWithOperator(array $value): bool
     {
         if (1 !== \count($value)) {

@@ -18,10 +18,6 @@ class ImapSettingsChecker
     /** @var SymmetricCrypterInterface */
     private $encryptor;
 
-    /**
-     * @param ImapConnectorFactory $connectorFactory
-     * @param SymmetricCrypterInterface $encryptor
-     */
     public function __construct(
         ImapConnectorFactory $connectorFactory,
         SymmetricCrypterInterface $encryptor

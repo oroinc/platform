@@ -9,9 +9,6 @@ interface ContextInterface
      */
     public function addError($message);
 
-    /**
-     * @param array $messages
-     */
     public function addErrors(array $messages);
 
     /**
@@ -19,14 +16,8 @@ interface ContextInterface
      */
     public function getErrors();
 
-    /**
-     * @param array $row
-     */
     public function addPostponedRow(array $row);
 
-    /**
-     * @param array $rows
-     */
     public function addPostponedRows(array $rows);
 
     /**

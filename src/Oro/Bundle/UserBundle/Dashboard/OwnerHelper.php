@@ -29,11 +29,6 @@ class OwnerHelper
     /** @var array */
     protected $ownerIds;
 
-    /**
-     * @param ManagerRegistry            $registry
-     * @param TokenStorageInterface      $tokenStorage
-     * @param OwnerTreeProviderInterface $ownerTreeProvider
-     */
     public function __construct(
         ManagerRegistry $registry,
         TokenStorageInterface $tokenStorage,
@@ -123,7 +118,6 @@ class OwnerHelper
     {
         return $this->tokenStorage->getToken()->getUser();
     }
-
 
     /**
      * @param WidgetOptionBag $widgetOptions

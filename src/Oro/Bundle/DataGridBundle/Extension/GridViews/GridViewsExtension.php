@@ -55,15 +55,6 @@ class GridViewsExtension extends AbstractExtension
     /** @var array|AbstractGridView[] */
     protected $defaultGridView = [];
 
-    /**
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param TranslatorInterface           $translator
-     * @param ManagerRegistry               $registry
-     * @param AclHelper                     $aclHelper
-     * @param ServiceLink                   $managerLink
-     */
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -247,9 +238,6 @@ class GridViewsExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param ParameterBag $parameters
-     */
     public function setParameters(ParameterBag $parameters)
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {

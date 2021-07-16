@@ -71,7 +71,6 @@ use PHPUnit\Framework\SyntheticSkippedError;
  */
 trait AssertTrait
 {
-
     /**
      * Asserts that an array has a specified key.
      *

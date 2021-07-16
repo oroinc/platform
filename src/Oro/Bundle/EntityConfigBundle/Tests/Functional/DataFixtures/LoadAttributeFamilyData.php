@@ -41,9 +41,6 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         ];
     }
 
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');
@@ -69,10 +66,6 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @return Organization
-     */
     private function getOrganization(ObjectManager $manager): Organization
     {
         return $manager->getRepository(Organization::class)->getFirst();

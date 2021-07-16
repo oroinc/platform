@@ -15,10 +15,6 @@ class WorkflowDeactivationHelper
     /** @var WorkflowTranslationHelper */
     protected $translationHelper;
 
-    /**
-     * @param WorkflowRegistry $workflowRegistry
-     * @param WorkflowTranslationHelper $translationHelper
-     */
     public function __construct(WorkflowRegistry $workflowRegistry, WorkflowTranslationHelper $translationHelper)
     {
         $this->workflowRegistry = $workflowRegistry;

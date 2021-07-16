@@ -27,10 +27,6 @@ class FixAddressesTypesSubscriber implements EventSubscriberInterface
     /** @var PropertyAccessorInterface */
     private $propertyAccessor;
 
-    /**
-     * @param string                         $addressesPropertyPath
-     * @param PropertyAccessorInterface|null $propertyAccessor
-     */
     public function __construct(string $addressesPropertyPath, PropertyAccessorInterface $propertyAccessor = null)
     {
         $this->addressesPropertyPath = $addressesPropertyPath;
@@ -47,9 +43,6 @@ class FixAddressesTypesSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param FormEvent $event
-     */
     public function postSubmit(FormEvent $event)
     {
         /** @var AbstractTypedAddress $address */

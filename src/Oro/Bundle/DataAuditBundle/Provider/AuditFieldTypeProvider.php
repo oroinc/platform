@@ -36,11 +36,6 @@ class AuditFieldTypeProvider
         return AuditFieldTypeRegistry::TYPE_STRING;
     }
 
-    /**
-     * @param ClassMetadata $classMetadata
-     * @param string $fieldName
-     * @return bool
-     */
     public function isAssociation(ClassMetadata $classMetadata, string $fieldName): bool
     {
         if ($classMetadata->hasAssociation($fieldName)) {

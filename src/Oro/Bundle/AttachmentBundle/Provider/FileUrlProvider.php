@@ -17,10 +17,6 @@ class FileUrlProvider implements FileUrlProviderInterface
      */
     private $filenameProvider;
 
-    /**
-     * @param UrlGeneratorInterface $urlGenerator
-     * @param FilenameProviderInterface $filenameProvider
-     */
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
         FilenameProviderInterface $filenameProvider

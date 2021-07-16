@@ -234,9 +234,6 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider owningEntityNamesDataProvider
-     *
-     *
-     * @param array $owningEntityNames
      */
     public function testInvalidOwningEntityNames(array $owningEntityNames)
     {
@@ -296,10 +293,6 @@ class OwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider getMaxAccessLevelDataProvider
-     *
-     * @param $accessLevel
-     * @param $object
-     * @param $expectedResult
      */
     public function testGetMaxAccessLevel($accessLevel, $object, $expectedResult)
     {

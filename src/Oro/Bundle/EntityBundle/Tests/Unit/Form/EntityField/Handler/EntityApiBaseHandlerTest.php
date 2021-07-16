@@ -207,7 +207,6 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
         $manager->expects($this->any())
             ->method('flush');
 
-
         $this->registry->expects($this->any())->method('getManager')->willReturn($manager);
     }
 }

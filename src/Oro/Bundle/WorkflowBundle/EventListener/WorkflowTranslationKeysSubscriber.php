@@ -14,9 +14,6 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     /** @var TranslationManager */
     private $translationManager;
 
-    /**
-     * @param TranslationManager $translationManager
-     */
     public function __construct(TranslationManager $translationManager)
     {
         $this->translationManager = $translationManager;
@@ -35,7 +32,6 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param WorkflowChangesEvent $changesEvent
      * @throws \InvalidArgumentException
      */
     public function ensureTranslationKeys(WorkflowChangesEvent $changesEvent)
@@ -48,7 +44,6 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param WorkflowChangesEvent $changesEvent
      * @throws \LogicException
      */
     public function clearTranslationKeys(WorkflowChangesEvent $changesEvent)
@@ -77,7 +72,6 @@ class WorkflowTranslationKeysSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param WorkflowChangesEvent $workflowChangesEvent
      * @throws \InvalidArgumentException
      */
     public function deleteTranslationKeys(WorkflowChangesEvent $workflowChangesEvent)

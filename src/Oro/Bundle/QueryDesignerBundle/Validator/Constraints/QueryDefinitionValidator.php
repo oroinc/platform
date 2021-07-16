@@ -22,10 +22,6 @@ class QueryDefinitionValidator extends ConstraintValidator
     /** @var EntityFieldProvider */
     private $fieldProvider;
 
-    /**
-     * @param ConfigProvider      $entityConfigProvider
-     * @param EntityFieldProvider $fieldProvider
-     */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         EntityFieldProvider $fieldProvider
@@ -68,11 +64,6 @@ class QueryDefinitionValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param string          $rootEntityClass
-     * @param string          $columnName
-     * @param QueryDefinition $constraint
-     */
     private function validateColumns(
         string $rootEntityClass,
         string $columnName,
@@ -98,12 +89,6 @@ class QueryDefinitionValidator extends ConstraintValidator
         }
     }
 
-    /**
-     * @param string $columnName
-     * @param array  $fields
-     *
-     * @return bool
-     */
     private function isColumnAccessible(string $columnName, array $fields): bool
     {
         foreach ($fields as $field) {
@@ -115,11 +100,6 @@ class QueryDefinitionValidator extends ConstraintValidator
         return false;
     }
 
-    /**
-     * @param string          $className
-     * @param string          $columnName
-     * @param QueryDefinition $constraint
-     */
     private function addColumnViolation(string $className, string $columnName, QueryDefinition $constraint): void
     {
         $this->context->buildViolation($constraint->messageColumn)
@@ -128,10 +108,6 @@ class QueryDefinitionValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    /**
-     * @param string          $className
-     * @param QueryDefinition $constraint
-     */
     private function addClassViolation(string $className, QueryDefinition $constraint): void
     {
         $this->context->buildViolation($constraint->message)

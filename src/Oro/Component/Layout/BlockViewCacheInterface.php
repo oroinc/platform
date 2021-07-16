@@ -6,9 +6,6 @@ interface BlockViewCacheInterface
 {
     /**
      * Puts BlockView serialized data into the cache.
-     *
-     * @param ContextInterface $context
-     * @param BlockView $rootView
      */
     public function save(ContextInterface $context, BlockView $rootView);
 

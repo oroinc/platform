@@ -38,12 +38,6 @@ class AvailableSuiteSetsController implements Controller
      */
     private $featureStatisticManager;
 
-    /**
-     * @param SuiteConfigurationRegistry $suiteConfigRegistry
-     * @param FeatureAvgTimeRegistry $featureAvgTimeProvider
-     * @param FeaturePathLocator $featurePathLocator
-     * @param FeatureStatisticManager $featureStatisticManager
-     */
     public function __construct(
         SuiteConfigurationRegistry $suiteConfigRegistry,
         FeatureAvgTimeRegistry $featureAvgTimeProvider,
@@ -166,10 +160,6 @@ class AvailableSuiteSetsController implements Controller
         }
     }
 
-    /**
-     * @param OutputInterface $output
-     * @param array $paths
-     */
     private function printFeatures(OutputInterface $output, array $paths)
     {
         foreach ($paths as $path) {

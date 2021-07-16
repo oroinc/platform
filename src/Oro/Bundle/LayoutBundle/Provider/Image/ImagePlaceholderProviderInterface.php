@@ -9,10 +9,5 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 interface ImagePlaceholderProviderInterface
 {
-    /**
-     * @param string $filter
-     * @param int $referenceType
-     * @return string|null
-     */
     public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string;
 }

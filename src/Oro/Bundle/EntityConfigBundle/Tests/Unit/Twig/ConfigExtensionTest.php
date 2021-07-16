@@ -111,7 +111,6 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($className, $fieldName)
             ->will($this->returnValue(true));
 
-
         $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -207,7 +206,6 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->with($className, $fieldName)
             ->will($this->returnValue(true));
-
 
         $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -506,7 +504,6 @@ class ConfigExtensionTest extends \PHPUnit\Framework\TestCase
         $reflection = new \ReflectionClass($metadata);
         $routeViewProp = $reflection->getProperty($attrName);
         $routeViewProp->setValue($metadata, $attrVal);
-
 
         $this->configManager
             ->expects($this->once())

@@ -44,9 +44,6 @@ class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $column
-     * @param string $behaviour
-     * @param bool $exceptIsEnableInline
      * @dataProvider getColumnOptionsDataProvider
      */
     public function testGetColumnOptions(array $column, string $behaviour, bool $exceptIsEnableInline): void
@@ -77,9 +74,6 @@ class InlineEditColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function getColumnOptionsDataProvider(): array
     {
         return [

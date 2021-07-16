@@ -15,9 +15,6 @@ class ImapConnectionConfigurationValidator extends ConstraintValidator
     /** @var ImapSettingsChecker */
     private $checker;
 
-    /**
-     * @param ImapSettingsChecker $checker
-     */
     public function __construct(ImapSettingsChecker $checker)
     {
         $this->checker = $checker;

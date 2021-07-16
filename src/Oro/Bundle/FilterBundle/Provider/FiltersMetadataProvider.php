@@ -52,12 +52,6 @@ class FiltersMetadataProvider
         return $filtersMetadata ?? [];
     }
 
-    /**
-     * @param array $rawGridConfig
-     * @param array $filterMetadata
-     *
-     * @return string|null
-     */
     private function getFilterCacheId(array $rawGridConfig, array $filterMetadata): ?string
     {
         $rawOptions = ArrayUtil::getIn($rawGridConfig, ['filters', 'columns', $filterMetadata['name'], 'options']);

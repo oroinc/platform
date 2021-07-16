@@ -22,9 +22,6 @@ class DbalMessageProducer implements MessageProducerInterface
      */
     private $connection;
 
-    /**
-     * @param ConnectionInterface $connection
-     */
     public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;

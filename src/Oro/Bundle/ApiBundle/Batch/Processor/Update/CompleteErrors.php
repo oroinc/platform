@@ -23,9 +23,6 @@ class CompleteErrors implements ProcessorInterface
     /** @var ErrorCompleterRegistry */
     private $errorCompleterRegistry;
 
-    /**
-     * @param ErrorCompleterRegistry $errorCompleterRegistry
-     */
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry)
     {
         $this->errorCompleterRegistry = $errorCompleterRegistry;
@@ -79,11 +76,6 @@ class CompleteErrors implements ProcessorInterface
         }
     }
 
-    /**
-     * @param Error $error
-     *
-     * @return string
-     */
     private function getErrorHash(Error $error): string
     {
         $result = serialize([
@@ -104,11 +96,6 @@ class CompleteErrors implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param BatchUpdateItem $item
-     *
-     * @return EntityMetadata|null
-     */
     private function getItemMetadata(BatchUpdateItem $item): ?EntityMetadata
     {
         $targetContext = $item->getContext()->getTargetContext();

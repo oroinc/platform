@@ -255,7 +255,6 @@ class BuilderTest extends \PHPUnit\Framework\TestCase
         return $builder;
     }
 
-
     /**
      * @return ExtensionVisitorInterface|\PHPUnit\Framework\MockObject\MockObject
      */

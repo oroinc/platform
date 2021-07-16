@@ -74,11 +74,6 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @return Definition
-     */
     private function getServiceLocatorDefinition(ContainerBuilder $container): Definition
     {
         if ($container->hasDefinition($this->serviceLocatorServiceId)) {
@@ -91,12 +86,6 @@ class MergeServiceLocatorsCompilerPass implements CompilerPassInterface
             ->addTag('container.service_locator');
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $id
-     *
-     * @return array|null
-     */
     private function findServiceLocators(ContainerBuilder $container, string $id): ?array
     {
         $locators = [];

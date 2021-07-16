@@ -37,7 +37,6 @@ class EntityConfigListenerCreateFieldTest extends EntityConfigListenerTestCase
         );
     }
 
-
     public function testUpdateNewField()
     {
         $entityConfig = new Config(

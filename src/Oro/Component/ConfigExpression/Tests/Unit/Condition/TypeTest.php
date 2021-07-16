@@ -123,9 +123,6 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
      * @dataProvider errorMessagesProvider
      */
     public function testErrorMessages(array $inputData, array $expectedData)

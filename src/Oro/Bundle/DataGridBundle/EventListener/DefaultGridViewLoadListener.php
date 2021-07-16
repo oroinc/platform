@@ -29,12 +29,6 @@ class DefaultGridViewLoadListener
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param EntityClassResolver $entityClassResolver
-     * @param AbstractSearchMappingProvider $mappingProvider
-     * @param ConfigManager $configManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityClassResolver $entityClassResolver,
         AbstractSearchMappingProvider $mappingProvider,
@@ -47,9 +41,6 @@ class DefaultGridViewLoadListener
         $this->translator = $translator;
     }
 
-    /**
-     * @param GridViewsLoadEvent $event
-     */
     public function onViewsLoad(GridViewsLoadEvent $event): void
     {
         $config = $event->getGridConfiguration();
@@ -72,11 +63,6 @@ class DefaultGridViewLoadListener
         $event->setGridViews($gridViews);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return string
-     */
     protected function getAllGridViewLabel(DatagridConfiguration $config): string
     {
         $entityClass = $this->getEntityClassNameFromQuery($config);
@@ -101,11 +87,6 @@ class DefaultGridViewLoadListener
         return '';
     }
 
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
     protected function getEntityPluralLabel(string $className): string
     {
         $provider = $this->configManager->getProvider('entity');
@@ -116,11 +97,6 @@ class DefaultGridViewLoadListener
         return $this->translator->trans($provider->getConfig($className)->get('plural_label', false, ''));
     }
 
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
     protected function getAllGridViewTranslationKey(string $className): string
     {
         $provider = $this->configManager->getProvider('entity');
@@ -131,11 +107,6 @@ class DefaultGridViewLoadListener
         return $provider->getConfig($className)->get('grid_all_view_label', false, '');
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     *
-     * @return string|null
-     */
     protected function getEntityClassNameFromQuery(DatagridConfiguration $config): ?string
     {
         $entityClassName = null;

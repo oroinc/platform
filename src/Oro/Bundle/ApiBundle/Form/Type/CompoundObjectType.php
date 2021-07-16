@@ -24,9 +24,6 @@ class CompoundObjectType extends AbstractType
     /** @var FormHelper */
     private $formHelper;
 
-    /**
-     * @param FormHelper $formHelper
-     */
     public function __construct(FormHelper $formHelper)
     {
         $this->formHelper = $formHelper;
@@ -71,14 +68,6 @@ class CompoundObjectType extends AbstractType
             ->setAllowedTypes('children_mapped', ['bool', 'null']);
     }
 
-    /**
-     * @param FormBuilderInterface   $formBuilder
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     * @param PropertyMetadata       $fieldMetadata
-     * @param bool                   $inheritData
-     * @param bool                   $readOnly
-     */
     private function addFormField(
         FormBuilderInterface $formBuilder,
         EntityDefinitionConfig $config,

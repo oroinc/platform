@@ -20,9 +20,6 @@ class MultipleFileSubscriber implements EventSubscriberInterface
     /** @var ConfigMultipleFileValidator */
     protected $validator;
 
-    /**
-     * @param ConfigMultipleFileValidator $validator
-     */
     public function __construct(ConfigMultipleFileValidator $validator)
     {
         $this->validator = $validator;
@@ -40,8 +37,6 @@ class MultipleFileSubscriber implements EventSubscriberInterface
 
     /**
      * Trigger attachment entity update
-     *
-     * @param FormEvent $event
      */
     public function postSubmit(FormEvent $event)
     {
@@ -53,10 +48,6 @@ class MultipleFileSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param FormInterface $form
-     * @param Collection $data
-     */
     protected function validate(FormInterface $form, Collection $data)
     {
         $fieldName = $form->getName();

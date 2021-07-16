@@ -18,17 +18,12 @@ class AddTriggerToRowHashColumn implements Migration
      */
     protected $manager;
 
-    /**
-     * @param AddCommentToRoHashManager $manager
-     */
     public function __construct(AddCommentToRoHashManager $manager)
     {
         $this->manager = $manager;
     }
 
     /**
-     * @param Schema $schema
-     * @param QueryBag $queries
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function up(Schema $schema, QueryBag $queries): void

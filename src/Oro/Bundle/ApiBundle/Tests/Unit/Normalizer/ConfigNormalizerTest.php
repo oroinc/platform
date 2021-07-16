@@ -11,9 +11,6 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigNormalizerTest extends ConfigNormalizerTestCase
 {
-    /**
-     * @param array $expectedConfig
-     */
     private function updateExpectedConfig(array &$expectedConfig): void
     {
         if (array_key_exists(ConfigUtil::FIELDS, $expectedConfig)) {

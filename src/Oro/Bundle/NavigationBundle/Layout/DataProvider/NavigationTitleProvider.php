@@ -15,10 +15,6 @@ class NavigationTitleProvider
     /** @var ConfigManager */
     private $userConfigManager;
 
-    /**
-     * @param TitleService  $titleService
-     * @param ConfigManager $userConfigManager
-     */
     public function __construct(
         TitleService $titleService,
         ConfigManager $userConfigManager

@@ -290,8 +290,6 @@ class QueryBuilderUtil
 
     /**
      * Removes unused parameters from query builder
-     *
-     * @param QueryBuilder $qb
      */
     public static function removeUnusedParameters(QueryBuilder $qb)
     {

@@ -161,7 +161,6 @@ class EmailControllerTest extends WebTestCase
             'type'     => 'inbox'
         ];
 
-
         $this->client->request(
             'PUT',
             $this->getUrl('oro_api_put_email', ['id' => $id]),

@@ -25,9 +25,6 @@ class OroImportExportBundleInstaller implements Installation
         $this->addForeignKeys($schema);
     }
 
-    /**
-     * @param Schema $schema
-     */
     private function createImportExportResultTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_import_export_result');
@@ -49,8 +46,6 @@ class OroImportExportBundleInstaller implements Installation
     }
 
     /**
-     * @param Schema $schema
-     *
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function addForeignKeys(Schema $schema): void

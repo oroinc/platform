@@ -18,10 +18,6 @@ class EmailNotificationGridHelper
     /** @var array */
     private $events;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param array           $events
-     */
     public function __construct(ManagerRegistry $doctrine, array $events)
     {
         $this->doctrine = $doctrine;

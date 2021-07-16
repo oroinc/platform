@@ -90,9 +90,6 @@ class ItemStep extends BaseItemStep implements StepExecutionWarningHandlerInterf
         }
     }
 
-    /**
-     * @return null|int
-     */
     public function getBatchSize(): ?int
     {
         return $this->batchSize;

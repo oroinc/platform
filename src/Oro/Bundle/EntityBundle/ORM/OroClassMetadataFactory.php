@@ -45,8 +45,6 @@ class OroClassMetadataFactory extends ClassMetadataFactory
      * Switches this metadata factory to the disconnected or connected state.
      *
      * @internal this method is intended to be used only to memory usage optimization of the message queue consumer
-     *
-     * @param $disconnected
      */
     public function setDisconnected($disconnected)
     {

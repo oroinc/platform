@@ -29,7 +29,6 @@ class MigrationsLoader
 
     /**
      * @var KernelInterface
-     *
      */
     protected $kernel;
 
@@ -65,12 +64,6 @@ class MigrationsLoader
      */
     protected $excludeBundles;
 
-    /**
-     * @param KernelInterface          $kernel
-     * @param Connection               $connection
-     * @param ContainerInterface       $container
-     * @param EventDispatcherInterface $eventDispatcher
-     */
     public function __construct(
         KernelInterface $kernel,
         Connection $connection,
@@ -364,7 +357,6 @@ class MigrationsLoader
         return $groupedMigrations;
     }
 
-
     /**
      * Loads migration objects
      *
@@ -417,7 +409,6 @@ class MigrationsLoader
             $installers
         ];
     }
-
 
     /**
      * Removes already installed migrations

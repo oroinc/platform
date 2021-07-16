@@ -24,14 +24,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
     /** @var SegmentQueryConverterState|null */
     private $state;
 
-    /**
-     * @param FunctionProviderInterface        $functionProvider
-     * @param VirtualFieldProviderInterface    $virtualFieldProvider
-     * @param VirtualRelationProviderInterface $virtualRelationProvider
-     * @param DoctrineHelper                   $doctrineHelper
-     * @param RestrictionBuilderInterface      $restrictionBuilder
-     * @param SegmentQueryConverterState|null  $state
-     */
     public function __construct(
         FunctionProviderInterface $functionProvider,
         VirtualFieldProviderInterface $virtualFieldProvider,
@@ -45,11 +37,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         $this->state = $state;
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     *
-     * @return QueryBuilder
-     */
     public function convert(AbstractQueryDesigner $source): QueryBuilder
     {
         if (null === $this->state) {
@@ -82,11 +69,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         }
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     *
-     * @return QueryBuilder
-     */
     protected function convertToQueryBuilder(AbstractQueryDesigner $source): QueryBuilder
     {
         $qb = $this->doctrineHelper->getEntityManagerForClass($source->getEntity())->createQueryBuilder();
@@ -95,10 +77,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         return $qb;
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     * @param QueryBuilder          $qb
-     */
     protected function doConvertToQueryBuilder(AbstractQueryDesigner $source, QueryBuilder $qb): void
     {
         $this->context()->setQueryBuilder($qb);
@@ -207,11 +185,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         );
     }
 
-    /**
-     * @param string $columnAlias
-     *
-     * @return string
-     */
     private function getOrderByColumnExpr(string $columnAlias): string
     {
         $columnName = $this->context()->getColumnName($this->context()->getColumnId($columnAlias));
@@ -225,11 +198,6 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         return $this->getTableAliasForColumn($columnName) . '.' . $columnName;
     }
 
-    /**
-     * @param AbstractQueryDesigner $source
-     *
-     * @return int|null
-     */
     private function getSegmentId(AbstractQueryDesigner $source): ?int
     {
         return $source instanceof SegmentIdentityAwareInterface

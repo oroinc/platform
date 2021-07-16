@@ -19,21 +19,12 @@ class BatchUpdateHandler
     /** @var BatchUpdateItemProcessor */
     private $itemProcessor;
 
-    /**
-     * @param BatchUpdateProcessor     $processor
-     * @param BatchUpdateItemProcessor $itemProcessor
-     */
     public function __construct(BatchUpdateProcessor $processor, BatchUpdateItemProcessor $itemProcessor)
     {
         $this->stepExecutor = new StepExecutor($processor);
         $this->itemProcessor = $itemProcessor;
     }
 
-    /**
-     * @param BatchUpdateRequest $request
-     *
-     * @return BatchUpdateResponse
-     */
     public function handle(BatchUpdateRequest $request): BatchUpdateResponse
     {
         /** @var BatchUpdateContext $context */
@@ -58,9 +49,6 @@ class BatchUpdateHandler
         );
     }
 
-    /**
-     * @param BatchUpdateContext $context
-     */
     private function process(BatchUpdateContext $context): void
     {
         $this->stepExecutor->executeStep(ApiActionGroup::INITIALIZE, $context);

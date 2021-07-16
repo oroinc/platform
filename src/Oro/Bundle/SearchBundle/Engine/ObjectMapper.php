@@ -25,13 +25,6 @@ class ObjectMapper extends AbstractMapper
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @param SearchMappingProvider $mappingProvider
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param TypeCastingHandlerRegistry $handlerRegistry
-     * @param EventDispatcherInterface $dispatcher
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,

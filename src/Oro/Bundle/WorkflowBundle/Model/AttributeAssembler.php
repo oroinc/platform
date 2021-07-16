@@ -25,10 +25,6 @@ class AttributeAssembler extends BaseAbstractAssembler
      */
     protected $translator;
 
-    /**
-     * @param AttributeGuesser $attributeGuesser
-     * @param TranslatorInterface $translator
-     */
     public function __construct(AttributeGuesser $attributeGuesser, TranslatorInterface $translator)
     {
         $this->attributeGuesser = $attributeGuesser;
@@ -178,7 +174,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param array $options
      * @throws AssemblerException
      */
     protected function assertAttributeEntityAcl(array $options)
@@ -195,7 +190,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function validateAttribute(BaseAttribute $attribute)
@@ -211,7 +205,6 @@ class AttributeAssembler extends BaseAbstractAssembler
     }
 
     /**
-     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
     protected function assertAttributeHasValidType(BaseAttribute $attribute)

@@ -16,12 +16,6 @@ class ConfigCacheFile extends BaseConfigCache implements WarmableConfigCacheInte
     /** @var ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /**
-     * @param string            $file
-     * @param bool              $debug
-     * @param string            $configKey
-     * @param ConfigCacheWarmer $configCacheWarmer
-     */
     public function __construct(
         string $file,
         bool $debug,

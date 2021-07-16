@@ -31,7 +31,7 @@ class AclPrivilegeWorkflowFilter implements AclPrivilegeConfigurableFilterInterf
     public function isSupported(AclPrivilege $aclPrivileges)
     {
         $identity = $aclPrivileges->getIdentity();
-        
+
         return ObjectIdentityHelper::getExtensionKeyFromIdentityString($identity->getId()) === 'workflow';
     }
 }

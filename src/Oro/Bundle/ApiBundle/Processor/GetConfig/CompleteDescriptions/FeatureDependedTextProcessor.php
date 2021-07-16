@@ -15,9 +15,6 @@ class FeatureDependedTextProcessor extends AbstractTextProcessor
     /** @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
@@ -27,10 +24,6 @@ class FeatureDependedTextProcessor extends AbstractTextProcessor
      * Checks whether the given text contains "{@feature:...}" placeholders and, if so, do the following:
      * * replaces placeholders related to the specific feature with their content
      * * removes placeholders that are not related to the specific feature
-     *
-     * @param string $text
-     *
-     * @return string
      */
     public function process(string $text): string
     {

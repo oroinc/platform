@@ -20,10 +20,6 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
 
     /**
      * @dataProvider isScheduleAllowedDataProvider
-     *
-     * @param array $beforeEvents
-     * @param array $afterEvents
-     * @param array $expects
      */
     public function testIsScheduleAllowed(
         array $beforeEvents,
@@ -44,7 +40,6 @@ class ExcludeDefinitionsProcessSchedulePolicyTest extends \PHPUnit\Framework\Tes
         foreach ($afterEvents as $event) {
             $this->schedulePolicy->onProcessHandleAfterFlush($event);
         }
-
 
         foreach ($expects as $expectation) {
             $this->assertEquals(

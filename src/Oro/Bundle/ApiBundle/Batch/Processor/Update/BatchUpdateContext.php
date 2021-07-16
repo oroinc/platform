@@ -65,8 +65,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets an identifier of an asynchronous operation a batch operation is processed within.
-     *
-     * @return int
      */
     public function getOperationId(): int
     {
@@ -75,8 +73,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets an identifier of an asynchronous operation a batch operation is processed within.
-     *
-     * @param int $operationId
      */
     public function setOperationId(int $operationId): void
     {
@@ -85,8 +81,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the summary statistics of this batch operation.
-     *
-     * @return BatchSummary
      */
     public function getSummary(): BatchSummary
     {
@@ -95,8 +89,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Indicates whether some unexpected errors occurred when processing this batch operation.
-     *
-     * @return bool
      */
     public function hasUnexpectedErrors(): bool
     {
@@ -105,8 +97,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets a value indicates whether some unexpected errors occurred when processing this batch operation.
-     *
-     * @param bool $hasUnexpectedErrors
      */
     public function setHasUnexpectedErrors(bool $hasUnexpectedErrors): void
     {
@@ -115,8 +105,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Indicates whether this batch operation cannot be processed now and it is required to retry it.
-     *
-     * @return bool
      */
     public function isRetryAgain(): bool
     {
@@ -125,8 +113,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets a reason why this batch operation cannot be processed now and should be processed again.
-     *
-     * @return string|null
      */
     public function getRetryReason(): ?string
     {
@@ -135,8 +121,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets a reason why this batch operation cannot be processed now and should be processed again.
-     *
-     * @param string|null $reason
      */
     public function setRetryReason(?string $reason): void
     {
@@ -145,8 +129,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the file manager.
-     *
-     * @return FileManager
      */
     public function getFileManager(): FileManager
     {
@@ -155,8 +137,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the file manager.
-     *
-     * @param FileManager $fileManager
      */
     public function setFileManager(FileManager $fileManager): void
     {
@@ -165,8 +145,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets the file contains the request data.
-     *
-     * @return ChunkFile
      */
     public function getFile(): ChunkFile
     {
@@ -175,8 +153,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets the file contains the request data.
-     *
-     * @param ChunkFile $file
      */
     public function setFile(ChunkFile $file): void
     {
@@ -206,8 +182,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets included data.
-     *
-     * @return IncludedData|null
      */
     public function getIncludedData(): ?IncludedData
     {
@@ -216,8 +190,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets included data.
-     *
-     * @param IncludedData|null $includedData
      */
     public function setIncludedData(IncludedData $includedData = null): void
     {
@@ -271,10 +243,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     /**
      * Gets the statuses of a specific item processed by this batch operation.
      * @see \Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus
-     *
-     * @param BatchUpdateItem $item
-     *
-     * @return int|null
      */
     public function getProcessedItemStatus(BatchUpdateItem $item): ?int
     {
@@ -305,8 +273,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Gets a handler that was used to flush data in this batch operation.
-     *
-     * @return BatchFlushDataHandlerInterface|null
      */
     public function getFlushDataHandler(): ?BatchFlushDataHandlerInterface
     {
@@ -315,8 +281,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
 
     /**
      * Sets a handler that was used to flush data in this batch operation.
-     *
-     * @param BatchFlushDataHandlerInterface|null $flushDataHandler
      */
     public function setFlushDataHandler(BatchFlushDataHandlerInterface $flushDataHandler = null): void
     {
@@ -327,8 +291,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
      * Gets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @return ParameterBagInterface
      */
     public function getSharedData(): ParameterBagInterface
     {
@@ -343,8 +305,6 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
      * Sets an object that is used to share data between a primary action
      * and actions that are executed as part of this action.
      * Also, this object can be used to share data between different kind of child actions.
-     *
-     * @param ParameterBagInterface $sharedData
      */
     public function setSharedData(ParameterBagInterface $sharedData): void
     {

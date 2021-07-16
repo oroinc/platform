@@ -46,7 +46,6 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
     /**
      * Load default administrator
      *
-     * @param ObjectManager $manager
      * @throws \RuntimeException
      */
     public function load(ObjectManager $manager)

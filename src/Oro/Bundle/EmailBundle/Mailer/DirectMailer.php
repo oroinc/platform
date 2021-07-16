@@ -28,10 +28,6 @@ class DirectMailer extends \Swift_Mailer
     /** @var \Swift_Transport */
     private $transport;
 
-    /**
-     * @param \Swift_Mailer      $baseMailer
-     * @param ContainerInterface $container
-     */
     public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
     {
         $this->baseMailer = $baseMailer;
@@ -75,8 +71,6 @@ class DirectMailer extends \Swift_Mailer
 
     /**
      * Last chance to modify SMTP transport
-     *
-     * @param SmtpSettings|null $smtpSettings
      */
     public function afterPrepareSmtpTransport(SmtpSettings $smtpSettings = null)
     {
@@ -159,7 +153,6 @@ class DirectMailer extends \Swift_Mailer
     /**
      * Register a plugin using a known unique key (e.g. myPlugin).
      *
-     * @param \Swift_Events_EventListener $plugin
      * @throws \Oro\Bundle\EmailBundle\Exception\NotSupportedException
      */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
@@ -281,9 +274,6 @@ class DirectMailer extends \Swift_Mailer
         return $this;
     }
 
-    /**
-     * @param  \Swift_Transport_AbstractSmtpTransport $transport
-     */
     protected function configureTransportLocalDomain(\Swift_Transport_AbstractSmtpTransport $transport)
     {
         if (php_sapi_name() === 'cli') {

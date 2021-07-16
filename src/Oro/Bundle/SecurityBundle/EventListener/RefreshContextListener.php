@@ -25,27 +25,17 @@ class RefreshContextListener
     /** @var bool */
     protected $isClosing = false;
 
-    /**
-     * @param TokenStorageInterface $securityTokenStorage
-     * @param ManagerRegistry       $doctrine
-     */
     public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
     {
         $this->securityTokenStorage = $securityTokenStorage;
         $this->doctrine             = $doctrine;
     }
 
-    /**
-     * @param PreCloseEventArgs $event
-     */
     public function preClose(PreCloseEventArgs $event)
     {
         $this->isClosing = true;
     }
 
-    /**
-     * @param OnClearEventArgs $event
-     */
     public function onClear(OnClearEventArgs $event)
     {
         if ($this->isClosing) {
@@ -67,10 +57,6 @@ class RefreshContextListener
         }
     }
 
-    /**
-     * @param OnClearEventArgs $event
-     * @param TokenInterface   $token
-     */
     protected function checkUser(OnClearEventArgs $event, TokenInterface $token)
     {
         $user = $token->getUser();
@@ -95,10 +81,6 @@ class RefreshContextListener
         }
     }
 
-    /**
-     * @param OnClearEventArgs                $event
-     * @param OrganizationAwareTokenInterface $token
-     */
     protected function checkOrganization(OnClearEventArgs $event, OrganizationAwareTokenInterface $token)
     {
         $organization = $token->getOrganization();

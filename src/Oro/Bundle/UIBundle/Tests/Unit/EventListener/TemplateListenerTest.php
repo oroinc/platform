@@ -179,8 +179,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function templateDataProvider(): array
@@ -272,10 +270,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param string|null $container
-     * @return TemplateReference
-     */
     private function templateWithContainer(?string $container = null): TemplateReference
     {
         return new TemplateReference(
@@ -284,10 +278,6 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $name
-     * @return TemplateReference
-     */
     private function templateWithController(string $name): TemplateReference
     {
         return new TemplateReference($name, 'twig');

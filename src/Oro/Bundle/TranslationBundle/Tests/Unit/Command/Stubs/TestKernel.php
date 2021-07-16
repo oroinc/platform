@@ -13,9 +13,6 @@ class TestKernel extends Kernel
     /** @var string */
     private $projectDir;
 
-    /**
-     * @param string $projectDir
-     */
     public function __construct(string $projectDir)
     {
         $this->projectDir = $projectDir;

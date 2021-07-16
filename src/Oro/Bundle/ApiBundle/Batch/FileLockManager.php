@@ -24,10 +24,6 @@ class FileLockManager
     /** @var string|null */
     private $contentChecksum;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param string          $connectionName
-     */
     public function __construct(ManagerRegistry $doctrine, string $connectionName)
     {
         $this->doctrine = $doctrine;
@@ -77,12 +73,6 @@ class FileLockManager
         );
     }
 
-    /**
-     * @param Connection $connection
-     * @param string     $lockFileName
-     *
-     * @return bool
-     */
     private function tryToAcquireLock(Connection $connection, string $lockFileName): bool
     {
         try {
@@ -102,9 +92,6 @@ class FileLockManager
         return true;
     }
 
-    /**
-     * @return Connection
-     */
     private function getConnection(): Connection
     {
         return $this->doctrine->getConnection($this->connectionName);

@@ -31,11 +31,6 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
      */
     private $aclHelper;
 
-    /**
-     * @param TranslationManager $translationManager
-     * @param TranslatorInterface $translator
-     * @param AclHelper $aclHelper
-     */
     public function __construct(
         TranslationManager $translationManager,
         TranslatorInterface $translator,
@@ -122,9 +117,6 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         );
     }
 
-    /**
-     * @param array $translationData
-     */
     private function processReset(array $translationData)
     {
         if ($translationData['id'] === null) {
@@ -140,9 +132,6 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         );
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     private function removeEmptyValuesFromQB(QueryBuilder $qb)
     {
         $valuesParameter = $qb->getParameter('values');
@@ -157,9 +146,6 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         $valuesParameter->setValue($values);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     private function addRequiredParameters(QueryBuilder $qb)
     {
         $qb->addSelect('translation.scope as translation_scope');

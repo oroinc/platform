@@ -26,7 +26,6 @@ class RestFilterValueAccessorFactory
         $this->operators = $operators;
     }
 
-
     /**
      * Creates new instance of the filter value accessor.
      *

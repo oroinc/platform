@@ -14,11 +14,6 @@ class FormUtils
 {
     /**
      * Finds a form field by its property path and checks whether it is submitted.
-     *
-     * @param FormInterface $form
-     * @param string        $propertyPath
-     *
-     * @return bool
      */
     public static function isFormFieldSubmitted(FormInterface $form, string $propertyPath): bool
     {
@@ -29,11 +24,6 @@ class FormUtils
 
     /**
      * Finds a form field by its property path.
-     *
-     * @param FormInterface $form
-     * @param string        $propertyPath
-     *
-     * @return FormInterface|null
      */
     public static function findFormField(FormInterface $form, string $propertyPath): ?FormInterface
     {
@@ -85,11 +75,6 @@ class FormUtils
         $form->add($fieldName, get_class($config->getType()->getInnerType()), $options);
     }
 
-    /**
-     * @param FormInterface $form
-     * @param string $fieldName
-     * @param array $mergeOptions
-     */
     public static function replaceFieldOptionsRecursive(
         FormInterface $form,
         string $fieldName,
@@ -104,9 +89,6 @@ class FormUtils
 
     /**
      * Appends CSS class(es) to given form view
-     *
-     * @param FormView $view
-     * @param string|[]   $cssClass
      */
     public static function appendClass(FormView $view, $cssClasses)
     {

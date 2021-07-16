@@ -30,7 +30,6 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $this->dropTable('message_queue');
     }
 
-
     public function testShouldRedeliverOrphanMessages()
     {
         $connection = $this->createConnection();

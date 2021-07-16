@@ -61,9 +61,6 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getCountryChoices(): array
     {
         $countryAndRegion = $this->getValidCountryAndRegion();
@@ -76,9 +73,6 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getRegionChoices(): array
     {
         $countryAndRegion = $this->getValidCountryAndRegion();
@@ -90,9 +84,6 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     protected function getValidCountryAndRegion(): array
     {
         if (!$this->validCountry) {
@@ -105,9 +96,6 @@ abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
         return [$this->validCountry, $this->validCountry->getRegions()->first()];
     }
 
-    /**
-     * @return Country
-     */
     private function getCountryWithoutRegions(): Country
     {
         if (!$this->noRegionsCountry) {

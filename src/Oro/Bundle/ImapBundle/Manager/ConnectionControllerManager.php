@@ -86,10 +86,6 @@ class ConnectionControllerManager
 
     /**
      * Returns check connection form instance
-     *
-     * @param Request $request
-     * @param string $formParentName
-     * @return FormInterface
      */
     public function getCheckConnectionForm(Request $request, string $formParentName): FormInterface
     {

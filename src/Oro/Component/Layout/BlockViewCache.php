@@ -21,10 +21,6 @@ class BlockViewCache implements BlockViewCacheInterface
      */
     protected $serializer;
 
-    /**
-     * @param CacheProvider $cacheProvider
-     * @param Serializer    $serializer
-     */
     public function __construct(CacheProvider $cacheProvider, Serializer $serializer)
     {
         $this->cache = $cacheProvider;

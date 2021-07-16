@@ -9,9 +9,6 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 abstract class AbstractEnumFixture extends AbstractFixture
 {
-    /**
-     * @param ObjectManager $manager
-     */
     public function load(ObjectManager $manager)
     {
         $className = ExtendHelper::buildEnumValueClassName($this->getEnumCode());

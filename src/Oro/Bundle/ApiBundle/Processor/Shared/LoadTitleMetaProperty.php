@@ -47,11 +47,6 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     /** @var Context */
     private $context;
 
-    /**
-     * @param EntityTitleProvider          $entityTitleProvider
-     * @param ExpandedAssociationExtractor $expandedAssociationExtractor
-     * @param ConfigProvider               $configProvider
-     */
     public function __construct(
         EntityTitleProvider $entityTitleProvider,
         ExpandedAssociationExtractor $expandedAssociationExtractor,
@@ -110,22 +105,8 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         }
     }
 
-    /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
-     */
     abstract protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array;
 
-    /**
-     * @param array                  $data
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
-     */
     protected function addTitles(array $data, string $entityClass, EntityDefinitionConfig $config): array
     {
         $idFieldName = AssociationConfigUtil::getEntityIdentifierFieldName($config);
@@ -444,12 +425,6 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     *
-     * @return string
-     */
     private function getFieldPropertyPath(EntityDefinitionConfig $config, string $fieldName): string
     {
         $field = $config->findField($fieldName);

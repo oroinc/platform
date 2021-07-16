@@ -99,10 +99,6 @@ class RtlModeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stylesOutputDataProvider
-     *
-     * @param bool $themeRtl
-     * @param bool $localRtl
-     * @param bool $expected
      */
     public function testConfigureContext(bool $themeRtl, bool $localRtl, bool $expected): void
     {

@@ -13,19 +13,12 @@ class RequestQueryStringNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider testNormalizeQueryStringDataProvider
-     *
-     * @param string $query
-     * @param string $expectedQuery
-     * @param string $msg
      */
     public function testNormalizeQueryString(string $query, string $expectedQuery, string $msg): void
     {
         $this->assertSame($expectedQuery, RequestQueryStringNormalizer::normalizeQueryString($query), $msg);
     }
 
-    /**
-     * @return array
-     */
     public function testNormalizeQueryStringDataProvider(): array
     {
         return [

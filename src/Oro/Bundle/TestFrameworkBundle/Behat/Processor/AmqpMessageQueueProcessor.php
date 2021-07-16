@@ -26,10 +26,6 @@ class AmqpMessageQueueProcessor implements MessageQueueProcessorInterface
     /** @var AMQPChannel */
     private $channel;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param MessageQueueProcessorInterface $baseMessageQueueProcessor
-     */
     public function __construct(KernelInterface $kernel, MessageQueueProcessorInterface $baseMessageQueueProcessor)
     {
         $this->kernel = $kernel;

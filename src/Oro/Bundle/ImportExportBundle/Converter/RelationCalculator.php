@@ -21,10 +21,6 @@ class RelationCalculator implements RelationCalculatorInterface
      */
     protected $fieldHelper;
 
-    /**
-     * @param ManagerRegistry $registry
-     * @param FieldHelper $fieldHelper
-     */
     public function __construct(
         ManagerRegistry $registry,
         FieldHelper $fieldHelper

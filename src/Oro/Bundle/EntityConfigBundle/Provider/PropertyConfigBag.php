@@ -10,9 +10,6 @@ class PropertyConfigBag
     /** @var PropertyConfigContainer[] [scope => PropertyConfigContainer, ...] */
     private $configObjects = [];
 
-    /**
-     * @param array $config
-     */
     public function __construct(array $config)
     {
         $this->config = $config;

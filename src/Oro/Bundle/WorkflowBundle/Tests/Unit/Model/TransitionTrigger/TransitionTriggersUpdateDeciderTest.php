@@ -9,9 +9,6 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDe
 class TransitionTriggersUpdateDeciderTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param array $expected
-     * @param array $existing
-     * @param array $new
      * @dataProvider decideData
      */
     public function testDecide(array $expected, array $existing, array $new)

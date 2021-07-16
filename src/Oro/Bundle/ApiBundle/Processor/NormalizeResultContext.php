@@ -43,8 +43,6 @@ class NormalizeResultContext extends ApiContext
 
     /**
      * Registers an error.
-     *
-     * @param Error $error
      */
     public function addError(Error $error)
     {

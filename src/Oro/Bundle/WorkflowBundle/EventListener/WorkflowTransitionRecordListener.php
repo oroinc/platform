@@ -26,20 +26,12 @@ class WorkflowTransitionRecordListener implements OptionalListenerInterface
     /** @var TokenStorageInterface */
     protected $tokenStorage;
 
-    /**
-     * @param EventDispatcherInterface $eventDispatcher
-     * @param TokenStorageInterface $tokenStorage
-     */
     public function __construct(EventDispatcherInterface $eventDispatcher, TokenStorageInterface $tokenStorage)
     {
         $this->eventDispatcher = $eventDispatcher;
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @param WorkflowTransitionRecord $transitionRecord
-     * @param LifecycleEventArgs       $args
-     */
     public function postPersist(WorkflowTransitionRecord $transitionRecord, LifecycleEventArgs $args)
     {
         if (!$this->enabled) {

@@ -9,9 +9,6 @@ class TestArrayObject implements ToArrayInterface
     /** @var array */
     protected $items;
 
-    /**
-     * @param array $items
-     */
     public function __construct(array $items)
     {
         $this->items = $items;

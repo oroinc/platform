@@ -14,9 +14,6 @@ class TestFlashBagInjection implements ProcessorInterface
     /** @var TestFlashBagDependedService */
     private $flashBagDependedService;
 
-    /**
-     * @param TestFlashBagDependedService $flashBagDependedService
-     */
     public function __construct(TestFlashBagDependedService $flashBagDependedService)
     {
         $this->flashBagDependedService = $flashBagDependedService;

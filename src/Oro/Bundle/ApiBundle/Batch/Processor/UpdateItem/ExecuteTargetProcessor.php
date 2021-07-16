@@ -36,9 +36,6 @@ class ExecuteTargetProcessor implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ContextInterface $targetContext
-     */
     protected function assertTargetContext(ContextInterface $targetContext): void
     {
         if (!$targetContext->getFirstGroup()) {
@@ -49,18 +46,10 @@ class ExecuteTargetProcessor implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ContextInterface       $targetContext
-     * @param BatchUpdateItemContext $context
-     */
     protected function syncContext(ContextInterface $targetContext, BatchUpdateItemContext $context): void
     {
     }
 
-    /**
-     * @param Context                $targetContext
-     * @param BatchUpdateItemContext $context
-     */
     protected function syncErrors(Context $targetContext, BatchUpdateItemContext $context): void
     {
         $errors = $targetContext->getErrors();

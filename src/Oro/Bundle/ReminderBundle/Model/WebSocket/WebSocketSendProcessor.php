@@ -32,11 +32,6 @@ class WebSocketSendProcessor implements SendProcessorInterface
      */
     protected $messageParamsProvider;
 
-    /**
-     * @param WebsocketClientInterface $websocketClient
-     * @param ConnectionChecker $connectionChecker
-     * @param MessageParamsProvider $messageParamsProvider
-     */
     public function __construct(
         WebsocketClientInterface $websocketClient,
         ConnectionChecker $connectionChecker,

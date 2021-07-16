@@ -17,20 +17,12 @@ class ReportCacheCleanerListener
     /** @var string */
     private $prefixCacheKey;
 
-    /**
-     * @param Cache  $cache
-     * @param string $prefixCacheKey
-     */
     public function __construct(Cache $cache, string $prefixCacheKey)
     {
         $this->cache = $cache;
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
-    /**
-     * @param Report             $entity
-     * @param LifecycleEventArgs $args
-     */
     public function postUpdate(Report $entity, LifecycleEventArgs $args): void
     {
         $cacheKey = $this->prefixCacheKey . '.' . $entity->getGridPrefix() . $entity->getId();

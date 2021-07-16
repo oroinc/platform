@@ -1,11 +1,12 @@
-define([
-    'underscore', 'oroform/js/validator/range'
-], function(_, range) {
+define(function(require) {
     'use strict';
 
-    const constraint = _.clone(range);
+    const range = require('oroform/js/validator/range');
 
-    constraint[0] = 'Oro\\Bundle\\ValidationBundle\\Validator\\Constraints\\NumericRange';
+    // clone of range constraint
+    const numericRange = range.slice();
 
-    return constraint;
+    numericRange[0] = 'Oro\\Bundle\\ValidationBundle\\Validator\\Constraints\\NumericRange';
+
+    return numericRange;
 });

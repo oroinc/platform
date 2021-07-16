@@ -29,11 +29,6 @@ class InvalidateCacheTimeProvider
      */
     private $cronFormatTransformer;
 
-    /**
-     * @param InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgsBuilder
-     * @param ScheduleManager                                  $scheduleManager
-     * @param DateTimeToStringTransformerInterface             $cronFormatTransformer
-     */
     public function __construct(
         InvalidateCacheScheduleArgumentsBuilderInterface $scheduleArgsBuilder,
         ScheduleManager $scheduleManager,

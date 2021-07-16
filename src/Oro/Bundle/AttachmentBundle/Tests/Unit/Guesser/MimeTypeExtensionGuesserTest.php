@@ -32,18 +32,12 @@ class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider extensionDataProvider
-     *
-     * @param string $mimeType
-     * @param array $expectedExtensions
      */
     public function testGetExtensions(string $mimeType, array $expectedExtensions): void
     {
         $this->assertEquals($expectedExtensions, $this->guesser->getExtensions($mimeType));
     }
 
-    /**
-     * @return array
-     */
     public function extensionDataProvider(): array
     {
         return [
@@ -60,18 +54,12 @@ class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider mimeTypeDataProvider
-     *
-     * @param string $extension
-     * @param array $expectedMimeTypes
      */
     public function testGetMimeTypes(string $extension, array $expectedMimeTypes): void
     {
         $this->assertEquals($expectedMimeTypes, $this->guesser->getMimeTypes($extension));
     }
 
-    /**
-     * @return array
-     */
     public function mimeTypeDataProvider(): array
     {
         return [

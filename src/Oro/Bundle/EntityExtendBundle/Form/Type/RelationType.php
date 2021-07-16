@@ -35,9 +35,6 @@ class RelationType extends AbstractType
     /** @var FormFactory */
     protected $formFactory;
 
-    /**
-     * @param ConfigManager   $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager   = $configManager;
@@ -198,10 +195,6 @@ class RelationType extends AbstractType
             : $defaultValue;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array $options
-     */
     private function addTargetEntityField(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -214,10 +207,6 @@ class RelationType extends AbstractType
         );
     }
 
-    /**
-     * @param FormInterface $form
-     * @param array|null $data
-     */
     private function addBidirectionalField(FormInterface $form, array $data = null)
     {
         /** @var FieldConfigId $fieldConfigId */

@@ -88,9 +88,6 @@ abstract class RestApiTestCase extends ApiTestCase
      */
     abstract protected function request($method, $uri, array $parameters = [], array $server = [], $content = null);
 
-    /**
-     * @param array $server
-     */
     protected function checkWsseAuthHeader(array &$server)
     {
         if (!array_key_exists('HTTP_X-WSSE', $server)) {
@@ -100,9 +97,6 @@ abstract class RestApiTestCase extends ApiTestCase
         }
     }
 
-    /**
-     * @param array $server
-     */
     protected function checkCsrfHeader(array &$server)
     {
         $csrfHeader = 'HTTP_' . CsrfRequestManager::CSRF_HEADER;
@@ -123,9 +117,6 @@ abstract class RestApiTestCase extends ApiTestCase
         }
     }
 
-    /**
-     * @param array $server
-     */
     protected function checkHateoasHeader(array &$server)
     {
         $isHateoasEnabled = false;
@@ -803,9 +794,6 @@ abstract class RestApiTestCase extends ApiTestCase
         return $response;
     }
 
-    /**
-     * @param Response $response
-     */
     protected function assertOptionsResponseCacheHeader(Response $response)
     {
         self::assertResponseHeader($response, 'Cache-Control', 'max-age=600, public');
@@ -834,12 +822,6 @@ abstract class RestApiTestCase extends ApiTestCase
             ->transform($entityId, $metadata);
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string|null $action
-     *
-     * @return EntityDefinitionConfig|null
-     */
     protected function getApiConfig(
         string $entityClass,
         string $action = null,
@@ -862,12 +844,6 @@ abstract class RestApiTestCase extends ApiTestCase
         return $config->getDefinition();
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string|null $action
-     *
-     * @return EntityMetadata|null
-     */
     protected function getApiMetadata(
         string $entityClass,
         string $action = null,
@@ -892,11 +868,6 @@ abstract class RestApiTestCase extends ApiTestCase
         );
     }
 
-    /**
-     * @param array $server
-     *
-     * @return bool
-     */
     protected function isStatelessRequest(array $server): bool
     {
         return
@@ -904,11 +875,6 @@ abstract class RestApiTestCase extends ApiTestCase
             || null === $this->client->getCookieJar()->get(self::API_TEST_STATEFUL_REQUEST);
     }
 
-    /**
-     * @param string $method
-     * @param string $uri
-     * @param array  $server
-     */
     protected function assertSessionNotStarted(string $method, string $uri, array $server): void
     {
         // do not check session if request was made as a session aware AJAX request

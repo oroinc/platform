@@ -16,19 +16,11 @@ interface FilterBagInterface
 
     /**
      * Checks if a filter exists in this bag.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasFilter(string $name): bool;
 
     /**
      * Gets a filter by its name.
-     *
-     * @param string $name
-     *
-     * @return FilterInterface
      */
     public function getFilter(string $name): FilterInterface;
 }

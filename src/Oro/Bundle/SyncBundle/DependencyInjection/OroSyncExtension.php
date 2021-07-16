@@ -120,9 +120,6 @@ class OroSyncExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function configureLogger(ContainerBuilder $container): void
     {
         if (true === $container->getParameter('kernel.debug')) {
@@ -168,9 +165,6 @@ class OroSyncExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function validateWebSocketBackendTransport(ContainerBuilder $container): void
     {
         if (!\in_array(
@@ -186,9 +180,6 @@ class OroSyncExtension extends Extension
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     */
     private function validateWebSocketContextOptions(ContainerBuilder $container): void
     {
         $options = $container->getParameter(self::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS);

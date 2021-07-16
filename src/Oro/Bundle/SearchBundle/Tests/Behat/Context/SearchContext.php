@@ -70,8 +70,6 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
      *            | Calendar Events |
      *            | Organizations   |
      *
-     * @param TableNode $table
-     *
      * @Then /^(?:|I )should not see following search entity types:$/
      */
     public function iShouldNotSeeFollowingSearchEntityTypes(TableNode $table)

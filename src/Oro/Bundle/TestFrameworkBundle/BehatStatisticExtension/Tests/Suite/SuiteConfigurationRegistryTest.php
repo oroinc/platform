@@ -45,8 +45,6 @@ class SuiteConfigurationRegistryTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider generateSetsDividedByCountProvider
-     * @param $divider
-     * @param $expectedSets
      */
     public function testGenerateSetsDividedByCount($divider, $expectedSets)
     {

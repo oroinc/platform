@@ -26,12 +26,6 @@ class EmailAttachmentProvider
     /** @var EmailAttachmentTransformer */
     private $emailAttachmentTransformer;
 
-    /**
-     * @param EmailThreadProvider        $emailThreadProvider
-     * @param ManagerRegistry            $doctrine
-     * @param AttachmentProvider         $attachmentProvider
-     * @param EmailAttachmentTransformer $emailAttachmentTransformer
-     */
     public function __construct(
         EmailThreadProvider $emailThreadProvider,
         ManagerRegistry $doctrine,

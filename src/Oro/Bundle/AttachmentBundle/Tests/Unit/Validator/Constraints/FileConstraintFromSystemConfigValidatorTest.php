@@ -47,10 +47,6 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
 
     /**
      * @dataProvider validateDataProvider
-     *
-     * @param FileConstraintFromSystemConfig $constraint
-     * @param int $expectedMaxSize
-     * @param array $expectedMimeTypes
      */
     public function testValidate(
         FileConstraintFromSystemConfig $constraint,
@@ -77,9 +73,6 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
         $this->assertEquals($expectedMimeTypes, $constraint->mimeTypes);
     }
 
-    /**
-     * @return array
-     */
     public function validateDataProvider(): array
     {
         return [

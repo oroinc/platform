@@ -12,9 +12,6 @@ class EntityPaginationManager
     const VIEW_SCOPE = 'view';
     const EDIT_SCOPE = 'edit';
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

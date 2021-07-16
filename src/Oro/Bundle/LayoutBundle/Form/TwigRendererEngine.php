@@ -31,9 +31,6 @@ class TwigRendererEngine extends BaseTwigRendererEngine
         return parent::renderBlock($view, $resource, $blockName, $variables);
     }
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function setConfigManager(ConfigManager $configManager)
     {
         $this->configManager = $configManager;

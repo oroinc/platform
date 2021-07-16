@@ -128,8 +128,6 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider notApplicableDataProvider
-     *
-     * @param array $options
      */
     public function testBuildFormWhenNotApplicable(array $options)
     {
@@ -239,7 +237,6 @@ class DynamicAttributesExtensionTest extends TypeTestCase
 
     /**
      * @dataProvider preSubmitProviderNoAdd
-     * @param array $data
      */
     public function testOnPreSubmitNoAdd(array $data)
     {

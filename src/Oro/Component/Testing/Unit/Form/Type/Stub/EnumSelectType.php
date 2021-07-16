@@ -13,9 +13,6 @@ class EnumSelectType extends EntityType
 {
     const NAME = 'oro_enum_select';
 
-    /**
-     * @param array $choices
-     */
     public function __construct(array $choices)
     {
         $choices = $this->getEnumChoices($choices);

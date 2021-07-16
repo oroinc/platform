@@ -17,19 +17,11 @@ class Publisher
      */
     private $draftHelper;
 
-    /**
-     * @param DraftHelper $draftHelper
-     */
     public function __construct(DraftHelper $draftHelper)
     {
         $this->draftHelper = $draftHelper;
     }
 
-    /**
-     * @param DraftableInterface $source
-     *
-     * @return DraftableInterface
-     */
     public function create(DraftableInterface $source): DraftableInterface
     {
         $accessor = new PropertyAccessor();

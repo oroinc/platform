@@ -44,13 +44,6 @@ class ExtendFieldValueRenderListener
     /** @var EntityClassNameHelper */
     private $entityClassNameHelper;
 
-    /**
-     * @param ConfigManager                 $configManager
-     * @param UrlGeneratorInterface         $router
-     * @param ManagerRegistry               $registry
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityClassNameHelper         $entityClassNameHelper
-     */
     public function __construct(
         ConfigManager $configManager,
         UrlGeneratorInterface $router,

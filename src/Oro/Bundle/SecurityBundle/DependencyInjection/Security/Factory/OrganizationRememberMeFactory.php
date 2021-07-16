@@ -44,7 +44,6 @@ class OrganizationRememberMeFactory extends RememberMeFactory
             ->addArgument($config['secret'])
             ->addArgument($id);
 
-
         // remember-me listener
         $listenerId = 'oro_security.authentication.listener.rememberme.' . $id;
         $listener = $container

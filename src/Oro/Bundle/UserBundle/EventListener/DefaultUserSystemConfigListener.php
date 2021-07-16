@@ -23,10 +23,6 @@ class DefaultUserSystemConfigListener
     /** @var DoctrineHelper*/
     private $doctrineHelper;
 
-    /**
-     * @param DefaultUserProvider $defaultUserProvider
-     * @param DoctrineHelper      $doctrineHelper
-     */
     public function __construct(DefaultUserProvider $defaultUserProvider, DoctrineHelper $doctrineHelper)
     {
         $this->defaultUserProvider = $defaultUserProvider;
@@ -57,9 +53,6 @@ class DefaultUserSystemConfigListener
         return $this;
     }
 
-    /**
-     * @param ConfigSettingsUpdateEvent $event
-     */
     public function onFormPreSetData(ConfigSettingsUpdateEvent $event)
     {
         $settingsKey = $this->getSettingsKey();
@@ -79,9 +72,6 @@ class DefaultUserSystemConfigListener
         $event->setSettings($settings);
     }
 
-    /**
-     * @param ConfigSettingsUpdateEvent $event
-     */
     public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event)
     {
         $settings = $event->getSettings();

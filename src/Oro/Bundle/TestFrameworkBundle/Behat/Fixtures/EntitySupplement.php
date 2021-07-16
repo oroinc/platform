@@ -49,11 +49,6 @@ class EntitySupplement
      */
     protected $metadataProvider;
 
-    /**
-     * @param KernelInterface $kernel
-     * @param Collection $referenceRepository
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     */
     public function __construct(
         KernelInterface $kernel,
         Collection $referenceRepository,

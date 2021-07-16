@@ -10,9 +10,6 @@ class ExpressionAssembler extends AbstractAssembler
     /** @var ExpressionFactoryInterface */
     protected $factory;
 
-    /**
-     * @param ExpressionFactoryInterface $factory
-     */
     public function __construct(ExpressionFactoryInterface $factory)
     {
         $this->factory = $factory;

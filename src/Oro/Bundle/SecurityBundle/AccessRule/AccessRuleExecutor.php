@@ -35,8 +35,6 @@ class AccessRuleExecutor
 
     /**
      * Applies access rules to the given criteria object.
-     *
-     * @param Criteria $criteria
      */
     public function process(Criteria $criteria): void
     {
@@ -54,11 +52,6 @@ class AccessRuleExecutor
 
     /**
      * Decides whether an access rule with the given options is applicable for the given criteria object.
-     *
-     * @param Criteria $criteria
-     * @param array    $ruleOptions
-     *
-     * @return bool
      */
     private function matches(Criteria $criteria, array $ruleOptions): bool
     {

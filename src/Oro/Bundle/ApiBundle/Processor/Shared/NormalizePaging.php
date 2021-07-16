@@ -17,9 +17,6 @@ class NormalizePaging implements ProcessorInterface
     /** @var int */
     private $maxEntitiesLimit;
 
-    /**
-     * @param int $maxEntitiesLimit
-     */
     public function __construct(int $maxEntitiesLimit)
     {
         $this->maxEntitiesLimit = $maxEntitiesLimit;
@@ -56,11 +53,6 @@ class NormalizePaging implements ProcessorInterface
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return int
-     */
     private function getMaxResultsLimit(?EntityDefinitionConfig $config): int
     {
         if (null === $config) {

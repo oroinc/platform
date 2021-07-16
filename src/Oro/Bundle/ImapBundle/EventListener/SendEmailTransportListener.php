@@ -18,10 +18,6 @@ class SendEmailTransportListener
     /** @var OAuth2ManagerRegistry */
     private $oauthManagerRegistry;
 
-    /**
-     * @param SymmetricCrypterInterface $crypter
-     * @param OAuth2ManagerRegistry     $oauthManagerRegistry
-     */
     public function __construct(
         SymmetricCrypterInterface $crypter,
         OAuth2ManagerRegistry $oauthManagerRegistry
@@ -32,8 +28,6 @@ class SendEmailTransportListener
 
     /**
      * Set smtp configuration from user imap settings
-     *
-     * @param SendEmailTransport $event
      */
     public function setSmtpTransport(SendEmailTransport $event)
     {

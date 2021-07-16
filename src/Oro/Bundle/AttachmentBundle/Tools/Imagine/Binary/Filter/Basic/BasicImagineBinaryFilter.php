@@ -13,9 +13,6 @@ class BasicImagineBinaryFilter implements ImagineBinaryFilterInterface
      */
     private $filterManager;
 
-    /**
-     * @param FilterManager $filterManager
-     */
     public function __construct(FilterManager $filterManager)
     {
         $this->filterManager = $filterManager;

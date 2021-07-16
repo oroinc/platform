@@ -24,8 +24,6 @@ final class BatchSummary
 
     /**
      * Gets the number of items that have been successfully read.
-     *
-     * @return int
      */
     public function getReadCount(): int
     {
@@ -34,8 +32,6 @@ final class BatchSummary
 
     /**
      * Increments the number of items that have been successfully read.
-     *
-     * @param int $increment
      */
     public function incrementReadCount(int $increment = 1): void
     {
@@ -44,8 +40,6 @@ final class BatchSummary
 
     /**
      * Gets the number of items that have been successfully written.
-     *
-     * @return int
      */
     public function getWriteCount(): int
     {
@@ -54,8 +48,6 @@ final class BatchSummary
 
     /**
      * Increments the number of items that have been successfully written.
-     *
-     * @param int $increment
      */
     public function incrementWriteCount(int $increment = 1): void
     {
@@ -64,8 +56,6 @@ final class BatchSummary
 
     /**
      * Gets the number of errors occurred when processing this batch operation.
-     *
-     * @return int
      */
     public function getErrorCount(): int
     {
@@ -74,8 +64,6 @@ final class BatchSummary
 
     /**
      * Increments the number of errors occurred when processing this batch operation.
-     *
-     * @param int $increment
      */
     public function incrementErrorCount(int $increment = 1): void
     {
@@ -84,8 +72,6 @@ final class BatchSummary
 
     /**
      * Gets the number of items that have been successfully created.
-     *
-     * @return int
      */
     public function getCreateCount(): int
     {
@@ -94,8 +80,6 @@ final class BatchSummary
 
     /**
      * Increments the number of items that have been successfully created.
-     *
-     * @param int $increment
      */
     public function incrementCreateCount(int $increment = 1): void
     {
@@ -104,8 +88,6 @@ final class BatchSummary
 
     /**
      * Gets the number of items that have been successfully updated.
-     *
-     * @return int
      */
     public function getUpdateCount(): int
     {
@@ -114,8 +96,6 @@ final class BatchSummary
 
     /**
      * Increments the number of items that have been successfully updated.
-     *
-     * @param int $increment
      */
     public function incrementUpdateCount(int $increment = 1): void
     {

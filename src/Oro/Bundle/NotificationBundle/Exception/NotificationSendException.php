@@ -9,9 +9,6 @@ use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
  */
 class NotificationSendException extends \Exception
 {
-    /**
-     * @param TemplateEmailNotificationInterface $notification
-     */
     public function __construct(TemplateEmailNotificationInterface $notification)
     {
         $criteria = $notification->getTemplateCriteria();

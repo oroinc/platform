@@ -47,13 +47,6 @@ class ConfigCacheWarmer
     /** @var ResourceInterface[] [config file name => ResourceInterface, ...] */
     private $resources;
 
-    /**
-     * @param array                   $configFiles
-     * @param ConfigExtensionRegistry $configExtensionRegistry
-     * @param ConfigCacheFactory      $configCacheFactory
-     * @param bool                    $debug
-     * @param string                  $environment
-     */
     public function __construct(
         array $configFiles,
         ConfigExtensionRegistry $configExtensionRegistry,
@@ -68,10 +61,6 @@ class ConfigCacheWarmer
         $this->environment = $environment;
     }
 
-
-    /**
-     * @param string|null $configKey
-     */
     public function warmUp(string $configKey = null): void
     {
         $configFiles = $this->configFiles;
@@ -107,11 +96,6 @@ class ConfigCacheWarmer
         }
     }
 
-    /**
-     * @param string $configKey
-     * @param string $fileName
-     * @param array  $fileConfig
-     */
     private function dumpConfigCacheForSingleFileApi(string $configKey, string $fileName, array $fileConfig): void
     {
         $config = $fileConfig[self::CONFIG];
@@ -203,14 +187,6 @@ class ConfigCacheWarmer
         );
     }
 
-    /**
-     * @param string $configKey
-     * @param array  $config
-     * @param array  $aliases
-     * @param array  $substitutions
-     * @param array  $exclusions
-     * @param array  $inclusions
-     */
     private function dumpConfigCacheFile(
         string $configKey,
         array $config,
@@ -318,12 +294,6 @@ class ConfigCacheWarmer
         );
     }
 
-    /**
-     * @param ConfigurationInterface $configuration
-     * @param array                  $configs
-     *
-     * @return array
-     */
     private function processConfiguration(ConfigurationInterface $configuration, array $configs): array
     {
         $processor = new Processor();
@@ -351,12 +321,6 @@ class ConfigCacheWarmer
         return $hasConfig;
     }
 
-    /**
-     * @param array $item
-     * @param array $items
-     *
-     * @return bool
-     */
     private function hasInclusionOrExclusion(array $item, array $items): bool
     {
         $exist = false;

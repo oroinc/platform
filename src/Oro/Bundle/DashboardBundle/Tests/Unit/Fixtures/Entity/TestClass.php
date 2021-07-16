@@ -19,7 +19,7 @@ class TestClass
      * @ORM\Column(type="text")
      */
     protected $existing;
-    
+
     public function getExisting()
     {
         return $this->existing;

@@ -146,9 +146,6 @@ class Attachment
             : null;
     }
 
-    /**
-     * @return string
-     */
     protected function getContentTransferEncoding(): string
     {
         if ($this->part->getHeaders()->has('Content-Transfer-Encoding')) {

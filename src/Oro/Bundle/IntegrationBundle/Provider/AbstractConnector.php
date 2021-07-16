@@ -32,11 +32,6 @@ abstract class AbstractConnector extends IteratorBasedReader implements
     /** @var ConnectorContextMediator */
     protected $contextMediator;
 
-    /**
-     * @param ContextRegistry          $contextRegistry
-     * @param LoggerStrategy           $logger
-     * @param ConnectorContextMediator $contextMediator
-     */
     public function __construct(
         ContextRegistry $contextRegistry,
         LoggerStrategy $logger,

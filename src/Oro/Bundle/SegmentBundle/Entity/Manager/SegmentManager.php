@@ -40,13 +40,6 @@ class SegmentManager
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ManagerRegistry             $doctrine
-     * @param SegmentQueryBuilderRegistry $queryBuilderRegistry
-     * @param SubQueryLimitHelper         $subQueryLimitHelper
-     * @param AclHelper                   $aclHelper
-     * @param LoggerInterface             $logger
-     */
     public function __construct(
         ManagerRegistry $doctrine,
         SegmentQueryBuilderRegistry $queryBuilderRegistry,
@@ -75,14 +68,6 @@ class SegmentManager
         return $result;
     }
 
-    /**
-     * @param string      $entityName
-     * @param string|null $term
-     * @param int         $page
-     * @param int|null    $skippedSegmentId
-     *
-     * @return array
-     */
     public function getSegmentByEntityName(
         string $entityName,
         ?string $term,
@@ -129,21 +114,11 @@ class SegmentManager
         return $result;
     }
 
-    /**
-     * @param int $segmentId
-     *
-     * @return Segment|null
-     */
     public function findById(int $segmentId): ?Segment
     {
         return $this->getEntityRepository(Segment::class)->find($segmentId);
     }
 
-    /**
-     * @param Segment $segment
-     *
-     * @return QueryBuilder|null
-     */
     public function getSegmentQueryBuilder(Segment $segment): ?QueryBuilder
     {
         $segmentQueryBuilder = $this->queryBuilderRegistry->getQueryBuilder($segment->getType()->getName());
@@ -158,10 +133,6 @@ class SegmentManager
         return null;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param Segment      $segment
-     */
     public function filterBySegment(QueryBuilder $queryBuilder, Segment $segment): void
     {
         $segmentQueryBuilder = $this->getSegmentQueryBuilder($segment);
@@ -199,11 +170,6 @@ class SegmentManager
         );
     }
 
-    /**
-     * @param Segment $segment
-     *
-     * @return QueryBuilder|null
-     */
     public function getEntityQueryBuilder(Segment $segment): ?QueryBuilder
     {
         $entityClass = $segment->getEntity();
@@ -222,12 +188,6 @@ class SegmentManager
         return $qb->where($qb->expr()->in($alias . '.' . $identifier, $subQuery));
     }
 
-    /**
-     * @param Segment      $segment
-     * @param QueryBuilder $externalQueryBuilder
-     *
-     * @return string|null
-     */
     public function getFilterSubQuery(Segment $segment, QueryBuilder $externalQueryBuilder): ?string
     {
         $queryBuilder = $this->getSegmentQueryBuilder($segment);
@@ -258,11 +218,6 @@ class SegmentManager
         );
     }
 
-    /**
-     * @param Segment      $segment
-     * @param QueryBuilder $qb
-     * @param string       $alias
-     */
     private function applyOrderByPart(Segment $segment, QueryBuilder $qb, string $alias): void
     {
         $segmentQb = $this->getSegmentQueryBuilder($segment);
@@ -281,11 +236,6 @@ class SegmentManager
         }
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return string|null
-     */
     private function getFromPart(QueryBuilder $queryBuilder): ?string
     {
         $from = $queryBuilder->getDQLPart('from');
@@ -299,11 +249,6 @@ class SegmentManager
         return null;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string
-     */
     private function getIdentifierFieldName(string $entityClass): string
     {
         return $this->getEntityManager($entityClass)
@@ -311,33 +256,16 @@ class SegmentManager
             ->getSingleIdentifierFieldName();
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManagerInterface
-     */
     private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityRepository
-     */
     private function getEntityRepository(string $entityClass): EntityRepository
     {
         return $this->doctrine->getRepository($entityClass);
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param Segment      $segment
-     * @param QueryBuilder $externalQueryBuilder
-     *
-     * @return string
-     */
     private function bindSegmentParametersToQueryBuilder(
         QueryBuilder $queryBuilder,
         Segment $segment,

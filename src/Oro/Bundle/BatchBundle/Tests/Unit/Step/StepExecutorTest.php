@@ -77,11 +77,6 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    /**
-     * @param array $items
-     *
-     * @return StepExecutor
-     */
     private function getStepExecutor(array $items = []): StepExecutor
     {
         $stepExecutor = new StepExecutor();

@@ -25,8 +25,6 @@ class ProcessTriggerListConfigurationTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $input
-     * @param array $expected
      * @dataProvider processDataProvider
      */
     public function testProcess(array $input, array $expected)

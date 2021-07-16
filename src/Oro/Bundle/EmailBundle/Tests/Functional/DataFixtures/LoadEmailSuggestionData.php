@@ -50,7 +50,6 @@ class LoadEmailSuggestionData extends AbstractFixture implements DependentFixtur
         $this->em->flush();
     }
 
-
     /**
      * @param string $firstName
      * @param string $lastName

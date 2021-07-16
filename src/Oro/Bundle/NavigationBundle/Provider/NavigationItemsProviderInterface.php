@@ -10,14 +10,6 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
  */
 interface NavigationItemsProviderInterface
 {
-    /**
-     * @param UserInterface $user
-     * @param Organization $organization
-     * @param string $type
-     * @param array $options
-     *
-     * @return array
-     */
     public function getNavigationItems(
         UserInterface $user,
         Organization $organization,

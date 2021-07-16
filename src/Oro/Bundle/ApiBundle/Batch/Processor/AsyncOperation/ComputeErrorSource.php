@@ -32,11 +32,6 @@ class ComputeErrorSource implements ProcessorInterface
         }
     }
 
-    /**
-     * @param ErrorSource $errorSource
-     *
-     * @return array
-     */
     private function getSourceValue(ErrorSource $errorSource): array
     {
         $result = [];

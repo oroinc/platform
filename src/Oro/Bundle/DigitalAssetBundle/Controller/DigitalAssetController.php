@@ -31,8 +31,6 @@ class DigitalAssetController extends AbstractController
      * @Route("/", name="oro_digital_asset_index")
      * @Template("@OroDigitalAsset/DigitalAsset/index.html.twig")
      * @AclAncestor("oro_digital_asset_view")
-     *
-     * @return array
      */
     public function indexAction(): array
     {

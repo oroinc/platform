@@ -12,9 +12,6 @@ class WorkflowManagerRegistry
     /** @var WorkflowManager[] */
     protected $managers = [];
 
-    /**
-     * @param CurrentApplicationProviderInterface $currentApplicationProvider
-     */
     public function __construct(CurrentApplicationProviderInterface $currentApplicationProvider)
     {
         $this->currentApplicationProvider = $currentApplicationProvider;

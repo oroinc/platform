@@ -23,10 +23,6 @@ class ChannelType extends AbstractType
     /** @var IntegrationFormSubscriber */
     protected $integrationFormSubscriber;
 
-    /**
-     * @param DefaultOwnerSubscriber    $defaultOwnerSubscriber
-     * @param IntegrationFormSubscriber $integrationFormSubscriber
-     */
     public function __construct(
         DefaultOwnerSubscriber $defaultOwnerSubscriber,
         IntegrationFormSubscriber $integrationFormSubscriber

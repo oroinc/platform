@@ -21,9 +21,6 @@ class FixturePathLocatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $expected);
     }
 
-    /**
-     * @return array
-     */
     public function pathDataProvider(): array
     {
         return [

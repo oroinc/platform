@@ -21,9 +21,6 @@ class WidgetDateRangeType extends AbstractType
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -135,7 +132,6 @@ class WidgetDateRangeType extends AbstractType
      * @param Options $options
      *
      * @return array
-     *
      */
     protected function getOperatorChoices(Options $options)
     {

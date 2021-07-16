@@ -212,7 +212,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $router->addRoute('theTopicName', 'aFooProcessor', 'aFooQueue');
         $router->addRoute('theTopicName', 'aBarProcessor', 'aBarQueue');
 
-
         $result = $router->route($message);
         $result = iterator_to_array($result);
 

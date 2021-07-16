@@ -41,9 +41,6 @@ class EmailTemplatePerLocalization implements Migration, DatabasePlatformAwareIn
         }
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailTemplateLocalizedTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_email_template_localized');
@@ -57,9 +54,6 @@ class EmailTemplatePerLocalization implements Migration, DatabasePlatformAwareIn
         $table->setPrimaryKey(['id']);
     }
 
-    /**
-     * @param Schema $schema
-     */
     public static function oroEmailTemplateLocalizedForeignKeys(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_template_localized');

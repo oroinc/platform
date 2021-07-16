@@ -13,9 +13,6 @@ class ClassesInProcessorTagsTest extends WebTestCase
         $this->initClient();
     }
 
-    /**
-     * @return ProcessorBag
-     */
     private function getProcessorBag(): ProcessorBag
     {
         return self::getContainer()->get('oro_api.tests.processor_bag');

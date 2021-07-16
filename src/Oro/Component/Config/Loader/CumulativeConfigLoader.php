@@ -93,8 +93,6 @@ class CumulativeConfigLoader
     /**
      * Adds a resource objects to the container.
      * These objects will be used to monitor whether resources are up-to-date or not.
-     *
-     * @param ResourcesContainerInterface $resourcesContainer
      */
     public function registerResources(ResourcesContainerInterface $resourcesContainer): void
     {
@@ -103,8 +101,6 @@ class CumulativeConfigLoader
 
     /**
      * Gets CumulativeResource object that can be used to monitor whether resources are up-to-date or not.
-     *
-     * @return CumulativeResource
      */
     public function getResources(): CumulativeResource
     {

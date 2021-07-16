@@ -20,9 +20,6 @@ class TokenInfo
     /** @var int|null */
     private $expiresIn;
 
-    /**
-     * @param array $data
-     */
     public function __construct(array $data)
     {
         $this->accessToken = array_key_exists(self::KEY_ACCESS_TOKEN, $data)
@@ -35,8 +32,6 @@ class TokenInfo
 
     /**
      * Returns access_token
-     *
-     * @return null|string
      */
     public function getAccessToken(): ?string
     {
@@ -45,8 +40,6 @@ class TokenInfo
 
     /**
      * Returns refresh_token
-     *
-     * @return string|null
      */
     public function getRefreshToken(): ?string
     {
@@ -55,8 +48,6 @@ class TokenInfo
 
     /**
      * Returns expires_in
-     *
-     * @return int|null
      */
     public function getExpiresIn(): ?int
     {
@@ -65,11 +56,8 @@ class TokenInfo
             : (int)$this->expiresIn;
     }
 
-
     /**
      * Returns array representation of the object
-     *
-     * @return array
      */
     public function toArray(): array
     {

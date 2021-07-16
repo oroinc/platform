@@ -15,9 +15,6 @@ class FeatureCheckerWorkflowRegistryFilter implements WorkflowDefinitionFilterIn
     /** @var array */
     private $resources = [];
 
-    /**
-     * @param FeatureChecker $featureChecker
-     */
     public function __construct(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

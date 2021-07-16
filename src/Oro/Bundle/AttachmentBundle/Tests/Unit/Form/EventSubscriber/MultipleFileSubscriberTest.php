@@ -78,11 +78,6 @@ class MultipleFileSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($formEvent);
     }
 
-    /**
-     * @param Collection|null $data
-     *
-     * @return FormEvent
-     */
     private function mockFormEvent(?Collection $data): FormEvent
     {
         /** @var FormEvent|\PHPUnit\Framework\MockObject\MockObject $formEvent */

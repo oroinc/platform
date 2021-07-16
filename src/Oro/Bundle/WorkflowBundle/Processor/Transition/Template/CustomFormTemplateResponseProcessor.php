@@ -23,10 +23,6 @@ class CustomFormTemplateResponseProcessor implements ProcessorInterface
     /** @var FormTemplateDataProviderRegistry */
     private $templateDataProviderRegistry;
 
-    /**
-     * @param Environment $twig
-     * @param FormTemplateDataProviderRegistry $templateDataProviderRegistry
-     */
     public function __construct(Environment $twig, FormTemplateDataProviderRegistry $templateDataProviderRegistry)
     {
         $this->twig = $twig;
@@ -80,10 +76,6 @@ class CustomFormTemplateResponseProcessor implements ProcessorInterface
         );
     }
 
-    /**
-     * @param TransitionContext $context
-     * @return bool
-     */
     public function isApplicable(TransitionContext $context): bool
     {
         if ($context->isSaved()) {

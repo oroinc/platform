@@ -28,9 +28,6 @@ class GedmoTranslationForm extends AbstractTranslationForm
         return $this->gedmoTranslatableListener;
     }
 
-    /**
-     * @param TranslatableListener $gedmoTranslatableListener
-     */
     public function setGedmoTranslatableListener(TranslatableListener $gedmoTranslatableListener)
     {
         $this->gedmoTranslatableListener = $gedmoTranslatableListener;

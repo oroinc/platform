@@ -14,9 +14,6 @@ class IntlNumberFormatterFactory
     /** @var LocaleSettings */
     private $localeSettings;
 
-    /**
-     * @param LocaleSettings $localeSettings
-     */
     public function __construct(LocaleSettings $localeSettings)
     {
         $this->localeSettings = $localeSettings;
@@ -98,12 +95,9 @@ class IntlNumberFormatterFactory
         return $style;
     }
 
-
     /**
      * Converts keys of attributes array to values of NumberFormatter constants
      *
-     * @param array $attributes
-     * @return array
      * @throws \InvalidArgumentException
      */
     private function parseAttributes(array $attributes): array
@@ -116,12 +110,6 @@ class IntlNumberFormatterFactory
         return $result;
     }
 
-    /**
-     * @param IntlNumberFormatter $formatter
-     * @param string $locale
-     * @param int $style
-     * @param array $attributes
-     */
     private function adjustFormatter(
         IntlNumberFormatter $formatter,
         string $locale,

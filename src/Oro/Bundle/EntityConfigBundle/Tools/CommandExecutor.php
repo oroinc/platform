@@ -21,10 +21,6 @@ class CommandExecutor implements CommandExecutorInterface
      */
     private $dataCacheManager;
 
-    /**
-     * @param CommandExecutorInterface $commandExecutor
-     * @param OroDataCacheManager|null $dataCacheManager
-     */
     public function __construct(CommandExecutorInterface $commandExecutor, OroDataCacheManager $dataCacheManager = null)
     {
         $this->commandExecutor = $commandExecutor;

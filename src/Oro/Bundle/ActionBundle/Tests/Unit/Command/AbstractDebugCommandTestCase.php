@@ -80,9 +80,6 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function executeProvider(): array
     {
         return [
@@ -151,17 +148,9 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
-    /**
-     * @return string
-     */
+
     abstract protected function getArgumentName(): string;
 
-    /**
-     * @param ContainerInterface $container
-     * @param FactoryWithTypesInterface $factory
-     *
-     * @return Command
-     */
     abstract protected function getCommandInstance(
         ContainerInterface $container,
         FactoryWithTypesInterface $factory

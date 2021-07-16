@@ -20,9 +20,6 @@ class DoctrineFlushProgressListener
 
     /**
      * Method allows to get information about flush progress for specific entity manager
-     *
-     * @param EntityManager $em
-     * @return bool
      */
     public function isFlushInProgress(EntityManager $em): bool
     {
@@ -31,17 +28,11 @@ class DoctrineFlushProgressListener
         return $this->flushInProgressByHash[$hash] ?? false;
     }
 
-    /**
-     * @param PreFlushEventArgs $args
-     */
     public function preFlush(PreFlushEventArgs $args): void
     {
         $this->markAsInProgress($args->getEntityManager(), true);
     }
 
-    /**
-     * @param PostFlushEventArgs $args
-     */
     public function postFlush(PostFlushEventArgs $args): void
     {
         $this->markAsInProgress($args->getEntityManager(), false);
@@ -53,9 +44,6 @@ class DoctrineFlushProgressListener
      * Argument $isInProgress:
      *      'true' means that flush is in progress
      *      'false' means that flush finished/not started
-     *
-     * @param EntityManager $em
-     * @param bool $isInProgress
      */
     private function markAsInProgress(EntityManager $em, bool $isInProgress): void
     {
@@ -63,10 +51,6 @@ class DoctrineFlushProgressListener
         $this->flushInProgressByHash[$hash] = $isInProgress;
     }
 
-    /**
-     * @param EntityManager $em
-     * @return string
-     */
     private function getHash(EntityManager $em): string
     {
         return spl_object_hash($em);

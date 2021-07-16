@@ -14,9 +14,6 @@ class EntityReferenceToStringTransformer implements DataTransformerInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

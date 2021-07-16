@@ -17,8 +17,6 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
 
     /**
      * @When /^(?:|I )add the following columns:$/
-     *
-     * @param TableNode $table
      */
     public function iAddTheFollowingColumns(TableNode $table)
     {
@@ -30,8 +28,6 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
 
     /**
      * @When /^(?:|I )add the following grouping columns:$/
-     *
-     * @param TableNode $table
      */
     public function iAddTheFollowingGroupingColumns(TableNode $table)
     {
@@ -58,8 +54,6 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
 
     /**
      * @Given /^(?:|I )should see "(?P<column>(?:[^"]|\\")*)" grouping column/
-     *
-     * @param string $column
      */
     public function shouldSeeGroupingColumn(string $column)
     {
@@ -68,8 +62,6 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
 
     /**
      * @Given /^(?:|I )should not see "(?P<column>(?:[^"]|\\")*)" grouping column/
-     *
-     * @param string $column
      */
     public function shouldNotSeeGroupingColumn(string $column)
     {
@@ -154,19 +146,12 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
         $columnFunction->selectOption($value);
     }
 
-    /**
-     * @param string $value
-     */
     private function setLabel(string $value)
     {
         $columnLabel = $this->createElement('Column Label');
         $columnLabel->setValue($value);
     }
 
-    /**
-     * @param string $column
-     * @param bool $isShouldSee
-     */
     private function checkGroupingColumn(string $column, bool $isShouldSee): void
     {
         $this->clickLinkInGroupingDesigner('Choose a field');

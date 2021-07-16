@@ -44,7 +44,6 @@ class ConfigLogDiff
      */
     protected $scope;
 
-
     /**
      * @var array
      * @ORM\Column(type="text")

@@ -41,10 +41,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Checks whether this request type represents the given aspect.
-     *
-     * @param string $aspect
-     *
-     * @return bool
      */
     public function contains(string $aspect): bool
     {
@@ -53,8 +49,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Adds an aspect to this request type.
-     *
-     * @param string $aspect
      */
     public function add(string $aspect): void
     {
@@ -66,8 +60,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Adds an aspect from this request type.
-     *
-     * @param string $aspect
      */
     public function remove(string $aspect): void
     {
@@ -81,8 +73,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Initializes this request type based on an another request type.
-     *
-     * @param RequestType $requestType
      */
     public function set(RequestType $requestType): void
     {
@@ -92,8 +82,6 @@ class RequestType implements ToArrayInterface
 
     /**
      * Checks if this request type represents at least one aspect.
-     *
-     * @return bool
      */
     public function isEmpty(): bool
     {

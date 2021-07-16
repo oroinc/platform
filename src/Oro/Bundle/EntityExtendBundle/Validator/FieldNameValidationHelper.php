@@ -42,10 +42,6 @@ class FieldNameValidationHelper
     /**
      * Checks whether a field can be restored.
      * Unessential symbols, like _ or upper case letters, in a field name are ignored.
-     *
-     * @param FieldConfigModel $field
-     *
-     * @return bool
      */
     public function canFieldBeRestored(FieldConfigModel $field): bool
     {
@@ -77,10 +73,6 @@ class FieldNameValidationHelper
     /**
      * Checks whether a field can be removed.
      * Return empty array when can remove otherwise array with validation errors
-     *
-     * @param FieldConfigModel $field
-     *
-     * @return array
      */
     public function getRemoveFieldValidationErrors(FieldConfigModel $field): array
     {
@@ -93,12 +85,6 @@ class FieldNameValidationHelper
     /**
      * Finds a field by its name.
      * Unessential symbols, like _ or upper case letters, in a field name are ignored.
-     *
-     * @param string $className
-     * @param string $fieldName
-     * @param bool $isAttribute
-     *
-     * @return ConfigInterface|null
      */
     public function findFieldConfig(string $className, string $fieldName, bool $isAttribute = false): ?ConfigInterface
     {
@@ -141,9 +127,6 @@ class FieldNameValidationHelper
         return $existField ? [$existField->getFieldName(), $existField->getType()] : [];
     }
 
-    /**
-     * @param FieldConfigModel $fieldConfigModel
-     */
     public function registerField(FieldConfigModel $fieldConfigModel)
     {
         $key = $this->getKey($fieldConfigModel->getEntity()->getClassName(), $fieldConfigModel->getFieldName());

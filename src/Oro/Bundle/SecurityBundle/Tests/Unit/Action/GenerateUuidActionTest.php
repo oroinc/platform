@@ -16,7 +16,6 @@ class GenerateUuidActionTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dispatcher;
 
-    /** @var GenerateUuidAction */
     private GenerateUuidAction $action;
 
     protected function setUp(): void
@@ -31,8 +30,6 @@ class GenerateUuidActionTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeDataProvider
-     *
-     * @param array $options
      */
     public function testExecute(array $options): void
     {
@@ -52,9 +49,6 @@ class GenerateUuidActionTest extends \PHPUnit\Framework\TestCase
         $this->action->execute([]);
     }
 
-    /**
-     * @return array
-     */
     public function executeDataProvider(): array
     {
         $attributePath = new PropertyPath('attribute');

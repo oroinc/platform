@@ -17,9 +17,6 @@ class SingleObjectIterableResultDecorator implements \Iterator
      */
     protected $iterableResult;
 
-    /**
-     * @param IterableResult $iterableResult
-     */
     public function __construct(IterableResult $iterableResult)
     {
         $this->iterableResult = $iterableResult;

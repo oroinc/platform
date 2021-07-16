@@ -22,11 +22,6 @@ class ClearInactiveMailboxMessageProcessor implements MessageProcessorInterface,
     /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @param ImapClearManager $clearManager
-     * @param JobRunner $jobRunner
-     * @param LoggerInterface $logger
-     */
     public function __construct(ImapClearManager $clearManager, JobRunner $jobRunner, LoggerInterface $logger)
     {
         $this->clearManager = $clearManager;

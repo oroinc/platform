@@ -14,10 +14,6 @@ final class Version
      * Normalizes the given API version.
      * If the given version is NULL, the "latest" string is returned as an API version.
      * If the given version number contains meaningless prefix, e.g. "v", it will be removed.
-     *
-     * @param string|null $version
-     *
-     * @return string
      */
     public static function normalizeVersion(?string $version): string
     {

@@ -18,11 +18,6 @@ class EntityCacheWarmer extends CacheWarmer
     /** @var ConfigCacheWarmer */
     private $configCacheWarmer;
 
-    /**
-     * @param ExtendConfigDumper $dumper
-     * @param ConfigManager      $configManager
-     * @param ConfigCacheWarmer  $configCacheWarmer
-     */
     public function __construct(
         ExtendConfigDumper $dumper,
         ConfigManager $configManager,

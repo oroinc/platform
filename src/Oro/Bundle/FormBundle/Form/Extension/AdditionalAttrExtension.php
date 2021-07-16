@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class AdditionalAttrExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
-    
+
     /**
      * {@inheritdoc}
      */

@@ -32,22 +32,6 @@ services:
         tags:
             - { name: container.service_locator }
 
-    oro_platform.maintenance:
-        class: Oro\Bundle\PlatformBundle\Maintenance\Mode
-        arguments:
-            - "@lexik_maintenance.driver.factory"
-            - "@event_dispatcher"
-
-    Oro\Bundle\PlatformBundle\Maintenance\Mode:
-        alias: oro_platform.maintenance
-
-    oro_platform.event_listener.driver_lock:
-        class: Oro\Bundle\PlatformBundle\EventListener\Console\DriverLockCommandListener
-        arguments:
-            - "@event_dispatcher"
-        tags:
-            - { name: kernel.event_listener, event: console.terminate, method: afterExecute }
-
     oro_platform.composer.local_repo_factory:
         class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
         public: false
@@ -163,22 +147,3 @@ services:
 
     Doctrine\Inflector\Inflector:
         factory: [ !service { class: Doctrine\Inflector\Rules\English\InflectorFactory }, 'build' ]
-
-    oro_platform.listener.maintenance_propagation:
-        class: Oro\Bundle\PlatformBundle\EventListener\MaintenancePropagationListener
-        tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 1024 }
-
-    oro_platform.maintenance_listener:
-        decorates: lexik_maintenance.listener
-        decoration_priority: 100
-        parent: lexik_maintenance.listener
-        class: Oro\Bundle\PlatformBundle\EventListener\MaintenanceListener
-
-    oro_platform.decorator.maintenance_listener:
-        decorates: lexik_maintenance.listener
-        class: Oro\Bundle\PlatformBundle\EventListener\MaintenanceListenerDecorator
-        arguments:
-            - '@oro_platform.decorator.maintenance_listener.inner'
-            - '@lexik_maintenance.driver.factory'
-            - '@router_listener'

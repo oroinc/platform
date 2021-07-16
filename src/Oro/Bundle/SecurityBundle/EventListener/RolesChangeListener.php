@@ -22,25 +22,16 @@ class RolesChangeListener
     /** @var bool */
     private $isCacheOutdated = false;
 
-    /**
-     * @param string $rolesFieldName
-     */
     public function __construct(string $rolesFieldName = 'userRoles')
     {
         $this->rolesFieldName = $rolesFieldName;
     }
 
-    /**
-     * @param string $className
-     */
     public function addSupportedClass(string $className): void
     {
         $this->securityClasses[] = $className;
     }
 
-    /**
-     * @param OnFlushEventArgs $args
-     */
     public function onFlush(OnFlushEventArgs $args): void
     {
         if ($this->isCacheOutdated || !$this->securityClasses) {

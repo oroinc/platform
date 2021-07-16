@@ -5,16 +5,14 @@ parameters:
 services:
     oro_message_queue.consumption.extensions:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ChainExtension'
-        public: false
         arguments:
             - []
             - '@oro_message_queue.log.consumer_state'
 
     oro_message_queue.consumption.maintenance_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\MaintenanceExtension'
-        public: false
         arguments:
-            - '@oro_platform.maintenance'
+            - '@oro_maintenance.maintenance'
             - '%oro_message_queue.maintenance.idle_time%'
         calls:
             - ['setFilePathServerLockFromConfig', ['%kernel.project_dir%/config/oro_env.conf']]
@@ -23,7 +21,6 @@ services:
 
     oro_message_queue.consumption.docrine_clear_identity_map_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\DoctrineClearIdentityMapExtension'
-        public: false
         arguments:
             - '@service_container'
             - '%doctrine.entity_managers%'
@@ -40,7 +37,6 @@ services:
 
     oro_message_queue.consumption.container_reset_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerResetExtension'
-        public: false
         arguments:
             - [] # clearers. They are set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ConfigureClearersPass
         tags:
@@ -48,7 +44,6 @@ services:
 
     oro_message_queue.consumption.interrupt_consumption_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\InterruptConsumptionExtension'
-        public: false
         arguments:
             - '%oro_message_queue.consumption.interrupt_filepath%'
             - '@oro_message_queue.consumption.cache_state'
@@ -57,7 +52,6 @@ services:
 
     oro_message_queue.consumption.consumer_heartbeat_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\ConsumerHeartbeatExtension'
-        public: false
         arguments:
             - '%oro_message_queue.consumer_heartbeat_update_period%'
             - '@oro_message_queue.consumption.consumer_heartbeat'
@@ -66,7 +60,6 @@ services:
 
     oro_message_queue.consumption.security_aware_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareConsumptionExtension'
-        public: false
         arguments:
             - [] # security agnostic processors
             - '@security.token_storage'
@@ -76,7 +69,6 @@ services:
 
     oro_message_queue.consumption.locale_extension:
         class: 'Oro\Bundle\MessageQueueBundle\Consumption\Extension\LocaleExtension'
-        public: false
         arguments:
             - '@oro_locale.settings'
             - '@stof_doctrine_extensions.listener.translatable'
@@ -85,7 +77,6 @@ services:
 
     oro_message_queue.consumption.clear_logger_extension:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ClearLoggerExtension
-        public: false
         arguments:
             - '@service_container'
             - [] # persistentLoggers; set by Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\MakeLoggerServicesPersistentPass
@@ -96,7 +87,6 @@ services:
     # see Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension::buildOptionalExtensions
     oro_message_queue.consumption.redelivery_message_extension:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\RedeliveryMessageExtension
-        public: false
         arguments:
             - '@oro_message_queue.client.driver'
             - ~
@@ -105,11 +95,9 @@ services:
     # see Oro\Bundle\MessageQueueBundle\DependencyInjection\OroMessageQueueExtension::buildOptionalExtensions
     oro_message_queue.consumption.signal_extension:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\SignalExtension
-        public: false
 
     oro_message_queue.consumption.container_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer
-        public: false
         arguments:
             - '@service_container'
         tags:
@@ -117,7 +105,6 @@ services:
 
     oro_message_queue.consumption.garbage_collector_clearer:
         class: Oro\Bundle\MessageQueueBundle\Consumption\Extension\GarbageCollectorClearer
-        public: false
         tags:
             - { name: oro_message_queue.consumption.clearer, priority: -255 }
 
@@ -143,7 +130,6 @@ services:
 
     oro_message_queue.consumption.cache_state_driver.dbal:
         class: Oro\Bundle\MessageQueueBundle\Consumption\StateDriver\DbalStateDriver
-        public: false
         arguments:
             - 'cache'
             - '@doctrine'
@@ -157,7 +143,6 @@ services:
 
     oro_message_queue.consumption.consumer_state_driver.dbal:
         class: Oro\Bundle\MessageQueueBundle\Consumption\StateDriver\DbalStateDriver
-        public: false
         arguments:
             - 'consumers'
             - '@doctrine'
@@ -188,21 +173,18 @@ services:
 
     oro_message_queue.processor_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator
-        public: false
         arguments:
             - [] # processors. Will be set in Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass
         tags:
             - { name: container.service_locator }
 
     oro_message_queue.cache.doctrine_metadata:
-        public: false
         parent: oro.cache.abstract.without_memory_cache
         calls:
             - [ setNamespace, [ 'doctrine_metadata_message_queue' ] ]
 
     oro_message_queue.platform.optional_listener_extension:
         class: Oro\Bundle\MessageQueueBundle\Platform\OptionalListenerExtension
-        public: false
         arguments:
             - '@oro_platform.optional_listeners.manager'
         tags:

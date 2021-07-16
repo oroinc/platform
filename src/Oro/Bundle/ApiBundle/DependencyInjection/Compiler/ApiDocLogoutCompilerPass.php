@@ -31,10 +31,6 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
 
     /**
      * Checks whether a firewall is configured to handle logout
-     *
-     * @param array $firewallConfig
-     *
-     * @return bool
      */
     private function isLogoutFirewall(array $firewallConfig): bool
     {
@@ -44,10 +40,6 @@ class ApiDocLogoutCompilerPass implements CompilerPassInterface
             && !empty($firewallConfig['logout']['path']);
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $firewallName
-     */
     private function configureLogoutHandler(ContainerBuilder $container, string $firewallName): void
     {
         $listenerId = 'security.logout_listener.' . $firewallName;

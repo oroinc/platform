@@ -12,9 +12,6 @@ class EmailOwnerAwareStub implements EmailOwnerAwareInterface
      */
     private $emailOwner;
 
-    /**
-     * @param EmailOwnerInterface $emailOwner
-     */
     public function __construct(EmailOwnerInterface $emailOwner)
     {
         $this->emailOwner = $emailOwner;

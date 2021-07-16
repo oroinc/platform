@@ -57,10 +57,6 @@ class AjaxController extends AbstractController
     }
 
     /**
-     * @param ExecuteOperationResult $result
-     * @param Request                $request
-     *
-     * @return Response
      * @throws \InvalidArgumentException
      */
     protected function handleExecutionResult(ExecuteOperationResult $result, Request $request): Response
@@ -101,9 +97,6 @@ class AjaxController extends AbstractController
     }
 
     /**
-     * @param Collection $messages
-     *
-     * @return array
      * @throws \InvalidArgumentException
      */
     protected function prepareMessages(Collection $messages): array
@@ -119,11 +112,6 @@ class AjaxController extends AbstractController
 
     /**
      * Handle failed response non ajax requests
-     *
-     * @param string $message
-     * @param string $routeName
-     *
-     * @return RedirectResponse
      */
     protected function handleFailedNonAjaxResponse(string $message, string $routeName): RedirectResponse
     {

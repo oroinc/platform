@@ -680,7 +680,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^(?:|I )should not see any selected option in "([^"]*)" select$/
-     * @param string $field
      */
     public function iShouldNotSeeAnySelectedOption(string $field)
     {
@@ -695,8 +694,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be enabled$/
-     *
-     * @param string $fieldName
      */
     public function fieldShouldBeEnabled(string $fieldName): void
     {
@@ -707,8 +704,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @Then /^the "(?P<fieldName>(?:[^"]|\\")*)" field should be disabled$/
-     *
-     * @param string $fieldName
      */
     public function fieldShouldBeDisabled(string $fieldName): void
     {
@@ -833,7 +828,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * This method introduces delay to wait for validation errors to appear.
      * It's useful when dealing with js validation errors as it can take some time for them to be rendered.
      *
-     * @param callable $assertionFunction
      * @throws \Exception
      */
     private function waitForValidationErrorsAssertion(callable $assertionFunction)
@@ -862,8 +856,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
 
     /**
      * @When /^(?:|I )upload "(?P<fileName>.*)" file to "(?P<fileElement>.*)"/
-     * @param string $fileName
-     * @param string $element
      */
     public function iUploadFileToElement(string $fileName, string $element)
     {

@@ -13,9 +13,6 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuditChangedEntitiesExtensionTrait
 {
-    /**
-     * @return TestAuditDataOwner
-     */
     protected function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
@@ -26,9 +23,6 @@ trait AuditChangedEntitiesExtensionTrait
         return $owner;
     }
 
-    /**
-     * @return TestAuditDataChild
-     */
     protected function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
@@ -38,15 +32,12 @@ trait AuditChangedEntitiesExtensionTrait
 
         return $child;
     }
-    
+
     private function assertStoredAuditCount($expected): void
     {
         self::assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
     }
 
-    /**
-     * @return Audit
-     */
     private function findLastStoredAudit(): Audit
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
@@ -73,10 +64,6 @@ trait AuditChangedEntitiesExtensionTrait
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @param array $body
-     * @return Message
-     */
     private function createDummyMessage(array $body): Message
     {
         $body = array_replace([
@@ -87,7 +74,6 @@ trait AuditChangedEntitiesExtensionTrait
             'entities_deleted' => [],
             'collections_updated' => [],
         ], $body);
-
 
         $message = new Message();
         $message->setBody(json_encode($body));

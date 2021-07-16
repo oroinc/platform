@@ -427,8 +427,6 @@ class EntityConfig
 
     /**
      * Adds an association to a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
-     *
-     * @param string $propertyPath
      */
     public function addInnerJoinAssociation(string $propertyPath): void
     {
@@ -441,8 +439,6 @@ class EntityConfig
 
     /**
      * Removes an association from a list of associations for which INNER JOIN should be used instead of LEFT JOIN.
-     *
-     * @param string $propertyPath
      */
     public function removeInnerJoinAssociation(string $propertyPath): void
     {

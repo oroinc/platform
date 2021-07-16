@@ -37,8 +37,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTable(Schema $schema)
     {
@@ -67,8 +65,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address_type table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTypeTable(Schema $schema)
     {
@@ -81,8 +77,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_address_type_translation table
-     *
-     * @param Schema $schema
      */
     protected function createOroAddressTypeTranslationTable(Schema $schema)
     {
@@ -99,8 +93,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_country table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryCountryTable(Schema $schema)
     {
@@ -114,8 +106,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_country_trans table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryCountryTransTable(Schema $schema)
     {
@@ -132,8 +122,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_region table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryRegionTable(Schema $schema)
     {
@@ -149,8 +137,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Create oro_dictionary_region_trans table
-     *
-     * @param Schema $schema
      */
     protected function createOroDictionaryRegionTransTable(Schema $schema)
     {
@@ -167,8 +153,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Add oro_address foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroAddressForeignKeys(Schema $schema)
     {
@@ -189,8 +173,6 @@ class OroAddressBundleInstaller implements Installation
 
     /**
      * Add oro_dictionary_region foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroDictionaryRegionForeignKeys(Schema $schema)
     {

@@ -26,10 +26,6 @@ class UpgradeEmailBodyMessageProcessor implements MessageProcessorInterface
     /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @param MessageProducerInterface  $messageProducer
-     * @param NativeQueryExecutorHelper $queryHelper
-     */
     public function __construct(
         MessageProducerInterface $messageProducer,
         NativeQueryExecutorHelper $queryHelper,

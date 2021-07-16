@@ -485,9 +485,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         $extension->load([], $container);
     }
 
-    /**
-     * @return array
-     */
     public function invalidConfigurationDataProvider(): array
     {
         return [
@@ -506,9 +503,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     private function getRequiredParameters(): array
     {
         return [
@@ -520,9 +514,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     private function getRequiredDefinitions(): array
     {
         return [
@@ -587,9 +578,6 @@ class OroMessageQueueExtensionTest extends ExtensionTestCase
         ];
     }
 
-    /**
-     * @return array
-     */
     private function getClientDefinitions(): array
     {
         return [

@@ -332,11 +332,6 @@ class RestApiTest extends WebTestCase
         }
     }
 
-    /**
-     * @param string $itemType
-     * @param array $parameters
-     * @return array
-     */
     private function postNavigationItem(string $itemType, array $parameters): array
     {
         $this->client->request(
@@ -354,19 +349,12 @@ class RestApiTest extends WebTestCase
         return json_decode($result->getContent(), true);
     }
 
-    /**
-     * @return string
-     */
     private function getQueryPath(): string
     {
         // forms query path of 8150 characters long
         return '/' . str_repeat('some_part/', 815);
     }
 
-    /**
-     * @param int $id
-     * @param string $url
-     */
     private function assertUrl(int $id, string $url): void
     {
         $em = self::getContainer()->get('doctrine')->getManagerForClass(PinbarTab::class);

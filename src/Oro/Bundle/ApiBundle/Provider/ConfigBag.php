@@ -20,10 +20,6 @@ class ConfigBag implements ConfigBagInterface, ResetInterface
     /** @var array */
     private $config;
 
-    /**
-     * @param ConfigCache $configCache
-     * @param string      $configFile
-     */
     public function __construct(ConfigCache $configCache, string $configFile)
     {
         $this->configCache = $configCache;

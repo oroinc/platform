@@ -74,7 +74,6 @@ class ConfigUpdateEvent extends Event
      *
      * @return mixed
      * @throws \LogicException
-     *
      */
     public function getNewValue($name)
     {

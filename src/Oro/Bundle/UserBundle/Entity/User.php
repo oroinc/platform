@@ -517,9 +517,6 @@ class User extends ExtendUser implements
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getUsernameLowercase(): string
     {
         return $this->usernameLowercase;
@@ -642,7 +639,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     *
      * @param \DateTime $birthday [optional] New birthday value. Null by default.
      *
      * @return User
@@ -755,8 +751,6 @@ class User extends ExtendUser implements
      * Invoked before the entity is updated.
      *
      * @ORM\PreUpdate
-     *
-     * @param PreUpdateEventArgs $event
      */
     public function preUpdate(PreUpdateEventArgs $event)
     {
@@ -976,9 +970,6 @@ class User extends ExtendUser implements
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getEmailLowercase(): string
     {
         return $this->emailLowercase;
@@ -1030,9 +1021,6 @@ class User extends ExtendUser implements
             : $items->first();
     }
 
-    /**
-     * @param AccountTypeModel|null $accountTypeModel
-     */
     public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
@@ -1245,10 +1233,6 @@ class User extends ExtendUser implements
     /**
      * Checks whether the user has the given organization.
      * Note: use {@see isBelongToOrganization} to check whether the user is belong to an organization.
-     *
-     * @param Organization $organization
-     *
-     * @return bool
      */
     public function hasOrganization(Organization $organization): bool
     {

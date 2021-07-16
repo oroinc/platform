@@ -39,10 +39,6 @@ class ChunkSizeProvider
 
     /**
      * Gets the maximum number of objects that can be saved in a batch operation chunk.
-     *
-     * @param string $entityClass
-     *
-     * @return int
      */
     public function getChunkSize(string $entityClass): int
     {
@@ -51,10 +47,6 @@ class ChunkSizeProvider
 
     /**
      * Gets the maximum number of included objects that can be saved in a batch operation chunk.
-     *
-     * @param string $entityClass
-     *
-     * @return int
      */
     public function getIncludedDataChunkSize(string $entityClass): int
     {

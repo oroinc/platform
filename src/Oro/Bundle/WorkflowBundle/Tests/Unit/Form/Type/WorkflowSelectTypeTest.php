@@ -62,8 +62,6 @@ class WorkflowSelectTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @param array $inputOptions
-     * @param array $expectedOptions
      * @dataProvider configureOptionsDataProvider
      */
     public function testConfigureOptions(array $inputOptions, array $expectedOptions)

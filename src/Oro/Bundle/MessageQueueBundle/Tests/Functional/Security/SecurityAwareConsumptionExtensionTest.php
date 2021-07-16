@@ -93,17 +93,11 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         ]));
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
     private function getTokenStorage(): TokenStorageInterface
     {
         return $this->getContainer()->get('security.token_storage');
     }
 
-    /**
-     * @return TokenSerializerInterface
-     */
     private function getTokenSerializer(): TokenSerializerInterface
     {
         return $this->getContainer()->get('oro_security.token_serializer');

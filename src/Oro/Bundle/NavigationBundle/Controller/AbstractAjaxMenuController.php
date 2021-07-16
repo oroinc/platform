@@ -295,7 +295,6 @@ abstract class AbstractAjaxMenuController extends AbstractController
     }
 
     /**
-     * @param array $context
      * @throws \Symfony\Component\Security\Core\Exception\AccessDeniedException
      */
     protected function checkAcl(array $context)
@@ -313,25 +312,16 @@ abstract class AbstractAjaxMenuController extends AbstractController
         return $this->get(MenuUpdateManager::class);
     }
 
-    /**
-     * @return ScopeManager
-     */
     private function getScopeManager(): ScopeManager
     {
         return $this->get(ScopeManager::class);
     }
 
-    /**
-     * @return string
-     */
     private function getValidationErrorMessage(): string
     {
         return $this->get(TranslatorInterface::class)->trans('oro.navigation.menuupdate.validation_error_message');
     }
 
-    /**
-     * @return ContextNormalizer
-     */
     private function getScopeNormalizer(): ContextNormalizer
     {
         return $this->get(ContextNormalizer::class);

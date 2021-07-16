@@ -64,7 +64,6 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
 
     /**
      * @depends testScopesCreated
-     * @param TestActivity $previousActivity
      */
     public function testScopesUpdated(TestActivity $previousActivity)
     {
@@ -109,10 +108,6 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
         );
     }
 
-    /**
-     * @param Collection $scopes
-     * @param TestActivity $activity
-     */
     protected function assertActivityExists(Collection $scopes, TestActivity $activity)
     {
         $this->assertTrue(

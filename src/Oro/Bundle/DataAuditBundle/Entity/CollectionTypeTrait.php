@@ -180,9 +180,6 @@ trait CollectionTypeTrait
         $this->setOldValue($oldValue);
     }
 
-    /**
-     * @param AbstractAuditField $field
-     */
     public function mergeCollectionField(AbstractAuditField $field)
     {
         $fieldCollectionDiffs = $field->getCollectionDiffs();

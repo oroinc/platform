@@ -34,10 +34,8 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /** @var FilterBagInterface */
     protected $filterBag;
 
-    /** @var DatagridFiltersProviderInterface */
     protected DatagridFiltersProviderInterface $filtersProvider;
 
-    /** @var FiltersMetadataProvider */
     protected FiltersMetadataProvider $filtersMetadataProvider;
 
     /** @var DatagridStateProviderInterface */
@@ -46,14 +44,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /** @var FilterExecutionContext */
     protected $filterExecutionContext;
 
-    /**
-     * @param RawConfigurationProvider $configurationProvider
-     * @param FilterBagInterface $filterBag
-     * @param DatagridFiltersProviderInterface $datagridFiltersProvider
-     * @param FiltersMetadataProvider $filtersMetadataProvider
-     * @param DatagridStateProviderInterface $filtersStateProvider
-     * @param FilterExecutionContext $filterExecutionContext
-     */
     public function __construct(
         RawConfigurationProvider $configurationProvider,
         FilterBagInterface $filterBag,
@@ -198,11 +188,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
             ->offsetAddToArray('state', ['filters' => $filtersState]);
     }
 
-    /**
-     * @param MetadataObject $metadata
-     *
-     * @return bool
-     */
     protected function isLazy(MetadataObject $metadata): bool
     {
         return (bool)$metadata->offsetGetOr(MetadataObject::LAZY_KEY, true);
@@ -211,11 +196,6 @@ abstract class AbstractFilterExtension extends AbstractExtension
     /**
      * Submits filter form with filter state (i.e. value).
      * Works with cloned form to ensure filter is stateless.
-     *
-     * @param FilterInterface $filter
-     * @param array $filterState
-     *
-     * @return FormInterface
      */
     protected function submitFilter(FilterInterface $filter, array $filterState): FormInterface
     {

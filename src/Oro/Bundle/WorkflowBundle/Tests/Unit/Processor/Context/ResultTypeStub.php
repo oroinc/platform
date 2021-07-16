@@ -12,10 +12,6 @@ class ResultTypeStub implements TransitActionResultTypeInterface
     /** @var bool */
     private $supportsCustom;
 
-    /**
-     * @param string $name
-     * @param bool $supportsCustom
-     */
     public function __construct(string $name, bool $supportsCustom = false)
     {
         $this->name = $name;

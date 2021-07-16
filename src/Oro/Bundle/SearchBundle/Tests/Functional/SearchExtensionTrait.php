@@ -67,8 +67,6 @@ trait SearchExtensionTrait
 
     /**
      * Remove all data added in fixtures
-     *
-     * @param string $entity
      */
     protected static function clearTestData(string $entity = Item::class)
     {

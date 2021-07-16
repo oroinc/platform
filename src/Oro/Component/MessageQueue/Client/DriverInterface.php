@@ -11,26 +11,11 @@ use Oro\Component\MessageQueue\Transport\QueueInterface;
  */
 interface DriverInterface
 {
-    /**
-     * @return MessageInterface
-     */
     public function createTransportMessage(): MessageInterface;
 
-    /**
-     * @param QueueInterface $queue
-     * @param Message $message
-     */
     public function send(QueueInterface $queue, Message $message): void;
 
-    /**
-     * @param string $queueName
-     *
-     * @return QueueInterface
-     */
     public function createQueue(string $queueName): QueueInterface;
 
-    /**
-     * @return Config
-     */
     public function getConfig(): Config;
 }

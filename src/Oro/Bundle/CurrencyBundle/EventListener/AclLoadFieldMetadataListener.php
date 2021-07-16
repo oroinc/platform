@@ -27,18 +27,12 @@ class AclLoadFieldMetadataListener
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @param ConfigManager       $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->multicurrencyConfigProvider = $configManager->getProvider('multicurrency');
         $this->entityConfigProvider = $configManager->getProvider('entity');
     }
 
-    /**
-     * @param LoadFieldsMetadata $event
-     */
     public function onLoad(LoadFieldsMetadata $event)
     {
         $className = $event->getClassName();

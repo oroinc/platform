@@ -157,7 +157,6 @@ HELP
             ->execute();
     }
 
-
     /**
      * Find job instances where job executions created before the given date time
      *

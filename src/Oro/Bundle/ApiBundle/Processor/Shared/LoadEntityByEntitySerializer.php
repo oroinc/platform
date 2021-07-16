@@ -31,11 +31,6 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
     /** @var EntityClassResolver */
     private $entityClassResolver;
 
-    /**
-     * @param EntitySerializer    $entitySerializer
-     * @param DoctrineHelper      $doctrineHelper
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(
         EntitySerializer $entitySerializer,
         DoctrineHelper $doctrineHelper,
@@ -78,13 +73,6 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         $context->skipGroup(ApiActionGroup::NORMALIZE_DATA);
     }
 
-    /**
-     * @param QueryBuilder           $qb
-     * @param EntityDefinitionConfig $config
-     * @param array                  $normalizationContext
-     *
-     * @return array|null
-     */
     private function loadNormalizedData(
         QueryBuilder $qb,
         EntityDefinitionConfig $config,
@@ -109,9 +97,6 @@ class LoadEntityByEntitySerializer implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     */
     private function prepareNotAclProtectedQueryBuilder(QueryBuilder $qb): void
     {
         $entityClass = $this->entityClassResolver->getEntityClass(QueryBuilderUtil::getSingleRootEntity($qb));

@@ -103,9 +103,6 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         return $requestStack;
     }
 
-    /**
-     * @return array
-     */
     protected function getExtensions(): array
     {
         $type = new ConfigurationGmailType(

@@ -55,13 +55,6 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    /**
-     * @param array  $expectedErrors
-     * @param array  $expectedPointers
-     * @param string $expectedTitle
-     * @param int    $expectedStatusCode
-     * @param array  $errors
-     */
     private function assertValidationErrors(
         array $expectedErrors,
         array $expectedPointers,

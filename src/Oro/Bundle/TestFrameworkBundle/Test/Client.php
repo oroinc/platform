@@ -294,9 +294,6 @@ class Client extends BaseKernelBrowser
         return sprintf($html, $title, $title, $flashMessages, $content['beforeContentAddition'], $content['content']);
     }
 
-    /**
-     * @param array $server
-     */
     public function mergeServerParameters(array $server)
     {
         $this->server = array_replace($this->server, $server);
@@ -314,9 +311,6 @@ class Client extends BaseKernelBrowser
             : null;
     }
 
-    /**
-     * @param array $server
-     */
     private function setSessionCookie(array &$server)
     {
         if (array_key_exists('HTTP_X-WSSE', $server)) {

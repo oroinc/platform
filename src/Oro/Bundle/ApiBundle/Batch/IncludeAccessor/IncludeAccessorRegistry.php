@@ -34,10 +34,6 @@ class IncludeAccessorRegistry
 
     /**
      * Returns the included data accessor for the given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return IncludeAccessorInterface|null
      */
     public function getAccessor(RequestType $requestType): ?IncludeAccessorInterface
     {

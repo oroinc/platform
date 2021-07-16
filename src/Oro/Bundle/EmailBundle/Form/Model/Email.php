@@ -467,17 +467,11 @@ class Email implements OrganizationAwareInterface
         return $this->attachments;
     }
 
-    /**
-     * @param EmailAttachment $attachment
-     */
     public function addAttachment(EmailAttachment $attachment)
     {
         $this->attachments->add($attachment);
     }
 
-    /**
-     * @param EmailAttachment $attachment
-     */
     public function removeAttachment(EmailAttachment $attachment)
     {
         if ($this->attachments->contains($attachment)) {

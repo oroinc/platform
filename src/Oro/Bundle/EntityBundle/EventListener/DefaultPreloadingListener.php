@@ -27,19 +27,12 @@ class DefaultPreloadingListener
     /** @var array */
     private $entityIdField = [];
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param PropertyAccessorInterface $propertyAccessor
-     */
     public function __construct(DoctrineHelper $doctrineHelper, PropertyAccessorInterface $propertyAccessor)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * @param PreloadEntityEvent $preloadEntityEvent
-     */
     public function onPreload(PreloadEntityEvent $preloadEntityEvent): void
     {
         $mainEntities = $preloadEntityEvent->getEntities();
@@ -98,12 +91,6 @@ class DefaultPreloadingListener
 
     /**
      * Sorts out entities to preload from TO_ONE and TO_MANY relations.
-     *
-     * @param PreloadEntityEvent $preloadEntityEvent
-     * @param ClassMetadata $mainEntityMetadata
-     * @param object $mainEntity
-     * @param array $targetEntitiesByIds
-     * @param array $entitiesToLoadCollections
      */
     private function processRelations(
         PreloadEntityEvent $preloadEntityEvent,
@@ -145,14 +132,6 @@ class DefaultPreloadingListener
 
     /**
      * Gets target entity from $fieldName of main entity and puts it to $targetEntitiesByIds if it is not initialized.
-     *
-     * @param PreloadEntityEvent $preloadEntityEvent
-     * @param ClassMetadata $mainEntityMetadata
-     * @param object $mainEntity
-     * @param $mainEntityId
-     * @param string $fieldName
-     * @param $fieldValue
-     * @param array $targetEntitiesByIds
      */
     private function processToOneRelation(
         PreloadEntityEvent $preloadEntityEvent,
@@ -175,14 +154,6 @@ class DefaultPreloadingListener
 
     /**
      * Puts main entity to $mainEntitiesByFields if it has a collection to preload.
-     *
-     * @param PreloadEntityEvent $preloadEntityEvent
-     * @param ClassMetadata $mainEntityMetadata
-     * @param object $mainEntity
-     * @param $mainEntityId
-     * @param string $fieldName
-     * @param $fieldValue
-     * @param array $mainEntitiesByFields
      */
     private function processToManyRelation(
         PreloadEntityEvent $preloadEntityEvent,
@@ -200,10 +171,6 @@ class DefaultPreloadingListener
         $mainEntitiesByFields[$fieldName][$mainEntityId] = $mainEntity;
     }
 
-    /**
-     * @param string $entityClass
-     * @return string
-     */
     private function getEntityIdField(string $entityClass): string
     {
         if (!isset($this->entityIdField[$entityClass])) {
@@ -217,10 +184,6 @@ class DefaultPreloadingListener
     /**
      * Loads uninitialized main entities.
      * Additonally loads TO_ONE relations if any.
-     *
-     * @param string $mainEntityClass
-     * @param array $mainEntities
-     * @param array $fieldsToPreload
      */
     private function loadMainEntities(string $mainEntityClass, array $mainEntities, array $fieldsToPreload): void
     {
@@ -251,9 +214,6 @@ class DefaultPreloadingListener
 
     /**
      * Loads TO_MANY relations for specified entities.
-     *
-     * @param string $mainEntityClass
-     * @param array $mainEntitiesByFields
      */
     private function loadToManyRelations(string $mainEntityClass, array $mainEntitiesByFields): void
     {
@@ -295,12 +255,6 @@ class DefaultPreloadingListener
         }
     }
 
-    /**
-     * @param array $mainEntities
-     * @param ClassMetadata $mainEntityMetadata
-     * @param string $targetField
-     * @return array
-     */
     private function getCollectionItems(
         array $mainEntities,
         ClassMetadata $mainEntityMetadata,
@@ -318,12 +272,6 @@ class DefaultPreloadingListener
         return $qbToMany->getQuery()->execute();
     }
 
-    /**
-     * @param ClassMetadata $mainEntityMetadata
-     * @param array $mainEntities
-     * @param string $fieldName
-     * @return QueryBuilder
-     */
     private function getOneToManyQueryBuilder(
         ClassMetadata $mainEntityMetadata,
         array $mainEntities,
@@ -357,12 +305,6 @@ class DefaultPreloadingListener
         return $qbToMany;
     }
 
-    /**
-     * @param ClassMetadata $mainEntityMetadata
-     * @param array $mainEntities
-     * @param string $fieldName
-     * @return QueryBuilder
-     */
     private function getManyToManyQueryBuilder(
         ClassMetadata $mainEntityMetadata,
         array $mainEntities,
@@ -400,8 +342,6 @@ class DefaultPreloadingListener
 
     /**
      * Loads entities by specified ids.
-     *
-     * @param array $idsToLoadBy
      */
     private function loadToOneRelationsByIds(array $idsToLoadBy): void
     {
@@ -427,19 +367,11 @@ class DefaultPreloadingListener
         }
     }
 
-    /**
-     * @param object|null $entity
-     * @return bool
-     */
     private function isProxyAndNotInitialized(?object $entity): bool
     {
         return $entity instanceof Proxy && !$entity->__isInitialized();
     }
 
-    /**
-     * @param object|null $collection
-     * @return bool
-     */
     private function isCollectionAndNotInitialized(?object $collection): bool
     {
         return $collection instanceof AbstractLazyCollection && !$collection->isInitialized();

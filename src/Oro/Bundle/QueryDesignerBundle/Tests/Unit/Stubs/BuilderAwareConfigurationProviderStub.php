@@ -12,9 +12,6 @@ class BuilderAwareConfigurationProviderStub implements ConfigurationProviderInte
     /** @var DatagridConfigurationBuilder */
     private $builder;
 
-    /**
-     * @param DatagridConfigurationBuilder $builder
-     */
     public function __construct(DatagridConfigurationBuilder $builder)
     {
         $this->builder = $builder;

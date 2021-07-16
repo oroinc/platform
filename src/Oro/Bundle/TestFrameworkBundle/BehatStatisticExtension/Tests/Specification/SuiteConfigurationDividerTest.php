@@ -119,7 +119,6 @@ class SuiteConfigurationDividerTest extends \PHPUnit\Framework\TestCase
             $result[$suiteName] = $config;
         }
 
-
         return $result;
     }
 

@@ -10,7 +10,7 @@ class Message implements MessageInterface
 {
     /** @var string */
     private $body = '';
-    
+
     /** @var array */
     private $properties = [];
 

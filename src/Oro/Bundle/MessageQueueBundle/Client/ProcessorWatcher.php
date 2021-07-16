@@ -14,17 +14,11 @@ class ProcessorWatcher extends AbstractExtension
     /** @var BufferedMessageProducer */
     private $bufferedProducer;
 
-    /**
-     * @param BufferedMessageProducer $bufferedProducer
-     */
     public function __construct(BufferedMessageProducer $bufferedProducer)
     {
         $this->bufferedProducer = $bufferedProducer;
     }
 
-    /**
-     * @param Context $context
-     */
     public function onPreReceived(Context $context): void
     {
         if (!$this->bufferedProducer->isBufferingEnabled()) {
@@ -32,9 +26,6 @@ class ProcessorWatcher extends AbstractExtension
         }
     }
 
-    /**
-     * @param Context $context
-     */
     public function onPostReceived(Context $context): void
     {
         if ($this->bufferedProducer->isBufferingEnabled() && $this->bufferedProducer->hasBufferedMessages()) {

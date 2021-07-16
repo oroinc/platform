@@ -23,8 +23,6 @@ interface NavigationItemInterface
 
     /**
      * Set entity properties
-     *
-     * @param array $values
      */
     public function setValues(array $values);
 }

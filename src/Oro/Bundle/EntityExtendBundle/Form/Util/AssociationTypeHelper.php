@@ -15,10 +15,6 @@ class AssociationTypeHelper extends ConfigTypeHelper
     /** @var array */
     protected $owningSideEntities = [];
 
-    /**
-     * @param ConfigManager       $configManager
-     * @param EntityClassResolver $entityClassResolver
-     */
     public function __construct(ConfigManager $configManager, EntityClassResolver $entityClassResolver)
     {
         parent::__construct($configManager);

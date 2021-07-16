@@ -127,7 +127,6 @@ class MenuUpdateManager
      * @param string        $key
      * @param Scope         $scope
      * @return null|MenuUpdateInterface
-     *
      */
     public function findOrCreateMenuUpdate(ItemInterface $menu, $key, Scope $scope)
     {
@@ -227,11 +226,6 @@ class MenuUpdateManager
         }
     }
 
-    /**
-     * @param ItemInterface $menu
-     * @param ItemInterface $item
-     * @param Scope         $scope
-     */
     private function hideMenuItemChildren(ItemInterface $menu, ItemInterface $item, Scope $scope)
     {
         /** @var ItemInterface $child */

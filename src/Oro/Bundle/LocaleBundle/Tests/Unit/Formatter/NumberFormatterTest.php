@@ -57,9 +57,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $style
-     */
     private function mockFormat(string $style): void
     {
         $intlNumberFormatter = $this->createMock(IntlNumberFormatter::class);
@@ -122,9 +119,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider formatCurrencyWhenAnotherSymbolDataProvider
-     *
-     * @param string $formattedValue
-     * @param string $expectedValue
      */
     public function testFormatCurrencyWhenAnotherSymbol(string $formattedValue, string $expectedValue): void
     {
@@ -170,9 +164,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function formatCurrencyWhenAnotherSymbolDataProvider(): array
     {
         return [
@@ -294,13 +285,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $locale
-     * @param string $currencyCode
-     * @param string $currencySymbol
-     * @param float $value
-     * @param string $formattedValue
-     * @param array $attributes
-     *
      * @dataProvider dataProviderFormatCurrency
      */
     public function testFormatCurrencyWithNoneFractionDigits(
@@ -359,16 +343,7 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-
     /**
-     * @param string $locale
-     * @param string $currencyCode
-     * @param string $currencySymbol
-     * @param float $value
-     * @param string $formattedValue
-     * @param array $attributes
-     * @param int $minFractionDigits
-     *
      * @dataProvider dataProviderFormatCurrencyWithFractionDigits
      */
     public function testFormatCurrencyWithFractionDigits(
@@ -445,7 +420,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
             ]
         ];
     }
-
 
     public function testFormatDecimal(): void
     {
@@ -545,9 +519,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function formatDurationWhenDefaultFormatDataProvider(): array
     {
         return [
@@ -638,9 +609,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
     public function formatDurationWhenNotDefaultFormatDataProvider(): array
     {
         return [
@@ -743,9 +711,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider currencySymbolPrependDataProvider
-     *
-     * @param string $formattedValue
-     * @param bool|null $expectedResult
      */
     public function testIsCurrencySymbolPrepend(string $formattedValue, ?bool $expectedResult): void
     {
@@ -760,9 +725,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedResult, $this->formatter->isCurrencySymbolPrepend(self::CURRENCY, self::LOCALE));
     }
 
-    /**
-     * @return array
-     */
     public function currencySymbolPrependDataProvider(): array
     {
         return [
@@ -823,9 +785,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider currencySymbolPrependDataProvider
-     *
-     * @param string $formattedValue
-     * @param bool|null $expectedResult
      */
     public function testIsCurrencySymbolPrependWhenNoLocale(string $formattedValue, ?bool $expectedResult): void
     {
@@ -847,9 +806,6 @@ class NumberFormatterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider currencySymbolPrependDataProvider
-     *
-     * @param string $formattedValue
-     * @param bool|null $expectedResult
      */
     public function testIsCurrencySymbolPrependWhenNoCurrency(string $formattedValue, ?bool $expectedResult): void
     {

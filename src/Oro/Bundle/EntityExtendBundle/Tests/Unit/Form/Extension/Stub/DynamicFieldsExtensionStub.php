@@ -13,9 +13,6 @@ class DynamicFieldsExtensionStub extends DynamicFieldsOptionsExtension
      */
     private $fieldsConfiguration;
 
-    /**
-     * @param array $fieldsConfiguration
-     */
     public function __construct(array $fieldsConfiguration)
     {
         $this->fieldsConfiguration = $fieldsConfiguration;

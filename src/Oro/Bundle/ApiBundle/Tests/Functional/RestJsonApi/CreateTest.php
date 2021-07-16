@@ -86,11 +86,6 @@ class CreateTest extends RestJsonApiTestCase
         self::assertResponseStatusCodeNotEquals($response, 500);
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     *
-     * @return array
-     */
     private function getReadOnlyTimestampableFields(EntityDefinitionConfig $config): array
     {
         $readOnlyTimestampableFields = [];
@@ -103,12 +98,6 @@ class CreateTest extends RestJsonApiTestCase
         return $readOnlyTimestampableFields;
     }
 
-    /**
-     * @param EntityDefinitionConfig $config
-     * @param string                 $fieldName
-     *
-     * @return bool
-     */
     private function hasReadOnlyTimestampableField(EntityDefinitionConfig $config, string $fieldName): bool
     {
         $field = $config->getField($fieldName);

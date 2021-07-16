@@ -31,11 +31,6 @@ class ImapEmailFolderManager
      */
     protected $em;
 
-    /**
-     * @param ImapConnector $connector
-     * @param EntityManager $em
-     * @param EmailOrigin $origin
-     */
     public function __construct(ImapConnector $connector, EntityManager $em, EmailOrigin $origin)
     {
         $this->connector = $connector;

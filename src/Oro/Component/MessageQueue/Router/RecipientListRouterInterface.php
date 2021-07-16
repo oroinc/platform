@@ -9,11 +9,6 @@ use Oro\Component\MessageQueue\Transport\MessageInterface;
  */
 interface RecipientListRouterInterface
 {
-    /**
-     * @param string $topicName
-     *
-     * @return array
-     */
     public function getTopicSubscribers(string $topicName): array;
 
     /**

@@ -54,13 +54,6 @@ class LoadUsersAvatarsDigitalAssets extends AbstractFixture implements Dependent
         $manager->flush();
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param File $sourceFile
-     * @param string $name
-     *
-     * @return DigitalAsset
-     */
     private function createDigitalAsset(ObjectManager $manager, File $sourceFile, string $name): DigitalAsset
     {
         $user = $this->getFirstUser($manager);

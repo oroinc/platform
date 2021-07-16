@@ -8,9 +8,6 @@ class ProcessJobRepository extends EntityRepository
 {
     const DELETE_HASH_BATCH = 100;
 
-    /**
-     * @param array $hashes
-     */
     public function deleteByHashes(array $hashes)
     {
         $queryBuilder = $this->createQueryBuilder('job');

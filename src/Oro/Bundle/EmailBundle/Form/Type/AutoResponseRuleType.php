@@ -23,9 +23,6 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
     /** @var EventSubscriberInterface */
     protected $autoResponseRuleSubscriber;
 
-    /**
-     * @param EventSubscriberInterface $autoResponseRuleSubscriber
-     */
     public function __construct(EventSubscriberInterface $autoResponseRuleSubscriber)
     {
         $this->autoResponseRuleSubscriber = $autoResponseRuleSubscriber;

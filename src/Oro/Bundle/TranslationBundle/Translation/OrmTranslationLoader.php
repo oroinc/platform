@@ -26,10 +26,6 @@ class OrmTranslationLoader implements LoaderInterface
      */
     private $enabled = true;
 
-    /**
-     * @param ManagerRegistry $doctrine
-     * @param DatabaseChecker $databaseChecker
-     */
     public function __construct(ManagerRegistry $doctrine, DatabaseChecker $databaseChecker)
     {
         $this->doctrine = $doctrine;

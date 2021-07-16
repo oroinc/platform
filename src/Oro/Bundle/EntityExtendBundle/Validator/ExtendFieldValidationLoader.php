@@ -61,10 +61,6 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
 
     /**
      * Check if field applicable to add constraint
-     *
-     * @param ConfigInterface $extendConfig
-     *
-     * @return bool
      */
     protected function isApplicable(ConfigInterface $extendConfig): bool
     {

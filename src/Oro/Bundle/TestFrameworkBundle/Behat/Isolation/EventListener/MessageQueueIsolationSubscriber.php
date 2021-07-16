@@ -43,9 +43,6 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface, Messa
         ];
     }
 
-    /**
-     * @param BeforeStepTested $event
-     */
     public function beforeStep(BeforeStepTested $event)
     {
         if ($this->skip) {
@@ -83,9 +80,6 @@ class MessageQueueIsolationSubscriber implements EventSubscriberInterface, Messa
         $this->messageQueueProcessor->cleanUp();
     }
 
-    /**
-     * @param OutputInterface $output
-     */
     public function setOutput(OutputInterface $output)
     {
         $this->output = $output;

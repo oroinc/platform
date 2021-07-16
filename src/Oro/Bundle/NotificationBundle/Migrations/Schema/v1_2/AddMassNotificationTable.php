@@ -15,11 +15,9 @@ class AddMassNotificationTable implements Migration
     {
         $this->createOroNotificationMassNotifTable($schema);
     }
-    
+
     /**
      * Create oro_notification_mass_notif table
-     *
-     * @param Schema $schema
      */
     protected function createOroNotificationMassNotifTable(Schema $schema)
     {

@@ -93,8 +93,6 @@ class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildViewDataProvider
-     * @param array $options
-     * @param array $expectedVars
      */
     public function testBuildView(array $options, array $expectedVars)
     {

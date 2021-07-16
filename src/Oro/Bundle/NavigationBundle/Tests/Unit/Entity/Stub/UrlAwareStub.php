@@ -9,9 +9,6 @@ class UrlAwareStub implements UrlAwareInterface
 {
     use UrlAwareTrait;
 
-    /**
-     * @param $url
-     */
     public function __construct($url)
     {
         $this->url = $url;

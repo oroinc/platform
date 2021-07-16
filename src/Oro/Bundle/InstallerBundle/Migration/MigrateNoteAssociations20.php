@@ -29,12 +29,6 @@ class MigrateNoteAssociations20
     /** @var ExtendExtension */
     private $extendExtension;
 
-    /**
-     * @param Connection                      $connection
-     * @param ExtendDbIdentifierNameGenerator $nameGenerator
-     * @param ActivityExtension               $activityExtension
-     * @param ExtendExtension                 $extendExtension
-     */
     public function __construct(
         Connection $connection,
         ExtendDbIdentifierNameGenerator $nameGenerator,
@@ -47,10 +41,6 @@ class MigrateNoteAssociations20
         $this->extendExtension = $extendExtension;
     }
 
-    /**
-     * @param Schema   $schema
-     * @param QueryBag $queries
-     */
     public function migrate(Schema $schema, QueryBag $queries)
     {
         $migration = new NoteAssociationMigration();

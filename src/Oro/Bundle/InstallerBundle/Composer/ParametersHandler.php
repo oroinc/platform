@@ -69,9 +69,6 @@ class ParametersHandler
 
 DOC;
 
-    /**
-     * @param Event $event
-     */
     public static function set(Event $event)
     {
         $options = $event->getComposer()->getPackage()->getExtra();

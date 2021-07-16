@@ -178,8 +178,6 @@ class AclAnnotationStorage implements \Serializable
 
     /**
      * Removes bindings for class.
-     *
-     * @param string $class
      */
     public function removeBindings(string $class): void
     {
@@ -188,9 +186,6 @@ class AclAnnotationStorage implements \Serializable
 
     /**
      * Removes an annotation binding.
-     *
-     * @param string      $class
-     * @param string|null $method
      */
     public function removeBinding(string $class, string $method = null): void
     {

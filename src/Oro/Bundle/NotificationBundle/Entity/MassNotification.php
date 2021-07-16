@@ -91,7 +91,7 @@ class MassNotification
     {
         return $this->id;
     }
-    
+
     /**
      * @return string
      */
@@ -110,7 +110,7 @@ class MassNotification
 
         return $this;
     }
-    
+
     /**
      * @return string
      */

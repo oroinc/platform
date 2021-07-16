@@ -35,10 +35,6 @@ class RestRoutesRegistry
 
     /**
      * Returns routes provider for a given request type.
-     *
-     * @param RequestType $requestType
-     *
-     * @return RestRoutes
      */
     public function getRoutes(RequestType $requestType): RestRoutes
     {

@@ -23,10 +23,6 @@ class SegmentDatagridConfigurationQueryDesigner extends AbstractQueryDesigner
     /** @var array|null */
     private $preparedDefinition;
 
-    /**
-     * @param Segment                $segment
-     * @param EntityManagerInterface $em
-     */
     public function __construct(Segment $segment, EntityManagerInterface $em)
     {
         $this->segment = $segment;

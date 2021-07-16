@@ -12,9 +12,6 @@ class SegmentQueryBuilderRegistry
 
     /**
      * Registers a segment query builder for the given segment type.
-     *
-     * @param string                $segmentType
-     * @param QueryBuilderInterface $queryBuilder
      */
     public function addQueryBuilder(string $segmentType, QueryBuilderInterface $queryBuilder): void
     {
@@ -23,10 +20,6 @@ class SegmentQueryBuilderRegistry
 
     /**
      * Gets a segment query builder for the given segment type.
-     *
-     * @param string $segmentType
-     *
-     * @return QueryBuilderInterface|null
      */
     public function getQueryBuilder(string $segmentType): ?QueryBuilderInterface
     {

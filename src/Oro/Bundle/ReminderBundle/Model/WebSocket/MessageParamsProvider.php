@@ -35,12 +35,6 @@ class MessageParamsProvider
      */
     protected $configProvider;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param DateTimeFormatterInterface $dateTimeFormatter
-     * @param UrlProvider $urlProvider
-     * @param ConfigProvider $provider
-     */
     public function __construct(
         TranslatorInterface $translator,
         DateTimeFormatterInterface $dateTimeFormatter,

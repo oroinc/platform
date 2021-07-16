@@ -74,7 +74,6 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
             static fn ($item) => isset($item['code'], $item['translationStatus'], $item['lastBuildDate'])
         );
 
-
         if (empty($filtered)) {
             $this->throwErrorException(
                 TranslationServiceAdapterException::class,
@@ -267,7 +266,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     private function jsonDecode(ResponseInterface $response)
     {
         $responseBodyContents = $response->getBody()->getContents();
-        
+
         try {
             $result = Utils::jsonDecode($responseBodyContents, true);
         } catch (\GuzzleHttp\Exception\InvalidArgumentException $e) {

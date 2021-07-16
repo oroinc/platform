@@ -25,10 +25,6 @@ class MenuUpdateBuilder implements BuilderInterface
      */
     private $menuUpdateProvider;
 
-    /**
-     * @param LocalizationHelper          $localizationHelper
-     * @param MenuUpdateProviderInterface $menuUpdateProvider
-     */
     public function __construct(LocalizationHelper $localizationHelper, MenuUpdateProviderInterface $menuUpdateProvider)
     {
         $this->localizationHelper = $localizationHelper;
@@ -73,9 +69,6 @@ class MenuUpdateBuilder implements BuilderInterface
         }
     }
 
-    /**
-     * @param ItemInterface $item
-     */
     private function applyDivider(ItemInterface $item)
     {
         if ($item->getExtra('divider', false)) {

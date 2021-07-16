@@ -18,10 +18,6 @@ class MailerWrapper extends \Swift_Mailer
     /** @var \Swift_Mailer */
     private $mailer;
 
-    /**
-     * @param \Swift_Transport $transport
-     * @param ServiceLink $loggerLink
-     */
     public function __construct(\Swift_Transport $transport, ServiceLink $loggerLink)
     {
         /* we need _mailer because _transport is private
@@ -85,9 +81,6 @@ class MailerWrapper extends \Swift_Mailer
         return $this->mailer->getTransport();
     }
 
-    /**
-     * @param \Swift_Events_EventListener $plugin
-     */
     public function registerPlugin(\Swift_Events_EventListener $plugin)
     {
         $this->getTransport()->registerPlugin($plugin);

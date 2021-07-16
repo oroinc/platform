@@ -29,9 +29,6 @@ class ServiceExists extends AbstractCondition implements ContextAccessorAwareInt
      */
     protected $propertyPath;
 
-    /**
-     * @param ContainerInterface $container
-     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;

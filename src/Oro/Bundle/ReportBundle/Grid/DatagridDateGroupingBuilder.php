@@ -63,8 +63,6 @@ class DatagridDateGroupingBuilder
     }
 
     /**
-     * @param DatagridConfiguration $config
-     * @param AbstractQueryDesigner $report
      * @throws InvalidDatagridConfigException
      */
     public function applyDateGroupingFilterIfRequired(DatagridConfiguration $config, AbstractQueryDesigner $report)
@@ -112,9 +110,6 @@ class DatagridDateGroupingBuilder
         $this->removeViewLink($config);
     }
 
-    /**
-     * @param DatagridConfiguration $config
-     */
     protected function removeViewLink(DatagridConfiguration $config)
     {
         if (!$config->offsetExists(static::PROPERTIES_KEY_NAME)) {
@@ -231,8 +226,6 @@ class DatagridDateGroupingBuilder
 
     /**
      * Adds two more columns to datagrid config related to grouping
-     *
-     * @param DatagridConfiguration $config
      */
     protected function changeColumnsSection(DatagridConfiguration $config)
     {
@@ -252,8 +245,6 @@ class DatagridDateGroupingBuilder
 
     /**
      * Configures sorter section for newly added date grouping columns
-     *
-     * @param DatagridConfiguration $config
      */
     protected function changeSortersSection(DatagridConfiguration $config)
     {

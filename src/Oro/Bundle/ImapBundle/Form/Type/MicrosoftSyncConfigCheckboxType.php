@@ -19,9 +19,6 @@ class MicrosoftSyncConfigCheckboxType extends ConfigCheckbox
     /** @var ConfigManager */
     private $configManager;
 
-    /**
-     * @param ConfigManager $configManager
-     */
     public function __construct(ConfigManager $configManager)
     {
         $this->configManager = $configManager;
@@ -55,9 +52,6 @@ class MicrosoftSyncConfigCheckboxType extends ConfigCheckbox
         });
     }
 
-    /**
-     * @return bool
-     */
     private function hasAllConfigValues(): bool
     {
         foreach ($this->getMandatoryValues() as $mandatoryConfig) {

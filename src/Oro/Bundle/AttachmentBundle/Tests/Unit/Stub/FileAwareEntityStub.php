@@ -18,9 +18,6 @@ class FileAwareEntityStub
     /** @var string */
     private $string;
 
-    /**
-     * @return null|int
-     */
     public function getId(): ?int
     {
         return $this->id;
@@ -36,9 +33,6 @@ class FileAwareEntityStub
         return $this;
     }
 
-    /**
-     * @return null|File
-     */
     public function getFile(): ?File
     {
         return $this->file;
@@ -55,9 +49,6 @@ class FileAwareEntityStub
         return $this;
     }
 
-    /**
-     * @return null|File
-     */
     public function getImage(): ?File
     {
         return $this->image;
@@ -74,9 +65,6 @@ class FileAwareEntityStub
         return $this;
     }
 
-    /**
-     * @return null|string
-     */
     public function getString(): ?string
     {
         return $this->string;

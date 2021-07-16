@@ -39,7 +39,6 @@ class IdentifierToReferenceFilterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($testResult);
         $em->expects($this->once())->method('getRepository')->with($testClassName)->willReturn($repo);
 
-
         $this->assertSame($testResult, $filter->filter($testFieldValue, null));
     }
 }

@@ -9,7 +9,7 @@ use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsPr
 class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private const FILTER_NAME = 'filter_name';
-    
+
     /** @var AttachmentFilterConfiguration */
     private $attachmentFilterConfiguration;
 
@@ -31,9 +31,6 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param array $actual
-     * @param array $expected
      */
     public function testGet(array $actual, array $expected): void
     {
@@ -70,9 +67,6 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filterProvider
-     *
-     * @param array $actual
-     * @param array $expected
      */
     public function testAll(array $actual, array $expected): void
     {
@@ -89,9 +83,6 @@ class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$expected], $this->attachmentFilterConfiguration->all());
     }
 
-    /**
-     * @return array
-     */
     public function filterProvider(): array
     {
         return [

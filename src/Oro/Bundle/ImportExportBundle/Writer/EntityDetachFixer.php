@@ -34,11 +34,6 @@ class EntityDetachFixer
      */
     protected $propertyAccessor;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param FieldHelper $fieldHelper
-     * @param PropertyAccessor $propertyAccessor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         FieldHelper $fieldHelper,

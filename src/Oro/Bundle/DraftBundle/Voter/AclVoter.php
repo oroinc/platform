@@ -30,9 +30,6 @@ class AclVoter implements AclVoterInterface
      */
     private $voter;
 
-    /**
-     * @param BaseAclVoter $voter
-     */
     public function __construct(BaseAclVoter $voter)
     {
         $this->voter = $voter;
@@ -50,25 +47,16 @@ class AclVoter implements AclVoterInterface
         return $this->voter->vote($token, $object, $attributes);
     }
 
-    /**
-     * @param OneShotIsGrantedObserver $observer
-     */
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {
         $this->voter->addOneShotIsGrantedObserver($observer);
     }
 
-    /**
-     * @return TokenInterface
-     */
     public function getSecurityToken(): TokenInterface
     {
         return $this->voter->getSecurityToken();
     }
 
-    /**
-     * @return AclExtensionInterface
-     */
     public function getAclExtension(): AclExtensionInterface
     {
         return $this->voter->getAclExtension();

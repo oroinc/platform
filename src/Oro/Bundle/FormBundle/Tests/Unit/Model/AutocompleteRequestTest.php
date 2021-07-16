@@ -9,9 +9,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param Request $request
-     * @param array   $expected
-     *
      * @dataProvider createDataProvider
      */
     public function testCreate(Request $request, array $expected)

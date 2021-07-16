@@ -41,11 +41,6 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new DateFilterSubscriber($modifier);
     }
 
-    /**
-     * @param string $dateTime
-     *
-     * @return string
-     */
     private function getUtcDate(string $dateTime): string
     {
         return (new \DateTime($dateTime, new \DateTimeZone('UTC')))->format('Y-m-d H:i:00\Z');

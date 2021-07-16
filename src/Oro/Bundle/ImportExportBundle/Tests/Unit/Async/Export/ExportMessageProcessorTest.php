@@ -124,7 +124,6 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setDoctrineHelper($doctrineHelper);
         $processor->setExportHandler($exportHandler);
 
-
         $message = new Message();
         $message->setBody(json_encode([
             'jobId' => 1,

@@ -27,11 +27,6 @@ class NestedAssociationType extends AbstractType
     /** @var EntityLoader */
     protected $entityLoader;
 
-    /**
-     * @param PropertyAccessorInterface $propertyAccessor
-     * @param DoctrineHelper            $doctrineHelper
-     * @param EntityLoader              $entityLoader
-     */
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
         DoctrineHelper $doctrineHelper,

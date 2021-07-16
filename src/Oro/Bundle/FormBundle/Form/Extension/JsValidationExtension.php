@@ -19,9 +19,6 @@ class JsValidationExtension extends AbstractTypeExtension
     /** @var ConstraintsProviderInterface */
     protected $constraintsProvider;
 
-    /**
-     * @param ConstraintsProviderInterface $constraintsProvider
-     */
     public function __construct(ConstraintsProviderInterface $constraintsProvider)
     {
         $this->constraintsProvider = $constraintsProvider;
@@ -40,9 +37,6 @@ class JsValidationExtension extends AbstractTypeExtension
      * Adds "data-validation-optional-group" attributes to embedded form.
      *
      * Validation will run only if one of the children is filled in.
-     *
-     * @param FormView $view
-     * @param array $options
      */
     protected function addDataValidationOptionalGroupAttributes(FormView $view, array $options)
     {
@@ -91,8 +85,6 @@ class JsValidationExtension extends AbstractTypeExtension
     /**
      * Adds "data-validation" attribute to form view that contain data for JS validation
      *
-     * @param FormView $view
-     * @param FormInterface $form
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addDataValidationAttribute(FormView $view, FormInterface $form)

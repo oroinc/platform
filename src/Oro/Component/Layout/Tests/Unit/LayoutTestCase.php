@@ -125,10 +125,6 @@ class LayoutTestCase extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @param array $result
-     * @param array $view
-     */
     protected function buildViewHierarchy(array &$result, array $view)
     {
         foreach ($view['children'] as $childView) {

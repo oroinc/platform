@@ -25,11 +25,6 @@ class AttributesImportFilter
      */
     private $configManager;
 
-    /**
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param AttributesImportTopicSender $topicSender
-     * @param ConfigManager $configManager
-     */
     public function __construct(
         EntityAliasResolver $entityAliasResolver,
         AttributesImportTopicSender $topicSender,
@@ -64,10 +59,6 @@ class AttributesImportFilter
         return $this->hasEntityClassAttributes($entity->getClassName());
     }
 
-    /**
-     * @param string $entityClass
-     * @return bool
-     */
     private function hasEntityClassAttributes(string $entityClass): bool
     {
         $entityConfig = $this->configManager->getEntityConfig('attribute', $entityClass);

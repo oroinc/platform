@@ -26,10 +26,6 @@ class MenuUpdateHelper
     /** @var PropertyAccessor */
     private $propertyAccessor;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param LocalizationHelper  $localizationHelper
-     */
     public function __construct(TranslatorInterface $translator, LocalizationHelper $localizationHelper)
     {
         $this->translator = $translator;

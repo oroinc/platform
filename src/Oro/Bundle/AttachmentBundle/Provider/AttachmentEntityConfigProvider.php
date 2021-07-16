@@ -18,9 +18,6 @@ class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderIn
     /** @var EntityConfigManager */
     private $entityConfigManager;
 
-    /**
-     * @param EntityConfigManager $entityConfigManager
-     */
     public function __construct(EntityConfigManager $entityConfigManager)
     {
         $this->entityConfigManager = $entityConfigManager;

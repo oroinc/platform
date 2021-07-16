@@ -16,10 +16,6 @@ class WriterChain
         $this->writers = [];
     }
 
-    /**
-     * @param ItemWriterInterface $writer
-     * @param $alias
-     */
     public function addWriter(ItemWriterInterface $writer, $alias)
     {
         $this->writers[$alias] = $writer;

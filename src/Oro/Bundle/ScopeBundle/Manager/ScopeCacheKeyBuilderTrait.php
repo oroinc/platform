@@ -15,20 +15,11 @@ trait ScopeCacheKeyBuilderTrait
     /** @var ScopeCacheKeyBuilderInterface */
     private $innerBuilder;
 
-    /**
-     * @param ScopeCacheKeyBuilderInterface $innerBuilder
-     */
     public function __construct(ScopeCacheKeyBuilderInterface $innerBuilder)
     {
         $this->innerBuilder = $innerBuilder;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     * @param string        $paramName
-     *
-     * @return string|null
-     */
     private function buildCacheKey(ScopeCriteria $criteria, string $paramName): ?string
     {
         $cacheKey = $this->innerBuilder->getCacheKey($criteria);

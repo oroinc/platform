@@ -37,9 +37,6 @@ class ValidateApiDocViewListener
         $this->defaultView = $defaultView;
     }
 
-    /**
-     * @param ControllerEvent $event
-     */
     public function onKernelController(ControllerEvent $event): void
     {
         $controller = $event->getController();
@@ -59,11 +56,6 @@ class ValidateApiDocViewListener
         }
     }
 
-    /**
-     * @param array $controller
-     *
-     * @return bool
-     */
     protected function isApiDocController(array $controller): bool
     {
         $controllerClass = $controller[0];
@@ -77,11 +69,6 @@ class ValidateApiDocViewListener
         return false;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     protected function isValidView(Request $request): bool
     {
         $view = $this->getView($request);
@@ -89,31 +76,16 @@ class ValidateApiDocViewListener
         return !$view || \in_array($view, $this->views, true);
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return string|null
-     */
     protected function getView(Request $request): ?string
     {
         return $request->attributes->get('view');
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return string|null
-     */
     protected function getDefaultView(Request $request): ?string
     {
         return $this->defaultView;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return bool
-     */
     protected function isDefaultViewRequested(Request $request): bool
     {
         $pathInfo = $request->getPathInfo();

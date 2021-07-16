@@ -20,10 +20,6 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     /** @var EntityRuleMatcher|null */
     private $matcher;
 
-    /**
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param EntityConfigurationProvider      $configProvider
-     */
     public function __construct(
         EntityHierarchyProviderInterface $entityHierarchyProvider,
         EntityConfigurationProvider $configProvider

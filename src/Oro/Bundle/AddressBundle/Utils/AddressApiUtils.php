@@ -40,10 +40,6 @@ class AddressApiUtils
         return $result;
     }
 
-    /**
-     * @param array         $address
-     * @param EntityManager $em
-     */
     public static function fixAddress(array &$address, EntityManager $em)
     {
         // just a temporary workaround until new API is implemented
@@ -160,11 +156,6 @@ class AddressApiUtils
         return !empty($region) ? $region[0]['combinedCode'] : null;
     }
 
-    /**
-     * @param array $result
-     *
-     * @return array
-     */
     protected static function postSerializeAddress(array $result): array
     {
         // just a temporary workaround until new API is implemented

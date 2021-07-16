@@ -13,9 +13,6 @@ class RestInvalidUsersTest extends WebTestCase
 
     /**
      * @dataProvider usernameKeyDataProvider
-     *
-     * @param string $username
-     * @param string $key
      */
     public function testInvalidCredentials(string $username, string $key): void
     {
@@ -41,9 +38,6 @@ class RestInvalidUsersTest extends WebTestCase
         $this->assertJsonResponseStatusCodeEquals($result, 401);
     }
 
-    /**
-     * @return array
-     */
     public function usernameKeyDataProvider(): array
     {
         return [

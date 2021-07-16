@@ -112,11 +112,6 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
         $this->translationManager->flush();
     }
 
-    /**
-     * @param $key
-     *
-     * @return bool
-     */
     private function isTranslationKeyExists($key): bool
     {
         $translationKey = $this->translationManager->findTranslationKey($key);

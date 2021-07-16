@@ -33,9 +33,6 @@ class MetaPropertyFilter extends StandaloneFilter implements SpecialHandlingFilt
         $this->allowedMetaProperties[$name] = $type;
     }
 
-    /**
-     * @param string $name
-     */
     public function removeAllowedMetaProperty(string $name): void
     {
         unset($this->allowedMetaProperties[$name]);

@@ -113,10 +113,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider formChoicesDataProvider
-     *
-     * @param array $fields
-     * @param array $fieldsData
-     * @param array $expectedChoices
      */
     public function testFormChoices(array $fields, array $fieldsData, array $expectedChoices)
     {
@@ -142,9 +138,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedChoices, $actualChoices);
     }
 
-    /**
-     * @return array
-     */
     public function formChoicesDataProvider(): array
     {
         /** @var FieldConfigModel $field1 */
@@ -200,9 +193,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider formChoicesWithFieldsWithoutFieldNameAttributeDataProvider
-     *
-     * @param array $fields
-     * @param array $expectedChoices
      */
     public function testFormChoicesWithFieldsWithoutFieldNameAttribute(array $fields, array $expectedChoices)
     {
@@ -224,9 +214,6 @@ class AttributeMultiSelectTypeTest extends FormIntegrationTestCase
         $this->assertEquals($expectedChoices, $actualChoices);
     }
 
-    /**
-     * @return array
-     */
     public function formChoicesWithFieldsWithoutFieldNameAttributeDataProvider(): array
     {
         /** @var FieldConfigModel $field1 */

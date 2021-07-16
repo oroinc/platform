@@ -33,8 +33,6 @@ class OroTranslationBundleInstaller implements Installation
 
     /**
      * Create oro_language table
-     *
-     * @param Schema $schema
      */
     protected function createOroLanguageTable(Schema $schema)
     {
@@ -53,8 +51,6 @@ class OroTranslationBundleInstaller implements Installation
 
     /**
      * Create oro_translation table
-     *
-     * @param Schema $schema
      */
     protected function createOroTranslationTable(Schema $schema)
     {
@@ -70,8 +66,6 @@ class OroTranslationBundleInstaller implements Installation
 
     /**
      * Create oro_translation_key table
-     *
-     * @param Schema $schema
      */
     protected function createOroTranslationKeyTable(Schema $schema)
     {
@@ -90,8 +84,6 @@ class OroTranslationBundleInstaller implements Installation
 
     /**
      * Add oro_language foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroLanguageForeignKeys(Schema $schema)
     {
@@ -112,8 +104,6 @@ class OroTranslationBundleInstaller implements Installation
 
     /**
      * Add oro_translation foreign keys.
-     *
-     * @param Schema $schema
      */
     protected function addOroTranslationForeignKeys(Schema $schema)
     {

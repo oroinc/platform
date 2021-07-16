@@ -20,7 +20,6 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
-
     protected function setUp(): void
     {
         $this->credentialsDriver = $this->createMock(WrongCredentialsOriginsDriverInterface::class);

@@ -59,16 +59,6 @@ class CommentApiManager extends ApiEntityManager
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
-    /**
-     * @param Registry                      $doctrine
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param EntityNameResolver            $entityNameResolver
-     * @param CountQueryBuilderOptimizer    $countQueryBuilderOptimizer
-     * @param EventDispatcherInterface      $eventDispatcher
-     * @param AttachmentProvider            $attachmentProvider
-     * @param AclHelper                     $aclHelper
-     * @param ConfigManager                 $configManager
-     */
     public function __construct(
         Registry $doctrine,
         AuthorizationCheckerInterface $authorizationChecker,
@@ -92,17 +82,11 @@ class CommentApiManager extends ApiEntityManager
         $this->setEventDispatcher($eventDispatcher);
     }
 
-    /**
-     * @param HtmlTagHelper $htmlTagHelper
-     */
     public function setHtmlTagHelper(HtmlTagHelper $htmlTagHelper)
     {
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    /**
-     * @param AttachmentManager $attachmentManager
-     */
     public function setAttachmentManager(AttachmentManager $attachmentManager)
     {
         $this->attachmentManager = $attachmentManager;

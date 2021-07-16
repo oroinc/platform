@@ -14,10 +14,6 @@ class GroupSearchProvider implements SearchProviderInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /**
-     * @param ConfigBag $configBag
-     * @param TranslatorInterface $translator
-     */
     public function __construct(ConfigBag $configBag, TranslatorInterface $translator)
     {
         $this->configBag = $configBag;

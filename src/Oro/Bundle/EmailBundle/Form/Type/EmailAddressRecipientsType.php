@@ -23,9 +23,6 @@ class EmailAddressRecipientsType extends AbstractType
     /** @var ConfigManager */
     protected $cm;
 
-    /**
-     * @param ConfigManager $cm
-     */
     public function __construct(ConfigManager $cm)
     {
         $this->cm = $cm;

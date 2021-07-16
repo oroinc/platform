@@ -13,9 +13,6 @@ class RouteChoiceTypeStub extends AbstractType
      */
     protected $choices;
 
-    /**
-     * @param array $choices
-     */
     public function __construct(array $choices)
     {
         $this->choices = $choices;

@@ -128,9 +128,6 @@ class ButtonProvider
         return false;
     }
 
-    /**
-     * @param ArrayCollection $errors
-     */
     private function processErrors(ArrayCollection $errors)
     {
         foreach ($errors as $error) {

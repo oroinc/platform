@@ -20,10 +20,6 @@ class ConfigSettingsUpdateEvent extends Event
      */
     protected $settings;
 
-    /**
-     * @param ConfigManager $configManager
-     * @param array $settings
-     */
     public function __construct(ConfigManager $configManager, array $settings)
     {
         $this->configManager = $configManager;

@@ -64,11 +64,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
 
     /**
      * @dataProvider dataProvider
-     *
-     * @param string $timeZone
-     * @param array $definition
-     * @param array $actual
-     * @param array $expected
      */
     public function testCreateReportWithDateFilter(
         string $timeZone,
@@ -86,11 +81,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         $this->assertReportValid($actual, $expected, $result);
     }
 
-    /**
-     * @param array $actualRecords
-     * @param array $expectedRecords
-     * @param string $content
-     */
     private function assertReportValid(array $actualRecords, array $expectedRecords, string $content): void
     {
         foreach ($expectedRecords as $expectedRecord) {
@@ -106,8 +96,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      *
      * @throws \Exception
-     *
-     * @return \Generator
      */
     public function dataProvider(): \Generator
     {
@@ -325,13 +313,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
     }
 
     /**
-     * @param int $type
-     * @param string|null $start
-     * @param string|null $end
-     * @param bool $isVariable
-     *
      * @throws \Exception
-     * @return array
      */
     private function buildFilter(int $type, string $start = null, string $end = null, bool $isVariable = false): array
     {
@@ -351,22 +333,11 @@ class ReportControllerWithFiltersTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param int $variable
-     * @param string $modifier
-     *
-     * @return string
-     */
     private function buildFilterVariable(int $variable, string $modifier = ''): string
     {
         return sprintf('{{%s}}%s', $variable, $modifier);
     }
 
-    /**
-     * @param array $entitiesData
-     *
-     * @return array
-     */
     private function buildEntities(array $entitiesData): array
     {
         $data = [];
@@ -377,9 +348,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $data;
     }
 
-    /**
-     * @param array $entitiesData
-     */
     private function prepareEntities(array $entitiesData): void
     {
         foreach ($entitiesData as $message => $createdAt) {
@@ -389,21 +357,12 @@ class ReportControllerWithFiltersTest extends WebTestCase
         $this->entityManager->flush();
     }
 
-    /**
-     * @param string $timeZone
-     */
     private function updateSystemTimeZone(string $timeZone): void
     {
         $this->configManager->set('oro_locale.timezone', $timeZone);
         $this->configManager->flush();
     }
 
-    /**
-     * @param string $message
-     * @param \DateTime $createAt
-     *
-     * @return Note
-     */
     private function createEntity(string $message, \DateTime $createAt): Note
     {
         $owner = $this->getOwner();
@@ -416,11 +375,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $note;
     }
 
-    /**
-     * @param array $definition
-     *
-     * @return Report
-     */
     private function createReport(array $definition): Report
     {
         $businessUnit = $this->getBusinessUnit();
@@ -441,9 +395,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $report;
     }
 
-    /**
-     * @param string $className
-     */
     private function removeEntities(string $className): void
     {
         $noteRepository = $this->entityManager->getRepository($className);
@@ -453,11 +404,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         $this->entityManager->flush();
     }
 
-    /**
-     * @param string $email
-     *
-     * @return User
-     */
     private function getOwner(string $email = LoadAdminUserData::DEFAULT_ADMIN_EMAIL): User
     {
         if (!$this->owner) {
@@ -468,11 +414,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $this->owner;
     }
 
-    /**
-     * @param string $businessUnit
-     *
-     * @return BusinessUnit
-     */
     private function getBusinessUnit(
         string $businessUnit = LoadOrganizationAndBusinessUnitData::MAIN_BUSINESS_UNIT
     ): BusinessUnit {
@@ -485,11 +426,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         return $this->businessUnit;
     }
 
-    /**
-     * @param string $reportType
-     *
-     * @return ReportType
-     */
     private function getReportType(string $reportType = ReportType::TYPE_TABLE): ReportType
     {
         if (!$this->reportType) {

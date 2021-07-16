@@ -14,19 +14,12 @@ class SectionConfigurationProvider implements ConfigurationProviderInterface
     /** @var string */
     private $sectionName;
 
-    /**
-     * @param ConfigurationProviderInterface $configurationProvider
-     * @param string                         $sectionName
-     */
     public function __construct(ConfigurationProviderInterface $configurationProvider, string $sectionName)
     {
         $this->configurationProvider = $configurationProvider;
         $this->sectionName = $sectionName;
     }
 
-    /**
-     * @return array
-     */
     public function getConfiguration(): array
     {
         $config = $this->configurationProvider->getConfiguration();

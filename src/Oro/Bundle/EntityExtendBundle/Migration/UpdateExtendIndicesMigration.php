@@ -44,10 +44,6 @@ class UpdateExtendIndicesMigration implements
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @param EntityMetadataHelper $entityMetadataHelper
-     * @param FieldTypeHelper      $fieldTypeHelper
-     */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
         FieldTypeHelper $fieldTypeHelper

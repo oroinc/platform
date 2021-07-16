@@ -41,10 +41,6 @@ class AttributeFamilyRepository extends EntityRepository
         return $this->getFamilyIds($this->getFamilyIdsForAttributesQb($attributes));
     }
 
-    /**
-     * @param array $attributes
-     * @return QueryBuilder
-     */
     public function getFamilyIdsForAttributesQb(array $attributes): QueryBuilder
     {
         return $this->createQueryBuilder('f')
@@ -102,10 +98,6 @@ class AttributeFamilyRepository extends EntityRepository
         );
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @return array
-     */
     private function getFamilyIds(QueryBuilder $qb): array
     {
         $result = $qb->getQuery()->getArrayResult();
@@ -118,11 +110,6 @@ class AttributeFamilyRepository extends EntityRepository
         return $attributeIds;
     }
 
-    /**
-     * @param string $attributeFamilyCode
-     * @param AclHelper $aclHelper
-     * @return AttributeFamily|null
-     */
     public function getFamilyByCode(string $attributeFamilyCode, AclHelper $aclHelper): ?AttributeFamily
     {
         $qb = $this->createQueryBuilder('f');

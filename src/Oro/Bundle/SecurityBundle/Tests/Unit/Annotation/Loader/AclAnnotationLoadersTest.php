@@ -15,9 +15,6 @@ use Oro\Component\Config\ResourcesContainer;
 
 class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return array
-     */
     private function getControllers(): array
     {
         $controllers = [
@@ -77,9 +74,6 @@ class AclAnnotationLoadersTest extends \PHPUnit\Framework\TestCase
         self::assertBindings($storage);
     }
 
-    /**
-     * @param AclAnnotationStorage $storage
-     */
     private static function assertBindings(AclAnnotationStorage $storage)
     {
         self::assertEquals(

@@ -13,8 +13,5 @@ interface IdentityAwareTranslationRepositoryInterface
      */
     public function getAllIdentities();
 
-    /**
-     * @param array $data
-     */
     public function updateTranslations(array $data);
 }

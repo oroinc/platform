@@ -35,9 +35,6 @@ class ArraySubstitution
         $this->ignoreCircularReferences = $ignoreCircularReferences;
     }
 
-    /**
-     * @param array $things
-     */
     public function apply(array &$things)
     {
         $bounded = $this->replace($things);
@@ -123,10 +120,6 @@ class ArraySubstitution
         return $this->lookUpReplacements($map, $map[$key], $maxDepth, ++$depth);
     }
 
-    /**
-     * @param array $things
-     * @param array $bounded
-     */
     private function clearUnbounded(array &$things, array $bounded)
     {
         $things = $this->filterValueKey($things, function ($value, $key) use (&$bounded) {

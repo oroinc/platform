@@ -33,7 +33,6 @@ class LocaleDataConfiguration implements ConfigurationInterface
                 ->end()
             ->end();
 
-
         return $treeBuilder;
     }
 }

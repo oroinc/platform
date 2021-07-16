@@ -47,8 +47,6 @@ class OroNavigationBundle implements Migration, ContainerAwareInterface
 
     /**
      * Update navigation history with route names and parameters
-     *
-     * @param QueryBag $queries
      */
     protected function updateNavigationHistory(QueryBag $queries)
     {

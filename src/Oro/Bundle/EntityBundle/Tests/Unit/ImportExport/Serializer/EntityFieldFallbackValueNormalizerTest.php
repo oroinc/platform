@@ -149,9 +149,6 @@ class EntityFieldFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $fallbackValue->getScalarValue());
     }
 
-    /**
-     * @return array
-     */
     public function denormalizeDecimalValueDataProvider(): array
     {
         return [

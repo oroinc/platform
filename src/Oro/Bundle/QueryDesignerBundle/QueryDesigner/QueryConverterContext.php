@@ -62,9 +62,6 @@ class QueryConverterContext
     /** @var array */
     private $queryAliases = [];
 
-    /**
-     * @param AbstractQueryDesigner $source
-     */
     public function init(AbstractQueryDesigner $source): void
     {
         $entity = $source->getEntity();
@@ -94,33 +91,21 @@ class QueryConverterContext
         $this->virtualRelationJoinsInverse = [];
     }
 
-    /**
-     * @return array
-     */
     public function getDefinition(): array
     {
         return $this->definition;
     }
 
-    /**
-     * @return string
-     */
     public function getRootEntity(): string
     {
         return $this->rootEntity;
     }
 
-    /**
-     * @return string
-     */
     final public function getRootJoinId(): string
     {
         return self::ROOT_JOIN_ID;
     }
 
-    /**
-     * @return string
-     */
     public function getRootTableAlias(): string
     {
         $rootJoinId = $this->getRootJoinId();
@@ -131,9 +116,6 @@ class QueryConverterContext
         return $this->tableAliases[$rootJoinId];
     }
 
-    /**
-     * @param string $alias
-     */
     public function setRootTableAlias(string $alias): void
     {
         $this->setTableAlias($this->getRootJoinId(), $alias);
@@ -147,31 +129,16 @@ class QueryConverterContext
         return $this->joins;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return bool
-     */
     public function hasJoin(string $alias): bool
     {
         return !empty($this->joins[$alias]);
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string|null
-     */
     public function findJoin(string $alias): ?string
     {
         return $this->joins[$alias] ?? null;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string
-     */
     public function getJoin(string $alias): string
     {
         if (!isset($this->joins[$alias])) {
@@ -181,9 +148,6 @@ class QueryConverterContext
         return $this->joins[$alias];
     }
 
-    /**
-     * @return string
-     */
     public function generateTableAlias(): string
     {
         return sprintf(self::TABLE_ALIAS_TEMPLATE, ++$this->generatedTableAliasCounter);
@@ -197,31 +161,16 @@ class QueryConverterContext
         return $this->tableAliases;
     }
 
-    /**
-     * @param string $joinId
-     *
-     * @return bool
-     */
     public function hasTableAlias(string $joinId): bool
     {
         return isset($this->tableAliases[$joinId]);
     }
 
-    /**
-     * @param string $joinId
-     *
-     * @return string|null
-     */
     public function findTableAlias(string $joinId): ?string
     {
         return $this->tableAliases[$joinId] ?? null;
     }
 
-    /**
-     * @param string $joinId
-     *
-     * @return string
-     */
     public function getTableAlias(string $joinId): string
     {
         if (!isset($this->tableAliases[$joinId])) {
@@ -231,19 +180,12 @@ class QueryConverterContext
         return $this->tableAliases[$joinId];
     }
 
-    /**
-     * @param string $joinId
-     * @param string $alias
-     */
     public function setTableAlias(string $joinId, string $alias): void
     {
         $this->tableAliases[$joinId] = $alias;
         $this->joins[$alias] = $joinId;
     }
 
-    /**
-     * @return string
-     */
     public function generateColumnAlias(): string
     {
         return sprintf(self::COLUMN_ALIAS_TEMPLATE, count($this->columnAliases) + 1);
@@ -257,31 +199,16 @@ class QueryConverterContext
         return $this->columnAliases;
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return bool
-     */
     public function hasColumnAlias(string $columnId): bool
     {
         return isset($this->columnAliases[$columnId]);
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return string|null
-     */
     public function findColumnAlias(string $columnId): ?string
     {
         return $this->columnAliases[$columnId] ?? null;
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return string
-     */
     public function getColumnAlias(string $columnId): string
     {
         if (!isset($this->columnAliases[$columnId])) {
@@ -294,11 +221,6 @@ class QueryConverterContext
         return $this->columnAliases[$columnId];
     }
 
-    /**
-     * @param string $columnId
-     * @param string $columnAlias
-     * @param string $columnName
-     */
     public function setColumnAlias(string $columnId, string $columnAlias, string $columnName): void
     {
         $this->columnAliases[$columnId] = $columnAlias;
@@ -306,21 +228,11 @@ class QueryConverterContext
         $this->columnIds[$columnAlias] = $columnId;
     }
 
-    /**
-     * @param string $columnAlias
-     *
-     * @return string|null
-     */
     public function findColumnId(string $columnAlias): ?string
     {
         return $this->columnIds[$columnAlias] ?? null;
     }
 
-    /**
-     * @param string $columnAlias
-     *
-     * @return string
-     */
     public function getColumnId(string $columnAlias): string
     {
         if (!isset($this->columnIds[$columnAlias])) {
@@ -333,31 +245,16 @@ class QueryConverterContext
         return $this->columnIds[$columnAlias];
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return bool
-     */
     public function hasColumnName(string $columnId): bool
     {
         return isset($this->columnNames[$columnId]);
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return string|null
-     */
     public function findColumnName(string $columnId): ?string
     {
         return $this->columnNames[$columnId] ?? null;
     }
 
-    /**
-     * @param string $columnId
-     *
-     * @return string
-     */
     public function getColumnName(string $columnId): string
     {
         if (!isset($this->columnNames[$columnId])) {
@@ -370,21 +267,11 @@ class QueryConverterContext
         return $this->columnNames[$columnId];
     }
 
-    /**
-     * @param string $columnName
-     *
-     * @return bool
-     */
     public function hasVirtualColumnExpression(string $columnName): bool
     {
         return isset($this->virtualColumnExpressions[$columnName]);
     }
 
-    /**
-     * @param string $columnName
-     *
-     * @return string
-     */
     public function getVirtualColumnExpression(string $columnName): string
     {
         if (!isset($this->virtualColumnExpressions[$columnName])) {
@@ -397,30 +284,16 @@ class QueryConverterContext
         return $this->virtualColumnExpressions[$columnName];
     }
 
-    /**
-     * @param string $columnName
-     * @param string $expression
-     */
     public function setVirtualColumnExpression(string $columnName, string $expression): void
     {
         $this->virtualColumnExpressions[$columnName] = $expression;
     }
 
-    /**
-     * @param string $columnJoinId
-     *
-     * @return bool
-     */
     public function hasVirtualColumnOptions(string $columnJoinId): bool
     {
         return isset($this->virtualColumnOptions[$columnJoinId]);
     }
 
-    /**
-     * @param string $columnJoinId
-     *
-     * @return array
-     */
     public function getVirtualColumnOptions(string $columnJoinId): array
     {
         if (!isset($this->virtualColumnOptions[$columnJoinId])) {
@@ -433,12 +306,6 @@ class QueryConverterContext
         return $this->virtualColumnOptions[$columnJoinId];
     }
 
-    /**
-     * @param string $columnJoinId
-     * @param string $optionName
-     *
-     * @return bool
-     */
     public function hasVirtualColumnOption(string $columnJoinId, string $optionName): bool
     {
         return
@@ -463,42 +330,24 @@ class QueryConverterContext
             ));
         }
 
-
         return $options[$optionName];
     }
 
-    /**
-     * @param string $columnJoinId
-     * @param array  $options
-     */
     public function setVirtualColumnOptions(string $columnJoinId, array $options): void
     {
         $this->virtualColumnOptions[$columnJoinId] = $options;
     }
 
-    /**
-     * @return bool
-     */
     public function hasVirtualRelationJoins(): bool
     {
         return !empty($this->virtualRelationJoins);
     }
 
-    /**
-     * @param string $joinId
-     *
-     * @return bool
-     */
     public function hasVirtualRelationJoin(string $joinId): bool
     {
         return isset($this->virtualRelationJoins[$joinId]);
     }
 
-    /**
-     * @param string $joinId
-     *
-     * @return string
-     */
     public function getVirtualRelationJoin(string $joinId): string
     {
         if (!isset($this->virtualRelationJoins[$joinId])) {
@@ -511,21 +360,12 @@ class QueryConverterContext
         return $this->virtualRelationJoins[$joinId];
     }
 
-    /**
-     * @param string $joinId
-     * @param string $virtualJoinId
-     */
     public function setVirtualRelationJoin(string $joinId, string $virtualJoinId): void
     {
         $this->virtualRelationJoins[$joinId] = $virtualJoinId;
         $this->virtualRelationJoinsInverse[$virtualJoinId] = $joinId;
     }
 
-    /**
-     * @param string $virtualJoinId
-     *
-     * @return string|null
-     */
     public function findJoinByVirtualRelationJoin(string $virtualJoinId): ?string
     {
         return $this->virtualRelationJoinsInverse[$virtualJoinId] ?? null;
@@ -539,21 +379,11 @@ class QueryConverterContext
         return $this->aliases;
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return bool
-     */
     public function hasAlias(string $alias): bool
     {
         return isset($this->aliases[$alias]);
     }
 
-    /**
-     * @param string $alias
-     *
-     * @return string
-     */
     public function getAlias(string $alias): string
     {
         if (!isset($this->aliases[$alias])) {
@@ -563,10 +393,6 @@ class QueryConverterContext
         return $this->aliases[$alias];
     }
 
-    /**
-     * @param string $alias
-     * @param string $tableAlias
-     */
     public function setAlias(string $alias, string $tableAlias): void
     {
         $this->aliases[$alias] = $tableAlias;
@@ -588,9 +414,6 @@ class QueryConverterContext
         $this->queryAliases = $queryAliases;
     }
 
-    /**
-     * @param string|null $entity
-     */
     protected function validateEntity(?string $entity): void
     {
         if (!$entity) {
@@ -598,9 +421,6 @@ class QueryConverterContext
         }
     }
 
-    /**
-     * @param array $definition
-     */
     protected function validateDefinition(array $definition): void
     {
         if (!\array_key_exists('columns', $definition)) {

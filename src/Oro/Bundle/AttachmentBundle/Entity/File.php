@@ -188,10 +188,6 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this->id;
     }
 
-    /**
-     * @param string|null $uuid
-     * @return File
-     */
     public function setUuid(?string $uuid): File
     {
         $this->uuid = $uuid;
@@ -199,9 +195,6 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getUuid(): ?string
     {
         return $this->uuid;
@@ -299,9 +292,6 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this->updatedAt;
     }
 
-    /**
-     * @param ComponentFile|null $file
-     */
     public function setFile(ComponentFile $file = null)
     {
         $this->file = $file;
@@ -500,9 +490,6 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getParentEntityClass(): ?string
     {
         return $this->parentEntityClass;
@@ -520,19 +507,11 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getParentEntityId(): ?int
     {
         return $this->parentEntityId;
     }
 
-    /**
-     * @param string|null $parentEntityFieldName
-     *
-     * @return File
-     */
     public function setParentEntityFieldName(?string $parentEntityFieldName): File
     {
         $this->parentEntityFieldName = $parentEntityFieldName;
@@ -540,9 +519,6 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getParentEntityFieldName(): ?string
     {
         return $this->parentEntityFieldName;

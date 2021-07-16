@@ -183,9 +183,6 @@ class JsonFileSplitterListener implements ListenerInterface
         $this->stack[] = $obj;
     }
 
-    /**
-     * @param string $whitespace
-     */
     public function whitespace(string $whitespace): void
     {
         // nothing to do here

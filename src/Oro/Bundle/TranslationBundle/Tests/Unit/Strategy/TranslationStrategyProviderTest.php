@@ -201,9 +201,6 @@ class TranslationStrategyProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param array $fallbackTree
-     * @param array $expectedFallbackLocales
-     *
      * @dataProvider getAllFallbackLocalesDataProvider
      */
     public function testGetAllFallbackLocales(array $fallbackTree, array $expectedFallbackLocales)

@@ -295,9 +295,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getFamiliesByAttributeId(1);
     }
 
-    /**
-     * @return array
-     */
     public function isSystemDataProvider(): array
     {
         return [
@@ -312,7 +309,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider isSystemDataProvider
-     * @param bool $expectation
      */
     public function testIsSystem(bool $expectation): void
     {
@@ -352,8 +348,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $expectedTranslation
-     *
      * @dataProvider getAttributeLabelDataProvider
      */
     public function testGetAttributeLabel(string $expectedTranslation): void
@@ -369,9 +363,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedTranslation, $this->manager->getAttributeLabel($attribute));
     }
 
-    /**
-     * @return array
-     */
     public function getAttributeLabelDataProvider(): array
     {
         return [
@@ -418,9 +409,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->getAttributesMapByGroupIds([1, 2]);
     }
 
-    /**
-     * @return array
-     */
     public function groupsWithAttributesDataProvider(): array
     {
         $group1 = $this->getEntity(AttributeGroup::class, [
@@ -478,11 +466,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider groupsWithAttributesDataProvider
-     * @param array $groups
-     * @param array $attributes
-     * @param array $attributeIds
-     * @param array $familyData
-     * @param array $expected
      */
     public function testGetGroupsWithAttributes(
         array $groups,
@@ -564,10 +547,6 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(true, $this->manager->isActive($attribute));
     }
 
-    /**
-     * @param bool $isCheckSuccessful
-     * @param int $calls
-     */
     private function expectsDatabaseCheck(bool $isCheckSuccessful, int $calls = 1): void
     {
         $this->configManager->expects($this->exactly($calls))
@@ -628,20 +607,11 @@ class AttributeManagerTest extends \PHPUnit\Framework\TestCase
         return $repository;
     }
 
-    /**
-     * @param $attributeId
-     * @return AttributeGroupRelation
-     */
     private function createAttributeGroupRelation($attributeId): AttributeGroupRelation
     {
         return $this->getEntity(AttributeGroupRelation::class, ['entityConfigFieldId' => $attributeId]);
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param string $expectedTranslation
-     */
     private function mockAttributeLabelTranslation(
         string $className,
         string $fieldName,

@@ -28,9 +28,6 @@ abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerD
      */
     protected $tableName;
 
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;

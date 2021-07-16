@@ -65,9 +65,6 @@ class LocaleListener implements EventSubscriberInterface
         $this->installed = (bool) $installed;
     }
 
-    /**
-     * @param RequestEvent $event
-     */
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -96,9 +93,6 @@ class LocaleListener implements EventSubscriberInterface
         \Locale::setDefault($locale);
     }
 
-    /**
-     * @param ConsoleCommandEvent $event
-     */
     public function onConsoleCommand(ConsoleCommandEvent $event)
     {
         if (!$this->installed) {
@@ -150,9 +144,6 @@ class LocaleListener implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @return string
-     */
     private function getCurrentLanguage(): string
     {
         if (!$this->currentLanguage) {

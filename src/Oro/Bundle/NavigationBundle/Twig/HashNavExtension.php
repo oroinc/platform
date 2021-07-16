@@ -23,8 +23,6 @@ class HashNavExtension extends AbstractExtension
      * Listen to the 'kernel.request' event to get the main request.
      * The request can not be injected directly into a Twig extension,
      * this causes a ScopeWideningInjectionException
-     *
-     * @param RequestEvent $event
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -52,8 +50,6 @@ class HashNavExtension extends AbstractExtension
 
     /**
      * Check for hash navigation
-     *
-     * @return bool
      */
     public function checkIsHashNavigation(): bool
     {
@@ -67,8 +63,6 @@ class HashNavExtension extends AbstractExtension
 
     /**
      * Get hash navigation header string
-     *
-     * @return string
      */
     public function getHashNavigationHeaderConst(): string
     {

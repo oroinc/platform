@@ -32,9 +32,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /** @var object */
     protected $importedEntity;
 
-    /**
-     * @param ServiceLink $tagManagerLink
-     */
     public function __construct(ServiceLink $tagManagerLink)
     {
         $this->tagManagerLink = $tagManagerLink;
@@ -58,8 +55,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Stores currently imported entity for later use
-     *
-     * @param StrategyEvent $event
      */
     public function beforeImport(StrategyEvent $event)
     {
@@ -69,8 +64,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     /**
      * Checks if the entity is the same object as before import
      * (in case it is not - update tags)
-     *
-     * @param StrategyEvent $event
      */
     public function afterImport(StrategyEvent $event)
     {
@@ -90,17 +83,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $this->importedEntity = null;
     }
 
-    /**
-     * @param AfterEntityPageLoadedEvent $event
-     */
     public function updateEntityResults(AfterEntityPageLoadedEvent $event)
     {
         $this->getTagImportManager()->loadTags($event->getRows());
     }
 
-    /**
-     * @param DenormalizeEntityEvent $event
-     */
     public function denormalizeEntity(DenormalizeEntityEvent $event)
     {
         $object = $event->getObject();
@@ -118,8 +105,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Prepare taggable objects to save their tags
-     *
-     * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
@@ -148,8 +133,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
     /**
      * Saves tagging during import
-     *
-     * @param PostFlushEventArgs $args
      */
     public function postFlush(PostFlushEventArgs $args)
     {
@@ -168,9 +151,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $args->getEntityManager()->flush();
     }
 
-    /**
-     * @param NormalizeEntityEvent $event
-     */
     public function normalizeEntity(NormalizeEntityEvent $event)
     {
         if (!$event->isFullData() || !$this->getTagImportManager()->isTaggable($event->getObject())) {
@@ -183,9 +163,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LoadEntityRulesAndBackendHeadersEvent $event
-     */
     public function loadEntityRulesAndBackendHeaders(LoadEntityRulesAndBackendHeadersEvent $event)
     {
         if (!$event->isFullData() ||
@@ -207,9 +184,6 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         $event->setRule($name, $rule);
     }
 
-    /**
-     * @param LoadTemplateFixturesEvent $event
-     */
     public function addTagsIntoFixtures(LoadTemplateFixturesEvent $event)
     {
         foreach ($event->getEntities() as $entityRecords) {

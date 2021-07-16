@@ -29,11 +29,6 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
     /** @var LocalizedFallbackValueExtractorInterface */
     private $valueExtractor;
 
-    /**
-     * @param DoctrineHelper                           $doctrineHelper
-     * @param LocalizationHelper                       $localizationHelper
-     * @param LocalizedFallbackValueExtractorInterface $valueExtractor
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         LocalizationHelper $localizationHelper,
@@ -161,11 +156,6 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
         return [$ids, $idsPerField, $classesPerField];
     }
 
-    /**
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return array
-     */
     private function getAssociationMappings(CustomizeLoadedDataContext $context): array
     {
         $entityClass = $this->doctrineHelper->getManageableEntityClass($context->getClassName(), $context->getConfig());
@@ -232,11 +222,6 @@ class ComputeLocalizedFallbackValues implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param ArrayCollection $values
-     *
-     * @return string|null
-     */
     private function getLocalizedValue(ArrayCollection $values): ?string
     {
         $value = $this->localizationHelper->getLocalizedValue($values);

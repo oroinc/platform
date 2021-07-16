@@ -15,9 +15,6 @@ class ObjectLabelType extends AbstractType
     /** @var EntityClassNameHelper */
     protected $classNameHelper;
 
-    /**
-     * @param EntityClassNameHelper $classNameHelper
-     */
     public function __construct(EntityClassNameHelper $classNameHelper)
     {
         $this->classNameHelper = $classNameHelper;

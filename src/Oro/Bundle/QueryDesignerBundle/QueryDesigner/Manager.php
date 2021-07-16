@@ -31,13 +31,6 @@ class Manager implements FunctionProviderInterface
     /** @var ConfigurationObject|null */
     private $config;
 
-    /**
-     * @param ConfigurationProvider            $configProvider
-     * @param ConfigurationResolver            $configResolver
-     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
-     * @param FilterBagInterface               $filterBag
-     * @param TranslatorInterface              $translator
-     */
     public function __construct(
         ConfigurationProvider $configProvider,
         ConfigurationResolver $configResolver,
@@ -260,9 +253,6 @@ class Manager implements FunctionProviderInterface
         return false;
     }
 
-    /**
-     * @return ConfigurationObject
-     */
     private function getConfig(): ConfigurationObject
     {
         if (null === $this->config) {

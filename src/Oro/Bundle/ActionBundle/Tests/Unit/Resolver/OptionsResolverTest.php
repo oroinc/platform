@@ -30,9 +30,6 @@ class OptionsResolverTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider resolveOptionsDataProvider
-     *
-     * @param array $options
-     * @param array $expected
      */
     public function testResolveOptions(array $options, array $expected)
     {

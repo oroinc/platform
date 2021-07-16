@@ -109,11 +109,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    /**
-     * @param array $identifiers
-     *
-     * @return ClassMetadata
-     */
     private function mockClassMetadata(array $identifiers): ClassMetadata
     {
         $metadata = $this->createMock(ClassMetadata::class);
@@ -131,19 +126,11 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         return $metadata;
     }
 
-    /**
-     * @return array
-     */
     private function getSimpleDefinition(): array
     {
         return ['columns' => [['name' => 'sampleColumn']]];
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return array
-     */
     private function getSimpleConfiguration(string $gridName): array
     {
         return [
@@ -187,11 +174,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    /**
-     * @param string $viewRoute
-     *
-     * @return EntityMetadata
-     */
     private function mockEntityMetadata(string $viewRoute): EntityMetadata
     {
         $this->configManager
@@ -206,8 +188,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider invalidIdentifiersDataProvider
-     *
-     * @param array $identifiers
      */
     public function testGetConfigurationWhenInvalidIdentifier(array $identifiers): void
     {
@@ -223,9 +203,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    /**
-     * @return array
-     */
     public function invalidIdentifiersDataProvider(): array
     {
         return [
@@ -248,11 +225,6 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->getExpectedConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
-    /**
-     * @param string $gridName
-     *
-     * @return array
-     */
     private function getExpectedConfiguration(string $gridName): array
     {
         return [

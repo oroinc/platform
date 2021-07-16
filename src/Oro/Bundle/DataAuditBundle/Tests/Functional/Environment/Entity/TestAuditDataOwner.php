@@ -438,9 +438,6 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
         $this->childrenManyToMany = $collection;
     }
 
-    /**
-     * @param TestAuditDataChild $testAuditDataChild
-     */
     public function addChildrenManyToMany(TestAuditDataChild $testAuditDataChild)
     {
         $this->childrenManyToMany->add($testAuditDataChild);
@@ -488,9 +485,6 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
         $this->childrenOneToMany = $collection;
     }
 
-    /**
-     * @param TestAuditDataChild $testAuditDataChild
-     */
     public function addChildrenOneToMany(TestAuditDataChild $testAuditDataChild)
     {
         $this->childrenOneToMany->add($testAuditDataChild);
@@ -847,9 +841,6 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
         return $this->childrenManyToManyUnidirectional;
     }
 
-    /**
-     * @param Collection $collection
-     */
     public function setChildrenManyToManyUnidirectional(Collection $collection)
     {
         $this->childrenManyToManyUnidirectional = $collection;
@@ -1081,9 +1072,6 @@ class TestAuditDataOwner extends ExtendTestAuditDataOwner implements
         return $this->json;
     }
 
-    /**
-     * @param array $json
-     */
     public function setJson(array $json = [])
     {
         $this->json = $json;

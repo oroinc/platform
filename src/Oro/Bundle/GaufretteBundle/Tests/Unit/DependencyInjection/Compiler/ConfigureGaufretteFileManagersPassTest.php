@@ -30,12 +30,6 @@ class ConfigureGaufretteFileManagersPassTest extends \PHPUnit\Framework\TestCase
             ->setAbstract(true);
     }
 
-    /**
-     * @param string $id
-     * @param string $parentId
-     *
-     * @return Definition
-     */
     private function registerServiceWithParent(string $id, string $parentId): Definition
     {
         return $this->container->setDefinition($id, new ChildDefinition($parentId));

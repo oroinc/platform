@@ -42,16 +42,6 @@ class OwnerChecker
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @param DoctrineHelper                     $doctrineHelper
-     * @param BusinessUnitManager                $businessUnitManager
-     * @param OwnershipMetadataProviderInterface $ownershipMetadataProvider
-     * @param EntityOwnerAccessor                $ownerAccessor
-     * @param AuthorizationCheckerInterface      $authorizationChecker
-     * @param TokenAccessorInterface             $tokenAccessor
-     * @param OwnerTreeProvider                  $treeProvider
-     * @param AclVoterInterface                  $aclVoter
-     */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         BusinessUnitManager $businessUnitManager,
@@ -178,7 +168,6 @@ class OwnerChecker
 
         return null;
     }
-
 
     /**
      * Returns current Organization

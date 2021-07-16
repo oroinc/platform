@@ -46,10 +46,6 @@ class DatagridParametersHelper
         return $parameter ?? null;
     }
 
-    /**
-     * @param ParameterBag $dataGridParameters
-     * @param string $filterName
-     */
     public function resetFilter(ParameterBag $dataGridParameters, string $filterName): void
     {
         $filters = $dataGridParameters->get(AbstractFilterExtension::FILTER_ROOT_PARAM);
@@ -65,9 +61,6 @@ class DatagridParametersHelper
         }
     }
 
-    /**
-     * @param ParameterBag $dataGridParameters
-     */
     public function resetFilters(ParameterBag $dataGridParameters): void
     {
         $filters = $dataGridParameters->get(AbstractFilterExtension::FILTER_ROOT_PARAM);
@@ -91,10 +84,6 @@ class DatagridParametersHelper
         $parameterBag->set(self::DATAGRID_SKIP_EXTENSION_PARAM, $value);
     }
 
-    /**
-     * @param ParameterBag $parameterBag
-     * @return bool
-     */
     public function isDatagridExtensionSkipped(ParameterBag $parameterBag): bool
     {
         return $parameterBag->get(self::DATAGRID_SKIP_EXTENSION_PARAM, false);

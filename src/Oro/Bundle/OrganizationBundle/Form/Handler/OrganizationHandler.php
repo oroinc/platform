@@ -24,10 +24,6 @@ class OrganizationHandler
     /** @var EntityManager */
     protected $manager;
 
-    /**
-     * @param RequestStack  $requestStack
-     * @param EntityManager $manager
-     */
     public function __construct(RequestStack $requestStack, EntityManager $manager)
     {
         $this->requestStack = $requestStack;
@@ -57,9 +53,6 @@ class OrganizationHandler
         return false;
     }
 
-    /**
-     * @param Organization $entity
-     */
     protected function onSuccess(Organization $entity)
     {
         $this->manager->persist($entity);

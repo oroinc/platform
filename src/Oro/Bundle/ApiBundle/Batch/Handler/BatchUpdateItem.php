@@ -26,11 +26,6 @@ class BatchUpdateItem
     /** @var BatchUpdateItemContext */
     private $context;
 
-    /**
-     * @param int                      $index
-     * @param BatchUpdateItemProcessor $processor
-     * @param BatchUpdateContext       $updateContext
-     */
     public function __construct(
         int $index,
         BatchUpdateItemProcessor $processor,
@@ -43,8 +38,6 @@ class BatchUpdateItem
 
     /**
      * Gets the index of the source record related to the batch item.
-     *
-     * @return int
      */
     public function getIndex(): int
     {
@@ -53,8 +46,6 @@ class BatchUpdateItem
 
     /**
      * Gets the context of the batch item.
-     *
-     * @return BatchUpdateItemContext
      */
     public function getContext(): BatchUpdateItemContext
     {
@@ -72,8 +63,6 @@ class BatchUpdateItem
 
     /**
      * Gets included data.
-     *
-     * @return IncludedData|null
      */
     public function getIncludedData():? IncludedData
     {

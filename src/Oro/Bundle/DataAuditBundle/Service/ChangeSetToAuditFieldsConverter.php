@@ -30,11 +30,6 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
     /** @var AuditFieldTypeProvider */
     private $auditFieldTypeProvider;
 
-    /**
-     * @param AuditConfigProvider  $configProvider
-     * @param EntityNameProvider   $entityNameProvider
-     * @param AuditRecordValidator $auditRecordValidator
-     */
     public function __construct(
         AuditConfigProvider $configProvider,
         EntityNameProvider $entityNameProvider,
@@ -340,18 +335,11 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
         $this->logger->error($message, ['audit_record' => $record]);
     }
 
-    /**
-     * @param AuditFieldTypeProvider $auditFieldTypeProvider
-     */
     public function setAuditFieldTypeProvider(AuditFieldTypeProvider $auditFieldTypeProvider)
     {
         $this->auditFieldTypeProvider = $auditFieldTypeProvider;
     }
 
-    /**
-     * @param array $changes
-     * @return array
-     */
     private function clearData(array $changes): array
     {
         if (isset($changes[1]['inserted']) || isset($changes[1]['changed'])) {

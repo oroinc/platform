@@ -52,8 +52,6 @@ class HateoasMetadataExtra implements MetadataExtraInterface
     /**
      * Returns an instance of a class that can be used to get URL-encoded query string
      * representation of all requested filters.
-     *
-     * @return QueryStringAccessorInterface
      */
     public function getQueryStringAccessor(): QueryStringAccessorInterface
     {

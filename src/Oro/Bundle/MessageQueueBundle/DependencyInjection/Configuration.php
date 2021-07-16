@@ -30,7 +30,7 @@ class Configuration implements ConfigurationInterface
     {
         $builder = new TreeBuilder('oro_message_queue');
         $rootNode = $builder->getRootNode();
-        
+
         $transportNode = $rootNode->children()
             ->arrayNode('transport')
             ->addDefaultsIfNotSet()
@@ -113,9 +113,6 @@ class Configuration implements ConfigurationInterface
         return $builder;
     }
 
-    /**
-     * @param ArrayNodeDefinition $builder
-     */
     private function appendClientConfiguration(ArrayNodeDefinition $builder)
     {
         $builder

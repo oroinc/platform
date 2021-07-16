@@ -69,10 +69,6 @@ class ImapSettingsCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->checker->checkConnection($value));
     }
 
-    /**
-     * @param UserEmailOrigin $value
-     * @param string $decryptedPassword
-     */
     private function mockDecryptedPassword(UserEmailOrigin $value, string $decryptedPassword)
     {
         $this->encryptor->expects($this->once())

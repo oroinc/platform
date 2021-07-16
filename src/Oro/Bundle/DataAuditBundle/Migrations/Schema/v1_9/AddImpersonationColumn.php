@@ -18,8 +18,6 @@ class AddImpersonationColumn implements Migration
 
     /**
      * Adds impersonation_id column
-     *
-     * @param Schema $schema
      */
     public static function addImpersonationColumn(Schema $schema)
     {

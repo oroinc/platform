@@ -75,9 +75,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureActionNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
@@ -149,10 +146,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
     }
 
     /**
-     * @param array $config
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -186,9 +179,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return $config;
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     public function addStatusCodesNode(NodeBuilder $node): void
     {
         /** @var ArrayNodeDefinition $parentNode */
@@ -212,9 +202,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->configureStatusCodeNode($codeNode);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureStatusCodeNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.status_code';
@@ -226,9 +213,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->addPostProcessCallbacks($parentNode, $sectionName);
     }
 
-    /**
-     * @param NodeBuilder $node
-     */
     protected function configureFieldNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName . '.field';
@@ -269,11 +253,6 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->end();
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
     protected function postProcessFieldConfig(array $config): array
     {
         if (empty($config[ConfigUtil::FORM_TYPE])) {
